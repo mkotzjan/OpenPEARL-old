@@ -1,0 +1,34 @@
+MODULE(char_dcl);
+
+PROBLEM;
+/*
+DCL c CHAR;
+DCL x4a CHARACTER(4);
+DCL x4 CHAR(4);
+DCL y4 CHAR(4) INIT('ABCD');
+DCL x8 CHAR(8);
+
+*/
+__cpp__(
+    'pearlrt::Character<1>  _c;'
+    'pearlrt::Character<4>  _x4a;'
+    'pearlrt::Character<4>  _x4;'
+    'pearlrt::Character<4>  _y4("ABCD");'
+    'pearlrt::Character<8>  _x8;'
+);
+! make automatic test happy
+T: TASK MAIN;
+/*
+   x8 := y4 CAT y4;
+   x8 := y4 >< y4;
+   c:= x8.CHAR(1);
+   x4 := x8.CHAR(2:4);
+*/
+__cpp__(
+   'pearlrt::catChar(_y4,_y4,_x8);		'
+   'pearlrt::catChar(_y4,_y4,_x8);		'
+   '_c = _x8.getCharAt((size_t)1);		'
+   'pearlrt::getSliceChar(_x8,(size_t)2,(size_t)4, _x4);		'
+);
+END;
+MODEND;

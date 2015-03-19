@@ -1,0 +1,99 @@
+/*#############################################################################
+PROGRAM
+
+The Output Task activate Writer1 and Writer2 Task. This both tasks have the same prio (2).
+This programm works like a buffer with the size 1.
+Writer1 oder Writer2 make a request on the semaphore in_the_buffer write something 
+in a variable (xVar) and make a release on the semaphore out_the_buffer. 
+The other Writer task is tham blocked on the semaphore. 
+The Output Task make the request on the semaphore out_the_buffer and 
+write the value from xVar in xVarTemp and do a release on the semaphore in_the_buffer. 
+This procedure is repeated 2000 times.
+Because the two Writer Task have the same Prio, 
+they write alternately in the buffer (scheduler RR).
+###############################################################################
+RESULT
+
+The result must be that both Writer task repeated 1000 times and 
+the Output task 2000 times and the writer task write alternately in the buffer, 
+because of this it must be 1999 task changes.
+#############################################################################*/
+
+MODULE(semaphoreOne);
+
+PROBLEM;
+    DCL (in_the_buffer, out_the_buffer, S1, S2) SEMA;
+    DCL (xVar, varLoopTask1, varLoopTask2, varLoopMain) FIXED(31) INIT(0,0,0,0);
+    DCL (varActiTask1, varActiTask2) FIXED(2) INIT(0,0);
+
+    Output: TASK PRIO 1 MAIN;
+
+        DCL xVarTemp FIXED(15) INIT(0);
+        DCL xVarTemp2 FIXED(15) INIT(0);
+        DCL varTaskChange FIXED (31) INIT (-1);
+
+        ACTIVATE Writer_1;
+        ACTIVATE Writer_2;
+       
+        REQUEST S1;
+        REQUEST S1;
+        
+        RELEASE in_the_buffer;
+
+        __cpp__(
+        'while (_varLoopMain.x < 2000) { ');
+
+            REQUEST out_the_buffer;
+                xVarTemp := xVar;
+                varLoopMain := varLoopMain + 1;
+            RELEASE in_the_buffer;
+        
+            __cpp__(
+            'if (_xVarTemp.x != _xVarTemp2.x) { ');
+                varTaskChange := varTaskChange + 1;
+                xVarTemp2 := xVarTemp;
+            __cpp__(
+            '}'
+       '}');
+
+        
+        __cpp__(
+        'if (_varLoopTask1.x == 1000 && _varLoopTask2.x == 1000 && _varTaskChange.x == 1999 ) {'
+        '   pearlrt::Control::setExitCode(0); '
+        '   printf("*** SUCCESS ***\\n");'
+        '}else {'  
+        '   pearlrt::Control::setExitCode(1); '
+        '   printf("*** FAILED ***\\n");'
+        '}');
+
+    END;
+
+    Writer_1: TASK PRIO 2;
+        RELEASE S1;
+        
+        __cpp__('int a = 0;'
+        'while (_varLoopTask1.x < 1000) { ');
+                
+            REQUEST in_the_buffer;
+                 xVar := 1;
+                varLoopTask1 := varLoopTask1 + 1;
+            RELEASE out_the_buffer;
+       
+        __cpp__(
+        '}');
+    END;
+    
+    Writer_2: TASK PRIO 2;
+        RELEASE S1;
+    
+        __cpp__('int b = 0;'
+                'while (_varLoopTask2.x < 1000) { ');
+
+                    REQUEST in_the_buffer;
+                        xVar := 2;
+                        varLoopTask2 := varLoopTask2 + 1;
+                    RELEASE out_the_buffer;
+
+        __cpp__('}');
+    END;
+MODEND;       

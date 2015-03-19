@@ -1,0 +1,84 @@
+MODULE(float_expr);
+
+! test for float expressions without tests for operator 
+! priority and execution sequence
+! no type mixing in this test
+
+PROBLEM;
+DCL x24 FLOAT(24) INIT(4.0);
+DCL y24 FLOAT(24) INIT(2);
+DCL z24 FLOAT(24);
+DCL bit BIT(1);
+DCL x54 FLOAT(53);
+DCL f31 FIXED(31) INIT(2);
+
+T1: TASK MAIN;
+__cpp__ ('bool ok = 1;');
+  ! basic operations
+   z24 := x24 + y24;
+__cpp__('ok &= _z24.x == 6;');
+   z24 := x24 - y24;
+__cpp__('ok &= _z24.x == 2;');
+   z24 := x24 * y24;
+__cpp__('ok &= _z24.x == 8;');
+   z24 := x24 / y24;
+__cpp__('ok &= _z24.x == 4;');
+   z24 := x24 ** f31; 
+__cpp__('ok &= _z24.x == 16;');
+
+   ! simple expressions with ()
+   z24 := (x24+y24)*(x24-y24);
+__cpp__('ok &= _z24.x == 36;');
+
+   ! comparison with c-style operators
+   bit := x24 < y24;
+   bit := (x24+y24) <= z24; 
+   bit := x24 == y24;	 
+   bit := x24 == y24 + z24; 
+   bit := (x24+y24) /= z24;	
+   bit := (x24+y24) >= z24; 
+   bit := (x24+y24) > z24; 
+
+   ! comparison with fortran-style operators
+   bit := x24 LT y24;	
+   bit := (x24+y24) LE z24; 
+   bit := x24 EQ y24 + z24;	 
+   bit := (x24+y24) NE z24;	 
+   bit := (x24+y24) GE z24;	 
+   bit := (x24+y24) GT z24;	
+
+   ! intrinsic math functions
+   z24 := SIN(x24);		 
+   z24 := COS(x24);		 
+   z24 := TAN(x24);		 
+   z24 := ATAN(x24);		
+   z24 := TANH(x24);	
+   z24 := EXP(x24); 
+   z24 := LN(x24); 
+   z24 := SQRT(x24); 
+   x24 := -4.5;
+   z24 := ABS(x24);
+__cpp__('ok &= _z24.x == 4.5;');
+
+   ! fit
+   x54 := x24 FIT x54;
+   x24 := x54 FIT x24;
+
+
+   ! entier and round
+   x24 := -4.4;
+   f31 := ENTIER x24;
+__cpp__('ok &= _f31.x == -5;');
+   f31 := ROUND x24;
+__cpp__('ok &= _f31.x == -4;');
+   ! sizeof
+
+
+   f31 := SIZEOF x24;
+   f31 := SIZEOF(x24);
+__cpp__('ok &= _f31.x == 4;');
+
+__cpp__('pearlrt::Control::setExitCode(ok);');
+END;
+
+MODEND;

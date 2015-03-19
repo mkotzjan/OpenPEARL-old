@@ -1,0 +1,79 @@
+/*#############################################################################
+PROGRAM
+
+The main Task activate the Task2. Task2 will do an request on a blocked
+semaphore. Main Task check if Task2 active and go sleep for 0.1 sec and 
+then they suspend Task2, which is in the task state blocked_sema.
+After 0.1 sec Main Task check if the flag variable still zero, 
+release the semaphore S1, continue Task2 and go sleep for 0.2 Sec.
+Task2 do the request put 1 in the variable flag, 
+make a release and be terminated. 
+Main Task come back,check if flag = 1 and check = 0 and 
+set the exit code and be terminated.
+##############################################################################
+RESULT
+
+The variable check must be zero and the variable flag must be 1.
+#############################################################################*/
+
+MODULE(suspend_blocked);
+
+PROBLEM;
+
+DCL (S1, S2) SEMA;
+DCL (flag, active) FIXED(1) INIT(0,0);
+
+
+Main : TASK PRIO 1 MAIN;
+    DCL check FIXED(2) INIT(0);
+
+    ACTIVATE Task2;
+    REQUEST S2;
+
+    SUSPEND Task2;
+
+    AFTER 0.1 SEC RESUME;
+
+    __cpp__(
+    'if (_flag.x != 0) {');
+        check := check + 1;
+    __cpp__('}');
+
+    RELEASE S1;
+
+    AFTER 1 SEC RESUME;
+
+    __cpp__(
+    'if (_flag.x != 0) {');
+        check := check + 1;
+    __cpp__('}');
+
+    CONTINUE Task2;
+
+    REQUEST S2;
+
+    __cpp__(
+    'if (_flag.x == 1 && _check.x == 0) {'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf ("*** SUCCESS *** \\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf ("*** FAILED *** \\n"); '
+    '}');
+
+END;
+
+Task2 : TASK PRIO 2;
+    
+    RELEASE S2;
+    
+    REQUEST S1;
+
+        flag := 1;
+
+    RELEASE S1,S2;
+
+END;
+
+
+MODEND;

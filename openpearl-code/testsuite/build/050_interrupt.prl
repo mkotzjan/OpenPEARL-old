@@ -1,0 +1,31 @@
+MODULE(irupt);
+
+PROBLEM;
+
+SPC ctrlc INTERRUPT;
+SPC int1 INTERRUPT;
+
+
+T1: TASK MAIN;
+
+
+    ENABLE ctrlc;
+
+    WHEN ctrlc ACTIVATE T2 PRIO 10;
+    WHEN ctrlc ACTIVATE T3 AFTER 10 SEC ALL 5 SEC DURING 20 SEC PRIO 30;
+    WHEN ctrlc RESUME;
+
+END;
+
+T2: TASK;
+    ENABLE int1;
+    TRIGGER int1;
+END;
+
+T3: TASK;
+    DISABLE int1;
+    TRIGGER int1;
+END;
+
+MODEND;
+

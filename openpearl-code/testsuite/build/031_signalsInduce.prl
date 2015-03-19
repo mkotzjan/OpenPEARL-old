@@ -1,0 +1,107 @@
+MODULE(sigInduce);
+
+SYSTEM;
+   TaskRunningSignal: TaskRunningSignal;
+   Arithmetic: ArithmeticSignalSignal;
+
+/*
+__cpp__(
+	'static pearlrt::TaskRunningSignal _TaskRunningSignal;'
+	'pearlrt::Signal *generalized_TaskRunningSignal = &_TaskRunningSignal;'
+	'static pearlrt::ArithmeticSignal _Arithmetic;'
+	'pearlrt::Signal *generalized_Arithmetic = &_Arithmetic;'
+);
+*/
+PROBLEM;
+
+   SPC taskRunningSignal SIGNAL;
+   SPC Arithmetic SIGNAL;
+/*
+__cpp__(
+	'extern pearlrt::Signal *generalized_TaskRunningSignal;'
+	'extern pearlrt::Signal *generalized_Arithmetic;'
+);
+*/
+   DCL Errorcode FIXED(15);
+   DCL counter FIXED(15) INIT(0);
+
+__cpp__(
+'void _Test(pearlrt::Task * me) ;'
+);
+
+Prog: TASK MAIN;
+    ALL 1 SEC DURING 5 SEC ACTIVATE Demo;
+END;
+
+Demo: TASK; 
+   counter := counter + 1;
+
+   ON TaskSignal RST(Errorcode)
+	PUT 'TaskSignal occured with RST=', Errorcode TO
+           console BY A,F,SKIP;
+   ON Arithimetic RST(Errorcode)
+	PUT 'Arithmetic problem occured with RST=', Errorcode TO
+           console BY A,F,SKIP;
+   Test;
+/* 
+__cpp__(
+	'static pearlrt::ScheduleSignalAction sigActions[] = {'
+        '    pearlrt::ScheduleSignalAction(generalized_Arithmetic),'
+        '    pearlrt::ScheduleSignalAction(generalized_TaskRunningSignal)};'
+   	'const size_t NBROFSIGACTIONS ='
+        '        sizeof(sigActions)/sizeof(sigActions[0]);'
+   	'enum signalIndex{index_Arithmetic, index_TaskRunningSignal};'
+);
+
+__cpp__(
+   'try {'
+   '    sigActions[index_TaskRunningSignal].setActionIndex(1);'
+   '    sigActions[index_Arithmetic].setActionIndex(2);'
+'       _Test(me);'
+'   } catch  (pearlrt::Signal & s) {'
+'      switch(pearlrt::ScheduleSignalAction::getAction('
+'                    &s, NBROFSIGACTIONS, sigActions)) {'
+'         default: throw;'
+'         case 1:'
+'           _Errorcode.x = s.getCurrentRst();'
+'           printf("TaskSignal occured with RST=%d\\n", _Errorcode.x);'
+'           me->terminate();'
+'         case 2:'
+'           _Errorcode.x = s.getCurrentRst();'
+'           printf("Arithmetic problem occured with RST=%d\\n", _Errorcode.x);'
+'           me->terminate();'
+'      } ' 
+'    }	'
+'}'
+);
+*/
+END;
+*/
+
+
+Test1: PROC;
+   CASE counter
+   ALT  INDUCE TaskSignal RST(200);	! 1
+   ALT  INDUCE TaskSignal;		! 2
+   ALT  INDUCE TaskSignal RST(200);	! 3
+   FIN;
+END;
+
+/*
+__cpp__(
+'void _Test1(Task * me) {'
+'   switch(_counter.x) {'
+'      case 1: '
+'	generalized_TaskRunningSignal->induce(200);'
+'	break;'
+'      case 2: '
+'	generalized_TaskRunningSignal->induce();'
+'	break;'
+'      case 3: '
+'	generalized_TaskRunningSignal->induce(200);'
+'	break;'
+'    }'
+'}'
+);
+*/
+MODEND;

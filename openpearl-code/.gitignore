@@ -1,0 +1,17 @@
+admin/
+compiler/testsuite/
+compiler/.idea/
+doc/
+gen-railroad.sh
+*.depend
+*.orig
+*~
+*.backup
+*.save
+smallpearl.tmproj
+thirdparty/
+tmp/
+website/
+FreeRTOS_lpc1768/FreeRTOS/
+FreeRTOS_lpc1768/NXP/
+FreeRTOS_lpc1768/FLASH_RUN/

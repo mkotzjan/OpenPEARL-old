@@ -1,0 +1,83 @@
+MODULE(userdation_dcl);
+! declare several user-dations on a disc file
+!  Note: ALPHIC supports currently no CYCLIC option
+!SYSTEM;
+! Disc defines a folder on the file system. The second parameters
+! denotes the maximum number of simultaneous open files
+!disc: Disc('/tmp/' ,10);
+
+/* expected C++ code  */
+__cpp__(
+     ' // system decl'
+     'static pearlrt::Disc s_disc("/tmp/", 10);'
+     'pearlrt::Device * d_disc = & s_disc;'
+);
+__cpp__(
+     ' // problem  decl in system part'
+    'extern pearlrt::Device *d_disc;'
+    'static pearlrt::SystemDationNB *_disc = '
+    '      static_cast<pearlrt::SystemDationNB*>(d_disc);'
+);
+/*  */
+
+PROBLEM;
+!   SPC disc DATION INOUT ALL;
+/*__cpp__(
+     ' // problem  decl in problem part'
+    'extern pearlrt::Device *d_disc;'
+    'static pearlrt::SystemDationNB *_disc = '
+    '      static_cast<pearlrt::SystemDationNB*>(d_disc);'
+);
+*/ 
+! different dimensions
+   DCL tableAlphicForward3 DATION OUT ALPHIC DIM(10,10,10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicForward3u DATION OUT ALPHIC DIM(*,10,10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicForward2 DATION OUT ALPHIC DIM(10,10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicForward2u DATION OUT ALPHIC DIM(*,10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicForward1 DATION OUT ALPHIC DIM(10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicForward1u DATION OUT ALPHIC DIM(*) FORWARD
+             CREATED(disc);
+
+! different directions (other params constant)
+   DCL tableAlphicOUT3 DATION OUT ALPHIC DIM(10,10,10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicIN3 DATION IN ALPHIC DIM(10,10,10) FORWARD
+             CREATED(disc);
+   DCL tableAlphicINOUT3 DATION INOUT ALPHIC DIM(10,10,10) FORWARD
+             CREATED(disc);
+
+! different access modes
+   DCL tableAlphicSTREAM3 DATION OUT ALPHIC DIM(10,10,10) 
+		FORWARD STREAM
+             CREATED(disc);
+   DCL tableAlphicNOSTREAM3 DATION OUT ALPHIC DIM(10,10,10) 
+		FORWARD NOSTREAM
+             CREATED(disc);
+!   DCL tableAlphicCYCLIC3 DATION OUT ALPHIC DIM(10,10,10) 
+!		DIRECT CYCLIC
+!             CREATED(disc);
+   DCL tableAlphicNOCYCLC3 DATION OUT ALPHIC DIM(10,10,10)
+		 FORWARD NOCYCL 
+             CREATED(disc);
+
+! different types
+!   DCL tableAlphic DATION OUT ALPHIC DIM(10,10,10)
+!		 DIRECT CYCLIC STREAM 
+!             CREATED(disc);
+   DCL tableFIXED15 DATION OUT FIXED(15) DIM(10,10,10)
+		 DIRECT CYCLIC 
+             CREATED(disc);
+
+ttt: TASK;
+   DCL table0 DATION INOUT FIXED(15) DIM(10,10,10)
+		DIRECT CYCLIC
+             CREATED(disc);
+
+END;
+MODEND;
+

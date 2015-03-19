@@ -1,0 +1,50 @@
+/*###############################################################################
+PROGRAM
+
+The main task Activate task2 with the start condition that the task2 start all 2
+sec maximal 5.9 sec long. That means the task2 can run maximal 3 times.
+The main task prevent the task2 after 3 sec.
+The Task2 runs therefore maximal 1 times.
+After the main task prevent the task2, the main task go sleep for 1 sec and then they
+check the variable check and set the exit code.
+###############################################################################
+RESULT
+
+The check variable must be 1.
+#############################################################################*/
+
+MODULE(test);
+
+PROBLEM;
+
+DCL check FIXED(15) INIT(0);
+
+Main : TASK PRIO 1 MAIN;
+        
+   ALL 2 SEC DURING 5.9 SEC ACTIVATE Task2;
+
+   AFTER 3 SEC RESUME; 
+
+   PREVENT Task2;
+
+   AFTER 1 SEC RESUME;
+
+    __cpp__(
+    'if (_check.x == 1) {'
+    '   printf("*** SUCCESS *** \\n");'
+    '   pearlrt::Control::setExitCode(0);'
+    '}else {'
+    '   printf("*** FAILED *** \\n");'
+    '   pearlrt::Control::setExitCode(1);'
+    '}');
+    
+
+END;
+
+Task2 : TASK PRIO 2;
+    
+    check := check + 1;
+    
+END;
+
+MODEND;

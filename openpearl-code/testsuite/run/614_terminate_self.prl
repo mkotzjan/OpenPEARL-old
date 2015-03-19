@@ -1,0 +1,50 @@
+/*#############################################################################
+PROGAM
+
+The main task activate task 2 and then the main task go sleep fpr 2 sec.
+The Task2 increment the check variable and terminates itself.
+The second increment command form the check variable should never be executed.
+After the 2 sec mai task come back and check the value from the check variable
+and set the exit code.
+###############################################################################
+RESULT
+
+The result must be, that the variable check is one.
+#############################################################################*/
+
+
+MODULE(terminate_self);
+
+PROBLEM;
+
+DCL check FIXED(15) INIT(0);
+
+Main : TASK PRIO 1 MAIN;
+
+    ACTIVATE Task2;
+
+    AFTER 2 SEC RESUME;
+
+    __cpp__(
+    'if (_check.x == 1) {'
+    '   printf("*** SUCCESS *** \\n");'
+    '   pearlrt::Control::setExitCode (0);'
+    '}else {'
+    '   printf ("*** FAILED *** \\n");'
+    '   pearlrt::Control::setExitCode(1);'
+    '}');
+    
+
+END;
+
+Task2 : TASK PRIO 2;
+    DCL i FIXED(31) INIT (0);
+
+    check := check + 1;
+    TERMINATE; 
+    check := check + 1;
+
+END;
+
+MODEND;
+

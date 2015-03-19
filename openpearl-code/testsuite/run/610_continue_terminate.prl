@@ -1,0 +1,85 @@
+/*#########################################################################
+PROGRAM
+Main task continue a terminated task which all combination of the terminated
+taskstate ([sa=0,sc=0], [sa=1,sc=0], [sa=0,sc=1], [sa=1,sc=1)
+###########################################################################
+RESULT
+It muss come the Signal TaskTerminatedSignal four times.
+(This behavior is unspecified in PEARL90)
+#########################################################################*/
+
+MODULE(continue_terminate);
+
+PROBLEM;
+
+Main : TASK PRIO 2 MAIN;
+    
+    DCL check FIXED(5) INIT (0);    
+    __cpp__(
+    'try {');
+        CONTINUE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__(
+    '}');
+    __cpp__('printf("AFTER ACTI T2\\n");');
+
+	AFTER 3 SEC ACTIVATE Task2;
+
+	__cpp__(
+    'try {');
+        CONTINUE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__(
+    '}');
+
+    __cpp__('printf("PREVET     T2\\n");');
+	PREVENT Task2;
+
+	AFTER 2 SEC CONTINUE Task2;
+
+	__cpp__(
+    'try {');
+        CONTINUE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__(
+    '}');
+
+    __cpp__('printf("AFTER ACTI T2\\n");');
+	AFTER 3 SEC ALL 1 SEC ACTIVATE Task2;
+	AFTER 2 SEC CONTINUE Task2;
+
+	__cpp__(
+    'try {');
+        CONTINUE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__(
+    '}');
+
+    __cpp__('printf("PREVET     T2\\n");');
+	PREVENT Task2;
+
+	__cpp__(
+    'if (_check.x == 4){'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf ("*** SUCCESS ***\\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf ("*** FAILED ***\\n");'
+    '}');
+    __cpp__('printf("TERM T1\\n");');
+
+END;
+
+Task2 : TASK;
+
+END;
+
+MODEND;

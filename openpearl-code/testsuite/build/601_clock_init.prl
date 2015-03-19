@@ -1,0 +1,12 @@
+MODULE(clockinit);
+! declare and initialize clock variables at module and task level
+PROBLEM;
+   DCL x CLOCK INIT(00:00:00);
+   DCL x1 CLOCK INIT(00:00:01.1234);
+   DCL x2 CLOCK INIT(25:00:00);
+T1: TASK MAIN;
+   DCL x CLOCK INIT(00:00:00);
+   DCL x1 CLOCK INIT(00:00:01.1234);
+   DCL x2 CLOCK INIT(25:00:00);
+END;
+MODEND;

@@ -1,0 +1,7 @@
+MODULE(onetask);
+
+PROBLEM;
+T1: TASK MAIN;
+END;
+
+MODEND;

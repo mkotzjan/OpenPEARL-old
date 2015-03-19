@@ -1,0 +1,68 @@
+Octopus README for SmallPEARL
+-----------------------------
+
+1) Source
+   Embedded Projects: www.embedded-projects.de
+
+2) The installation process of 'liboctopus' is described in the 
+   octopus projects. The major steps are:
+   + get software from svn
+    svn checkout http://embeddedprojects.googlecode.com/svn/trunk/OPEN-SOURCE/octopus_at90
+   + required debian packages
+       	+ subversion
+	+ libtool
+	+ automake
+
+   + follow steps in README in liboctopus
+	+ autoreconf --force --install (required when libtool version 
+          are detected)
+   + add udev-rules (99-octopus-udev.rules) to udev repository
+   + sudo udevadm control --reload-rules
+   + test whether led-sample from octopus software works
+
+3) Installation in Makefile
+   add OctopusXXX to the variable DRIVERS in the Makefile
+   + OctopusDigitalIn
+   + OctopusDigitalOut
+   + OctopusAnalogIn (planned)
+
+4) Available system devices
+  + OctopusDigitalIn(brd, Port, StartBit, Width);
+  + OctopusDigitalOut(brd, Port, StartBit, Width);
+    Port = 'A','B',..., 'F')
+    StartBit = 7..0
+    Width   = 1..7 (StartBit-Width >= -1 must be fulfilled)
+    Bitnumbering: 76543210
+
+    usage
+       SYSTEM;
+         led7 : OctopusDigitalOut('C' ,6, 1); ! Port C6 is LED7
+       PROBLEM;
+         DCL on BIT(1);
+         OPEN led7;
+         SEND on TO led7;
+         CLOSE led7;
+
+    Note:
+       The data must by of type BIT(x), where x <= 8
+
+5) Contact
+   mueller@hs-furtwangen.de
+
+
+6) Tools for patches
+  + automake, libtool
+  + subversion
+  + dfu-programmer
+  + avr-gcc
+  + lib-avr
+  to flash device: 
+    1) press RST+HWB
+    2) release RST
+    3) release HWB
+    4) run: dfu-programmer at90usb1287 flash main.hex
+    5) press/release RST
+
+7) Changes in Lib-Octopus:
+   octopus.c: get_port needs answer-length 4
+              open: reads pending input from previous run

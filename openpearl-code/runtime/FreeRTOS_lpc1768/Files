@@ -1,0 +1,22 @@
+CSRC += $(NXP)/uart_17xx_40xx.c
+CSRC += $(NXP)/chip_17xx_40xx.c
+CSRC += $(NXP)/clock_17xx_40xx.c
+CSRC += $(NXP)/rtc_17xx_40xx.c
+CSRC += $(NXP)/iocon_17xx_40xx.c
+#NXPSRC += $(NXP)/../chip_common/ring_buffer.c
+CSRC += ./systeminit.c
+CSRC += ./retarget.c
+CSRC += ./hy32a.c
+CINCS += $(NXPINC) 
+
+CPPSRC += ./Post.cc
+CPPSRC += ./Clock.cc
+CPPSRC += ./RTC.cc
+CPPSRC += ./FreeRTOSTickHook.cc
+CPPINCS += .
+
+CHECK_HDRS += ./FreeRTOSTickHook.h
+CHECK_HDRS += ./Post.h
+CHECK_HDRS += ./RTC.h
+CHECK_HDRS += ./Clock.h
+

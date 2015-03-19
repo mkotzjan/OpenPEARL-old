@@ -1,0 +1,78 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!!
+!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+MODULE CPP_Inline_1;
+
+    ! ===============================================================
+    ! Check that cpp inlining is working at module level
+    ! ===============================================================
+
+    !
+    ! Test#1: Allow empty inlining
+    !
+    __cpp__( '' );
+
+    !
+    ! Test#2: Check if C++ comments are allowed.
+    !
+    __cpp__( '// A simple C++ comment!' );
+
+    !
+    ! Test#3: Check if digits are allowed.
+    !
+    __cpp__( '// 1234567890' );
+
+    !
+    ! Test#4: Check if standard characters are allowed.
+    !
+    __cpp__( '// abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' );
+
+    !
+    ! Test#5: Check if special characters are allowed.
+    !
+    __cpp__( '// !"§$%&/()=?`´+*#-_.:,;@<>°' );
+
+    !
+    ! Test#6: Check if german umlauts  are allowed.
+    !
+    __cpp__( '// äöüßÄÖÜ' );
+
+    !
+    ! Test#7: Check if escape characters are allowed.
+    !
+    __cpp__( '// \\ \n \r \t \'' );
+
+    !
+    ! Test#8: Check that multiple lines are allowed.
+    !
+    __cpp__( '/* A simple C++ comment!'
+             '1234567890'
+             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+             '!"§$%&/()=?`´+*#-_.:,;@<>° '
+             'äöüßÄÖÜ'
+             '\\ \n \r \t \' */' );
+
+SYSTEM;
+
+
+PROBLEM;
+
+	main_task : TASK  MAIN;
+        !
+        ! Test#9: Check cpp inlining is also working at TASK level
+        !
+        __cpp__( '/* TASK BEGIN:'
+                 'A simple C++ comment!'
+                 '1234567890'
+                 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                 '!"§$%&/()=?`´+*#-_.:,;@<>° '
+                 'äöüßÄÖÜ'
+                 '\\ \n \r \t \''
+                 'TASK  END */' );
+	END;
+
+MODEND;
+
+

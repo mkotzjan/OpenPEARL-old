@@ -1,0 +1,33 @@
+!
+! this test case needs the SampleBasicDation
+!
+MODULE(dationts);
+! declare a TS-dation on an SampleBasicDation and do some operations
+!SYSTEM;
+!inout4: SampleBasicDation();
+
+/* expected C++ code  */
+__cpp__(
+     'static pearlrt::SampleBasicDation s_inout4;'
+     'pearlrt::Device * d_inout4 = & s_inout4;'
+);
+/*  */
+
+PROBLEM;
+   SPC inout4 DATION INOUT BASIC;
+
+TakeSendTest: TASK MAIN;
+   DCL b BIT(4);
+   DCL error FIXED(15);
+
+   OPEN inout4 BY RST(error);
+   CLOSE inout4;
+   OPEN inout4;
+
+   SEND b TO inout4;
+   TAKE b FROM inout4;
+
+   CLOSE inout4;
+END;
+MODEND;
+

@@ -1,0 +1,23 @@
+MODULE (float_type);
+
+PROBLEM;
+    DCL f   FLOAT;
+    DCL f24 FLOAT(24);
+    DCL f53 FLOAT(53);
+
+    DCL (h1,h2,h3)   FLOAT;
+    DCL (h4,h5,h6)   FLOAT(24);
+    DCL (h7,h8,h9)   FLOAT(53);
+
+    DCL g   FLOAT      INIT(1.0);
+    DCL g24 FLOAT(24)  INIT(-1.0);
+    DCL g53 FLOAT(53)  INIT(9999999.87654321);
+
+    DCL (k1,k2)   FLOAT      INIT(1.0,2.0);
+    DCL (k3,k4)   FLOAT(24)  INIT(-1.0,-2.0);
+    DCL (k5,k6)   FLOAT(53)  INIT(9999999.87654321,-9999999.87654321);
+! define dummy task to produce a return code of 0
+T1: TASK MAIN;
+END;
+
+MODEND;

@@ -1,0 +1,101 @@
+MODULE(dationpg);
+! declare a PG-dation on a disc file and do some operations
+SYSTEM;
+! Disc defines a folder on the file system. The second parameters
+! denotes the maximum number of simultaneous open files
+!disc: Disc('/tmp/' ,10);
+
+/* expected C++ code  */
+__cpp__(
+     'static pearlrt::Disc s_disc("/tmp/", 10);'
+     'pearlrt::Device * d_disc = & s_disc;'
+);
+/*  */
+!PROBLEM;
+
+!   SPC disc DATION INOUT ALL;
+/* expected C++ code keyword ALL -> static_cast<pearlrt::SystemDationNB*>
+*/ 
+
+__cpp__('pearlrt::SystemDationNB* _disc = '
+        '    static_cast<pearlrt::SystemDationNB*>(d_disc);');
+
+/* */
+PROBLEM;
+
+   DCL table DATION INOUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  NOSTREAM 
+             CREATED(disc);
+
+FileTest1: TASK MAIN;
+     DCL f FIXED(15);
+     DCL f1 FIXED(15);
+__cpp__('pearlrt::Character<5> _text("f = ");');
+__cpp__('pearlrt::Character<5> _text1;');
+ 
+     OPEN table BY ANY, IDF('file1.txt');
+     PUT text, f TO table BY  X(3), A,F(3), SKIP;
+     FOR i TO 10 REPEAT
+        f := i;
+        PUT ' f = ', f TO table BY A, F(3), SKIP;
+     END; 
+     CLOSE table;
+
+     OPEN table BY OLD, IDF('file1.txt');
+     GET text1, f1 FROM table BY  X(3), A,F(3), SKIP;
+     CLOSE table;
+/*
+
+__cpp__ (
+	'pearlrt::Character<9> tmp_name("file1.txt");'
+	'_table.dationOpen(pearlrt::Dation::IDF | pearlrt::Dation::ANY, &tmp_name);'
+	'');
+
+        DCL i FIXED(31);
+        i := 1;
+
+__cpp__(
+        ' static Character<5> text1(" f = ");'
+	'while (_i <= pearlrt::Fixed<15>(10)) {'
+	'    _f = _i;'
+	'    try {'
+	'      _table.beginSequence(me);'
+	'      _table.toA(text1);'
+	'      _table.toF(_f, 3);'
+	'      _table.toSkip(1);'
+	'      _table.endSequence();'
+	'    } catch (pearlrt::Signal & s) {'
+	'       if (!_table.updateRst(&s) ) {'
+	'         _table.endSequence();'
+	'         throw;'
+	'       }'
+	'      _table.endSequence();'
+	'    }'
+);
+        i := i + 1;
+__cpp__(
+	'}'
+	'_table.dationClose();'
+);
+__cpp__ ('// tmp_name defined in upper section'
+	'_table.dationOpen(pearlrt::Dation::IDF | pearlrt::Dation::OLD, &tmp_name);'
+	'    try {'
+	'      _table.beginSequence(me);'
+	'      _table.fromA(text1);'
+	'      _table.fromF(_f, 3);'
+	'      _table.fromSkip(1);'
+	'      _table.endSequence();'
+	'    } catch (pearlrt::Signal & s) {'
+	'       if (!_table.updateRst(&s) ) {'
+	'         _table.endSequence();'
+	'         throw;'
+	'       }'
+	'      _table.endSequence();'
+	'    }'
+	'_table.dationClose();'
+);
+*/
+
+END;
+MODEND;
+

@@ -1,0 +1,47 @@
+#! /bin/bash
+# compile job for both stages of the SmallPearl compilation
+#  stage 1: .prl -> .cc
+#  stage 2: .cc  -> (executable)
+#
+# created by r. mueller / 2014-02-01
+# -------------------------------------------
+# Modifications
+#
+#
+# remove .prl is present
+
+y=$(basename $1 .prl)
+
+if [ -z $1 ]
+    then
+       echo "call with pearl file" 
+       echo " eg:   "$0 "  00_empty"
+       exit 1
+fi
+if [ ! -f $y.prl ]
+   then 
+      echo "input "$y".prl does not exist."
+      exit 1
+fi
+# ----------
+# remove older stuff
+rm -f $y.cc
+rm -f $y
+java -cp /usr/local/bin/smallpearl_compiler.jar:/usr/local/lib/antlr-4.0-complete.jar  org/smallpearl/compiler/Compiler --output $y $y.prl
+rc=$?
+if [ $rc -ne 0 ]
+   then
+      echo "terminate due to errors in stage 1"
+      exit $rc
+fi
+g++  $y.cc -o $y /usr/local/lib/plib.a -lrt -lpthread -lm
+rc=$?
+if [ $rc -eq 0 ]
+   then
+      echo "*** compilation done successful ***"
+   else
+      echo "compilation stage 2 terminated with errors"
+      echo " --> check PEARL-source code for problems"
+      exit $rc
+fi
+

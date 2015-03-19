@@ -1,0 +1,107 @@
+/*#########################################################################
+PROGRAM
+Main task activate Task2 and suspend them. The SuspendedTask have now the 
+Taskstate suspended. The main ACTIVATE then the SuspendedTask.
+The main Tasks ACTIVATE the BlockedSynchTask (Taskstate = blocked(synch)) 
+and do then an ACTIVATE.
+Then the main task suspended the BlockedSynchTask which change her 
+Taskstate in Suspended(synch) and ACTIAVTE then the Task.
+All this ACTICATE Statements must throw the Signal TaskRunningSignal.
+This Behavior is not specify in the language report.
+
+###########################################################################
+RESULT
+It muss come the Signal TaskRunningSignal and when this signal come,
+the variable check is increased. The variable check must have the 
+value 3.
+##########################################################################*/
+
+MODULE(activate_signal_one);
+
+PROBLEM;
+
+	DCL S1 SEMA;
+
+Main: TASK PRIO 1 MAIN ;
+
+	DCL check FIXED(3) INIT(0);
+
+	/*Suspended Task */	
+
+    ACTIVATE SuspendedTask;
+
+	AFTER 0.5 SEC RESUME;
+
+    SUSPEND SuspendedTask;
+
+    __cpp__(
+    'try {');
+        ACTIVATE SuspendedTask;
+    __cpp__(
+    '}catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	/* BlockedSynch Task */
+
+	ACTIVATE BlockedSynchTask;
+
+	AFTER 0.5 SEC RESUME;
+
+	__cpp__(
+    'try {');
+        ACTIVATE BlockedSynchTask;
+    __cpp__(
+    '}catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	/* Suspended Synch Task */
+	
+	SUSPEND BlockedSynchTask;
+
+	__cpp__(
+    'try {');
+        ACTIVATE BlockedSynchTask;
+    __cpp__(
+    '}catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__(
+    '}'
+    'if (_check.x == 3) {'
+    '   printf ("*** SUCCESS ***\\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'    
+    '   printf ("*** FAILED ***\\n");'
+    '}');
+
+	CONTINUE SuspendedTask;
+	CONTINUE BlockedSynchTask;
+	RELEASE S1;
+
+
+END;
+
+SuspendedTask: TASK PRIO 4;
+
+	DCL x FIXED(31) INIT(0);
+
+    !WHILE (x < 11000000) THEN
+    !   x := x + 1;
+    !FIN;
+
+    __cpp__(
+    'while (_x.x < 11000000) {');
+        x := x +1;  
+    __cpp__(
+    '}');
+
+END;
+
+BlockedSynchTask: TASK PRIO 3;
+
+	REQUEST S1;
+
+END;
+
+MODEND;

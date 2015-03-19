@@ -1,0 +1,90 @@
+/*#############################################################################
+PROGRAM
+
+This program works like 700_oneSemaphore_samePrio.prl, with the only difference
+that here the tasks request two semaphore at the same time
+REQUEST in_the_buffer1, in_the_buffer2
+###############################################################################
+RESULT
+
+The same result like program 700_oneSemaphore_samePrio.prl.
+Also 1999 task changes an the two writer tasks muste be run 1000 times
+#############################################################################*/
+
+MODULE(twoSemaphore_samePrio);
+
+PROBLEM;
+    DCL (in_the_buffer1, out_the_buffer1, in_the_buffer2, out_the_buffer2, S1,S2) SEMA;
+    DCL (x, y, varLoop1, varLoop2) FIXED(31) INIT(0,0,0,0);
+    DCL (varActiTask1, varActiTask2) FIXED(31) INIT(0,0);
+
+Output: TASK PRIO 1 MAIN;
+    
+    DCL (xTemp, yTemp, temp, checkXandY) FIXED(15) INIT(0,0,0,0);
+    DCL taskChanges FIXED(31) INIT (-1);
+
+    ACTIVATE Writer1;
+    ACTIVATE Writer2;
+
+    REQUEST S1;
+    REQUEST S1;
+
+    RELEASE in_the_buffer1, in_the_buffer2;
+
+    __cpp__('int i = 0;'
+            'while (i < 2000) { ');
+                REQUEST out_the_buffer1, out_the_buffer2;
+                    xTemp := x;
+                    yTemp := y;
+                RELEASE in_the_buffer2, in_the_buffer1;
+            
+                __cpp__('if (_xTemp.x != _yTemp.x) { ');
+                            checkXandY := checkXandY + 1;
+                __cpp__('}else if(_xTemp.x == _yTemp.x && _xTemp.x != _temp.x) { ');
+                            taskChanges := taskChanges + 1;
+                            temp := xTemp;
+                __cpp__('}'
+                'i += 1; '
+            '}');
+                            
+    __cpp__('if (_checkXandY.x == 0 && _taskChanges.x == 1999 && ((_varLoop1.x - _varLoop2.x ) == 0)) {'
+            '   printf ("*** SUCCESS *** \\n"); '
+            '   pearlrt::Control::setExitCode(0);'
+            '}else {'
+            '   printf ("*** FAILED *** \\n");'
+            '   pearlrt::Control::setExitCode(1); }');                
+
+END;
+
+
+Writer1: TASK PRIO 2;
+    
+    RELEASE S1;
+    __cpp__(
+    'while (_varLoop1.x < 1000) {');
+        REQUEST in_the_buffer1, in_the_buffer2;
+            x := 1;
+            y := 1;
+            varLoop1 := varLoop1 + 1;
+        RELEASE out_the_buffer1, out_the_buffer2;
+   __cpp__(
+            '}');
+    
+END;
+
+Writer2: TASK PRIO 2;
+
+    RELEASE S1;
+    __cpp__(
+    'while (_varLoop2.x < 1000) {');
+        REQUEST in_the_buffer2, in_the_buffer1;
+             x := 2;
+             y := 2;
+             varLoop2 := varLoop2 + 1;
+        RELEASE out_the_buffer2, out_the_buffer1;
+    __cpp__(   
+    '}'); 
+
+END;
+
+MODEND;       

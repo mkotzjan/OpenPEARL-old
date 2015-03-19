@@ -1,0 +1,43 @@
+/*#########################################################################
+PROGRAM
+Main Task activate a Task with a not mapable prio by Linux.
+The highest mapable prio in linux is 99
+###########################################################################
+RESULT
+It musst come the signal PriorityNotMapableSignal
+(This behavior is unspecified in PEARL90)
+#########################################################################*/
+
+
+MODULE(prio_range_linux);
+
+PROBLEM;
+
+Main : TASK PRIO 2 MAIN;
+    DCL check FIXED(1) INIT(0);
+
+    __cpp__(
+    'try {');
+        ACTIVATE Task2 PRIO 100;
+    __cpp__(
+    '}catch (pearlrt::PriorityNotMapableSignal &s){');
+        check := 1;
+!        ACTIVATE Task2 PRIO 97;
+    __cpp__(
+    '}'
+    'if (_check.x == 1) {'
+    '   printf ("*** SUCCESS ***\\n"); '
+    '   pearlrt::Control::setExitCode(0);'
+    '}else {'
+    '   printf ("*** FAILED ***\\n"); '
+    '   pearlrt::Control::setExitCode(1);'
+    '}'); 
+    
+
+END;
+
+Task2 : TASK PRIO 2;
+
+END;
+
+MODEND;

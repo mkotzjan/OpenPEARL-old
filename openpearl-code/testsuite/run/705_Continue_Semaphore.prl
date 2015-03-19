@@ -1,0 +1,137 @@
+/*#############################################################################
+PROGRAM
+
+This program works equal to 700_oneSemaphore_samePrio.prl with 
+the small difference, that after 10 runs in the main loop Task1 make 
+an CONTINUE and the Task3 priority should be not  changed.
+###############################################################################
+RESULT
+
+Must be the same result as 700_oneSemaphore_samePrio.prl
+(It musst be 1999 task Changes)
+#############################################################################*/
+
+MODULE(tasking_continue);
+
+PROBLEM;
+
+DCL (in_the_buffer, out_the_buffer, S1) SEMA;
+
+DCL (varLoop2, varLoop3, taskChange) FIXED(15) INIT (0,0,-1);
+DCL (varTask2, varTask3, x) FIXED(15) INIT (0,0,0);
+
+Task1: TASK PRIO 1 MAIN;
+
+    DCL (xTemp, xTemp2, varLoop1) FIXED(15) INIT(0,0,0);
+
+    ACTIVATE Task2 PRIO 3;
+    ACTIVATE Task3;
+
+    REQUEST S1;    
+    REQUEST S1;    
+
+    RELEASE in_the_buffer;    
+   
+    !WHILE varLoop1 < 2000 REPEAT
+    !   IF varLoop1 == 10 THEN
+    !       REQUEST out_the_buffer;
+    !           xTemp := x;
+    !           CONTINUE Task2;
+    !           varLoop1 := varLoop1 + 1;
+    !       RELEASE in_the_buffer;
+    !   ELSE
+    !       REQUEST out_the_buffer;
+    !           xTemp := x;
+    !           varLoop1 := varLoop1 + 1;
+    !        RELEASE in_the_buffer;
+    !   FIN;  
+    !   IF xTemp != xTemp2 THEN
+    !       taskChange := taskChange + 1;
+    !       xTemp2 := xTemp;
+    !   FIN; 
+    !END;
+    !
+    !IF taskChange == 1999 THEN
+    !    __cpp__('printf("*** SUCCESS ***\\n");'
+    !    'pearlrt::Control::setExitCode(0);');
+    !ELSE
+    !   __cpp__('printf("*** FAILED ***\\n");'
+    !   'pearlrt::Control::setExitCode(1);');
+    !FIN;
+ 
+    __cpp__(
+    'while (_varLoop1.x < 2000)  {'
+    '   if (_varLoop1.x == 10) {');  
+            REQUEST out_the_buffer;
+                xTemp := x;
+                CONTINUE Task2;             
+                varLoop1 := varLoop1 + 1; 
+            RELEASE in_the_buffer;
+    __cpp__(
+    '   }else {');
+            REQUEST out_the_buffer;
+                xTemp := x;
+                varLoop1 := varLoop1 + 1; 
+            RELEASE in_the_buffer;
+     __cpp__(
+     '  }'
+     '  if (_xTemp.x != _xTemp2.x) {');
+            taskChange := taskChange + 1;
+            xTemp2 := xTemp;
+     __cpp__(
+     '  }'
+    '}');
+
+    __cpp__(
+    'if (_taskChange.x == 1999) {'
+    '   printf("*** SUCCESS ***\\n");'
+    '   pearlrt::Control::setExitCode(0);'
+    '}else {'
+    '   printf("*** FAILED ***\\n"); '
+    '   pearlrt::Control::setExitCode(1);'
+    '}');
+
+        
+END;
+
+Task2: TASK PRIO 2;
+    RELEASE S1; 
+        
+    !WHILE varLoop2 < 1000 REPEAT
+    !   REQUEST in_the_buffer;
+    !       x := 2;
+    !       varLoop2 := varLoop3 + 1;
+    !   RELEASE out_the_buffer;
+    !END;    
+
+    __cpp__(
+    'while (_varLoop2.x < 1000) {');
+        REQUEST in_the_buffer;
+            x := 2;
+            varLoop2 := varLoop2 + 1;
+        RELEASE out_the_buffer;
+    __cpp__(
+    '}');
+END;
+
+Task3: TASK PRIO 3;
+    RELEASE S1;
+    
+    !WHILE varLoop3 < 1000 REPEAT
+    !   REQUEST in_the_buffer;
+    !       x := 3;
+    !       varLoop3 := varLoop3 + 1;
+    !   RELEASE out_the_buffer;
+    !END;    
+ 
+    __cpp__(
+    'while(_varLoop3.x < 1000) {');
+        REQUEST in_the_buffer;
+            x := 3;
+            varLoop3 := varLoop3 + 1;
+        RELEASE out_the_buffer;
+    __cpp__(
+    '}');
+END;
+
+MODEND;

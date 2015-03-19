@@ -1,0 +1,30 @@
+MODULE(switch);
+PROBLEM;
+
+T1: TASK MAIN;
+
+  DCL f1 FIXED(15) INIT(1);
+  DCL f2 FIXED(15) INIT(2);
+  DCL f3 FIXED(15) INIT(3);
+
+  CASE f3
+     ALT /* 1 */ 
+         __cpp__('printf("failure \\n";'
+                 'pearlrt::Control:setExitCode(1);');
+     ALT /* 2 */ 
+         __cpp__('printf("failure \\n";'
+                 'pearlrt::Control:setExitCode(1);');
+     ALT /* 3 */ 
+         __cpp__('printf("success \\n";'
+     ALT /* 4 */ 
+         __cpp__('printf("failure \\n";'
+                 'pearlrt::Control:setExitCode(1);');
+     OUT /* all other cases */
+         __cpp__('printf("failure \\n";'
+                 'pearlrt::Control:setExitCode(1);');
+  FIN;
+END;
+
+MODEND;
+
+

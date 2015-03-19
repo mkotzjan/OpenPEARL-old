@@ -1,0 +1,42 @@
+/*
+test if task scheduled activation is buffered 1 time
+
+t1 activates t2 at relative times 0, 0.5, 1, 1.5, ... , 7 second 
+15 activations over all
+
+t2 sleeps 3 seconds and increments the counter by 1
+during these 3 seconds there are 6 activate overruns
+
+the end value of the counter must be  3
+*/
+MODULE(ActivateOverrun);
+
+PROBLEM;
+
+DCL count FIXED(31) INIT(0);
+
+t1: TASK PRIO 2 MAIN;
+
+    ALL 0.5 SEC DURING 7 SEC ACTIVATE t2;
+
+    ! wait until t2 finished after last activation
+    AFTER 11 SEC RESUME;
+    __cpp__('printf("count=%d\\n", _count.x);');
+    IF count == 3 THEN
+        __cpp__('printf("ok\\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf("fail\\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+END;
+
+t2: TASK;
+    __cpp__('printf("t2 start (count=%d)\\n",_count.x);');
+
+    AFTER 3.1 SEC RESUME;
+    count := count + 1;
+END;
+
+MODEND;
+

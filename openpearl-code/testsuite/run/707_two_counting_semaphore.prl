@@ -1,0 +1,109 @@
+/*############################################################################# 
+PROGRAM
+
+This program works like 704_counting_semaphore.prl, with the only difference 
+that here the tasks blocked two counting semaphore at the same time.
+###############################################################################
+RESULT
+
+The same result like 704_counting_semaphore.prl
+#############################################################################*/
+
+
+MODULE(two_counting_semaphore);
+
+PROBLEM;
+
+DCL (S1, S2) SEMA PRESET (100, 100);
+DCL (S3,S4,S5) SEMA;
+DCL (write) FIXED (15) INIT(0);
+__cpp__(' int buffer [100] = {0}; ');
+
+
+Main : TASK PRIO 1 MAIN;
+
+    ACTIVATE Writer_1;
+    ACTIVATE Writer_2 PRIO 2;
+    
+    REQUEST S4;
+    REQUEST S4;
+
+    RELEASE S5;
+    RELEASE S5;
+
+        
+    REQUEST S4;
+    REQUEST S4;  
+     
+    
+    __cpp__(
+    'int check = 100;'
+    'for (int j = 0; j < 100; j++) {'
+    '   if (j < 50) {'
+    '       if (buffer[j] == 2)'
+    '           check -= 1;'
+    '   }else {'
+    '       if (buffer[j] == 1)'
+    '           check -= 1;'
+    '   }'
+    '}'
+    'if (check == 0) {'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf("*** SUCCESS *** \\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf("*** FAILED *** \\n");'
+    '}');
+   
+END;
+
+
+Writer_1 : TASK PRIO 3;
+    DCL varLoop FIXED(15) INIT(0);
+    RELEASE S4;
+    REQUEST S5;
+    
+    __cpp__(
+    'while (_varLoop.x < 50) {');
+        REQUEST S1,S2;
+            __cpp__(
+            'buffer [_write.x] = 1;'
+            'if ( (_write.x + 1) > 99) {' );
+                write := 0;
+            __cpp__(
+            '}else { ');
+                write := write + 1;
+            __cpp__(
+            '}');
+            varLoop := varLoop + 1;
+        RELEASE S3;
+    __cpp__(
+    '}');
+    RELEASE S4;
+END;
+
+Writer_2 : TASK PRIO 3;
+    DCL varLoop FIXED(15) INIT(0);
+    RELEASE S4;
+    REQUEST S5;
+
+    __cpp__(
+    'while (_varLoop.x < 50) {');
+        REQUEST S1,S2;
+            __cpp__(
+            'buffer [_write.x] = 2;'
+            'if ( (_write.x + 1) > 99) {');
+                write := 0;
+            __cpp__(
+            '}else { ');
+                write := write + 1;
+            __cpp__(
+            '}');
+            varLoop := varLoop + 1;
+        RELEASE S3;    
+    __cpp__(
+    '}');
+    RELEASE S4;
+END;
+
+MODEND;

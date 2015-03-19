@@ -1,0 +1,73 @@
+/*#########################################################################
+PROGRAM
+The main Task activate the Task2 and give them a scheduled continue condition.
+After this, the main task suspend task2.
+The task2 has now the tasktate -> suspended [sa=0, sc=1].
+The main task go sleep for 2 sec and come then back and terminate task2.
+Then the main task activate Task2 and give them a scheduled continue and a
+scheduled activate conidtion. After this, the main task suspend task2.
+The task2 have now the taskstate -> suspended [sa=1,sc=1].
+After 2 Sec the main task come back prevent the task2 and 
+and check the taskRunning variable.
+###########################################################################
+RESULT
+The taskRunning variable have must the value 0. 
+The Task2 come never back because the main task suspend and prevent them.
+##########################################################################*/
+
+MODULE(taskingPrevent_schedContinue);
+
+PROBLEM;
+
+	DCL taskRunning FIXED (3) INIT (0);
+	DCL S1 SEMA;
+
+Main : TASK PRIO 2 MAIN;
+
+	/* suspended [sa=0,sc=1] */
+
+	ACTIVATE Task2;
+
+	AFTER 1.5 SEC CONTINUE Task2 PRIO 3;
+
+	SUSPEND Task2;
+
+	PREVENT Task2;
+
+	AFTER 2 SEC RESUME;
+
+	TERMINATE Task2;
+
+	/* suspended [sa=1,sc=1] */
+
+	ACTIVATE Task2;
+	AFTER 4 SEC ACTIVATE Task2;
+
+	AFTER 1.5 SEC CONTINUE Task2 PRIO 1;
+
+	SUSPEND Task2;
+
+	PREVENT Task2;
+
+	AFTER 2 SEC RESUME;
+
+	__cpp__(
+	'if (_taskRunning.x != 0) {'
+	'	pearlrt::Control::setExitCode(1);'
+	'	printf("*** FAILED *** \\n");'
+	'}else {'
+	'	printf("*** SUCCESS *** \\n");'
+	'}');
+
+	CONTINUE Task2;		
+
+END;
+
+Task2 : TASK;
+
+	taskRunning :=  taskRunning + 1;
+
+	
+END;
+
+MODEND;

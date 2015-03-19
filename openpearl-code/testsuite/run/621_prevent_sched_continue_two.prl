@@ -1,0 +1,65 @@
+/*#########################################################################
+PROGRAM
+The main Task activate the Task2 and give them a scheduled continue condition.
+After this, the main task terminated task2.
+The task2 has now the tasktate -> terminated [sa=0, sc=1].
+The main task go sleep for 2 sec and come then back and prevent the task2.
+Then the main task give the task2 a scheduled activate condition and
+a scheduled continue condition. The task2 have now the task state
+->terminated [sa=1,sc=1].
+After 2 Sec the main task come back and Prevent the task 2.
+The Task2 should be never run.
+
+###########################################################################
+RESULT
+The taskRunning variable have must the value 0. 
+The Task2 come never back because the main task terminated them and the
+scheduled continue condition can never be executed because at the moment
+when the scheduled condition are executing the Task2 are terminated.
+##########################################################################*/
+
+MODULE(taskingPrevent_schedContinue);
+
+PROBLEM;
+
+	DCL taskRunning FIXED (1) INIT (0);
+
+Main : TASK PRIO 2 MAIN;
+	__cpp__('pearlrt::Control::setExitCode(1);');
+
+	/*terminated [sa=0,sc=1] */
+
+	ACTIVATE Task2;
+	AFTER 1.5 SEC CONTINUE Task2 PRIO 3;
+
+	TERMINATE Task2;
+
+	AFTER 2 SEC RESUME;
+	PREVENT Task2;
+
+	/* terminated [sa=1,sc=1] */
+
+	AFTER 4 SEC ACTIVATE Task2;
+	AFTER 1.5 SEC CONTINUE Task2 PRIO 1;
+
+	AFTER 2 SEC RESUME;
+	PREVENT Task2;
+
+	__cpp__(
+	'if (_taskRunning.x != 0) {'
+	'	pearlrt::Control::setExitCode(1);'
+	'	printf("*** FAILED *** \\n");'
+	'}else {'
+	'	printf("*** SUCCESS *** \\n");'
+	'	pearlrt::Control::setExitCode(0);'
+	'}');
+
+END;
+
+Task2 : TASK;
+
+	taskRunning := taskRunning + 1;
+	
+END;
+
+MODEND;

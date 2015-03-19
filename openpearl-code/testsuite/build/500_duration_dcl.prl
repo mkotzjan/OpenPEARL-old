@@ -1,0 +1,12 @@
+MODULE(durationdcl);
+! declare duration variables at module and task level
+
+PROBLEM;
+   DCL x DURATION;
+   DCL x1 DUR;
+
+T1: TASK MAIN;
+   DCL y DURATION;
+   DCL y1 DUR;
+END;
+MODEND;

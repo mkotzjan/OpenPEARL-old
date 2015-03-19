@@ -1,0 +1,12 @@
+MODULE(clockdcl);
+! declare clock variables at module and task level
+
+PROBLEM;
+   DCL x CLOCK;
+   ! __cpp__ ('pearlrt::Clock _x;');
+
+T1: TASK MAIN;
+   DCL y CLOCK;
+   ! __cpp__ ('pearlrt::Clock _y;');
+END;
+MODEND;

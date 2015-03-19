@@ -1,0 +1,122 @@
+/*
+ [The "BSD license"]
+ Copyright (c) 2012-2013 Holger Koelle
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/**
+\file
+\brief Implementation of generic non-Basic Linux Systemdation
+
+*/
+
+#include "Pipe.h"
+#include "Signals.h"
+#include <stdio.h>
+#include <string.h>
+
+namespace pearlrt {
+
+   Pipe::Pipe(const char* dev) : SystemDationNB() {
+      struct stat attribut;
+      strcpy(device, dev);
+      //if device exist, delete it
+      unlink(dev);
+
+      /* create fifo*/
+      if ((mkfifo(dev, 0777)) == -1) {
+         throw theOpenFailedSignal;
+      }
+
+      /**
+        check wether path points to fifo file
+      */
+      if (stat(device, &attribut) == -1) {
+         //can't get stat -> throw signal
+         throw theNoFileInfoSignal;
+      }
+
+      if (attribut.st_mode & S_IFREG)
+         //->normal file -> throw signal , not allowed
+      {
+         throw theIllegalPathSignal;
+      }
+      //path is directory in this case not allowed
+      else if (attribut.st_mode & S_IFDIR) {
+         throw theIllegalPathSignal;
+      }
+      //devicefile is not allowed
+      else if (attribut.st_mode & S_IFCHR) {
+         throw theIllegalPathSignal;
+      }
+      //path is a pipe or fifo everything is fine
+      else if (S_ISFIFO(attribut.st_mode)) {
+         pathIsDev = true;
+      } else {
+         // unknown file -> throw signal
+         throw theNoFileInfoSignal;
+      }
+   }
+
+   /**
+    call this method has to throw a signal (PEARL specified)
+   */
+   void Pipe::dationOpen() {
+      throw theNotAllowedSignal;
+   }
+
+   /**
+    call this method has to throw a signal (PEARL specified)
+   */
+   void Pipe::dationClose() {
+      throw theNotAllowedSignal;
+   }
+   /**
+   return path
+   */
+   char* Pipe::get() {
+      return device;
+   }
+
+   /**
+   return whether path is directory or devicefile
+   */
+   bool Pipe::isDevicePath() {
+      return pathIsDev;
+   }
+   /**
+    return whether path or Filedescriptor.
+    */
+   bool Pipe::isFileDes() {
+      return false;
+   }
+   /**
+    return Filedescriptor if theres one.
+   */
+   FILE* Pipe::getFileDes() {
+      return dev;
+   }
+}

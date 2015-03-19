@@ -1,0 +1,31 @@
+# pearl runtime system portable components FreeRTOS port
+
+# list of files which are independend of the target platform
+# give the path name as valid from the platform specific folder
+
+CSRC += ../FreeRTOS/FreeRTOSCommonHooks.c 
+
+CPPSRC += \
+	../FreeRTOS/CSema.cc \
+	../FreeRTOS/Log.cc \
+	../FreeRTOS/main.cc \
+	../FreeRTOS/Mutex.cc \
+	../FreeRTOS/PrioMapper.cc \
+	../FreeRTOS/Task.cc \
+	../FreeRTOS/TaskTimer.cc \
+	../FreeRTOS/TaskMonitor.cc 
+
+#	../FreeRTOS/TimerList.cc 
+#	../FreeRTOS/TaskList.cc \
+
+CPPINCS += ../FreeRTOS/.
+CINCS += ../FreeRTOS/.
+CINCS += ../common/.
+
+CHECK_HDRS += ../FreeRTOS/CSema.h
+CHECK_HDRS += ../FreeRTOS/Mutex.h
+CHECK_HDRS += ../FreeRTOS/PrioMapper.h
+CHECK_HDRS += ../FreeRTOS/Task.h
+CHECK_HDRS += ../FreeRTOS/TaskMonitor.h
+CHECK_HDRS += ../FreeRTOS/TaskTimer.h
+

@@ -1,0 +1,63 @@
+/*#########################################################################
+PROGRAM
+MonitorTask activate the SuspendTask and SUSPEND them after 0.1 SEC.
+The SuspendTask increment the variable var in a while loop for 2 seconds.
+After the SUSPEND the MonitorTask check the variable var 
+and check it after 0.5 sec once again.
+Then, the SuspendTask is continued .
+###########################################################################
+RESULT
+The variable var must be greater then checkVar and var must be 10 million 
+and checkVar and checkVar2 must be the same.
+##########################################################################*/
+
+MODULE(tasking_SuspendContinue);
+
+PROBLEM;
+
+DCL var FIXED(63) INIT (0);
+DCL varFinal FIXED(63) INIT (0);
+
+MonitorTask: TASK PRIO 2 MAIN;
+
+    DCL checkVar FIXED(63) INIT (0);
+    DCL checkVar2 FIXED(63) INIT (0);
+
+
+    ACTIVATE SuspendTask;
+    
+    AFTER 0.1 SEC RESUME;
+    
+    SUSPEND SuspendTask;
+    checkVar := var;
+      
+
+    AFTER 0.5 SEC RESUME;
+    checkVar2 := var;
+    
+    CONTINUE SuspendTask;
+    
+    SUSPEND;
+
+    __cpp__('if ( (_varFinal.x > _checkVar.x) && (_var.x == _varFinal.x) && (_checkVar.x == _checkVar2.x) ){ '
+            '   pearlrt::Control::setExitCode(0); '
+            '   printf("*** SUCCESS *** \\n"); '
+            '}else {'
+            '   pearlrt::Control::setExitCode(1); '
+            '   printf("*** FAILED ***\\n"); } ');
+END;
+
+SuspendTask: TASK PRIO 3;
+!    DCL end CLOCK;
+__cpp__('pearlrt::Clock _end;');
+__cpp__(
+    '_end = pearlrt::Clock::now() + pearlrt::Duration(2);');
+
+    __cpp__('while ((_end > pearlrt::Clock::now()).getBoolean()) {');
+               var := var + 1;
+    __cpp__('}');
+    varFinal := var;
+    CONTINUE MonitorTask;
+END;    
+
+MODEND;

@@ -1,0 +1,2 @@
+# Embedded Projects Octopus Hutschienen I/O
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c65", GROUP="users", MODE="0666"

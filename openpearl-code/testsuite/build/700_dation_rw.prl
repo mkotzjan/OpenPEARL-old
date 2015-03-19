@@ -1,0 +1,64 @@
+MODULE(dationrw);
+SYSTEM;
+! Disc defines a folder on the file system. The second parameters
+! denotes the maximum number of simultaneous open files
+!disc: Disc('/tmp/' ,10);
+
+/* expected C++ code  */
+__cpp__(
+     'static pearlrt::Disc s_disc("/tmp/", 10);'
+     'pearlrt::Device * d_disc = & s_disc;'
+);
+/*  */
+PROBLEM;
+   SPC disc DATION INOUT ALL;
+
+FileTest1: TASK MAIN;
+     DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
+     DCL f FIXED(15) INIT(42);
+     DCL (f4,f5) FIXED(15) INIT(0,0);
+     DCL error FIXED(15);
+
+     OPEN table BY ANY,IDF('file1.txt');
+
+!        'pearlrt::Character<9> tmp_name("file1.txt");'
+!        '_table.dationOpen(pearlrt::Dation::IDF | pearlrt::Dation::ANY, &tmp_name);'
+              WRITE f4 TO table;
+              WRITE f4 TO table;
+              WRITE f4 TO table;
+              WRITE f4 TO table;
+              WRITE f4 TO table;
+              WRITE f4 TO table;
+              WRITE f4 TO table;
+
+              WRITE f TO table BY POS(4), RST(error), POS(5);
+              READ f5,f4 FROM table BY RST(error), POS(4), POS(5);
+              READ f4 FROM table BY RST(error), POS(4);
+              READ f5 FROM table BY RST(error), POS(5);
+              READ f4 FROM table BY RST(error), POS(4);
+     CLOSE table;
+     IF (error /= 0) THEN
+__cpp__('printf(" error: RST-value should be zero( %d)\\n", _error.x);');
+__cpp__('pearlrt::Control::setExitCode(1);');
+     FIN;
+
+     IF (f /= f5) THEN
+__cpp__('printf(" error: did not read the same value (%d, %d)\\n", _f.x, _f5.x);');
+__cpp__('pearlrt::Control::setExitCode(1);');
+       error = 1;
+     FIN;
+     IF (f4 /= 0) THEN
+__cpp__('printf("error: f4 should be zero (%d)\\n",_f4.x);');
+__cpp__('pearlrt::Control::setExitCode(1);');
+       error = 1;
+     FIN;
+
+
+    IF error == 0 THEN
+      __cpp__('printf("success\\n");');
+    FIN;
+
+END;
+MODEND;
+
+

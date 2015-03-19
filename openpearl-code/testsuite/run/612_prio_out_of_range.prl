@@ -1,0 +1,51 @@
+/*#########################################################################
+PROGRAM
+Main Task activate task2 with prio 256 and task3 with prio 0.
+###########################################################################
+RESULT
+Both activations musst throw a signal (PrioOutOfRangeSignal).
+#########################################################################*/
+
+MODULE(prio_out_of_range);
+
+PROBLEM;
+
+Main : TASK  PRIO 2 MAIN;
+    
+    DCL check FIXED(2) INIT(2);
+    __cpp__(
+    'try {');
+        ACTIVATE Task2 PRIO 256;
+    __cpp__(
+    '}catch(pearlrt::PrioOutOfRangeSignal &s) {');
+        check := check -  1;
+        ACTIVATE Task2 PRIO  255;
+    __cpp__(
+    '}'
+    'try {');
+        ACTIVATE Task3 PRIO 0;
+    __cpp__(
+    '}catch (pearlrt::PrioOutOfRangeSignal &s) {');
+        check := check - 1;
+        ACTIVATE Task3 PRIO 1;
+    __cpp__(
+    '}'
+    'if (_check.x == 0) {'
+    '   printf("*** SUCCESS *** \\n"); '
+    '   pearlrt::Control::setExitCode(0);'
+    '}else {'
+    '   printf("*** FAILED *** \\n"); '
+    '   pearlrt::Control::setExitCode(1);'
+    '}');
+       
+END;
+
+Task2 : TASK PRIO 2;
+
+END;
+
+Task3 : TASK PRIO 2;
+    
+END;
+
+MODEND;

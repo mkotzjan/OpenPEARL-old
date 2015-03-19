@@ -1,0 +1,54 @@
+/*##############################################################################
+PROGRAM
+Main Task Activate Task2 with the Prio 3. The standard Prio from Task 2 ist 1.
+Main wait of Task2 and do then a CONTINUE Task2.
+Then the main task set the variable taskRunning and check the variable.
+When Main Task at the end, the Task2 is running an set the variable running of 2
+and go to the end.
+#################################################################################
+RESULT
+The Task2 don't came to the end befor the Main Task at the end.
+The CONTINUE statemant has no effect on the sequence from the programm.
+Because of this the value of the variable taskRunning at the moment when the main Task check 
+then musst be 1.
+##############################################################################*/
+
+MODULE(continue_two);
+
+PROBLEM;
+
+DCL s1 SEMA;
+DCL (task2Loop, task1Loop)  FIXED(63) INIT(0,0);
+DCL taskRunning FIXED (2) INIT(0);
+
+Task1: TASK PRIO 2 MAIN;
+    
+    ACTIVATE Task2 PRIO 3;
+    REQUEST s1;
+
+    CONTINUE Task2;
+    
+	taskRunning := taskRunning + 1;
+
+	
+	__cpp__(
+    'if (_taskRunning.x == 2) {'
+    '   printf ("*** FAILED *** \\n");'
+    '   pearlrt::Control::setExitCode (1);'
+    '}else if (_taskRunning.x == 1) {'
+    '   printf ("*** SUCCESS ***\\n");'
+    '   pearlrt::Control::setExitCode(0);'
+    '}');
+           
+
+END;
+
+Task2 : TASK PRIO 1;
+
+    RELEASE s1;
+
+	taskRunning := taskRunning + 1;
+        
+
+END;
+MODEND;
