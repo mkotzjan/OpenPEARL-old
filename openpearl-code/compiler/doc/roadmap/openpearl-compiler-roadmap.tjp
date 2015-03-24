@@ -1,0 +1,143 @@
+#
+#  [The "BSD license"]
+#  Copyright (c) 2012-2015 Marcel Schaible
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. The name of the author may not be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+#  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+#  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+#  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+##############################################################################
+# OpenPEARL Roadmap
+##############################################################################
+
+project prlc "OpenPEARL Compiler"  2015-03-22 +4m {
+	# Set the default time zone for the project. If not specified, UTC
+	# is used.
+	timezone "Europe/Berlin"
+	# Hide the clock time. Only show the date.
+	timeformat "%Y-%m-%d"
+	# Use US format for numbers
+	numberformat "-" "" "," "." 1
+	# Use US financial format for currency values. Don't show cents.
+	currencyformat "(" ")" "," "." 0
+	# Pick a day during the project that will be reported as 'today' in
+	# the project reports. If not specified, the current day will be
+	# used, but this will likely be outside of the project range, so it
+	# can't be seen in the reports.
+	now 2015-01-01-16:00
+	# The currency for all money values is the Euro.
+	currency "EUR"
+}
+
+
+resource dev "Developers" {
+  resource dev_marcel    "Marcel Schaible"
+  resource dev_jens      "Jens Dörwald"
+  resource dev_sebastian "Sebastian Kukuk"
+}
+
+copyright "© 2013-2015 OpenPEARL"
+
+task prlc "OpenPEARL Compiler" {
+    task "Ticket#56 TAKE/SEND does not compile" {  effort 5d allocate dev_marcel }
+    task "Ticket#61 SymbolTable:Type information"  { effort 20d allocate dev_jens }
+    task "Ticket#83 BIT INIT and BIT Operations do not compile" { effort 5d allocate dev_marcel }
+    task "Ticket#113 INIT at float datatyp" { effort 5d allocate dev_marcel }
+    task "Ticket#120 float constant 24 or 53" { effort 5d allocate dev_marcel }
+    task "Ticket#122 INTERRUPT does not compile" { effort 5d allocate dev_marcel }
+    task "Ticket#126 READ/WRITE with two (or more) absolute positioning statements" { effort 5d allocate dev_marcel }
+    task "Ticket#127 Signal handler must be finished with GOTO,RETURN, TERMINATE or INDUCE" { effort 5d allocate dev_marcel }
+    task "Ticker#129 Renaming of the compiler package from SmallPearl into OpenPEARL" { effort 5d allocate dev_marcel }
+    task "Integrate Semnatic Analysis into main branch" { effort 10d allocate dev_marcel,dev_jens }
+}
+
+# Now the project has been specified completely. Stopping here would
+# result in a valid TaskJuggler file that could be processed and
+# scheduled. But no reports would be generated to visualize the
+# results.
+
+navigator navbar {
+  hidereport @none
+}
+
+macro TaskTip [
+  tooltip istask() -8<-
+    '''Start: ''' <-query attribute='start'->
+    '''End: ''' <-query attribute='end'->
+    ----
+    '''Resources:'''
+
+    <-query attribute='resources'->
+    ----
+    '''Precursors: '''
+
+    <-query attribute='precursors'->
+    ----
+    '''Followers: '''
+
+    <-query attribute='followers'->
+    ->8-
+]
+
+textreport frame "" {
+  header -8<-
+    == OpenPEARL Compiler ==
+    <[navigator id="navbar"]>
+  ->8-
+  footer "----"
+  textreport index "Overview" {
+    formats html
+    center '<[report id="overview"]>'
+  }
+}
+
+# A traditional Gantt chart with a project overview.
+taskreport overview "" {
+  header -8<-
+    === Project Overview ===
+
+    The project is structured into 3 phases.
+
+    === Original Project Plan ===
+  ->8-
+  columns bsi { title 'WBS' },
+          name, start, end, chart { ${TaskTip} }
+  # For this report we like to have the abbreviated weekday in front
+  # of the date. %a is the tag for this.
+  timeformat "%a %Y-%m-%d"
+  loadunit days
+  hideresource @all
+}
+
+# Macro to set the background color of a cell according to the alert
+# level of the task.
+macro AlertColor [
+  cellcolor plan.alert = 0 "#00D000" # green
+  cellcolor plan.alert = 1 "#D0D000" # yellow
+  cellcolor plan.alert = 2 "#D00000" # red
+]
+
+
+
+
