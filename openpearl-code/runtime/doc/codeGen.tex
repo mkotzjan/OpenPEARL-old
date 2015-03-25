@@ -1,0 +1,28 @@
+\chapter{Language Elements to be treated by the Compiler}
+The following language elements must be treated by the compiler.
+
+\begin{description}
+\item[LENGTH] of FIXED, FLOAT, BIT, CHAR must be evaluated by the 
+    compiler. The runtime system expects concrete lengths for each element
+\item[REF] corresponds to the definition of a pointer to the 
+    element. This can be mapped on the C++ operators \verb|&| and \verb|*|.
+    Note that REF CHARACTER works different. This type is supported by the
+    runtime system.
+\item[CONT] Follow a pointer (\verb|*| should work). 
+		Only REF CHAR is supplied by the runtime system
+\item[TYPE] is a type declaration. The runtime expects the primitive types.
+   Perhaps the TYPE can be mapped on \verb|typedef|.
+\item[INV] denotes invariant. This should be checked by the compiler internally.
+    Perhaps the C++ \verb|const| may work. 
+\item[ARRAY] defines an array of elements (\verb|[]| should work)
+\item[STRUCT] must be mapped to C++ \verb|struct| by the compiler
+\item[TYPE] defines a type  upon e.g. a struct (\verb|typedef| should work)
+\item[DCL] defines a element. The compiler must instantiate an object
+    of the requested type. The C++ storage class modifiers should work
+    without problems.
+\item[SPC] specifies an element, which is declared in another module as
+  GLOBAL. The C++ \verb|extern| must be used.
+\end{description}
+
+ 
+

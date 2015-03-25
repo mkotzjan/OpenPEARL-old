@@ -1,0 +1,26 @@
+\chapter{Log}
+The logging facility itself is plattform specific. The interface is 
+defined plattform independently in {\em Log.h}.
+
+The following log levels are defined:
+\begin{description}
+\item[INFO] general information about the program execution
+\item[DEBUG] messages used for debugging the runtime system. Note that
+   many messages may affect the application execution.
+\item[WARN] messages aabout situations, where a backup solution is used.
+E.g. start of the application without root priviledes in Linux will 
+forbid the usage of the priority scheduler. The normal scheduler will be 
+used instead.
+\item[ERROR] are diagnostic information is case of signal raising.
+\end{description}
+
+The log interface defines the methods
+\verb|Log::info()|, \verb|Log::debug()|, Log::warn()| and \verb|Log::error()|.
+Each method takes at least on string argument like printf.
+Plain text is passed to the corresponding output.
+The following format elements are in use: \verb|%d|, \verb|%u|, \verb|%s|,
+\verb|%f| and \verb|%c|. No additional parameters are allowed with these 
+formatting options.
+
+The formatting is written plattform independently.
+The output is still plattform specific.

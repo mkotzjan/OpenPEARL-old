@@ -1,0 +1,126 @@
+\chapter{Introduction}
+
+This document describes the overview of the runtime system
+of OpenPEARL for all plattforms.
+The compiler API is described.
+Internal methods are documented as far as need for comprehension.
+Details on methods and parameters are 
+described in the source code based documentation with doxygen.
+
+\section{Structure of Files}
+The project targets different plattform. 
+This is reflected in the directory structure inside the runtime system.
+
+The structure is kept flat. The top level of runtime directories
+just contains folders for the diffent plattforms and the plattform
+independent part. Files, which are special to a specific plattform
+are stored in parallel folders which are named according the content.
+\begin{description}
+\item[common] contains the plattform independent parts.
+   The file \verb|Files.common| contains lists which are used in the
+  plattform specific  \verb|Makefile|
+\item[linux] contains the linux specific parts, as well as the common
+   linux device drivers. 
+\item[FreeRTOS] contains the FreeRTOS specific parts
+   The file \verb|Files| contains lists which are used in the
+  plattform specific  \verb|Makefile|
+\item[FreeRTOS\_lpc1768] constains the processor and board specific
+   files for the FreeRTOS port.
+\item[FreeRTOS\_V8.1.2] contains the files from the FreeRTOS system.
+  Theses files must be downloaded separately in order of licensing.
+   The file \verb|Files| contains lists which are used in the
+  plattform specific  \verb|Makefile|
+\item[includeComposer] contains helper an application to generate 
+   one include file for the complete runtime system
+\item[codeStyle] contains source code formating check routines
+\end{description}
+
+Some modules have a plattform independent part and a plattform
+depended part. The naming is usually done in that way that the 
+plattform independent part is named as e.q. {\em TaskCommon} and the 
+plattform depended part is names eq. {\em Task}. This provides a simple
+interface towards the compiler, since the compiler just instanciates
+an object of type {\em Task}.
+
+\section{Companion Tools}
+\subsection{Include Composer}
+There are a lot of header files in the runtime system. 
+The headers may include other headers again.
+To allow an easy deployment the tool {\em include composer} 
+was build using lex and yacc. It reads one header file {\em PearlIncludes.h}
+and creates one header which contains all definitions from the headers
+included bei PearlInclude.h. The system includes are treated in that way
+that they appear only once in the resulting header file.
+
+\begin{itemize}
+\item The tool treats the preprocessor statements 
+ifdef, ifndef, else, endif, define undef.
+\item The system includes (path separator \verb|<..>|) are collected
+and dumped in order to speed up the compilation process of the 
+pearl system.
+\item ifdef/ifndef statemente are evaluated. Only really required code
+   is passed to standard ouput stream.
+\item Limits may be changed in the source code: 
+   \begin{itemize}
+   \item length of defined identifier: 59 characters
+   \item number of defines identifier: 200
+   \item include depth: 10
+   \item IF depth: 20
+   \item include file name length: 29
+   \end{itemize}
+\item The user includes (path separator \verb|"..."|) are treated
+\end{itemize}
+ 
+
+\subsection{Delete White Space Lines}
+This tool removes multiple lines, which contain only white space characters
+and reduces them to one line.
+
+\section{Code Generation}
+There are some point to be considered at code generation.
+\begin{itemize}
+\item to avoid name conflicts, the identifiers from the PEARL code
+   are prepended with a prefix  (underscore)
+\item the runtime system is placed in the namespace \verb|pearlrt|.
+\item the compiler output code is in no namespace
+\end{itemize}
+
+{\bf 
+In this document the namespace qualifiers  and name decorators 
+are omitted in many places for better readability.
+}
+
+Signal handling and device definitions need the definition of 
+different components, which are related to one user define pearl 
+element.
+The corresponding chapters define a decoration scheme. If suitable
+for the compiler othe schemes are possible. 
+
+
+\section{Internal Helper Classes}
+\begin{description}
+\item[CSemaCommon]  provides the interface definition for counting semphores
+\item[MutexCommon] provides the interface definition for mutexes
+\item[IfThenElseTemplate] provides conditional compilation
+\item[NumberOfBytes] provides templates for size of data computations
+\end{description}
+The documentation of runtime internal classes is not subject of this document.
+Please refer to the doxygen output.
+
+\section{Code Portability}
+The code of the runtime system is according C++ standard.
+
+The following extensions provided by gcc are used:
+\begin{description}
+\item[labels as values] is used in the signal handling. 
+   If this featureis not available, the compiler must produce a switch 
+   statement instead of the {\em computed goto} to resolve
+   the current goto target.
+\item[\_attribute\_(format)] is used in the log facility to check
+   proper argument matching according the printf-semantic.
+   This option may be removed without problems, as long as the logging
+   calls are correct.
+\item[\_attribute\_(used)] is used in the FreeRTOS port to bypass linkage
+   problems which appear with FreeRTOS and LTO (Link Time Optimization)
+\end{description}
+   

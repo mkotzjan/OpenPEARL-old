@@ -1,0 +1,83 @@
+\chapter{Semaphore}
+PEARL requires a semaphore implementation with simultaneous locking
+mechanism. This is very unfamiliar in small embedded operation systems.
+Despite of the fact that Linux would support this feature for semaphores 
+thie mechanisme is implemented in the class {\em Semaphore} using one counting semaphore and a mutex. 
+Each multitasking operating system provide these two native elements.
+The Semaphore-class uses the common interfaces {\em CSemaCommon} and 
+{\em MutexCommon}. Both classes need a plattform specific implementation 
+with the names {\em CSema} and {\em Mutex}.
+
+A single PEARL semaphore is
+just a counter --- and for diagnosic purposes a pointer to the semaphore''s
+name.
+
+The semaphore operation request locks the class mutex to avoid race conditions 
+with other tasks semaphore operations. In case of all semaphores value are 
+larger than 0, they are decremented and the task continued.
+In case of at least one requested single semaphore is 0, the task is added
+to a wait queue ({\em PriorityQueue}).
+
+On releasing a PEARL semaphore, the wait queue content is checked if a 
+task may become continued. The wait queue is searched in order of the tasks 
+priority. The single semaphore''s  values are updated as necessary.
+
+To block a task the class must provided the methods {\em block} and 
+{\em unblock}.
+
+\section{Declaration}
+The declaration of a PEARL semaphore is always done with a preset value.
+
+\begin{PEARLCode}
+DCL s0 SEMAPHORE PRESET(0);
+DCL s1 SEMAPHORE PRESET(1);
+DCL s2 SEMAPHORE PRESET(2);
+\end{PEARLCode}
+
+The class {\em Semaphore} provides two macros for definition and 
+specification of a semaphore variable.
+\begin{description}
+\item[DCLSEMA] takes 2 parameters; the semaphore's name and the preset value.
+\item[SPCSEMA] takes only  the semphore's name as parameter.
+\end{description}
+
+\begin{CppCode}
+DCLSEMA(s0,0);
+DCLSEMA(s1,1);
+DCLSEMA(s2,2);
+SPCSEMA(s2);
+\end{CppCode}
+
+\section{Operations}
+The class {\em Semaphore} provides the \verb|static| operations 
+{\em request()}, {\em release()} and {\em dotry()}\footnote{try is a reserved
+keyword in C++}.
+
+PEARL provides the simultaneous locking pattern on semphores.
+This leads to the interface of the operations:
+\begin{CppCode}
+void Semaphore::request(Task *me, int nbrOfSemas, Semaphore **semas);
+void Semaphore::release(Task *me, int nbrOfSemas, Semaphore **semas);
+int Semaphore::dotry(Task *me, int nbrOfSemas, Semaphore **semas);
+\end{CppCode}
+
+\paragraph{Regard that TRY allows only one sempahore in PEARL.}
+
+\section{Sample Usage}
+
+\begin{PEARLCode}
+REQUEST s0,s1,s2;
+\end{PEARLCode}
+
+\begin{CppCode}
+{
+   static Semaphore * semas[] = {&s0,&s1,&s2};
+   Semaphore::request(me, sizeof(semas[])/sizeof(semas[0]), &semas);
+}
+\end{CppCode}
+
+The new block allows the reuse of the identifier {\em semas} in multiple
+{\em request}, {\em release} and {\em try} operations in the same 
+module.
+The static storage declaration provides the initialization before run time.
+The size calculation should be executed by the C++-compiler.

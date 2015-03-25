@@ -1,0 +1,669 @@
+\chapter{Devices and I/O}
+
+PEARL distinguishes between system dations and user dations.
+All examples in the language report shown that the statements TAKE and SEND
+operate directly on system dations like a digital i/o.
+The operations READ, WRITE, GET and PUT work only on user dations.
+User dations are created upon a system dation.
+
+System part and problem part may be compiled separatelly. Therefore 
+no information from the system part may be used to compile the problem part.
+
+\section{Language Problems}
+The language definition lacks some details in the region of the
+interface between system part and problem part as well as the 
+inter module specification declaration interface.
+Any incompatibilities in the interface specifications should result in
+errors during the build process. Detections during runtime should be avoided.
+
+\begin{itemize}
+\item There seems to be no strict signature to distinguish
+ in the {\em SPC} statement between system dation and user dation.
+\item BASIC dations do not specify the type of transferred data
+\item the global attribute may be omitted in the specification statement
+  if the system device is defined in the same module
+\item it is not clearified in the language specification, which attributes
+   are required in the specification of a imported user dation.
+\end{itemize}
+
+\paragraph{Work around in OpenPEARL: ({\em subject of discussion}) }
+\begin{itemize}
+\item a new optional class attribute is introdued {\em SYSTEM}, which
+   must be set for system dations
+\item the class attribute {\em BASIC} must be combined with a data type
+    like {\em ALL} or {\em any other specified type}. This allows
+    type checking at {\em TAKE} and {\em SEND}.
+\item there should be no intermixing of system and problem part.  ---
+   The specification of a system device need always a global attribute.
+\item the specification of a user dation need the specification of direction
+   and class attribute.
+\end{itemize}
+
+Example:
+\begin{PEARLCode}
+MODULE (m1);
+SYSTEM;
+   output: StdStream(stdout);
+PROBLEM;
+   SPC output  DATION OUT SYSTEM ALPHIC GLOBAL;
+   DCL console DATION OUT ALPHIC DIM(*,80) FORWARD STREAM NOCYCL CREATED(output) GLOBAL;
+MODEND;
+...
+MODULE (m2);
+PROBLEM;
+   SPC output  DATION OUT SYSTEM ALPHIC GLOBAL;
+   SPC console DATION OUT ALPHIC /* DIM(*,80) FORWARD STREAM NOCYCL CREATED(output) */ GLOBAL;
+MODEND;
+\end{PEARLCode}
+
+Remarks:
+\begin{itemize}
+\item the dation parameters in the comment in the specification
+   are not required 
+\end{itemize}
+
+\section{Not Supported Language Elements}
+\begin{description}
+\item[TFU] should be ignored by the compiler
+\item[TFU(MAX)] should be ignored by the compiler
+\item[FORBACK] is not supported yet, since tape drives are
+   difficult to find
+\item[R()] remote format must be treated by the compiler
+\end{description}
+
+\section{Declarations in System Part}
+There is surrently no rule to compile the system part into C++.
+
+To provide complete code examples the x86\_32\_linux target is used here.
+For details of the used system devices please check chapter \ref{x8632devices}.
+
+\begin{PEARLCode}
+MODULE (m1);
+SYSTEM;
+   output: StdStream(1);
+PROBLEM;
+MODEND;
+\end{PEARLCode}
+
+\begin{CppCode}
+static pearlrt::StdStream s_output(1);
+       pearlrt::Device * d_output = &s_output;
+\end{CppCode};
+
+All devices are derived from {\em Device}.
+Devices for basic dations are derived from {\em SystemDationB},
+all other devices are derived from {\em SystemDationNB}.
+The upcast of the pointer
+to the generic {\em Device*} type enables the compiler to generated 
+suitable code for the problem part.
+
+The concrete device object is set to {\em static} to avoid namespace pollution.
+Only the pointer is needed.
+
+\section{Decoration Scheme for Devices}
+We need different obejcts, which concern the same user object.
+The user objects are prependend with an underscore (\verb|_|).
+
+\begin{description}
+\item[d\_...] denotes the upcasted to {\em Device} 
+\item[s\_...] denotes the (static defined) real system device object
+\item[\_...] without other prefix)denotes the downcasted object in 
+     the C++ code of the problem part
+\item[dim\_...] denotes the dimension object, which is relate to the 
+   user dation
+\end{description}
+
+\section{Specifications in Problem Part}
+The system device is specified in the problem part.
+Depending on the class specifier in the {\em SPC}-statement the concete 
+dation type is deduced (see tab. \ref{dationTypes}).
+
+\begin{table}[bpht]
+\begin{tabular}{l|l|l|l}
+  & BASIC & ALPHIC & ALL / type \\
+\hline
+SYSTEM & SystemDationB & SystemDationNB & SystemDationNB \\
+ & {\em error} & DationPG & DationRW \\
+\hline
+\end{tabular}
+\caption{Deduced type of the dation object}
+\label{dationTypes}
+\end{table}
+
+
+\begin{PEARLCode}
+SPC output DATION OUT SYSTEM ALPHIC GLOBAL;
+SPC disc DATION OUT SYSTEM ALL GLOBAL;
+SPC console DATION OUT ALPHIC GLOBAL;
+SPC logbook DATION OUT Fixed(15) GLOBAL;
+SPC motor DATION OUT SYSTEM BIT(4) GLOBAL;
+\end{PEARLCode}
+
+\begin{CppCode}
+extern pearlrt::Device * d_output;
+static pearlrt::SystemDationNB _output* = 
+             static_cast<pearlrt::SystemDationNB*>(d_output);
+
+extern pearlrt::Device * d_disc;
+static pearlrt::SystemDationNB _disc* = 
+             static_cast<pearlrt::SystemDationNB*>(d_disc);
+
+extern pearlrt::DationPG _console;
+
+extern pearlrt::DationRW _logbook;
+
+extern pearlrt::Device * d_motor;
+static pearlrt::SystemDationB _motor* = 
+             static_cast<pearlrt::SystemDationB*>(d_motor);
+\end{CppCode}
+
+\section{Declaration of a User Dation}
+The declaration of user dation may appear inside and outside of procedures and 
+tasks.
+The declaration leads to an instantiation of an object. 
+The class attribute of the user dation decide about the type of the object
+(see tab. \ref{dationTypes}).
+
+The different types of possible dimension specifications are mapped to
+a class hierarchy for {\em DationDim}s. For details see the doxygen part 
+of the runtime documentation.
+
+\begin{PEARLCode}
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
+\end{PEARLCode}
+
+\begin{CppCode} 
+// 2-dimensions, first dimension is unbound
+static pearlrt::DationDim2 dim_console(80);
+static pearlrt::DationPG _console(_output, 
+                pearlrt::Dation::OUT      |
+                pearlrt::Dation::FORWARD  | 
+                pearlrt::Dation::STREAM   |
+                pearlrt::Dation::NOCYCL,
+                &dim_console);
+\end{CppCode}
+
+Remarks:
+\begin{itemize}
+\item the dation parameters are \verb|or|ed together
+\item the dimenion object is defined statically. 
+\item the {\em CREATED()} parameter is passsed as first parameter
+\item if the dation is defined as {\em GLOBAL} the \verb|static| must
+  be omitted
+\end{itemize}
+
+\subsection{DIRECT Dation}
+DIRECT dations are implemented on e.g. disc files
+\begin{itemize}
+\item    as artificial array like structure
+\item    the DIM-specifies the structure
+\item    absolute positioning is allowed
+\item    relative positioning is mapped on the absolute positioning
+\item    STREAM allows the positioning across dimension limits
+\item    STREAM allows silent reading and writing across dimension limits
+ \item   CYCLIC realizes a cyclic positioning modulo the complete
+        dimension in both directions
+\item    CYCLIC realizes a cyclic writing in that way that a
+          repositioning to the beginning of the dation is inserted
+          at the end of the dation
+\item    unwritten locations in the dations contain undefined values
+\item    CYCLIC on unbounded dations is ridiculous
+\end{itemize}
+
+\subsection{FORWARD Dation}
+FORWARD and CYCLIC is ridiculous since FORWARD can not rewind.
+FORWARD requires NOCYCL by logic.
+
+FORWARD dations are typically used on devices like stdin, 
+stdout or TCP/IP-sockets.
+
+\begin{description}
+\item[PUT/GET] dations are created on e.g. stdout. 
+   \begin{itemize}
+   \item PUT ... BY X, SKIP and PAGE write space, new line or formfeeds
+         as required by format
+   \item  GET ... BY X, SKIP and PAGE discard input characters until the
+         required number of characters, newlines or formfeeds were detected
+   \item NOSTREAM causes 
+        the specified dimension is used for error detection. 
+         GET/PUT across boundary cause an error condition
+   \item STREAM:
+         number of dimensions control the possibility for X,SKIP and PAGE
+         no boundary enforced
+   \end{itemize}
+
+\item[READ/WRITE] positioning:
+   \begin{itemize}
+     \item WRITE ... BY  X,SKIP and PAGE fills zero-records as required 
+           by the current location
+     \item READ ... BY  X,SKIP and PAGE discards input until 
+           the required location is reached.
+   \end{itemize}
+\item[READ/WRITE + NOSTREAM] dations are implemented on e.g.
+        TCP/IP socket or pipes
+   \begin{itemize}
+    \item The specified dimension is used for error detection
+    \end{itemize}
+\item[ READ/WRITE + STREAM] will  
+        normalize the current location to be within the specified dimensions
+        by calculating any out of bounds position by simulating line
+        and page wraps. Eg:
+\begin{verbatim}
+DIM( 10,80)
+! current location: (5,79)
+WRITE a,b,c TO ...; --> new logical location (5, 81)
+WRITE d TO .. BY SKIP;
+\end{verbatim}
+    \begin{itemize}
+     \item calculate virtual normalized location: (6,1)
+     \item SKIP fills 79 records with 0; new location (7,1)
+     \item d will be written on location (7,1); new location is  (7,2)
+     \end{itemize}
+\end{description}
+
+\section{Concurrency during I/O}
+\label{ioconcurrency}
+It is never stated but clearly appreciated that i/o-statements from
+different tasks should not intermix within their i/o-operations.
+This behavior is achieved by the {\em beginSequence} and 
+{\em endSequence} clause. 
+This clause locks mutex of the dation object to block concurrent
+i/o-statments upon the same dation.
+The task''s object reference (me-pointer) is passed with
+the {\em beginSequence} call.
+
+In case of abnormal termination due to signals in the try-block
+the {\em endSequence} in the catch-clause releases the used mutex.
+If a RST-value is specified in the statement the given variable is
+updated, else the exception is rethrown.
+
+Task suspending and termination within the try-block would cause an
+eternal blocking of the dation. 
+This behavior is not desired.
+Thus the suspend and terminate will not be done only at the end of a record
+{\em SKIP}) or after the completion of the i/o-statement.
+This is realized internally in the runtime system.
+
+\begin{PEARLCode}
+DCL (x,y) Fixed(15);
+DCL rst Fixed(31);
+...
+PUT x,y TO console BY F(4), RST(rst), F(5), SKIP;
+\end{PEARLCode}
+
+\begin{CppCode}
+Fixed<31> rst;
+Fixed<15> x
+Fixed<15> y;
+
+try {
+   _console.beginSequence(me);
+   _console.toF(x,4);
+   _console.rst(rst);
+   _console.toF(y,5);
+   _console.toSkip(1);
+   _console.endSequence();
+} catch (Signal& s) {
+   if (!_console.updateRst(&s)) {
+      _console.endSequence();
+      throw;
+   }
+   _console.endSequence();
+}
+\end{CppCode}
+
+The try-catch-clause captures all PEARL-signals from the code in the 
+type block. If a RST-value is specified in the format list, the method
+{\em updateRst} will assign the actual signal code to the RST-variable.
+If no RST-vale is specfied for this statement, the signal is propagated.
+If the error is produced in the formatting of x, a signal is thrown.
+If the error is produced in the formatting of y, no signal is thrown but rst
+is set.
+
+\section{Open and Close}
+The super class UserDation knows the OPEN and CLOSE operations.
+Both have optional parameters. This is solved by a \verb|or|ed
+parameter.
+
+\begin{PEARLCode}
+DCL f FIXED(31);
+...
+OPEN console;
+...
+OPEN logbook BY RST(f), IDF('file.001') ANY;
+...
+CLOSE console;
+...
+CLOSE logbook BY CAN;
+\end{PEARLCode}
+
+\begin{CppCode}
+Fixed<15> f;
+...
+_console.dationOpen();
+...
+{
+   static Character<8> fileName("file.001");
+   _logbook.dationOpen(Dation::IDF|Dation::ANY| Dation::RST, &fileName ,& f);
+}
+...
+_console.dationClose();
+...
+_logbook.dationClose(Dation::CAN);
+\end{CppCode}
+
+Remarks:
+\begin{itemize}
+\item The presence of a rst-value is signaled by the \verb|or|ed parameter
+   in dationOpen and dationClose
+\item The filename must be passed by reference. The corresponding
+   object must be defined. Eg. as \verb|static| is a new block.
+\item The runtime system checks whether the dation parameters from
+   user dation match the system dation's parameters. 
+   If they do not match a PEARL signal is raised
+\end{itemize}
+
+\section{Positioning}
+User dations allow to position with POS, ADV, SKIP, LIN, COL, ...
+
+The following positioning methods are supplied.
+All methods are available for output and input. The versions for 
+output have the prefix \verb|to|, the input version have the prefix \verb|from|.
+To avoid redundancy only the output versions are listed below.
+
+\begin{methodMapping}
+POS(x) & toPos(x) & \\
+POS(x,y) & toPos(x,y) & \\
+POS(x,y,z) & toPos(x,y,z) & \\
+SOP(x) & toSop(x) & \\
+SOP(x,y) & toSop(x,y) & \\
+SOP(x,y,z) & toSop(x,y,z) & \\
+ADV(x) & toAdv(x) & \\
+ADV(x,y) & toAdv(x,y) & \\
+ADV(x,y,z) & toAdv(x,y,z) & \\
+X(x) & toX(x) & \\
+SKIP(x) & toSkip(x) & \\
+PAGE(x) & toPage(x) & \\
+LINE(x) & & {\em not supported yet} \\
+COL(x) & & {\em not supported yet} \\
+\end{methodMapping}
+
+Note:
+\begin{itemize}
+\item a user dation with type {\em ALL} does not the size of 
+   the record. No positioning is allowed on such a dation.
+\end{itemize}   
+
+\section{PUT/GET Operations}
+PUT and GET are allowed on ALPHIC user dations. They are mapped on the
+class {\em DationPG}. 
+The compiler must produce a list of operations according the sequence 
+in the format list.
+This list of statements must be embedded in the try/catch/block described in
+\ref{ioconcurrency}.
+
+In the following table, the parameter denotes the corresponding data element.
+In PUT-statments the prefix \verb|to| is set to the formatting methog,
+in GET-statements the prefix \verb|from| is used.
+To avoid redundancy, only PUT-formatting is listed below.
+\begin{methodMapping}
+A & toA(x) & \\
+A(w) & toA(x,w) & \\
+F(w) & toF(x,w) & \\
+F(w,d) & toF(x,w,d) & \\
+F(w,d,s) & toF(x,w,d,s) & \\
+F(w) & toF(x,w) & \\
+D(w) & toD(x,w) & {\em not implemented yet} \\
+T(w) & toT(x,w) & {\em not implemented yet} \\
+B(w) & toB1(x,w) & {\em not implemented yet} \\
+B1(w) & toB1(x,w) & {\em not implemented yet} \\
+B3(w) & toB3(x,w) & {\em not implemented yet} \\
+B4(w) & toB4(x,w) & {\em not implemented yet} \\
+LIST &  & {\em not implemented yet} \\
+\end{methodMapping}
+
+Note:
+\begin{itemize}
+\item float is not supported yet
+\end{itemize}
+
+\section{READ/WRITE Operations}
+READ and WRITE are allowed on user dations with a specifig type or of type ALL.
+They are mapped on the class {\em DationRW}. 
+The compiler must produce a list of operations
+\begin{enumerate}
+\item perform all positioning operations first
+\item perform the data transfer in sequence of the given item list
+\end{enumerate}
+This list of statements must be embedded in the try/catch/block described in
+\ref{ioconcurrency}.
+
+For the data transfer two operations are defined. 
+
+\begin{description}
+\item[dationRead]{get a pointer to the data storage and the size of the data}
+\item[dationWrite]{get a pointer to the data storage and the size of the data}
+\end{description}
+
+
+\begin{PEARLCode}
+DCL (x,y) Fixed(15);
+DCL rst Fixed(31);
+...
+WRITE x,y TO dataFile BY RST(rst), POS(10), ADV(1);
+\end{PEARLCode}
+
+\begin{CppCode}
+Fixed<31> _rst;
+Fixed<15> _x
+Fixed<15> _y;
+
+try {
+   _dataFile.beginSequence(me);
+   _dataFile.rst(_rst);
+   _dataFile.toPos(10);
+   _dataFile.toAdv(1);
+   _dataFile.DationWrite(&_x, sizeof(_x));
+   _dataFile.DationWrite(&_y, sizeof(_y));
+   _dataFile.endSequence();
+} catch (Signal& s) {
+   if (!_dataFile.updateRst(&s)) {
+      _dataFile.endSequence();
+      throw;
+   }
+   _dataFile.endSequence();
+}
+\end{CppCode}
+
+The try-catch-clause captures all PEARL-signals from the code in the 
+type block. If a RST-value is specified in the format list, the method
+
+Remarks:
+\begin{itemize}
+\item The runtime system checks whether the operation is allowed according
+    the dation type (direction, positioning)
+\item The runtime system passes the raw data to the system device to
+   perform the i/o-operation
+\end{itemize}
+
+\section{TAKE/SEND Operations}
+TAKE and SEND are allowed on BASIC dations. They are mapped on the
+class {\em DationTS}. 
+The compiler must produce a list of operations according the sequence 
+in the format and data list.
+\begin{enumerate}
+\item insert the rst-setting first
+\item the data transfer 
+\end{enumerate}
+This list of statements must be embedded in the try/catch/block described in
+\ref{ioconcurrency}.
+
+\begin{PEARLCode}
+DCL x Bit(4);
+DCL rst Fixed(31);
+...
+SEND x TO device BY RST(rst);
+\end{PEARLCode}
+
+\begin{CppCode}
+BitString<4> _x
+Fixed<31> _rst;
+
+try {
+   d_motor.beginSequence(me);
+   d_motor.rst(_rst);
+   d_motor.dationSend(&_x, sizeof(_x));
+   d_motor.endSequence();
+} catch (Signal& s) {
+   if (!d_motor.updateRst(&s)) {
+      d_motor.endSequence();
+      throw;
+   }
+   d_motor.endSequence();
+}
+\end{CppCode}
+
+
+Remarks:
+\begin{itemize}
+\item S and CONTROL are not supported
+\item there may be only one data element in a TAKE or SEND statement
+\end{itemize}
+
+\section{Interface for User supplied Drivers for Basic Dations}
+For currently not supported system interfaces a C++ class must be supplied to 
+provide the system device.
+
+\subsection{System Dation Name}
+Define the name and parameters for the system dation.
+The new class must be derived from \verb|SystemDationB|.
+The parameters will be passed to the constructor of the class.
+
+Basic dations are used in combination with the PEARL statements TAKE and
+SEND.
+
+\subsection{Open}
+A method \verb|dationOpen(int openParam=0, Character<S>* idf=0, Fixed<31>* rstValue)|
+must be provided.
+The method is called when the PEARL program opens the dation.
+The specified open parameters are passed bitwise encoded in \verb|openParams|.
+If IDF- and/or RST-value are specified they are passed as pointers, else
+a null pointer is given.
+The method should make shure that the dation is not opened twice and
+the open parameters are ok.
+
+\paragraph{Note:} The idf parameter is a templated type.
+ Thus the dationOpen-method should be realized as a template method,
+ which delegates the concrete value of the parameter to an
+ internalOpen-method in an appropriate way.
+
+\subsection{Close}
+A method \verb|dationClose(int closeParams=0, Fixed<31>* rstValue)|
+must be provided.
+The method is called when the PEARL program closes the dation.
+The specified close parameters are passed bitwise encoded in \verb|closeParams|.
+If an RST-value is specified it passed as pointer, else
+a null pointer is given.
+The method should make shure that the dation is not closed twice and
+the close parameters are ok.
+
+\subsection{Read}
+A method \verb|dationRead(void * destination, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+input data to the location specified by \verb|destination|.
+The runtime system expects that this method blocks the calling thread,
+if no data are available.
+The method should make shure that only an opened dation may be used.
+
+\subsection{Write}
+A method \verb|dationWrite(void * source, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+output data from the location specified by \verb|source|.
+The runtime system expects that this method blocks the calling thread,
+until all data is transfered.
+The method should make shure that only an opened dation may be used.
+
+\subsection{Error Conditions}
+The methods may throw C++ exceptions, which are defines in the signal list.
+Existing signals should be reused as far as possible.
+
+\section{Interface for User supplied Drivers for Non Basic Dations}
+For currently not supported system interfaces a C++ class must be supplied to 
+provide the system device.
+
+\subsection{System Dation Name}
+Define the name and parameters for the system dation.
+The new class must be derived from \verb|SystemDationNB|.
+The parameters will be passed to the constructor of the class.
+
+Non basic dations are used in combination with the PEARL statements READ, WRITE
+or PUT,GET. 
+
+\subsection{Capabilities}
+The input and output routines for non basic dations 
+need information about the capabilities of the
+real device. The method \verb|capabilities()| must return a set of
+capabilities, which are provided by the device. The capabilities are
+defines as \verb|enum| in the \verb|Dation|-class.
+
+The runtime system checks whether the requested operations fit to the 
+device capabilities. The capabilities of the device are defined by this
+method. Multiple capabilities from the list below may be set via bitwise
+or operations.
+
+\begin{description}
+\item[IN] the device may be used as pure input dation
+\item[OUT] the device may be used as pure output dation
+\item[INOUT] the device may be used as dation for random directions
+    input and output
+\item[IDF] the device {\em needs} a file name for the open-statement
+\item[OLD] the device may contain persistent files,
+          which are indented to be read
+\item[NEW] the device allows the creation of files 
+\item[ANY] the device  supports files at all; at least 
+            this attribut should be set if IDF is set
+\item[PRM] the device supports persistent files
+\item[CAN] the device supports the removal of files
+\item[DIRECT] the device supports direct positioning (on given byte adresses)
+\item[FORWARD] the device allows sequential read and write operations
+\item[FORBACK] {\em NOT SUPPORTED} --- the device allows relative positioning
+\end{description}
+Note that the capability
+\begin{itemize}
+\item IDF needs any of the capabilites OLD, NEW, ANY.
+\item OLD needs the capability IN
+\item NEW needs the capability OUT
+\item FORWARD and DIRECT may be both
+\end{itemize}
+
+\subsection{Open}
+A method \verb|dationOpen(const char * idfValue, int openParams)|
+must be provided.
+The method is called when the PEARL program opens the dation.
+The current {\em openParams} must be treated according the language definition.
+
+\subsection{Close}
+A method \verb|dationClose(int closeParams)|
+must be provided.
+The method is called when the PEARL program closes the dation.
+The current {\em closeParams} must be treated according the language 
+definition.
+
+\subsection{Read}
+A method \verb|dationRead(void * destination, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+input data to the location specified by \verb|destination|.
+The runtime system expects that this method blocks the calling thread,
+if no data are available.
+
+\subsection{Write}
+A method \verb|dationWrite(void * source, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+output data from the location specified by \verb|source|.
+The runtime system expects that this method blocks the calling thread,
+until all data is transfered.
+
+\subsection{Error Conditions}
+The methods may throw C++ exceptions, which are defines in the signal list.
+Existing signals should be reused as far as possible.
+

@@ -1,0 +1,155 @@
+\section{System devices}
+\label{x8632devices}
+
+System devices are defined by entries in the system part.
+In case of problems during creation of the system device entry, the
+usual exception mechanism does not work, since these objects are created
+statically. Please check the log file for details.
+
+\subsection{Disc}
+The system device \verb|Disc| allows the access of files in the system.
+
+Synopsis: \verb|Disc(path, nbr)|
+
+\begin{description}
+\item [path] specifies the system path of the directory which should contain
+    the files defined by the {\em IDF} parameter in the {\em OPEN} statement
+\item[nbr] specifies the number of concurrent opened files with this dation
+     specified by {\em CREATED(...)} in the {\em OPEN} statement
+\end{description}
+
+Supported attributes: FORWARD, DIRECT, IN, OUT, INOUT
+
+Multiple dations may by defined on the same path.
+
+\subsection{StdStream}
+The system device \verb|StdPath| allows the access of UNIX standard streams
+like stdin, stdout and stderr.
+
+Synopsis: \verb|StdStream(path)|
+
+\begin{description}
+\item [path] specifies the system stream with the usual values. 
+   \begin{description}
+    \item [0] denotes stdin
+    \item [1] denotes stdout
+    \item [2] denotes stderr
+   \end{description}
+\end{description}
+
+Supported attributes: FORWARD, IN, OUT
+
+Only one system device shall be defined per standard stream to avoid
+intermixing of input and output.
+
+\subsection{Pipe}
+The system dation {\em Pipe} is useful for testing and interaction with
+other applications. The dation provides access to named pipes.
+
+Synopsis: \verb|Pipe(path, nbr, params)|
+
+\begin{description}
+\item [path] specifies the system path of the fifo file
+    of the named pipe
+\item[nbr] specifies the number of concurrent opened files with this dation
+     specified by {\em CREATED(...)} in the {\em OPEN} statement
+\item [params] is a string value for detailed control of the behavior
+     at creation and termination. The parameters are searched in the string
+     case sensitive. The sequence of the parameters is artificial.
+   \begin{description}
+     \item[OLD] the entry in the file system must exist before starting
+     \item[NEW] the entry in the file system must not exist at starting
+     \item[ANY] the entry may exist or will be created else; an existing
+                file syste entry must by of type FIFO (default).
+     \item[CAN] the file system entry shall be deleted at the end of the 
+                application
+     \item[PRM] the file system entry shall remain at the end of the
+                application (default)
+   \end{description} 
+   The permissions are set to \verb|ugo=rwx| for new file system entries.
+\end{description}
+
+Supported attributes: FORWARD, IN, OUT
+
+The declaration of multiple pipe devices upon the same system file shall
+be avoided.
+ 
+\subsection{OctopusDigitalOut}
+The device OctopusDigitalOut provides an access to digital output bits
+on the so called OCTOPUS-Board of Embedded Projects.
+The Octopus board provides 6 ports with 8 bits each. Each bit may be
+used as input or output.
+
+Synopsis: \verb|OctopusDigitalOut(port, start, width)|
+
+\begin{description}
+\item [port] specifies the port letter. Valid characters are 'A', 'B', .. 'F'
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     are 7,6,... 0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..8.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by writing a BIT(width)-value to the
+opened system dation. 
+Writing other data than BIT-types  may cause a signal, if the size of the
+data is larger than 1 byte. If the size is 1 byte, unpredictable results may
+occur.
+
+It is checked that a i/o-bit is not used by different declarations within
+one application.
+  
+\subsection{OctopusDigitalIn}
+The device OctopusDigitalIn provides an access to digital input bits
+on the so called OCTOPUS-Board of Embedded Projects.
+The Octopus board provides 6 ports with 8 bits each. Each bit may be
+used as input or output.
+
+Synopsis: \verb|OctopusDigitalIn(port, start, width)|
+
+\begin{description}
+\item [port] specifies the port letter. Valid characters are 'A', 'B', .. 'F'
+\item[start] specifies the number of left most bit of the group. Valid numbers
+     are 7,6,... 0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..8.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by reading a BIT(width)-value to the
+opened system dation. 
+Reading other data than BIT-types  may cause a signal, if the size of the
+data is larger than 1 byte. If the size is 1 byte, unpredictable results may
+occur.
+
+It is checked that a i/o-bit is not used by different declarations within
+one application.
+  
+  
+\subsection{Creating a new Device for User Dations}
+The creation of a new device is very simple:
+\begin{enumerate}
+\item find a suitable device name
+\item pass the parameters needed for construction of the device as
+      parameters
+\item add a target rule for the device in the Makefile
+\item create a C++ class with the name of the device and add this class
+      in the Makefile
+\item provide {\em capabilities} in the ctor in that way that the allowed
+      capabilities are listed
+\item if more than on dation may be opened in a concurrent way on the new
+      device, you should provide a pool mechanism like in Disc.
+      If the new device allows only one opened dation at one time, you 
+      should omit the pool like in Serio.
+\item provide the dationOpen, dationClose, dationRead, dationWrite 
+      and dationSeek methods. Check the actual given parameters on
+      validity and create Log-entries and throw exceptions in case
+      of bad parameters.
+      Note that dationSeek is not required, if only FORWARD dations
+      may be created.
+\item create unit tests for google tests framework in tests/ and add the
+      tests in tests/Makefile
+\item run tests/DationTests and check for proper operation of the new device
+\end{enumerate}
+
