@@ -1,0 +1,1753 @@
+\chapter{Parallel Activities}  % 9
+
+Typical for a program to control a technical process are
+\begin{itemize}
+\item asynchronous processes as program parts which run parallel in time 
+and independent from one another, and which are initiated by
+spontaneous events or at certain (scheduled) times, as well as
+\item the synchronisation of such processes at certain program points,
+e.g., to be able to exchange data with one another.
+\end{itemize}
+
+To program such processes, in PEARL tasks, interrupts and
+synchronisation objects are used.
+
+A task is of a program part which is executed under the control of the
+operating system. The task body, like a procedure body consists of PEARL 
+declarations and statements. Before using it, a task must be declared; 
+upon this, an identifier is assigned to it, which is then mentioned 
+in tasking operations such as start or resumption.
+
+Since usually only one processor is available to the tasks of a program,
+they must compete for its use --- but also for the access to other
+resources (such as I/O devices) which have to be shared. The
+operating system, assigns the resources taking account of
+the tasks' priority. Thus, a positive integer can be allocated to a task
+as priority, smaller numbers meaning higher priority. The thus
+determined task priorities are used by the operating system to control
+the allocation of resources. If a task, e.g., possesses the only
+processor and requests another, exclusively occupied resource, the
+operating system withdraws the processor from this task and allocates it to
+the task of highest priority among all runable  tasks waiting for the
+processor. To runnable tasks of the same priority, the processor is
+allocated due to the Round-Robin-Strategy.
+
+Such a priority controlled re-allocation of a processor takes place each
+time, when one of its operating system functions is called, e.g., upon
+the occurrence of an interrupt or upon executing statements for task 
+control, for synchronisation and for input and output.
+
+\section{Declaration and Specification of Tasks (TASK)}   % 9.1
+
+The declaration of tasks takes place analogously to the declaration of
+procedures. In contrast to procedures, tasks may only be declared at
+module level --- i.e., not within procedure or task bodies. Furthermore,
+parameters are not permitted. However, since in a task body all PEARL
+objects declared at module level may be used and --- as far as it is
+possible --- changed, the data exchange with a task can take place via
+data which are declared at module level. Particularly the access of
+several tasks to the same data, however, should carefully be
+synchronised with the means described in 9.3. In the case of the data 
+exchange by I/O statements, the input/output functions
+already take over the synchronisation.
+
+Example:
+
+A task Protocol deposits protocol texts in the variable Text to be
+delivered to a terminal via the task Output. (The needed synchronisation
+statements are explained in 9.3.)
+
+\begin{tabbing}
+\x Protocol: \= \kill
+
+{\bf PROBLEM}; \> \\
+\x {\bf DCL} Text {\bf CHAR}(60); \> \\
+\x Protocol: \> {\bf TASK}; \\
+      \> Text := ProtocolText(27);\\
+      \> ... \\
+      \> {\bf END}; ! Protocol \\
+      \> \\
+\x Output:   \> {\bf TASK}; \\
+      \> {\bf PUT} Text {\bf TO} Printer {\bf BY} LIST;\\
+      \> ... \\
+      \> {\bf END}; ! Output\\
+\x ...       \>
+\end{tabbing}
+
+The general form of a task declaration reads:
+
+TaskDeclaration ::=\\
+\x Identifier: {\bf TASK} [ PriorityAttribute ] [ {\bf MAIN} ] [ GlobalAttribute ] ;\\
+\x TaskBody \\
+\x {\bf END};
+
+PriorityAttribute ::= \\
+\x \{ {\bf PRIORITY $\mid$ PRIO} \} IntegerWithoutPrecision$\S $GreaterZero
+
+TaskBody ::= \\
+\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
+
+If no priority is given in a task declaration, priority 255 is assumed.
+\addedtext{The priority value must be in the range from 1 to 255. 
+In case the priority value is not inside this range the PrioOutOfRangeSignal
+is induced.}
+
+
+The general form of a task specification reads:
+
+TaskSpecification ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier$\S $Task {\bf TASK} GlobalAttribute;
+
+Upon program or system start, the tasks marked with MAIN are started
+according to their priority. All MAIN tasks must be declared in the same
+module.
+
+The global attribute is explained in 4.4.
+
+\subsection{References to Tasks (REF TASK)}   % 9.1.1
+
+The control of all task activities is also possible via references to
+objects of type TASK. The declaration of corresponding reference
+variables can take place like this:
+
+TaskReferenceDeclaration ::= \\
+\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ]\\
+\x [ AllocationProtection ] {\bf REF TASK} [ GlobalAttribute ] [ InitialisationAttribute ];
+
+The general form of the specification of task reference variables reads:
+
+TaskReferenceSpecification ::= \\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList [ VirtualDimensionList ] \\
+\x [ AllocationProtection ] {\bf REF TASK} GlobalAttribute;
+
+The following short example shows an application possibility for task
+reference variables:
+
+Example:
+
+Both segments from two PEARL programs show how various tasks can be
+started from a procedure, once via their names, once via references.
+
+\begin{tabbing}
+\x {\bf SPC} \= {\bf END}; \= {\bf PROC} \= \kill
+
+{\bf PROBLEM}; \> \> \\
+\x {\bf SPC} (Consumer\_1, Consumer\_2, Consumer\_3) {\bf TASK GLOBAL}; \> \> \> \\
+\x ... \> \> \> \\
+\x StartTask: \> \> {\bf PROC} \> (Index {\bf FIXED});\\
+       \> \> {\bf CASE} \> Index \\
+       \> \> {\bf ALT}  \> {\bf ACTIVATE} Consumer\_1;\\
+       \> \> {\bf ALT}  \> {\bf ACTIVATE} Consumer\_2; \\
+       \> \> {\bf ALT}  \> {\bf ACTIVATE} Consumer\_3; \\
+       \> \> {\bf FIN}; \> \\
+\x \> {\bf END}; \> ! StartTask \> \\
+\x ... \> \> \>
+\end{tabbing}
+
+\begin{tabbing}
+\x {\bf DCL} Consumer (3) \= \kill
+{\bf PROBLEM}; \>  \\
+\x {\bf SPC} (Consumer\_1, Consumer\_2, Consumer\_3) {\bf TASK GLOBAL}; \> \\
+\x {\bf DCL} Consumer (3) \> {\bf INV REF TASK GLOBAL} \\
+     \> {\bf INIT} (Consumer\_1, Consumer\_2, Consumer\_3);\\
+\x ... \> \\
+\x {\bf DCL} \= {\bf END}; \= \kill
+\x StartTask: \> \> {\bf PROC} (Index {\bf FIXED});\\
+       \> \> {\bf IF} Index $<$ {\bf UPB} Consumer {\bf THEN}\\
+       \> \> \x {\bf ACTIVATE} Consumer (Index);\\
+       \> \> {\bf FIN};\\
+\x \> {\bf END}; \> ! StartTask\\
+
+\x ... \> \>
+\end{tabbing}
+
+\subsection{Determining Task Addresses}  % 9.1.2
+
+The address of a task can be obtained by calling the predefined
+function TASK or simply by assigning a task identifier to a task
+reference variable.
+
+Example:
+
+{\bf SPC} TemperatureMeasurement {\bf TASK GLOBAL};\\
+{\bf DCL} PtrTask {\bf REF TASK};\\
+...\\
+PtrTask := {\bf TASK} (TemperatureMeasurement);\\
+PtrTask := TemperatureMeasurement;
+
+Both assignments are equivalent, however, the first form should be used,
+because it documents the address assignment in a better way.
+
+The address of the running task is received by invoking the function
+TASK without stating a parameter.
+
+Example:
+
+...\\
+PtrTask := {\bf TASK}; \x ! provides address of the task containing
+this statement.\\
+...\\
+
+Besides using task reference variables in task statements, they can
+also be used for identifying tasks (cf. IS and ISNT operators).
+
+Example:
+
+{\bf IF} PtrTask {\bf IS TASK}(hello) {\bf THEN}\\
+\x \x ...\\
+{\bf FIN};\\
+{\bf IF} PtrTask {\bf IS TASK THEN}\\
+\x \x $/^*$ points to running task $^*/$\\
+\x \x ...\\
+{\bf FIN};
+
+\subsection{Determining Task Priorities}   % 9.1.3
+
+The (current) priority of a task can be obtained by the predefined
+function PRIO. Without stating a parameter, it provides the priority of
+the running task, and with a task name as parameter, it returns the
+priority of that task.
+
+Example:
+
+{\bf DCL} CurrPrio {\bf FIXED}(15);\\
+{\bf DCL} CurrTaskA {\bf FIXED}(15);\\
+{\bf SPC} TaskA {\bf TASK GLOBAL};\\
+...\\
+CurrPrio := {\bf PRIO};\\
+PrioTaskA := {\bf PRIO} (TaskA);\\
+{\bf CONTINUE} TaskA {\bf PRIO} CurrPrio + 1;
+
+\section{Statements for Controlling Tasks}    % 9.2
+
+A task can be started, terminated, suspended, continued, resumed and
+descheduled.
+
+\subsection{Start Condition}   % 9.2.1
+
+Unlike procedures, tasks are not executed immediately by calls, but in
+dependence of time instants and interrupts. Thus, a task must first be
+{\bf scheduled} for the start by a task control statement of the
+syntax
+
+Task\_Start ::= \\
+\x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task;
+
+The start itself is managed by a real time operating system. If
+the StartCondition defined in the control statement is fulfilled,
+the task first becomes ``runnable''; but it is not started, i.e.,
+transferred into the state ``running'', until it has become the runnable
+task of highest priority (cf. also 9.2.2).
+
+Examples:
+
+{\bf AT} 20:0:0 {\bf ACTIVATE} Statistics;\\
+\x means that the task ``statistics'' is not to be started until the
+future time ``8 o'clock p.m.''.
+
+{\bf ACTIVATE} statistics;\\
+\x in contrast, means that the task ``statistics'' is to be started
+immediately.
+
+With the start condition, tasks can be scheduled for cyclic (repeated)
+start, in accordance with the syntax definition
+
+StartCondition ::=\\
+\x {\bf AT} Expression$\S $Time [ Frequency ]\\
+\x $\mid$ {\bf AFTER} Expression$\S $Duration [ Frequency ]\\
+\x $\mid$ {\bf WHEN} Name$\S $Interrupt [ {\bf AFTER} Expression$\S $Duration ] [ Frequency ]\\
+\x $\mid$ Frequency
+
+Frequency ::= \\
+\x {\bf ALL} Expression$\S $Duration [ \{ {\bf UNTIL} Expression$\S $Time \}\\
+\x $\mid$ \{ {\bf DURING} Expression$\S $Duration \} ]
+
+% Zeile zu lang; Umbruch vor ]
+
+Examples:
+
+{\bf ALL} T {\bf ACTIVATE} Regulator;\\
+\x means that task Regulator becomes runnable at each integer
+multiple of the time interval T.
+
+{\bf WHEN} Alarm {\bf ACTIVATE} ShutDown;\\
+\x means that the task ShutDown becomes runnable each time when the
+interrupt Alarm occurs.
+
+AT Expression$\S $Time determines, at which time the task shall be
+executed for the first time, AFTER Expression$\S $Duration determines,
+from when on this is to happen relative to the execution of the task
+control statement, and WHEN Name$\S $Interrupt determines that this is
+to happen when the denoted interrupt occurs, possibly delayed by the
+duration denoted in AFTER Expression$\S $Duration. If AT, AFTER and WHEN
+are lacking, the task becomes runnable immediately after the execution
+of the task control statement.
+
+If the task is to be repeated after equal time intervals, the time between
+two executions is to be determined by ALL Expression$\S $Duration. To
+limit the repeated executions, a time can be determined by UNTIL
+Expression$\S $Time, or a duration with DURING Expression$\S $Duration,
+respectively, after which no more task starts are repeated.
+
+If the start condition commences with WHEN, the task becomes runnable
+each time the denoted interrupt occurs, considering further components
+of the start condition. A schedule determined by ALL becomes
+re-effective, relative to the occurrence of the interrupt, whereas the
+previous schedule becomes ineffective.
+
+\begin{added}
+In combinations of WHEN and AFTER each interrupt occurance restarts
+the delay period for the tasks activation.
+This is shown in figure  \ref{whenAfter}.
+\end{added}
+
+\begin{figure}
+\setlength{\unitlength}{1.00mm}
+\linethickness{0.4pt}
+\begin{picture}(140.00,30.0)
+\footnotesize
+\thicklines{}
+\setlength\fboxsep{0pt}
+
+\put(0,18){IruptTask}
+\put(0,8){Interrupt occurs}
+\put(20,05){\vector(1,0){120}}
+\put(135,0){time}
+\put(29.2,8){$\uparrow$}
+% ################
+\put(30,18){\colorbox{gray!20}{\framebox(10,5){delay}}} % 
+\put(40.20,18){\framebox(10,5){T1}}
+
+\put(52.2,8){$\uparrow$}
+\put(53,18){\colorbox{gray!20}{\framebox(10,5){delay}}} % 
+\put(54.2,8){$\uparrow$ (a)}
+\put(55,22){\colorbox{gray!20}{\framebox(10,5){delay}}} % 
+\put(65.20,22){\framebox(10,5){T1}}
+
+\put(79.2,8){$\uparrow$}
+\put(80,18){\colorbox{gray!20}{\framebox(10,5){delay}}} % 
+\put(90.20,18){\framebox(25,5){T1}}
+\put(93.2,8){$\uparrow$ (b)}
+\put(94,22){\colorbox{gray!20}{\framebox(10,5){delay}}} % 
+\put(115.45,22){\framebox(10,5){T1}}
+\multiput(104,27)(2,0){5}{\line(1,0){1}}
+  \put(114.5,27){\vector(1,0){1}}
+\put(110.2,8){$\uparrow$ (c)}
+\end{picture}
+\caption{The task IruptTask becomes activated by an interrupt. 
+The activation itself is delayed for 1 second. 
+If the interrupt re-occurs during the delay period - the delay
+period is retriggered (a).
+If the interrupt occurs while the task is still active, the delay
+timer is started again (b). If the task is still active at the end
+of the delay time
+the activation is buffered once and executed immediately after the 
+task's termination (c).}
+\label{whenAfter}
+\end{figure}
+
+The start condition becomes ineffective 
+\removedtext{(i.e., the task associated with
+it is not executed any longer)} % verwirrende Formulierung
+,
+\begin{itemize}
+\item if it commences with AFTER or ALL and an end condition determined
+by UNTIL or DURING is reached, or if it has the form AFTER
+Expression$\S $Duration and the denoted Duration reckoning from the
+execution of the task control statement has passed,
+\item because a statement to deschedule a task is executed (see 9.2.7),
+\item \removedtext{
+ upon execution of a new task control statement of the same type.
+The previous start condition is replaced by the new one
+, or, if no new
+condition is denoted, deleted.}
+\item \addedtext{
+ upon execution of a new task control statement of the same type ({\bf ACTIVATE}
+or {\bf CONTINUE}).
+The previous start condition is replaced by the new one
+, or, if no new
+condition is denoted, deleted.}
+\end{itemize}
+
+Example:
+
+...\\
+{\bf AT} 12:0:0 {\bf ACTIVATE} Protocol; \\
+{\bf ALL} 2 HRS {\bf ACTIVATE} Protocol; \\
+...
+
+These two schedulings cannot be valid at the same time. On the contrary,
+start condition ALL 2 HRS replaces start condition AT 12:0:0, unless
+time ``12 o'clock'' does not occur before executing the second
+statement.
+
+\subsection{Starting a Task (ACTIVATE)}   % 9.2.2
+
+The general form of the statement to start a task (i.e., to schedule a
+task to be started) reads:
+
+TaskStart ::=\\
+\x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task [ Priority ];
+
+Priority ::=\\
+\x \{ {\bf PRIORITY $\mid$ PRIO} \} Expression$\S $WithPositiveIntegerAsValue
+
+Executing such a start statement causes that the indicated task
+applies for the allocation of a processor immediately (form without
+start condition) or at the instant determined by the start condition ---
+competing with all other tasks being runable at the moment
+of the start (being runable) as well. Thus, upon an immediate start,
+the started task competes particulary with the starting task, if only
+one processor is provided.
+
+Possibly, the indicated task has already been started and not been
+terminated when executing the start statement. If in this case no
+StartCondition is denoted, an error message occurs.
+However, if the
+start statement contains a StartCondition, the indicated task is
+continued, and its re-start is scheduled (buffered) according to the
+StartCondition, replacing a possibly existing scheduling by the new
+one.
+\begin{added}
+The the task will be re-started as soon as the task terminates.
+This buffering is limited to 1 re-start action.
+% as described in FullPEARL(1977)
+
+This behavior is shown in figure~\ref{task-sched} and \ref{task-sched1}. The rectangles denote the time period, where the tasks are active. The arrows mark
+the time of interaction.
+\end{added}
+
+\begin{figure}
+\setlength{\unitlength}{1.00mm}
+\linethickness{0.4pt}
+\begin{picture}(90.00,20.0)
+\footnotesize
+\thicklines{}
+\put(0,8){Interrupt occurs}
+\put(0,14){IruptTask}
+\put(20,05){\vector(1,0){70}}
+\put(85,0){time}
+\put(39.2,8){$\uparrow$ (a)}
+\put(40,12){\framebox(10,5){T1}}
+\put(59.2,8){$\uparrow$}
+\put(60,12){\framebox(10,5){T1}}
+\put(63,8){$\uparrow$}
+\put(65,8){$\uparrow$ (b)}
+\put(70.3,12){\framebox(10,5){T1}}
+
+\end{picture}
+\caption{The task IruptTask becomes activated by an interrupt (a). 
+If the interrupt occurs while the task is still active, the 
+activation is buffered once and executed immediately after the 
+task's termination (b).}
+\label{task-sched}
+\end{figure}
+
+\begin{figure}
+\setlength{\unitlength}{1.00mm}
+\linethickness{0.4pt}
+\begin{picture}(110.00,20.0)
+\footnotesize
+\thicklines{}
+\put(0,10){CyclTask}
+\put(0,0){1 second tick}
+\put(10,05){\vector(1,0){100}}
+\put(105,0){time}
+\multiput(29.2,0)(20,0){4}{$\uparrow$}
+\put(30,10){\framebox(10,5){T1}}
+
+\put(50,10){\framebox(25,5){T1}}
+\put(75.3,10){\framebox(5,5){T1}}
+
+\put(90,10){\framebox(5,5){T1}}
+\end{picture}
+\caption{The task CyclTask should become activated all 1 sec. 
+The execution time varies. If the task is still active at the 
+next activation time, the 
+activation is buffered once and executed immediately after the 
+task's termination.}
+\label{task-sched1}
+\end{figure}
+
+A possibly stated priority overwrites the priority stated in the
+declaration of the indicated task. 
+\begin{added}
+The new priority is valid only 
+for this activation. Subsequent activations will use the priority, which
+is specified in the task declaration.
+\end{added}
+
+\begin{added}
+\OpenPEARL{} uses relative times for the startCondition. This becomes apparent,
+if the time-scale is re-adjusted. The re-start will occur according the
+time-base which was valid while setting the task schedule condition.
+
+Example:
+
+{\bf AT} 22:00:00 {\bf ALL} 2 HRS {\bf UNTIL} 2:00:00  {\bf ACTIVATE} t1;
+will produce the activation of the task t1 at the following time, 
+depending on the time of the execution of the scheduled activation statement.
+\begin{tabular}{l|l}
+current time & activation times \\
+\hline
+12:00:00 & 22:00:00, 0:00:00 (tomorrow), 2:00:00 (tomorrow) \\
+23:00:00 & 22:00:00 (tomorrow), 0:00:00 (day after tomorrow) ,\\
+  &  2:00:00 (day after tomorrow) \\ 
+\end{tabular}
+
+Note that \OpenPEARL{} treats time intervals inclusive the borders.
+
+Figure \ref{sched_act} illustrates the possibilities to start a task
+immediately or under various start conditions.
+\end{added}
+
+\setlength{\unitlength}{1.00mm}
+\begin{figure}
+\begin{picture}(145,145)
+\newsavebox{\normalstmt}
+\savebox{\normalstmt}(40,8)[bl]{
+   \put(0,0){\line(1,0){40}}
+   \put(0,8){\line(1,0){40}}
+   \put(0,0){\line(0,1){8}}
+   \put(40,0){\line(0,1){8}}
+}
+\newsavebox{\compare}
+\savebox{\compare}(30,8)[bl]{
+   \put(0,4){\line(1,1){4}}
+   \put(0,4){\line(1,-1){4}}
+   \put(4,0){\line(1,0){22}}
+   \put(4,8){\line(1,0){22}}
+   \put(26,0){\line(1,1){4}}
+   \put(26,8){\line(1,-1){4}}
+}
+
+% show bounding frame
+%\put(0,0){\line(1,0){145}}
+%\put(0,0){\line(0,1){145}}
+%\put(145,145){\line(0,-1){145}}
+%\put(145,145){\line(-1,0){145}}
+
+\put(60,140){\makebox(0,0){{\bf start by statement}}}
+\put(110,140){\makebox(0,0){{\bf start by interrupt}}}
+\put(110,130){\makebox(0,0){{\bf WHEN} Name\S Interrupt}}
+\put(090,126){\usebox{\normalstmt}}
+\put(110,126){\vector(0,-1){8}}
+\put(60,126){\vector(0,-1){8}}
+% --------------------
+
+\put(60,114){\makebox(0,0){delayed start ?}}
+\put(45,110){\usebox{\compare}}
+\put(75,114){\line(1,0){4}}
+\put(74,110){y}
+\put(79,114){\line(0,-1){8}}
+\put(60,106){\vector(0,-1){4}}
+\put(60,106){\vector(1,0){50}}
+\put(30,114){\line(1,0){15}}
+\put(42,116){n}
+\put(30,114){\line(0,-1){28}}
+\put(30,86){\vector(1,0){55}}
+
+\put(110,114){\makebox(0,0){delayed start ?}}
+\put(095,110){\usebox{\compare}}
+\put(110,110){\vector(0,-1){8}}
+\put(112,107){y}
+\put(125,114){\line(1,0){15}}
+\put(127,116){n}
+\put(140,114){\line(0,-1){28}}
+\put(140,86){\vector(-1,0){55}}
+
+\put(15,98){\makebox(0,0){\shortstack{delayed\\start}}}
+
+\put(60,98){\makebox(0,0){\shortstack{{\bf AT} time\\e.g. 12:00:00}}}
+\put(40,94){\usebox{\normalstmt}}
+\put(60,94){\line(0,-1){4}}
+
+\put(110,98){\makebox(0,0){\shortstack{{\bf AFTER} delay\\e.g. 5 SEC}}}
+\put(090,94){\usebox{\normalstmt}}
+\put(110,94){\line(0,-1){4}}
+
+\put(60,90){\line(1,0){50}}
+\put(85,90){\vector(0,-1){8}}
+
+% ---------------------------------
+\put(85,78){\makebox(0,0){periodic start ?}}
+\put(70,74){\usebox{\compare}}
+\put(85,74){\vector(0,-1){8}}
+\put(87,71){y}
+\put(30,78){\line(1,0){40}}
+\put(67,80){n}
+\put(30,78){\line(0,-1){60}}
+\put(30,18){\vector(1,0){55}}
+
+\put(85,62){\makebox(0,0){\shortstack{{\bf ALL} period\\(e.g.  5 SEC)}}}
+\put(65,58){\usebox{\normalstmt}}
+\put(85,58){\vector(0,-1){8}}
+
+\put(15,62){\makebox(0,0){\shortstack{periodic\\start}}}
+
+\put(85,46){\makebox(0,0){end condition ?}}
+
+\put(70,42){\usebox{\compare}}
+\put(70,46){\vector(-1,0){40}}
+\put(67,48){n}
+\put(85,42){\line(0,-1){4}}
+\put(87,39){y}
+\put(60,38){\line(1,0){50}}
+\put(110,38){\vector(0,-1){4}}
+\put(60,38){\vector(0,-1){4}}
+
+% -----------------------
+\put(60,30){\makebox(0,0){\shortstack{{\bf UNTIL} time\\(e.g. 12:30:00)}}}
+\put(40,26){\usebox{\normalstmt}}
+\put(60,26){\line(0,-1){4}}
+
+\put(110,30){\makebox(0,0){\shortstack{{\bf DURING} duration\\(e.g. 20 MIN)}}}
+\put(090,26){\usebox{\normalstmt}}
+\put(110,26){\line(0,-1){4}}
+
+\put(15,30){\makebox(0,0){\shortstack{end\\criteria}}}
+
+\put(60,22){\line(1,0){50}}
+\put(85,22){\vector(0,-1){8}}
+
+\put(85,10){\makebox(0,0){{\bf ACTIVATE} Name\S Task}}
+\put(65, 6){\usebox{\normalstmt}}
+\end{picture}
+\caption{Possibilities to start a task immediately or under 
+various conditions}
+\label{sched_act}
+\end{figure}
+% Bild. 9-9 einfuegen !!!
+
+% Fussnote (im Bild): After occurrence of the interrupt, the task is
+% re-scheduled under the related start condition. The old scheduling becomes
+% ineffective.
+\begin{added}
+Possible problem situations:
+\begin{description}
+\item[TaskRunningSignal] is induced, if the task is still active when 
+an {\bf ACTIVATE} statement without start-condition is executed.
+\item[IllegalSchedulingSignal] is induced, if at least one the values of 
+  {\bf AFTER}, {\bf ALL} or {\bf DURING} is non positiv.
+\end{description}
+The first activation will be on the next day, if the current time is larger 
+than the value of the {\bf AT} parameter.
+If the time specified by {\bf UNTIL} is less than the time of {\bf bf} the 
+period will end the day after the first scheduled activation. This is true
+independent of the way of specifying the first activation.
+\end{added}
+
+A task is terminated
+\begin{itemize}
+\item when it reaches the terminating END statement of its body, or
+\item by executing a statement to terminate tasks related to the task
+(see 9.2.3).
+\end{itemize}
+
+Example:
+
+The task Pressure\_measurement shall measure all 5 seconds the pressure in a tank and transfer it to the task Checking. If the pressure increases significantly fast, the measurement shall by taken all second with increased priority. The task Checking is started immediately by task Initial.
+
+\begin{tabbing}
+\x Pressure\_measurement: \= \kill
+
+{\bf PROBLEM}; \> \\
+\x Initial:    \> {\bf TASK MAIN};\\
+        \> {\bf ACTIVATE} Checking;\\
+        \> \x $/^*$ further initialisations $^*/$ \\
+        \> \\
+        \> {\bf END}; ! Initial\\
+        \> \\
+\x Checking:   \> {\bf TASK PRIORITY} 6;\\
+        \> {\bf ALL} 5 {\bf SEC ACTIVATE} Pressure\_measurement;\\
+        \> \x $/^*$ taking over the measured values\\
+        \> \x if the pressure rises: $^*/$\\
+        \> {\bf ALL} 1 {\bf SEC ACTIVATE} Pressure\_measurement {\bf PRIO} 2;\\
+        \> ...\\
+        \> {\bf END}; ! Checking\\
+        \> \\
+\x Pressure\_measurement: \> {\bf TASK PRIO} 5;\\
+    \> $/^*$ measuring and passing over to checking $^*/$\\
+    \> {\bf END}; ! Pressure\_measurement\\
+\x ... \>
+\end{tabbing}
+
+
+
+\subsection{Terminating a Task (TERMINATE)}    % 9.2.3
+
+The premature termination of a task is achieved by following
+statement:
+
+TaskTermination ::= \\
+\x {\bf TERMINATE} [ Name$\S $Task ] ;
+
+If the denotation Name$\S $Task is lacking, the statement refers to
+the task in whose body it is contained.
+
+All resources occupied by the terminated task (including processor) are
+withdrawn from it. Synchronisation variables blocked by the task,
+however, are not released automatically.
+
+\begin{added}
+Possible problem situations:
+\begin{description}
+\item[TaskTerminatedSignal] is induced, if the task is in terminated state
+ when a {\bf TERMINATE} statement is executed.
+\item[Termination is delayed], if the task is doing i/o. The task's termination
+is delayed until the i/o-statement is completed, or a record mark ({\bf SKIP}) 
+is encountered.  This is done to enshure the integrity of the i/o-behavior.
+\end{description}
+\end{added}
+
+\subsection{Suspending a Task (SUSPEND)}   % 9.2.4
+
+By executing the statement
+
+TaskSuspension ::=\\
+\x {\bf SUSPEND} [ Name$\S $Task ] ;
+
+the indicated task --- or the executing task, respectively, if
+Name$\S $Task is lacking --- is suspended, i.e., its execution is
+postponed. The processor allocated to it is withdrawn from it --- but
+not all the other resources occupied by it.
+
+A suspended task can only be continued by executing a continue
+statement (see 9.2.5).
+
+\begin{added}
+Possible problem situations:
+\begin{description}
+\item[TaskTerminatedSignal] is induced, if the task is not activated when 
+a {\bf SUSPEND} statement is executed.
+\item[TaskSuspendedSignal] is induced, if the task is already suspended when
+a {\bf SUSPEND} statement is executed.
+\item[Suspending is delayed], if the task is doing i/o. The task's suspension
+is delayed until the i/o-statement is completed, or a record mark ({\bf SKIP}) 
+is encountered. This is done to enshure the integrity of the i/o-behavior.
+\end{description}
+\end{added}
+
+
+\subsection{Continuing a Task (CONTINUE)}    % 9.2.5
+
+A suspended task can be continued immediately, at a certain point in
+time, after a certain duration or after the occurrence of an interrupt by
+the following statement:
+
+TaskContinuation ::=\\
+\x [ SimpleStartCondition ] {\bf CONTINUE} [ Name$\S $Task ] [ Priority ]\
+
+SimpleStartCondition ::= \\
+\x {\bf AT} Expression$\S $Time $\mid$ {\bf AFTER} Expression$\S $Duration $\mid$ {\bf WHEN} Name$\S $Interrupt
+
+If Name$\S $Task is stated, the statement causes that the indicated task
+competes for the processor immediately (form without start condition) or
+at the instant determined by the start condition --- possibly with the
+given priority replacing the declared one.
+
+The form without Name$\S $Task causes that the executing task re-competes
+for the processor at the instant determined by the start condition ---
+possibly with the given priority replacing the declared one.
+
+Example:
+
+The task Acquisition shall cause an output and not continue until
+the occurrence of the interrupt Continuation, but then with higher
+priority.
+
+\begin{tabbing}
+Acquisition: \= {\bf TASK PRIO} 8;\\
+      \> \x \x ! Acquisition of data\\
+      \> \x {\bf WHEN} Continuation {\bf CONTINUE PRIO} 5;\\
+      \> \x \x ! Output\\
+      \> \x {\bf SUSPEND};\\
+      \> \x \x ! Acquisition of data\\
+      \> {\bf END}; ! Acquisition
+\end{tabbing}
+
+In Figure~\ref{zustaende},
+the state transitions of a task possible by executing CONTINUE
+instructions are illustrated graphically. For the case of
+``scheduled continuations'', the state transitions for SUSPEND statements are
+given additionally.
+\begin{added}
+Note that fulfilling the continuation condition annihilates the
+continuation condition.
+\end{added}
+
+\begin{added}
+Possible problem situations:
+\begin{description}
+\item[TaskTerminatedSignal] is induced, if the task is not activated when 
+a {\bf CONTINUE} statement is executed, without a schedule condition.
+\item[Priority update] occurs at any {\bf CONTINUE PRIO xxx} statement,
+ except if the tasks state is terminated.
+\item[executing a scheduled CONTINUE] never induces a signal. The action will
+   be discarded, if the tasks state is not suspended. The priority will be 
+   updated, if the tasks state is not terminated.
+\end{description}
+\end{added}
+
+
+\begin{figure}
+\unitlength 1.00mm
+\linethickness{0.4pt}
+\begin{picture}(158.00,117.67)
+\footnotesize
+\thicklines{}
+%\circle(15.00,46.00){18.00}
+\multiput(15.00,55.00)(0.98,-0.11){2}{\line(1,0){0.98}}
+\multiput(16.97,54.78)(0.31,-0.11){6}{\line(1,0){0.31}}
+\multiput(18.84,54.14)(0.19,-0.12){9}{\line(1,0){0.19}}
+\multiput(20.53,53.10)(0.12,-0.12){12}{\line(1,0){0.12}}
+\multiput(21.95,51.72)(0.11,-0.17){10}{\line(0,-1){0.17}}
+\multiput(23.03,50.06)(0.12,-0.31){6}{\line(0,-1){0.31}}
+\multiput(23.72,48.21)(0.09,-0.65){3}{\line(0,-1){0.65}}
+\multiput(24.00,46.25)(-0.08,-0.99){2}{\line(0,-1){0.99}}
+\multiput(23.83,44.27)(-0.12,-0.38){5}{\line(0,-1){0.38}}
+\multiput(23.24,42.38)(-0.11,-0.19){9}{\line(0,-1){0.19}}
+\multiput(22.25,40.67)(-0.11,-0.12){12}{\line(0,-1){0.12}}
+\multiput(20.91,39.21)(-0.16,-0.11){10}{\line(-1,0){0.16}}
+\multiput(19.28,38.08)(-0.26,-0.11){7}{\line(-1,0){0.26}}
+\multiput(17.45,37.34)(-0.65,-0.11){3}{\line(-1,0){0.65}}
+\put(15.50,37.01){\line(-1,0){1.98}}
+\multiput(13.52,37.12)(-0.38,0.11){5}{\line(-1,0){0.38}}
+\multiput(11.61,37.66)(-0.22,0.12){8}{\line(-1,0){0.22}}
+\multiput(9.87,38.60)(-0.14,0.12){11}{\line(-1,0){0.14}}
+\multiput(8.38,39.90)(-0.12,0.16){10}{\line(0,1){0.16}}
+\multiput(7.21,41.50)(-0.11,0.26){7}{\line(0,1){0.26}}
+\multiput(6.41,43.31)(-0.09,0.49){4}{\line(0,1){0.49}}
+\put(6.03,45.26){\line(0,1){1.98}}
+\multiput(6.09,47.24)(0.10,0.38){5}{\line(0,1){0.38}}
+\multiput(6.57,49.16)(0.11,0.22){8}{\line(0,1){0.22}}
+\multiput(7.47,50.92)(0.11,0.14){11}{\line(0,1){0.14}}
+\multiput(8.72,52.45)(0.14,0.11){11}{\line(1,0){0.14}}
+\multiput(10.29,53.67)(0.22,0.11){8}{\line(1,0){0.22}}
+\multiput(12.08,54.51)(0.58,0.10){5}{\line(1,0){0.58}}
+%\end
+%\circle(15.00,72.00){18.00}
+\multiput(15.00,81.00)(0.98,-0.11){2}{\line(1,0){0.98}}
+\multiput(16.97,80.78)(0.31,-0.11){6}{\line(1,0){0.31}}
+\multiput(18.84,80.14)(0.19,-0.12){9}{\line(1,0){0.19}}
+\multiput(20.53,79.10)(0.12,-0.12){12}{\line(1,0){0.12}}
+\multiput(21.95,77.72)(0.11,-0.17){10}{\line(0,-1){0.17}}
+\multiput(23.03,76.06)(0.12,-0.31){6}{\line(0,-1){0.31}}
+\multiput(23.72,74.21)(0.09,-0.65){3}{\line(0,-1){0.65}}
+\multiput(24.00,72.25)(-0.08,-0.99){2}{\line(0,-1){0.99}}
+\multiput(23.83,70.27)(-0.12,-0.38){5}{\line(0,-1){0.38}}
+\multiput(23.24,68.38)(-0.11,-0.19){9}{\line(0,-1){0.19}}
+\multiput(22.25,66.67)(-0.11,-0.12){12}{\line(0,-1){0.12}}
+\multiput(20.91,65.21)(-0.16,-0.11){10}{\line(-1,0){0.16}}
+\multiput(19.28,64.08)(-0.26,-0.11){7}{\line(-1,0){0.26}}
+\multiput(17.45,63.34)(-0.65,-0.11){3}{\line(-1,0){0.65}}
+\put(15.50,63.01){\line(-1,0){1.98}}
+\multiput(13.52,63.12)(-0.38,0.11){5}{\line(-1,0){0.38}}
+\multiput(11.61,63.66)(-0.22,0.12){8}{\line(-1,0){0.22}}
+\multiput(9.87,64.60)(-0.14,0.12){11}{\line(-1,0){0.14}}
+\multiput(8.38,65.90)(-0.12,0.16){10}{\line(0,1){0.16}}
+\multiput(7.21,67.50)(-0.11,0.26){7}{\line(0,1){0.26}}
+\multiput(6.41,69.31)(-0.09,0.49){4}{\line(0,1){0.49}}
+\put(6.03,71.26){\line(0,1){1.98}}
+\multiput(6.09,73.24)(0.10,0.38){5}{\line(0,1){0.38}}
+\multiput(6.57,75.16)(0.11,0.22){8}{\line(0,1){0.22}}
+\multiput(7.47,76.92)(0.11,0.14){11}{\line(0,1){0.14}}
+\multiput(8.72,78.45)(0.14,0.11){11}{\line(1,0){0.14}}
+\multiput(10.29,79.67)(0.22,0.11){8}{\line(1,0){0.22}}
+\multiput(12.08,80.51)(0.58,0.10){5}{\line(1,0){0.58}}
+%\end
+%\circle(71.00,23.00){18.01}
+\multiput(71.00,32.01)(0.98,-0.11){2}{\line(1,0){0.98}}
+\multiput(72.97,31.79)(0.31,-0.11){6}{\line(1,0){0.31}}
+\multiput(74.84,31.14)(0.19,-0.12){9}{\line(1,0){0.19}}
+\multiput(76.53,30.11)(0.12,-0.12){12}{\line(1,0){0.12}}
+\multiput(77.95,28.73)(0.11,-0.17){10}{\line(0,-1){0.17}}
+\multiput(79.03,27.07)(0.12,-0.31){6}{\line(0,-1){0.31}}
+\multiput(79.73,25.21)(0.09,-0.65){3}{\line(0,-1){0.65}}
+\multiput(80.00,23.25)(-0.08,-0.99){2}{\line(0,-1){0.99}}
+\multiput(79.84,21.28)(-0.12,-0.38){5}{\line(0,-1){0.38}}
+\multiput(79.25,19.38)(-0.11,-0.19){9}{\line(0,-1){0.19}}
+\multiput(78.26,17.67)(-0.11,-0.12){12}{\line(0,-1){0.12}}
+\multiput(76.92,16.21)(-0.16,-0.11){10}{\line(-1,0){0.16}}
+\multiput(75.29,15.08)(-0.26,-0.11){7}{\line(-1,0){0.26}}
+\multiput(73.45,14.34)(-0.65,-0.11){3}{\line(-1,0){0.65}}
+\put(71.50,14.01){\line(-1,0){1.98}}
+\multiput(69.52,14.12)(-0.38,0.11){5}{\line(-1,0){0.38}}
+\multiput(67.61,14.66)(-0.22,0.12){8}{\line(-1,0){0.22}}
+\multiput(65.87,15.60)(-0.14,0.12){11}{\line(-1,0){0.14}}
+\multiput(64.38,16.90)(-0.12,0.16){10}{\line(0,1){0.16}}
+\multiput(63.20,18.49)(-0.11,0.26){7}{\line(0,1){0.26}}
+\multiput(62.41,20.31)(-0.10,0.49){4}{\line(0,1){0.49}}
+\put(62.03,22.25){\line(0,1){1.98}}
+\multiput(62.08,24.23)(0.10,0.38){5}{\line(0,1){0.38}}
+\multiput(62.57,26.15)(0.11,0.22){8}{\line(0,1){0.22}}
+\multiput(63.46,27.92)(0.11,0.14){11}{\line(0,1){0.14}}
+\multiput(64.72,29.45)(0.14,0.11){11}{\line(1,0){0.14}}
+\multiput(66.28,30.67)(0.22,0.11){8}{\line(1,0){0.22}}
+\multiput(68.07,31.52)(0.59,0.10){5}{\line(1,0){0.59}}
+%\end
+%\circle(71.00,88.00){18.00}
+\multiput(71.00,97.00)(0.98,-0.11){2}{\line(1,0){0.98}}
+\multiput(72.97,96.78)(0.31,-0.11){6}{\line(1,0){0.31}}
+\multiput(74.84,96.14)(0.19,-0.12){9}{\line(1,0){0.19}}
+\multiput(76.53,95.10)(0.12,-0.12){12}{\line(1,0){0.12}}
+\multiput(77.95,93.72)(0.11,-0.17){10}{\line(0,-1){0.17}}
+\multiput(79.03,92.06)(0.12,-0.31){6}{\line(0,-1){0.31}}
+\multiput(79.72,90.21)(0.09,-0.65){3}{\line(0,-1){0.65}}
+\multiput(80.00,88.25)(-0.08,-0.99){2}{\line(0,-1){0.99}}
+\multiput(79.83,86.27)(-0.12,-0.38){5}{\line(0,-1){0.38}}
+\multiput(79.24,84.38)(-0.11,-0.19){9}{\line(0,-1){0.19}}
+\multiput(78.25,82.67)(-0.11,-0.12){12}{\line(0,-1){0.12}}
+\multiput(76.91,81.21)(-0.16,-0.11){10}{\line(-1,0){0.16}}
+\multiput(75.28,80.08)(-0.26,-0.11){7}{\line(-1,0){0.26}}
+\multiput(73.45,79.34)(-0.65,-0.11){3}{\line(-1,0){0.65}}
+\put(71.50,79.01){\line(-1,0){1.98}}
+\multiput(69.52,79.12)(-0.38,0.11){5}{\line(-1,0){0.38}}
+\multiput(67.61,79.66)(-0.22,0.12){8}{\line(-1,0){0.22}}
+\multiput(65.87,80.60)(-0.14,0.12){11}{\line(-1,0){0.14}}
+\multiput(64.38,81.90)(-0.12,0.16){10}{\line(0,1){0.16}}
+\multiput(63.21,83.50)(-0.11,0.26){7}{\line(0,1){0.26}}
+\multiput(62.41,85.31)(-0.09,0.49){4}{\line(0,1){0.49}}
+\put(62.03,87.26){\line(0,1){1.98}}
+\multiput(62.09,89.24)(0.10,0.38){5}{\line(0,1){0.38}}
+\multiput(62.57,91.16)(0.11,0.22){8}{\line(0,1){0.22}}
+\multiput(63.47,92.92)(0.11,0.14){11}{\line(0,1){0.14}}
+\multiput(64.72,94.45)(0.14,0.11){11}{\line(1,0){0.14}}
+\multiput(66.29,95.67)(0.22,0.11){8}{\line(1,0){0.22}}
+\multiput(68.08,96.51)(0.58,0.10){5}{\line(1,0){0.58}}
+%\end
+%\circle(130.00,23.00){18.00}
+\multiput(130.00,32.00)(0.98,-0.11){2}{\line(1,0){0.98}}
+\multiput(131.97,31.78)(0.31,-0.11){6}{\line(1,0){0.31}}
+\multiput(133.84,31.14)(0.19,-0.12){9}{\line(1,0){0.19}}
+\multiput(135.53,30.10)(0.12,-0.12){12}{\line(1,0){0.12}}
+\multiput(136.95,28.72)(0.11,-0.17){10}{\line(0,-1){0.17}}
+\multiput(138.03,27.06)(0.12,-0.31){6}{\line(0,-1){0.31}}
+\multiput(138.72,25.21)(0.09,-0.65){3}{\line(0,-1){0.65}}
+\multiput(139.00,23.25)(-0.08,-0.99){2}{\line(0,-1){0.99}}
+\multiput(138.83,21.27)(-0.12,-0.38){5}{\line(0,-1){0.38}}
+\multiput(138.24,19.38)(-0.11,-0.19){9}{\line(0,-1){0.19}}
+\multiput(137.25,17.67)(-0.11,-0.12){12}{\line(0,-1){0.12}}
+\multiput(135.91,16.21)(-0.16,-0.11){10}{\line(-1,0){0.16}}
+\multiput(134.28,15.08)(-0.26,-0.11){7}{\line(-1,0){0.26}}
+\multiput(132.45,14.34)(-0.65,-0.11){3}{\line(-1,0){0.65}}
+\put(130.50,14.01){\line(-1,0){1.98}}
+\multiput(128.52,14.12)(-0.38,0.11){5}{\line(-1,0){0.38}}
+\multiput(126.61,14.66)(-0.22,0.12){8}{\line(-1,0){0.22}}
+\multiput(124.87,15.60)(-0.14,0.12){11}{\line(-1,0){0.14}}
+\multiput(123.38,16.90)(-0.12,0.16){10}{\line(0,1){0.16}}
+\multiput(122.21,18.50)(-0.11,0.26){7}{\line(0,1){0.26}}
+\multiput(121.41,20.31)(-0.09,0.49){4}{\line(0,1){0.49}}
+\put(121.03,22.26){\line(0,1){1.98}}
+\multiput(121.09,24.24)(0.10,0.38){5}{\line(0,1){0.38}}
+\multiput(121.57,26.16)(0.11,0.22){8}{\line(0,1){0.22}}
+\multiput(122.47,27.92)(0.11,0.14){11}{\line(0,1){0.14}}
+\multiput(123.72,29.45)(0.14,0.11){11}{\line(1,0){0.14}}
+\multiput(125.29,30.67)(0.22,0.11){8}{\line(1,0){0.22}}
+\multiput(127.08,31.51)(0.58,0.10){5}{\line(1,0){0.58}}
+%\end
+%\circle(130.00,88.00){18.01}
+\multiput(130.00,97.01)(0.98,-0.11){2}{\line(1,0){0.98}}
+\multiput(131.97,96.79)(0.31,-0.11){6}{\line(1,0){0.31}}
+\multiput(133.84,96.14)(0.19,-0.12){9}{\line(1,0){0.19}}
+\multiput(135.53,95.11)(0.12,-0.12){12}{\line(1,0){0.12}}
+\multiput(136.95,93.73)(0.11,-0.17){10}{\line(0,-1){0.17}}
+\multiput(138.03,92.07)(0.12,-0.31){6}{\line(0,-1){0.31}}
+\multiput(138.73,90.21)(0.09,-0.65){3}{\line(0,-1){0.65}}
+\multiput(139.00,88.25)(-0.08,-0.99){2}{\line(0,-1){0.99}}
+\multiput(138.84,86.28)(-0.12,-0.38){5}{\line(0,-1){0.38}}
+\multiput(138.25,84.38)(-0.11,-0.19){9}{\line(0,-1){0.19}}
+\multiput(137.26,82.67)(-0.11,-0.12){12}{\line(0,-1){0.12}}
+\multiput(135.92,81.21)(-0.16,-0.11){10}{\line(-1,0){0.16}}
+\multiput(134.29,80.08)(-0.26,-0.11){7}{\line(-1,0){0.26}}
+\multiput(132.45,79.34)(-0.65,-0.11){3}{\line(-1,0){0.65}}
+\put(130.50,79.01){\line(-1,0){1.98}}
+\multiput(128.52,79.12)(-0.38,0.11){5}{\line(-1,0){0.38}}
+\multiput(126.61,79.66)(-0.22,0.12){8}{\line(-1,0){0.22}}
+\multiput(124.87,80.60)(-0.14,0.12){11}{\line(-1,0){0.14}}
+\multiput(123.38,81.90)(-0.12,0.16){10}{\line(0,1){0.16}}
+\multiput(122.20,83.49)(-0.11,0.26){7}{\line(0,1){0.26}}
+\multiput(121.41,85.31)(-0.10,0.49){4}{\line(0,1){0.49}}
+\put(121.03,87.25){\line(0,1){1.98}}
+\multiput(121.08,89.23)(0.10,0.38){5}{\line(0,1){0.38}}
+\multiput(121.57,91.15)(0.11,0.22){8}{\line(0,1){0.22}}
+\multiput(122.46,92.92)(0.11,0.14){11}{\line(0,1){0.14}}
+\multiput(123.72,94.45)(0.14,0.11){11}{\line(1,0){0.14}}
+\multiput(125.28,95.67)(0.22,0.11){8}{\line(1,0){0.22}}
+\multiput(127.07,96.52)(0.59,0.10){5}{\line(1,0){0.59}}
+%\end
+\put(14.67,72.00){\makebox(0,0)[cc]{\tekst 20mm,explicitly suspended;}}
+\put(14.67,46.33){\makebox(0,0)[cc]
+{\tekst 15mm,explicitly suspended and scheduled for continuation;}}
+\put(70.67,88.00){\makebox(0,0)[cc]
+{\tekst 12mm,runable and scheduled for continuation;}}
+\put(130.00,88.00){\makebox(0,0)[cc]{\tekst 12mm,runable;}}
+\put(71.00,23.33){\makebox(0,0)[cc]
+{\tekst 12mm,running and scheduled for continuation;}}
+\put(130.00,22.67){\makebox(0,0)[cc]{\tekst 12mm,running;}}
+\put(13.33,7.00){\makebox(0,0)[cc]{``active''}}
+\put(74.00,7.00){\makebox(0,0)[cc]{``executing''}}
+\put(16.34,88.00){\makebox(0,0)[cc]{``suspended''}}
+\put(41.33,34.67){\makebox(0,0)[cc]{\tekst 12mm,SUSPEND;}}
+\put(45.00,54.66){\makebox(0,0)[cc]{\tekst 25mm,ContinuationCondition fulfilled;}}
+\put(41.33,76.33){\makebox(0,0)[cc]{\tekst 12mm,SUSPEND t$_i$;}}
+\put(100.67,19.00){\makebox(0,0)[cc]{\tekst 20mm,ContinuationCondition\\
+CONTINUE PRIO p;}}
+\put(144.67,50.67){\makebox(0,0)[cc]{\tekst 12mm,CONTINUE\\~[PRIO p];}}
+\put(145.33,98.00){\makebox(0,0)[cc]{\tekst 20mm, CONTINUE t$_i$\\PRIO p;}}
+\put(100.67,100.00){\makebox(0,0)[cc]
+{\tekst 25mm,ContinuationCondition\\CONTINUE t$_i$ PRIO p;}}
+\bezier{92}(123.33,16.33)(114.00,9.00)(104.67,15.00)
+\bezier{80}(137.67,28.00)(143.33,36.00)(143.67,46.33)
+%\bezvec{120}(97.33,103.67)(78.67,106.67)(76.33,96.00)
+\put(76.33,96.00){\vector(-1,-3){0.2}}
+\bezier{120}(97.33,103.67)(78.67,106.67)(76.33,96.00)
+%\end
+%\bezvec{80}(97.00,23.00)(92.33,28.33)(79.67,25.33)
+\put(79.67,25.33){\vector(-4,-1){0.2}}
+\bezier{80}(97.00,23.00)(92.33,28.33)(79.67,25.33)
+%\end
+\bezier{60}(121.67,92.00)(113.67,92.67)(108.33,97.00)
+%\bezvec{104}(36.67,73.00)(26.67,65.33)(20.67,53.33)
+\put(20.67,53.33){\vector(-1,-2){0.2}}
+\bezier{104}(36.67,73.00)(26.67,65.33)(20.67,53.33)
+%\end
+\bezier{84}(62.00,24.67)(46.33,27.33)(44.00,32.33)
+%\bezvec{76}(39.00,38.33)(34.67,45.00)(24.00,43.67)
+\put(24.00,43.67){\vector(-1,0){0.2}}
+\bezier{76}(39.00,38.33)(34.67,45.00)(24.00,43.67)
+%\end
+\bezier{72}(62.33,85.67)(50.00,81.67)(46.00,79.00)
+%\bezvec{116}(144.33,55.33)(145.00,69.33)(136.67,81.67)
+\put(136.67,81.67){\vector(-2,3){0.2}}
+\bezier{116}(144.33,55.33)(145.00,69.33)(136.67,81.67)
+%\end
+\bezier{56}(139.00,87.33)(146.67,88.33)(146.67,94.33)
+%\bezvec{96}(144.00,102.33)(135.00,109.00)(133.00,96.67)
+\put(133.00,96.67){\vector(-1,-4){0.2}}
+\bezier{96}(144.00,102.33)(135.00,109.00)(133.00,96.67)
+%\end
+\thinlines{}
+\put(79.00,55.67){\oval(158.00,110.67)[]}
+\put(106.50,55.50){\oval(97.00,105.00)[]}
+\put(120.00,103.00){\makebox(0,0)[cc]{\tekst 20mm,Start condition\\fulfilled;}}
+\bezier{48}(122.00,117.67)(118.67,113.00)(119.67,107.00)
+%\bezvec{24}(120.67,99.33)(120.33,98.00)(124.00,95.33)
+\put(124.00,95.33){\vector(1,-1){0.2}}
+\bezier{24}(120.67,99.33)(120.33,98.00)(124.00,95.33)
+%\end
+\put(130.33,116.33){\makebox(0,0)[cc]{\tekst 12mm,from state\\``scheduled'';}}
+\put(100.33,89.00){\makebox(0,0)[cc]{\tekst 20mm,ContinuationCondition\\fulfilled;}}
+\bezier{72}(80.00,90.33)(86.33,95.33)(95.33,92.00)
+%\bezvec{68}(105.33,85.33)(108.33,82.33)(120.67,85.67)
+\put(120.67,85.67){\vector(4,1){0.2}}
+\bezier{68}(105.33,85.33)(108.33,82.33)(120.67,85.67)
+%\end
+\bezier{48}(23.67,49.00)(30.67,49.00)(35.33,51.67)
+%\bezvec{312}(48.33,59.33)(77.33,72.67)(122.67,82.00)
+\put(122.67,82.00){\vector(4,1){0.2}}
+\bezier{312}(48.33,59.33)(77.33,72.67)(122.67,82.00)
+%\end
+\put(105.00,66.00){\makebox(0,0)[cc]{\tekst 20mm,ContinuationCondition\\fulfilled;}}
+\bezier{160}(77.33,29.33)(92.67,43.67)(101.67,60.67)
+%\bezvec{88}(107.00,70.67)(112.33,78.00)(124.67,79.67)
+\put(124.67,79.67){\vector(4,1){0.2}}
+\bezier{88}(107.00,70.67)(112.33,78.00)(124.67,79.67)
+%\end
+\put(122.33,46.33){\makebox(0,0)[cc]
+{\tekst 12mm,t$_i$ is highest priority\\runable task;}}
+\put(134.33,63.67){\makebox(0,0)[cc]
+{\tekst 20mm,t$_i$ not any longer\\highest priority\\runable task;}}
+\bezier{132}(128.00,79.00)(115.33,68.67)(120.00,52.67)
+%\bezvec{36}(123.67,40.33)(126.67,31.67)(126.67,31.67)
+\put(126.67,31.67){\vector(1,-3){0.2}}
+\bezier{36}(123.67,40.33)(126.67,31.67)(126.67,31.67)
+%\end
+\bezier{120}(134.00,31.67)(140.67,43.67)(135.67,59.33)
+%\bezvec{36}(133.00,70.67)(131.33,74.33)(131.33,79.00)
+\put(131.33,79.00){\vector(0,1){0.2}}
+\bezier{36}(133.00,70.67)(131.33,74.33)(131.33,79.00)
+%\end
+\put(63.67,48.33){\makebox(0,0)[cc]
+{\tekst 12mm,t$_i$ is highest priority\\runable task;}}
+\put(80.67,61.00){\makebox(0,0)[cc]
+{\tekst 20mm,t$_i$ not any longer\\highest priority\\runable task;}}
+\bezier{100}(66.67,79.67)(60.00,69.67)(61.67,56.67)
+%\bezvec{44}(63.67,41.67)(64.33,37.33)(66.33,31.33)
+\put(66.33,31.33){\vector(1,-3){0.2}}
+\bezier{44}(63.67,41.67)(64.33,37.33)(66.33,31.33)
+%\end
+\put(16.83,62.33){\oval(31.00,64.67)[]}
+%------
+\bezier{100}(73.67,31.67)(80.00,44.33)(80.00,55.67)
+%\bezvec{60}(80.33,66.67)(80.33,75.00)(76.33,80.33)
+\put(76.33,80.33){\vector(-1,2){0.2}}
+\bezier{60}(80.33,66.67)(80.33,75.00)(76.33,80.33)
+%\end
+\end{picture}
+
+\caption{State transition diagram of task $t_i$ when executing
+CONTINUE}
+\label{zustaende}
+\end{figure}
+
+
+\subsection{Delaying a Task (RESUME)}    % 9.2.6
+
+If the running task shall release the processor allocated to it for a
+certain duration or until the occurrence of a certain point in time or an
+interrupt, respectively, (if it is to be delayed), the following
+statement is to be executed:
+
+TaskDelay ::= \\
+\x SimpleStartCondition {\bf RESUME};
+
+This statement if equivalent to the non-devisable combination of
+the statements
+
+SimpleStartCondition {\bf CONTINUE};\\
+{\bf SUSPEND};
+
+After having executed the statement TaskDelay, the start condition is
+ineffective, i.e., the execution is once.
+
+\begin{added}
+Note that {\bf RESUME} annihilates a continuation condition
+for the current task, due to the implicit {\bf CONTINUE} in the {\bf RESUME}-
+statement.
+\end{added}
+
+Example:
+
+The task Control shall turn on a device and check 10 seconds later,
+whether the device works as desired.
+
+\begin{tabbing}
+Control: \= {\bf TASK};\\
+  \> \x \x ! turning on the device\\
+  \> \x {\bf AFTER} 10 {\bf SEC} {\bf RESUME};\\
+  \> \x \x ! ckecking the function of the device\\
+  \> \x ...\\
+  \> {\bf END}; ! Control
+\end{tabbing}
+
+\subsection{De-scheduling a Task (PREVENT)}    % 9.2.7
+
+Sometimes it is necessary to cancel the schedules existing for a task,
+i.e., to take care that the start conditions related to this task become
+ineffective. This can be achieved with the following statement:
+
+TaskPrevent ::= \\
+\x {\bf PREVENT} [ Name$\S $Task ] ;
+
+This statement does not terminate the corresponding task; if
+Name$\S $Task is not given, the statement effects the running task.
+
+Example:
+
+The procedure Control called by a higher level task, gives a move
+request to an AGV (Automatic Guided Vehicle) which has to send the ready message Ready within
+30 seconds in order to start the task Supply. If the ready message has not
+arrived within 30 seconds, the task Malfunction shall be started, and
+the probably still possible, but delayed start of Supply shall be
+de-scheduled. In the normal case --- Ready arrives within 30 seconds
+--- the already scheduled start of Malfunction must be de-scheduled.
+
+\begin{tabbing}
+\x malfunction: \= {\bf PROC} (\= \kill
+
+{\bf PROBLEM}: \> \> \\
+\x {\bf SPECIFY} \> Ready {\bf INTERRUPT}; \> \\
+   \> \> \\
+\x Control:      \> {\bf PROC} (\> X {\bf FIXED},  $/^*$ X coordinate $^*/$ \\
+   \>             \> Y {\bf FIXED}); $/^*$ Y coordinate $^*/$ \\
+   \> $/^*$ converting the coordinates taken over into a bit string, \> \\
+   \> output of the bit string to the AGV $^*/$ \> \\
+   \> {\bf WHEN} Ready {\bf ACTIVATE} Supply; \> \\
+   \> {\bf AFTER} 30 {\bf SEC} {\bf ACTIVATE} Malfunction; \> \\
+   \> ... \> \\
+\x \x {\bf END}; \> ! Control \> \\
+   \> \> \\
+\x Supply:       \> {\bf TASK PRIO} 3; \> \\
+   \> {\bf PREVENT} Malfunction; \> \\
+   \> ... \> \\
+\x \x {\bf END}; \> ! Supply \> \\
+   \> \> \\
+\x Malfunction:  \> {\bf TASK PRIO} 2; \> \\
+   \> {\bf PREVENT} Supply; \> \\
+   \> ... \> \\
+\x \x {\bf END}; \> ! Malfunction \>
+\end{tabbing}
+
+\section{Synchronising Tasks}    % 9.3
+
+Generally, tasks are run independently from one another. However, it may
+happen that several tasks work on parts of a more complex, overall
+problem and have to use certain resources, particularly data, jointly.
+
+Example:
+
+\begin{figure}[h]
+\centering
+\setlength{\unitlength}{0.00087500in}%
+\begin{picture}(4148,2325)(249,-1705)
+\put(1351,344){\line( 0,-1){405}}
+\put(1351,-61){\line( 1, 0){900}}
+\put(3151,-61){\line( 1, 0){900}}
+\put(4051,-61){\line( 0, 1){450}}
+\put(3151,-61){\vector( 0,-1){225}}
+\put(2251,-61){\vector( 0,-1){225}}
+\put(2701,-736){\vector( 0,-1){675}}
+\thicklines
+\put(2026,-736){\framebox(1350,450){}}
+\put(1351,524){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Message}}}
+\put(4051,524){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Message}}}
+\put(2701,-601){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Buffer}}}
+\put(4276,119){\makebox(0,0)[lb]{\smash{\SetFigFont{10}{12.0}{rm}Producer2}}}
+\put(1126,119){\makebox(0,0)[rb]{\smash{\SetFigFont{10}{12.0}{rm}Producer1}}}
+\put(2926,-1141){\makebox(0,0)[lb]{\smash{\SetFigFont{10}{12.0}{rm}Output}}}
+\put(2746,-1681){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Protocol printer}}}
+\end{picture}
+
+\caption{Example for task co-ordination}
+\label{puffer}
+\end{figure}
+
+According to Figure~\ref{puffer} the tasks Producer1 and Producer2 produce messages which they want to
+store in a common buffer; by the task output, a message is taken from
+the buffer and displayed in a formatted way on a protocol printer.
+
+For a correct execution of the operations, they have to be co-ordinated
+as follows:
+\begin{itemize}
+\item The task Output creates only an output, if a message was buffered, which
+means that it possibly waits that the buffer is filled by Producer1 or
+Producer2.
+\item Producer1 and Producer2 can only buffer a message, if no
+previous message is being sent out by Output, i.e., they must possibly
+be suspended until Output has issued the previous message completely.
+\item The tasks Producer1 and Producer2 to buffer a
+message have to be mutually exclusive.
+\end{itemize}
+
+To control such co-ordination tasks, two types of synchronisation
+variables are provided, namely semaphore and bolt variables. If the
+access to jointly used resources (e.g., data, procedures, devices) is to
+be co-ordinated, one synchronisation variable is associated to each
+resource; then the using tasks execute a locking statement on the
+associated synchronisation variable before and a release statement
+after using a resource.
+
+The association of synchronisation variables to resources does not take
+place by PEARL statements; it is only assumed and is realised by using a
+certain synchronisation variable always in combination with a certain
+resource, only. Such an association is not restricted to data,
+procedures, devices, etc., sometimes it must also be done for program
+parts (e.g., for executing sub-tasks), which shall all be
+terminated until a certain other program part (e.g., the main task) is to be
+continued.
+
+\subsection{Semaphore Variables (SEMA) and Statements (REQUEST,
+RELEASE, TRY)} % 9.3.1
+% Zeilenumbruch mitten im Wort RELEASE
+
+Semaphore variables can have non-negative integers as values. These
+numbers represent the states ``free'' or ``locked'': Zero means state
+``locked'' (the semaphore variable ``locks''), positive numbers mean the
+state ``free''.  These states can only be changed by special request or
+release statements.
+
+Semaphore variables are declared as follows:
+
+{\bf DCL} Identifier\_or\_IdentifierList {\bf SEMA};
+
+Example:
+
+{\bf DCL} (On, Off) {\bf SEMA};
+
+After its declaration, a semaphore variable has the state ``locked''.
+
+If a semaphore variable explicitly is to assume the state ``locked'',
+the following locking statement is to be executed:
+
+{\bf REQUEST} Name$\S $Sema;
+
+The effect of this statement depends on the actual value of the
+indicated semaphore variable:
+\begin{itemize}
+\item If the value is greater than zero, it is decremented by 1.
+\item If the value equals zero, it stays the same; the executing task,
+however, is suspended and placed in a queue which is (implicitly)
+associated to the semaphore variable (the task is blocked).
+\end{itemize}
+
+The execution of the release statement
+
+{\bf RELEASE} Name$\S $Sema;
+
+causes that the value of the indicated semaphore variable is incremented
+by 1. Furthermore, the tasks in the queue of the semaphore variable are
+released; they repeat their request statement in the order of their
+priorities.
+
+Example:
+
+With these means, the problem of buffering messages can be solved as
+follows:
+
+For entering messages into the buffer, a semaphore variable
+Into\_buffer, for the output out of the buffer, a semaphore variable
+Out\_of\_buffer is declared. Upon declaration, Into\_buffer and
+Out\_of\_buffer are implicitly initialised with ``locked''. The task
+Consumer is started from outside. Before it starts the tasks Producer\_1 and
+Producer\_2, Into\_buffer must receive the state ``free''.
+
+{\bf PROBLEM};\\
+\x {\bf DCL} (Into\_buffer, Out\_of\_buffer) {\bf SEMA};
+
+\begin{tabbing}
+\x Producer\_2: \= \kill
+
+\x Consumer: \> {\bf TASK}; \\
+    \> \x {\bf RELEASE} Into\_buffer; \\
+    \> \x {\bf ACTIVATE} Producer\_1; \\
+    \> \x {\bf ACTIVATE} Producer\_2; \\
+    \> \x {\bf REPEAT}\\
+    \> \x \x {\bf REQUEST} Out\_of\_buffer;\\
+    \> \x \x \x ! Output to the protocol printer\\
+    \> \x \x {\bf RELEASE} Into\_buffer;\\
+    \> \x {\bf END}; ! Loop\\
+    \> {\bf END}; ! Consumer\\
+    \> \\
+\x Producer\_1: \> {\bf TASK};\\
+  \> \x {\bf REPEAT} \\
+  \> \x \x \x ! Preparing the message \\
+  \> \x \x {\bf REQUEST} Into\_buffer;\\
+  \> \x \x \x ! Buffering\\
+  \> \x \x {\bf RELEASE} Out\_of\_buffer;\\
+  \> \x {\bf END}; ! Loop\\
+  \> {\bf END}; ! Producer\_1\\
+  \> \\
+\x Producer\_2: \> {\bf TASK};\\
+  \> \x {\bf REPEAT}\\
+  \> \x \x \x ! Preparing the message\\
+  \> \x \x {\bf REQUEST} Into\_buffer;\\
+  \> \x \x \x ! Buffering\\
+  \> \x \x {\bf RELEASE} Out\_of\_buffer;\\
+  \> \x {\bf END}; ! Loop\\
+  \> {\bf END}; ! Producer\_2
+\end{tabbing}
+
+Explanation:\\
+Output waits first for the release of Out\_of\_buffer, i.e., the
+buffering of a message, because Out\_of\_buffer can only be released by
+Producer\_1 or Producer\_2. After the output has taken place, Consumer
+releases Into\_buffer, i.e., admits buffering, and waits for a new
+request. Producer\_1 and Producer\_2 can only buffer a message, if state
+``free'' is defined for Into\_buffer; after buffering a message, they
+release Out\_of\_buffer resulting in the continuation of Consumer.
+
+The state of a semaphore variable can be obtained with the monadic
+operator
+
+{\bf TRY} Name$\S $Sema;
+
+As result, the operator provides a BIT(1) value to be used in all
+logical expressions. If the semaphore variable is ``free'', the operator
+executes a REQUEST statement and provides value '1'B as result. If the
+semaphore variable has already state ``locked'', no REQUEST statement
+is executed, and value '0'B is provided. Therefores a possible blocking 
+of the running task can be avoided when using the TRY operator!
+
+Example:
+
+In a dialogue system the function Function1 may not be called twice at the same time, although the
+blocking of a task calling Function1 has to be avoided.
+
+\begin{tabbing}
+\x Dialogue: \= \x \x {\bf RELEASE} Func1; \x \= \kill
+
+{\bf PROBLEM}; \> \> \\
+\x {\bf DCL} Func\_1 {\bf SEMA}; \> \> \\
+   \> \> \\
+   \x Dialogue: \> {\bf TASK}; \> \\
+  \> \x ...      \> \\
+  \> \x {\bf IF TRY} Func1 {\bf THEN} \> \\
+  \> \x \x ! Semaphore variable Func1 had state ``free'' \> \\
+  \> \x \x {\bf CALL} Function1; \> ! execute function \\
+  \> \x \x {\bf RELEASE} Func1;  \> ! release semaphore \\
+  \> \x {\bf ELSE} \> \\
+  \> \x \x ! Semaphore variable func\_1 had state ``locked'' \> \\
+  \> \x \x {\bf PUT} 'Function 1 not possible at present' {\bf TO} Terminal; \> \\
+  \> \x {\bf FIN}; \> \\
+  \> \x ... \> \\
+  \> {\bf END}; ! Dialogue \>
+\end{tabbing}
+
+Due to erroneous synchronisations, tasks can constantly block one
+another; such a deadlock, e.g., could arise due to the following program
+organisation:
+
+\begin{tabbing}
+\hspace{6cm} \= \kill
+
+\underline{Task T1}  \>       \underline{Task T2}  \\
+{\bf REQUEST} S1;    \>       {\bf REQUEST} S2;    \\
+\x 1st segment       \>       \x 1st segment       \\
+{\bf REQUEST} S2;    \>       {\bf REQUEST} S1;    \\
+\x 2nd segment       \>       \x 2nd segment       \\
+{\bf RELEASE} S2;    \>       {\bf RELEASE} S1;    \\
+{\bf RELEASE} S1;    \>       {\bf RELEASE} S2;
+\end{tabbing}
+
+If tasks T1 and T2 are in their first segments at the same time, a
+deadlock occurs, for on the one hand, T1 is blocked by the execution of
+statement ``REQUEST S2;'', because T2 has already built up the lock
+with the semaphore variable S2, and on the other hand, T2 is blocked by
+the execution of statement ``REQUEST S1;''. If no other task executes
+a release, the blockings remain permanently.
+
+To avoid such situations, lists of semaphore variables can be stated for
+locking statements.
+
+By executing the statement
+
+{\bf REQUEST} Name$\S $Sema [ , Name$\S $Sema ]$^{...}$ ;
+
+the running task is suspended, if at least one of the indicated semaphore
+variables is in state ``locked''; the task is not continued until none
+of the semaphore variables is locking any longer. If none of the
+indicated semaphore variables is locking, the executing task is
+continued after decrementing the values of each of these semaphore variables by
+1.
+
+The statement
+
+{\bf RELEASE} Name$\S $Sema [ , Name$\S $Sema ]$^{...}$;
+
+has the effect, as if a release statement were executed for each of
+the indicated semaphore variables without any interruption.
+
+In the last example, the deadlock could be avoided by the following
+program organisation:
+
+\begin{tabbing}
+\hspace{6cm} \= \kill
+
+\underline{Task T1}   \>       \underline{Task T2}   \\
+{\bf REQUEST} S1, S2; \>       {\bf REQUEST} S1, S2; \\
+\x 1st segment        \>       \x 1st segment        \\
+\x 2nd segment        \>       \x 2nd segment        \\
+{\bf RELEASE} S1, S2; \>       {\bf RELEASE} S1, S2;
+\end{tabbing}
+
+The order of the semaphore variables in the list is of no significance.
+
+After the TRY operator, only one single semaphore variable may be
+given, a list of semaphore variables is not allowed.
+
+The general forms for the declaration of semaphore variables as well as
+locking and release statements read:
+
+SemaDeclaration ::= \\
+\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ] {\bf SEMA} [ GlobalAttribute ]\\
+\x [ {\bf PRESET} (IntegerWithoutPrecision [ , IntegerWithoutPrecision ] $^{...}$ ) ];
+
+RequestStatement ::=\\
+\x {\bf REQUEST} Name$\S $Sema [ , Name$\S $Sema ] $^{...}$;
+
+ReleaseStatement ::=\\
+\x {\bf RELEASE} Name$\S $Sema [ , Name$\S $Sema ] $^{...}$;
+
+TRY-Operator ::= \\
+\x {\bf TRY} Name$\S $Sema
+
+Thus, also arrays of semaphore variables are possible; the various
+elements are addressed by indices in the request and release
+statements.
+
+Semaphore variables must be declared at module level. Upon declaration,
+semaphore variables can also be initialised explicitly by PRESET
+statement; the given values are assigned to the corresponding
+semaphore variables according to their order.
+
+Example:
+
+Upon declaration, values 3 and 5 shall be assigned to the semaphore
+variables S1 and S2, respectively.
+
+{\bf DCL} (S1, S2) {\bf SEMA PRESET}(3, 5);
+
+The general form for the specification of semaphore variables reads:
+
+SemaSpecification ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList\\
+\x \x [ VirtualDimensionAttribute ] {\bf SEMA} \\
+\x \x \{ GlobalAttribute $\mid$ IdentificationAttribute \};
+
+\begin{added}
+Possible problem situations:
+
+\begin{description}
+\item[SemaOverFlowSignal] is induces, if too many release operations
+   are executed and the range of a FIXED(32) would exceed.
+\end{description}
+
+\end{added}
+\begin{tobedone}
+\subsection{Bolt Variables (BOLT) and Statements (ENTER, LEAVE,
+RESERVE, FREE)} % 9.3.2
+
+We assume that in different tasks the same data are used for
+calculation, but not modified (e.g., comparison quantities for
+supervision processes); additionally, another task shall re-establish
+these data (e.g., establishing new supervision data). It shall be
+granted that the processes for modifying and using data mutually exclude
+each other; in contrast, the simultaneous use of data (by various tasks)
+is desired.
+
+These problems can principally be solved with the described locking and
+release statements; the formulation, however, is relatively
+complicated, and the run time for the execution considerable. Thus, four
+more statements working on variables of data type bolt are provided.
+
+A bolt variable can take on the states ``locked'', ``lock possible'', or
+``lock not possible'', depending on whether the associated resource
+is used exclusively, is free or is used simultaneously.
+
+Bolt variables, e.g., are declared as follows:
+
+{\bf DCL} Identifier\_or\_IdentifierList {\bf BOLT};
+
+After its declaration, a bolt variable has the state ``lock possible''.
+
+Let the bolt variable B be associated to a resource. When entering a
+critical section for the exclusive use of this resource, the access by
+other tasks is locked by executing the statement
+
+{\bf RESERVE} B;
+
+When leaving this critical section, the release takes place by the
+statement
+
+{\bf FREE} B;
+
+The critical sections for the simultaneous use of the resource are
+initiated and terminated, respectively, by executing the statements
+
+{\bf ENTER} B; or {\bf LEAVE} B;
+
+The exact description of the effect of theses statements considers the
+state and the modification of the bolt variables:
+\begin{description}
+\item[Effect of RESERVE B;]
+If B has state ``lock possible'', B assumes state ``locked''; otherwise,
+the executing task is suspended and placed in a queue associated with B.
+\item[Effect of FREE B;]
+B assumes state ``lock possible''. Furthermore, all tasks waiting in the
+queue of B due to a RESERVE statement are released; the tasks repeat
+their locking statements in the order of their priorities. If no task
+is waiting due to a RESERVE statement, all other waiting tasks, due to 
+their ENTER-instruction, are released, in turn repeating the ENTER 
+statement in the order of their priorities.
+\item[Effect of ENTER B;]
+If B has state ``locked'', or if a task is in the queue of B due to a
+RESERVE statement, the executing task is suspended and placed in the
+queue of B. Otherwise, B assumes state ``lock not possible'', to prohibit
+exclusive access; furthermore, the (internally noted) number Z of
+``using'' tasks is incremented by 1.\\
+(I.e., tasks executing ``ENTER B'' are continued not before the tasks
+requiring exclusive access to the resource.)
+\item[Effect of LEAVE B;]
+If Z = 1, this statement has the same effect as ``FREE B;''.
+Otherwise, Z is decremented by 1, and B keeps the state ``lock not
+possible''.
+\end{description}
+
+Example:
+
+A task Measurement continuously acquires values of comparison
+quantities needed by the tasks Control and Disposition for
+calculations from a process to be supervised. It shall be granted that
+Measurement changes the comparison quantities only if they are not
+used; in contrast, Control and Disposition shall use the
+comparison quantities simultaneously.
+
+For this, a bolt variable Vvalue is declared; in the bodies of the three
+tasks the critical sections of the modification or the use of the
+comparison quantities are initiated or terminated, respectively, as
+follows:
+
+In the body of Measurement:
+
+...\\
+{\bf RESERVE} Vvalue;\\
+\x ! modification\\
+{\bf FREE} Vvalue;\\
+...
+
+In the bodies of Control and Disposition:
+
+...\\
+{\bf ENTER} Vvalue;\\
+\x ! use\\
+{\bf LEAVE} Vvalue;\\
+...
+
+All statements for bolt variables are also defined for lists of bolt
+variables --- analogously to the request and release statements for
+semaphore variables.
+
+Generally, bolt variables can be declared and used as follows:
+
+BoltDeclaration ::=\\
+\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList 
+[ DimensionAttribute ] {\bf BOLT}\\
+\x [ GlobalAttribute ] ;
+
+BoltSpecification ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList 
+[ VirtualDimensionAttribute ]\\
+\x \x {\bf BOLT} \{ GlobalAttribute $\mid$ IdentificationAttribute \} ;
+
+\begin{tabbing}
+\x $\mid$ \= {\bf RESERVE} \= \kill
+BoltStatement ::= \> \> \\
+   \> {\bf RESERVE} \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
+\x $\mid$ \> {\bf FREE}    \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
+\x $\mid$ \> {\bf ENTER}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
+\x $\mid$ \> {\bf LEAVE}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;
+\end{tabbing}
+
+Therefore, also arrays of bolt variables can be declared.
+
+Bolt declarations must take place at module level.
+\end{tobedone}
+
+
+\section{Interrupts and Interrupt Statements}   % 9.4
+\subsection{Declarations of Interrupts and Software Interrupts}    % 9.4.1
+
+An interrupt is a message of the controlled process via an interrupt
+input line of the interrupt controller to the operating system, which,
+after occurrence of the interrupt has to initiate the reaction planned
+by the programmer for that case, e.g., ``Upon occurrence of interrupt
+Ready, task Supply is to be started''.
+
+The interrupt channels provided in a computer system are described in the
+user manual, giving their (system) names. The interrupt channels required
+by a PEARL program are declared in the system part, where user names can
+be associated to them. Under these user names, they are specified as
+interrupts in the problem part, to be able to use them in the task
+control statements (see 9.2) and the interrupt statements.
+
+Example:
+
+\begin{tabbing}
+Initialisation: \= \kill
+
+{\bf MODULE}; \> \\
+{\bf SYSTEM}; \> \\
+\x Ready: Hard\_Int(7); ! Hard\_Int is the system name \> \\
+   \> \\
+{\bf PROBLEM}; \> \\
+{\bf SPECIFY} Ready {\bf INTERRUPT}; \> \\
+... \> \\
+Initialisation: \> {\bf TASK}; \\
+  \> ... \\
+  \> {\bf WHEN} Ready {\bf ACTIVATE} Supply; \\
+  \> ... \\
+  \> {\bf END}; ! Initialisation \\
+  \> \\
+...             \> \\
+Supply:         \> {\bf TASK PRIORITY} 2;\\
+  \> ! task body \\
+  \> {\bf END}; ! Supply \\
+...             \>
+\end{tabbing}
+
+The general form of an interrupt specification reads:
+
+InterruptSpecification ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList \{ {\bf INTERRUPT $\mid$ IRPT} \}\\
+\x [ GlobalAttribute ];
+
+Most modern computers and operating systems, however, do not provide the
+possibility to address interrupt channels anymore, because hardware
+oriented device control and supervision are taken over by programmable
+logic controllers. The possibilities for interrupts provided by PEARL,
+however, are also usable for so-called {\em software interrupts}
+introduced into the system part under their own system names. The user manual
+gives information about the system name and usage possibilities.
+
+\subsection{Interrupt Statements (TRIGGER, ENABLE, DISABLE)}    % 9.4.2
+
+First, interrupts are disabled by their declarations and have to be
+enabled by an enable statement.
+
+If the effect of an enabled interrupt, e.g., upon malfunctions in the
+technical process, shall be suppressed, i.e., start conditions for task
+statements related to it shall stay ineffective although the interrupt
+occurs, a disable statement is to be executed for this purpose, which
+in turn can be revoked again by executing an enable statement.
+
+DisableStatement ::= \\
+\x {\bf DISABLE} Name$\S $Interrupt;
+
+EnableStatement ::=  \\
+\x {\bf ENABLE} Name$\S $Interrupt;
+
+The validity range of the disable statement starts with its
+execution and ends upon execution of an enable statement.
+
+Example:
+
+{\bf MODULE};\\
+{\bf SYSTEM};\\
+\x Alarm: INT;\\
+\x ...\\
+{\bf PROBLEM};
+
+\x {\bf SPC} Alarm {\bf INTERRUPT};\\
+\x ...\\
+\x Init: {\bf TASK MAIN};\\
+\x \x {\bf WHEN} Alarm {\bf ACTIVATE} Recovery;\\
+\x \x {\bf ENABLE} Alarm;\\
+\x \x ... \\
+\x \x {\bf END}; ! Init
+
+\x Recovery: {\bf TASK PRIO} 1;\\
+\x \x {\bf DISABLE} Alarm;\\
+\x \x \x ! checking the reason\\
+\x \x \x ! initiate reaction\\
+\x \x {\bf ENABLE} Alarm;\\
+\x \x {\bf END}; ! Recovery\\
+\x ...\\
+{\bf MODEND};
+
+The test of real time programs requires sometimes to simulate the effect
+of interrupts, particularly if the technical process has not been
+connected to the computer, yet. For such simulations, the trigger
+statement is provided:
+
+TriggerStatement := \\
+{\bf TRIGGER} Name$\S $Interrupt;
+
+Example:
+
+\begin{tabbing}
+\hspace{6cm} \= \kill
+
+{\bf MODULE};                 \> {\bf MODULE}(Test);\\
+{\bf SYSTEM};                 \> {\bf PROBLEM};\\
+         \> \\
+\x Ready: Soft\_Int;          \> \x {\bf SPC} Ready {\bf IRPT GLOBAL};\\
+\x ...                        \> \\
+{\bf PROBLEM};                \> \x ...\\
+\x ...                        \> \\
+\x {\bf WHEN} Ready           \> \x $/^*$ e.g., at random times $^*/$ \\
+\x \x {\bf ACTIVATE} Control; \> \x {\bf TRIGGER} Ready;\\
+\x ...                        \> \x ...\\
+{\bf MODEND};                 \> {\bf MODEND};
+\end{tabbing}
+

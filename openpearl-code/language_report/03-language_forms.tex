@@ -1,0 +1,224 @@
+\chapter{Rules for the Construction of PEARL Language Forms}   % 3
+
+A PEARL program can be written free of format; particularly, it is not
+necessary to pay attention to the fact that a statement starts in a
+certain column.
+
+All elements of a PEARL program are produced from characters of the
+following character set. Certainly, character string constants and
+comments may contain any character that is allowed by ISO 646 and
+national variants of ISO 646.
+
+\section{Character Set}   % 3.1
+
+The character set of PEARL is a partial set of the ISO 7 bit character
+set (ISO 646). It contains
+
+\begin{itemize}
+\item the upper-case letters A to Z
+\item the lower-case letters a to z
+\item the digits 0 to 9, and
+\item the special characters
+      \begin{tabbing}
+      \x \=   \kill
+      \_ \> underline\\
+  \> space (for better clearness sometimes, underline \_ is used)\\
+      !  \> exclamation mark (start of the line comment)\\
+      '  \> apostrophe\\
+      (  \> open round parenthesis\\
+      )  \> close round parenthesis\\
+      ,  \> comma\\
+      .  \> full stop\\
+      ;  \> semicolon\\
+      :  \> colon\\
+      +  \> plus sign (e.g. for addition, algebraic sign)\\
+      -  \> minus sign (e.g. for subtraction, algebraic sign)\\
+      $\ast$  \> asterisk (e.g. for multiplication)\\
+      /  \> oblique stroke (e.g. for division)\\
+      =  \> equals sign (e.g. for assignment)\\
+      $<$  \> less sign\\
+      $>$  \> greater sign\\
+      $[$  \> square bracket\\
+      $]$  \> square bracket\\
+      $\backslash$ \> backslash (for control signs in character strings)
+      \end{tabbing}
+\end{itemize}
+
+The following character combinations are interpreted as an entity (a
+compound symbol):
+
+\begin{tabbing}
+== \= exponentiation symbol \kill
+
+:=    \> assignment symbol\\ \relax
+**    \> exponentiation symbol\\
+/*    \> start comment\\ \relax
+*/    \> end comment\\
+//    \> symbol for integer division\\
+==    \> equals symbol\\
+/=    \> not equals symbol\\
+$<=$  \> greater or equal symbol\\
+$>=$  \> less or equal symbol\\
+$<>$  \> cyclic-shift symbol\\
+$><$  \> concatenation symbol\\
+$'\backslash$ \> start of a control character sequence in character string constants\\
+$\backslash'$ \> end of a control character sequence in character string constants
+\end{tabbing}
+
+If not all symbols required for program notation are available on a
+device, the following character sequences can be used alternatively:
+
+\begin{tabbing}
+CSHIFT \= for $<>$ \kill
+
+LT     \> for $<$\\
+GT     \> for $>$\\
+EQ     \> for ==\\
+NE     \> for /=\\
+LE     \> for $<=$\\
+GE     \> for $>=$\\
+CSHIFT \> for $<>$\\
+CAT    \> for $><$\\
+(/     \> for $[$\\
+/)     \> for $]$\\
+\end{tabbing}
+
+\section{Basic Elements}    % 3.2
+
+A PEARL program is built up from the following basic elements:
+
+\begin{itemize}
+\item identifiers
+\item constants
+\item delimiters (meaning special characters and compound symbols), and
+\item comments
+\end{itemize}
+
+Character sequences for identifiers and constants must be followed by
+delimiters or comments.
+
+\subsection{Identifiers}   % 3.2.1
+
+Identifiers are used for constructing names of objects (e.g. numerical
+variables, procedures). They consist of a sequence of letters
+(upper-case or lower-case), the underline and/or numerals; this sequence
+has to start with a letter. For identifiers, PEARL distinguishes between
+upper-case and lower-case letters, i.e., valve, VALVE and Valve denote
+different objects.
+
+Examples: counter\_1, DISPO, wait
+
+Some words have a specific meaning at prescribed positions in the PEARL
+program; these words are called keywords. E.g., the words BIT or GOTO
+are such keywords. The appendix contains a list of all keywords. They
+must not be used as identifiers and have always to be written with
+upper-case letters.
+
+\subsection{Constants}   % 3.2.2
+
+Constants are integer numbers, floating point numbers, bit strings,
+character strings, times and durations. They are described in Chapter 5
+together with the corresponding variables.
+
+\subsection{Comments}    % 3.2.3
+
+Comments are used to explain the program and are of no importance for
+running of the program. There are two kinds of comments: One kind may
+cover several lines and is put in brackets by the compound symbols ``/*''
+and ``*/''. Within these brackets, any characters may occur except the
+compound symbol ``*/'' for the end of the comment.
+
+The other kind, the line of comment, starts with an exclamation
+mark ``!'' and is terminated by the end of the line.
+
+Comments may be inserted wherever spaces are allowed.
+
+Examples:
+
+/* This comment is not ended\\
+\x by the end of the line */\\
+! This comment is limited to 1 line
+
+\section{Construction of Language Forms}  % 3.3
+
+In the following chapters, the language forms allowed in PEARL are
+described.  In order to make these descriptions exact and as compact as
+possible, some formal possibilities are needed apart from the verbal
+formulation:
+
+Each language form has a name, by which it is defined with the help of
+the (meta) symbol ``::='' :
+
+NameOfTheLanguageForm ::=\\
+\x DefinitionOfTheLanguageForm
+
+Example:
+
+UpperCaseLetter ::=\\
+\x A or B or ... or Z
+
+Digit ::=\\
+\x 0 or 1 or ... or 9
+
+As this example shows, the definition of a language form may contain
+elements that are given alternatively when constructing the language
+form. To shorten that, in the following the alternatively possible
+elements are divided by the symbol ``$\mid$'':
+
+Example:
+
+Letter ::=\\
+\x A $\mid$ B $\mid$ ... $\mid$ Z $\mid$ a $\mid$ b $\mid$ ... $\mid$ z
+
+Digit ::=\\
+\x 0 $\mid$ 1 $\mid$ 2 $\mid$ ... $\mid$ 9
+
+If one element shall occur on different occasions, but at least once, it
+is to be provided with three superscribed dots.
+
+Example:
+
+SimpleInteger ::=\\
+\x Digit $^{...}$
+
+To express that an element may be missing while constructing the
+language form, it is given in square brackets ``['' ... ``]'' (in case
+of doubt, the square brackets are printed boldly).
+
+Example:
+
+Identifier ::=\\
+\x Letter [ \{ Letter $\mid$ Digit $\mid$ \_ \} $^{...}$ ]
+
+Here, already two further rules were used: The definition of a language
+form may again contain names of language forms; furthermore the braces
+and square brackets are also used to put together elements to new
+elements. Thus, the last example is equivalent to the following:
+
+Example:
+
+Identifier ::=\\
+\x Letter [ Letter $\mid$ Digit $\mid$ \_ ] $^{...}$
+
+For the description of lists whose elements are separated by a certain
+symbol, the list element and the delimiter are given in the form
+
+ListElement [ Delimiter ListElement ] $^{...}$
+
+to define the corresponding language form.
+
+Example:
+
+IdentifierList ::=\\
+\x Identifier [ , Identifier ] $^{...}$
+
+For a better understanding or a more exact description of the definition
+of a language form, elements are often provided with an explanatory or
+restricting comment that is separated from the element by the symbol
+\S .
+
+Example:
+
+DeviceList ::=\\
+\x Identifier\S  Device [ , Identifier\S Device ] $^{...}$
+

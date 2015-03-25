@@ -1,0 +1,474 @@
+% for loop diagramm updated
+
+\chapter{Statements for the Control of Sequential Execution}   % 7
+
+A task or procedure declaration defines a sequence of statements which
+are processed sequentially in the defined order when executing the task or
+the procedure, unless control statements designated for this influence the
+order of processing.
+
+Such control statements are
+\begin{itemize}
+\item the conditional statement
+\item the statement selection
+\item the empty statement
+\item the repetition
+\item the jump statement
+\item the exit statement
+\end{itemize}
+
+\section{Conditional Statement (IF)}   % 7.1
+
+With the help of the conditional statement, it is determined depending
+on the result of an expression with which statement the program
+execution is to continued.
+
+ConditionalStatement ::=\\
+\x {\bf IF} Expression {\bf THEN} Statement$^{...}$ {\bf [ ELSE} Statement$^{...}$ {\bf ] FIN};
+
+The result of the expression must be of type BIT(1). If the expression
+provides value '1'B (true), the statements following THEN are evaluated;
+otherwise the statements following ELSE are evaluated.
+
+If the execution of the statements following THEN or ELSE, resp., does
+not result in a jump out of the conditional statement, the statement
+following FIN is evaluated subsequently.
+
+Example:
+
+{\bf IF} gradient $>$ degree\_bound \\
+\x {\bf THEN} alarm;\\
+\x {\bf ELSE IF} gradient $>$ degree\_threshold \\
+\x \x \x {\bf THEN ALL} 1 {\bf SEC ACTIVATE} measurement; ! measure more often\\
+\x \x {\bf FIN};\\
+{\bf FIN};\\
+...
+
+\section{Statement Selection (CASE) and Empty Statement}  % 7.2
+
+Let us assume that a (function) procedure control shall be used for
+controlling several devices of the same kind, after each call returning
+a number between 1 and 4 meaning:
+\begin{itemize}
+\item returned value = 1: request carried out
+\item returned value = 2: request data wrong
+\item returned value = 3: device not addressable
+\item returned value = 4: device does not work correctly
+\end{itemize}
+
+The task supply shall perform a measure planned for each case.
+
+For the programming of such case distinctions, the statement selection
+provided in two (historically caused) forms is suitable: The older form
+allows only integers as distinction criteria; the newer one permits also
+characters. At first, the older form is described:
+
+StatementSelection1 ::=\\
+\x {\bf CASE} Expression\\
+\x \x \{ {\bf ALT} Statement$^{...} \}^{...}$\\
+\x \x [ {\bf OUT} Statement$^{...}$ ]\\
+\x {\bf FIN};
+
+The number 1 is assigned to the statement sequence following the first
+ALT (alternative 1), the number 2 to the statement sequence following
+the second ALT (alternative 2), etc.
+
+Upon execution of the statement selection, the given expression is
+evaluated; it must result in a value of type FIXED. If the integer value
+is between 1 and the number of given alternatives, the associated
+statement sequence is executed; otherwise the statement sequence
+following OUT (if given) is executed.
+
+If the selected statement sequence does not contain a jump out of the
+statement selection, the statement following FIN is evaluated
+subsequently.
+
+Example:
+
+The above problem can be programmed as follows:
+
+\begin{tabbing}
+
+control: \= {\bf TASK} \= order {\bf BIT}(8)) \x \= \kill
+
+supply:  \> {\bf TASK} \> {\bf PRIO} 7;       \> \\
+ \> \> \> \\
+control: \> {\bf PROC} \> (No {\bf FIXED},    \> ! device \\
+ \>             \> order {\bf BIT}(8)) \> ! order inf.\\
+ \> {\bf RETURNS} ({\bf FIXED});   \>  \> \\
+ \> ! procedure body for carrying out the control order \> \> \\
+ \> {\bf END}; ! control \> \> \\
+ \> ... \> \> \\
+ \> ! creating an order for the device with index no \> \> \\
+ \> \> \> \\
+again:   \> {\bf CASE} \> control (no, order) \> \\
+ \> {\bf ALT}   \> ! order carried out \> \\
+ \>             \> ; \> \\
+ \> {\bf ALT}   \> ! order inf. wrong \> \\
+ \>             \> {\bf CALL} error(2); {\bf GOTO} end; \> \\
+ \> {\bf ALT}   \> ! device dead \> \\
+ \>             \> {\bf ACTIVATE} device\_breakdown {\bf PRIO} 2; \> \\
+ \>             \> {\bf CALL} error(3); {\bf GOTO} end; \> \\
+ \> {\bf ALT}   \> ! device works incorrectly \> \\
+ \>             \> {\bf CALL} device\_check; {\bf GOTO} again; \> \\
+ \> {\bf OUT}   \> ! result out of range \> \\
+ \>             \> {\bf CALL} error(5); \> \\
+ \> {\bf FIN}; \> \> \\
+ \> ...         \> \> \\
+end:     \> {\bf END}; \> ! supply \>
+\end{tabbing}
+
+In this example, the empty statement is used. It consists of one
+semicolon only and has no effects. The keyword ALT must be followed by
+one statement at least; this may also be an empty statement. It has no
+effects and is only of interest in conditional statements and statement
+selections.
+
+In the example, the empty statement results in the immediate execution
+of the statement following FIN in the case of success (``request carried
+out'').
+
+The general form of the empty statement reads:
+
+EmptyStatement ::=\\
+\x ;
+
+The second form of the statement selection has the following form:
+
+StatementSelection2 ::= \\
+\x {\bf CASE} CaseIndex\\
+\x \{ {\bf ALT} (CaseList) Statement$^{...} \}^{...}$ \\
+\x [ {\bf OUT} Statement$^{...}$ ] \\
+\x {\bf FIN};
+
+CaseIndex ::=\\
+\x Expression\S WithValueOfType-FIXED-or-CHAR(1)
+
+CaseList ::= \\
+\x IndexRange [ , Index-Range ]$^{...}$
+
+IndexRange ::= \\
+\x Constant [ : Constant ]
+
+All given constants must be of type CaseIndex expression; CHAR(1) or
+FIXED are allowed.
+
+When executing the StatementSelection2, the CaseIndex is evaluated.
+If the value is contained in one of the given case lists, the associated
+statement sequence is executed; otherwise the statement sequence
+following OUT (if given) is executed.
+
+If the selected statement sequence does not contain a jump out of the
+statement selection, the statement following FIN is evaluated
+subsequently.
+
+Examples:
+
+\begin{tabbing}
+{\bf CASE} \= {\bf ALT} ('A':'Z') \= \kill
+
+{\bf DCL}  \> (Operator, chr)CHAR(1), (x, y) {\bf FIXED}; \> \\
+...        \> \> \\
+{\bf CASE} \> Operator \> \\
+    \> {\bf ALT} ('+')    \> x := x + y; \\
+    \> {\bf ALT} ('-')    \> x := x - y; \\
+    \> {\bf ALT} ('*')    \> x := x * y; \\
+    \> {\bf ALT} ('/')    \> {\bf CASE} y \\
+    \>                    \> {\bf ALT} (0) {\bf CALL} Error;\\
+    \>                    \> {\bf OUT} x := x//y;\\
+    \>                    \> {\bf FIN};\\
+{\bf FIN}; \> \> \\
+    \> \> \\
+{\bf CASE} \> chr \> \\
+    \> {\bf ALT} ('A':'Z') \> {\bf CALL} uppercase;\\
+    \> {\bf ALT} ('a':'z') \> {\bf CALL} lowercase;\\
+{\bf FIN}; \> \> \\
+    \> \> \\
+{\bf CASE} \> chr \> \\
+    \> {\bf ALT} ('A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u') {\bf CALL} Vocal(chr); \> \\
+    \> ... \> \\
+{\bf FIN}; \> \>
+\end{tabbing}
+
+It is not intended to mix both forms of the statement selection. Thus,
+e.g., the following is not correct:
+
+\begin{tabbing}
+{\bf CASE} \= {\bf ALT} /* 1 */ \= \kill
+
+{\bf CASE} \> ErrNum \> \\
+    \> {\bf ALT} /* 1 */  \> {\bf CALL} ok;\\
+    \> {\bf ALT} (0)      \> {\bf CALL} nothing\_done;\\
+    \> {\bf ALT} (-99:-1) \> {\bf CALL} ErrorMsg (ErrNum);\\
+    \> ... \>
+\end{tabbing}
+
+The selection must be deterministic.
+
+Jumps into a statement selection are forbidden.
+
+\section{Repetition (FOR -- REPEAT)}   % 7.3
+
+Often, a statement sequence must be executed repeatedly, with only one
+parameter changing. E.g., various devices are to be checked; let
+num\_devices be the number of devices:
+
+{\bf FOR} i {\bf FROM} 1 {\bf BY} 1 {\bf TO} num\_devices\\
+{\bf REPEAT}\\
+\x checking of device(i)\\
+{\bf END};
+
+In general, such ``program loops'' are constructed like this:
+
+repetition ::= \\
+\x [ {\bf FOR} Identifier\S ControlVariable ] \\
+\x [ {\bf FROM} Expression\S InitialValue ] \\
+\x [ {\bf BY} Expression\S Increment ] \\
+\x [ {\bf TO} Expression\S FinalValue ] \\
+\x [ {\bf WHILE} Expression\S Condition ] \\
+\x {\bf REPEAT} \\
+\x [ Declaration ]$^{...}$ [ Statement ]$^{...}$ \\
+\x {\bf END} [ Identifier\S Loop ] ;
+
+The declarations and statements following REPEAT, i.e., the loop body,
+are run so often as specified by the clauses given in front of them; the
+statement following END is carried out subsequently. However, it is also
+possible to leave the loop body prematurely by a jump statement or the
+exit statement (cf. 7.5). Jumps into the loop body are not permitted.
+
+In the loop body, all statements are permitted; thus, particularly
+repetitions can be nested:
+
+{\bf FOR} i {\bf TO} 10\\
+{\bf REPEAT} \\
+\x {\bf FOR} k {\bf TO} 10 \\
+\x {\bf REPEAT} \\
+\x \x c (i,k) := a (i,k) + b(i,k);\\
+\x {\bf END};\\
+{\bf END};
+
+If InitialValue or Increment are missing, they are assumed as 1. If FinalValue is lacking, the loop body can be repeated unrestrictedly.
+
+The ControlVariable may neither be declared nor changed; it has
+implicitly type FIXED. The values of the expressions for InitialValue,
+Increment and FinalValue have to be of type FIXED, the value of the
+expression for the Condition must be of type BIT(1).
+
+The ControlVariable may not be used in the given expressions, except
+for Expression\S Condition, but in the statements to be repeated.
+
+Besides, all rules for blocks are valid for the loop body (cf. 4.4).
+
+\begin{added}
+The precision of the control variable is derived from the
+required precision defined by the initial and final expression if both are
+specifed.
+The default precision is 31.
+\end{added}
+
+The flow chart depicted in Figure~\ref{schleife} is an equivalent representation of the
+statement
+
+{\bf FOR} Indicator\S ControlVariable \\
+{\bf FROM} Expression\S InitialValue \\
+{\bf BY} Expression\S Increment \\
+{\bf TO} Expression\S FinalValue \\
+{\bf WHILE} Expression\S Condition \\
+{\bf REPEAT} \\
+\x LoopBody \\
+{\bf END};
+
+\begin{added}
+Regard that the expression for the increment and the final
+value are calculated once. Modifications of these expressions
+in the loop body does not effect the loop behavior.
+
+The increment of the control variable does not cause
+a range exception.
+\end{added}
+
+\begin{figure}[htb]
+\centering
+\setlength{\unitlength}{0.00087500in}%
+\begin{picture}(4299,9740)(214,-8900)
+\thicklines
+\put(1126,-736){\framebox(2475,1125){}}
+   \put(2341,119){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	a:=Expression\S InitialValue}}}
+   \put(2341,-181){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s:=Expression\S Increment}}}
+   \put(2341,-481){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	e:=Expression\S FinalValue}}}
+
+\put(1576,-1411){\line( 1, 0){1575}}
+   \put(3151,-1411){\line( 1,-1){450}}
+   \put(3601,-1861){\line(-1,-1){450}}
+   \put(3151,-2311){\line(-1, 0){1575}}
+   \put(1576,-2311){\line(-1, 1){450}}
+   \put(1126,-1861){\line( 1, 1){450}}
+   \put(2251,-1681){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s $>$ 0 AND a $<=$ e OR}}}
+   \put(2251,-1951){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s $<$ 0 AND a $>=$ e OR}}}
+   \put(2251,-2221){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s == 0 ?}}}
+
+\put(1126,-3211){\framebox(2475,450){}}
+   \put(2251,-3076){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	Indicator\S ControlVariable := a}}}
+\put(1126,-5011){\framebox(2475,450){}}
+   \put(2251,-4876){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}LoopBody}}}
+\put(2386,-5011){\vector( 0,-1){450}}
+
+%%%%
+\put(1151,-5661){\line( 1, 1){200}}
+\put(1151,-5661){\line( 1,-1){200}}
+\put(1351,-5461){\line(1, 0){2025}}
+\put(1351,-5861){\line(1, 0){2025}}
+\put(3576,-5661){\line(-1,-1){200}}
+\put(3576,-5661){\line(-1, 1){200}}
+\put(1151,-5661){\vector(-1,0){925}}
+\put( 901,-5615){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}yes}}}
+
+   \put(2350,-5661){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s == 0 ?}}}
+\put(2386,-5861){\vector( 0,-1){500}}
+\put(2600,-6111){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}no}}}
+%%%%
+\put(3601,-6586){\vector( 1, 0){900}}
+\put(3916,-6550){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}no}}}
+%%% 
+\put(2386,-6811){\vector( 0,-1){500}}
+\put(2600,-7061){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}yes}}}
+%%% a  + s < e....
+\put(1126,-6586){\line( 1, 1){225}}
+   \put(1126,-6586){\line( 1,-1){225}}
+   \put(1351,-6361){\line( 1, 0){2025}}
+   \put(1351,-6811){\line( 1, 0){2025}}
+   \put(3601,-6586){\line(-1, 1){225}}
+   \put(3601,-6586){\line(-1,-1){225}}
+   \put(2251,-6511){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s $>$ 0 AND a $<=$ e - s OR}}}
+   \put(2251,-6761){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	s $<$ 0 AND a $>=$ e - s ?}}}
+%%%
+
+%%%%
+\put(1126,-7761){\framebox(2475,450){}}
+  \put(2341,-7626){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	a := a + s}}}
+
+\put(2386,-7761){\line( 0,-1){270}}
+\put(2386,-8031){\line(-1, 0){2160}}
+\put(226,-8031){\line( 0, 1){5535}}
+\put(226,-2496){\vector( 1, 0){2160}}
+
+\put(1126,-3886){\line( 1, 1){225}}
+\put(1351,-3661){\line( 1, 0){2025}}
+\put(3376,-3661){\line( 1,-1){225}}
+\put(3601,-3886){\line(-1,-1){225}}
+\put(3376,-4111){\line(-1, 0){2025}}
+\put(1351,-4111){\line(-1, 1){225}}
+   \put(2350,-3906){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}
+	Expression\S Condition == '1'B ?}}}
+
+\thinlines
+\put(2386,839){\vector( 0,-1){450}}
+\put(2386,-736){\vector( 0,-1){675}}
+\put(2386,-2311){\vector( 0,-1){450}}
+\put(2386,-3211){\vector( 0,-1){450}}
+\put(2386,-4111){\vector( 0,-1){450}}
+\put(3601,-1861){\line( 1, 0){900}}
+% rechts aussen nach unten
+\put(4501,-1861){\line( 0,-1){6420}}
+\put(4501,-8281){\line(-1, 0){2115}}
+\put(2386,-8281){\vector( 0,-1){270}}
+\put(2386,-8776){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}LoopEnd}}}
+
+\put(3601,-3886){\vector( 1, 0){900}}
+
+\put(3916,-1771){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}no}}}
+\put(3916,-3796){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}no}}}
+\put(2600,-2570){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}yes}}}
+\put(2600,-4325){\makebox(0,0)[b]{\smash{\SetFigFont{10}{14.4}{rm}yes}}}
+
+\end{picture}
+
+\caption{Flow chart for evaluating a repetition statement}
+\label{schleife}
+\end{figure}
+
+\section{GoTo Statement (GOTO)}   % 7.4
+
+GoToStatement ::=\\
+\x {\bf GOTO} Identifier\S Label;
+
+This statement has the result that program processing is continued at
+the program position determined by the label identifier. This program
+position must be a statement and may not be outside the body of the
+task or procedure executing the GoTo statement.
+
+Example:
+
+\begin{tabbing}
+measure: read: \= \kill
+        \> ...\\
+measure: read: \> {\bf READ} value {\bf FROM} device;\\
+        \> ... \\
+        \> {\bf GOTO} read;
+\end{tabbing}
+
+In general, statements can (several times) be marked with lables; i.e.,
+the label is given immediately before the (possibly already marked)
+statement, separated by a colon.
+
+\begin{added}
+The label for a {\bf GOTO} statement must be defined in the same block or in a superior block 
+in the same {\bf PROC} or {\bf TASK}.
+\end{added}
+
+\section{Exit Statement (EXIT)}    % 7.5
+
+The exit statement serves to exit blocks and loops deliberately. With
+EXIT, also blocks and loops nested several times can be exited
+deliberately, which must have an identifier (the jump target) at the
+corresponding end.
+
+ExitStatement ::= \\
+\x {\bf EXIT} [ Identifier\S BlockOrLoop ] ;
+
+If the identifier is missing, program processing is continued with the
+statement following the end of the block or the loop containing the exit
+statement.
+
+If the identifier is given, program processing is continued with the
+statement following the end of the indicated block or loop, the exit
+statement being in an internal block or loop.
+
+The exit statement may not serve for exiting procedures or tasks.
+
+Example:
+
+\begin{tabbing}
+\hspace*{7cm} \= \kill
+
+... \> \\
+{\bf BEGIN} \> /* analysis */ \\
+\x ... \> \\
+\x {\bf TO} number {\bf REPEAT} \> /* comparison */ \\
+\x \x ... \> \\
+\x \x {\bf IF} MeasuredValue $<$ BoundaryValue \> \\
+\x \x {\bf THEN EXIT} analysis; \> \\
+\x \x {\bf ELSE} ... \> \\
+\x \x {\bf FIN}; \> \\
+\x \x ... \> \\
+\x {\bf END} comparison; \> \\
+\x ... \> \\
+{\bf END} analysis; \> \\
+{\bf RETURN} (OK);\> \\
+\x ... \>
+\end{tabbing}
+
+The execution of ``EXIT analysis;'' would immediately be followed by
+``RETURN (OK);''.
+

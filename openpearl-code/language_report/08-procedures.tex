@@ -1,0 +1,390 @@
+\chapter{Procedures}   % 8
+
+When solving an automation problem, in the sense of structured
+programming an independent program part is formulated and named for a
+logically independent algorithm, particularly if the processing of the
+algorithm is needed in several parts of the program, eventually only
+changing the arguments of the algorithm, its parameters. The execution
+of such a program part is initiated by calling its name --- possibly
+provided with actual parameters.
+
+If this call shall have the same effect as executing the proper program
+part instead of it, in PEARL this program part is declared and called
+as a procedure. Otherwise --- namely, if the statements following the
+call are to be executed simultaneously with the called program part ---
+the program part is declared and started as task. Tasks are treated in
+Chapter 9, Parallel Activities.
+
+Procedures returning a result to their call position are called function
+procedures, all other ones are called subprogram procedures.
+
+Example for a subprogram procedure:
+
+Let the procedure Output convert a position indication of type FIXED
+into a bit string BinPos and pass it to a machine to be positioned and
+marked by number Mach\_No of type FIXED. Let Output be called by
+the task Control.
+
+{\bf PROBLEM};\\
+\x Output: {\bf PROC} ((Position, Mach\_No) {\bf FIXED});\\
+\x \x {\bf DCL} BinPos {\bf BIT}(8);\\
+\x \x ! transmission of Position into BinPos\\
+\x \x ! output of BinPos to machine Mach\_No \\
+\x \x {\bf END}; ! declaration of Output
+
+\x Control: {\bf TASK};\\
+\x \x {\bf DCL} (Pos, /* actual nominal position */ \\
+\x \x \x         No   /* no of the device */ ) {\bf FIXED};\\
+\x \x ... \\
+\x \x /* assignments to Pos and No */ \\
+\x \x {\bf CALL} Output (Pos, No); \\
+\x \x ... \\
+\x \x {\bf END}; ! declaration of Control \\
+\x ...
+
+Position and Mach\_No are the formal parameters of Output; Pos and No
+are actual parameters. BinPos is a local variable of Output only known
+within this procedure.
+
+Example for a function procedure:
+
+Due to a schedule Occ\_Plan, procedure Next\_Machine shall determine the
+number of the machine to be occupied next among all available machines.
+Occ\_Plan shall not be passed on as parameter. Let the number to be
+returned be of type FIXED. Next\_Machine shall be declared and called
+within the task Supply.
+
+{\bf PROBLEM};\\
+\x {\bf DCL} Occ\_Plan ...;
+
+\x Supply: {\bf TASK};\\
+\x \x \x {\bf DCL} Mach\_No {\bf FIXED};\\
+\x \x \x ... \\
+\x \x \x Next\_Machine: {\bf PROCEDURE RETURNS (FIXED)};\\
+\x \x \x \x \x {\bf DCL} No {\bf FIXED}; ! No of the next machine\\
+\x \x \x \x \x \x ! establishing of No with the help of Occ\_Plan\\
+\x \x \x \x \x {\bf RETURN} (No);\\
+\x \x \x \x {\bf END} ! Declaration of Next\_Machine\\
+\x \x \x ...
+
+\x \x \x Mach\_No := Next\_Machine;\\
+\x \x \x ... \\
+\x \x {\bf END}; ! Declaration of Supply\\
+\x ...
+
+Since the variable Occ\_Plan is declared at module level, it can be used
+and, if needed, changed by all procedures and tasks of the module.
+
+\section{Declaration and Specification of Procedures (PROC)}  % 8.1
+
+The statement sequence to be executed when calling a procedure is
+prescribed in a procedure declaration, defining a procedure identifier.
+The statements of the procedure can use data
+\begin{itemize}
+\item which are declared at module level or in a higher level relativ to the procedure
+(see 4.1),
+\item which are specified as formal parameters, i.e., as representatives
+for those expressions or variables, which, upon calling, are passed
+to the procedure as actual parameters, or
+\item which are locally declared in the procedure.
+\end{itemize}
+
+The local declarations and the statements of the procedure form the
+procedure body.
+
+ProcedureDeclaration ::= \\
+\x Identifier: \{ {\bf PROCEDURE $\mid$ PROC} \} [ ListOfFormalParameters ]\\
+\x [ ResultAttribute ]\\
+\x [ GlobalAttribute ] ;\\
+\x ProcedureBody\\
+\x {\bf END};
+
+ProcedureBody ::= \\
+\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
+
+ListOfFormalParameters ::=\\
+\x (FormalParameter [ , FormalParameter ]$^{...}$)
+
+FormalParameter ::=\\
+\x Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ AssignmentProtection ]\\
+\x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
+
+VirtualDimensionList ::=\\
+\x ( [ , $^{...}$ ] )
+
+ParameterType ::= \\
+\x SimpleType $\mid$ TypeReference $\mid$ TypeStructure\\
+\x $\mid$ Identifier\S ForType $\mid$ TypeDation $\mid$ TypeRealTimeObject
+
+TypeRealTimeObject ::=\\
+\x {\bf SEMA $\mid$ BOLT $\mid$ IRPT $\mid$ INTERRUPT $\mid$ SIGNAL}
+
+ResultAttribute ::= \\
+\x {\bf RETURNS}(ResultType)
+
+ResultType ::= \\
+\x SimpleType $\mid$ TypeReference $\mid$ TypeStructure $\mid$ Identifier\S ForType
+
+The general form of the specification of a procedure reads as follows:
+
+ProcedureSpecification ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\S Procedure \{ {\bf ENTRY $\mid$ [ : ] PROC} \} \\
+\x [ ListOfParametersFor-SPC ] [ResultAttribute ] GlobalAttribute ;
+
+ListOfParametersFor-SPC ::=\\
+\x (ParameterSpecification [ , ParameterSpecification ]$^{...}$)
+
+ParameterSpecification ::=\\
+\x [ Identifier ] [ VirtualDimensionList ] [ AssignmentProtection ] \\
+\x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
+
+In the procedure specification, the (optionally) definable list of
+parameters is only of documentary importance; however, it is thus
+possible to copy the head of a procedure declaration into another module
+and to generate a correct specification of the procedure by adding the
+keyword SPECIFY.
+
+Subprogram procedures are declared without and function procedures with
+result attribute. The result type determines the type of the calculated
+result which is returned to the call position. With the help of the
+return statement, this return takes place in the form
+
+{\bf RETURN} (Expression);
+
+Thus, the value of the expression must have the type specified by the
+result attribute.
+
+Execution of the procedure body of a function procedure is terminated by
+executing a return statement. Function procedures may only be terminated
+this way and no other.
+
+Execution of a subprogram procedure is terminated by
+\begin{itemize}
+\item executing the return statement in the form\\
+      {\bf RETURN};\\
+\item executing the last statement of the procedure body.
+\end{itemize}
+
+The procedure body can contain declarations, e.g., declarations of local
+variables which are only known within the procedure body. However,
+further procedures, so-called nested procedures, may also be declared; the
+occurring aspects of unambiguity of names, also occurring when declaring
+procedures in task bodies, are described in 4.3 within the context of
+blocks.
+
+Due to the call, variables or expressions are associated with the
+specified formal parameters of the procedure as actual parameters. How
+this association takes place (two possibilities), is determined by the
+fact whether the attribute IDENTICAL is given or not. Both ways are
+explained in 8.2, Call of Procedures.
+
+The number n of commas in the virtual dimension list indicates that the
+parameter is an (n+1) dimensional array. Formal array parameters
+(virtual dimension list is present) may only be specified together with
+the IDENTICAL attribute. If, e.g., the one-dimensional array ``A(10)
+FIXED'' shall be passed on to a procedure P with the corresponding
+formal parameter Array, Array is to be specified like this: ``Array()
+FIXED IDENTICAL''.
+
+Procedures declared at module level, are translated by the compiler with
+the {\em re-entrancy} capability, so that they can be used
+simultaneously by several tasks (see 9). The recursive call of
+procedures is allowed for all --- even for nested --- procedures.
+However, since for each task only limited memory space for the local
+data of the called procedures (stack) is provided, the programmer
+should avoid (or suitably restrict) recursion in the sense of safe
+programs.
+
+\section{Calls of Procedures (CALL)}   % 8.2
+
+Subprogram procedures are called with the help of the keyword CALL or
+only with their identifiers:
+
+CallStatement ::=\\
+\x [ {\bf CALL} ] Name\S SubprogramProcedure [ ListOfActualParameters ] ;
+
+ListOfActualParameters ::=\\
+\x (Expression [ , Expression ]$^{...}$)
+
+Example:
+
+{\bf SPC} Output {\bf PROC} (P {\bf FIXED}, N {\bf FIXED}) {\bf GLOBAL};\\
+{\bf DCL} (Pos, No) {\bf FIXED};\\
+...\\
+! Assignments to Pos and No\\
+{\bf CALL} Output (Pos, No);
+
+The call statement results in associating the given actual parameters
+to the formal parameters of the indicated procedure in the order of
+writing down them, and then executing the procedure body. Subsequently,
+the statement following the call statement is executed.
+
+The call of a function procedure does not take place as an independent
+statement, but within expressions upon stating the identifier and the
+actual parameters:
+
+FunctionCall ::= \\
+\x Name\S FunctionProcedure [ ListOfActualParameters ]
+
+Example:
+
+The function procedure Ari shall calculate the arithmetic average of an
+array of n FLOAT variables. This average shall then be printed together
+with the text ``Arith.Average''.
+
+Ari: {\bf PROC} (Array() {\bf FLOAT IDENTICAL}) {\bf RETURNS} ({\bf FLOAT});\\
+\x \x {\bf DCL} Sum {\bf FLOAT};\\
+\x \x {\bf DCL} (LowerBound, UpperBound) {\bf FIXED};\\
+\x \x Sum := 0;\\
+\x \x LowerBound := LWB Array; \\
+\x \x UpperBound := UPB Array; \\
+\x \x {\bf FOR} i {\bf FROM} LowerBound {\bf BY} 1 {\bf TO} UpperBound\\
+\x \x {\bf REPEAT}\\
+\x \x \x Sum := Sum + Array(i);\\
+\x \x {\bf END}; ! loop\\
+\x \x {\bf RETURN} (Sum/(UpperBound - LowerBound + 1));\\
+\x {\bf END}; ! Ari
+
+\x {\bf DCL} MeasuredValue(10) {\bf FLOAT};\\
+\x ...
+\x \x /* Acquisition of the measured values */ \\
+\x {\bf PUT} Ari (MeasuredValue), 'Arith.Average' {\bf TO} Printer {\bf BY} LIST;\\
+\x ...
+
+When evaluating a function call, the given actual parameters are
+associated with the formal parameters of the indicated function
+procedure in the order of writing down them; then the procedure body is
+executed. Subsequently, the evaluation of the expression where the
+function call took place is continued --- in the above example the
+evaluation of the expression 'Arith.Average' in the put statement.
+
+Both in the call statement and in the function call, the types of the
+actual parameters must match the types of the formal parameters
+corresponding to them.
+
+The association of the actual parameters with the formal parameters can
+take place in two ways: If the specification of a formal parameter has
+the attribute IDENTICAL or IDENT, the association takes places with the
+help of identification, otherwise by value transmission.
+
+In the case of value transmission (also called {\em call by value}), a
+new object, having the type of the formal parameter and being local to
+the procedure body, is declared for each defined formal parameter when
+invoking the procedure; i.e., the formal parameters become local
+variables of specified types. Then, the values of the actual parameters
+are assigned to the corresponding formal parameters. An assignment to a
+formal parameter by a statement in the procedure body, hence, does not
+result in a change of the actual parameter. Furthermore, in this case
+any expressions may be passed as actual parameters.
+
+When associating with the help of identification (also called {\em call
+by reference}), a formal parameter is identified with the corresponding
+actual parameter; i.e., in the procedure body, the data of the actual
+parameter are referred to under the name of the formal parameter. An
+assignment to a formal parameter in the procedure body means, thus, an
+assignment to the variable passed as corresponding actual parameter.
+Hence, in this case, not expressions, but only names (of variables) may
+be passed as actual parameters.
+
+Example:
+
+\begin{tabbing}
+P2: \= \kill
+
+{\bf PROBLEM}; \> \\
+    \> \\
+P1: \> {\bf PROC} (pi {\bf FIXED}, pj {\bf FLOAT IDENT});\\
+    \> ... \\
+    \> pi := 3; pj := 5.0;\\
+    \> {\bf END}; ! P1\\
+
+P2: \> {\bf PROC} ...;\\
+    \> {\bf DCL} (i, j) {\bf FIXED}, a(100) {\bf FLOAT};\\
+    \> ... \\
+    \> i := 2 ; a(i) := 2.5; \\
+    \> {\bf CALL} P1 (i, a(i));\\
+    \> ... \\
+    \> {\bf END}; ! P2 \\
+... \>
+\end{tabbing}
+
+After the call of P1 in P2 i (still) has the value 2, but a(i) has the
+value 5.0.
+
+As the language form of the procedure declaration already shows (see
+8.1), the values of the actual parameters may be of type
+\begin{itemize}
+\item Integer or FloatingPointNumber, or
+\item BitString or CharacterString, or
+\item Time or Duration, or
+\item Structure or Identifier\S For\_Type, or
+\item TypeReference.
+\end{itemize}
+No explicit values are assigned to objects of types
+\begin{itemize}
+\item DATION, SEMA, BOLT, INTERRUPT and SIGNAL.
+\end{itemize}
+Such objects may only be passed to a procedure via identification, i.e.,
+the formal parameter may only be defined with the IDENTICAL attribute.
+
+\section{References to Procedures (REF PROC)}  % 8.3
+
+The opportunity to use procedure reference variables is a first step
+towards object oriented programming. With the help of it, e.g., data
+structures and the necessary procedures for the controlled manipulation of
+these structures can be combined into new, abstract data structures.
+
+A declaration of reference variables for procedures contains the
+description of all parameter types, as well as the type of the result.
+
+ProcedureReferenceDeclaration ::= \\
+\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ] [ {\bf INV} ]\\
+\x {\bf REF} TypeProcedure [ GlobalAttribute ] [ InitialisationAttribute ] ;
+
+TypeProcedure ::=\\
+\x {\bf PROC} [ ListOfParametersFor-SPC ] [ ResultAttribute ]
+
+The general form of the specification of procedure reference variables
+reads:
+
+ProcedureReferenceSpecification ::= \\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ {\bf INV} ]\\
+\x {\bf REF} TypeProcedure GlobalAttribute;
+
+The value assignment to a procedure reference variable takes place with
+the assignment:
+
+Assignment ::=\\
+\x Name\S RefProcVariable \{ := $\mid$ = \} Identifier\S Procedure;
+
+Only procedures declared at module level may be assigned here.
+
+The required matching of types means in this case, that the number of
+parameters, all parameter types and also the type of the result
+attributes match.
+
+Calling a procedure via a procedure reference variable takes simply
+place by giving the reference variable, followed by a list of the actual
+parameters. For procedures without parameters, CALL, or in the case of
+function procedures, also CONT, can be used.
+
+Examples:
+\begin{enumerate}
+\item {\bf DCL} ProcPointer {\bf REF PROC} (a {\bf FIXED}, b {\bf FIXED}, c {\bf FIXED IDENT});\\
+      add: {\bf PROC} (a {\bf FIXED}, b {\bf FIXED}, c {\bf FIXED IDENT});\\
+      \x   c := a + b;\\
+      \x   {\bf END};\\
+      \x   {\bf DCL} (A, B, C) {\bf FIXED};\\
+      ProcPointer := add;\\
+      ProcPointer (A, B, C);
+\item {\bf DCL} FuncPointer {\bf REF PROC RETURNS(CLOCK)};\\
+      time: {\bf PROC RETURNS(CLOCK)};\\
+      \x    {\bf RETURN}(NOW);\\
+      \x    {\bf END};
+
+      {\bf DCL}(A, B) {\bf CLOCK};\\
+      FuncPointer := time;\\
+      A := FuncPointer;\\
+      B := {\bf CONT} FuncPointer;
+\end{enumerate}
+
