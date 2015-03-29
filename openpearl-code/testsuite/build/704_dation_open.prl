@@ -4,31 +4,44 @@ MODULE(userdation_open);
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
 !disc: Disc('/tmp/' ,10);
+! output: StdStream(1);
 
 /* expected C++ code  */
 __cpp__(
      ' // system decl'
      'static pearlrt::Disc s_disc("/tmp/", 10);'
      'pearlrt::Device * d_disc = & s_disc;'
+     'static pearlrt::StdStream s_output(1);'
+     'pearlrt::Device * d_output = &s_output;'
 );
 __cpp__(
      ' // problem  decl in system part'
     'extern pearlrt::Device *d_disc;'
     'static pearlrt::SystemDationNB *_disc = '
     '      static_cast<pearlrt::SystemDationNB*>(d_disc);'
+    'extern pearlrt::Device *d_output;'
+    'static pearlrt::SystemDationNB *_output = '
+    '      static_cast<pearlrt::SystemDationNB*>(d_output);'
 );
 /*  */
 
 PROBLEM;
 !   SPC disc DATION INOUT ALL;
+!   SPC output DATION OUT ALPHIC GLOBAL;
    DCL tableAlphicForward2u DATION OUT ALPHIC DIM(*,10) FORWARD
              CREATED(disc);
+   DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(output);
 
 ttt: TASK;
    DCL f FIXED(31);   ! RST-value
 
-!   OPEN tableAlphicForward2u BY OLD;
-__cpp__('_tableAlphicForward2u.dationOpen(pearlrt::Dation::OLD,(pearlrt::Character<1>*)0, (pearlrt::Fixed<31>*)0);');
+   OPEN termout;
+/* expected code  ...
+__cpp__('_termout.dationOpen(0, '
+         '                   (pearlrt::Character<1>*) 0,'
+         '                   (pearlrt::Fixed<31>*) 0);');
+*/
+   OPEN tableAlphicForward2u BY OLD;
    OPEN tableAlphicForward2u BY NEW;
    OPEN tableAlphicForward2u BY ANY;
    OPEN tableAlphicForward2u BY OLD, IDF('test.dat');
