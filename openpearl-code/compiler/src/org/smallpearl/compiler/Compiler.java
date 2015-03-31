@@ -65,7 +65,7 @@ public class Compiler {
     static boolean debug = false;
     static boolean debugSTG=false;
     static boolean stacktrace=false;
-    static boolean exportSystemPart=true;
+    static boolean exportSystemPart=false;
     static int     noOfErrors = 0;
     static int     noOfWarnings = 0;
     static int     warninglevel = 255;
@@ -192,6 +192,8 @@ public class Compiler {
                 "  --warninglevel <level>      Set the warning level                 \n" +
                 "                              Level   0: no warning                 \n" +
                 "                              Level 255: all warnings (default)     \n" +
+                " --export-systempart          Export the System part into a xml     \n" +
+                "                              file                                  \n" +
                 "  --output <filename>         Filename of the generated code        \n" +
                 "  infile ...                                                        \n");
 
@@ -237,7 +239,7 @@ public class Compiler {
                 debugSTG = true;
             } else if (arg.equals("--stacktrace")) {
                 stacktrace = true;
-            } else if (arg.equals("--export-system-part")) {
+            } else if (arg.equals("--export-systempart")) {
                 exportSystemPart = true;
             } else if (arg.equals("--output")) {
                 if (i >= args.length) {

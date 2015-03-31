@@ -45,6 +45,7 @@ Username_Declaration(var,type) ::= <<
   \<name><var>\</name>
   <type>
 \</declaration>
+
 >>
 
 Username_Declaration_Type(name,params) ::= <<
