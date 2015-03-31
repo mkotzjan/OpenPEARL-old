@@ -65,10 +65,11 @@ public class Compiler {
     static boolean debug = false;
     static boolean debugSTG=false;
     static boolean stacktrace=false;
+    static boolean exportSystemPart=true;
     static int     noOfErrors = 0;
     static int     noOfWarnings = 0;
     static int     warninglevel = 255;
-
+    static int     lineWidth = 80;
 
     public static void main(String[] args) throws Exception {
         int i;
@@ -128,6 +129,10 @@ public class Compiler {
                 if (!nosemantic) {
                     SemanticCheckVisitor semanticCheckVisitor = new SemanticCheckVisitor(verbose);
                     semanticCheckVisitor.visit(tree);
+                }
+
+                if (exportSystemPart) {
+                    SystemPartExport(lexer.getSourceName(),tree);
                 }
 
 //                try {
@@ -232,6 +237,8 @@ public class Compiler {
                 debugSTG = true;
             } else if (arg.equals("--stacktrace")) {
                 stacktrace = true;
+            } else if (arg.equals("--export-system-part")) {
+                exportSystemPart = true;
             } else if (arg.equals("--output")) {
                 if (i >= args.length) {
                     System.err.println("missing filename on --output");
@@ -274,8 +281,6 @@ public class Compiler {
         CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor(sourceFileName, groupFile, verbose, debug);
         ST code = cppCodeGenerator.visit(tree);
 
-        int lineWidth = 80;
-
         if ( debugSTG ) {
             System.out.println( "Press a key to continue" );
             code.inspect();
@@ -312,6 +317,43 @@ public class Compiler {
 
         return null;
     }
+
+    private static Void SystemPartExport(String sourceFileName, ParserRuleContext tree) {
+        String outputFileName = sourceFileName;
+
+        SystemPartExporter  systemPartExporter = new SystemPartExporter(sourceFileName,verbose, debug);
+        ST systemPart = systemPartExporter.visit(tree);
+
+        if ( debugSTG ) {
+            System.out.println( "Press a key to continue" );
+            systemPart.inspect();
+            try {
+                int ch = System.in.read();
+            }
+            catch (IOException ex) {
+            }
+        }
+
+        outputFileName = outputFileName.substring(0, outputFileName.lastIndexOf('.'));
+        outputFileName = outputFileName.concat(".xml");
+
+        try {
+
+            if (verbose>0) {
+                System.out.println("Generating export file "+outputFileName);
+            }
+
+            PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
+            writer.println(systemPart.render(lineWidth));
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Problem writing to the export file " + outputFileName);
+        }
+
+        return null;
+    }
+
+
 
     static String getStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
