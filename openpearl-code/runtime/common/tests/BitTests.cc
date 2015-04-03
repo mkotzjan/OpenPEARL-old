@@ -303,5 +303,14 @@ TEST(BitTest, toFixed) {
 }
 
 /**
+test comparison
+*/
+TEST(BitTest, comparison) {
+   pearlrt::BitString<16> a16(0x4000);
+   pearlrt::BitString<16> b16(0x8000);
+   EXPECT_FALSE((a16==b16).getBoolean());
+   EXPECT_TRUE((a16!=b16).getBoolean());
+}
+/**
 \endcond
 */

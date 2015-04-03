@@ -634,8 +634,8 @@ namespace pearlrt {
       */
       template<int P>
       BitString<1> operator!= (const BitString<P> y) const {
-         return bitNot((IF < (S < P), THENAND<P>, ELSEAND<P> >::
-                        SELECT_CLASS::bitCompare(*this, y)));
+         return (IF < (S < P), THENAND<P>, ELSEAND<P> >::
+                    SELECT_CLASS::bitCompare(*this, y)).bitNot();
       }
 
    };
