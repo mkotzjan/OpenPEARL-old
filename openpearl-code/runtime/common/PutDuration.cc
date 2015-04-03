@@ -36,10 +36,6 @@
 
 */
 
-#include <sys/time.h>
-#include <string.h>
-#include <ctype.h>
-
 #include "PutDuration.h"
 #include "Duration.h"
 #include "Signals.h"
