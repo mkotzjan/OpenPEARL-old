@@ -269,10 +269,10 @@ ClassAttribute ::= \\
 \end{removed}
 \begin{added}
 ClassAttribute ::= \\
-\x {\bf SYSTEM} TypeOfTransmissionData  /* system dation */\\
-\x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\
-\x {\bf BASIC}  TypeOfTransmissionData $\mid$  /* TAKE/SEND */\\
-\x  TypeOfTransmissionData               /* READ/WRITE */ \\
+\x [ {\bf SYSTEM} ]  /* system dation */\\
+\x \x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\
+\x \x {\bf BASIC}  TypeOfTransmissionData $\mid$  /* TAKE/SEND */\\
+\x \x  TypeOfTransmissionData               /* READ/WRITE */ \\
 \end{added}
 
 TypeOfTransmissionData ::=\\
@@ -432,7 +432,7 @@ to elements directly and only reading.
 \x ... \\
 \label{Example}
 {\bf PROBLEM};\\
-\x {\bf SPC} Disk {\bf DATION INOUT ALL};\\
+\x {\bf SPC} Disk {\bf DATION INOUT \addedtext{SYSTEM} ALL};\\
 \x {\bf DCL} Table {\bf DATION IN FLOAT DIM}(300, 5) {\bf DIRECT}\\
 \x \x {\bf GLOBAL CREATED} (Disk);\\
 \x ...
@@ -440,6 +440,19 @@ to elements directly and only reading.
 Examples for the declaration of data stations for inputs/outputs in
 character form are described in 
 \ref{sec_read_write} and \ref{sec_get_put}.
+
+\begin{added}
+The characteristics of the system dation must fit to the specification:
+\begin{itemize}
+\item ALPHIC specification may be done upon system dations of type ALPHIC,
+   ALL or CHAR
+\item FORWARD specification is compatible with DIRECT attribute
+   of the system dation
+\item DIM specifications must not exceed the size of the system dation --- 
+   more artificial dimensions may be specified
+\item ... (some more items missing??)
+\end{itemize}
+\end{added}
 
 \section{Opening and Closing of Data Stations (OPEN, CLOSE)}   % 10.3
 \label{sec_open_close}
@@ -537,10 +550,10 @@ Example:
 \x Disk: PSP31;\\
 \x ... \\
 {\bf PROBLEM};\\
-\x {\bf SPC} Printer {\bf DATION OUT ALPHIC};\\
+\x {\bf SPC} Printer {\bf DATION OUT \addedtext{SYSTEM} ALPHIC};\\
 \x {\bf DCL} Tab\_Prot {\bf DATION OUT ALPHIC DIM}($^*$, 50, 30) {\bf FORWARD}\\
 \x \x {\bf GLOBAL CREATED}(Printer);\\
-\x {\bf SPC} Disk {\bf DATION INOUT ALL};\\
+\x {\bf SPC} Disk {\bf DATION INOUT \addedtext{SYSTEM} ALL};\\
 \x {\bf DCL} Table {\bf DATION IN FLOAT DIM}(300, 5) {\bf DIRECT}\\
 \x \x {\bf GLOBAL CREATED}(Disk);
 
@@ -594,7 +607,7 @@ blocks with 14 values in a logbook on the disk.
 
 {\bf PROBLEM};\\
 \x {\bf SPC} Get\_Temp {\bf PROC}(i {\bf FIXED}) {\bf RETURNS} ({\bf FIXED}(15)) {\bf GLOBAL};\\
-\x {\bf SPC} File {\bf DATION INOUT ALL};\\
+\x {\bf SPC} File {\bf DATION INOUT \addedtext{SYSTEM} ALL};\\
 \x {\bf DCL} Logbook {\bf DATION OUT FIXED}(15) {\bf DIM}($^*$, 14) {\bf TFU FORWARD}\\
 \x \x {\bf CREATED} (File);\\
 \x {\bf DCL} Num\_Temp {\bf INV FIXED}(15) {\bf INIT}(14);

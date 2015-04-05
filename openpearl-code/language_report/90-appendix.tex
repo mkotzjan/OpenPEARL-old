@@ -345,10 +345,10 @@ ClassAttribute ::= \\
 \end{removed}
 \begin{added}
 ClassAttribute ::= \\
-\x {\bf SYSTEM} TypeOfTransmissionData  /* system dation */\\
-\x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\ 
-\x {\bf BASIC}  TypeOfTransmissionData $\mid$  /* TAKE/SEND */\\
-\x  TypeOfTransmissionData               /* READ/WRITE */ \\
+\x [ {\bf SYSTEM} ]                     /* system dation */\\
+\x \x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\ 
+\x \x {\bf BASIC}  TypeOfTransmissionData $\mid$  /* TAKE/SEND */\\
+\x \x  TypeOfTransmissionData               /* READ/WRITE */ \\
 \end{added}
 
 TypeOfTransmissionData ::=\\

@@ -123,7 +123,7 @@ dation type is deduced (see tab. \ref{dationTypes}).
   & BASIC & ALPHIC & ALL / type \\
 \hline
 SYSTEM & SystemDationB & SystemDationNB & SystemDationNB \\
- & {\em error} & DationPG & DationRW \\
+ & DationTS & DationPG & DationRW \\
 \hline
 \end{tabular}
 \caption{Deduced type of the dation object}
@@ -136,7 +136,7 @@ SPC output DATION OUT SYSTEM ALPHIC GLOBAL;
 SPC disc DATION OUT SYSTEM ALL GLOBAL;
 SPC console DATION OUT ALPHIC GLOBAL;
 SPC logbook DATION OUT Fixed(15) GLOBAL;
-SPC motor DATION OUT SYSTEM BIT(4) GLOBAL;
+SPC motor DATION OUT SYSTEM BASIC BIT(4) GLOBAL;
 \end{PEARLCode}
 
 \begin{CppCode}
@@ -390,8 +390,9 @@ COL(x) & & {\em not supported yet} \\
 
 Note:
 \begin{itemize}
-\item a user dation with type {\em ALL} does not the size of 
-   the record. No positioning is allowed on such a dation.
+\item a user dation with type {\em ALL} does not specify the size of 
+   the record. No positioning is allowed on such a FORWARD dation. 
+   The DIRECT attribute will allow to rewind the dation by POS(1),
 \end{itemize}   
 
 \section{PUT/GET Operations}
@@ -502,7 +503,7 @@ This list of statements must be embedded in the try/catch/block described in
 DCL x Bit(4);
 DCL rst Fixed(31);
 ...
-SEND x TO device BY RST(rst);
+SEND x TO motor BY RST(rst);
 \end{PEARLCode}
 
 \begin{CppCode}
@@ -510,16 +511,16 @@ BitString<4> _x
 Fixed<31> _rst;
 
 try {
-   d_motor.beginSequence(me);
-   d_motor.rst(_rst);
-   d_motor.dationSend(&_x, sizeof(_x));
-   d_motor.endSequence();
+   _motor.beginSequence(me);
+   _motor.rst(_rst);
+   _motor.dationSend(&_x, sizeof(_x));
+   _motor.endSequence();
 } catch (Signal& s) {
-   if (!d_motor.updateRst(&s)) {
-      d_motor.endSequence();
+   if (!_motor.updateRst(&s)) {
+      _motor.endSequence();
       throw;
    }
-   d_motor.endSequence();
+   _motor.endSequence();
 }
 \end{CppCode}
 
