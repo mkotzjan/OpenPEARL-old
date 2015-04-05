@@ -114,8 +114,15 @@ public class Compiler {
             }
 
             if (inspectAST) {
+                System.out.println("Inspect Parse tree:");
                 // visualize parse tree in dialog box
                 tree.inspect(parser);
+                System.out.println("Press any key");
+                try {
+                    int ch = System.in.read();
+                }
+                catch (IOException ex) {
+                }
             }
 
             if (dumpDFA) {
@@ -196,7 +203,6 @@ public class Compiler {
                 "                              file                                  \n" +
                 "  --output <filename>         Filename of the generated code        \n" +
                 "  infile ...                                                        \n");
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,14 +218,16 @@ public class Compiler {
                 continue;
             }
 
-            if (arg.equals("--printAST")) {
+            if (arg.equals("--help")) {
+                printHelp();
+                System.exit(0);
+            } else if (arg.equals("--printAST")) {
                 printAST = true;
             } else if (arg.equals("--inspectAST")) {
                 inspectAST = true;
             } else if (arg.equals("--gui")) {
                 gui = true;
-            }
-            if (arg.equals("--tokens")) {
+            } else if (arg.equals("--tokens")) {
                 showTokens = true;
             } else if (arg.equals("--trace")) {
                 trace = true;
