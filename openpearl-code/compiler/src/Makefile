@@ -72,7 +72,7 @@ javac:
 	javac -cp .:$(ANTLR)  org/smallpearl/compiler/Compiler.java
 	rm -f smallpearl_compiler.jar
 	jar cf smallpearl_compiler.jar org/smallpearl/compiler/*.class \
-		SmallPearlCpp.stg
+		SmallPearlCpp.stg SystemPartExport.stg
 
 ##############################################################################
 
