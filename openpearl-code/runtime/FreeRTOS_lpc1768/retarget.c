@@ -10,10 +10,6 @@ static const PINMUX_GRP_T pinmuxing[] = {
 static const char hello[] = "retarget initiated\n";
 static const char cr = '\r';
 
-/* System oscillator rate and RTC oscillator rate */
-const uint32_t OscRateIn = 12000000;
-const uint32_t RTCOscRateIn = 32768;
-
 static bool initiated = false;
 
 static void retarget_init();

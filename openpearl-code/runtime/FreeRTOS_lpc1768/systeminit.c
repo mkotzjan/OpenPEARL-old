@@ -1,6 +1,10 @@
 #include "chip.h"
 #include "clock_17xx_40xx.h"
 
+/* System oscillator rate and RTC oscillator rate */
+const uint32_t OscRateIn = 12000000;
+const uint32_t RTCOscRateIn = 32768;
+
 static void clockInit() {
 	/* Disconnect the Main PLL if it is connected already */
 	if (Chip_Clock_IsMainPLLConnected()) {
