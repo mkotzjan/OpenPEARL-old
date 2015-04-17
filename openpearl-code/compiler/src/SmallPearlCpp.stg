@@ -612,7 +612,12 @@ take_send_control_position(dation,expression1,expression2,expression3) ::= <%
 open_statement(id,paramlist,fname,flen,rst_var) ::= <<
 {
     <if(fname)>static Character\<<flen>\> idf_filename("<fname>"); <\n> <endif>
-    _<id>.dationOpen(<paramlist>
+    _<id>.dationOpen(
+    <if(paramlist)>
+        <paramlist>
+    <else>
+        0
+    <endif>
     <if(fname)>
     , &idf_filename
     <else>
