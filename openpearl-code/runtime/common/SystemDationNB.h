@@ -31,7 +31,7 @@
 #ifndef SYSTEMDATIONNB_INCLUDED
 #define SYSTEMDATIONNB_INCLUDED
 
-#include "Dation.h"
+#include "SystemDation.h"
 #include "Character.h"
 #include "Log.h"
 #include <stdio.h>
@@ -64,91 +64,25 @@ namespace pearlrt{
 
   The API is defined generic (similar to the UNIX API), with 
   dationOpen, dationClose, dationRead, dationWrite, dationUnGetChar
-
-  \note only type DIRECT and FORWARD are realized, yet
 */
-class SystemDationNB: public Dation {
+class SystemDationNB: public SystemDation {
 public:
     /**
-    obtain the capabilities of the device
-
-    This method must be implemented by each concrete SystemDationNB-class.
-    It returns the support of the operations an user dations. The 
-    return value is the ORed value of the enumeerations in Dation.h
-
-    e.g.: <ul>
-          <li> IN | IDF | PRM for a file on a CD 
-          <li> INOUT | IDF | CAN | PRM | ANY | NEW | OLD for a file on disc
-          </ul>
- 
-    \returns available commands of the device
-    */
-    virtual int capabilities() = 0;
-
-    /**
     Open the device/file.
-    
+
     To support multiple files on a system dation, the openDation must be
     realized as factory. The capacity is defined by the concrete system
     dation (e.g. 20 for files, or 1 for a serial line).
-   
+
     \param idfValue as C-string containing the value of the IDF-field
     \param openParam a bit map containing the required operation
 
     \returns reference to the new object
 
     \throws * may throw exceptions in case of problems in execution
-    */ 
+    */
     virtual SystemDationNB* dationOpen(const char * idfValue,
                                        int openParam) = 0;
-   
-    /**
-    Close the device/file.
-
-    The call of close will also return the handle to the factory pool.
-   
-    \param closeParam a bit map containing the required operation
-
-    \throws * may throw exceptions in case of problems in execution
-    */ 
-    virtual void dationClose(int closeParam) = 0;
-
-#ifdef MOVEDTODATION
-    /**
-    Read from the device/file.
-   
-    \param destination target area to store the required number of bytes
-    \param size number of bytes to read
-
-    \throws * may throw exceptions in case of problems in execution
-    */ 
-    virtual void dationRead(void * destination, size_t size) = 0;
-   
-    /**
-    Write to the device/file.
-   
-    \param destination source area to get the required number of bytes
-    \param size number of bytes to write
-
-    \throws * may throw exceptions in case of problems in execution
-    */ 
-    virtual void dationWrite(void * destination, size_t size) = 0;
-   
-    /**
-    set absolut position on dation/file 
-
-    The method applies only on DIRECT or FORBACK dations.
-    FORWARD dations will write 0 bytes or discard input on read.
-   
-    \param p the target position of the read/write pointer (conted in bytes)
-    \param dationParam specified the dation type (DIRECT,FORWARD,..)
-    \throws may throw different exceptions - not defined yet
-    */
-    virtual void dationSeek(const Fixed<31> & p, const int dationParam) {
-       Log::error("SystemDationNB: no seek implemented");
-       throw theDationSeekNotRealizedSignal;
-    }
-#endif
 
     /**
     return one character back to the input stream.

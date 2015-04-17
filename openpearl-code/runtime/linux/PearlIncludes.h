@@ -73,10 +73,10 @@ Only this file mus be included.
 #include "SystemDationNB.h"
 #include "SystemDationB.h"
 #include "UserDation.h"
-#include "LockingDation.h"
 #include "DationPG.h"
 #include "DationRW.h"
-#include "UserDation.h"
+#include "DationTS.h"
+#include "UserDationNB.h"
 #include "DationDim.h"
 #include "DationDim1.h"
 #include "DationDim2.h"
@@ -98,8 +98,8 @@ Only this file mus be included.
 #include "compare.h"
 
 #include "SampleBasicDation.h"
-// drivers
 
+// drivers
 //#include "Octopus.h"
 //#include "OctopusDigitalIn.h"
 //#include "OctopusDigitalOut.h"

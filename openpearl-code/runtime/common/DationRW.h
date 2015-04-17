@@ -36,7 +36,7 @@
        with the class attribute "TYPE"
 
 */
-#include "UserDation.h"
+#include "UserDationNB.h"
 #include "SystemDationNB.h"
 #include "DationDim.h"
 #include "Fixed.h"
@@ -140,7 +140,7 @@ namespace pearlrt {
 
       */
 
-   class DationRW: public UserDation {
+   class DationRW: public UserDationNB {
 
    private:
 

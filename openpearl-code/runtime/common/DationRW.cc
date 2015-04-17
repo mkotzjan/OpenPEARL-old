@@ -51,7 +51,7 @@ namespace pearlrt {
                       int params,
                       DationDim * dimensions,
                       const Fixed<15> stepsize)
-      : UserDation(parent, params, dimensions, UserDation::TYPE) {
+      : UserDationNB(parent, params, dimensions, UserDationNB::TYPE) {
       stepSize = stepsize;
       dationStatus = CLOSED;
    }

@@ -24,10 +24,6 @@ errors during the build process. Detections during runtime should be avoided.
   if the system device is defined in the same module
 \item it is not clearified in the language specification, which attributes
    are required in the specification of a imported user dation.
-\end{itemize}
-
-\paragraph{Work around in OpenPEARL: ({\em subject of discussion}) }
-\begin{itemize}
 \item a new optional class attribute is introdued {\em SYSTEM}, which
    must be set for system dations
 \item the class attribute {\em BASIC} must be combined with a data type
@@ -72,9 +68,9 @@ Remarks:
 \end{description}
 
 \section{Declarations in System Part}
-There is surrently no rule to compile the system part into C++.
+There is currently no rule how to compile the system part into C++.
 
-To provide complete code examples the x86\_32\_linux target is used here.
+To provide complete code examples the linux target is used here.
 For details of the used system devices please check chapter \ref{x8632devices}.
 
 \begin{PEARLCode}
@@ -136,7 +132,7 @@ SPC output DATION OUT SYSTEM ALPHIC GLOBAL;
 SPC disc DATION OUT SYSTEM ALL GLOBAL;
 SPC console DATION OUT ALPHIC GLOBAL;
 SPC logbook DATION OUT Fixed(15) GLOBAL;
-SPC motor DATION OUT SYSTEM BASIC BIT(4) GLOBAL;
+SPC mot DATION OUT SYSTEM BASIC BIT(4) GLOBAL;
 \end{PEARLCode}
 
 \begin{CppCode}
@@ -152,9 +148,9 @@ extern pearlrt::DationPG _console;
 
 extern pearlrt::DationRW _logbook;
 
-extern pearlrt::Device * d_motor;
-static pearlrt::SystemDationB _motor* = 
-             static_cast<pearlrt::SystemDationB*>(d_motor);
+extern pearlrt::Device * d_mot;
+static pearlrt::SystemDationB * _mot = 
+             static_cast<pearlrt::SystemDationB*>(d_mot);
 \end{CppCode}
 
 \section{Declaration of a User Dation}
@@ -170,6 +166,8 @@ of the runtime documentation.
 
 \begin{PEARLCode}
 DCL console DATION OUT ALPHIC DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
+DCL file DATION OUT FIXED(15) DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
+DCL motor DATION OUT BASIC BIT(4) CREATED(mot);
 \end{PEARLCode}
 
 \begin{CppCode} 
@@ -181,15 +179,28 @@ static pearlrt::DationPG _console(_output,
                 pearlrt::Dation::STREAM   |
                 pearlrt::Dation::NOCYCL,
                 &dim_console);
+
+static pearlrt::DationDim2 dim_file(80);
+static pearlrt::DationPG _file(_output, 
+                pearlrt::Dation::OUT      |
+                pearlrt::Dation::FORWARD  | 
+                pearlrt::Dation::STREAM   |
+                pearlrt::Dation::NOCYCL,
+                &dim_file, sizeof(pearlrt::Fixed<15>));
+
+static pearlrt::DationTS _motor(_mot,
+                pearlrt::Dation::OUT);
 \end{CppCode}
 
 Remarks:
 \begin{itemize}
 \item the dation parameters are \verb|or|ed together
-\item the dimenion object is defined statically. 
+\item the dimenion object is defined statically.
 \item the {\em CREATED()} parameter is passsed as first parameter
 \item if the dation is defined as {\em GLOBAL} the \verb|static| must
   be omitted
+\item the userdations of type BASIC do not allow Topology- and 
+AccessAttribut-specifications 
 \end{itemize}
 
 \subsection{DIRECT Dation}
@@ -364,7 +375,8 @@ Remarks:
 \end{itemize}
 
 \section{Positioning}
-User dations allow to position with POS, ADV, SKIP, LIN, COL, ...
+User dations with specified topology allow
+ to position with POS, ADV, SKIP, LIN, COL, ...
 
 The following positioning methods are supplied.
 All methods are available for output and input. The versions for 
@@ -390,9 +402,12 @@ COL(x) & & {\em not supported yet} \\
 
 Note:
 \begin{itemize}
+\item {\em THIS IS SUBJECT OF DISCUSSION!}
 \item a user dation with type {\em ALL} does not specify the size of 
    the record. No positioning is allowed on such a FORWARD dation. 
    The DIRECT attribute will allow to rewind the dation by POS(1),
+\item as alternative one dimenion is allowed and the positions are
+    expected to be calculated by the application as byte offsets.
 \end{itemize}   
 
 \section{PUT/GET Operations}
@@ -488,8 +503,15 @@ Remarks:
 \end{itemize}
 
 \section{TAKE/SEND Operations}
-TAKE and SEND are allowed on BASIC dations. They are mapped on the
-class {\em DationTS}. 
+TAKE and SEND are allowed on userdations of type BASIC.
+ They are mapped on the
+class {\em DationTS} operations. 
+
+\begin{methodMapping}
+TAKE & \verb|dationRead(void* dst, size_t size)| & \\
+SEND & \verb|dationWrite(void* dst, size_t size)| & \\
+\end{methodMapping}
+
 The compiler must produce a list of operations according the sequence 
 in the format and data list.
 \begin{enumerate}
@@ -513,7 +535,7 @@ Fixed<31> _rst;
 try {
    _motor.beginSequence(me);
    _motor.rst(_rst);
-   _motor.dationSend(&_x, sizeof(_x));
+   _motor.dationWrite(&_x, sizeof(_x));
    _motor.endSequence();
 } catch (Signal& s) {
    if (!_motor.updateRst(&s)) {
@@ -528,11 +550,12 @@ try {
 Remarks:
 \begin{itemize}
 \item S and CONTROL are not supported
-\item there may be only one data element in a TAKE or SEND statement
+\item the laguage specification specifies that there
+   may be only one data element in a TAKE or SEND statement
 \end{itemize}
 
 \section{Interface for User supplied Drivers for Basic Dations}
-For currently not supported system interfaces a C++ class must be supplied to 
+{\bf \it PRELIMINARY} For currently not supported system interfaces a C++ class must be supplied to 
 provide the system device.
 
 \subsection{System Dation Name}

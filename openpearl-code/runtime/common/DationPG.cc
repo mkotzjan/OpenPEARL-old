@@ -52,7 +52,7 @@ namespace pearlrt {
    DationPG::DationPG(SystemDationNB* parent,
                       int params,
                       DationDim * dimensions)
-      : UserDation(parent, params, dimensions, UserDation::ALPHIC) {
+      : UserDationNB(parent, params, dimensions, UserDationNB::ALPHIC) {
       dationStatus = CLOSED;
 
       if (params & CYCLIC) {
@@ -118,11 +118,11 @@ namespace pearlrt {
 
    void DationPG::internalOpen() {
       if (dationParams & (OUT | INOUT)) {
-         sink.setSystemDationNB(work);
+         sink.setSystemDationNB((SystemDationNB*)work);
       }
 
       if (dationParams & (IN | INOUT)) {
-         source.setSystemDationNB(work);
+         source.setSystemDationNB((SystemDationNB*)work);
       }
    }
 

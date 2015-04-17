@@ -167,6 +167,17 @@ namespace pearlrt {
 
       */
       void dationWrite(void * data, size_t size);
+
+    /**
+    obtain the capabilities of the device
+
+    This method returns :
+          OUT ANY
+
+    \returns available commands of the device
+    */
+    int capabilities();
+
    };
 
 

@@ -48,15 +48,14 @@ namespace pearlrt {
    \brief general interface for all types of dations.
 
           this class defines the interface for the basic operations
-           and common attributes,
+           darionRead, dationWrite and dationSeek and common attributes,
           which have either to be implemented in all kinds of dations
            or are all the same in all kinds of dations.
+
+          dationOpen, dationClose differ between system
+          dations and user dations
    */
-
-
    class Dation: public Device {
-
-
 
    public:
 
@@ -158,14 +157,14 @@ namespace pearlrt {
 
 
       /**
-      Classinternal stat variables for open and
+      Classinternal status variables for open and
       close statements
 
       there are different sections within this variable.
 
       via OPENMASK, CLOSEMASK, POSITIONINGMASK  they can be selected
       */
-      DationParams dationParams;
+      /* DationParams*/ int dationParams;
 
       /** Classinternal stat variable for dation stat.
           should prevent from open a already opened dation

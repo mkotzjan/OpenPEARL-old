@@ -200,7 +200,7 @@ namespace pearlrt {
       return blockParams.next;
    }
 
-   void TaskCommon::enterIO(LockingDation * d) {
+   void TaskCommon::enterIO(UserDation * d) {
       mutexLock();
       taskState = IO_BLOCKED;
       dation = d;

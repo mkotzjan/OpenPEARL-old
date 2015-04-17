@@ -8,26 +8,41 @@ MODULE(dationts);
 
 /* expected C++ code  */
 __cpp__(
-     'static pearlrt::SampleBasicDation s_inout4;'
-     'pearlrt::Device * d_inout4 = & s_inout4;'
+     'static pearlrt::SampleBasicDation s_inout;'
+     'pearlrt::Device * d_inout = & s_inout;'
 );
 /*  */
 
 PROBLEM;
-   SPC inout4 DATION INOUT BASIC;
+!   SPC inout DATION INOUT SYSTEM BASIC FIXED(15) GLOBAL;
+/* expected C++ code  */
+__cpp__(
+     'extern pearlrt::Device * d_inout;'
+     'static pearlrt::SystemDationB* _inout = (pearlrt::SystemDationB*)d_inout;'
+);
+/*  */
 
 TakeSendTest: TASK MAIN;
-   DCL b BIT(4);
-   DCL error FIXED(15);
+   DCL f FIXED(15) INIT(13);
+   DCL f1 FIXED(15) INIT(3);
+   DCL error FIXED(31);
+   
+!   DCL user DATION INOUT BASIC FIXED(15) CREATED(inout);
+/* expected C++ code  */
+__cpp__(
+     ' pearlrt::DationTS _user(_inout, pearlrt::Dation::INOUT);'
+);
+/*  */
 
-   OPEN inout4 BY RST(error);
-   CLOSE inout4;
-   OPEN inout4;
+   OPEN user BY RST(error);
+   CLOSE user;
 
-   SEND b TO inout4;
-   TAKE b FROM inout4;
+   OPEN user BY RST(error);
+   !OPEN user;
+   SEND f TO user;
+   TAKE f1 FROM user;
+   CLOSE user;
 
-   CLOSE inout4;
 END;
 MODEND;
 

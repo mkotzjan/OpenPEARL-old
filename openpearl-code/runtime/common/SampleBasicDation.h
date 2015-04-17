@@ -39,6 +39,7 @@
 #include "Fixed.h"
 #include "Signals.h"
 
+#include <stdint.h>
 
 namespace pearlrt {
 
@@ -57,7 +58,7 @@ namespace pearlrt {
    class SampleBasicDation: public SystemDationB {
 
    private:
-      char echo;
+      int16_t echo;
       void internalDationOpen();
       void internalDationClose();
 
@@ -73,8 +74,26 @@ namespace pearlrt {
 
       /* destructor to remove the bit group
       */
-      ~SampleBasicDation();
+      //~SampleBasicDation();
 
+      /**
+      Open the sample basic dation
+
+      \param openParam open parameters if given
+      \param idf pointer to IDF-value if given
+
+      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      */
+      SystemDationB* dationOpen(const char* idf = 0, int openParam = 0); 
+
+      /**
+      Close the sample basic dation
+
+      \param closeParam close parameters if given
+      */
+      void dationClose(int closeParam = 0);
+
+#ifdef XXXXXXXXXXXXX
       /**
       Open the sample basic dation
 
@@ -114,6 +133,22 @@ namespace pearlrt {
       Close the sample basic dation
 
       \param closeParam close parameters if given
+      */
+      void dationClose(int closeParam = 0) {
+        if (closeParam != 0) {
+           Log::error("No close parameters allowed for"
+                      " SampleBasicDation device");
+           throw theNotAllowedSignal;
+        }
+
+         internalDationClose();
+      }
+#endif
+#ifdef XXXXX
+      /**
+      Close the sample basic dation
+
+      \param closeParam close parameters if given
       \param rstValue pointer to error variable if given
 
 
@@ -137,6 +172,7 @@ namespace pearlrt {
             }
          }
       }
+#endif
 
       /**
       read  a Bit<width> value from the device
@@ -163,6 +199,19 @@ namespace pearlrt {
       \throws NotAllowedSignal, if  dation is not opened
       */
       void dationWrite(void * data, size_t size);
+
+    /**
+    obtain the capabilities of the device
+
+    This method returns : 
+          IN  OUT INOUT
+
+    does not return:
+          IDF  PRM CAN NEW  OLD ANY
+
+    \returns available commands of the device
+    */
+    int capabilities();
    };
 }
 #endif

@@ -28,9 +28,12 @@
 */
 
 
+#include "Dation.h"
 #include "SampleBasicDation.h"
 #include "Log.h"
 #include "Signals.h"
+#include <iostream>
+
 /**
  \brief Implementation of example basic  systemdation
 
@@ -42,18 +45,32 @@ namespace pearlrt {
       dationStatus = CLOSED;
    }
 
-   void SampleBasicDation::internalDationOpen() {
+   SystemDationB* SampleBasicDation::dationOpen(const char * idf, int params) {
+      if (idf) {
+         Log::error("SampleBasicDation: no IDF allowed");
+         throw theNotAllowedSignal;
+      }
+      if (params & ~(RST | IN | OUT | INOUT) ) {
+         Log::error("SampleBasicDation: only RST allowed");
+         throw theNotAllowedSignal;
+      }
       if (dationStatus != CLOSED) {
          Log::error("SampleBasicDation: Dation already open");
          throw theNotAllowedSignal;
       }
 
       dationStatus = OPENED;
+      return this;
    }
-   void SampleBasicDation::internalDationClose() {
+
+   void SampleBasicDation::dationClose(int params) {
 
       if (dationStatus != OPENED) {
          Log::error("SampleBasicDation: Dation not open");
+         throw theNotAllowedSignal;
+      }
+      if (params & ~(RST | IN | OUT | INOUT) ) {
+         Log::error("SampleBasicDation: only RST allowed");
          throw theNotAllowedSignal;
       }
 
@@ -62,11 +79,11 @@ namespace pearlrt {
 
    void SampleBasicDation::dationWrite(void* data, size_t size) {
       //check size of parameter!
-      // it is expected that a BitString<width> object is passed
-      // with a maximum of 8 bits. This fits into 1 byte.
-      // Therefore size must be 1
-      if (size != 1) {
-         Log::error("SampleBasicDation: 1 byte expected");
+      // it is expected that a Fixed<15> object is passed
+      // with a maximum of 16 bits. This fits into 2 byte.
+      // Therefore size must be 2
+      if (size != 2) {
+         Log::error("SampleBasicDation: 2 byte expected (got %d)", (int)size);
          throw theIllegalParamSignal;
       }
 
@@ -76,17 +93,19 @@ namespace pearlrt {
       }
 
       // write data to application memory
-      echo = *(char*)data;
+      echo = *(int16_t*)data;
+      std::cout << "SampleBasicDation::dationWrite: " << echo << std::endl;
+
    }
 
    void SampleBasicDation::dationRead(void* data, size_t size) {
 
       //check size of parameter!
-      // it is expected that a BitString<width> object is passed
-      // with a maximum of 8 bits. This fits into 1 byte.
-      // Therefore size must be 1
-      if (size != 1) {
-         Log::error("SampleBasicDation: 1 byte expected");
+      // it is expected that a Fixed<15> object is passed
+      // with a maximum of 16 bits. This fits into 2 byte.
+      // Therefore size must be 2
+      if (size != 2) {
+         Log::error("SampleBasicDation: 2 byte expected (got %d)", (int)size);
          throw theIllegalParamSignal;
       }
 
@@ -96,8 +115,13 @@ namespace pearlrt {
       }
 
       // write data to application memory
-      *(char*)data = echo;
+      std::cout << "SampleBasicDation::dationRead: " << echo << std::endl;
+      *(int16_t*)data = echo;
    }
 
+   int SampleBasicDation::capabilities() {
+      int cap =  IN  | OUT | INOUT;
+      return cap;
+   }
 }
 

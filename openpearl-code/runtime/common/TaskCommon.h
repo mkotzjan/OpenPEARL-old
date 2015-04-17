@@ -82,7 +82,7 @@ namespace pearlrt {
 #include "Prio.h"
 #include "Mutex.h"
 #include "CSema.h"
-#include "LockingDation.h"
+#include "UserDation.h"
 #include "TaskWhenLinks.h"
 #include "TaskTimerCommon.h"
 
@@ -162,7 +162,7 @@ namespace pearlrt {
    protected:
       /** pointer to dation object when doing I/O
       */
-      LockingDation * dation;
+      UserDation * dation;
 
       /**
         tests for correct combination AT/ALL/..
@@ -564,7 +564,7 @@ namespace pearlrt {
 
          \param d pointer to the dation which performs the i/o
       */
-      void enterIO(LockingDation * d);
+      void enterIO(UserDation * d);
 
       /**
          leave i/o operation

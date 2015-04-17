@@ -27,8 +27,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef DATIONRP_INCLUDED
-#define DATIONRP_INCLUDED
+#ifndef DATIONPG_INCLUDED
+#define DATIONPG_INCLUDED
 /**
 \file
 
@@ -36,7 +36,7 @@
        with the class attribute "ALPHIC"
 
 */
-#include "UserDation.h"
+#include "UserDationNB.h"
 #include "SystemDationNB.h"
 #include "DationDim.h"
 #include "SystemDationNBSink.h"
@@ -133,7 +133,7 @@ namespace pearlrt {
 
       */
 
-   class DationPG: public UserDation {
+   class DationPG: public UserDationNB {
 
    private:
 

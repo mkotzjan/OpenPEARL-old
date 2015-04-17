@@ -95,5 +95,10 @@ namespace pearlrt {
       octo->writePortBits(port, start, width, d);
    }
 
+   int OctopusDigitalOut::capabilities() {
+      int cap = OUT | ANY;
+      return cap;
+   }
+
 }
 

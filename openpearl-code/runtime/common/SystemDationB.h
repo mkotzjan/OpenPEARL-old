@@ -31,8 +31,8 @@
 #define SYSTEMDATIONB_INCLUDED
 
 #include "Dation.h"
+#include "SystemDation.h"
 #include "Fixed.h"
-#include "LockingDation.h"
 
 /**
 \file
@@ -52,7 +52,7 @@ namespace pearlrt{
  and NON-BASIC dations. BASIC dations are opened directly by the application.
  They need no user defined dation. 
 */
-class SystemDationB: public LockingDation {
+class SystemDationB: public SystemDation {
 
 /**
 \file
@@ -69,6 +69,23 @@ class SystemDationB: public LockingDation {
 protected:
 
 public:
+    /**
+    Open the device/file.
+
+    To support multiple files on a system dation, the openDation must be
+    realized as factory. The capacity is defined by the concrete system
+    dation (e.g. 20 for files, or 1 for a serial line).
+
+    \param idfValue as C-string containing the value of the IDF-field
+    \param openParam a bit map containing the required operation
+
+    \returns reference to the new object
+
+    \throws * may throw exceptions in case of problems in execution
+    */
+    virtual SystemDationB* dationOpen(const char * idfValue,
+                                       int openParam) = 0;
+#ifdef XXXXXXXXXXXXXXX
         /**
         dation open method
 
@@ -85,16 +102,15 @@ public:
 	    Log::error("dationOpen for BASIC dation not implemented");
             throw theInternalDationSignal;
         }
-
+#endif
         /**
         dation close method
 
         The method may throw exceptions, if no rstValue is given.
 
         \param parameters open parameters as bit-ored-value
-        \param rstValue  pointer to rst error variable if given
 	*/
-	virtual void dationClose(int parameters=0, Fixed<31>* rstValue=0)=0;
+	virtual void dationClose(int parameters=0)=0;
 
         /**
         dation write method

@@ -45,6 +45,7 @@ TESTS +=  \
 	susp_cont_test \
 	sched_demo \
 	interruptTest \
+	SampleBasicDationTests \
 	sematest sematerminate  \
 	signalTest\
 	DationTests \
@@ -53,7 +54,8 @@ TESTS +=  \
 
 TEST_SRCS +=  log_test.cc \
 	../../common/tests/sematest.cc ../../common/tests/sematerminate.cc\
-	../../common/tests/interruptTest.cc
+	../../common/tests/interruptTest.cc \
+	../../common/tests/SampleBasicDationTests.cc
 
 TEST_DATION_SRCS += gtest_main.cc myTests.cc  \
 	DiscTests.cc PipeTests.cc \
@@ -90,6 +92,9 @@ signalTest: signalTest.o ../plib.a
 
 interruptTest: ../../common/tests/interruptTest.o ../plib.a
 	$(CXX) $^ $(LDFLAGS) -o interruptTest -pthread
+		
+SampleBasicDationTests: ../../common/tests/SampleBasicDationTests.o ../plib.a
+	$(CXX) $^ $(LDFLAGS) -o SampleBasicDationTests -pthread
 		
 api: api.o ../plib.a
 	$(CXX) $^ $(LDFLAGS) -o api -pthread

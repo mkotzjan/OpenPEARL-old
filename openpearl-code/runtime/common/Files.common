@@ -52,7 +52,8 @@ SRC_COMMON = \
 	../common/Semaphore.cc ../common/PriorityQueue.cc \
 	../common/DationRW.cc \
 	../common/DationPG.cc \
-	../common/LockingDation.cc ../common/UserDation.cc \
+	../common/DationTS.cc \
+	../common/UserDationNB.cc ../common/UserDation.cc \
 	../common/DationDim.cc  ../common/DationDim1.cc \
 	../common/DationDim2.cc ../common/DationDim3.cc \
 	../common/FloatHelper.cc \
@@ -70,6 +71,8 @@ HDR_COMMON = $(SRC_COMMON:%.cc=%.h) \
 	../common/Log.h ../common/Float.h \
 	../common/TaskTimerCommon.h \
 	../common/TaskMonitor.h \
-	../common/compare.h
+	../common/compare.h \
+	../common/SystemDation.h \
+	../common/SystemDationNB.h
 
 

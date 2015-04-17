@@ -36,11 +36,6 @@ ttt: TASK;
    DCL f FIXED(31);   ! RST-value
 
    OPEN termout;
-/* expected code  ...
-__cpp__('_termout.dationOpen(0, '
-         '                   (pearlrt::Character<1>*) 0,'
-         '                   (pearlrt::Fixed<31>*) 0);');
-*/
    OPEN tableAlphicForward2u BY OLD;
    OPEN tableAlphicForward2u BY NEW;
    OPEN tableAlphicForward2u BY ANY;
