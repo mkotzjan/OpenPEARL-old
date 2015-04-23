@@ -138,7 +138,7 @@ namespace pearlrt {
       \param sink the destination for the generated character sequence
       \throws FixedFormatSignal if
                 format parameters are illegal<br>
-       or rst value of FixedFormatValueSignal
+       or rst value of FixedValueSignal
                if fixed value does not fit into format
       */
       static void toF(
@@ -213,7 +213,7 @@ namespace pearlrt {
             }
 
             Log::info("F: width too small");
-            throw theFixedFormatValueSignal;
+            throw theFixedValueSignal;
          }
 
          while (leadingSpaces > 0) {

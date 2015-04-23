@@ -73,8 +73,8 @@ namespace pearlrt {
 
       \param f the variable which gets the read value
       \param w the input field width
-      \param d the input field width
-      \param p the input field width
+      \param d the decimal point position 
+      \param p the scale factor
       \param source the input stream
 
       \throws FixedFormatSignal if w is <= 0 or d<0
@@ -89,7 +89,7 @@ namespace pearlrt {
                         Source & source) {
          Fixed63 value;
 
-         if (w.x <= 0 || d.x < 0) {
+         if (w.x <= 0 || d.x < 0 || w.x < d.x) {
             throw theFixedFormatSignal;
          }
 

@@ -61,7 +61,7 @@ TEST(GetBitString, B1_format) {
    // test format width exceptions
    ASSERT_THROW(
       pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<15>) - 1, source),
-      pearlrt::BFormatSignal);
+      pearlrt::BitFormatSignal);
    // test reading with width=0 and continue with width>0
    ASSERT_NO_THROW(
       pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<15>)0, source));
@@ -103,7 +103,7 @@ TEST(GetBitString, B1_format) {
       pearlrt::BitString<1> x;
       ASSERT_THROW(
          pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<15>)2, source),
-         pearlrt::BValueSignal);
+         pearlrt::BitValueSignal);
    }
    {
       pearlrt::Character<20> d("2               ");
@@ -112,7 +112,7 @@ TEST(GetBitString, B1_format) {
       pearlrt::BitString<1> x;
       ASSERT_THROW(
          pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<15>)2, source),
-         pearlrt::BValueSignal);
+         pearlrt::BitValueSignal);
    }
    // test capture data from wide fields
    {
@@ -148,7 +148,7 @@ TEST(GetBitString, B4_format) {
    // test format width exceptions
    ASSERT_THROW(
       pearlrt::GetBitString<5>::fromB4(x, (pearlrt::Fixed<15>) - 1, source),
-      pearlrt::BFormatSignal);
+      pearlrt::BitFormatSignal);
    // test reading with width=0 and continue with width>0
    ASSERT_NO_THROW(
       pearlrt::GetBitString<5>::fromB4(x, (pearlrt::Fixed<15>)0, source));
@@ -190,7 +190,7 @@ TEST(GetBitString, B4_format) {
       pearlrt::BitString<4> x;
       ASSERT_THROW(
          pearlrt::GetBitString<4>::fromB4(x, (pearlrt::Fixed<15>)2, source),
-         pearlrt::BValueSignal);
+         pearlrt::BitValueSignal);
    }
    {
       pearlrt::Character<20> d("@               ");
@@ -199,7 +199,7 @@ TEST(GetBitString, B4_format) {
       pearlrt::BitString<4> x;
       ASSERT_THROW(
          pearlrt::GetBitString<4>::fromB4(x, (pearlrt::Fixed<15>)2, source),
-         pearlrt::BValueSignal);
+         pearlrt::BitValueSignal);
    }
    // test capture data from wide fields
    {

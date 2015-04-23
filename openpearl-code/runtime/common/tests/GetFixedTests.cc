@@ -150,7 +150,7 @@ TEST(GetFixed, conversions) {
       source.rewind();
       EXPECT_THROW(
          pearlrt::GetFixed<15>::fromF(f15, 4, 0, 0, source),
-         pearlrt::FixedFormatValueSignal);
+         pearlrt::FixedValueSignal);
       EXPECT_NO_THROW(
          pearlrt::GetFixed<15>::fromF(f15, 2, 0, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(69)).getBoolean());

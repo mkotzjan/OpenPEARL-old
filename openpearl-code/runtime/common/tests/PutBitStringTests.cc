@@ -58,7 +58,7 @@ TEST(PutBitString, B4) {
    rc.setWork(r1);
    ASSERT_THROW(
       pearlrt::PutBitString<7>::toB4(x, 0, sink),
-      pearlrt::BFormatSignal);
+      pearlrt::BitFormatSignal);
    {
       x = (pearlrt::BitString<7>)1;
       rc.clear();
@@ -100,7 +100,7 @@ TEST(PutBitString, B1) {
    rc.setWork(r1);
    ASSERT_THROW(
       pearlrt::PutBitString<7>::toB1(x, 0, sink),
-      pearlrt::BFormatSignal);
+      pearlrt::BitFormatSignal);
    {
       x = (pearlrt::BitString<7>)1;
       rc.clear();

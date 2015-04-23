@@ -384,7 +384,7 @@ namespace pearlrt {
             } else if (c < 0 || c == ' ') {
                // do nothing - is treated n´in while condition
             } else {
-               throw theBValueSignal;
+               throw theBitValueSignal;
             }
          } while (c > 0 && isxdigit(c) && getRemainingWidth() > 0);
 
@@ -418,7 +418,7 @@ namespace pearlrt {
             } else if (c < 0 || c == ' ') {
                // do nothing - is treated n´in while condition
             } else {
-               throw theBValueSignal;
+               throw theBitValueSignal;
             }
          } while ((c == '0' || c == '1') && getRemainingWidth() > 0);
 
@@ -469,14 +469,14 @@ namespace pearlrt {
                } else {
                   // other character
                   discardRemaining();
-                  throw theFixedFormatValueSignal;
+                  throw theFixedValueSignal;
                }
             }
 
             if (skipSpaces() == 0) {
                discardRemaining();
                Log::info("F: illegal character in field");
-               throw theFixedFormatValueSignal;
+               throw theFixedValueSignal;
             }
 
             // if d > 0 : the value must be divided    d times by 10

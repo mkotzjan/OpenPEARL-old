@@ -98,7 +98,7 @@ namespace pearlrt {
       \param d the seconds, may by > 60
 
       \return the duration
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
 
       Duration(const double d);
@@ -132,7 +132,7 @@ namespace pearlrt {
       \returns reference to the added duration
 
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       Duration& operator+=(const Duration& rhs);
 
@@ -142,7 +142,7 @@ namespace pearlrt {
       \param rhs the increment
       \returns sum of the two durations as a new object
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       const Duration operator+(const Duration& rhs) const;
 
@@ -153,7 +153,7 @@ namespace pearlrt {
       \returns reference to the reduced duration
 
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       Duration& operator-=(const Duration& rhs);
 
@@ -163,7 +163,7 @@ namespace pearlrt {
       \param rhs the increment
       \returns difference between the two durations as a new object
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       const Duration operator-(const Duration& rhs) const;
 
@@ -173,7 +173,7 @@ namespace pearlrt {
 
       \returns the inverted duration as a new object
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       const Duration operator-() const;
 
@@ -184,7 +184,7 @@ namespace pearlrt {
       \param rhs the multiplicator
       \returns reference to the multiplied duration
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       template <int S>Duration& operator*=(const Float<S>& rhs) {
          intval = (double)(intval.get()) * rhs.x;
@@ -197,7 +197,7 @@ namespace pearlrt {
       \param rhs the multiplicator
       \returns new object containg the product
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       template<int S>const Duration  operator*(const Float<S>& rhs) const {
          return Duration(*this) *= rhs;
@@ -208,7 +208,7 @@ namespace pearlrt {
       \param rhs the denominator
       \returns reference to the divided duration
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       template <int S>Duration& operator/=(const Float<S>& rhs) {
          if ((rhs == Float<S>(0.0)).getBoolean()) {
@@ -220,7 +220,7 @@ namespace pearlrt {
          try {
             help = Float<S>(intval.get()) / rhs;
          } catch (FloatIsINFSignal &s) {
-            throw theDurationValueSignal;
+            throw theDurationRangeSignal;
          }
 
          intval = Fixed63(help.x);
@@ -233,7 +233,7 @@ namespace pearlrt {
       \param rhs the denominator
       \returns sum of the two durations as a new object
 
-      \throws DurationValueSignal
+      \throws DurationRangeSignal
       */
       template <int S>Duration operator/(const Float<S>& rhs) {
          return Duration(*this) /= rhs;
@@ -358,7 +358,7 @@ namespace pearlrt {
    \param rhs the multiplicator
    \returns new object containg the product
 
-   \throws DurationValueSignal
+   \throws DurationRangeSignal
    */
    template<int S>const Duration  operator*(const Float<S>& lhs,
          const Duration &rhs) {

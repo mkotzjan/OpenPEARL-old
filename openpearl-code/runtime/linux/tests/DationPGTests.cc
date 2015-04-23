@@ -286,7 +286,7 @@ TEST(DationPG, signal_get) {
 
       logbuch.endSequence();
    },
-   pearlrt::FixedFormatValueSignal);
+   pearlrt::FixedValueSignal);
    ASSERT_NO_THROW(
 
    try {
@@ -303,6 +303,6 @@ TEST(DationPG, signal_get) {
       logbuch.endSequence();
    }
    );
-   ASSERT_EQ(rst.x , pearlrt::theFixedFormatValueSignal.whichRST());
+   ASSERT_EQ(rst.x , pearlrt::theFixedValueSignal.whichRST());
    logbuch.dationClose();
 }

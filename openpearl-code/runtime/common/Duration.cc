@@ -74,7 +74,7 @@ namespace pearlrt {
             intval = Fixed63(d * 1000000.0 - 0.5);
          }
       } catch (ArithmeticOverflowSignal &s) {
-         throw theDurationValueSignal;
+         throw theDurationRangeSignal;
       }
    }
 
@@ -82,9 +82,9 @@ namespace pearlrt {
       try {
          intval += rhs.intval;
       } catch (ArithmeticOverflowSignal &s) {
-         throw theDurationValueSignal;
+         throw theDurationRangeSignal;
       } catch (ArithmeticUnderflowSignal &s) {
-         throw theDurationValueSignal;
+         throw theDurationRangeSignal;
       }
 
       return (*this);
@@ -98,9 +98,9 @@ namespace pearlrt {
       try {
          intval -= rhs.intval;
       } catch (ArithmeticOverflowSignal &s) {
-         throw theDurationValueSignal;
+         throw theDurationRangeSignal;
       } catch (ArithmeticUnderflowSignal &s) {
-         throw theDurationValueSignal;
+         throw theDurationRangeSignal;
       }
 
       return (*this);

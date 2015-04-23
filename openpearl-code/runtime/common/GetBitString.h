@@ -99,15 +99,15 @@ namespace pearlrt {
       \param bitstring the data to be read
       \param w the width of the input field.
       \param source the origin of the character sequence
-      \throws  BFormatSignal, if w is < 0, or <br>
-      \throws  BValueSignal, if field was empty
+      \throws  BitFormatSignal, if w is < 0, or <br>
+      \throws  BitValueSignal, if field was empty
       */
       static void fromB1(
          BitString<S> &bitstring,
          const Fixed<15> w,
          Source & source) {
          if (w.x < 0) {
-            throw theBFormatSignal;
+            throw theBitFormatSignal;
          }
 
          if (w.x == 0) {
@@ -142,15 +142,15 @@ namespace pearlrt {
       \param bitstring the data to be read
       \param w the width of the input field.
       \param source the origin of the character sequence
-      \throws BFormatSignal, if w is < 0, or <br>
-      \throws BValueSignal if field was empty
+      \throws BitFormatSignal, if w is < 0, or <br>
+      \throws BitValueSignal if field was empty
       */
       static void fromB4(
          BitString<S> &bitstring,
          const Fixed<15> w,
          Source & source) {
          if (w.x < 0) {
-            throw theBFormatSignal;
+            throw theBitFormatSignal;
          }
 
          if (w.x == 0) {

@@ -90,14 +90,14 @@ namespace pearlrt {
       \param bitstring the data to be formatted
       \param w the width of the output field.
       \param sink the destination for the generated character sequence
-      \throws BFormatSignal, if w is <= 0
+      \throws BitFormatSignal, if w is <= 0
       */
       static void toB4(
          BitString<S> &bitstring,
          int w,
          Sink & sink) {
          if (w <= 0) {
-            throw theBFormatSignal;
+            throw theBitFormatSignal;
          }
 
          typename BitString<S>::DataType h, m;
@@ -166,14 +166,14 @@ namespace pearlrt {
       \param bitstring the data to be formatted
       \param w the width of the output field.
       \param sink the destination for the generated character sequence
-      \throw BFormatSignal, if w is <= 0
+      \throw BitFormatSignal, if w is <= 0
       */
       static void toB1(
          BitString<S> &bitstring,
          int w,
          Sink & sink) {
          if (w <= 0) {
-            throw theBFormatSignal;
+            throw theBitFormatSignal;
          }
 
          typename BitString<S>::DataType h, m;
@@ -206,7 +206,7 @@ namespace pearlrt {
 
       \param bitstring the data to be formatted
       \param sink the destination for the generated character sequence
-      \throws BFormatSignal, if w is <= 0
+      \throws BitFormatSignal, if w is <= 0
       */
       static void toB1(
          BitString<S> &bitstring,

@@ -81,7 +81,7 @@ TEST(PutFixed, simpleFixed) {
                                     (pearlrt::Fixed<15>)1,
                                     (pearlrt::Fixed<15>)0,
                                     sink),
-         pearlrt::FixedFormatValueSignal);
+         pearlrt::FixedValueSignal);
       // after OverflowSignal, the data should be ****
       rc.store(d2);
       ASSERT_TRUE((d1 == d2).getBoolean());

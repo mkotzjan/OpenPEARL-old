@@ -67,7 +67,7 @@ TEST(Duration, Operations) {
    ASSERT_THROW(
       // threshold shuold should be +0.000001
       pearlrt::Duration c(9223372036854.775807 + 0.001),
-      pearlrt::DurationValueSignal);
+      pearlrt::DurationRangeSignal);
    {
       pearlrt::Duration d(24 * 3600.0); // 1 day
       pearlrt::Duration d2;
@@ -81,7 +81,7 @@ TEST(Duration, Operations) {
          for (i = 0; i < 1000000000; i++) {
             d2 = d2 + d;
          }
-      } catch (pearlrt::DurationValueSignal &s) {
+      } catch (pearlrt::DurationRangeSignal &s) {
          test = 1;
          printf(".. duration overflow works (%d days)\n", i + preset.x);
       }
@@ -101,7 +101,7 @@ TEST(Duration, Operations) {
          for (i = 0; i < 1000000000; i++) {
             d2 = d2 - d;
          }
-      } catch (pearlrt::DurationValueSignal &s) {
+      } catch (pearlrt::DurationRangeSignal &s) {
          test = 1;
          printf(".. duration underflow works (%d days)\n", i + preset.x);
       }

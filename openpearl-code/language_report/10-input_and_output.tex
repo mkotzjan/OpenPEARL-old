@@ -1,5 +1,6 @@
 % labels and refs added
 % grammar for 'SYSTEM' added
+% signals in put/get formats added; behavior clearified
 
 \chapter{Input and Output}   % 10
 
@@ -1106,6 +1107,7 @@ format, but also the processing of fractional fixed point numbers is
 possible by scaling. These are converted to integers upon input and to
 fractional numbers again upon output.
 
+\begin{removed}
 \begin{enumerate}
 \item {\bf Output}
 \begin{enumerate}
@@ -1152,12 +1154,78 @@ value  & format   & output \\ \hline
 212.73 & F(9,2,2) & \_21273.00 \\
 212.73 & F(9,2)   & \_\_\_212.73
 \end{tabular}
+\end{removed}
+
+\begin{added}
+\begin{enumerate}
+\item {\bf Output}
+\begin{enumerate}
+\item The decimal number is stored right-justified in a field of length
+w in the form
+
+[ - ] pi [ . pi ]
+
+where pi means positive integer. If the number does not occupy the
+entire field, the left part is padded with spaces.
+\item If 0 $>$ d or w $<$ d, the FixedFormatSignal is induced
+\item In case w $\leq$ 0, the FixedFormatSignal is induced
+\item If d = 0 or is not given, only the integer part of the decimal
+number rounded without decimal point is written out.
+\item Except for the zero immediately in front of the decimal point,
+leading zeros are suppressed.
+\item if the output value does not fit into the given field width 
+   (also regarding p), the FixedValueSignal is induced.
+\end{enumerate}
+\item {\bf Input}
+\begin{enumerate}
+\item A field of length w is read, containing a decimal fixed point
+number in the following representation:
+
+[ [ + $\mid$ - ] pi [ . [ pi ] ] ]
+
+\item Spaces preceding or following the number are ignored.
+\item If the entire field is empty, value 0 is read in.
+\item If no decimal point occurs in the representation, the last d
+digits are interpreted as positions following a decimal point. It must
+be p $\geq$ d.
+\item If a decimal point occurs in front of the last b digits in the
+representation, then it has priority over the specification by d. In
+this case, the statement of d has no meaning. It must be p$\geq$ b.
+\item If w $\leq$ 0, no assignment takes place;
+    the FixedFormatSignal is induced
+\item If d $<$ 0 or w $<$ d, no assignmant happens and 
+    the FixedFormatSignal is induced
+\item If the data in the input field does not match a valid fixed 
+   number, the FixedValueSignal is induced
+\end{enumerate}
+\end{enumerate}
+
+Example:
+
+\begin{tabular}{lll}
+value  & format   & output \\ \hline
+13.5   & F(7,-1)   &  \x \x {\em FixedFormatSignal!}  \\
+13.5   & F(0)   &  \x \x {\em FixedFormatSignal!}  \\
+13.5   & F(7,2)   & \_\_13.50  \\
+-13.5   & F(7,2)   & \_-13.50  \\
+275.2  & F(4,1)   &  \x \x {\em FixedValueSignal!} \\
+22.8   & F(5)     & \_\_\_23 \\
+212.73 & F(9,2,2) & \_21273.00 \\
+212.73 & F(9,2)   & \_\_\_212.73
+\end{tabular}
+\end{added}
 
 \subsection{The Float Format (E)}   % 10.5.2
 \label{sec_dation_e_format}
 
+\begin{removed}
 FloatFormat ::=\\
 \x {\bf E} (FieldWidth [ , DecimalPositions [ , Significance ] ] )
+\end{removed}
+\begin{added}
+FloatFormat ::=\\
+\x {\bf E}[3] (FieldWidth [ , DecimalPositions [ , Significance ] ] )
+\end{added}
 
 Significance ::= \\
 \x Expression$\S $WithIntegerAsValue
@@ -1167,13 +1235,15 @@ floating point numbers of the form
 
 [ + $\mid$ - ] FloatingPointNumber
 
-where the exponent consists of two digits. Field width and decimal
+where the exponent consists of two \addedtext{(E) or three (E3)} digits.
+ Field width and decimal
 positions have the same meaning as in the fixed format; significance s
 denotes the number of significant digits; i.e., the length of the
 mantissa.
 
 E(w,d) is of equivalent to E(w,d,d+1), and E(w) to E(w,0).
 
+\begin{removed}
 \begin{enumerate}
 \item {\bf Output}\\
 The floating point number is stored right-justified in a field of length
@@ -1214,6 +1284,64 @@ value  & format    & output \\ \hline
 2713.5 & E(11,2,4) & \_\_27.13E+02 \\
 2721   & E(8)      & \_\_\_2E+03
 \end{tabular}
+\end{removed}
+
+\begin{added}
+\begin{enumerate}
+\item {\bf Output}\\
+\begin{enumerate}
+\item If 0 $<$ w $<$ d, the FloatFormatSignal is induced. 
+
+\item For w $<=$ 0, the FloatFormatSignal is induced.
+
+\item If w is too small to mention a digit of the mantissa, the FloatValueSignal is induced
+
+\item The floating point number is stored right-justified in a field of length
+w. Otherwise, 1(a) in \ref{sec_dation_f_format} holds.
+
+\item In case w $>$ d $>$ s, the mantissa is chosen so that it holds:
+
+\hspace*{1cm}$10^{s-d-1} \leq \mid$ mantissa $\mid < 10^{s-d}$
+
+\item If d $>$ 0, the number has the form
+
+\hspace*{1cm}[ - ] s-d digits . d digits E \{ + $\mid$ - \} exponent.
+
+The exponent is determined in such a way that the leading digit of the
+mantissa does not equal zero, if the number is different from zero.
+
+\item If d = 0, the number has the form
+
+\hspace*{1cm}[ - ] s digits E \{ + $\mid$ - \} exponent
+
+\item the exponent field used two digits in E-format and 
+      three digit in E3-format
+
+\end{enumerate}
+ 
+\item {\bf Input}\\
+\begin{enumerate}
+\item A field of length w is read,
+    containing a decimal floating point number
+    in one of the possible representations (cf. 5.3).
+
+%\item The statements 2(b) to 2(f) in \ref{sec_dation_f_format}
+%     hold analogously.
+\item If w $<=$ 0, or d $<$ 0, or s $<$ 0, no assignment happens and  
+         the FloatFormatSignal is induced
+\item If the data in the field does not match a valid number, 
+ no data is assigned and the FloatValueSignal is induced.
+\end{enumerate}
+\end{enumerate}
+
+\begin{tabular}{lll}
+value  & format    & output \\ \hline
+-0.07  & E(9,1)    & \_-7.0E-02 \\
+2713.5 & E(11,2,4) & \_\_27.13E+02 \\
+2721   & E(8)      & \_\_\_2E+03 \\
+2721   & E3(8)      & \_\_2E+003
+\end{tabular}
+\end{added}
 
 \subsection{The Character String Formats (A) and (S)}  % 10.5.3
 \label{sec_dation_a_format}
@@ -1236,9 +1364,15 @@ If the format has form ``A (Expression)'', the character string is
 written out left-justified in the above presented form in a field of
 length w. If the character string consists of more than w characters, it
 is truncated on the right; if it consists of less than w characters, the
-field is padded with spaces on the right. If w = 0, no characters are
+field is padded with spaces on the right. 
+\begin{removed}
+If w = 0, no characters are
 written out, and the expression in the expression list of the put
 statement is skipped.
+\end{removed}
+\begin{added}
+If w $<=$ 0, the CharacterFormatSignal is induced
+\end{added}
 
 If the expression is not given in the format, i.e., the format has the
 form ``A'', the string is written out in a field, whose length equals
@@ -1250,8 +1384,15 @@ into the character string variable.
 
 If w is smaller than length lg of the associated character string
 variable, the right part is padded with spaces; in case w $>$ lg, the
-right part is truncated. If w = 0, a string of lg spaces is assigned to
+right part is truncated.
+\begin{removed}
+ If w = 0, a string of lg spaces is assigned to
 the variable.
+\end{removed}
+\begin{added}
+ If w $<=$ 0, no assignment happens and the CharacterFormatSignal is 
+   induced. 
+\end{added}
 \end{enumerate}
 
 Examples:
@@ -1333,6 +1474,11 @@ padded with zeros on the right. If w is not given, and if the bit format
 thus has the form B $\mid$ B1 $\mid$ B2 $\mid$ B3 $\mid$ B4, the string
 is written out in a field, whose length equals the length of the
 string.
+
+\begin{added}
+If w $<=$ 0, no data is written and the BitFormatSignal is induced.
+\end{added}
+
 \item {\bf Input}\\
 The expression must be given.
 
@@ -1340,6 +1486,13 @@ A field of length w is read in, which must contain a bit string of the
 above described form. The field must not exclusively consist of spaces.
 Spaces preceding or following the string are ignored. The statements on
 the input with the A format hold likewise.
+
+\begin{added}
+If w $<=$ 0, no data is assigned and the BitFormatSignal is induced.
+
+If the data field does not match a valid bit representation, the
+BitValueSignal is induced.
+\end{added}
 \end{enumerate}
 
 Example:
@@ -1377,7 +1530,15 @@ number d of the digits for the fractional parts of seconds of the clock
 time.
 \begin{enumerate}
 \item {\bf Output}\\
-The time is written out rigth-justified in a field of length w in the
+\begin{added}
+If w $<=$ 0 or d $<$ 0, no data is written an the ClockFormatSignal
+   is induced.
+
+If w is too small for the given clock value, the ClockValueSignal
+   is induced.
+\end{added}
+
+The time is written out right-justified in a field of length w in the
 form
 
 [ Digit ] Digit : Digit Digit : Digit Digit [ . pi ]
@@ -1390,6 +1551,14 @@ padded up with spaces.
 \item {\bf Input}\\
 A field of length w is read in, which must contain a time in a permitted
 representation (see 1). Preceding and following spaces are ignored.
+
+\begin{added}
+If w $<=$ 0 or d $<$ 0, no data is read and the ClockFormatSignal
+   is induced.
+
+If the input field does not match a valid clock constant, the 
+   ClockValueSignal is induced.
+\end{added}
 \end{enumerate}
 
 Examples:
@@ -1418,11 +1587,29 @@ the form
 
 [ Digit ] Digit\_HRS\_Digit Digit\_MIN\_Digit Digit [ . pi ]\_SEC
 
+\begin{added}
+If w $<=$ 0 or d $<$ 0, no data is written an the ClockFormatSignal
+   is induced.
+
+If w is too small for the given clock value, the ClockValueSignal
+   is induced.
+\end{added}
+
+\begin{removed}
 The rules from \ref{sec_dation_t_format} (1) are valid.
+\end{removed}
 \item {\bf Input}\\
+If w $<=$ 0 or d $<$ 0, no data is read and the DurationFormatSignal
+   is induced.
+
+\begin{added}
 A field of length w is read in, which must contain a duration in a
 permitted representation (see 1). Preceding and following spaces are
 ignored.
+
+If the input field does not match a valid clock constant, the 
+   ClockValueSignal is induced.
+\end{added}
 \end{enumerate}
 
 Examples:
