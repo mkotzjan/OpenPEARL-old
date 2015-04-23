@@ -98,7 +98,11 @@ namespace pearlrt {
       timer = 0;
       startPeriod = 0;
       cyclicPeriod = 0;
-
+      //just to get rid of some warnings:
+      callback = 0;
+      isInStartPeriod = 0;
+      signalNumber = 0;
+      task = 0;
    }
    void TaskTimer::create(TaskCommon * task,
                           TimerCallback cb) {
