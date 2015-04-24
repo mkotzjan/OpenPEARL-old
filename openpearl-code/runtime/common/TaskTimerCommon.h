@@ -103,11 +103,12 @@ namespace pearlrt {
       */
       virtual int cancel() = 0;
 
-   public:
       /**
       start the timer.
 
-      At each timer event the callback function is called.
+      The time begins its execution. Each concrete TaskTimer must
+      contain a callback function, which is call at each elapsed time
+      interval.
 
       \returns 0 on success; -1 else
       */
@@ -115,28 +116,23 @@ namespace pearlrt {
 
       /** check if timer is active
 
+      Active means that the timer is started and its final time is
+      not reached yet.
+
       \returns true, if the time is still active<br>false else
       */
       virtual bool isActive() = 0;
 
       /** check if timer is set
+
+      This function returns true if the method set() was called
+      at least one time and is not cancelled.
+      Thus the timer be be started again.
+
       \returns true, if the time is set <br>false else
       */
       virtual bool isSet() = 0;
-
-      /**
-      update at timer event.
-
-      This method is only required inside of the class.
-      It is common to all plattforms. The plattform specific part
-      must call this method on each timer event.
-      */
-      virtual void update() = 0;
-
    };
-
-
-
 
 }
 #endif
