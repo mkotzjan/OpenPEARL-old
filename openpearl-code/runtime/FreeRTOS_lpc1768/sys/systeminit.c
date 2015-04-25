@@ -35,8 +35,8 @@ static void realinit_CpuClock();
 static void realinit_ClockRTC();
 static void realinit_ClockMonotonicRealtime();
 
-void software_init_hook(){
-	systeminit(CpuClock);
+__attribute__((used)) void software_init_hook(){
+	systeminit(ClockRTC);
 }
 
 void systeminit(enum systeminit sysinit){
@@ -100,16 +100,14 @@ static void realinit_CpuClock() {
 	LPC_SYSCON->PCLKSEL[0] = 0;
 	LPC_SYSCON->PCLKSEL[1] = 0;
 
-	/* Make timer0 run at CCLK */
-	LPC_SYSCON->PCLKSEL[0] = (1<<2);
 	SystemCoreClockUpdate();
 }
 
+extern void systeminit_rtc_settime(unsigned int fallbackstamp);
 static void realinit_ClockRTC(){
-	RTC_TIME_T time;
 	Chip_RTC_Init(LPC_RTC);
 	Chip_RTC_Enable(LPC_RTC, ENABLE);
-	Chip_RTC_GetFullTime(LPC_RTC, &time);
+	systeminit_rtc_settime(UNIXSTAMP);
 }
 
 static void realinit_ClockMonotonicRealtime(){
@@ -121,6 +119,7 @@ static void realinit_ClockMonotonicRealtime(){
 	LPC_SYSCON->PCLKSEL[0]|=(1<<2);//bits 3:2 = 01 to set PCLK_TIMER0 to run at full speed. reset=00
 	LPC_TIMER0->CTCR=0;//Timer0 is running in timer mode.
 	LPC_TIMER0->TCR=3;//reset and disable timer0
+	LPC_TIMER0->PR=0;//Prescaler=0;
 
 	LPC_RTC->ILR = 3; //clear interrupt flags
 //	NVIC->ISER[0] = (1<<RTC_IRQn);
