@@ -31,6 +31,7 @@
 #include <string>
 #include <sys/time.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "Clock.h"
 #include "BitString.h"
