@@ -11,9 +11,7 @@ CINCS += $(NXPINC)
 CINCS += ./sys/
 
 CPPSRC += ./Post.cc
-CPPSRC += ./Clock.cc
-CPPSRC += ./RTC.cc
-CPPSRC += ./FreeRTOSTickHook.cc
+CPPSRC += ../linux/Clock.cc
 CPPINCS += .
 
 CHECK_HDRS += ./FreeRTOSTickHook.h

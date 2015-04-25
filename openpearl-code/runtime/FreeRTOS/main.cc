@@ -55,7 +55,6 @@
 //#include "TimerList.h"
 #include "Log.h"
 #include "Clock.h"
-#include "RTC.h"
 //#include "LPC1768Function.h"
 
 using namespace pearlrt;
@@ -118,8 +117,6 @@ int main(void) {
 
    Log::info("system startup complete");
    /* Start the scheduler. */
-   pearlrt::RTC::init();
-   pearlrt::Clock::setupFromRTC();
    vTaskStartScheduler();
    Log::error("main.c: Scheduler terminated");
    /* IDLE task is declared in LPC1768Function.cc */
