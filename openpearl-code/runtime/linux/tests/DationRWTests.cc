@@ -83,7 +83,7 @@ TEST(DationRW, read_write_FORWARD) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::ANY ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    pearlrt::Character<16> text("PEARL");
    pearlrt::Fixed<31>  x(42);
    logbuch.dationWrite(&text, sizeof(text));
@@ -94,7 +94,7 @@ TEST(DationRW, read_write_FORWARD) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    pearlrt::Character<16> text1;
    pearlrt::Fixed<31>  x1;
    logbuch.dationRead(&text1, sizeof(text1));
@@ -129,7 +129,7 @@ TEST(DationRW, Read_Write_checkerfield) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
 
       for (int i = 1; i <= 20; i++) {
          for (int j = 1; j <= 20; j++) {
@@ -164,7 +164,7 @@ TEST(DationRW, Read_Write_checkerfield) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       // read so values by postioning with x, skip and adv
       logbuch.fromAdv(1, 2);
       logbuch.dationRead(&testValue, sizeof(testValue));
@@ -207,7 +207,7 @@ TEST(DationRW, toSkip1Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_THROW(file.toSkip(1), pearlrt::InternalDationSignal);
       ASSERT_THROW(file.toPage(1), pearlrt::InternalDationSignal);
       ASSERT_NO_THROW(file.toX(20));
@@ -229,7 +229,7 @@ TEST(DationRW, toSkip1Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_THROW(file.fromSkip(1), pearlrt::InternalDationSignal);
       ASSERT_THROW(file.fromPage(1), pearlrt::InternalDationSignal);
       file.dationRead(testValue, sizeof(testValue));
@@ -266,7 +266,7 @@ TEST(DationRW, toSkip2Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(file.toSkip(1));
       ASSERT_THROW(file.toPage(1), pearlrt::InternalDationSignal);
       ASSERT_NO_THROW(file.toX(20));
@@ -291,7 +291,7 @@ TEST(DationRW, toSkip2Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_THROW(file.fromPage(1), pearlrt::InternalDationSignal);
       file.dationRead(testValue, sizeof(testValue));
       file.dationClose();
@@ -312,7 +312,7 @@ TEST(DationRW, toSkip2Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       pearlrt::Fixed<31> testVal = (pearlrt::Fixed<31>)42;
       ASSERT_NO_THROW(file.toSkip(1));
       ASSERT_THROW(file.toPage(1), pearlrt::InternalDationSignal);
@@ -339,7 +339,7 @@ TEST(DationRW, toSkip2Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       file.dationRead(testValue, sizeof(testValue));
       file.dationClose();
       pearlrt::Fixed<31> cmpTestValue[200];
@@ -381,7 +381,7 @@ TEST(DationRW, toSkip3Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(file.toSkip(1));
       ASSERT_NO_THROW(file.toPage(1));
       ASSERT_NO_THROW(file.toX(20));
@@ -406,7 +406,7 @@ TEST(DationRW, toSkip3Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       file.dationRead(testValue, sizeof(testValue));
       file.dationClose();
       pearlrt::Fixed<31> cmpTestValue[200] = {(pearlrt::Fixed<31>)0};
@@ -426,7 +426,7 @@ TEST(DationRW, toSkip3Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       pearlrt::Fixed<31> testVal = (pearlrt::Fixed<31>)42;
       ASSERT_NO_THROW(file.toPage(1));
       ASSERT_NO_THROW(file.toSkip(1));
@@ -453,7 +453,7 @@ TEST(DationRW, toSkip3Dim) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       file.dationRead(testValue, sizeof(testValue));
       pearlrt::Fixed<31> testVal;  // read over EOF
       ASSERT_THROW(
@@ -499,7 +499,7 @@ TEST(DationRW, Read_Write_checkerfield3) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
 
       for (int i = 1; i <= 10; i++) {
          for (int j = 1; j <= 10; j++) {
@@ -539,7 +539,7 @@ TEST(DationRW, Read_Write_checkerfield3) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       // read so values by postioning with x, skip and adv
       logbuch.fromAdv(1, 2);
       logbuch.dationRead(&testValue, sizeof(testValue));
@@ -590,7 +590,7 @@ TEST(DationRW, read_CYCLIC) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       pearlrt::Fixed<31>  x(42);
       logbuch.dationWrite(&x, sizeof(x));
       x = pearlrt::Fixed<31>(8);
@@ -621,7 +621,7 @@ TEST(DationRW, read_CYCLIC) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       pearlrt::Fixed<31>  x1;
       pearlrt::Fixed<31>  y[4];
       logbuch.dationRead(&x1, sizeof(x1));
@@ -658,7 +658,7 @@ TEST(DationRW, write_CYCLIC) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       pearlrt::Fixed<31>  y[4];
       y[0] = pearlrt::Fixed<31>(8);
       y[1] = pearlrt::Fixed<31>(15);
@@ -682,7 +682,7 @@ TEST(DationRW, write_CYCLIC) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::OLD ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       pearlrt::Fixed<31>  y[3];
       logbuch.dationRead(&y, sizeof(y));
       logbuch.dationClose(pearlrt::Dation::CAN);

@@ -164,9 +164,9 @@ namespace pearlrt {
 
       */
       UserDationNB(SystemDationNB* parent,
-                 int & dationParams,
-                 DationDim * dimensions,
-                 DationType dt);
+                   int & dationParams,
+                   DationDim * dimensions,
+                   DationType dt);
 
 
       /**
@@ -466,73 +466,6 @@ namespace pearlrt {
       */
       virtual void internalClose() = 0;
 
-#ifdef MOVED
-      /**
-        Implementation of the Open-interface.
-
-        \param p open parameters as given
-       \param rst pointer to rst-variable; required, if RST is set in p
-
-        \note throws various exceptions if no RST-Variable is set
-      */
-      void dationOpen(int p = 0,
-                      Fixed<31> * rst = 0) ;
-
-      /**
-        Implementation of the Open-interface.
-
-        If nether OLD,NEW,ANY or PRM,CAN is given the default is set,
-        which is ANY + PRM
-
-
-        \param p open parameters as given
-        \param idf file name (used if IDF is set in p)
-       \param rst pointer to rst-variable; required, if RST is set in p
-
-        \note throws various exceptions if no RST-Variable is set
-      */
-      template <size_t S>
-      void dationOpen(int p = 0,
-                      Character<S> * idf = (Character<S>*)0,
-                      Fixed<31> * rst = 0) {
-         try {
-            if (p & RST) {
-               if (! rst) {
-                  Log::error("UserDation: RST is set but no"
-                             " variable given");
-                  throw theIllegalParamSignal;
-               }
-            }
-
-            if ((!!(p & Dation::IDF)) != (idf != 0)) {
-               Log::error("UserDation: ether both or non of IDF and filename");
-               throw theIllegalParamSignal;
-            }
-
-            if (S > 64) {
-               Log::error("filename exceeds 64 characters");
-               throw theIllegalParamSignal;
-            }
-
-            RefCharacter rc;
-            Character<64>  fileName;
-            rc.setWork(fileName);
-            rc.clear();
-
-            if (p & Dation::IDF) {
-               rc.add(*idf);
-            }
-
-            internalDationOpen(p, &rc);
-         } catch (Signal & s) {
-            if (rst) {
-               *rst = s.whichRST();
-            } else {
-               throw;
-            }
-         }
-      }
-#endif
    private:
       /**
        Implementation of the internal Open-interface.
@@ -551,30 +484,7 @@ namespace pearlrt {
       \note may throw exceptions
       */
       void closeSystemDation(int dationParams);
-#ifdef MOVED
-   public:
-#ifdef XXXXX
-      /**
-        Implementation of the Close-interface, which is inherited
-        from UserDation Basic-class
 
-       \param p close parameters if given, else 0
-       \param rst pointer to rst-variabla; required, if RST is set in p
-
-        \note throws various exceptions if no RST-Variable is set
-
-      */
-      void dationClose(const int  p = 0, Fixed<31> * rst = 0);
-#endif
-
-   protected:
-      /** assert dation properties
-
-       \throw NotAllowedSignal if condition is not met
-      */
-      void assertOpen();
-
-#endif
    protected:
       /** assert dation properties
 

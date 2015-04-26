@@ -85,24 +85,6 @@ public:
     */
     virtual SystemDationB* dationOpen(const char * idfValue,
                                        int openParam) = 0;
-#ifdef XXXXXXXXXXXXXXX
-        /**
-        dation open method
-
-        The method may throw exceptions, if no rstValue is given.
-
-        \param openParam open parameters as bit-ored-value
-        \param idf  pointer to idf-string if given
-        \param rstValue  pointer to rst error variable if given
-        */
-        template<size_t S>
-        void dationOpen(int openParam,
-                        Character<S>* idf=0,
-                         Fixed<31>* rstValue=0) {
-	    Log::error("dationOpen for BASIC dation not implemented");
-            throw theInternalDationSignal;
-        }
-#endif
         /**
         dation close method
 

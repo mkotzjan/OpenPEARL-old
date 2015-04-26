@@ -84,7 +84,7 @@ namespace pearlrt {
 
       \throws NotAllowedSignal, if  dation is not closed and rst is not given
       */
-      SystemDationB* dationOpen(const char* idf = 0, int openParam = 0); 
+      SystemDationB* dationOpen(const char* idf = 0, int openParam = 0);
 
       /**
       Close the sample basic dation
@@ -92,87 +92,6 @@ namespace pearlrt {
       \param closeParam close parameters if given
       */
       void dationClose(int closeParam = 0);
-
-#ifdef XXXXXXXXXXXXX
-      /**
-      Open the sample basic dation
-
-      \param openParam open parameters if given
-      \param idf pointer to IDF-value if given
-      \param rstValue pointer to error variable if given
-
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
-      */
-      template<size_t S>
-      void dationOpen(int openParam = 0,
-                      Character<S>* idf = 0,
-                      Fixed<31>* rstValue = 0) {
-         try {
-            if (idf != 0) {
-               Log::error("IDF not allowed for SampleBasicDation device");
-               throw theNotAllowedSignal;
-            }
-
-            if (openParam != 0) {
-               Log::error("No open parameters allowed for"
-                          " SampleBasicDation device");
-               throw theNotAllowedSignal;
-            }
-
-            internalDationOpen();
-         } catch (Signal *s) {
-            if (rstValue != 0) {
-               *rstValue = s->whichRST();
-            } else {
-               throw;
-            }
-         }
-      }
-
-      /**
-      Close the sample basic dation
-
-      \param closeParam close parameters if given
-      */
-      void dationClose(int closeParam = 0) {
-        if (closeParam != 0) {
-           Log::error("No close parameters allowed for"
-                      " SampleBasicDation device");
-           throw theNotAllowedSignal;
-        }
-
-         internalDationClose();
-      }
-#endif
-#ifdef XXXXX
-      /**
-      Close the sample basic dation
-
-      \param closeParam close parameters if given
-      \param rstValue pointer to error variable if given
-
-
-      \throws NotAllowedSignal, if  dation is not opened and rst is not given
-      */
-      void dationClose(int closeParam = 0,
-                       Fixed<31>* rstValue = 0) {
-         try {
-            if (closeParam != 0) {
-               Log::error("No close parameters allowed for"
-                          " SampleBasicDation device");
-               throw theNotAllowedSignal;
-            }
-
-            internalDationClose();
-         } catch (Signal *s) {
-            if (rstValue != 0) {
-               *rstValue = s->whichRST();
-            } else {
-               throw;
-            }
-         }
-      }
-#endif
 
       /**
       read  a Bit<width> value from the device
@@ -200,18 +119,18 @@ namespace pearlrt {
       */
       void dationWrite(void * data, size_t size);
 
-    /**
-    obtain the capabilities of the device
+      /**
+      obtain the capabilities of the device
 
-    This method returns : 
-          IN  OUT INOUT
+      This method returns :
+            IN  OUT INOUT
 
-    does not return:
-          IDF  PRM CAN NEW  OLD ANY
+      does not return:
+            IDF  PRM CAN NEW  OLD ANY
 
-    \returns available commands of the device
-    */
-    int capabilities();
+      \returns available commands of the device
+      */
+      int capabilities();
    };
 }
 #endif

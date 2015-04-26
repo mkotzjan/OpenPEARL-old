@@ -120,14 +120,14 @@ namespace pearlrt {
    class DationTS: public UserDation {
 
    private:
-     /**
-        Reference to the parent systemdation
+      /**
+         Reference to the parent systemdation
 
-        The two types of userdations (ALPHIC and TYPE) has
-        to hold a reference of
-        their parent systemdation.
+         The two types of userdations (ALPHIC and TYPE) has
+         to hold a reference of
+         their parent systemdation.
 
-      */
+       */
       SystemDationB* system;
 
       /**
@@ -151,7 +151,7 @@ namespace pearlrt {
       */
       void internalClose();
 
-  private:
+   private:
       /**
        Implementation of the internal Open-interface.
 

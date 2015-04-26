@@ -83,61 +83,35 @@ namespace pearlrt {
       */
       TaskCommon* currentTask;
 
-      /** dation parameters and attribute from from declaration.
-          This variable contains a collection of bits, which are
-          defined in Dation.h
-      */
-//      int dationParams;
-
    public:
       /**
       ctor presets the attributes
       */
       UserDation();
 
-      /**
-        internal open function. build path to device, performs
-        pre and post Open and creates the FILE descriptor (dev)
-
-        \note have to be implemented in system
-               specific Dation implementation
-      */
-
-//      virtual void internalOpen() = 0;
-
-      /**
-        internal close function. Close dev and delete it
-        (if closeParam CAN is set)
-
-        \note have to be implemented in system
-              specific Dation implementation
-
-      */
- //     virtual void internalClose() = 0;
-
    private:
       /**
        Implementation of the internal Open-interface.
 
-       \param p open parameters (with default setting
+       \param p specified open parameters
        \param rc RefChar with file name
 
-       \note throws various exceptions if no RST-Variable is set
+       \note throws various exceptions
       */
       virtual void internalDationOpen(int p,
-                              RefCharacter* rc) = 0;
+                                      RefCharacter* rc) = 0;
 
    public:
       /**
-        Implementation of the Open-interface.
+        Non template part of the Open-interface.
 
         \param p open parameters as given
        \param rst pointer to rst-variable; required, if RST is set in p
 
         \note throws various exceptions if no RST-Variable is set
       */
-      void dationOpen(int p = 0,
-                      Fixed<31> * rst = 0) ;
+      // void dationOpen(int p = 0,
+      //                 Fixed<31> * rst = 0) ;
 
       /**
         Implementation of the Open-interface.
@@ -152,10 +126,10 @@ namespace pearlrt {
 
         \note throws various exceptions if no RST-Variable is set
       */
-      template <size_t S>
+      template <size_t S, int R>
       void dationOpen(int p = 0,
                       Character<S> * idf = (Character<S>*)0,
-                      Fixed<31> * rst = 0) {
+                      Fixed<R> * rst = 0) {
          try {
             if (p & RST) {
                if (! rst) {
@@ -258,7 +232,7 @@ namespace pearlrt {
          \returns false, if RST-variable was NOT defined
       */
       bool updateRst(Signal * s);
-public:
+   public:
       /**
        suspend
 

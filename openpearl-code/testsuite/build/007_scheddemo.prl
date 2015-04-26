@@ -62,7 +62,7 @@ TASK1: TASK PRIO 2 MAIN;
      !DCL end CLOCK;
      __cpp__ (' pearlrt::Clock _end; ');
      !OPEN console;
-     __cpp__('_console.dationOpen();	');
+     __cpp__('_console.dationOpen(0,(pearlrt::Character<1>*)NULL,(pearlrt::Fixed<31>*) NULL);	');
 
 
      ACTIVATE TASK2 PRIO 10;

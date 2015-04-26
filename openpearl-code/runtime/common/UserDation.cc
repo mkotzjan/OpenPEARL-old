@@ -47,10 +47,10 @@ namespace pearlrt {
       mutex.name("UserDation");
    }
 
-   void UserDation::dationOpen(int p, Fixed<31>* rst) {
-      // delegate to the templated version in the header file
-      dationOpen(p, (Character<1>*)NULL, rst);
-   }
+//   void UserDation::dationOpen(int p, Fixed<31>* rst) {
+//      // delegate to the templated version in the header file
+//      dationOpen(p, (Character<1>*)NULL, rst);
+//   }
 
    void UserDation::dationClose(const int p, Fixed<31>* rst) {
       Fixed<31>* intRst = NULL;
@@ -78,7 +78,7 @@ namespace pearlrt {
             dationParams |= p;
          }
 
-        // work -> dationClose(dationParams);
+         // work -> dationClose(dationParams);
          closeSystemDation(dationParams);
          dationStatus = CLOSED;
       } catch (Signal &  s) {

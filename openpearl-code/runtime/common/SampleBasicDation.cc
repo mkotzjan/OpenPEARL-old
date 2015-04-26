@@ -50,10 +50,12 @@ namespace pearlrt {
          Log::error("SampleBasicDation: no IDF allowed");
          throw theNotAllowedSignal;
       }
-      if (params & ~(RST | IN | OUT | INOUT) ) {
+
+      if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("SampleBasicDation: only RST allowed");
          throw theNotAllowedSignal;
       }
+
       if (dationStatus != CLOSED) {
          Log::error("SampleBasicDation: Dation already open");
          throw theNotAllowedSignal;
@@ -69,7 +71,8 @@ namespace pearlrt {
          Log::error("SampleBasicDation: Dation not open");
          throw theNotAllowedSignal;
       }
-      if (params & ~(RST | IN | OUT | INOUT) ) {
+
+      if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("SampleBasicDation: only RST allowed");
          throw theNotAllowedSignal;
       }

@@ -238,14 +238,14 @@ TEST(UserDation, OPEN) {
       logbuch.dationOpen(
          pearlrt::Dation::ANY ,
          &filename,
-         NULL),
+         (pearlrt::Fixed<15>*)NULL),
       pearlrt::IllegalParamSignal);
    pearlrt::Log::info("*** idf +  no old/new/any  ***");
    ASSERT_NO_THROW(
       logbuch.dationOpen(
          pearlrt::Dation::IDF ,
          &filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose();
 
    // should open file with system defaulted name
@@ -254,7 +254,7 @@ TEST(UserDation, OPEN) {
       logbuch.dationOpen(
          0 ,
          (pearlrt::Character<1>*)0,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose();
 
    pearlrt::Log::info("*** CAN+PRM  ***");
@@ -265,7 +265,7 @@ TEST(UserDation, OPEN) {
          pearlrt::Dation::PRM |
          pearlrt::Dation::CAN ,
          &filename,
-         NULL),
+         (pearlrt::Fixed<15>*)NULL),
       pearlrt::IllegalParamSignal);
    pearlrt::Log::info("*** successful open  ***");
    ASSERT_NO_THROW(
@@ -273,17 +273,17 @@ TEST(UserDation, OPEN) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::ANY ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose(pearlrt::Dation::CAN);
 
    // tests with idf in userdation and different system dations
    pearlrt::Log::info("*** OPEN no IDF on Disc");
    ASSERT_THROW(
       logbuch.dationOpen(pearlrt::Dation::NEW ,
-                         (pearlrt::Character<1>*)(NULL), NULL),
+                         (pearlrt::Character<1>*)(NULL), (pearlrt::Fixed<15>*)NULL),
       pearlrt::IllegalParamSignal);
    ASSERT_NO_THROW(
-      logbuch.dationOpen(0 , (pearlrt::Character<1>*)(NULL), NULL));
+      logbuch.dationOpen(0 , (pearlrt::Character<1>*)(NULL), (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose();
 
    pearlrt::Log::info("*** OPEN  IDF on Pipe");
@@ -291,7 +291,7 @@ TEST(UserDation, OPEN) {
       logpipe.dationOpen(
          pearlrt::Dation::IDF ,
          & filename,
-         NULL),
+         (pearlrt::Fixed<15>*)NULL),
       pearlrt::IllegalParamSignal);
 
    pearlrt::Log::info("*** OPEN no IDF on Pipe");
@@ -299,7 +299,7 @@ TEST(UserDation, OPEN) {
       logpipe.dationOpen(
          0 ,
          (pearlrt::Character<1>*)(NULL),
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logpipe.dationClose();
 
 
@@ -330,14 +330,14 @@ TEST(UserDation, OpenClose) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::ANY ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose(pearlrt::Dation::CAN);
    ASSERT_THROW(
       logbuch.dationOpen(
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL),
+         (pearlrt::Fixed<15>*)NULL),
       pearlrt::OpenFailedSignal);
    pearlrt::Log::info("*** check if CAN works in OPEN ***");
    ASSERT_NO_THROW(
@@ -346,14 +346,14 @@ TEST(UserDation, OpenClose) {
          pearlrt::Dation::ANY |
          pearlrt::Dation::CAN,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose();
    ASSERT_THROW(
       logbuch.dationOpen(
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL),
+         (pearlrt::Fixed<15>*)NULL),
       pearlrt::OpenFailedSignal);
    pearlrt::Log::info("*** check if CAN superseeds in OPEN ***");
    ASSERT_NO_THROW(
@@ -362,14 +362,14 @@ TEST(UserDation, OpenClose) {
          pearlrt::Dation::ANY |
          pearlrt::Dation::PRM,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose(pearlrt::Dation::CAN);
    ASSERT_THROW(
       logbuch.dationOpen(
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL),
+         (pearlrt::Fixed<15>*)NULL),
       pearlrt::OpenFailedSignal);
    pearlrt::Log::info("*** check close params ***");
    ASSERT_NO_THROW(
@@ -378,7 +378,7 @@ TEST(UserDation, OpenClose) {
          pearlrt::Dation::ANY |
          pearlrt::Dation::PRM,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    ASSERT_THROW(
       logbuch.dationClose(pearlrt::Dation::CAN |
                           pearlrt::Dation::PRM),
@@ -412,7 +412,7 @@ TEST(UserDation, PosBasic) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_THROW(
          logbuch.pos(1),
          pearlrt::PositioningForbiddenSignal);
@@ -433,7 +433,7 @@ TEST(UserDation, PosBasic) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1));
       ASSERT_NO_THROW(logbuch.sop(&c));
       ASSERT_EQ(c.x, 1);
@@ -475,7 +475,7 @@ TEST(UserDation, Dim1_20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1));
       logbuch.sop(&c);
       ASSERT_EQ(c.x, 1);
@@ -511,7 +511,7 @@ TEST(UserDation, Dim1_20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1));
       logbuch.sop(&c);
       ASSERT_EQ(c.x, 1);
@@ -560,7 +560,7 @@ TEST(UserDation, Dim1_unbound_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1));
       logbuch.sop(&c);
       ASSERT_EQ(c.x, 1);
@@ -618,7 +618,7 @@ TEST(UserDation, Dim2_10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(5, 10));
       logbuch.sop(&r, &c);
       ASSERT_EQ(r.x, 5);
@@ -668,7 +668,7 @@ TEST(UserDation, Dim2_10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1, 20));
       logbuch.sop(&r, &c);
       ASSERT_EQ(r.x, 1);
@@ -700,7 +700,7 @@ TEST(UserDation, Dim2_10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1, 20));
       logbuch.sop(&r, &c);
       ASSERT_EQ(r.x, 1);
@@ -747,7 +747,7 @@ TEST(UserDation, Dim2_20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(5, 10));
       logbuch.sop(&r, &c);
       ASSERT_EQ(r.x, 5);
@@ -820,7 +820,7 @@ TEST(UserDation, Dim3_5x10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(2, 5, 10));
       logbuch.sop(&p, &r, &c);
       ASSERT_EQ(p.x, 2);
@@ -886,7 +886,7 @@ TEST(UserDation, Dim3_5x10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1, 20));
       logbuch.sop(&p, &r, &c);
       ASSERT_EQ(p.x, 1);
@@ -922,7 +922,7 @@ TEST(UserDation, Dim3_5x10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(1, 20));
       logbuch.sop(&p, &r, &c);
       ASSERT_EQ(p.x, 1);
@@ -985,7 +985,7 @@ TEST(UserDation, Dim3_10x20_Pos) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.pos(2, 5, 10));
       logbuch.sop(&p, &r, &c);
       ASSERT_EQ(p.x, 2);
@@ -1077,7 +1077,7 @@ TEST(Userdation, RST) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_THROW(
          logbuch.pos(0, 5, 10),
          pearlrt::DationIndexBoundSignal);
@@ -1162,7 +1162,7 @@ TEST(UserDation, Dim3_10x20_PosForward) {
             pearlrt::Dation::IDF |
             pearlrt::Dation::ANY ,
             & filename,
-            NULL));
+            (pearlrt::Fixed<15>*)NULL));
       ASSERT_NO_THROW(logbuch.adv(1, 4, 9));
       ASSERT_THROW(
          logbuch.sop(&p, &r, &c),

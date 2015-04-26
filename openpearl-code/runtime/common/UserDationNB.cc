@@ -47,9 +47,9 @@ namespace pearlrt {
    const Fixed<31> UserDationNB::one = (Fixed<31>)1;
 
    UserDationNB::UserDationNB(SystemDationNB * parent,
-                          int & params,
-                          DationDim * dimensions,
-                          DationType dt): dationType(dt) {
+                              int & params,
+                              DationDim * dimensions,
+                              DationType dt): dationType(dt) {
       system = parent;
 
       if (dimensions == NULL) {
@@ -121,7 +121,7 @@ namespace pearlrt {
    }
 
    void UserDationNB::closeSystemDation(int dationParams) {
-       work-> dationClose(dationParams);
+      work-> dationClose(dationParams);
    }
 
    void UserDationNB::pos(Fixed<31> element) {
@@ -206,8 +206,8 @@ namespace pearlrt {
    }
 
    void UserDationNB::pos(Fixed<31> page,
-                        Fixed<31> row,
-                        Fixed<31> element) {
+                          Fixed<31> row,
+                          Fixed<31> element) {
       assertOpenDirect();
       // adjust value range to 0...
       element = element - one;
@@ -259,8 +259,8 @@ namespace pearlrt {
    }
 
    void UserDationNB::sop(Fixed<31> * page,
-                        Fixed<31> * row,
-                        Fixed<31>* element) {
+                          Fixed<31> * row,
+                          Fixed<31>* element) {
       assertOpenDirect();
 
       if (dim->getDimensions() < 3) {
@@ -346,8 +346,8 @@ namespace pearlrt {
    }
 
    Fixed<31> UserDationNB::adv(Fixed<31> page,
-                             Fixed<31> row,
-                             Fixed<31> element) {
+                               Fixed<31> row,
+                               Fixed<31> element) {
       assertOpen();
       Fixed<31> oldPos;
       oldPos = dim->getIndex();
@@ -422,8 +422,8 @@ namespace pearlrt {
    }
 
    void UserDationNB::toAdv(Fixed<31> page,
-                          Fixed<31> row,
-                          Fixed<31> element) {
+                            Fixed<31> row,
+                            Fixed<31> element) {
       assertOpen();
 
       if (dationParams & Dation::DIRECT)  {
@@ -544,8 +544,8 @@ namespace pearlrt {
    }
 
    void UserDationNB::fromAdv(Fixed<31> page,
-                            Fixed<31> row,
-                            Fixed<31> element) {
+                              Fixed<31> row,
+                              Fixed<31> element) {
       assertOpen();
 
       if (dationParams & Dation::DIRECT)  {
@@ -621,14 +621,8 @@ namespace pearlrt {
       }
    }
 
-#ifdef MOVED
-   void UserDation::dationOpen(int p, Fixed<31>* rst) {
-      // Character<1> dummy;
-      dationOpen(p, (Character<1>*)NULL, rst);
-   }
-#endif
    void UserDationNB::internalDationOpen(int p,
-                                       RefCharacter * rc) {
+                                         RefCharacter * rc) {
       // enshure default open parameter
       if ((p & (ANY | OLD | NEW)) == 0) {
          p |= ANY;
@@ -693,45 +687,6 @@ namespace pearlrt {
       dim->reset();
       return;
    }
-
-#ifdef MOVED
-   void UserDation::dationClose(const int p, Fixed<31>* rst) {
-      Fixed<31>* intRst = NULL;
-
-      try {
-         if (p & RST) {
-            if (! rst) {
-               Log::error("UserDation: RST is set but no variable given");
-               throw theIllegalParamSignal;
-            }
-
-            intRst  = rst;
-         }
-
-         assertOpen();
-
-         if (p & CLOSEMASK) {
-            if (!!(p & PRM) && !!(p & CAN)) {
-               Log::error("UserDation: ether CAN or PRM allowed");
-               throw theIllegalParamSignal;
-            }
-
-            // superseed previous settings
-            dationParams &= ~CLOSEMASK;
-            dationParams |= p;
-         }
-
-         work -> dationClose(dationParams);
-         dationStatus = CLOSED;
-      } catch (Signal &  s) {
-         if (intRst != NULL) {
-            *intRst = (Fixed<31>)s.whichRST();
-         } else {
-            throw;
-         }
-      }
-   }
-#endif
 
    /* does nothing, if n <= 0
       write fillChar n times to the output
@@ -805,16 +760,6 @@ namespace pearlrt {
       }
    }
 
-
-#ifdef MOVED
-
-   void UserDation::assertOpen() {
-      if (dationStatus == CLOSED) {
-         Log::error("dation open required");
-         throw theNotAllowedSignal;
-      }
-   }
-#endif
 
    void UserDationNB::assertOpenDirect() {
       assertOpen();

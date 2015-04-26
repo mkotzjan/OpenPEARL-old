@@ -43,57 +43,57 @@
 
 */
 
-namespace pearlrt{
-   
-/**
-\file
+namespace pearlrt {
 
-\brief systemdation interface for non-BASIC dations
-*/
+   /**
+   \file
 
-/**       
-  Defines the interfaces to communicate with a non-BASIC (ALPHIC,TYPE)
-  dation.
-  This type of systemdation contains the basic transfer operations
-  for the device. It informs the UserDation abouts its capabilities
-  <ul>
-  <li>CAN : supports delete
-  <li>NEW : supports file creation
-  <li>...
-  </ul>
+   \brief systemdation interface for non-BASIC dations
+   */
 
-  The API is defined generic (similar to the UNIX API), with 
-  dationOpen, dationClose, dationRead, dationWrite, dationUnGetChar
-*/
-class SystemDationNB: public SystemDation {
-public:
-    /**
-    Open the device/file.
+   /**
+     Defines the interfaces to communicate with a non-BASIC (ALPHIC,TYPE)
+     dation.
+     This type of systemdation contains the basic transfer operations
+     for the device. It informs the UserDation abouts its capabilities
+     <ul>
+     <li>CAN : supports delete
+     <li>NEW : supports file creation
+     <li>...
+     </ul>
 
-    To support multiple files on a system dation, the openDation must be
-    realized as factory. The capacity is defined by the concrete system
-    dation (e.g. 20 for files, or 1 for a serial line).
+     The API is defined generic (similar to the UNIX API), with
+     dationOpen, dationClose, dationRead, dationWrite, dationUnGetChar
+   */
+   class SystemDationNB: public SystemDation {
+   public:
+      /**
+      Open the device/file.
 
-    \param idfValue as C-string containing the value of the IDF-field
-    \param openParam a bit map containing the required operation
+      To support multiple files on a system dation, the openDation must be
+      realized as factory. The capacity is defined by the concrete system
+      dation (e.g. 20 for files, or 1 for a serial line).
 
-    \returns reference to the new object
+      \param idfValue as C-string containing the value of the IDF-field
+      \param openParam a bit map containing the required operation
 
-    \throws * may throw exceptions in case of problems in execution
-    */
-    virtual SystemDationNB* dationOpen(const char * idfValue,
-                                       int openParam) = 0;
+      \returns reference to the new object
 
-    /**
-    return one character back to the input stream.
+      \throws * may throw exceptions in case of problems in execution
+      */
+      virtual SystemDationNB* dationOpen(const char * idfValue,
+                                         int openParam) = 0;
 
-    Only 1 character may be returned in sequence. More than 1 call in serie
-    will store the latest character discarding the previous returned
-    characters.
+      /**
+      return one character back to the input stream.
 
-    \param c the character with should be returned to the input stream
-    */
-    virtual void dationUnGetChar(const char c) = 0;
-};
+      Only 1 character may be returned in sequence. More than 1 call in serie
+      will store the latest character discarding the previous returned
+      characters.
+
+      \param c the character with should be returned to the input stream
+      */
+      virtual void dationUnGetChar(const char c) = 0;
+   };
 }
 #endif

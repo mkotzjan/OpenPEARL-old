@@ -43,123 +43,76 @@
 
 */
 
-namespace pearlrt{
-   
-/**
-\file
+namespace pearlrt {
 
-\brief dation interface for systemdations (BASIC, ALPHIC and TYPE)
+   /**
+   \file
 
-The dationOpen API uses char* instead of PEARL strings.
+   \brief dation interface for systemdations (BASIC, ALPHIC and TYPE)
 
-Each system device must report its capabilities.
+   The dationOpen API uses char* instead of PEARL strings.
 
-*/
+   Each system device must report its capabilities.
 
-/**       
-  Defines the interfaces to communicate with a non-BASIC (ALPHIC,TYPE)
-  dation.
-  This type of systemdation contains the basic transfer operations
-  for the device. It informs the UserDation abouts its capabilities
-  <ul>
-  <li>CAN : supports delete
-  <li>NEW : supports file creation
-  <li>ANY : supports ANY
-  <li>IDF : requires a file name
-  <li>DIRECT : supports DIRECT
-  <li>FORWARD : supports FORWARD
-  <li>IN : transfer direction is INPUT
-  <li>OUT : transfer direction is OUTPUT
-  <li>INOUT : transfer direction is INPUT and/or OUTPUT
-  </ul>
+   */
 
-  The API is defined generic (similar to the UNIX API), with 
-  dationOpen, define by SystemdationB and SystemDationNB
-  dationClose, define by Systemdation
-  dationRead, dationWrite  define by Dation
-  dationSeek defined by SystemDationNB
-  
+   /**
+     Defines the interfaces to communicate with a non-BASIC (ALPHIC,TYPE)
+     dation.
+     This type of systemdation contains the basic transfer operations
+     for the device. It informs the UserDation abouts its capabilities
+     <ul>
+     <li>CAN : supports delete
+     <li>NEW : supports file creation
+     <li>ANY : supports ANY
+     <li>IDF : requires a file name
+     <li>DIRECT : supports DIRECT
+     <li>FORWARD : supports FORWARD
+     <li>IN : transfer direction is INPUT
+     <li>OUT : transfer direction is OUTPUT
+     <li>INOUT : transfer direction is INPUT and/or OUTPUT
+     </ul>
 
-  \note only type DIRECT and FORWARD are realized, yet
-*/
-class SystemDation: public Dation {
-public:
-    /**
-    obtain the capabilities of the device
+     The API is defined generic (similar to the UNIX API), with
+     dationOpen, define by SystemdationB and SystemDationNB
+     dationClose, define by Systemdation
+     dationRead, dationWrite  define by Dation
+     dationSeek defined by SystemDationNB
 
-    This method must be implemented by each concrete SystemDation-class.
-    It returns the support of the operations an user dations. The 
-    return value is the ORed value of the enumeerations in Dation.h
 
-    e.g.: <ul>
-          <li> IN | IDF | PRM for a file on a CD 
-          <li> INOUT | IDF | CAN | PRM | ANY | NEW | OLD for a file on disc
-          </ul>
- 
-    \returns available commands of the device
-    */
-    virtual int capabilities() = 0;
+     \note only type DIRECT and FORWARD are realized, yet
+   */
+   class SystemDation: public Dation {
+   public:
+      /**
+      obtain the capabilities of the device
 
-    /**
-    Close the device/file.
+      This method must be implemented by each concrete SystemDation-class.
+      It returns the support of the operations an user dations. The
+      return value is the ORed value of the enumeerations in Dation.h
 
-    The call of close will also return the handle to the factory pool.
-   
-    \param closeParam a bit map containing the required operation
+      e.g.: <ul>
+            <li> IN | IDF | PRM for a file on a CD
+            <li> INOUT | IDF | CAN | PRM | ANY | NEW | OLD for a file on disc
+            </ul>
 
-    \throws * may throw exceptions in case of problems in execution
-    */ 
-    virtual void dationClose(int closeParam) = 0;
-
-     /**
-        Interface for the Close-interface, which is inherited
-        from UserDation Basic-class
-
-       \param p close parameters if given, else 0
-       \param rst pointer to rst-variabla; required, if RST is set in p
-
-        \note throws various exceptions if no RST-Variable is set
-
+      \returns available commands of the device
       */
-    //void dationClose(int closeParam, Fixed<31>* rst);
+      virtual int capabilities() = 0;
 
-#ifdef MOVEDTODATION
-    /**
-    Read from the device/file.
-   
-    \param destination target area to store the required number of bytes
-    \param size number of bytes to read
+      /**
+      Close the device/file.
 
-    \throws * may throw exceptions in case of problems in execution
-    */ 
-    virtual void dationRead(void * destination, size_t size) = 0;
-   
-    /**
-    Write to the device/file.
-   
-    \param destination source area to get the required number of bytes
-    \param size number of bytes to write
+      The call of close will also return the handle to the factory pool.
 
-    \throws * may throw exceptions in case of problems in execution
-    */ 
-    virtual void dationWrite(void * destination, size_t size) = 0;
-   
-    /**
-    set absolut position on dation/file 
+      \param closeParam a bit map containing the required operation
 
-    The method applies only on DIRECT or FORBACK dations.
-    FORWARD dations will write 0 bytes or discard input on read.
-   
-    \param p the target position of the read/write pointer (conted in bytes)
-    \param dationParam specified the dation type (DIRECT,FORWARD,..)
-    \throws may throw different exceptions - not defined yet
-    */
-    virtual void dationSeek(const Fixed<31> & p, const int dationParam) {
-       Log::error("SystemDationNB: no seek implemented");
-       throw theDationSeekNotRealizedSignal;
-    }
-#endif
+      \throws * may throw exceptions in case of problems in execution
+      */
+      virtual void dationClose(int closeParam) = 0;
 
-};
+
+
+   };
 }
 #endif

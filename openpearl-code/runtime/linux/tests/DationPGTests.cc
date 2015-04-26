@@ -83,7 +83,7 @@ TEST(DationPG, simple_put) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::ANY ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    pearlrt::Character<8> text("PEARL");
    pearlrt::Fixed<31>  x(42);
    logbuch.toA(text);
@@ -117,7 +117,7 @@ TEST(DationPG, simple_put) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    log_bin.dationRead(&rdata, sizeof(rdata));
    log_bin.dationClose();
    ASSERT_TRUE(
@@ -163,7 +163,7 @@ TEST(DationPG, simple_get) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::ANY ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    log_bin.dationWrite(&data, sizeof(data));
    log_bin.dationClose();
    /* read with GET and compare */
@@ -180,7 +180,7 @@ TEST(DationPG, simple_get) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    pearlrt::Fixed<31>  x;
    logbuch.fromA(text);
    EXPECT_TRUE((text == expect).getBoolean());
@@ -251,7 +251,7 @@ TEST(DationPG, signal_get) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::ANY ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    log_bin.dationWrite(&data, sizeof(data));
    log_bin.dationClose();
    /* read with GET and compare */
@@ -268,7 +268,7 @@ TEST(DationPG, signal_get) {
          pearlrt::Dation::IDF |
          pearlrt::Dation::OLD ,
          & filename,
-         NULL));
+         (pearlrt::Fixed<15>*)NULL));
    pearlrt::Fixed<31>  x;
    pearlrt::Fixed<15>  rst;
    // try to read without rst-value --> signal should be induced

@@ -74,7 +74,7 @@ DCLTASK(READER, pearlrt::Prio(30), pearlrt::BitString<1>(0)) {
    reader.dationOpen(
          0, //pearlrt::Dation::ANY ,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL);
+         (pearlrt::Fixed<15>*)NULL);
 for (int i=0; i<10; i++) {
 printf("READER@1 me=%p\n", me);
    try {
@@ -117,11 +117,11 @@ DCLTASK(CONTROL, pearlrt::Prio(10), pearlrt::BitString<1>(1)) {
    writer.dationOpen(
          0, //pearlrt::Dation::ANY ,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL);
+         (pearlrt::Fixed<15>*)NULL);
    console.dationOpen(
          0, //pearlrt::Dation::ANY ,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL);
+         (pearlrt::Fixed<15>*)NULL);
                               // 12345678901234567890123456789012345678901234567890
    pearlrt::Character<50> text0("Test SUSPEND+TERMINATE in Dation i/o");
    pearlrt::Character<50> text1("the value of x should change after CR");

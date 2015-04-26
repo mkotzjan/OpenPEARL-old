@@ -50,16 +50,17 @@ namespace pearlrt {
       system = parent;
 
       dationStatus = CLOSED;
-      if (params & (NOCYCL | CYCLIC | FORWARD | DIRECT | FORBACK) ) {
+
+      if (params & (NOCYCL | CYCLIC | FORWARD | DIRECT | FORBACK)) {
          Log::error("DationTS: illegal declartion parameters");
          throw theIllegalParamSignal;
       }
+
       dationParams = params;
    }
    void DationTS::internalDationOpen(int p,
-                                       RefCharacter * rc) {
+                                     RefCharacter * rc) {
       Log::error("DationTS: internalDationOpen empty");
-         // do dation (RW/PG) specific stuff
 
       // open system dation
       if (p & IDF) {
@@ -72,10 +73,10 @@ namespace pearlrt {
 
       internalOpen();
       dationStatus = OPENED;
-}
+   }
 
    void DationTS::closeSystemDation(int dationParams) {
-       work-> dationClose(dationParams);
+      work-> dationClose(dationParams);
    }
 
    void DationTS::internalOpen() {

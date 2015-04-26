@@ -34,6 +34,7 @@ PROBLEM;
 
 ttt: TASK;
    DCL f FIXED(31);   ! RST-value
+   DCL f15 FIXED(31);   ! RST-value
 
    OPEN termout;
    OPEN tableAlphicForward2u BY OLD;
@@ -63,6 +64,7 @@ ttt: TASK;
    OPEN tableAlphicForward2u BY OLD, CAN, RST(f);
    OPEN tableAlphicForward2u BY NEW, CAN, RST(f);
    OPEN tableAlphicForward2u BY ANY, CAN, RST(f);
+   OPEN tableAlphicForward2u BY ANY, CAN, RST(f15);
    OPEN tableAlphicForward2u BY OLD, CAN, IDF('test.dat'), RST(f);
    OPEN tableAlphicForward2u BY NEW, CAN, IDF('test.dat'), RST(f);
    OPEN tableAlphicForward2u BY ANY, CAN, IDF('test.dat'), RST(f);
