@@ -36,7 +36,7 @@ static void realinit_ClockRTC();
 static void realinit_ClockMonotonicRealtime();
 
 __attribute__((used)) void software_init_hook(){
-	systeminit(ClockRTC);
+	systeminit(ClockMonotonicRealtime);
 }
 
 void systeminit(enum systeminit sysinit){
