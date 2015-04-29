@@ -1,0 +1,329 @@
+#+PROPERTY: Effort_ALL 2d 5d 10d 20d 30d 35d 50d 
+#+PROPERTY: allocate_ALL dev doc test
+#+COLUMNS: %30ITEM(Task) %Effort %allocate %BLOCKER %ORDERED
+#+STARTUP: showeverything
+
+* OpenPEARL Compiler					:taskjuggler_project:
+
+** Software Development
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  start
+   :priority: 1000
+   :allocate: dev
+   :END:
+
+*** References (Keywords: REF and CONT)
+   :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Type Definition (Keyword: TYPE)
+   :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Structures (Keyword: STRUCT)
+   :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Datatype Array
+   :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** VOID Datatype 
+   :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Procedures (Keyword: PROC, RETURN and CALL)
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** "BY TYPE" Operator
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Statement Selection (Keyword: CASE)
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Label
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Repetition (Keyword: FOR and REPEAT)
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** GOTO Statement (depends on Label)
+  :PROPERTIES:
+  :Effort:   1d
+  :BLOCKER:  start
+  :allocate: dev
+  :END:      
+
+*** EXIT Statement (depends on Label and block)
+  :PROPERTIES:
+  :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** References to procedures (REF PROC)
+  :PROPERTIES:
+  :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** INTERRUPT and TRIGGER
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** CONVERT Statement
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** SIGNAL
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** BOLT
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+
+*** GLOBAL
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** SYSTEM Part
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Block (Keyword: BEGIN and END)
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Integration of Semantic Analysis
+  :PROPERTIES:
+  :Effort:   1d
+  :BLOCKER:  start
+  :allocate: dev
+  :END:      
+
+*** Expressions
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  start
+   :priority: 1000
+   :allocate: dev
+   :END:      
+
+**** Type checks
+  :PROPERTIES:
+  :Effort:   1d
+  :BLOCKER:  start
+  :allocate: dev
+  :END:      
+
+**** Operator precedence
+  :PROPERTIES:
+  :Effort:   1d
+  :BLOCKER:  start
+  :allocate: dev
+  :END:      
+
+*** Symboltable handling
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Renaming of Java package
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+
+*** Handling of generated constants
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+** Bug Fixing
+   :PROPERTIES:
+   :ORDERED:  t
+   :BLOCKER:  start
+   :priority: 1000
+   :allocate: dev
+   :END:      
+
+*** Ticket#56	TAKE/​SEND does not compile
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#61	SymbolTable:Type information
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#83	BIT INIT and BIT Operations do not compile
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#109	treatment of operator SIZEOF
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#110	Treatment of Character Expressions
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#119	Fixed divison fixed result float
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#120	float constant 24 or 53
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#122	INTERRUPT does not compile
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#126	READ/​WRITE with two (or more) absolute positioning statements
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#127	Signal handler must be finished with GOTO,RETURN, TERMINATE or INDUCE
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#129	Renaming of the compiler package from SmallPearl into OpenPEARL
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#137	integrate new DATION Grammer
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#140	minimum type for Fixed in RST-Format
+  :PROPERTIES:
+   :Effort:   1d
+   :BLOCKER:  start
+   :allocate: dev
+   :END:
+
+*** Ticket#144	Compiler must create Fixed parameters in I/​O-Statement
+
+** Project start
+    :PROPERTIES:
+    :task_id:  start
+    :End:
+
+* Resources                                         :taskjuggler_resource:
+** Developers
+   :PROPERTIES:
+   :resource_id: dev
+   :END:
+*** Marcel Schaible
+    :PROPERTIES:
+    :resource_id: marcel
+    :weeklymax: 20h
+    :END:
+
+** Students
+   :PROPERTIES:
+   :resource_id: dev_semanticanalysis
+   :END:
+
