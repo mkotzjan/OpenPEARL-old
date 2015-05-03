@@ -102,16 +102,6 @@ namespace pearlrt {
                                       RefCharacter* rc) = 0;
 
    public:
-      /**
-        Non template part of the Open-interface.
-
-        \param p open parameters as given
-       \param rst pointer to rst-variable; required, if RST is set in p
-
-        \note throws various exceptions if no RST-Variable is set
-      */
-      // void dationOpen(int p = 0,
-      //                 Fixed<31> * rst = 0) ;
 
       /**
         Implementation of the Open-interface.
@@ -127,9 +117,9 @@ namespace pearlrt {
         \note throws various exceptions if no RST-Variable is set
       */
       template <size_t S, int R>
-      void dationOpen(int p = 0,
-                      Character<S> * idf = (Character<S>*)0,
-                      Fixed<R> * rst = 0) {
+      void dationOpen(int p,
+                      Character<S> * idf,
+                      Fixed<R> * rst) {
          try {
             if (p & RST) {
                if (! rst) {
@@ -168,7 +158,10 @@ namespace pearlrt {
          }
       }
 
+    private:
+      void internalDationClose(const int  p = 0);
 
+    public:
       /**
         Implementation of the Close-interface, which is inherited
         from UserDation Basic-class
@@ -179,7 +172,27 @@ namespace pearlrt {
         \note throws various exceptions if no RST-Variable is set
 
       */
-      void dationClose(const int  p = 0, Fixed<31> * rst = 0);
+      template<int S> void dationClose(const int  p, Fixed<S> * rst) {
+         Fixed<S>* intRst = NULL;
+
+         try {
+            if (p & RST) {
+               if (! rst) {
+                  Log::error("UserDation: RST is set but no variable given");
+                  throw theIllegalParamSignal;
+               }
+
+               intRst  = rst;
+            }
+            internalDationClose(p);
+         } catch (Signal &  s) {
+            if (intRst != NULL) {
+               *intRst = (Fixed<31>)s.whichRST();
+            } else {
+               throw;
+            }
+         }
+      }
 
       /**
       interface to close the BASIC or NON-Basic system dation

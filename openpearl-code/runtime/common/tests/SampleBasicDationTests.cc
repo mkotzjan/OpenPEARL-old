@@ -94,7 +94,7 @@ DCLTASK(TASK1, pearlrt::Prio(2), pearlrt::BitString<1>(1)) {
     if ((f != f1).getBoolean()) {
         cout << " read failed: got " << f1.x << " instead of "<< f.x << endl;
     }
-    user.dationClose(0);
+    user.dationClose(0, (pearlrt::Fixed<15>*)0);
 
    if (success) {
       printf("success\n");

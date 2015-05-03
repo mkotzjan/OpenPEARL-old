@@ -47,47 +47,24 @@ namespace pearlrt {
       mutex.name("UserDation");
    }
 
-//   void UserDation::dationOpen(int p, Fixed<31>* rst) {
-//      // delegate to the templated version in the header file
-//      dationOpen(p, (Character<1>*)NULL, rst);
-//   }
-
-   void UserDation::dationClose(const int p, Fixed<31>* rst) {
+   void UserDation::internalDationClose(const int p) {
       Fixed<31>* intRst = NULL;
 
-      try {
-         if (p & RST) {
-            if (! rst) {
-               Log::error("UserDation: RST is set but no variable given");
-               throw theIllegalParamSignal;
-            }
+      assertOpen();
 
-            intRst  = rst;
+      if (p & CLOSEMASK) {
+         if (!!(p & PRM) && !!(p & CAN)) {
+            Log::error("UserDation: ether CAN or PRM allowed");
+            throw theIllegalParamSignal;
          }
 
-         assertOpen();
-
-         if (p & CLOSEMASK) {
-            if (!!(p & PRM) && !!(p & CAN)) {
-               Log::error("UserDation: ether CAN or PRM allowed");
-               throw theIllegalParamSignal;
-            }
-
-            // superseed previous settings
-            dationParams &= ~CLOSEMASK;
-            dationParams |= p;
-         }
-
-         // work -> dationClose(dationParams);
-         closeSystemDation(dationParams);
-         dationStatus = CLOSED;
-      } catch (Signal &  s) {
-         if (intRst != NULL) {
-            *intRst = (Fixed<31>)s.whichRST();
-         } else {
-            throw;
-         }
+         // superseed previous settings
+         dationParams &= ~CLOSEMASK;
+         dationParams |= p;
       }
+
+      closeSystemDation(dationParams);
+      dationStatus = CLOSED;
    }
 
    void UserDation::beginSequence(TaskCommon * me) {

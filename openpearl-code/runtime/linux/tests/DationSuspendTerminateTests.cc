@@ -93,7 +93,7 @@ printf("READER: got signal\n");
 //      me->resume(pearlrt::Task::AFTER,
 //                 pearlrt::Clock(), pearlrt::Duration(1.0));
 }
-   reader.dationClose();
+   reader.dationClose(0, (pearlrt::Fixed<15>*)0);
 printf("Task READER terminates\n");
 }
 
@@ -209,5 +209,5 @@ printf("CONTROL: written %d\n", y.x);
                  pearlrt::Clock(), pearlrt::Duration(5.0));
 
       
-   console.dationClose();
+   console.dationClose(0, (pearlrt::Fixed<15>*)0);
 }
