@@ -66,8 +66,6 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "chip.h"
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -178,9 +176,9 @@ numeric value the higher the interrupt priority). */
 /*-----------------------------------------------------------
  * Macros required to setup the timer for the run time stats.
  *-----------------------------------------------------------*/
-extern void vConfigureTimerForRunTimeStats( void );
+/*extern void vConfigureTimerForRunTimeStats( void );
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
 #define portGET_RUN_TIME_COUNTER_VALUE() LPC_TIMER0->TC
-
+*/
 
 #endif /* FREERTOS_CONFIG_H */

@@ -34,8 +34,6 @@
 #include "task.h"
 #include "FreeRTOSCommonHooks.h"
 
-#include "chip.h"
-
 /*****************************************************************************
  * Private types/enumerations/variables
  ****************************************************************************/
