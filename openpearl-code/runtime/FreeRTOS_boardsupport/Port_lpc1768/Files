@@ -1,0 +1,23 @@
+CINCS += .
+
+CSRC += $(wildcard ./src/*.c)
+CPPSRC += $(wildcard ./src/*.cc)
+
+#---------------------------------
+# LPCopen V2.xx stuff
+# directory, includes directories for LPCopen V2.xx
+NXP= 3rdparty/lpc_chip/chip_17xx_40xx
+NXPINC+= $(NXP) $(NXP)/../chip_common $(NXP)/config_175x_6x 
+
+CSRC += $(NXP)/uart_17xx_40xx.c
+CSRC += $(NXP)/chip_17xx_40xx.c
+CSRC += $(NXP)/clock_17xx_40xx.c
+CSRC += $(NXP)/rtc_17xx_40xx.c
+CSRC += $(NXP)/iocon_17xx_40xx.c
+
+CSRC += 3rdparty/display/hy32a.c
+CSRC += 3rdparty/display/AsciiLib.c
+CINCS += $(NXPINC)
+
+
+CPPSRC += Post.cc
