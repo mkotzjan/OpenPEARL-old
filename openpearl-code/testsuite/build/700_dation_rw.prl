@@ -11,7 +11,7 @@ __cpp__(
 );
 /*  */
 PROBLEM;
-   SPC disc DATION INOUT ALL;
+   SPC disc DATION SYSTEM INOUT ALL;
 
 FileTest1: TASK MAIN;
      DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);

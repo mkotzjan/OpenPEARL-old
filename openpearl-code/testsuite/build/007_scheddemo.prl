@@ -38,7 +38,7 @@ __cpp__('pearlrt::Device*  __termout = &___termout;');
 !__cpp__('SPCTASK(_TASK3);');
 
 PROBLEM;
-!SPC termout DATION OUT ALPHIC;
+!SPC termout DATION OUT SYSTEM ALPHIC;
 __cpp__('extern pearlrt::Device * __termout;');
 __cpp__('pearlrt::SystemDationNB* _termout = static_cast<pearlrt::SystemDationNB*>(__termout); ');
 

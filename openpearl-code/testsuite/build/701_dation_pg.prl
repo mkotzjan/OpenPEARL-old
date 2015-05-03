@@ -13,14 +13,15 @@ __cpp__(
 /*  */
 !PROBLEM;
 
-!   SPC disc DATION INOUT ALL;
-/* expected C++ code keyword ALL -> static_cast<pearlrt::SystemDationNB*>
-*/ 
+   SPC disc DATION INOUT SYSTEM ALL;
+/* expected C++ code keyword SYSTEM ALL -> 
+   static_cast<pearlrt::SystemDationNB*>
 
-__cpp__('pearlrt::SystemDationNB* _disc = '
+__cpp__('extern pearlrt::Decice* d_disc;'
+        'pearlrt::SystemDationNB* _disc = '
         '    static_cast<pearlrt::SystemDationNB*>(d_disc);');
 
-/* */
+ */
 PROBLEM;
 
    DCL table DATION INOUT ALPHIC DIM(*,80)

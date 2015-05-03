@@ -11,16 +11,18 @@ __cpp__(
      'static pearlrt::Disc s_disc("/tmp/", 10);'
      'pearlrt::Device * d_disc = & s_disc;'
 );
+
+/* expected c++ code form SPC in problem part 
 __cpp__(
      ' // problem  decl in system part'
     'extern pearlrt::Device *d_disc;'
     'static pearlrt::SystemDationNB *_disc = '
     '      static_cast<pearlrt::SystemDationNB*>(d_disc);'
 );
-/*  */
+  */
 
 PROBLEM;
-!   SPC disc DATION INOUT ALL;
+   SPC disc DATION INOUT SYSTEM ALL;
    DCL tableAlphicForward2u DATION OUT ALPHIC DIM(*,10) FORWARD
              CREATED(disc);
 
