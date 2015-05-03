@@ -3,29 +3,32 @@
 # list of files which are independend of the target platform
 # give the path name as valid from the platform specific folder
 
-CSRC += ../FreeRTOS/FreeRTOSCommonHooks.c 
+include ./3rdparty/FreeRTOS/Files
+include ../common/Files.common
 
+CSRC += $(wildcard ./src/*.c)
+CPPSRC += $(wildcard ./src/*.cc)
+CSRC += $(addprefix ./3rdparty/FreeRTOS/,$(RTOSCSRC)) 
+
+CPPSRC += ../linux/Clock.cc
 CPPSRC += \
-	../FreeRTOS/CSema.cc \
-	../FreeRTOS/Log.cc \
-	../FreeRTOS/main.cc \
-	../FreeRTOS/Mutex.cc \
-	../FreeRTOS/PrioMapper.cc \
-	../FreeRTOS/Task.cc \
-	../FreeRTOS/TaskTimer.cc \
-	../FreeRTOS/TaskMonitor.cc 
+	./PEARL/CSema.cc \
+	./PEARL/Log.cc \
+	./PEARL/main.cc \
+	./PEARL/Mutex.cc \
+	./PEARL/PrioMapper.cc \
+	./PEARL/Task.cc \
+	./PEARL/TaskTimer.cc \
+	./PEARL/TaskMonitor.cc 
 
-#	../FreeRTOS/TimerList.cc 
-#	../FreeRTOS/TaskList.cc \
-
-CPPINCS += ../FreeRTOS/.
-CINCS += ../FreeRTOS/.
+CPPINCS += ./PEARL
+CINCS += ./3rdparty/FreeRTOS/include
+CINCS += .
 CINCS += ../common/.
 
-CHECK_HDRS += ../FreeRTOS/CSema.h
-CHECK_HDRS += ../FreeRTOS/Mutex.h
-CHECK_HDRS += ../FreeRTOS/PrioMapper.h
-CHECK_HDRS += ../FreeRTOS/Task.h
-CHECK_HDRS += ../FreeRTOS/TaskMonitor.h
-CHECK_HDRS += ../FreeRTOS/TaskTimer.h
-
+CHECK_HDRS += ./PEARL/CSema.h
+CHECK_HDRS += ./PEARL/Mutex.h
+CHECK_HDRS += ./PEARL/PrioMapper.h
+CHECK_HDRS += ./PEARL/Task.h
+CHECK_HDRS += ./PEARL/TaskTimer.h
+CHECK_HDRS += ./PEARL/PearIncludes.h

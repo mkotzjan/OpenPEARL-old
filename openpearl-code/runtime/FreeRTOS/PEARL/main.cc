@@ -60,7 +60,7 @@
 using namespace pearlrt;
 /*-----------------------------------------------------------*/
 
-int main(void) {
+__attribute__((weak)) int main(void) {
    char line[40];
 
 

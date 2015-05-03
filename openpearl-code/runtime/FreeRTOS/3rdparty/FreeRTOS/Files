@@ -1,6 +1,6 @@
-CSRC += ../FreeRTOS_V8.1.2/tasks.c ../FreeRTOS_V8.1.2/port.c
-CSRC += ../FreeRTOS_V8.1.2/list.c ../FreeRTOS_V8.1.2/queue.c
-CSRC += ../FreeRTOS_V8.1.2/timers.c
-CSRC += ../FreeRTOS_V8.1.2/portable/MemMang/heap_2.c
-CINCS += ../FreeRTOS_V8.1.2/include ../FreeRTOS_V8.1.2/.
+RTOSCSRC += tasks.c
+RTOSCSRC += list.c 
+RTOSCSRC += queue.c
+RTOSCSRC += timers.c
+RTOSCSRC += portable/MemMang/heap_2.c
 
