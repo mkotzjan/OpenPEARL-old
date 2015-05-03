@@ -14,7 +14,7 @@ SPCTASK(TASK3);
 void printTimeAndDay(int line) {
       struct timespec ts;
       char buf[26];
-      clock_gettime(NULL,&ts);
+      clock_gettime(0,&ts);
       ts.tv_sec+=2*60*60;//Mitteleuropaeische Sommerzeit
       ctime_r(&ts.tv_sec, buf);
       GUI_Text(1,line,(uint8_t*)buf,Green,Black);

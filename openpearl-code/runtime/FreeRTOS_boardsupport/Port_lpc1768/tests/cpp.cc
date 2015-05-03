@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <iostream>
-#include "../hy32a.h"
-#include "../Post.h"
+#include "hy32a.h"
+#include "Post.h"
 #include <vector>
 
 extern "C" {
