@@ -113,18 +113,73 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
     @Override
     public ST visitUsername_declaration(SmallPearlParser.Username_declarationContext ctx) {
         ST decl = group.getInstanceOf("Username_Declaration");
-        ST type = group.getInstanceOf("Username_Declaration_Type");
 
-        System.out.println( "SystemPartExporter: visitUsername_declaration");
+        System.out.println("SystemPartExporter: visitUsername_declaration");
 
-        decl.add("var", ctx.ID(0).getText());
-        type.add("name", ctx.ID(1).getText());
+        decl.add("var", ctx.ID().getText());
 
-        decl.add("type",type);
+        if ( ctx.username_declaration_with_data_flow_direction() != null )
+        {
+           decl.add("type", visitUsername_declaration_with_data_flow_direction(ctx.username_declaration_with_data_flow_direction()));
+        }
+        else if ( ctx.username_declaration_without_data_flow_direction() != null )
+        {
+            decl.add("type", visitUsername_declaration_without_data_flow_direction(ctx.username_declaration_without_data_flow_direction()));
+        }
 
         return decl;
     }
 
-}
+    @Override
+    public ST visitUsername_declaration_without_data_flow_direction(SmallPearlParser.Username_declaration_without_data_flow_directionContext  ctx) {
+        ST decl = group.getInstanceOf("Username_Declaration_Without_Dataflow_Direction");
 
+        System.out.println("SystemPartExporter: visitUsername_declaration_without_data_flow_direction");
+
+        decl.add("peripheral_name", ctx.peripheral_name().ID().getText());
+
+        if (ctx.username_parameters() != null) {
+            decl.add("username_parameters", visitUsername_parameters(ctx.username_parameters()));
+        }
+        return decl;
+    }
+
+
+    // username_declaration_with_data_flow_direction:
+    // data_flow_direction ':' connection_name '---' peripheral_name username_parameters?
+
+
+    @Override
+    public ST visitUsername_declaration_with_data_flow_direction(SmallPearlParser.Username_declaration_with_data_flow_directionContext  ctx) {
+        ST decl = group.getInstanceOf("Username_Declaration_With_Dataflow_Direction");
+
+        System.out.println("SystemPartExporter: visitUsername_declaration_with_data_flow_direction");
+
+        decl.add("data_flow_direction", ctx.data_flow_direction().getText());
+        decl.add("connection", ctx.connection_name().getText());
+        decl.add("peripheral_name", ctx.peripheral_name().ID().getText());
+
+        if (ctx.username_parameters() != null) {
+            decl.add("username_parameters", visitUsername_parameters(ctx.username_parameters()));
+        }
+
+        return decl;
+    }
+
+
+    @Override
+    public ST visitUsername_parameters(SmallPearlParser.Username_parametersContext  ctx) {
+        ST params = group.getInstanceOf("Username_Parameters");
+
+        System.out.println("SystemPartExporter: visitUsername_parameters");
+
+        for (int i = 0; i < ctx.literal().size(); i++) {
+            params.add("params", ctx.literal(i).getText());
+        }
+
+        return params;
+    }
+
+
+}
 

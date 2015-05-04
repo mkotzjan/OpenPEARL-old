@@ -151,8 +151,51 @@ problem_part:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Changes added by Hertwig ////////////////////////////////////////////////////
+//
+// Possible composition of the PEARL system part (new syntax)
+// Thus the grammar must be capable of dealing with this type of declaration
+// ...
+// i2cbus : i2cbus_1 ('/dev/i2cbus', 100000);
+// tempsensor : i2cbus <- LM75(100.000);	1st version
+// tempsensor : IN : i2cbus <--- LM75(100.000);	2nd version
+// tempsensor : IN : i2cbus --- LM75(100.000);	3rd version (final)
+
 username_declaration:
-    ID ':' ID username_parameters? ';'
+    ID ':' (username_declaration_without_data_flow_direction |
+			username_declaration_with_data_flow_direction) ';'
+	;
+
+////////////////////////////////////////////////////////////////////////////////
+
+username_declaration_without_data_flow_direction:
+	peripheral_name username_parameters?
+	;
+
+////////////////////////////////////////////////////////////////////////////////
+
+username_declaration_with_data_flow_direction:
+    data_flow_direction ':' connection_name '---' peripheral_name username_parameters?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+data_flow_direction:
+	  'IN'
+	| 'OUT'
+    | 'INOUT'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+connection_name:
+    ID
+    ; 
+
+////////////////////////////////////////////////////////////////////////////////
+
+peripheral_name:
+    ID
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -48,11 +48,24 @@ Username_Declaration(var,type) ::= <<
 
 >>
 
-Username_Declaration_Type(name,params) ::= <<
-  \<type="<name>">
-    <params: {param| \<param>
-        <param>
-    \</param>
-    }>
+Username_Declaration_Without_Dataflow_Direction(peripheral_name,username_parameters) ::= <<
+  \<type>
+  \<peripheral_name><peripheral_name>\</peripheral_name>
+  <username_parameters>
   \</type>
+>>
+
+Username_Declaration_With_Dataflow_Direction(data_flow_direction,connection,peripheral_name,username_parameters) ::= <<
+  \<type>
+  \<connection><connection>\</connection>
+  \<data_flow_direction><data_flow_direction>\</data_flow_direction>
+  \<peripheral_name><peripheral_name>\</peripheral_name>
+  <username_parameters>
+  \</type>
+>>
+
+Username_Parameters(params) ::= <<
+  \<parameters>
+    <params: {param| \<param> <param> \</param> }; separator="\n">
+  \</parameters>
 >>
