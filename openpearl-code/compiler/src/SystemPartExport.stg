@@ -66,6 +66,6 @@ Username_Declaration_With_Dataflow_Direction(data_flow_direction,connection,peri
 
 Username_Parameters(params) ::= <<
   \<parameters>
-    <params: {param| \<param> <param> \</param> }; separator="\n">
+    <params: {param| \<param><param>\</param> }; separator="\n">
   \</parameters>
 >>
