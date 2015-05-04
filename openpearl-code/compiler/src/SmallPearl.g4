@@ -1457,7 +1457,7 @@ expression
     | expression op=('CAT'|'><') expression                 # catExpression
     | expression op=('CSHIFT'|'<>') expression              # cshiftExpression
     | expression op='SHIFT' expression                      # shiftExpression
-    | expression op='**' expression                         # exponentiationExpression
+    | expression op='**' <assoc=right> expression                         # exponentiationExpression
     | expression op=('*'|'/') expression                    # multiplicativeExpression
     | expression op='REM' expression                        # remainderExpression
     | expression op='FIT' expression                        # fitExpression
