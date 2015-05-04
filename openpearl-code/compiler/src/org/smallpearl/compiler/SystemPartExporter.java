@@ -174,7 +174,10 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
         System.out.println("SystemPartExporter: visitUsername_parameters");
 
         for (int i = 0; i < ctx.literal().size(); i++) {
-            params.add("params", ctx.literal(i).getText());
+            String p = ctx.literal(i).getText();
+            p = p.replaceAll("^'","");
+            p = p.replaceAll("'$","");
+            params.add("params",p);
         }
 
         return params;
