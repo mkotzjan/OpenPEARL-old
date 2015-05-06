@@ -22,13 +22,14 @@ __cpp__(
   */
 
 PROBLEM;
-   SPC disc DATION INOUT SYSTEM ALL;
+   SPC disc DATION INOUT SYSTEM  ALL;
    DCL tableAlphicForward2u DATION OUT ALPHIC DIM(*,10) FORWARD
              CREATED(disc);
 
 ttt: TASK;
    DCL f FIXED(31);   ! RST-value
 
+   CLOSE tableAlphicForward2u;
    CLOSE tableAlphicForward2u BY CAN;
    CLOSE tableAlphicForward2u BY PRM;
    CLOSE tableAlphicForward2u BY CAN, RST(f);
