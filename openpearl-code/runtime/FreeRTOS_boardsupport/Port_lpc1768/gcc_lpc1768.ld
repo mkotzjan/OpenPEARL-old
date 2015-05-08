@@ -11,6 +11,8 @@ MEMORY
   RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 32k /* 0x2000  8K */
 }
 
+EXTERN (vTaskSwitchContext)
+
 /* Linker script to place sections and symbol values. Should be used together
  * with other linker script that defines memory regions FLASH and RAM.
  * It references following symbols, which must be defined in code:
