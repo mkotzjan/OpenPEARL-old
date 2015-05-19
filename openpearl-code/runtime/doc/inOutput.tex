@@ -167,6 +167,7 @@ of the runtime documentation.
 \begin{PEARLCode}
 DCL console DATION OUT ALPHIC DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
 DCL file DATION OUT FIXED(15) DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
+DCL file1 DATION OUT ALL DIM(*) FORWARD STREAM NOCYCL CREATED(output);
 DCL motor DATION OUT BASIC BIT(4) CREATED(mot);
 \end{PEARLCode}
 
@@ -188,6 +189,14 @@ static pearlrt::DationPG _file(_output,
                 pearlrt::Dation::NOCYCL,
                 &dim_file, sizeof(pearlrt::Fixed<15>));
 
+static pearlrt::DationDim1 dim_file1();
+static pearlrt::DationPG _file1(_output, 
+                pearlrt::Dation::OUT      |
+                pearlrt::Dation::FORWARD  | 
+                pearlrt::Dation::STREAM   |
+                pearlrt::Dation::NOCYCL,
+                &dim_file, 1);
+
 static pearlrt::DationTS _motor(_mot,
                 pearlrt::Dation::OUT);
 \end{CppCode}
@@ -199,6 +208,8 @@ Remarks:
 \item the {\em CREATED()} parameter is passsed as first parameter
 \item if the dation is defined as {\em GLOBAL} the \verb|static| must
   be omitted
+\item a user dation with transfer type ALL must be 1-dimensional --- may
+be bounded --- and the size of a data element must be specified as 1
 \item the userdations of type BASIC do not allow Topology- and 
 AccessAttribut-specifications 
 \end{itemize}
