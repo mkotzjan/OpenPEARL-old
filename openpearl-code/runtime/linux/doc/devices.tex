@@ -45,13 +45,16 @@ intermixing of input and output.
 \subsection{Pipe}
 The system dation {\em Pipe} is useful for testing and interaction with
 other applications. The dation provides access to named pipes.
+The linux pipe blocks write attempts, if no reading file descriptor
+is opend on the pipe. 
+A dummy open with read may be achieved with the option OPEN1.
 
 Synopsis: \verb|Pipe(path, nbr, params)|
 
 \begin{description}
-\item [path] specifies the system path of the fifo file
+\item [path] is a C-string, which specifies the system path of the fifo file
     of the named pipe
-\item[nbr] specifies the number of concurrent opened files with this dation
+\item[nbr] specifies the number (as int) of concurrent opened files with this dation
      specified by {\em CREATED(...)} in the {\em OPEN} statement
 \item [params] is a string value for detailed control of the behavior
      at creation and termination. The parameters are searched in the string
@@ -61,6 +64,8 @@ Synopsis: \verb|Pipe(path, nbr, params)|
      \item[NEW] the entry in the file system must not exist at starting
      \item[ANY] the entry may exist or will be created else; an existing
                 file syste entry must by of type FIFO (default).
+     \item[OPEN1] specifies that one file descriptor should be opened 
+                automatically.
      \item[CAN] the file system entry shall be deleted at the end of the 
                 application
      \item[PRM] the file system entry shall remain at the end of the
