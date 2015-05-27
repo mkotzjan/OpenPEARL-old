@@ -36,8 +36,7 @@
 \brief timer facility for task scheduling
 
 */
-#include "FreeRTOS.h"  // FreeRTOS
-#include "timers.h"    // FreeRTOS
+
 
 #include "Clock.h"
 #include "Duration.h"
@@ -58,15 +57,11 @@ namespace pearlrt {
    A timer may be cancelled to disable any further start unless
    it is set again.
 
-
-   The timer function are mapped to the FreeRTOS timers.
-   They may be oneshot or autorepeated. The initial delay is realized by
-   a oneshot timer, the repeations are done by a autorepeated timer, which
-   is started in the reaction of the oneshottimer.
-
-   AFTER ... ALL  --> oneshot + autorepeated timer
-
-   ALL --> only autorepeated timer
+   The linux timer facility is used to realize the timers.
+   The timers are configured to emit a realtime signal which is
+   gathered by a time thread. The timer thread delegates the treatment
+   of the timer event of a callback function, which is specified in the
+   create()-method
    */
    class TaskTimer : public TaskTimerCommon {
    public:
@@ -80,10 +75,8 @@ namespace pearlrt {
       TaskCommon* task;
       TimerCallback callback;
       int signalNumber;
-      TimerHandle_t timer;     // the timer
-      TickType_t    startPeriod;
-      TickType_t    cyclicPeriod;
-      bool          isInStartPeriod;
+      timer_t timer;     // the timer
+      struct itimerspec its;  // the timer data required in triggered when
    public:
 
       /**
@@ -160,10 +153,16 @@ namespace pearlrt {
       */
       int start();
 
-      /** check if timer is active */
+      /** check if timer is active
+      \returns true, if the timer is active<br>
+               false, if the timer is not active
+      */
       bool isActive();
 
-      /** check if timer is set */
+      /** check if timer is set
+
+      \returns true, if the timer is set<br>false, if the timer is not set
+      */
       bool isSet();
 
       /**
@@ -185,8 +184,14 @@ namespace pearlrt {
 
       /**
       create the timer internal data
+
+      \param task pointer to the task which will use this timer
+      \param signalNumber number of the realtime signal for the
+             timer
+      \param cb callback function, which will be called on expiration
+             of the timer
       */
-      void create(TaskCommon * task, TimerCallback cb);
+      void create(TaskCommon * task, int signalNumber, TimerCallback cb);
 
       /**
       update at timer event.
@@ -199,6 +204,12 @@ namespace pearlrt {
 
       /**
       print detailed status of timer into given string
+
+      \param id short form of the time 'ACT' or 'CONT'. This
+             parameter is set by the calling function and passed
+             to the resulting string
+      \param line string which receives the details about the timer
+             status
       */
       void detailedStatus(char * id, char * line);
    };
