@@ -133,6 +133,7 @@ void RTC_IRQHandler() {
 	}
 	void calibraterRTtimerFromRTC_IRQHandler(volatile int delta){
 		unsigned int tickstore = tickspersecond;
+		void TimerResumeClackerFromISR();
 
 		if(delta==0){
 			goodcounter++;
@@ -147,8 +148,10 @@ void RTC_IRQHandler() {
 		}
 		else if(delta==1)
 			tickspersecond++;
-		else if(delta==-1)
+		else if(delta==-1){
 			tickspersecond--;
+			TimerResumeClackerFromISR();
+		}
 		else{
 			tickspersecond=tickspersecond+(delta/2);
 			if(tickstore==tickspersecond)
@@ -159,9 +162,8 @@ void RTC_IRQHandler() {
 							/(uint64_t)(LPC_TIMER0->PR+1))
 							);
 			goodcounter=0;
+			TimerResumeClackerFromISR();
 		}
-		void TimerResumeClackerFromISR();
-		TimerResumeClackerFromISR();
 	}
 	static enum{
 		tick,

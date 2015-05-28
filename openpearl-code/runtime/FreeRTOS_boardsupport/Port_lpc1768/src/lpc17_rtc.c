@@ -32,7 +32,6 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  that SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <inttypes.h>
 #include <time.h>
 #include "chip.h"
 
@@ -49,42 +48,6 @@ static void rtc_to_structtm(RTC_TIME_T * rtc_tm, struct tm * tm){
 	tm->tm_wday	= rtc_tm->time[RTC_TIMETYPE_DAYOFWEEK];
 	tm->tm_yday	= rtc_tm->time[RTC_TIMETYPE_DAYOFYEAR];
 }
-static void structtm_to_rtc(struct tm * tm, RTC_TIME_T * rtc_tm){
-	rtc_tm->time[RTC_TIMETYPE_SECOND]	= tm->tm_sec;
-	rtc_tm->time[RTC_TIMETYPE_MINUTE]	= tm->tm_min;
-	rtc_tm->time[RTC_TIMETYPE_HOUR]		= tm->tm_hour;
-	rtc_tm->time[RTC_TIMETYPE_DAYOFMONTH]	= tm->tm_mday;
-	rtc_tm->time[RTC_TIMETYPE_MONTH]	= tm->tm_mon;
-	rtc_tm->time[RTC_TIMETYPE_YEAR]		= tm->tm_year+1900;
-	rtc_tm->time[RTC_TIMETYPE_DAYOFWEEK]=tm->tm_wday;
-	rtc_tm->time[RTC_TIMETYPE_DAYOFYEAR]=tm->tm_yday;
-}
-static int check_rtc(RTC_TIME_T * rtctime, unsigned int fallbackstamp){
-	struct tm tm={0};
-	struct tm tmgood={0};
-	time_t timestamp=0;
-	rtc_to_structtm(rtctime,&tm);
-	timestamp = mktime(&tm);
-	gmtime_r(&timestamp,&tmgood);
-	if(!(tm.tm_mday==tmgood.tm_mday))
-			return 1;
-	if(!(tm.tm_wday==tmgood.tm_wday))
-		return 1;
-	if(!(tm.tm_yday==tmgood.tm_yday))
-			return 1;
-	if(timestamp<fallbackstamp){
-		return 1;
-	}
-	return 0;
-}
-
-static void rtc_setunixtime(time_t time){
-	RTC_TIME_T rtc_time;
-	struct tm tm;
-	gmtime_r(&time, &tm);
-	structtm_to_rtc(&tm,&rtc_time);
-	Chip_RTC_SetFullTime(LPC_RTC,&rtc_time);
-}
 
 static time_t rtc_getunixtime(){
 	RTC_TIME_T time;
@@ -100,7 +63,43 @@ static int rtc_clock_gettime_cb(clockid_t clock_id, struct timespec *ts){
 	return 0;
 }
 
+static void rtc_setunixtime(time_t time){
+	void structtm_to_rtc(struct tm * tm, RTC_TIME_T * rtc_tm){
+		rtc_tm->time[RTC_TIMETYPE_SECOND]	= tm->tm_sec;
+		rtc_tm->time[RTC_TIMETYPE_MINUTE]	= tm->tm_min;
+		rtc_tm->time[RTC_TIMETYPE_HOUR]		= tm->tm_hour;
+		rtc_tm->time[RTC_TIMETYPE_DAYOFMONTH]	= tm->tm_mday;
+		rtc_tm->time[RTC_TIMETYPE_MONTH]	= tm->tm_mon;
+		rtc_tm->time[RTC_TIMETYPE_YEAR]		= tm->tm_year+1900;
+		rtc_tm->time[RTC_TIMETYPE_DAYOFWEEK]=tm->tm_wday;
+		rtc_tm->time[RTC_TIMETYPE_DAYOFYEAR]=tm->tm_yday;
+	}
+	RTC_TIME_T rtc_time;
+	struct tm tm;
+	gmtime_r(&time, &tm);
+	structtm_to_rtc(&tm,&rtc_time);
+	Chip_RTC_SetFullTime(LPC_RTC,&rtc_time);
+}
+
 void systeminit_rtc_settime(unsigned int fallbackstamp){
+	int check_rtc(RTC_TIME_T * rtctime, unsigned int fallbackstamp){
+		struct tm tm={0};
+		struct tm tmgood={0};
+		time_t timestamp=0;
+		rtc_to_structtm(rtctime,&tm);
+		timestamp = mktime(&tm);
+		gmtime_r(&timestamp,&tmgood);
+		if(!(tm.tm_mday==tmgood.tm_mday))
+				return 1;
+		if(!(tm.tm_wday==tmgood.tm_wday))
+			return 1;
+		if(!(tm.tm_yday==tmgood.tm_yday))
+				return 1;
+		if(timestamp<fallbackstamp){
+			return 1;
+		}
+		return 0;
+	}
 	RTC_TIME_T time;
 	Chip_RTC_GetFullTime(LPC_RTC, &time);
 	if(check_rtc(&time, fallbackstamp))
