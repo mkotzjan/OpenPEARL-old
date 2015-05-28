@@ -66,6 +66,12 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
+#ifdef __XC
+#include <p32xxxx.h>
+#define configISR_STACK_SIZE                                   ( 250 )
+#define configPERIPHERAL_CLOCK_HZ                              ( 40000000UL )
+#endif
+
 /*-----------------------------------------------------------
  * Application specific definitions.
  *

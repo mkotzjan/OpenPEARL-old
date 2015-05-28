@@ -9,6 +9,10 @@ include ./Files
 CSRC += ./3rdparty/FreeRTOS/portable/GCC/ARM_CM3/port.c
 INCLUDES += ./3rdparty/FreeRTOS/portable/GCC/ARM_CM3
 
+#CSRC += ./3rdparty/FreeRTOS/portable/MPLAB/PIC32MX/port.c
+#ASMSRC += ./3rdparty/FreeRTOS/portable/MPLAB/PIC32MX/port_asm.S
+#INCLUDES += ./3rdparty/FreeRTOS/portable/MPLAB/PIC32MX/
+
 COBJ1 =$(addprefix OBJS/,$(notdir $(CSRC)))
 COBJ=$(COBJ1:.c=.o)
 CPPOBJ1 =$(addprefix OBJS/,$(notdir $(CPPSRC)))
