@@ -78,8 +78,8 @@ namespace pearlrt {
    }
 
    void Task::init() {
-      ((TaskTimer*)schedActivateData.taskTimer)->create(this, activateHandler);
-      ((TaskTimer*)schedContinueData.taskTimer)->create(this, continueHandler);
+      ((TaskTimer*)schedActivateData.taskTimer)->create(this, 0, activateHandler);
+      ((TaskTimer*)schedContinueData.taskTimer)->create(this, 0, continueHandler);
    }
 
    void Task::directActivate(const Fixed<15>& prio) {

@@ -45,6 +45,8 @@
 #include "TaskCommon.h"
 #include "TaskTimerCommon.h"
 
+#include "time.h"
+
 namespace pearlrt {
    /**
    \brief timer facility for task scheduling
@@ -77,6 +79,10 @@ namespace pearlrt {
       int signalNumber;
       timer_t timer;     // the timer
       struct itimerspec its;  // the timer data required in triggered when
+      struct {
+      		  void *cb;
+      		  void *th;
+      	  }timer_callback;
    public:
 
       /**
