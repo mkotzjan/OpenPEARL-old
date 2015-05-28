@@ -1,4 +1,10 @@
 /*
+ * lpc17_rtc.c
+ *
+ *  Created on: 28.04.2015
+ *      Author: quitte
+ */
+/*
  [The "BSD license"]
  Copyright (c) 2015 Jonas Meyer
  All rights reserved.
@@ -8,14 +14,14 @@
  are met:
 
  1. Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+    notice, that list of conditions and the following disclaimer.
  2. Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
+    notice, that list of conditions and the following disclaimer in the
     documentation and/or other materials provided with the distribution.
  3. The name of the author may not be used to endorse or promote products
-    derived from this software without specific prior written permission.
+    derived from that software without specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ that SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
@@ -24,14 +30,11 @@
  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ that SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+#include <inttypes.h>
 #include <time.h>
-#include <sys/time.h>
-#include <sys/errno.h>
 #include "chip.h"
-#include "systeminit.h"
 
 static int rtc_clock_gettime_cb(clockid_t clock_id, struct timespec *tp);
 int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp) = &rtc_clock_gettime_cb;
@@ -83,13 +86,6 @@ static void rtc_setunixtime(time_t time){
 	Chip_RTC_SetFullTime(LPC_RTC,&rtc_time);
 }
 
-void systeminit_rtc_settime(unsigned int fallbackstamp){
-	RTC_TIME_T time;
-	Chip_RTC_GetFullTime(LPC_RTC, &time);
-	if(check_rtc(&time, fallbackstamp))
-		rtc_setunixtime(fallbackstamp);
-}
-
 static time_t rtc_getunixtime(){
 	RTC_TIME_T time;
 	struct tm tm;
@@ -98,35 +94,15 @@ static time_t rtc_getunixtime(){
 	return mktime(&tm);
 }
 
-struct tm *localtime_r(const time_t *_time, struct tm * tm){
-	//always assume localtime was UTC
-	gmtime_r(_time, tm);
-	return tm;
-}
-
-struct tm *localtime(const time_t *_time){
-	//always assume localtime was UTC
-	static struct tm tm;//needs not be thread safe, says susv3
-	return localtime_r(_time, &tm);
-}
-
 static int rtc_clock_gettime_cb(clockid_t clock_id, struct timespec *ts){
 	ts->tv_nsec=0;
 	ts->tv_sec=rtc_getunixtime();
 	return 0;
 }
 
-extern int clock_gettime(clockid_t clock_id, struct timespec *ts){
-	return (*clock_gettime_cb)(clock_id, ts);
+void systeminit_rtc_settime(unsigned int fallbackstamp){
+	RTC_TIME_T time;
+	Chip_RTC_GetFullTime(LPC_RTC, &time);
+	if(check_rtc(&time, fallbackstamp))
+		rtc_setunixtime(fallbackstamp);
 }
-
-int gettimeofday(struct timeval *__p, void *__tz){
-	struct timespec ts;
-	clock_gettime(CLOCK_REALTIME, &ts);
-	if(__tz)
-		return ENOSYS;
-	__p->tv_usec=ts.tv_nsec/1000;
-	__p->tv_sec=ts.tv_sec;
-	return 0;
-}
-

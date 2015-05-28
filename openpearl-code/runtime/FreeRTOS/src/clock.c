@@ -1,4 +1,10 @@
 /*
+ * clock.c
+ *
+ *  Created on: 28.05.2015
+ *      Author: quitte
+ */
+/*
  [The "BSD license"]
  Copyright (c) 2015 Jonas Meyer
  All rights reserved.
@@ -26,25 +32,34 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include <time.h>
+#include <sys/errno.h>
 
-#ifndef SYS_SYSTEMINIT_H_
-#define SYS_SYSTEMINIT_H_
+extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-enum systeminit{
-	CpuClock,
-	ClockRTC,
-	ClockMonotonicRealtime,
-	ClockDebug
-};
-
-void systeminit(enum systeminit);
-
-#ifdef __cplusplus
+struct tm *localtime_r(const time_t *_time, struct tm * tm){
+	//always assume localtime was UTC
+	gmtime_r(_time, tm);
+	return tm;
 }
-#endif
 
-#endif /* SYS_SYSTEMINIT_H_ */
+struct tm *localtime(const time_t *_time){
+	//always assume localtime was UTC
+	static struct tm tm;//needs not be thread safe, says susv3
+	return localtime_r(_time, &tm);
+}
+
+extern int clock_gettime(clockid_t clock_id, struct timespec *ts){
+	return (*clock_gettime_cb)(clock_id, ts);
+}
+
+#include <sys/time.h>
+int gettimeofday(struct timeval *__p, void *__tz){
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	if(__tz)
+		return ENOSYS;
+	__p->tv_usec=ts.tv_nsec/1000;
+	__p->tv_sec=ts.tv_sec;
+	return 0;
+}
