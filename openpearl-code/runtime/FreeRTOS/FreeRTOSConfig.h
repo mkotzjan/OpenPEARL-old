@@ -99,10 +99,8 @@
 #define configUSE_MUTEXES			1
 
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION   0 /* added */
-//#define configUSE_TIMERS		1	/* added */
 #define INCLUDE_xTaskGetSchedulerState  1	/* added */
 #define INCLUDE_xTaskResumeFromISR	1	/* added */
-#define configUSE_APPLICATION_TASK_TAG	1	/* added */
 #define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 1) 
 #define configTIMER_QUEUE_LENGTH  50
 #define configTIMER_TASK_STACK_DEPTH	300
