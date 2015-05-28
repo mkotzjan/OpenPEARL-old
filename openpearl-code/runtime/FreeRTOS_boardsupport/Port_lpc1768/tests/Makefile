@@ -43,3 +43,6 @@ clean:
 	@echo "[building and linking]" $@
 	$(CROSS)$(CXX) $(CXXFLAGS) $(USE_NOHOST) $(MAP) $^ $(OBJS) $(LFLAGS) -o $@
 
+%.elf: %.c
+	@echo "[building and linking]" $@
+	@$(CROSS)$(CC) $(CXXFLAGS) $(USE_NOHOST) $(MAP) $^ $(OBJS) $(LFLAGS) -o $@
