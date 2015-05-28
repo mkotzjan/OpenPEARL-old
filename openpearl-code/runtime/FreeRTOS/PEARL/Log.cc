@@ -37,7 +37,7 @@ namespace pearlrt {
 #define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
    bool Log::initialized = false;
-   int Log::logLevel = Log::INFO | Log::WARN | Log::ERROR; // not Log::DEBUG
+   int Log::logLevel = Log::WARN | Log::ERROR; // not Log::INFO | Log::DEBUG
    Mutex Log::mutex;
 
    Log::Log() {
