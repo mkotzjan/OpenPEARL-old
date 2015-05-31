@@ -82,12 +82,8 @@ test:
 ###############################################################################
 
 install:
-	cp prl_c /usr/local/bin
-	cp smallpearl_compiler.jar /usr/local/bin
-	#cp prl_c /home/marcel/bin
-	#cp smallpearl_compiler.jar /home/marcel/bin
-	#cp prl_c /Users/marcel/bin
-	#cp smallpearl_compiler.jar /Users/marcel/bin
+	cp prl_c $(INSTALL_DIR)
+	cp smallpearl_compiler.jar $(INSTALL_DIR)
 
 ###############################################################################
 

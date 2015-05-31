@@ -28,17 +28,26 @@
 ###############################################################################
 
 # common definitionss
-CC	        = gcc
-PRJCFLAGS	= -g
-LD	        = gcc
-LDFLAGS	    = 
-AR	        = ar
-ARFLAGS 	=
-RANLIB	    = ranlib
-#RM	        = rm
-ECHO	    = echo
-SHELL	    = /bin/sh
-ANTLR       = /usr/local/lib/antlr-4.0-complete.jar
+CC	     = gcc
+PRJCFLAGS    = -g
+LD	     = gcc
+LDFLAGS	     =
+AR	     = ar
+ARFLAGS      =
+RANLIB	     = ranlib
+#RM	     = rm
+ECHO	     = echo
+SHELL	     = /bin/sh
+ANTLR        = /usr/local/lib/antlr-4.0-complete.jar
 #ANTLR       = /opt/antlr/antlr.jar
+
+################################
+# Where to install the compiler:
+################################
+ifndef OPENPEARL_INSTALL_DIR
+       INSTALL_DIR  = /usr/local/bin
+else
+       INSTALL_DIR = $(OPENPEARL_INSTALL_DIR)
+endif
 
 #.SILENT :
