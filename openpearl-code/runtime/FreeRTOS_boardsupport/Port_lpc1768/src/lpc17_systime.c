@@ -39,7 +39,7 @@ static void (*nsec_clock_gettime_cb)(uint64_t*) = &default_nsec_clock_gettime_cb
 
 static volatile time_t unixtime;
 static volatile uint64_t unixtime_nsec_offset=0;
-static volatile uint32_t tickspersecond = 100000000;
+static volatile uint32_t tickspersecond = 1e8;
 //used by the RTC self calibrating thing
 static volatile unsigned int goodcounter = 0;
 
@@ -64,13 +64,19 @@ static unsigned int nsec2ticks(unsigned int nsecs){
 
 /*timerarm prepares the HW to generate an Interrupt
  * no later than the specified time, but as late as
- * possible. */
-void timerarm(int64_t alarmstamp){
+ * possible. No need to check wether alarmstamp is
+ * in the past, ClackerTask already does*/
+int timerarm(int64_t alarmstamp){
 	uint32_t mystamp = nsec2ticks(alarmstamp);
 	mystamp += LPC_TIMER0->TC;
 	mystamp %= tickspersecond;
 	LPC_TIMER0->MR[2] = mystamp;
 	LPC_TIMER0->MCR |= (1<<6);
+	if(LPC_TIMER0->TC >= (tickspersecond-5)){
+		LPC_TIMER0->MCR &= ~(1<<6);
+		return -1;
+	}
+	return 0;
 };
 
 void nsec_clock_gettime(uint64_t *nsectime){
@@ -78,6 +84,13 @@ void nsec_clock_gettime(uint64_t *nsectime){
 }
 
 void default_nsec_clock_gettime_cb(uint64_t *nsectime){
+	struct timespec ts;
+			clock_gettime(0,&ts);
+	*nsectime = ts.tv_sec * (uint64_t)1e9;
+	*nsectime += ts.tv_nsec;
+}
+
+void monotonicrt_nsec_clock_gettime_cb(uint64_t *nsectime){
 	uint64_t timestamp = 0;
 	while(timestamp != unixtime_nsec_offset){
 		timestamp = unixtime_nsec_offset;

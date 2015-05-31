@@ -33,7 +33,6 @@
  that SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-//Todo: THINK ABOUT TABLESTATE FULL!
 #include <time.h>
 #include <errno.h> //not actually useful, at least not threadsafe,yet. It could however be added.
 #include <inttypes.h>
@@ -124,7 +123,7 @@ static int checktimerspec(const struct timespec * ts){
 }
 
 static int checkitimerspec(const struct itimerspec * its){
-	if(checktimerspec(&its->it_interval)==-1)
+	if(checktimerspec(&its->it_value)==-1)
 		return -1;
 	if(checktimerspec(&its->it_interval)==-1)
 		return -1;
@@ -367,7 +366,6 @@ static void TaskTimerSort(void *pcParameters){
 	}
 }
 
-extern void timerarm(int64_t);
 static void TaskClacker(void *pcParameters){
 	static uint64_t timestamp=0;
 	void activateEntry(){
@@ -414,6 +412,7 @@ static void TaskClacker(void *pcParameters){
 	}
 
 	for(;;){
+		extern int timerarm(int64_t);
 		if(tablestate.active)
 			do{//the double while reduces the gettime calls
 				while((table[firstactive].value.nsec_value < timestamp) && tablestate.active)
@@ -421,10 +420,13 @@ static void TaskClacker(void *pcParameters){
 				nsec_clock_gettime(&timestamp);
 			}while((table[firstactive].value.nsec_value < timestamp) && tablestate.active);
 		if(tablestate.active){//no harm in being called early
-			ENTERCRITICAL;
-			timerarm(table[firstactive].value.nsec_value-timestamp);
-			LEAVECRITICAL;
-			nsec_clock_gettime(&timestamp);
+			int fail=0;
+			do{
+				ENTERCRITICAL;
+				fail = timerarm(table[firstactive].value.nsec_value-timestamp);
+				LEAVECRITICAL;
+				nsec_clock_gettime(&timestamp);
+			}while(fail<0);
 			if(table[firstactive].value.nsec_value > timestamp)
 				vTaskSuspend(NULL);
 		}
