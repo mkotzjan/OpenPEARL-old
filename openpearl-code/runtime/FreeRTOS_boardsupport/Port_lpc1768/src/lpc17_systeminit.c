@@ -157,8 +157,6 @@ static void realinit_ClockMonotonicRealtime(){
 	NVIC_EnableIRQ(RTC_IRQn);
 	NVIC_SetPriority(TIMER0_IRQn,0);
 	NVIC_EnableIRQ(TIMER0_IRQn);
-	unsigned int timer_ready();
-	while(!timer_ready());
 }
 
 void systeminit_USBClock(){
