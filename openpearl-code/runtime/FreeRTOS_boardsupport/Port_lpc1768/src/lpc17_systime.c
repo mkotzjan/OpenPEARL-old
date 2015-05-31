@@ -37,7 +37,7 @@ extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
 static void default_nsec_clock_gettime_cb(uint64_t*);
 static void (*nsec_clock_gettime_cb)(uint64_t*) = &default_nsec_clock_gettime_cb;
 
-static volatile unsigned int unixtime;
+static volatile time_t unixtime;
 static volatile uint64_t unixtime_nsec_offset=0;
 static volatile uint32_t tickspersecond = 100000000;
 //used by the RTC self calibrating thing
@@ -56,7 +56,7 @@ static unsigned int ticks2nsec(unsigned int ticks){
 			/((uint64_t)tickspersecond));
 }
 
-unsigned int nsec2ticks(unsigned int nsecs){
+static unsigned int nsec2ticks(unsigned int nsecs){
 	return (unsigned int)(
 			((uint64_t)nsecs*(uint64_t)tickspersecond)
 			/(uint64_t)(1e9));
@@ -81,7 +81,7 @@ void default_nsec_clock_gettime_cb(uint64_t *nsectime){
 	uint64_t timestamp = 0;
 	while(timestamp != unixtime_nsec_offset){
 		timestamp = unixtime_nsec_offset;
-		*nsectime = unixtime_nsec_offset + ticks2nsec(LPC_TIMER0->TC);
+		*nsectime = timestamp + ticks2nsec(LPC_TIMER0->TC);
 	}
 }
 
@@ -128,8 +128,9 @@ void RTC_IRQHandler() {
 		struct timespec ts;
 		clock_gettime(0,&ts);
 		unixtime = ts.tv_sec;
-		unixtime_nsec_offset = unixtime * 1000000000;
+		unixtime_nsec_offset = unixtime * (uint64_t)1e9;
 		clock_gettime_cb=&systime_clock_gettime_cb;
+		nsec_clock_gettime_cb=&monotonicrt_nsec_clock_gettime_cb;
 	}
 	void calibraterRTtimerFromRTC_IRQHandler(volatile int delta){
 		unsigned int tickstore = tickspersecond;
@@ -144,6 +145,7 @@ void RTC_IRQHandler() {
 							/(uint64_t)(LPC_TIMER0->PR))
 								);
 				LPC_TIMER0->PR-=1;
+				TimerResumeClackerFromISR();
 			}
 		}
 		else if(delta==1)
@@ -178,12 +180,12 @@ void RTC_IRQHandler() {
 	case tick:
 		tickstate = tock;
 		unixtime++;
-		unixtime_nsec_offset += 1e9;
+		unixtime_nsec_offset += (uint64_t)1e9;
 		break;
 	case tock:
 		tickstate = tick;
 		unixtime++;
-		unixtime_nsec_offset += 1e9;
+		unixtime_nsec_offset += (uint64_t)1e9;
 		calibraterRTtimerFromRTC_IRQHandler(delta);
 		break;
 	case init:
