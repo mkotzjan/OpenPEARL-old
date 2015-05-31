@@ -44,10 +44,18 @@
 #define ENTERCRITICAL taskDISABLE_INTERRUPTS()
 #define LEAVECRITICAL taskENABLE_INTERRUPTS()
 
+static inline void DMB(void) { asm volatile ("dmb" ::: "memory"); }
+
 static TaskHandle_t xClackerTaskHandle;
 static TaskHandle_t xTimerSortTaskHandle;
 static void TaskClacker(void *);
 static void TaskTimerSort(void *);
+
+static void nsec_clock_gettime_wait(uint64_t*);
+static int timerarm_wait(int64_t alarm);
+
+void (* nsec_clock_gettime)(uint64_t*) = &nsec_clock_gettime_wait;
+int (*timerarm)(int64_t alarm) = &timerarm_wait;
 
 struct internaltimerspec{
 	uint64_t nsec_value;
@@ -80,6 +88,18 @@ static struct{
 //lists are terminated at both ends by next == index or prev == index
 //that way it is possible to put a timer between a single timer.
 static struct tableentry table[(timer_t)MAXTIMER];//endof range is special and marks the end of things
+
+static void nsec_clock_gettime_wait(uint64_t *alarm){
+	while(*nsec_clock_gettime == &nsec_clock_gettime_wait)
+		DMB();
+	(*nsec_clock_gettime)(alarm);
+}
+
+static int timerarm_wait(int64_t alarm){
+	while(*timerarm == &timerarm_wait)
+		DMB();
+	return (*timerarm)(alarm);
+}
 
 void TimerResumeClackerFromISR(){
 	if(xClackerTaskHandle){
@@ -189,13 +209,12 @@ int timer_create(clockid_t clock_id, struct sigevent *__restrict evp, timer_t *_
 	return 0;
 }
 
-extern void nsec_clock_gettime(uint64_t*);
 int timer_settime(const timer_t timerid, const int flags,
        const struct itimerspec *const value,
        struct itimerspec *const ovalue){
 	struct tableentry *const that = &table[timerid];
 	uint64_t nsectimestamp;
-	nsec_clock_gettime(&nsectimestamp);
+	(*nsec_clock_gettime)(&nsectimestamp);
 
 	if(timerid>MAXTIMER){
 		errno = EINVAL; return -1;}
@@ -261,7 +280,7 @@ int timer_gettime(timer_t timerid, struct itimerspec *value){
 		return -1;
 	}
 	uint64_t nsectimestamp;
-	nsec_clock_gettime(&nsectimestamp);
+	(*nsec_clock_gettime)(&nsectimestamp);
 
 	struct internaltimerspec valprep;
 
@@ -412,20 +431,19 @@ static void TaskClacker(void *pcParameters){
 	}
 
 	for(;;){
-		extern int timerarm(int64_t);
 		if(tablestate.active)
 			do{//the double while reduces the gettime calls
 				while((table[firstactive].value.nsec_value < timestamp) && tablestate.active)
 					activateEntry();
-				nsec_clock_gettime(&timestamp);
+				(*nsec_clock_gettime)(&timestamp);
 			}while((table[firstactive].value.nsec_value < timestamp) && tablestate.active);
 		if(tablestate.active){//no harm in being called early
 			int fail=0;
 			do{
 				ENTERCRITICAL;
-				fail = timerarm(table[firstactive].value.nsec_value-timestamp);
+				fail = (*timerarm)(table[firstactive].value.nsec_value-timestamp);
 				LEAVECRITICAL;
-				nsec_clock_gettime(&timestamp);
+				(*nsec_clock_gettime)(&timestamp);
 			}while(fail<0);
 			if(table[firstactive].value.nsec_value > timestamp)
 				vTaskSuspend(NULL);

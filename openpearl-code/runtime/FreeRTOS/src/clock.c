@@ -35,7 +35,8 @@
 #include <time.h>
 #include <sys/errno.h>
 
-extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
+static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts);
+int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp) = &clock_gettime_cb_notready;
 
 struct tm *localtime_r(const time_t *_time, struct tm * tm){
 	//always assume localtime was UTC
@@ -51,6 +52,13 @@ struct tm *localtime(const time_t *_time){
 
 extern int clock_gettime(clockid_t clock_id, struct timespec *ts){
 	return (*clock_gettime_cb)(clock_id, ts);
+}
+
+static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts){
+	ts->tv_nsec=0;
+	ts->tv_sec=0;
+	errno = EAGAIN;
+	return -1;
 }
 
 #include <sys/time.h>

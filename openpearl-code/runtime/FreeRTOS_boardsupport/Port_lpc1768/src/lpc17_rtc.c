@@ -36,7 +36,7 @@
 #include "chip.h"
 
 static int rtc_clock_gettime_cb(clockid_t clock_id, struct timespec *tp);
-int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp) = &rtc_clock_gettime_cb;
+extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
 
 static void rtc_to_structtm(RTC_TIME_T * rtc_tm, struct tm * tm){
 	tm->tm_sec	= rtc_tm->time[RTC_TIMETYPE_SECOND];
@@ -104,4 +104,5 @@ void systeminit_rtc_settime(unsigned int fallbackstamp){
 	Chip_RTC_GetFullTime(LPC_RTC, &time);
 	if(check_rtc(&time, fallbackstamp))
 		rtc_setunixtime(fallbackstamp);
+	clock_gettime_cb = &rtc_clock_gettime_cb;
 }
