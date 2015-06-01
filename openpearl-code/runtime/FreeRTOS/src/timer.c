@@ -40,7 +40,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define MAXTIMER 12
+#define MAXTIMER configTIMER_QUEUE_LENGTH
 #define ENTERCRITICAL taskDISABLE_INTERRUPTS();DMB();
 #define LEAVECRITICAL DMB();taskENABLE_INTERRUPTS()
 
@@ -104,14 +104,19 @@ static int timerarm_wait(int64_t alarm){
 void TimerResumeClackerFromISR(){
 	if(xClackerTaskHandle){
 		xTaskResumeFromISR(xClackerTaskHandle);
+		//The yield is _very_ important for performance
 		portYIELD_FROM_ISR(xClackerTaskHandle);
 	}
 }
 
 static void timer_init(){
 	int i=0;
-	for(i=0;i<MAXTIMER-1;i++)
+	table[0].prev=0;
+	table[0].next=1;
+	for(i=1;i<MAXTIMER;i++){
 		table[i].next=i+1;
+		table[i].prev=i-1;
+	}
 	table[MAXTIMER-1].next=MAXTIMER-1;
 	xTaskCreate(TaskTimerSort,"SortTask",50,NULL,configMAX_PRIORITIES-2,&xTimerSortTaskHandle);
 	xTaskCreate(TaskClacker,"ClackerTask",200,NULL,configMAX_PRIORITIES-1,&xClackerTaskHandle);//stack 50 war nicht nur schlecht
@@ -180,14 +185,12 @@ static critical putfirstunsorted(const timer_t thatindex){
 	table[that->next].prev = thatindex;
 	firstunsorted = thatindex;
 	tablestate.unsorted=1;
-	tablestate.sorttaskreset=1;
 }
 
 int timer_create(clockid_t clock_id, struct sigevent *__restrict evp, timer_t *__restrict timerid){
 	/*[EINVAL] The specified clock ID is not defined.*/
 	if(!tablestate.tableinitialized)
 		timer_init();
-
 	ENTERCRITICAL;
 	if(tablestate.full){
 		LEAVECRITICAL;
@@ -196,11 +199,10 @@ int timer_create(clockid_t clock_id, struct sigevent *__restrict evp, timer_t *_
 	}
 	*timerid = firstfree;
 	struct tableentry *const that = &table[firstfree];
-	if(firstfree == that->next)
+	if(that->next == firstfree)
 		tablestate.full = 1;
-	else
-		firstfree = that->next;
-	table[*timerid].evp=evp;
+	firstfree = that->next;
+	that->evp=evp;
 	//dangle the timer, this is the first timer in a list
 	table[that->next].prev = that->next;
 	that->next=*timerid;
@@ -214,7 +216,7 @@ int timer_settime(const timer_t timerid, const int flags,
        struct itimerspec *const ovalue){
 	struct tableentry *const that = &table[timerid];
 	uint64_t nsectimestamp;
-	(*nsec_clock_gettime)(&nsectimestamp);
+	nsec_clock_gettime(&nsectimestamp);
 
 	if(timerid>MAXTIMER){
 		errno = EINVAL; return -1;}
@@ -228,23 +230,13 @@ int timer_settime(const timer_t timerid, const int flags,
 		loadvalue.nsec_value = loadvalue.nsec_interval;
 	if(flags!=TIMER_ABSTIME&&loadvalue.nsec_value)
 		loadvalue.nsec_value+=nsectimestamp;
-	if(loadvalue.nsec_value){
-		ENTERCRITICAL;
-		ovalprep = that->value;
-		that->value = loadvalue;
-		dangle(timerid);
+	ENTERCRITICAL;
+	ovalprep = that->value;
+	that->value = loadvalue;
+	dangle(timerid);
+	if(loadvalue.nsec_value)
 		putfirstunsorted(timerid);
-		tablestate.sorttaskreset = 1;
-		LEAVECRITICAL;
-	}
-	else{
-		ENTERCRITICAL;
-		ovalprep = that->value;
-		that->value = loadvalue;
-		dangle(timerid);
-		tablestate.sorttaskreset = 1;
-		LEAVECRITICAL;
-	}
+	LEAVECRITICAL;
 
 	if(ovalue){
 		ovalprep.nsec_value -=nsectimestamp;
@@ -255,19 +247,19 @@ int timer_settime(const timer_t timerid, const int flags,
 	return 0;
 }
 
-int timer_delete(timer_t timerid){
-	if(timerid>=MAXTIMER){
+int timer_delete(timer_t thatindex){
+	if(thatindex>=MAXTIMER){
 		errno = EINVAL;
 		return -1;
 	}
 	ENTERCRITICAL;
-	struct tableentry *const that = &table[timerid];
-	dangle(timerid);
+	struct tableentry *const that = &table[thatindex];
+	dangle(thatindex);
 	//fixup free list: put the freed timer as the first free of the chain of free timers
 	if(!tablestate.full)
 		that->next = firstfree;
-	firstfree = timerid;
-	table[that->next].prev = timerid;
+	firstfree = thatindex;
+	table[that->next].prev = thatindex;
 	tablestate.full=0;
 	that->value.nsec_value = that->value.nsec_interval =0;
 	LEAVECRITICAL;
@@ -307,12 +299,14 @@ static void TaskTimerSort(void *pcParameters){
 		ENTERCRITICAL;
 		struct tableentry* const that = &table[lastunsorted];
 		const timer_t thatindex = lastunsorted;
+		if(tablestate.sorttaskreset==1){
+			LEAVECRITICAL;return;}
 		if(!(tablestate.unsorted&&(!tablestate.active))){
 			LEAVECRITICAL;return;}
-		if(that->prev==thatindex)
+		if(that->prev==that->next)
 			tablestate.unsorted=0;
 		lastunsorted = that->prev;
-		table[that->prev].next = that->prev; //terminate predecessor
+		table[that->prev].next = that->prev; //terminate former predecessor in unsorted list
 		that->prev = that->next = firstactive = thatindex;
 		tablestate.active = 1;
 		LEAVECRITICAL;
@@ -400,6 +394,7 @@ static void TaskClacker(void *pcParameters){
 		if(that->next == thatindex)
 			tablestate.active = 0;
 		firstactive = that->next;
+		table[that->next].prev = that->next;
 		//dangle
 		that->prev = that->next = thatindex;
 		//timer reload
