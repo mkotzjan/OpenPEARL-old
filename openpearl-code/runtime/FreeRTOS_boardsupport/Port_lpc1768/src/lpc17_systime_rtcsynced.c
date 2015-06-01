@@ -43,7 +43,7 @@ extern int (*timerarm)(int64_t alarmstamp);
 
 static volatile time_t unixtime;
 static volatile uint64_t unixtime_nsec_offset=0;
-static volatile uint32_t tickspersecond = 1e8;
+static volatile uint32_t tickspersecond = 0;
 
 static unsigned int ticks2nsec(unsigned int ticks){
 	return (unsigned int)(

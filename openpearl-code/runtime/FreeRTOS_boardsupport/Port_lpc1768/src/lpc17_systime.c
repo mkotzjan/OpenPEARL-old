@@ -33,6 +33,7 @@
 #include <inttypes.h>
 #include "chip.h"
 #include "systeminit.h"
+#include "FreeRTOSConfig.h"
 
 extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
 extern void (*nsec_clock_gettime)(uint64_t*);
@@ -44,14 +45,14 @@ static volatile uint32_t tickspersecond = 1e8;
 
 static unsigned int ticks2nsec(unsigned int ticks){
 	return (unsigned int)(
-			((uint64_t)ticks*(uint64_t)1e9)
+			((uint64_t)ticks*((uint64_t)1e9))
 			/((uint64_t)tickspersecond));
 }
 
 static unsigned int nsec2ticks(unsigned int nsecs){
 	return (unsigned int)(
 			((uint64_t)nsecs*(uint64_t)tickspersecond)
-			/(uint64_t)(1e9));
+			/((uint64_t)1e9));
 }
 
 /*timerarm prepares the HW to generate an Interrupt
@@ -64,11 +65,10 @@ static int timerarm_cb_systime(int64_t alarmstamp){
 	mystamp += LPC_TIMER0->TC;
 	mystamp %= tickspersecond;
 	LPC_TIMER0->MR[2] = mystamp;
-	LPC_TIMER0->MCR |= (1<<6);
 	if(LPC_TIMER0->TC >= tickspersecond){
-		LPC_TIMER0->MCR &= ~(1<<6);
 		return -1;
 	}
+	LPC_TIMER0->MCR |= (1<<6);
 	return 0;
 };
 
@@ -76,7 +76,7 @@ static void nsec_clock_gettime_timer0(uint64_t *nsectime){
 	uint64_t timestamp = 0;
 	while(timestamp != unixtime_nsec_offset){
 		timestamp = unixtime_nsec_offset;
-		*nsectime = timestamp + ticks2nsec(LPC_TIMER0->TC);
+		*nsectime = timestamp + (uint64_t)ticks2nsec(LPC_TIMER0->TC);
 	}
 }
 
@@ -105,7 +105,7 @@ void systeminit_timer0(){
 	timerarm = &timerarm_cb_systime;
 	LPC_TIMER0->IR = (~0);//clear interrupts
 	LPC_TIMER0->TCR=1;//enable
-	NVIC_SetPriority(TIMER0_IRQn,0);
+	NVIC_SetPriority(TIMER0_IRQn,configMAX_SYSCALL_INTERRUPT_PRIORITY);
 	NVIC_EnableIRQ(TIMER0_IRQn);
 	timerarm = &timerarm_cb_systime;
 	clock_gettime_cb = &clock_gettime_timer0;
@@ -116,7 +116,7 @@ static void nsec_clock_gettime_debug(uint64_t *nsectime){
 	uint32_t timestamp = 0;
 	while(timestamp != LPC_TIMER1->TC){
 		timestamp = LPC_TIMER1->TC;
-		*nsectime = ((uint64_t)timestamp * 1000000000) + ((LPC_TIMER0->TC)*10);
+		*nsectime = ((uint64_t)timestamp * (uint64_t)1e9) + ((uint64_t)(LPC_TIMER0->TC)*(uint64_t)10);
 	}
 }
 
@@ -155,6 +155,6 @@ void TIMER0_IRQHandler(){
 	if(LPC_TIMER0->IR&(1<<2)){
 		TimerResumeClackerFromISR();
 		LPC_TIMER0->MCR &= ~(1<<6);
-		LPC_TIMER0->IR = (1<<6);
+		LPC_TIMER0->IR = (1<<2);
 	}
 }
