@@ -452,3 +452,97 @@ static void TaskClacker(void *pcParameters){
 			vTaskSuspend(NULL);
 	}
 }
+
+/*This is not correct. For example it doesn't recognize that a list may be 1 long.
+Still it proved useful. Don't take its results as canon!
+void timer_table_check_dbg(){
+	ENTERCRITICAL;
+	unsigned int dangling =0;
+	unsigned int active = 0;
+	unsigned int unsorted = 0;
+	unsigned int free = 0;
+	uint64_t tstamp;
+	int error = 0;
+	int i=0;
+	nsec_clock_gettime(&tstamp);
+	printf("checking table...\n");
+	printf("time now is %" PRIu64 "\n",tstamp);
+	for(i=0;i<MAXTIMER;i++){
+		if(table[i].next == table[i].prev)
+			dangling++;
+	}
+	if(tablestate.active){
+		printf("table is active. next activation %" PRIu64 "\n",table[firstactive].value.nsec_value);
+		printf("in %" PRIu64 "ns\n", tstamp - table[firstactive].value.nsec_value);
+		printf("in s:%"PRIu64 "\n", (tstamp - table[firstactive].value.nsec_value)/((uint64_t)1e9));
+		active++;
+		i=firstactive;
+		if(table[i].prev != i){
+			printf("Front of active is not terminated\n");
+			error++;
+		}
+		while(table[i].next != i){
+			i=table[i].next;
+			active++;
+			if(i == MAXTIMER){
+				printf("End of active unterminated\n");
+				error++;
+				break;
+			}
+		}
+	}
+	if(tablestate.unsorted){
+		printf("table not sorted\n");
+		unsorted++;
+		i=firstunsorted;
+		if(table[i].prev != i){
+			printf("Front of unsorted is not terminated\n");
+		}
+		while((table[i].next) != i && (i < MAXTIMER)){
+			i=table[i].next;
+			unsorted++;
+			if(i == MAXTIMER){
+				printf("End of unsorted unterminated\n");
+				error++;
+				break;
+			}
+			if(i != lastunsorted){
+				printf("lastunsorted does not match end of unsorted");
+			}
+		}
+	}
+	if(!tablestate.full){
+		printf("table not full\n");
+		free++;
+		i=firstfree;
+		if(table[i].prev != i){
+			printf("Front of free is not terminated\n");
+		}
+		while((table[i].next) != i && (i < MAXTIMER)){
+			i=table[i].next;
+			unsorted++;
+			if(i == MAXTIMER){
+				printf("End of free unterminated\n");
+				error++;
+				break;
+			}
+		}
+	}
+
+	if((dangling + unsorted + active + free) != MAXTIMER){
+		printf("table size %i does not match number of entries %u\n",MAXTIMER,
+				(dangling + unsorted + active + free));
+		error++;
+	}
+	printf("dangling: %u \n",dangling);
+	printf("active:   %u \n", active);
+	printf("unsorted: %u\n", unsorted);
+	printf("free:     %u\n", free);
+
+	LEAVECRITICAL;
+	if(error)
+		printf("errors found\n");
+	else
+		printf("No errors found in table\n");
+}
+*/

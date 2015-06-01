@@ -82,6 +82,7 @@
  * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
  *----------------------------------------------------------*/
 
+//#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ );
 #define configUSE_PREEMPTION		1
 #define configUSE_IDLE_HOOK			0
 #define configMAX_PRIORITIES		( 260 )  
