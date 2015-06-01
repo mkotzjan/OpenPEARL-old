@@ -30,6 +30,7 @@
 #include "SystemConfig.h"
 #include "systeminit.h"
 #include "chip.h"
+#include "FreeRTOSConfig.h"
 
 static void realinit_CpuClock();
 static void realinit_ClockRTC();
@@ -38,8 +39,8 @@ static void realinit_ClockMonotonicRealtime();
 static void realinit_Clock64bit();
 
 void software_init_hook(){
-	systeminit(ClockTimer0);
-	//	systeminit(ClockMonotonicRealtime);
+	//systeminit(ClockTimer0);
+	systeminit(ClockMonotonicRealtime);
 	//	systeminit(ClockDebug);
 }
 
@@ -149,7 +150,7 @@ static void realinit_ClockMonotonicRealtime(){
 	LPC_RTC->ILR = 3; //clear interrupt flags
 //	NVIC->ISER[0] = (1<<RTC_IRQn);
 	NVIC_EnableIRQ(RTC_IRQn);
-	NVIC_SetPriority(TIMER0_IRQn,0);
+	NVIC_SetPriority(TIMER0_IRQn,configMAX_SYSCALL_INTERRUPT_PRIORITY);
 	NVIC_EnableIRQ(TIMER0_IRQn);
 }
 
