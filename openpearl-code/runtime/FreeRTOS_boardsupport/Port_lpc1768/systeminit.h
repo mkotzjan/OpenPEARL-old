@@ -37,6 +37,7 @@ extern "C" {
 enum systeminit{
 	CpuClock,
 	ClockRTC,
+	ClockTimer0,
 	ClockMonotonicRealtime,
 	ClockDebug
 };

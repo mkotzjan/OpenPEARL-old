@@ -38,9 +38,8 @@ extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
 extern void (*nsec_clock_gettime)(uint64_t*);
 extern int (*timerarm)(int64_t);
 
-
-//static volatile time_t unixtime;
-//static volatile uint64_t unixtime_nsec_offset=0;
+static volatile time_t unixtime;
+static volatile uint64_t unixtime_nsec_offset=0;
 static volatile uint32_t tickspersecond = 1e8;
 
 static unsigned int ticks2nsec(unsigned int ticks){
@@ -60,26 +59,60 @@ static unsigned int nsec2ticks(unsigned int nsecs){
  * possible. No need to check wether alarmstamp is
  * in the past, ClackerTask already does*/
 static int timerarm_cb_systime(int64_t alarmstamp){
+	LPC_TIMER0->IR = (1<<6);
 	uint32_t mystamp = nsec2ticks(alarmstamp);
 	mystamp += LPC_TIMER0->TC;
 	mystamp %= tickspersecond;
 	LPC_TIMER0->MR[2] = mystamp;
 	LPC_TIMER0->MCR |= (1<<6);
-	if(LPC_TIMER0->TC >= (tickspersecond-5)){
+	if(LPC_TIMER0->TC >= tickspersecond){
 		LPC_TIMER0->MCR &= ~(1<<6);
 		return -1;
 	}
 	return 0;
 };
 
-static void default_nsec_clock_gettime_cb(uint64_t *nsectime){
-	struct timespec ts;
-			clock_gettime(0,&ts);
-	*nsectime = ts.tv_sec * (uint64_t)1e9;
-	*nsectime += ts.tv_nsec;
+static void nsec_clock_gettime_timer0(uint64_t *nsectime){
+	uint64_t timestamp = 0;
+	while(timestamp != unixtime_nsec_offset){
+		timestamp = unixtime_nsec_offset;
+		*nsectime = timestamp + ticks2nsec(LPC_TIMER0->TC);
+	}
 }
 
-static void debug_nsec_clock_gettime_cb(uint64_t *nsectime){
+static int clock_gettime_timer0(clockid_t clock_id, struct timespec *tp){
+	while(tp->tv_sec!=unixtime){
+		tp->tv_sec=unixtime;
+		tp->tv_nsec=ticks2nsec(LPC_TIMER0->TC);
+	}
+	return 0;
+}
+
+void systeminit_timer0(){
+	//TODO: sync to beginning of RTC second
+	struct timespec ts;
+	clock_gettime(0,&ts);
+	unixtime = ts.tv_sec;
+	unixtime_nsec_offset = unixtime * (uint64_t)1e9;
+	tickspersecond = Chip_Clock_GetSystemClockRate();
+	LPC_SYSCON->PCONP|=(1<<1);//powerup Timer 0
+	LPC_SYSCON->PCLKSEL[0]|=(1<<2);//bits 3:2 = 01 to set PCLK_TIMER0 to run at full speed. reset=00
+	LPC_TIMER0->MR[1] = tickspersecond; //1s
+	LPC_TIMER0->MR[2] = ~0;
+	LPC_TIMER0->MCR = (0x3<<3)|(0x01<<6);//reset+interrupt on mr1, interrupt on mr2
+	LPC_TIMER0->CTCR=0;//Timer0 is running in timer mode.
+	LPC_TIMER0->PR=0;//Prescaler=0;
+	timerarm = &timerarm_cb_systime;
+	LPC_TIMER0->IR = (~0);//clear interrupts
+	LPC_TIMER0->TCR=1;//enable
+	NVIC_SetPriority(TIMER0_IRQn,0);
+	NVIC_EnableIRQ(TIMER0_IRQn);
+	timerarm = &timerarm_cb_systime;
+	clock_gettime_cb = &clock_gettime_timer0;
+	nsec_clock_gettime = &nsec_clock_gettime_timer0;
+}
+
+static void nsec_clock_gettime_debug(uint64_t *nsectime){
 	uint32_t timestamp = 0;
 	while(timestamp != LPC_TIMER1->TC){
 		timestamp = LPC_TIMER1->TC;
@@ -87,15 +120,7 @@ static void debug_nsec_clock_gettime_cb(uint64_t *nsectime){
 	}
 }
 
-//static int systime_clock_gettime_cb(clockid_t clock_id, struct timespec *tp){
-//	while(tp->tv_sec!=unixtime){
-//		tp->tv_sec=unixtime;
-//		tp->tv_nsec=ticks2nsec(LPC_TIMER0->TC);
-//	}
-//	return 0;
-//}
-
-static int debugtime_clock_gettime_cb(clockid_t clock_id, struct timespec *tp){
+static int clock_gettime_debug(clockid_t clock_id, struct timespec *tp){
 	while(tp->tv_sec!=LPC_TIMER1->TC){
 		tp->tv_sec=LPC_TIMER1->TC;
 		tp->tv_nsec=ticks2nsec(LPC_TIMER0->TC);
@@ -105,20 +130,31 @@ static int debugtime_clock_gettime_cb(clockid_t clock_id, struct timespec *tp){
 
 void systeminit_debug_settime(){
 	struct timespec ts;
+	systeminit_timer0();
+	LPC_SYSCON->PCONP|=(1<<1);//powerup Timer 1
+	LPC_SYSCON->PCLKSEL[0]|=(1<<4);//set PCLK_TIMER1 to run at full speed. reset=00
+	LPC_IOCON->PINSEL[3] |= (3<<4)|(3<<18)|(3<<24);//p1.18 is cap1.0 p1.25 is mat1.1 output,p1.28 is mat0.0
+	LPC_TIMER0->EMR |= (3<<4);//toggle externel match thingie
+	LPC_TIMER1->CTCR=0x3;//tick from both edges of cap1.0
+	LPC_TIMER1->TCR=1;
 	clock_gettime(0,&ts);
-	tickspersecond=Chip_Clock_GetSystemClockRate();
 	LPC_TIMER0->TC=nsec2ticks(ts.tv_nsec);
 	LPC_TIMER1->TC=ts.tv_sec;
-	clock_gettime_cb = &debugtime_clock_gettime_cb;
-	nsec_clock_gettime = &debug_nsec_clock_gettime_cb;
-	timerarm = &timerarm_cb_systime;
+	clock_gettime_cb = &clock_gettime_debug;
+	nsec_clock_gettime = &nsec_clock_gettime_debug;
 }
 
 void TIMER0_IRQHandler(){
 	void TimerResumeClackerFromISR();
 	//decide between second and alarm interrupt
-	TimerResumeClackerFromISR();
-	LPC_TIMER0->MCR &= ~(1<<6);
-	LPC_TIMER0->IR = 1<<2;
+	if(LPC_TIMER0->IR&(1<<1)){
+		unixtime++;
+		unixtime_nsec_offset += (uint64_t)1e9;
+		LPC_TIMER0->IR = (1<<1);
+	}
+	if(LPC_TIMER0->IR&(1<<2)){
+		TimerResumeClackerFromISR();
+		LPC_TIMER0->MCR &= ~(1<<6);
+		LPC_TIMER0->IR = (1<<6);
+	}
 }
-

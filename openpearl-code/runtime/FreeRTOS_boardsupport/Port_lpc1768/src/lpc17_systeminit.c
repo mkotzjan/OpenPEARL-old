@@ -33,12 +33,14 @@
 
 static void realinit_CpuClock();
 static void realinit_ClockRTC();
+static void realinit_ClockTimer0();
 static void realinit_ClockMonotonicRealtime();
 static void realinit_Clock64bit();
 
 void software_init_hook(){
-	systeminit(ClockMonotonicRealtime);
-//	systeminit(ClockDebug);
+	systeminit(ClockTimer0);
+	//	systeminit(ClockMonotonicRealtime);
+	//	systeminit(ClockDebug);
 }
 
 void systeminit(enum systeminit sysinit){
@@ -54,6 +56,10 @@ void systeminit(enum systeminit sysinit){
 	case ClockRTC:
 		systeminit(CpuClock);
 		realinit_ClockRTC();
+		break;
+	case ClockTimer0:
+		systeminit(ClockRTC);
+		realinit_ClockTimer0();
 		break;
 	case ClockMonotonicRealtime:
 		systeminit(ClockRTC);
@@ -116,30 +122,18 @@ static void realinit_ClockRTC(){
 	systeminit_rtc_settime(UNIXSTAMP);
 }
 
+static void realinit_ClockTimer0(){
+	void systeminit_timer0();
+	systeminit_timer0();
+}
+
 static void realinit_Clock64bit(){
 	void systeminit_debug_settime();
-	LPC_SYSCON->PCONP|=(1<<1)|(1<<2);//powerup Timer 0&1
-	LPC_SYSCON->PCLKSEL[0]|=(1<<2)|(1<<4);//bits 3:2 = 01 to set PCLK_TIMER0 to run at full speed. reset=00
-	LPC_IOCON->PINSEL[3] |= (3<<4)|(3<<18)|(3<<24);//p1.18 is cap1.0 p1.25 is mat1.1 output,p1.28 is mat0.0
-	LPC_TIMER0->EMR |= (3<<4);//toggle externel match thingie
-	LPC_TIMER0->MR[1] = 100000000; //1s
-	LPC_TIMER0->MR[2] = ~0;
-	LPC_TIMER0->MCR = 0x10|(0x01<<6);//reset on mr1, interrupt on mr2
-	LPC_TIMER0->CTCR=0;//Timer0 is running in timer mode.
-	LPC_TIMER0->PR=0;//Prescaler=0;
-	LPC_TIMER0->TCR=1;//enable
-
-	LPC_TIMER1->CTCR=0x3;//tick from both edges of cap1.0
-	LPC_TIMER1->TCR=1;
-
 	systeminit_debug_settime();
-
-	LPC_TIMER0->IR = (~0);//clear interrupts
-	NVIC_SetPriority(TIMER0_IRQn,0);
-	NVIC_EnableIRQ(TIMER0_IRQn);
 }
 
 static void realinit_ClockMonotonicRealtime(){
+	/*the final initialization happens from within the RTC Interrupt handler*/
 	LPC_RTC->CIIR = 1; //interrupt on second increment
 	//TODO: double check
 	LPC_RTC->RTC_AUXEN = 0; //disable the oscillator fail flag
