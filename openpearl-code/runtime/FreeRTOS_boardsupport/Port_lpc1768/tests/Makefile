@@ -21,7 +21,7 @@ OBJS = ../lpc1768_boardsupport.o
 #CXXFLAGS += -DSIMPLE_TESTS -I .
 #GTEST_OBJS=$(GTEST_SRCS:.cc=.o)
 
-all: info $(TARGETS) cpp.elf firsttest.elf
+all: info $(TARGETS) cpp.elf firsttest.elf stresstest.elf
 
 info:
 	@echo "CXXFLAGS="
