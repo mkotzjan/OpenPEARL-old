@@ -46,13 +46,17 @@
 #include "PrioMapper.h"
 #include "FreeRTOS.h"
 
+#if configMAX_PRIORITIES < 260
+#error PrioMapper: configMAX_PRIORITIES too small
+#endif
+
 namespace pearlrt {
 
    PrioMapper* PrioMapper::instance = NULL;
 
 
    PrioMapper::PrioMapper() {
-      max = configMAX_PRIORITIES - 1;  // timer task has configMAX_PRIORITIES-1
+      max = configMAX_PRIORITIES - 4;  // timer task has configMAX_PRIORITIES-1
       min = 1;                       // idle task has priority 0
 
       if (max < 256) {

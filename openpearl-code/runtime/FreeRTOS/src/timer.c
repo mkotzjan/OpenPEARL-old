@@ -40,9 +40,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define MAXTIMER 8
-#define ENTERCRITICAL taskDISABLE_INTERRUPTS()
-#define LEAVECRITICAL taskENABLE_INTERRUPTS()
+#define MAXTIMER 12
+#define ENTERCRITICAL taskDISABLE_INTERRUPTS();DMB();
+#define LEAVECRITICAL DMB();taskENABLE_INTERRUPTS()
 
 static inline void DMB(void) { asm volatile ("dmb" ::: "memory"); }
 
@@ -113,8 +113,8 @@ static void timer_init(){
 	for(i=0;i<MAXTIMER-1;i++)
 		table[i].next=i+1;
 	table[MAXTIMER-1].next=MAXTIMER-1;
-	xTaskCreate(TaskTimerSort,"SortTask",500,NULL,297,&xTimerSortTaskHandle);
-	xTaskCreate(TaskClacker,"ClackerTask",500,NULL,298,&xClackerTaskHandle);
+	xTaskCreate(TaskTimerSort,"SortTask",50,NULL,configMAX_PRIORITIES-2,&xTimerSortTaskHandle);
+	xTaskCreate(TaskClacker,"ClackerTask",200,NULL,configMAX_PRIORITIES-1,&xClackerTaskHandle);//stack 50 war nicht nur schlecht
 	tablestate.tableinitialized=1;
 }
 
@@ -425,7 +425,7 @@ static void TaskClacker(void *pcParameters){
 			callback->cb(callback->th);
 			vTaskDelete(NULL);
 		}
-		xTaskCreate(StarterTask,"StarterTask",200,callback,252,NULL);
+		xTaskCreate(StarterTask,"StarterTask",200,callback,configMAX_PRIORITIES-3,NULL);
 		if(tablestate.sorttaskreset)
 			vTaskResume(xTimerSortTaskHandle);
 	}
