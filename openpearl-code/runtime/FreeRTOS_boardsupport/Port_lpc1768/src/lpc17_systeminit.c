@@ -39,8 +39,8 @@ static void realinit_ClockMonotonicRealtime();
 static void realinit_Clock64bit();
 
 void software_init_hook(){
-	//systeminit(ClockTimer0);
-	systeminit(ClockMonotonicRealtime);
+	systeminit(ClockTimer0);
+	//systeminit(ClockMonotonicRealtime);
 	//	systeminit(ClockDebug);
 }
 
