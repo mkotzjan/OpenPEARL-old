@@ -104,7 +104,7 @@
 #define INCLUDE_xTaskResumeFromISR	1	/* added */
 #define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 1) 
 #define configTIMER_QUEUE_LENGTH  50
-#define configTIMER_TASK_STACK_DEPTH	300
+#define configTIMER_TASK_STACK_DEPTH	80 //200 is not enough for info log level, afterwards malloc fails with queue length 50. Don't use info log level for now
 
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 

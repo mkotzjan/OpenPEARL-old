@@ -420,7 +420,7 @@ static void TaskClacker(void *pcParameters){
 			callback->cb(callback->th);
 			vTaskDelete(NULL);
 		}
-		xTaskCreate(StarterTask,"StarterTask",200,callback,configMAX_PRIORITIES-3,NULL);
+		xTaskCreate(StarterTask,"StarterTask",configTIMER_TASK_STACK_DEPTH,callback,configMAX_PRIORITIES-3,NULL);
 		if(tablestate.sorttaskreset)
 			vTaskResume(xTimerSortTaskHandle);
 	}
