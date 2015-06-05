@@ -1,4 +1,4 @@
-project nil "OpenPEARL Compiler" "1.0" 2015-04-29 +280d {
+project nil "OpenPEARL Compiler" "1.0" 2015-06-05 +280d {
 }
 shift s40 "Part time shift" {
   workinghours wed, thu, fri off
@@ -13,155 +13,158 @@ task openpearl "OpenPEARL Compiler" {
   task software "Software Development" {
     purge allocate
     allocate dev
-    task references "References (Keywords: REF and CONT)" {
+    task feature_block "Block (Keyword: BEGIN and END)" {
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_repetition "Repetition (Keyword: FOR and REPEAT)" {
+      depends !feature_block
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_label "Label" {
+      depends !feature_repetition
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task type "Type Definition (Keyword: TYPE)" {
-      depends !references
+    task feature_goto "GOTO Statement (depends on Label)" {
+      depends !feature_label
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task structures "Structures (Keyword: STRUCT)" {
-      depends !type
+    task feature_procedure "Procedure (Keyword: PROC, RETURN and CALL)" {
+      depends !feature_goto
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_exit "EXIT Statement (depends on Label and block)" {
+      depends !feature_procedure
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task datatype "Datatype Array" {
-      depends !structures
+    task feature_semantic_analysis "Integration of Semantic Analysis" {
+      depends !feature_exit
+      purge allocate
+      allocate dev
+      effort 80.0h
+    }
+    task feature_symboltable "Symboltable handling" {
+      depends !feature_semantic_analysis
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_expressions "Expressions" {
+      depends !feature_symboltable
+      purge allocate
+      allocate dev
+      task feature_type_checks "Type checks" {
+        purge allocate
+        allocate dev
+        effort 8.0h
+      }
+      task feature_operator_precendence "Operator precedence" {
+        depends !feature_type_checks
+        purge allocate
+        allocate dev
+        effort 8.0h
+      }
+    }
+    task feature_void_datatype "VOID Datatype" {
+      depends !feature_expressions
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task void "VOID Datatype" {
-      depends !datatype
+    task feature_interrupt_and_triggers "INTERRUPT and TRIGGER" {
+      depends !feature_void_datatype
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task procedures "Procedures (Keyword: PROC, RETURN and CALL)" {
-      depends !void
+    task feature_signals "SIGNAL" {
+      depends !feature_interrupt_and_triggers
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task _by "\"BY TYPE\" Operator" {
-      depends !procedures
+    task feature_system_part "SYSTEM Part" {
+      depends !feature_signals
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+  }
+  task software_development "Software Development (not planned yet)" {
+    purge allocate
+    allocate dev
+    task feature_type "Type Definition (Keyword: TYPE)" {
       purge allocate
       allocate dev
       effort 8.0h
     }
     task statement "Statement Selection (Keyword: CASE)" {
-      depends !_by
+      depends !feature_type
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task label "Label" {
+    task feature_ref_proc "References to procedures (REF PROC)" {
       depends !statement
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task repetition "Repetition (Keyword: FOR and REPEAT)" {
-      depends !label
+    task feature_references "References (Keywords: REF and CONT)" {
+      depends !feature_ref_proc
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task goto "GOTO Statement (depends on Label)" {
-      depends !repetition
+    task feature_struct "Structures (Keyword: STRUCT)" {
+      depends !feature_references
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task exit "EXIT Statement (depends on Label and block)" {
-      depends !goto
+    task feature_array "Datatype Array" {
+      depends !feature_struct
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task references_to "References to procedures (REF PROC)" {
-      depends !exit
+    task feature_by_type "\"BY TYPE\" Operator" {
+      depends !feature_array
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task interrupt "INTERRUPT and TRIGGER" {
-      depends !references_to
+    task feature_convert "CONVERT Statement" {
+      depends !feature_by_type
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task convert "CONVERT Statement" {
-      depends !interrupt
+    task feature_bolt "BOLT" {
+      depends !feature_convert
       purge allocate
       allocate dev
       effort 8.0h
     }
-    task signal "SIGNAL" {
-      depends !convert
-      purge allocate
-      allocate dev
-      effort 8.0h
-    }
-    task bolt "BOLT" {
-      depends !signal
-      purge allocate
-      allocate dev
-      effort 8.0h
-    }
-    task global "GLOBAL" {
-      depends !bolt
-      purge allocate
-      allocate dev
-      effort 8.0h
-    }
-    task system "SYSTEM Part" {
-      depends !global
-      purge allocate
-      allocate dev
-      effort 8.0h
-    }
-    task block "Block (Keyword: BEGIN and END)" {
-      depends !system
-      purge allocate
-      allocate dev
-      effort 8.0h
-    }
-    task integration "Integration of Semantic Analysis" {
-      depends !block
-      purge allocate
-      allocate dev
-      effort 8.0h
-    }
-    task expressions "Expressions" {
-      depends !integration
-      purge allocate
-      allocate dev
-      task type "Type checks" {
-        purge allocate
-        allocate dev
-        effort 8.0h
-      }
-      task operator "Operator precedence" {
-        depends !type
-        purge allocate
-        allocate dev
-        effort 8.0h
-      }
-    }
-    task symboltable "Symboltable handling" {
-      depends !expressions
+    task feature_global "GLOBAL" {
+      depends !feature_bolt
       purge allocate
       allocate dev
       effort 8.0h
     }
     task renaming "Renaming of Java package" {
-      depends !symboltable
+      depends !feature_global
       purge allocate
       allocate dev
       effort 8.0h
@@ -179,31 +182,31 @@ task openpearl "OpenPEARL Compiler" {
     task ticket_56 "Ticket#56	TAKE/​SEND does not compile" {
       purge allocate
       allocate dev
-      effort 8.0h
+      effort 24.0h
     }
     task ticket_61 "Ticket#61	SymbolTable:Type information" {
       depends !ticket_56
       purge allocate
       allocate dev
-      effort 8.0h
+      effort 40.0h
     }
     task ticket_83 "Ticket#83	BIT INIT and BIT Operations do not compile" {
       depends !ticket_61
       purge allocate
       allocate dev
-      effort 8.0h
+      effort 40.0h
     }
     task ticket_109 "Ticket#109	treatment of operator SIZEOF" {
       depends !ticket_83
       purge allocate
       allocate dev
-      effort 8.0h
+      effort 40.0h
     }
     task ticket_110 "Ticket#110	Treatment of Character Expressions" {
       depends !ticket_109
       purge allocate
       allocate dev
-      effort 8.0h
+      effort 40.0h
     }
     task ticket_119 "Ticket#119	Fixed divison fixed result float" {
       depends !ticket_110
