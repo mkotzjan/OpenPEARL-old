@@ -60,6 +60,7 @@ TEST_SRCS +=  log_test.cc \
 TEST_DATION_SRCS += gtest_main.cc myTests.cc  \
 	DiscTests.cc PipeTests.cc \
 	UserDationNBTests.cc\
+	StdStreamTests.cc \
 	DationRWTests.cc DationPGTests.cc
 
 

@@ -164,6 +164,33 @@ TEST(PutFixed, simpleFixed) {
       rc.store(d2);
       EXPECT_TRUE((d1 == d2).getBoolean());
    }
+   {
+      pearlrt::Character<5> d1(5, (char*)"    1"), d2;
+      rc.clear();
+      x = (pearlrt::Fixed<15>)1234;
+      pearlrt::PutFixed<15>::toF(x,
+                                 (pearlrt::Fixed<15>)5,
+                                 (pearlrt::Fixed<15>)0,
+                                 (pearlrt::Fixed<15>) - 3,
+                                 sink);
+      ASSERT_EQ(rc.getCurrent(), 5);
+      rc.store(d2);
+      EXPECT_TRUE((d1 == d2).getBoolean());
+   }
+   {
+      pearlrt::Character<5> d1(5, (char*)" 12.3"), d2;
+      rc.clear();
+      x = (pearlrt::Fixed<15>)1234;
+      pearlrt::PutFixed<15>::toF(x,
+                                 (pearlrt::Fixed<15>)5,
+                                 (pearlrt::Fixed<15>)1,
+                                 (pearlrt::Fixed<15>) - 2,
+                                 sink);
+      ASSERT_EQ(rc.getCurrent(), 5);
+      rc.store(d2);
+      EXPECT_TRUE((d1 == d2).getBoolean());
+   }
+
 }
 
 

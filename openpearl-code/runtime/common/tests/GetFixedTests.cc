@@ -168,6 +168,50 @@ TEST(GetFixed, conversions) {
          pearlrt::GetFixed<15>::fromF(f15, 2, 0, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(69)).getBoolean());
    }
+   // precision and scale with given decimal point
+   {
+      //                        123456789012345678901234567890
+      pearlrt::Character<30> d("12.34      ");
+      rc.setWork(d);
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 0, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12)).getBoolean());
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 2, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1234)).getBoolean());
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 3, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12340)).getBoolean());
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, -1, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1)).getBoolean());
+   }
+   // precision and scale without given decimal point
+   {
+      //                        123456789012345678901234567890
+      pearlrt::Character<30> d("1234       ");
+      rc.setWork(d);
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 0, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12)).getBoolean());
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 2, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1234)).getBoolean());
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 3, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12340)).getBoolean());
+      source.rewind();
+      EXPECT_NO_THROW(
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, -1, source));
+      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1)).getBoolean());
+   }
 }
 
 /**

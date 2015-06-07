@@ -484,9 +484,9 @@ namespace pearlrt {
             // if p < 0 : the value must be multiplied p times by 10
 
             if (!decimalPointFound) {
-               scale = d + p;
+               scale = d - p;;
             } else {
-               scale = p;
+               scale = postPointDigits - p;
             }
 
             if (scale > 0) {

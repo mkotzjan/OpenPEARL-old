@@ -116,7 +116,7 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::IN |
                              pearlrt::Dation::FORWARD |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim),
      pearlrt::IllegalParamSignal);
 
@@ -125,7 +125,7 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::OUT |
                              pearlrt::Dation::DIRECT |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim),
      pearlrt::IllegalParamSignal);
 
@@ -134,7 +134,7 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::OUT |
                              pearlrt::Dation::FORBACK |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim),
      pearlrt::IllegalParamSignal);
 
@@ -142,29 +142,27 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::OUT |
                              pearlrt::Dation::FORWARD |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim);
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::IDF ,
-         &fn,
-         NULL),
+         &fn, (pearlrt::Fixed<15>*)0),
      pearlrt::IllegalParamSignal);
    pearlrt::Character<8> text("PEARL");
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::OLD | pearlrt::Dation::IDF,
-         &fn,
-         NULL),
+         &fn, (pearlrt::Fixed<15>*)0),
      pearlrt::IllegalParamSignal);
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::CAN,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL),
+         (pearlrt::Fixed<15>*)0),
      pearlrt::IllegalParamSignal);
 }
 
@@ -182,7 +180,7 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::OUT |
                              pearlrt::Dation::FORWARD |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim),
      pearlrt::IllegalParamSignal);
 
@@ -191,7 +189,7 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::IN |
                              pearlrt::Dation::DIRECT |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim),
      pearlrt::IllegalParamSignal);
 
@@ -200,7 +198,7 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::IN |
                              pearlrt::Dation::FORBACK |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim),
      pearlrt::IllegalParamSignal);
 
@@ -208,29 +206,27 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::IN |
                              pearlrt::Dation::FORWARD |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim);
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::IDF ,
-         &fn,
-         NULL),
+         &fn, (pearlrt::Fixed<15>*)0),
      pearlrt::IllegalParamSignal);
    pearlrt::Character<8> text("PEARL");
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::OLD | pearlrt::Dation::IDF,
-         &fn,
-         NULL),
+         &fn, (pearlrt::Fixed<15>*)0),
      pearlrt::IllegalParamSignal);
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::CAN,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL),
+         (pearlrt::Fixed<15>*)0),
      pearlrt::IllegalParamSignal);
 }
 /**
@@ -238,7 +234,8 @@ Put/Get as  visibility test only
 */
 TEST(StdStream, putGet) {
    pearlrt::Log::info("**** StdStream put get  start ***");
-
+   pearlrt::Character<37> prompt1("give String A(8)-format and enter    ");
+   pearlrt::Character<37> prompt2("and give Fixed F(3)-format and enter ");
    pearlrt::StdStream stdOut(1);
    pearlrt::DationDim2 dim(80);
    pearlrt::Character<1> fn;
@@ -246,36 +243,53 @@ TEST(StdStream, putGet) {
                              pearlrt::Dation::OUT |
                              pearlrt::Dation::FORWARD |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim);
    ASSERT_NO_THROW(
       console.dationOpen(
          0, //pearlrt::Dation::ANY ,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL));
+         (pearlrt::Fixed<15>*)0));
    pearlrt::Character<8> text("PEARL");
    pearlrt::Fixed<31>  x(42);
    console.toA(text);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<15>)3);
+   console.toF(x, (pearlrt::Fixed<15>)5);
+   console.toSkip(1);
+   console.toF(x, (pearlrt::Fixed<15>)5, (pearlrt::Fixed<15>)1);
+   console.toSkip(1);
+   console.toF(x, (pearlrt::Fixed<15>)5, (pearlrt::Fixed<15>)2);
+   console.toSkip(1);
+   console.toF(x, (pearlrt::Fixed<15>)5, 
+                  (pearlrt::Fixed<15>)1,
+                  (pearlrt::Fixed<15>)1);
+   console.toSkip(1);
+   console.toF(x, (pearlrt::Fixed<15>)5, 
+                  (pearlrt::Fixed<15>)1,
+                  (pearlrt::Fixed<15>)-1);
+   console.toSkip(1);
 
    pearlrt::StdStream stdIn(0);
    pearlrt::DationPG keyboard(&stdIn,
                              pearlrt::Dation::IN |
                              pearlrt::Dation::FORWARD |
                              pearlrt::Dation::STREAM |
-                             pearlrt::Dation::NOCYCLIC,
+                             pearlrt::Dation::NOCYCL,
                              &dim);
    ASSERT_NO_THROW(
       keyboard.dationOpen(
          0, //pearlrt::Dation::ANY ,
          (pearlrt::Character<1>*) 0, //&fn,
-         NULL));
+         (pearlrt::Fixed<15>*)0));
+   console.toA(prompt1);
+   console.toSkip(1);
+   console.toA(prompt2);
+   console.toSkip(1);
    keyboard.fromA(text);
    keyboard.fromSkip(1);
    keyboard.fromF(x, (pearlrt::Fixed<15>)3);
    keyboard.fromSkip(1);
-   keyboard.dationClose();
+   keyboard.dationClose(0, (pearlrt::Fixed<15>*)0);
 
    pearlrt::Character<8> result("Result: ");
    console.toA(result);
@@ -283,5 +297,5 @@ TEST(StdStream, putGet) {
    console.toX(5);
    console.toF(x, (pearlrt::Fixed<15>)3);
    console.toSkip(1);
-   console.dationClose();
+   console.dationClose(0, (pearlrt::Fixed<15>*)0);
 }

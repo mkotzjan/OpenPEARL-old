@@ -230,7 +230,11 @@ namespace pearlrt {
 
          // now: x ist the base of the first digit
          do {
-            ch = (absValue / x).x;
+            if (x.x == 0) {
+               ch = 0;
+            } else {
+               ch = (absValue / x).x;
+            }
             sink.putChar(ch + '0');
             absValue = absValue - x * (Fixed<S>)ch;
             x = x / y;                  // select next digit
@@ -242,7 +246,11 @@ namespace pearlrt {
          }
 
          while (postPointDigits > 0) {
-            ch = (absValue / x).x;
+            if (x.x == 0) {
+               ch = 0;
+            } else {
+               ch = (absValue / x).x;
+            }
             sink.putChar(ch + '0');
             absValue = absValue - x * (Fixed<S>)ch;
             x = x / y;                  // select next digit
