@@ -1533,10 +1533,42 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if (ctx.close_parameterlist() != null) {
             stmt.add("paramlist", visitClose_parameterlist(ctx.close_parameterlist()));
+
+            ArrayList<String> rstVars = getCloseRstVariables(ctx.close_parameterlist());
+
+            if (rstVars.size() > 1) {
+                throw new NotSupportedFeatureException("close_statement", ctx.start.getLine(), ctx.start.getCharPositionInLine(), "CLOSE: Mulitple RST not supported");
+            }
+
+            if (rstVars.size() == 1) {
+                String var = rstVars.get(0).toString();
+
+                stmt.add("rst_var", var);
+            }
+        }
+        else {
+            ST st = group.getInstanceOf("close_parameterlist");
+            st.add("parameter", group.getInstanceOf("close_parameter_none"));
+            stmt.add("paramlist", st);
+            stmt.add("rst_var", group.getInstanceOf("close_parameter_no_rst"));
         }
 
         return stmt;
     }
+
+    private boolean isRSTSpecified(SmallPearlParser.Close_parameterlistContext ctx) {
+        boolean rstFound = false;
+
+        for (ParseTree c : ctx.children) {
+            if (c instanceof SmallPearlParser.Close_parameter_rstContext) {
+                rstFound = true;
+                break;
+            }
+        }
+
+        return rstFound;
+    }
+
 
 /*
     OpenStatement ::=
@@ -1573,7 +1605,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 stmt.add("flen", fname.length());
             }
 
-            ArrayList<String> rstVars = getRstVariables(ctx.open_parameterlist());
+            ArrayList<String> rstVars = getOpenRstVariables(ctx.open_parameterlist());
 
             if (rstVars.size() > 1) {
                 throw new NotSupportedFeatureException("open_statement", ctx.start.getLine(), ctx.start.getCharPositionInLine(), "OPEN: Mulitple RST not supported");
@@ -1610,7 +1642,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return filenames;
     }
 
-    private ArrayList<String> getRstVariables(SmallPearlParser.Open_parameterlistContext ctx) {
+    private ArrayList<String> getOpenRstVariables(SmallPearlParser.Open_parameterlistContext ctx) {
         ArrayList<String> vars = new ArrayList();
 
         if (ctx != null) {
@@ -1623,6 +1655,24 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     }
                 }
 
+            }
+        }
+
+        return vars;
+    }
+
+    private ArrayList<String> getCloseRstVariables(SmallPearlParser.Close_parameterlistContext ctx) {
+        ArrayList<String> vars = new ArrayList();
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.close_parameter().size(); i++) {
+                if (ctx.close_parameter(i) instanceof SmallPearlParser.Close_parameter_rstContext) {
+                    SmallPearlParser.Close_parameter_rstContext c = (SmallPearlParser.Close_parameter_rstContext) ctx.close_parameter(i);
+
+                    if (c.ID() != null) {
+                        vars.add(c.ID().toString());
+                    }
+                }
             }
         }
 

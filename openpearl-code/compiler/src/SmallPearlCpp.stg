@@ -658,8 +658,8 @@ close_parameterlist(parameter) ::= <%
 <parameter: {p|<p>} ; separator=" | ">
 %>
 
-close_statement(id,paramlist) ::= <<
-_<id>.dationClose(<paramlist>);
+close_statement(id,paramlist,rst_var) ::= <<
+_<id>.dationClose(<paramlist>, <if(rst_var)>&_<rst_var><else>(pearlrt::Fixed\<15>*) 0<endif>);
 >>
 
 close_parameter_can(attribute) ::= <%
@@ -673,6 +673,11 @@ pearlrt::Dation::PRM
 close_parameter_rst(id) ::= <%
 pearlrt::Dation::RST
 %>
+
+close_parameter_none(id) ::= <%
+0
+%>
+
 
 idf(id,string) ::= <%
 **IDF***
