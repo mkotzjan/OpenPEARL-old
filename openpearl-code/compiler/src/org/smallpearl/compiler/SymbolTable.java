@@ -285,4 +285,11 @@ public class SymbolTable {
         return def;
     }
 
+    public void defineBlock(Symbol s) {
+        Position occ = new Position(s.getLine(), s.getColumn());
+        BlockDef block = new BlockDef(occ, getCurrentScope());
+        addToCurrentScope(block);
+        pushScope(block);
+    }
+
 }

@@ -100,7 +100,7 @@ SystemPart(cpp_inlines) ::= <<
 
 taskSpecifierList(taskSpecifiers) ::= <<
 <taskSpecifiers: {task|
-SPCTASK(_<task>);  ************************
+SPCTASK(_<task>);
 }>
 >>
 
@@ -182,7 +182,6 @@ variable_init(value) ::= <<
 <value>
 >>
 
-
 /*********************** TYPE DEFINITION ***********************/
 
 type(simple_type,time_type) ::= <<
@@ -251,17 +250,17 @@ PUTStatement(expression,format,destination) ::= <<
     PUT( <destination>, \"<expression>\");
 >>
 
-assignment_statement(lhs,rhs) ::= <%
-_<lhs> = <rhs>;<\n>
-%>
+assignment_statement(lhs,rhs) ::= <<
+_<lhs> = <rhs>;
+>>
 
 if_statement(rhs, then_block, else_block) ::= <<
-    if ((<rhs>).getBoolean()) {
-        <then_block>
-    }
-    <if(else_block)>else {
-        <else_block>
-    }<endif> <\n>
+if ((<rhs>).getBoolean()) {
+    <then_block>
+}
+<if(else_block)>else {
+    <else_block>
+}<endif>
 >>
 
 module_global_declaration(variable) ::= <<
@@ -273,7 +272,6 @@ declaration(module_globals_declarations,task_declarations) ::= <<
 <task_declarations>
 >>
 
-
 task_body(decls,statements) ::= <<
     <decls>
     <statements>
@@ -284,14 +282,14 @@ iochannel(id) ::= "<id>"
 identifier(id) ::= "<id>"
 
 statement(srcFilename,srcLine,srcColumn,code,cpp) ::= <<
-    <if(cpp)>
-        <cpp_inline(cpp)>
-    <else>
-    <if(srcFilename)>
-        me->setLocation(<srcLine>, filename);
-    <endif>
-    <code>
-    <endif>
+<if(cpp)>
+<cpp_inline(cpp)>
+<else>
+<if(srcFilename)>
+me->setLocation(<srcLine>, filename);
+<endif>
+<code>
+<endif>
 >>
 
 simpleConstruct(_construct) ::= <<
@@ -1105,12 +1103,12 @@ TypeOfTransmissionData(all,type,size) ::= <%
 <if(type)>sizeof(<type>)<endif>
 %>
 
-block_statement(code) ::= <<
-  // BEGIN
-  {
-    <code>
-  }
-  // END
+block_statement(code,id) ::= <<
+// BLOCK BEGIN
+{
+<code>
+}
+// BLOCK END <if(id)>Block-ID:<id><endif>
 >>
 
 user_variable(name) ::= <%

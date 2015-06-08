@@ -39,6 +39,7 @@ public class Symbol {
     public static final int SYMBOL_TASK = 3;
     public static final int SYMBOL_MODULE = 4;
     public static final int SYMBOL_SEMAPHORE = 5;
+    public static final int SYMBOL_BLOCK = 6;
 
     public static final String[] SYMBOLNAME_LC = new String[]{"constant", "variable", "procedure", "task", "module", "semaphore"};
     public static final String[] SYMBOLNAME_UC = new String[]{"Constant", "Variable", "Procedure", "Task", "Module", "Semaphore"};

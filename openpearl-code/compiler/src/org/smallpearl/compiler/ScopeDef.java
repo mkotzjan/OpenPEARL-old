@@ -56,7 +56,8 @@ public abstract class ScopeDef extends Definition {
     protected void add(Definition def) throws DoubleDeclarationException {
         Definition oldDef = (Definition)elements.get(def.getName());
         if (oldDef != null) {        // Wenn ja => Doppeldefinition
-            throw new DoubleDeclarationException(def, oldDef);
+            if ( !(oldDef instanceof BlockDef))
+                throw new DoubleDeclarationException(def, oldDef);
         }
         elements.put(def.getName(), def);
         def.setParentScope(this);

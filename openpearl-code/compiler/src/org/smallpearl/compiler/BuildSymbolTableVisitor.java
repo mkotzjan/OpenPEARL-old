@@ -94,6 +94,15 @@ public class BuildSymbolTableVisitor extends SmallPearlBaseVisitor<Void> impleme
     }
 
     @Override
+    public Void visitBlock_statement(SmallPearlParser.Block_statementContext ctx) {
+        SymbolTable symtab = SymbolTable.getSymbolTable();
+        symtab.defineBlock(new Symbol(ctx.getStart()));
+        visitChildren(ctx);
+        symtab.popScope();
+        return null;
+    }
+
+    @Override
     public Void visitScalarVariableDeclaration(SmallPearlParser.ScalarVariableDeclarationContext ctx) {
 
         if (ctx != null) {

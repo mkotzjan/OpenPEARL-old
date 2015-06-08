@@ -874,8 +874,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             for (ParseTree c : ctx.children) {
                 if (c instanceof SmallPearlParser.Unlabeled_statementContext) {
                     stmt.add("code", visitUnlabeled_statement((SmallPearlParser.Unlabeled_statementContext) c));
-//                } else if (c instanceof SmallPearlParser.Block_statementContext) {
-//                    stmt.add("code", visitBlock_statement((SmallPearlParser.Block_statementContext) c));
+                } else if (c instanceof SmallPearlParser.Block_statementContext) {
+                    stmt.add("code", visitBlock_statement((SmallPearlParser.Block_statementContext) c));
                 } else if (c instanceof SmallPearlParser.Cpp_inlineContext) {
                     stmt.add("cpp", visitCpp_inline((SmallPearlParser.Cpp_inlineContext) c));
                 }
@@ -2896,21 +2896,21 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return st;
     }
 
-//    @Override
-//    public ST visitBlock_statement(SmallPearlParser.Block_statementContext ctx) {
-//        ST st = group.getInstanceOf("block_statement");
-//
-//        for (ParseTree c : ctx.children) {
-//            if ( c instanceof SmallPearlParser.ScalarVariableDeclarationContext ) {
-//                st.add("code", visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext)c));
-//            }
-//            else if ( c instanceof SmallPearlParser.StatementContext ) {
-//                st.add("code", visitStatement((SmallPearlParser.StatementContext)c));
-//            }
-//        }
-//
-//        return st;
-//    }
+    @Override
+    public ST visitBlock_statement(SmallPearlParser.Block_statementContext ctx) {
+        ST st = group.getInstanceOf("block_statement");
+
+        for (ParseTree c : ctx.children) {
+            if ( c instanceof SmallPearlParser.ScalarVariableDeclarationContext ) {
+                st.add("code", visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext)c));
+            }
+            else if ( c instanceof SmallPearlParser.StatementContext ) {
+                st.add("code", visitStatement((SmallPearlParser.StatementContext)c));
+            }
+        }
+
+        return st;
+    }
 
     private class Format {
         private String format_;
