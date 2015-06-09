@@ -27,7 +27,13 @@ fi
 # remove older stuff
 rm -f $y.cc
 rm -f $y
-java -cp /usr/local/bin/smallpearl_compiler.jar:/usr/local/lib/antlr-4.0-complete.jar  org/smallpearl/compiler/Compiler --output $y $y.prl
+
+if [ -z ${OPENPEARL_INSTALL_DIR+x} ]; then
+    java -cp /usr/local/bin/smallpearl_compiler.jar:/usr/local/lib/antlr-4.0-complete.jar  org/smallpearl/compiler/Compiler --output $y $y.prl
+else
+   java -cp $OPENPEARL_INSTALL_DIR/smallpearl_compiler.jar:/usr/local/lib/antlr-4.0-complete.jar  org/smallpearl/compiler/Compiler --output $y $y.prl
+fi
+
 rc=$?
 if [ $rc -ne 0 ]
    then
