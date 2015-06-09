@@ -1951,6 +1951,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         st.add("element", getUserVariable(element));
         st.add( "fieldwidth", ctx.fieldWidth().getText());
+
+        if ( ctx.decimalPositions() != null ) {
+            st.add( "decimalPositions", ctx.decimalPositions().getText());
+
+            if ( ctx.scaleFactor() != null ) {
+                st.add( "scaleFactor", ctx.scaleFactor().getText());
+            }
+        }
+
         return st;
     }
 
@@ -1959,6 +1968,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         st.add("element", getUserVariable(element));
         st.add( "fieldwidth", ctx.fieldWidth().getText());
+
+        if ( ctx.decimalPositions() != null ) {
+            st.add( "decimalPositions", ctx.decimalPositions().getText());
+
+            if ( ctx.scaleFactor() != null ) {
+                st.add( "scaleFactor", ctx.scaleFactor().getText());
+            }
+        }
+
         return st;
     }
 

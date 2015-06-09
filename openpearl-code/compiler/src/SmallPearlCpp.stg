@@ -727,7 +727,7 @@ put_statement_factor_position_x(element) ::= <%
 %>
 
 put_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
-    toF(<element>,<fieldwidth>)
+    toF(<element>,<fieldwidth><if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
  %>
 
 put_statement_character_string_format(element,fieldwidth) ::= <%
@@ -774,7 +774,7 @@ get_statement_factor_position_x(element) ::= <%
 %>
 
 get_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
-    fromF(<element>,<fieldwidth>)
+    fromF(<element>,<fieldwidth><if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
  %>
 
 get_statement_character_string_format(element,fieldwidth) ::= <%
