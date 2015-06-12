@@ -396,7 +396,7 @@ TaskContinuation(task,Condition,priority,at,after) ::= <<
 >>
 
 expression(code,id,bitstring,operator) ::= <%
-<if(id)>_<id><elseif(code)><code; wrap><elseif(bitstring)>pearlrt::BitString\<<bitstring>\><endif>
+<if(id)><id><elseif(code)><code; wrap><elseif(bitstring)>pearlrt::BitString\<<bitstring>\><endif>
 <if(operator)><operator><endif>
 %>
 
@@ -727,8 +727,8 @@ put_statement_factor_position_x(element) ::= <%
 %>
 
 put_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
-    toF(<element>,<fieldwidth><if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
- %>
+    toF(<element>,<fieldwidth><if(decimalPositions)>,(Fixed\<15>)(<decimalPositions>)<if(scaleFactor)>,(Fixed\<15>)(<scaleFactor>)<endif><endif>)
+%>
 
 put_statement_character_string_format(element,fieldwidth) ::= <%
 toA(<element><if(fieldwidth)>,<fieldwidth><endif>)
@@ -774,7 +774,7 @@ get_statement_factor_position_x(element) ::= <%
 %>
 
 get_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
-    fromF(<element>,<fieldwidth><if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
+    fromF(<element>,<fieldwidth><if(decimalPositions)>,(Fixed\<15>)(<decimalPositions>)<if(scaleFactor)>,(Fixed\<15>)(<scaleFactor>)<endif><endif>)
  %>
 
 get_statement_character_string_format(element,fieldwidth) ::= <%
@@ -1080,11 +1080,8 @@ static pearlrt::DationDim1 h_dim_<name>(<DIM1>); <\n>
 
 %>
 
-TypeDation(SourceSinkAttribute,ClassAttribute,AccessAttribute,Dim,StepSize) ::= <<
-pearlrt::Dation::<SourceSinkAttribute> |
-    <AccessAttribute>,
-    &h_dim_<Dim>
-    <ClassAttribute>
+TypeDation(SourceSinkAttribute,SystemDation,ClassAttribute,AccessAttribute,Dim,StepSize) ::= <<
+pearlrt::Dation::<SourceSinkAttribute> | <AccessAttribute>, &h_dim_<Dim> <ClassAttribute>
 >>
 
 ClassAttribute(alphic,basic,attribute) ::= <%
