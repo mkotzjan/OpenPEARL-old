@@ -1843,10 +1843,17 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         stmt.add("dation", getUserVariable(ctx.ID().toString()));
 
         int j = 0;
+
+        if ( ctx.formatPosition() != null && (ctx.formatPosition().size() > ctx.expression().size()) ) {
+            throw new NoOfFormatSpecifiersDoesNotMatchException("put_statement", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         for (int i = 0; i < ctx.expression().size(); i++) {
             if (ctx.formatPosition() != null) {
                 int k = 0;
                 boolean foundFormat = false;
+
+
                 while ( k < ctx.formatPosition().size() && !foundFormat) {
                     if (ctx.formatPosition(j) instanceof SmallPearlParser.FactorFormatContext) {
                         ST e = getFactorFormatForPut((SmallPearlParser.FactorFormatContext) ctx.formatPosition(j), ctx.ID().getText(), ctx.expression(i).getText());
