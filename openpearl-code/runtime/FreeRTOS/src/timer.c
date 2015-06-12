@@ -54,8 +54,8 @@ static void TaskTimerSort(void *);
 static void nsec_clock_gettime_wait(uint64_t*);
 static int timerarm_wait(int64_t alarm);
 
-void (* nsec_clock_gettime)(uint64_t*) = &nsec_clock_gettime_wait;
-int (*timerarm)(int64_t alarm) = &timerarm_wait;
+void (*nsec_clock_gettime)(uint64_t*) = nsec_clock_gettime_wait;
+int (*timerarm)(int64_t alarm) = timerarm_wait;
 
 struct internaltimerspec{
 	uint64_t nsec_value;
@@ -92,7 +92,7 @@ static struct tableentry table[(timer_t)MAXTIMER];//endof range is special and m
 static void nsec_clock_gettime_wait(uint64_t *alarm){
 	while(*nsec_clock_gettime == &nsec_clock_gettime_wait)
 		DMB();
-	(*nsec_clock_gettime)(alarm);
+	nsec_clock_gettime(alarm);
 }
 
 static int timerarm_wait(int64_t alarm){
@@ -295,84 +295,66 @@ static void TaskTimerSort(void *pcParameters){
 	timindex = firstactive;
 	/*Nested functions are a non-standard GCC extension
 	 * just cut and paste if it is an issue */
-	void insertfirstactive(){
-		ENTERCRITICAL;
-		struct tableentry* const that = &table[lastunsorted];
-		const timer_t thatindex = lastunsorted;
-		if(tablestate.sorttaskreset==1){
-			LEAVECRITICAL;return;}
-		if(!(tablestate.unsorted&&(!tablestate.active))){
-			LEAVECRITICAL;return;}
-		if(that->prev==that->next)
-			tablestate.unsorted=0;
-		lastunsorted = that->prev;
-		table[that->prev].next = that->prev; //terminate former predecessor in unsorted list
-		that->prev = that->next = firstactive = thatindex;
-		tablestate.active = 1;
-		LEAVECRITICAL;
-		vTaskResume(xClackerTaskHandle);
-	}
-	void timer_put(	const timer_t previndex,
+	void timer_put(	timer_t previndex,
 							const timer_t nextindex){
 		struct tableentry *const prev = &table[previndex];
 		struct tableentry *const next = &table[nextindex];
 
-		//preventry == nextentry means either first or last
 		ENTERCRITICAL;
 		struct tableentry *const that = &table[lastunsorted];
 		const unsigned int thatindex = lastunsorted;
-		//check
-		if(tablestate.sorttaskreset==1){
+		if(tablestate.sorttaskreset){
 			LEAVECRITICAL;return;}
-		if(tablestate.active==0||tablestate.unsorted==0){
-			LEAVECRITICAL;return;}
+		if(!tablestate.active){
+			if(!(thatindex==previndex&&previndex==nextindex)){
+			LEAVECRITICAL;return;}}
 		if(!(prev->value.nsec_value <= that->value.nsec_value)){
 			LEAVECRITICAL;return;}
 		if(!(next->value.nsec_value >= that->value.nsec_value)){
 			LEAVECRITICAL;return;}
-		if(prev==next){
-			LEAVECRITICAL;return;}
-		//check was okay. so actually insert:
-		if(nextindex == firstactive)
-			firstactive = lastunsorted;
+		if(prev->prev == previndex)
+			firstactive = previndex;
 		if(that->next == that->prev)//lastunsorted == firstunsorted
 			tablestate.unsorted = 0;
 		lastunsorted = that->prev;
-
 		table[that->prev].next = that->prev;
 		table[previndex].next = thatindex;
 		table[nextindex].prev = thatindex;
 		that->prev=previndex;
 		that->next=nextindex;
-
+		tablestate.active = 1;
 		LEAVECRITICAL;
 		vTaskResume(xClackerTaskHandle);
 	}
 	for(;;){
-		while(tablestate.unsorted){
-			if(tablestate.sorttaskreset){
-				ENTERCRITICAL;
-				tablestate.sorttaskreset=0;
-				timindex = firstactive;
-				LEAVECRITICAL;
-			}
+		TTSBegin://used to match flow diagram
+		tablestate.sorttaskreset=0;
+		timindex = firstactive;
+		if(tablestate.unsorted){
 			if(!tablestate.active){
-				insertfirstactive();
+				timer_put(lastunsorted,lastunsorted);
+				goto TTSBegin;
 			}
-			else if(table[lastunsorted].value.nsec_value < table[firstactive].value.nsec_value){
+			if(table[lastunsorted].value.nsec_value < table[firstactive].value.nsec_value){
 				timer_put(lastunsorted, firstactive);
-				timindex=firstactive;
+				goto TTSBegin;
 			}
-			else if(table[lastunsorted].value.nsec_value < table[timindex].value.nsec_value){
-				timer_put(table[timindex].prev,timindex);//new 'normal' entry or first entry
-				timindex=firstactive;
+		}
+		while(tablestate.unsorted){
+			timindex = table[timindex].next;
+			if(table[lastunsorted].value.nsec_value < table[timindex].value.nsec_value){
+				timer_put(table[timindex].prev, timindex);
+				goto TTSBegin;
 			}
-			else if(table[timindex].next == timindex){
-				timer_put(timindex,lastunsorted);//new last entry
-				timindex=firstactive;
+			if(table[timindex].next == timindex){ //end of active list
+				timer_put(timindex,lastunsorted);
+				goto TTSBegin;
 			}
-			else{
-				timindex = table[timindex].next;
+			if(!(table[timindex].next < MAXTIMER)){
+				//this is a serious fault and should never happen
+				for(;;){
+					vTaskSuspend(NULL);
+				}
 			}
 		}
 		vTaskSuspend(NULL);
