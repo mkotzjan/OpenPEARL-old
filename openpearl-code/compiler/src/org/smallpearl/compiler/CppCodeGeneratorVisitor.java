@@ -1844,7 +1844,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         int j = 0;
 
-        if ( ctx.formatPosition() != null && (ctx.formatPosition().size() > ctx.expression().size()) ) {
+        int formatCount = 0;
+        for ( int i = 0; i < ctx.formatPosition().size(); i++ ) {
+            if (ctx.formatPosition(i) instanceof SmallPearlParser.FactorFormatContext) {
+                formatCount++;
+            }
+        }
+
+        if ( formatCount > ctx.expression().size() ) {
             throw new NoOfFormatSpecifiersDoesNotMatchException("put_statement", ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1852,7 +1859,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             if (ctx.formatPosition() != null) {
                 int k = 0;
                 boolean foundFormat = false;
-
 
                 while ( k < ctx.formatPosition().size() && !foundFormat) {
                     if (ctx.formatPosition(j) instanceof SmallPearlParser.FactorFormatContext) {
