@@ -305,6 +305,8 @@ static void TaskTimerSort(void *pcParameters){
 		const unsigned int thatindex = lastunsorted;
 		if(tablestate.sorttaskreset){
 			LEAVECRITICAL;return;}
+		if(!tablestate.unsorted){
+			LEAVECRITICAL;return;}
 		if(!tablestate.active){
 			if(!(thatindex==previndex&&previndex==nextindex)){
 			LEAVECRITICAL;return;}}
@@ -333,29 +335,22 @@ static void TaskTimerSort(void *pcParameters){
 		if(tablestate.unsorted){
 			if(!tablestate.active){
 				timer_put(lastunsorted,lastunsorted);
-				goto TTSBegin;
-			}
+				goto TTSBegin;}
 			if(table[lastunsorted].value.nsec_value < table[firstactive].value.nsec_value){
 				timer_put(lastunsorted, firstactive);
-				goto TTSBegin;
-			}
+				goto TTSBegin;}
 		}
 		while(tablestate.unsorted){
 			timindex = table[timindex].next;
 			if(table[lastunsorted].value.nsec_value < table[timindex].value.nsec_value){
 				timer_put(table[timindex].prev, timindex);
-				goto TTSBegin;
-			}
+				goto TTSBegin;}
 			if(table[timindex].next == timindex){ //end of active list
 				timer_put(timindex,lastunsorted);
-				goto TTSBegin;
-			}
-			if(!(table[timindex].next < MAXTIMER)){
-				//this is a serious fault and should never happen
-				for(;;){
+				goto TTSBegin;}
+			if(!(table[timindex].next < MAXTIMER))
+				for(;;)//this is a serious fault and should never happen
 					vTaskSuspend(NULL);
-				}
-			}
 		}
 		vTaskSuspend(NULL);
 	}
