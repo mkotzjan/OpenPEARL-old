@@ -1099,13 +1099,30 @@ The fixed format describes the external representation of decimal fixed
 point numbers. The field width w is the complete number of characters
 available for the decimal number; decimal positions d denote the number
 of digits behind the decimal point. The scale factor p can be both
-positive or negative; it causes that not the number itself, but its
+positive or negative; 
+\begin{removed}
+it causes that not the number itself, but its
 value multiplied by 10$^{**}$p is transferred.
+\end{removed}
+\begin{added}
+the bahavior is described separatelly for input and output.
+\end{added}
 
+\begin{removed}
 It is important that only integers can be transferred with the fixed
 format, but also the processing of fractional fixed point numbers is
 possible by scaling. These are converted to integers upon input and to
 fractional numbers again upon output.
+\end{removed}
+
+\begin{added}
+It is important that 
+ integers and floats can be transferred with the fixed
+format. 
+The processing of fractional fixed point numbers is
+possible by scaling. These are converted to integers upon input and to
+fractional numbers again upon output.
+\end{added}
 
 \begin{removed}
 \begin{enumerate}
@@ -1167,7 +1184,7 @@ w in the form
 
 where pi means positive integer. If the number does not occupy the
 entire field, the left part is padded with spaces.
-\item If 0 $>$ d or w $<$ d, the FixedFormatSignal is induced
+\item If 0 $>$ d or w $\leq$ d, the FixedFormatSignal is induced
 \item In case w $\leq$ 0, the FixedFormatSignal is induced
 \item If d = 0 or is not given, only the integer part of the decimal
 number rounded without decimal point is written out.
@@ -1175,6 +1192,8 @@ number rounded without decimal point is written out.
 leading zeros are suppressed.
 \item if the output value does not fit into the given field width 
    (also regarding p), the FixedValueSignal is induced.
+\item The scale factor p causes that not the number itself, but its
+value multiplied by 10$^{**}$-p is transferred.
 \end{enumerate}
 \item {\bf Input}
 \begin{enumerate}
@@ -1190,17 +1209,20 @@ digits are interpreted as positions following a decimal point. It must
 be p $\geq$ d.
 \item If a decimal point occurs in front of the last b digits in the
 representation, then it has priority over the specification by d. In
-this case, the statement of d has no meaning. It must be p$\geq$ b.
+this case, the statement of d has no meaning. Nevertheless the value must
+be reasonable in respect to the other rules. 
 \item If w $\leq$ 0, no assignment takes place;
     the FixedFormatSignal is induced
-\item If d $<$ 0 or w $<$ d, no assignmant happens and 
+\item If d $<$ 0 or w $\leq$ d, no assignmant happens and 
     the FixedFormatSignal is induced
 \item If the data in the input field does not match a valid fixed 
    number, the FixedValueSignal is induced
+\item The scale factor p causes that not the number itself, but its
+value multiplied by 10$^{**}$p is transferred.
 \end{enumerate}
 \end{enumerate}
 
-Example:
+Example for output:
 
 \begin{tabular}{lll}
 value  & format   & output \\ \hline
@@ -1211,8 +1233,28 @@ value  & format   & output \\ \hline
 275.2  & F(4,1)   &  \x \x {\em FixedValueSignal!} \\
 22.8   & F(5)     & \_\_\_23 \\
 212.73 & F(9,2,2) & \_21273.00 \\
-212.73 & F(9,2)   & \_\_\_212.73
+212.73 & F(9,2)   & \_\_\_212.73 \\
+21273 & F(9,2,-2)   & \_\_\_212.73 \\
+212 & F(9,2,+2)   & \_21200.00 \\
 \end{tabular}
+\end{added}
+
+\begin{added}
+Example for input:
+
+\begin{tabular}{llll}
+       &          & \multicolumn{2}{c}{input as}  \\ 
+       &          & FIXED & FLOAT  \\ \hline
+13.5   & F(7,1)   &  14 & 13.5   \\
+13.5   & F(5)     &  14 & 13.5   \\
+275.2  & F(4,1)   & 275 & 275.2 \\
+\_21273.00 & F(9,2,2) & 213 & 212.73 \\
+\ \ \ 212.73 &  F(9,2)&  213 & 213,73 \\
+\_\_\_212.73 & F(9,2,-2) & 21273 & 21273.0 \\
+\_\_\_21273 & F(9,2,-2) & 21273 & 21273.0 \\
+\_21273.00 & F(9,2,+2)   & 213 & 212.73 \\
+\end{tabular}
+
 \end{added}
 
 \subsection{The Float Format (E)}   % 10.5.2

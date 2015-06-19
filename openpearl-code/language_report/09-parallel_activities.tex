@@ -88,9 +88,12 @@ TaskBody ::= \\
 \x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
 
 If no priority is given in a task declaration, priority 255 is assumed.
-\addedtext{The priority value must be in the range from 1 to 255. 
+\begin{added}
+The priority value must be in the range from 1 to 255. 
 In case the priority value is not inside this range the PrioOutOfRangeSignal
-is induced.}
+is induced. Each target plattform must support at least the priorities 1 and 255. In case a requested priority is not avaliable on the current plattform
+the PrioNotMappableSignal is induced.
+\end{added}
 
 
 The general form of a task specification reads:
