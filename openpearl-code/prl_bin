@@ -40,7 +40,7 @@ if [ $rc -ne 0 ]
       echo "terminate due to errors in stage 1"
       exit $rc
 fi
-g++  $y.cc -o $y /usr/local/lib/plib.a -lrt -lpthread -lm
+g++  $y.cc -o $y /usr/local/lib/plib.a -lrt -lpthread -lm -trigraphs
 rc=$?
 if [ $rc -eq 0 ]
    then
