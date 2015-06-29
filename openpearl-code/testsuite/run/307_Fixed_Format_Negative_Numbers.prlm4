@@ -1,0 +1,87 @@
+/************************************
+Testing the Get Statement for Negative Numbers
+When decimal precision is given
+there should be enough space for the 
+sign and the decimal point. 
+Rounding should be according to DIN standards
+always round away from 0 when the last digit is 5.
+
+************************************/
+
+
+
+
+MODULE(Fixed_Format_Negative_Numbers);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_testing.m4h})
+include({m4_exception.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Test1: TASK MAIN;
+     DCL (fixed_out,fixed_in) FIXED(15) INIT(0,0);
+     DCL (float_out,float_in) FIXED(53) INIT(0.0,0.0);
+     DCL result_fixed FIXED(63) INIT (0);
+     DCL result_float FLOAT(53) INIT(0.0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+     fixed_out := -1;
+     PUT fixed_out TO pipe_out BY F(2), SKIP;
+     GET fixed_in FROM pipe_in BY F(2);
+     EXPECT_EQ({fixed_in},{fixed_out});
+
+     float_out := -10.6;
+     result_float := 11;
+     PUT float_out TO pipe_out BY F(3), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({fixed_in},{result_fixed});
+
+     float_out := -10.5;
+     result_float := 11;
+     PUT float_out TO pipe_out BY F(3), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({fixed_in},{result_fixed});
+
+     float_out := -10.4;
+     result_float := 10;
+     PUT float_out TO pipe_out BY F(3), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({fixed_in},{result_fixed});
+
+
+
+
+
+
+     float_out := -12.3;
+     PUT float_out TO pipe_out BY F(5), SKIP;
+     EXPECT_THROW({GET float_in FROM pipe_in BY F(1), SKIP;});		! Reading only the sign character should result into an exception 
+
+     
+    
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+include({m4_check_header.m4h})
+END;
+MODEND;
+

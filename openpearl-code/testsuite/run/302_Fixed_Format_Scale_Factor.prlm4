@@ -1,0 +1,100 @@
+/****************************************
+Testing PUT and GET statements with Fixed Format Scale Factor p.
+The Scale Factor multiplies the value with 10 to the power of p
+(10**p). The factor should work symmetrically so the same factor 
+applied on PUT and GET should result in the same value at the end
+which means PUT multiplies 10**p and GET multiplies 10**(-p).
+Scale Factor accepts negative and positive integer values.
+****************************************/
+
+
+
+MODULE(Fixed_Format_Scale_Factor);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_exception.m4h})
+include({m4_testing.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Test1: TASK MAIN;
+     DCL (fixed_out,fixed_in) FIXED(31) INIT(0,0);
+     DCL (float_out,float_in) FLOAT(53) INIT(0.0,0.0);
+     DCL result_fixed FIXED(63) INIT (0);
+     DCL result_float FLOAT(53) INIT(0.0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+
+     
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+
+     fixed_out := 1;
+     result_fixed := 100;
+     PUT fixed_out TO pipe_out BY F(3,0,2), SKIP;
+     GET fixed_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({fixed_in},{result_fixed});
+
+     fixed_out := 2;
+     result_fixed := 2000;
+     PUT fixed_out TO pipe_out BY F(4,0,3), SKIP;                         
+     GET fixed_in FROM pipe_in BY F(4), SKIP;                          
+     EXPECT_EQ({fixed_in},{result_fixed});
+
+     fixed_out := 3;
+     result_float := 0.3;
+     PUT fixed_out TO pipe_out BY F(2,0,-1), SKIP;
+     GET fixed_in FROM pipe_in BY F(2), SKIP;
+     EXPECT_EQ({fixed_in},{result_float});
+     result_float := 0.1;
+     float_out := 1.0;
+     PUT float_out TO pipe_out BY F(3,0,-1), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({float_in},{result_float});
+
+     result_float := 0.01;
+     fixed_out := 1;
+     PUT fixed_out TO pipe_out BY F(4,2,-2), SKIP;
+     GET float_in FROM pipe_in BY F(4), SKIP;
+     EXPECT_EQ({float_in},{result_float});
+
+     PUT fixed_out TO pipe_out BY F(4,2,-2), SKIP;
+     GET float_in FROM pipe_in BY F(4,2,-2), SKIP;
+     EXPECT_EQ({float_out},{float_in});
+
+     result_fixed := 100;
+     fixed_out := 1;
+     PUT fixed_out TO pipe_out BY F(3,0,2), SKIP;
+     GET fixed_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({fixed_in},{result_fixed});
+
+     PUT fixed_out TO pipe_out BY F(3,0,2), SKIP;
+     GET fixed_in FROM pipe_in BY F(3,0,2), SKIP;
+     EXPECT_EQ({fixed_out},{fixed_in});
+
+
+
+
+
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+include({m4_check_header.m4h})
+END;
+MODEND;
+
