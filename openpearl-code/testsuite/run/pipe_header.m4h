@@ -1,0 +1,8 @@
+__cpp__(
+  'static pearlrt::Pipe s_pipe("/tmp/pipe", 2, "OPEN1");'
+  'pearlrt::Device *d_pipe = &s_pipe;'
+);
+__cpp__(
+  'pearlrt::SystemDationNB* _pipe = '
+  'static_cast<pearlrt::SystemDationNB*>(d_pipe);'
+);

@@ -50,6 +50,8 @@ clean:
 	rm -f *.o
 	rm -f *.prl.out
 	rm -f *.log
+	./clean_m4.sh
+	
 
 run: 
 	@echo "run simple test programs"

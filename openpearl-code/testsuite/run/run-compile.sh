@@ -1,5 +1,15 @@
 #!/bin/bash
 
+m4files=`ls *.prlm4`
+
+for file in $m4files
+do
+	output=`basename $file .prlm4`
+	m4 $file > "$output.prl"
+done
+
+
+
 TESTS=`ls *.prl`
 
 nooftests=0
