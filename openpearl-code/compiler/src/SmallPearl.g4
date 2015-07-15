@@ -696,7 +696,7 @@ loopStatement_for:
      ;
 
 loopStatement_from:
-    'FROM' ID
+    'FROM' expression
      ;
 
 loopStatement_by:

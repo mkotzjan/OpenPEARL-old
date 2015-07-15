@@ -904,6 +904,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             statement.add("code", visitCallStatement(ctx.callStatement()));
         } else if (ctx.returnStatement() != null) {
             statement.add("code", visitReturnStatement(ctx.returnStatement()));
+        } else if (ctx.loopStatement() != null) {
+            statement.add("code", visitLoopStatement(ctx.loopStatement()));
         }
 
         return statement;
@@ -2994,6 +2996,41 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             else if ( c instanceof SmallPearlParser.StatementContext ) {
                 st.add("code", visitStatement((SmallPearlParser.StatementContext)c));
             }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitLoopStatement(SmallPearlParser.LoopStatementContext ctx) {
+        ST st = group.getInstanceOf("LoopStatement");
+
+        if ( ctx.loopStatement_for() != null) {
+            st.add( "variable", ctx.loopStatement_for().ID().toString());
+        }
+
+        if ( ctx.loopStatement_from() != null) {
+            st.add("from", getExpression(ctx.loopStatement_from().expression()));
+        }
+
+        if ( ctx.loopStatement_by() != null) {
+            st.add("by", getExpression(ctx.loopStatement_by().expression()));
+        }
+
+        if ( ctx.loopStatement_to() != null) {
+            st.add( "to", getExpression(ctx.loopStatement_to().expression()));
+        }
+
+        if ( ctx.loopStatement_while() != null) {
+            st.add( "while_cond", getExpression(ctx.loopStatement_while().expression()));
+        }
+
+        for (int i = 0; i < ctx.scalarVariableDeclaration().size(); i++) {
+            st.add("body", visitScalarVariableDeclaration(ctx.scalarVariableDeclaration(i)));
+        }
+
+        for ( int i = 0; i < ctx.statement().size(); i++) {
+            st.add("body", visitStatement(ctx.statement(i)));
         }
 
         return st;

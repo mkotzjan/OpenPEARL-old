@@ -401,7 +401,7 @@ expression(code,id,bitstring,operator) ::= <%
 %>
 
 literal(integer,float,string,time,duration) ::= <%
-<if(integer)>((pearlrt::Fixed\<31>)<integer>)<endif>
+<if(integer)>((pearlrt::Fixed\<31>)(<integer>))<endif>
 <if(float)>(pearlrt::Float\<24>)(<float>)<endif>
 <if(string)>"<string>"<endif>
 <if(time)>pearlrt::Clock(<time>)<endif>
@@ -719,19 +719,19 @@ put_statement_factor_position_rst(element) ::= <%
 %>
 
 put_statement_factor_position_skip(element) ::= <%
-    toSkip((pearlrt::Fixed\<31>)<element>)
+    toSkip((pearlrt::Fixed\<31>)(<element>))
 %>
 
 put_statement_factor_position_x(element) ::= <%
-    toX((pearlrt::Fixed\<31>)<element>)
+    toX((pearlrt::Fixed\<31>)(<element>))
 %>
 
 put_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
-    toF((pearlrt::Fixed\<31>)<element>,<fieldwidth><if(decimalPositions)>,(Fixed\<31>)(<decimalPositions>)<if(scaleFactor)>,<scaleFactor><endif><endif>)
+    toF(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
 %>
 
 put_statement_character_string_format(element,fieldwidth) ::= <%
-toA(<element><if(fieldwidth)>,(pearlrt::Fixed\<31>)<fieldwidth><endif>)
+toA(<element><if(fieldwidth)>,(pearlrt::Fixed\<31>)(<fieldwidth>)<endif>)
  %>
 
 /************************* GET STATEMENT *************************/
@@ -766,19 +766,19 @@ get_statement_factor_position_rst(element) ::= <%
 %>
 
 get_statement_factor_position_skip(element) ::= <%
-    fromSkip((pearlrt::Fixed\<31>)<element>)
+    fromSkip((pearlrt::Fixed\<31>)(<element>))
 %>
 
 get_statement_factor_position_x(element) ::= <%
-    fromX((pearlrt::Fixed\<31>)<element>)
+    fromX((pearlrt::Fixed\<31>)(<element>))
 %>
 
 get_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
-    fromF((pearlrt::Fixed\<31>)<element>,(pearlrt::Fixed\<31>)<fieldwidth><if(decimalPositions)>,(Fixed\<31>)(<decimalPositions>)<if(scaleFactor)>,(Fixed\<31>)(<scaleFactor>)<endif><endif>)
+    fromF(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,(pearlrt::Fixed\<31>)(<decimalPositions>)<if(scaleFactor)>,<scaleFactor><endif><endif>)
  %>
 
 get_statement_character_string_format(element,fieldwidth) ::= <%
-fromA(<element><if(fieldwidth)>,(pearlrt::Fixed\<31>)<fieldwidth><endif>)
+fromA(<element><if(fieldwidth)>,(pearlrt::Fixed\<31>)(<fieldwidth>)<endif>)
  %>
 
 /******************************** CALL Statement *********************************/
@@ -1115,4 +1115,17 @@ block_statement(code,id) ::= <<
 
 user_variable(name) ::= <%
     _<name>
+%>
+
+/* --------------------- LOOPS -------------------------- */
+
+LoopStatement(variable,from,by,to,while_cond,body) ::= <%
+for(<if(variable)>(pearlrt::Fixed\<31>) <variable> = <endif>
+    <if(from)><from><else>(pearlrt::Fixed\<31>)(1)<endif>;
+    <if(to)><variable> \< <to><endif>
+    <if(while_cond)>, <while_cond><endif>;
+    <if(by)><variable> = <variable> + (pearlrt::Fixed\<31>)(<by>)<else>(pearlrt::Fixed\<31>)(<variable>)++<endif>
+    ) {
+    <body>
+}
 %>
