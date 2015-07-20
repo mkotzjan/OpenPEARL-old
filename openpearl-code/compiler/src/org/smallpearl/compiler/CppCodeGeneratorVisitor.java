@@ -677,6 +677,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     problem_part.add("DationSpecifications", visitDationSpecification((SmallPearlParser.DationSpecificationContext) c));
                 } else if (c instanceof SmallPearlParser.DationDeclarationContext) {
                     problem_part.add("DationDeclarations", visitDationDeclaration((SmallPearlParser.DationDeclarationContext) c));
+                } else if (c instanceof SmallPearlParser.ProcedureDeclarationContext) {
+                    problem_part.add("ProcedureDeclarations", visitProcedureDeclaration((SmallPearlParser.ProcedureDeclarationContext) c));
                 }
             }
         }
@@ -1268,7 +1270,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitReturnStatement(SmallPearlParser.ReturnStatementContext ctx) {
         ST stmt = group.getInstanceOf("return_statement");
-//TODO:         stmt.add("expression", visitExpression(ctx.expression()));
+        stmt.add("expression", getExpression(ctx.expression()));
         return stmt;
     }
 
@@ -3031,6 +3033,120 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         for ( int i = 0; i < ctx.statement().size(); i++) {
             st.add("body", visitStatement(ctx.statement(i)));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitProcedureDeclaration(SmallPearlParser.ProcedureDeclarationContext ctx) {
+        ST st = group.getInstanceOf("ProcedureDeclaration");
+
+        st.add("id", ctx.ID().getText());
+
+        for (ParseTree c : ctx.children) {
+            if (c instanceof SmallPearlParser.ProcedureBodyContext) {
+                st.add("body", visitProcedureBody((SmallPearlParser.ProcedureBodyContext) c));
+            } else
+            if (c instanceof SmallPearlParser.ResultAttributeContext) {
+                st.add("resultAttribute", visitResultAttribute((SmallPearlParser.ResultAttributeContext) c));
+            } else
+            if (c instanceof SmallPearlParser.GlobalAttributeContext) {
+                st.add("globalAttribute", visitGlobalAttribute((SmallPearlParser.GlobalAttributeContext) c));
+            } else
+            if (c instanceof SmallPearlParser.ListOfFormalParametersContext) {
+                st.add("listOfFormalParameters", visitListOfFormalParameters((SmallPearlParser.ListOfFormalParametersContext) c));
+            }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitListOfFormalParameters(SmallPearlParser.ListOfFormalParametersContext ctx) {
+        ST st = group.getInstanceOf("ListOfFormalParameters");
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.formalParameter().size(); i++) {
+                st.add("FormalParameters", visitFormalParameter(ctx.formalParameter(i)));
+            }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitFormalParameter(SmallPearlParser.FormalParameterContext ctx) {
+        ST st = group.getInstanceOf("FormalParameters");
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.ID().size(); i++) {
+                ST param = group.getInstanceOf("FormalParameter");
+                param.add("id", ctx.ID(i));
+                param.add("type", visitParameterType(ctx.parameterType()));
+                st.add( "FormalParameter", param);
+            }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitParameterType(SmallPearlParser.ParameterTypeContext ctx) {
+        ST st = group.getInstanceOf("ParameterType");
+
+        for (ParseTree c : ctx.children) {
+            if (c instanceof SmallPearlParser.SimpleTypeContext) {
+                st.add("type", visitSimpleType(ctx.simpleType()));
+            }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitProcedureBody(SmallPearlParser.ProcedureBodyContext ctx) {
+        ST st = group.getInstanceOf("ProcedureBody");
+
+        if(ctx != null && ctx.children != null ) {
+            for (ParseTree c : ctx.children) {
+                if (c instanceof SmallPearlParser.ScalarVariableDeclarationContext) {
+                    st.add("scalarDeclarations", visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext) c));
+                } else if (c instanceof SmallPearlParser.StatementContext) {
+                    st.add("statements", visitStatement((SmallPearlParser.StatementContext) c));
+                }
+            }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitGlobalAttribute(SmallPearlParser.GlobalAttributeContext ctx) {
+        ST st = group.getInstanceOf("GlobalAttribute");
+
+        st.add("id", ctx.ID().getText());
+
+        return st;
+    }
+
+    @Override
+    public ST visitResultAttribute(SmallPearlParser.ResultAttributeContext ctx) {
+        ST st = group.getInstanceOf("ResultAttribute");
+
+        st.add("resultType", visitResultType(ctx.resultType()));
+
+        return st;
+    }
+
+    @Override
+    public ST visitResultType(SmallPearlParser.ResultTypeContext ctx) {
+        ST st = group.getInstanceOf("ResultType");
+
+        for (ParseTree c : ctx.children) {
+            if (c instanceof SmallPearlParser.SimpleTypeContext) {
+                st.add("type", visitSimpleType(ctx.simpleType()));
+            }
         }
 
         return st;

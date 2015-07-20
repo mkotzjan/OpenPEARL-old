@@ -307,7 +307,7 @@ typeAttribute :
 // SimpleType ::=
 //    TypeInteger | TypeFloatingPointNumber | TypeBitString | TypeCharacterString | TypeTime | TypeDuration
 ////////////////////////////////////////////////////////////////////////////////
-    
+
 simpleType :
        typeInteger 
      | typeFloatingPointNumber
@@ -446,7 +446,7 @@ listOfFormalParameters :
 ////////////////////////////////////////////////////////////////////////////////
 
 formalParameter :
-    ID ( ',' ID)*
+    ( ID | '(' ID ( ',' ID)* ')' ) parameterType
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -458,6 +458,11 @@ formalParameter :
 //   SimpleType | TypeReference | TypeStructure
 //  | Identifier§ForType | TypeDation | TypeRealTimeObject
 ////////////////////////////////////////////////////////////////////////////////
+
+parameterType :
+      simpleType
+    | typeDation
+    ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: TypeRealTimeObject ::=

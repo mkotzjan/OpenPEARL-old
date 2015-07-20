@@ -118,7 +118,7 @@ globalDecl(decls) ::= <<
 
 /*********************** PROBLEM PART ***********************/
 
-ProblemPart(ScalarVariableDeclarations,SemaDeclarations,temporarySemaphoreArrays,TaskDeclarations,DationSpecifications,DationDeclarations) ::= <<
+ProblemPart(ScalarVariableDeclarations,SemaDeclarations,temporarySemaphoreArrays,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureDeclarations) ::= <<
 /////////////////////////////////////////////////////////////////////////////
 // PROBLEM PART
 /////////////////////////////////////////////////////////////////////////////
@@ -156,6 +156,13 @@ ProblemPart(ScalarVariableDeclarations,SemaDeclarations,temporarySemaphoreArrays
 // TEMPORARY SEMAPHORE ARRAYS
 /////////////////////////////////////////////////////////////////////////////
 <temporarySemaphoreArrays>
+<endif>
+
+<if(ProcedureDeclarations)>
+/////////////////////////////////////////////////////////////////////////////
+// PROCEDURE DECLARATIONS
+/////////////////////////////////////////////////////////////////////////////
+<ProcedureDeclarations>
 <endif>
 
 <if(TaskDeclarations)>
@@ -1128,4 +1135,45 @@ for(<if(variable)>(pearlrt::Fixed\<31>) <variable> = <endif>
     ) {
     <body>
 }
+%>
+
+/* --------------------- PROCEDURES -------------------------- */
+
+ProcedureDeclaration(id,listOfFormalParameters,body,resultAttribute,globalAttribute) ::= <<
+<if(resultAttribute)><resultAttribute><else>void<endif>
+<id>(<listOfFormalParameters>)
+{
+    <body>
+}
+
+
+>>
+
+ProcedureBody(scalarDeclarations,statements) ::= <<
+<scalarDeclarations>
+<statements>
+>>
+
+ResultAttribute(resultType) ::= <%
+    <resultType>
+%>
+
+ResultType(type) ::= <%
+    <type>
+%>
+
+ListOfFormalParameters(FormalParameters) ::= <%
+<FormalParameters: {param|<param>} ; separator=", ">
+%>
+
+FormalParameters(FormalParameter) ::= <%
+<FormalParameter: {param|<param>} ; separator=", ">
+%>
+
+FormalParameter(id,type) ::= <%
+<type> <id>
+%>
+
+ParameterType(type) ::= <%
+<type>
 %>
