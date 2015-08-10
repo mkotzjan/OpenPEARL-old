@@ -235,7 +235,7 @@ namespace pearlrt {
       \tparam S size of the string
       */
       template<size_t S>
-      void toA(Character<S> & s, Fixed<15> w) {
+      void toA(Character<S> & s, Fixed<31> w) {
          RefCharacter rc;
          rc.setWork(s);
          // performs checks and output
@@ -251,7 +251,7 @@ namespace pearlrt {
       */
 
       template<size_t S>
-      void fromA(Character<S> & s, Fixed<15> w) {
+      void fromA(Character<S> & s, Fixed<31> w) {
          GetCharacter<S>::fromA(s, w, source);
          return;
       }
@@ -268,9 +268,9 @@ namespace pearlrt {
        */
       template<int S>
       void toF(Fixed<S> & f,
-               const Fixed<15> w,
-               const Fixed<15> d = 0,
-               const Fixed<15> s = 0) {
+               const Fixed<31> w,
+               const Fixed<31> d = 0,
+               const Fixed<31> s = 0) {
          PutFixed<S>::toF(f, w, d, s, sink);
       };
 
@@ -285,9 +285,9 @@ namespace pearlrt {
       */
       template<int S>
       void fromF(Fixed<S> & f,
-                 const Fixed<15> w,
-                 const Fixed<15> d = 0,
-                 const Fixed<15> s = 0) {
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0,
+                 const Fixed<31> s = 0) {
          GetFixed<S>::fromF(f, w, d, s, source);
       };
 
@@ -301,8 +301,8 @@ namespace pearlrt {
        \param d number of decimals to be used
        */
       void toT(const Clock f,
-               const Fixed<15> w,
-               const Fixed<15> d = 0);
+               const Fixed<31> w,
+               const Fixed<31> d = 0);
 
 
       /**
@@ -313,8 +313,8 @@ namespace pearlrt {
        \param d number of decimals to be used
        */
       void toD(const Duration& f,
-               const Fixed<15> w,
-               const Fixed<15> d = 0);
+               const Fixed<31> w,
+               const Fixed<31> d = 0);
 
       /**
       output format T
@@ -324,8 +324,8 @@ namespace pearlrt {
       \param d number of decimals to be used
       */
       void fromT(Clock & f,
-                 const Fixed<15> w,
-                 const Fixed<15> d = 0) ;
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0) ;
 
    };
 }

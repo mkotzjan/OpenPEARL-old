@@ -11,9 +11,9 @@ __cpp__(
      'pearlrt::Device * d_disc = & s_disc;'
 );
 /*  */
-!PROBLEM;
+PROBLEM;
 
-   SPC disc DATION INOUT SYSTEM ALL;
+   SPC disc DATION INOUT /* SYSTEM */ ALL;
 /* expected C++ code keyword SYSTEM ALL -> 
    static_cast<pearlrt::SystemDationNB*>
 
@@ -22,7 +22,6 @@ __cpp__('extern pearlrt::Decice* d_disc;'
         '    static_cast<pearlrt::SystemDationNB*>(d_disc);');
 
  */
-PROBLEM;
 
    DCL table DATION INOUT ALPHIC DIM(*,80)
              FORWARD NOCYCL  NOSTREAM 
@@ -31,15 +30,13 @@ PROBLEM;
 FileTest1: TASK MAIN;
      DCL f FIXED(15);
      DCL f1 FIXED(15);
-__cpp__('pearlrt::Character<5> _text("f = ");');
-__cpp__('pearlrt::Character<5> _text1;');
+     DCL text CHAR(5) INIT(' f = ');
+     DCL text1 CHAR(5);
+!__cpp__('pearlrt::Character<5> _text1;');
  
      OPEN table BY ANY, IDF('file1.txt');
      PUT text, f TO table BY  X(3), A,F(3), SKIP;
-     FOR i TO 10 REPEAT
-        f := i;
-        PUT ' f = ', f TO table BY A, F(3), SKIP;
-     END; 
+     PUT text, f TO table BY A, F(3), SKIP;
      CLOSE table;
 
      OPEN table BY OLD, IDF('file1.txt');

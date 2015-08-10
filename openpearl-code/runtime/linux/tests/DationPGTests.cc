@@ -88,7 +88,7 @@ TEST(DationPG, simple_put) {
    pearlrt::Fixed<31>  x(42);
    logbuch.toA(text);
    logbuch.toSkip(1);
-   logbuch.toF(x, (pearlrt::Fixed<15>)3);
+   logbuch.toF(x, (pearlrt::Fixed<31>)3);
    logbuch.dationClose(pearlrt::Dation::PRM, (pearlrt::Fixed<15>*)0);
    /* read binary and compare */
    pearlrt::Character<1> data[12];
@@ -185,10 +185,10 @@ TEST(DationPG, simple_get) {
    logbuch.fromA(text);
    EXPECT_TRUE((text == expect).getBoolean());
    // the value 42 is in the next line; read now should deliver 0
-   logbuch.fromF(x, (pearlrt::Fixed<15>)3);
+   logbuch.fromF(x, (pearlrt::Fixed<31>)3);
    EXPECT_EQ((x == (pearlrt::Fixed<31>)0).getBoolean(), true);
    logbuch.fromSkip(1);
-   logbuch.fromF(x, (pearlrt::Fixed<15>)3);
+   logbuch.fromF(x, (pearlrt::Fixed<31>)3);
    EXPECT_EQ((x == (pearlrt::Fixed<31>)42).getBoolean(), true);
    logbuch.dationClose(0, (pearlrt::Fixed<15>*)0);
 }
@@ -276,7 +276,7 @@ TEST(DationPG, signal_get) {
 
    try {
       logbuch.beginSequence(NULL);
-      logbuch.fromF(x, (pearlrt::Fixed<15>)3);
+      logbuch.fromF(x, (pearlrt::Fixed<31>)3);
       logbuch.endSequence();
    } catch (pearlrt::Signal & s) {
       if (!logbuch.updateRst(&s)) {
@@ -292,7 +292,7 @@ TEST(DationPG, signal_get) {
    try {
       logbuch.beginSequence(NULL);
       logbuch.rst(rst);
-      logbuch.fromF(x, (pearlrt::Fixed<15>)3);
+      logbuch.fromF(x, (pearlrt::Fixed<31>)3);
       logbuch.endSequence();
    } catch (pearlrt::Signal & s) {
       if (!logbuch.updateRst(&s)) {

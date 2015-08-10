@@ -79,10 +79,10 @@ for (int i=0; i<10; i++) {
 printf("READER@1 me=%p\n", me);
    try {
       reader.beginSequence(me);
-         reader.fromF(x, (pearlrt::Fixed<15>)3);
+         reader.fromF(x, (pearlrt::Fixed<31>)3);
 printf("READER x=%d\n", x.x);
          reader.fromSkip(1);
-         reader.fromF(x, (pearlrt::Fixed<15>)3);
+         reader.fromF(x, (pearlrt::Fixed<31>)3);
 printf("READER x=%d\n", x.x);
          reader.fromSkip(1);
       reader.endSequence();
@@ -130,18 +130,18 @@ DCLTASK(CONTROL, pearlrt::Prio(10), pearlrt::BitString<1>(1)) {
    console.toA(text0);
    console.toSkip(1);
    READER.activate(me);
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
        y = 12; 
-       writer.toF(y, (pearlrt::Fixed<15>)3);
+       writer.toF(y, (pearlrt::Fixed<31>)3);
        writer.toSkip(1);
 printf("CONTROL: written %d\n", y.x);
 
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
           console.toA(text1);
@@ -154,25 +154,25 @@ printf("CONTROL: READER suspended \n");
 
        y = 16; 
 printf("CONTROL: try to write in pipe..\n");
-       writer.toF(y, (pearlrt::Fixed<15>)3);
+       writer.toF(y, (pearlrt::Fixed<31>)3);
        writer.toSkip(1);
 printf("CONTROL: written %d\n", y.x);
 
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
        y = 17; 
-       writer.toF(y, (pearlrt::Fixed<15>)3);
+       writer.toF(y, (pearlrt::Fixed<31>)3);
        writer.toSkip(1);
 printf("CONTROL: written %d\n", y.x);
        y = 18; 
-       writer.toF(y, (pearlrt::Fixed<15>)3);
+       writer.toF(y, (pearlrt::Fixed<31>)3);
        writer.toSkip(1);
 printf("CONTROL: written %d\n", y.x);
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
 Log::info("**** READER.cont()");
@@ -180,7 +180,7 @@ Log::info("**** READER.cont()");
       me->resume(pearlrt::Task::AFTER,
                  pearlrt::Clock(), pearlrt::Duration(5.0));
 
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
 
@@ -188,10 +188,10 @@ Log::info("**** READER.cont()");
           console.toSkip(1);
 Log::info("**** READER.cont()");
           READER.cont(me);
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
      
-       console.toF(x, (pearlrt::Fixed<15>)3);
+       console.toF(x, (pearlrt::Fixed<31>)3);
        console.toSkip(1);
 
           console.toA(text3);
@@ -201,7 +201,7 @@ Log::info("**** READER.terminate()");
           READER.terminate(me);
        printf("write to pipe to enable reader to finish\n");
        y = 20; 
-       writer.toF(y, (pearlrt::Fixed<15>)3);
+       writer.toF(y, (pearlrt::Fixed<31>)3);
        writer.toSkip(1);
 printf("CONTROL: written %d\n", y.x);
 

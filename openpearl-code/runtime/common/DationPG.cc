@@ -134,20 +134,20 @@ namespace pearlrt {
    }
 
    void DationPG::toT(const Clock f,
-                      const Fixed<15> w,
-                      const Fixed<15> d) {
+                      const Fixed<31> w,
+                      const Fixed<31> d) {
       PutClock::toT(f, w, d, sink);
    }
 
    void DationPG::toD(const Duration& f,
-                      const Fixed<15> w,
-                      const Fixed<15> d) {
+                      const Fixed<31> w,
+                      const Fixed<31> d) {
       PutDuration::toD(f, w, d, sink);
    }
 
    void DationPG::fromT(Clock & f,
-                        const Fixed<15> w,
-                        const Fixed<15> d) {
+                        const Fixed<31> w,
+                        const Fixed<31> d) {
       GetClock::fromT(f, w, d, source);
    }
 

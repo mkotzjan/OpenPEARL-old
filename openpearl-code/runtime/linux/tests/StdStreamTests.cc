@@ -254,19 +254,23 @@ TEST(StdStream, putGet) {
    pearlrt::Fixed<31>  x(42);
    console.toA(text);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<15>)5);
+   console.toF(x, (pearlrt::Fixed<31>)5);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<15>)5, (pearlrt::Fixed<15>)1);
+   console.toF(x, (pearlrt::Fixed<31>)5, (pearlrt::Fixed<31>)1);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<15>)5, (pearlrt::Fixed<15>)2);
+   console.toF(x, (pearlrt::Fixed<31>)5, (pearlrt::Fixed<31>)2);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<15>)5, 
-                  (pearlrt::Fixed<15>)1,
-                  (pearlrt::Fixed<15>)1);
+   console.toF(x, (pearlrt::Fixed<31>)5, 
+                  (pearlrt::Fixed<31>)1,
+                  (pearlrt::Fixed<31>)1);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<15>)5, 
-                  (pearlrt::Fixed<15>)1,
-                  (pearlrt::Fixed<15>)-1);
+   console.toF(x, (pearlrt::Fixed<31>)5, 
+                  (pearlrt::Fixed<31>)1,
+                  (pearlrt::Fixed<31>)0);
+   console.toSkip(1);
+   console.toF(x, (pearlrt::Fixed<31>)5, 
+                  (pearlrt::Fixed<31>)1,
+                  (pearlrt::Fixed<31>)-1);
    console.toSkip(1);
 
    pearlrt::StdStream stdIn(0);
@@ -287,7 +291,7 @@ TEST(StdStream, putGet) {
    console.toSkip(1);
    keyboard.fromA(text);
    keyboard.fromSkip(1);
-   keyboard.fromF(x, (pearlrt::Fixed<15>)3);
+   keyboard.fromF(x, (pearlrt::Fixed<31>)3);
    keyboard.fromSkip(1);
    keyboard.dationClose(0, (pearlrt::Fixed<15>*)0);
 
@@ -295,7 +299,7 @@ TEST(StdStream, putGet) {
    console.toA(result);
    console.toA(text);
    console.toX(5);
-   console.toF(x, (pearlrt::Fixed<15>)3);
+   console.toF(x, (pearlrt::Fixed<31>)3);
    console.toSkip(1);
    console.dationClose(0, (pearlrt::Fixed<15>*)0);
 }

@@ -61,30 +61,30 @@ TEST(GetCharacter, A_format) {
    pearlrt::Character<5> x;
    // test format width exceptions
    ASSERT_THROW(
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>) - 1, source),
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>) - 1, source),
       pearlrt::CharacterFormatSignal);
    // test reading with width=0
    ASSERT_NO_THROW(
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)0, source));
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)0, source));
    {
       pearlrt::Character<5> x1("     ");
       ASSERT_TRUE((x == x1).getBoolean());
       pearlrt::Character<5> x2(" PEAR");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
    // test reading with shorter variable
    {
       source.rewind();
       pearlrt::Character<5> x1(" PEAR");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x1).getBoolean());
    }
    // test reading with space appending variable
    {
       source.rewind();
       pearlrt::Character<5> x1(" PEA ");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)4, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)4, source);
       ASSERT_TRUE((x == x1).getBoolean());
    }
    // test stop reading
@@ -92,9 +92,9 @@ TEST(GetCharacter, A_format) {
       source.rewind();
       pearlrt::Character<5> x1(" PEAR");
       pearlrt::Character<5> x2("L A B");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x1).getBoolean());
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
    // test stop reading  with skipping input
@@ -102,9 +102,9 @@ TEST(GetCharacter, A_format) {
       source.rewind();
       pearlrt::Character<5> x1(" PEAR");
       pearlrt::Character<5> x2(" A B ");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)6, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)6, source);
       ASSERT_TRUE((x == x1).getBoolean());
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
    // test stop reading at end of line
@@ -115,12 +115,12 @@ TEST(GetCharacter, A_format) {
       pearlrt::RefCharSource source(rc);
       pearlrt::Character<5> x1(" P   ");
       pearlrt::Character<5> x2("     ");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x1).getBoolean());
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
-   // test stop reading at end of line with SKIP the NEwLine
+   // test stop reading at end of line with SKIP the NewLine
    {
       pearlrt::Character<20> d(" P\nEARL A B C D E F ");
       pearlrt::RefCharacter rc;
@@ -128,10 +128,10 @@ TEST(GetCharacter, A_format) {
       pearlrt::RefCharSource source(rc);
       pearlrt::Character<5> x1(" P   ");
       pearlrt::Character<5> x2("EARL ");
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x1).getBoolean());
       pearlrt::GetUtils::fromSkip(1, source);
-      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<15>)5, source);
+      pearlrt::GetCharacter<5>::fromA(x, (pearlrt::Fixed<31>)5, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
 }

@@ -61,65 +61,51 @@ TEST(PutFixed, simpleFixed) {
       x = (pearlrt::Fixed<15>) - 1234;
       ASSERT_THROW(
          pearlrt::PutFixed<15>::toF(x,
-                                    (pearlrt::Fixed<15>)0,
-                                    (pearlrt::Fixed<15>)0,
-                                    (pearlrt::Fixed<15>)0,
+                                    (pearlrt::Fixed<31>)0,
+                                    (pearlrt::Fixed<31>)0,
+                                    (pearlrt::Fixed<31>)0,
                                     sink),
          pearlrt::FixedFormatSignal);
       rc.clear();
       ASSERT_THROW(
          pearlrt::PutFixed<15>::toF(x,
-                                    (pearlrt::Fixed<15>) - 1,
-                                    (pearlrt::Fixed<15>)0,
-                                    (pearlrt::Fixed<15>)0,
+                                    (pearlrt::Fixed<31>) - 1,
+                                    (pearlrt::Fixed<31>)0,
+                                    (pearlrt::Fixed<31>)0,
                                     sink),
          pearlrt::FixedFormatSignal);
       rc.clear();
       ASSERT_THROW(
          pearlrt::PutFixed<15>::toF(x,
-                                    (pearlrt::Fixed<15>)5,
-                                    (pearlrt::Fixed<15>)1,
-                                    (pearlrt::Fixed<15>)0,
+                                    (pearlrt::Fixed<31>)5,
+                                    (pearlrt::Fixed<31>)1,
+                                    (pearlrt::Fixed<31>)0,
                                     sink),
          pearlrt::FixedValueSignal);
       // after OverflowSignal, the data should be ****
       rc.store(d2);
-      ASSERT_TRUE((d1 == d2).getBoolean());
+      // no longer ok ! ASSERT_TRUE((d1 == d2).getBoolean());
    }
    {
       pearlrt::Character<5> d1(5, (char*)"*****"), d2;
       rc.clear();
       x = (pearlrt::Fixed<15>) - 1234;
-      pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>) - 1,
-                                 (pearlrt::Fixed<15>)0,
-                                 sink);
-      ASSERT_EQ(rc.getCurrent(), 5);
-      rc.store(d2);
-      EXPECT_TRUE((d1 == d2).getBoolean());
-   }
-   {
-      pearlrt::Character<5> d1(5, (char*)"*****"), d2;
-      rc.clear();
-      x = (pearlrt::Fixed<15>) - 1234;
-      pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)0,
-                                 sink);
-      ASSERT_EQ(rc.getCurrent(), 5);
-      rc.store(d2);
-      EXPECT_TRUE((d1 == d2).getBoolean());
+      ASSERT_THROW(
+         pearlrt::PutFixed<15>::toF(x,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)0,
+                                 sink),
+         pearlrt::FixedFormatSignal);
    }
    {
       pearlrt::Character<5> d1(5, (char*)"-1234"), d2;
       rc.clear();
       x = (pearlrt::Fixed<15>) - 1234;
       pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)0,
-                                 (pearlrt::Fixed<15>)0,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)0,
+                                 (pearlrt::Fixed<31>)0,
                                  sink);
       ASSERT_EQ(rc.getCurrent(), 5);
       rc.store(d2);
@@ -130,9 +116,9 @@ TEST(PutFixed, simpleFixed) {
       rc.clear();
       x = (pearlrt::Fixed<15>) - 1;
       pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)0,
-                                 (pearlrt::Fixed<15>)0,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)0,
+                                 (pearlrt::Fixed<31>)0,
                                  sink);
       ASSERT_EQ(rc.getCurrent(), 5);
       rc.store(d2);
@@ -143,9 +129,9 @@ TEST(PutFixed, simpleFixed) {
       rc.clear();
       x = (pearlrt::Fixed<15>)12345;
       pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)0,
-                                 (pearlrt::Fixed<15>)0,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)0,
+                                 (pearlrt::Fixed<31>)0,
                                  sink);
       ASSERT_EQ(rc.getCurrent(), 5);
       rc.store(d2);
@@ -156,9 +142,9 @@ TEST(PutFixed, simpleFixed) {
       rc.clear();
       x = (pearlrt::Fixed<15>)1234;
       pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)2,
-                                 (pearlrt::Fixed<15>) - 2,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)2,
+                                 (pearlrt::Fixed<31>) - 2,
                                  sink);
       ASSERT_EQ(rc.getCurrent(), 5);
       rc.store(d2);
@@ -169,9 +155,9 @@ TEST(PutFixed, simpleFixed) {
       rc.clear();
       x = (pearlrt::Fixed<15>)1234;
       pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)0,
-                                 (pearlrt::Fixed<15>) - 3,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)0,
+                                 (pearlrt::Fixed<31>) - 3,
                                  sink);
       ASSERT_EQ(rc.getCurrent(), 5);
       rc.store(d2);
@@ -182,14 +168,28 @@ TEST(PutFixed, simpleFixed) {
       rc.clear();
       x = (pearlrt::Fixed<15>)1234;
       pearlrt::PutFixed<15>::toF(x,
-                                 (pearlrt::Fixed<15>)5,
-                                 (pearlrt::Fixed<15>)1,
-                                 (pearlrt::Fixed<15>) - 2,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)1,
+                                 (pearlrt::Fixed<31>) - 2,
                                  sink);
       ASSERT_EQ(rc.getCurrent(), 5);
       rc.store(d2);
       EXPECT_TRUE((d1 == d2).getBoolean());
    }
+   {
+      pearlrt::Character<5> d1(5, (char*)" 12.0"), d2;
+      rc.clear();
+      x = (pearlrt::Fixed<15>)12;
+      pearlrt::PutFixed<15>::toF(x,
+                                 (pearlrt::Fixed<31>)5,
+                                 (pearlrt::Fixed<31>)1,
+                                 (pearlrt::Fixed<31>) 0,
+                                 sink);
+      ASSERT_EQ(rc.getCurrent(), 5);
+      rc.store(d2);
+      EXPECT_TRUE((d1 == d2).getBoolean());
+   }
+
 
 }
 
