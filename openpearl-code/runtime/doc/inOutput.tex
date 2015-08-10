@@ -320,10 +320,10 @@ Fixed<15> y;
 
 try {
    _console.beginSequence(me);
-   _console.toF(x,4);
+   _console.toF(x,(pearlrt::Fixed<31>)4);
    _console.rst(rst);
-   _console.toF(y,5);
-   _console.toSkip(1);
+   _console.toF(y,(pearlrt::Fixed<31>)5);
+   _console.toSkip((pearlrt::Fixed<31>)1);
    _console.endSequence();
 } catch (Signal& s) {
    if (!_console.updateRst(&s)) {
@@ -394,6 +394,9 @@ All methods are available for output and input. The versions for
 output have the prefix \verb|to|, the input version have the prefix \verb|from|.
 To avoid redundancy only the output versions are listed below.
 
+Please note that all parameters are expected as type
+\verb|pearlrt::Fixed<31>|.
+
 \begin{methodMapping}
 POS(x) & toPos(x) & \\
 POS(x,y) & toPos(x,y) & \\
@@ -417,7 +420,7 @@ Note:
 \item a user dation with type {\em ALL} does not specify the size of 
    the record. No positioning is allowed on such a FORWARD dation. 
    The DIRECT attribute will allow to rewind the dation by POS(1),
-\item as alternative one dimenion is allowed and the positions are
+\item as alternative one dimension is allowed and the positions are
     expected to be calculated by the application as byte offsets.
 \end{itemize}   
 
@@ -433,6 +436,11 @@ In the following table, the parameter denotes the corresponding data element.
 In PUT-statments the prefix \verb|to| is set to the formatting methog,
 in GET-statements the prefix \verb|from| is used.
 To avoid redundancy, only PUT-formatting is listed below.
+
+Please note that all parameters (except the value itself)
+ are expected as type
+\verb|pearlrt::Fixed<31>|.
+
 \begin{methodMapping}
 A & toA(x) & \\
 A(w) & toA(x,w) & \\
@@ -488,8 +496,8 @@ Fixed<15> _y;
 try {
    _dataFile.beginSequence(me);
    _dataFile.rst(_rst);
-   _dataFile.toPos(10);
-   _dataFile.toAdv(1);
+   _dataFile.toPos((pearlrt::Fixed<31>)10);
+   _dataFile.toAdv((pearlrt::Fixed<31>)1);
    _dataFile.DationWrite(&_x, sizeof(_x));
    _dataFile.DationWrite(&_y, sizeof(_y));
    _dataFile.endSequence();
