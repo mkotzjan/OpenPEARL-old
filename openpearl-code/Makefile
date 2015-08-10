@@ -27,7 +27,7 @@ install: clean build
 	cp prl_bin /usr/local/bin
 
 clean:
-	(cd runtime/FreeRTOS_lpc1768; make clean; )
+#	(cd runtime/FreeRTOS_lpc1768; make clean; )
 	(cd runtime/linux; make clean; )
 	(cd compiler/src; make clean; )
 	(cd testsuite; make clean; )
