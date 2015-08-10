@@ -74,17 +74,16 @@ namespace pearlrt {
       schedContinueData.whenRegistered = false;
       //schedContinueData.counts = 0;
       schedContinueData.prio = 0;
-
    }
 
    CSema TaskCommon::mutexTasks(1);
    int cccc = 1;
 
    void TaskCommon::mutexLock() {
-      Log::info("MUTEX TASK: LOCKING...cccc= %d", cccc);
+//      Log::info("MUTEX TASK: LOCKING...cccc= %d", cccc);
       mutexTasks.request();
       cccc --;
-      Log::info("MUTEX TASK: LOCKED   cccc= %d", cccc);
+//      Log::info("MUTEX TASK: LOCKED   cccc= %d", cccc);
    }
 
    void TaskCommon::mutexUnlock() {
@@ -92,10 +91,12 @@ namespace pearlrt {
 
       if (cccc > 1) {
          Log::error("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
-      } else {
+      }
+/*
+      else {
          Log::info("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
       }
-
+*/
       mutexTasks.release();
    }
 
