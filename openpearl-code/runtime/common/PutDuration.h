@@ -79,8 +79,8 @@ namespace pearlrt {
       \throws DurationValueSignal, if the value does not fit into field
       */
       static void toD(const Duration& dur,
-                      const Fixed<15>& w,
-                      const Fixed<15>& d,
+                      const Fixed<31>& w,
+                      const Fixed<31>& d,
                       Sink& s);
    };
 

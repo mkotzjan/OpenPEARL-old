@@ -143,14 +143,14 @@ namespace pearlrt {
       */
       static void toF(
          Fixed<S> fixedValue,
-         Fixed<15> w,
-         Fixed<15> d,
-         Fixed<15> s,
+         Fixed<31> w,
+         Fixed<31> d,
+         Fixed<31> s,
          Sink & sink) {
          Fixed<S> x, y, absValue; // internal workspace
-         int16_t prePointDigits, postPointDigits;
-         int16_t leadingSpaces, i, digits, ch;
-         Fixed<15> digitsFixed;
+         int32_t prePointDigits, postPointDigits;
+         int32_t leadingSpaces, digits, ch;
+         Fixed<31> digitsFixed;
          bool signNeeded;
          bool pointNeeded;
 
@@ -160,12 +160,14 @@ namespace pearlrt {
             throw theFixedFormatSignal;
          }
 
-         if ((d < (Fixed<15>)0).getBoolean() || (d >= w).getBoolean()) {
-            for (i = 0; i < w.x; i++) {
-               sink.putChar('*');
-            }
-
-            return;
+         if ((d < (Fixed<31>)0).getBoolean() || (d >= w).getBoolean()) {
+            Log::info("F: width and decimals violation");
+            throw theFixedFormatSignal;
+            //for (i = 0; i < w.x; i++) {
+            //   sink.putChar('*');
+            //}
+            //
+            //return;
          }
 
          // test whether number fits into format
@@ -208,9 +210,9 @@ namespace pearlrt {
                          );
 
          if (leadingSpaces < 0) {
-            for (i = 0; i < w.x; i++) {
-               sink.putChar('*');
-            }
+            //for (i = 0; i < w.x; i++) {
+            //   sink.putChar('*');
+            //}
 
             Log::info("F: width too small");
             throw theFixedValueSignal;
@@ -225,7 +227,7 @@ namespace pearlrt {
             sink.putChar('-');
          }
 
-         digitsFixed = (Fixed<15>)(digits - 1);
+         digitsFixed = (Fixed<31>)(digits - 1);
          x = y.pow(digitsFixed); // y is still 10
 
          // now: x ist the base of the first digit

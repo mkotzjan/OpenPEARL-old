@@ -112,7 +112,7 @@ namespace pearlrt {
       */
       static void toA(
          Character<S> &charValue,
-         const Fixed<15> w,
+         const Fixed<31> w,
          Sink & sink) {
          RefCharacter rc;
          rc.setWork(charValue);

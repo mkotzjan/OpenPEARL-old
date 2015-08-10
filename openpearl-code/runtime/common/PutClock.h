@@ -63,7 +63,7 @@ namespace pearlrt {
       \throws ClockFormatSignal if parameters are illegal
       */
       static void toT(const Clock & x,
-                      const Fixed<15>& w, const Fixed<15>& d,
+                      const Fixed<31>& w, const Fixed<31>& d,
                       Sink& sink) ;
    };
 }

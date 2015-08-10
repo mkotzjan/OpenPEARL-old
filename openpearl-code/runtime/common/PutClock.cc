@@ -61,7 +61,7 @@ namespace pearlrt {
 
 
    void PutClock::toT(const Clock & x,
-                      const  Fixed<15>& width, const Fixed<15>& decimals,
+                      const  Fixed<31>& width, const Fixed<31>& decimals,
                       Sink& sink) {
       int decimal;
       int hours;
