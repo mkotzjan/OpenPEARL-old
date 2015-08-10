@@ -77,7 +77,7 @@ namespace pearlrt {
 
       */
       static void fromA(Character<S> &c,
-                        const Fixed<15> w,
+                        const Fixed<31> w,
                         Source & source) {
 
           GetHelper helper(w, &source);

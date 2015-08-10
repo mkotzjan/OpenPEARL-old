@@ -86,8 +86,8 @@ namespace pearlrt {
 
       */
       static int fromT(Clock&c,
-                       const Fixed<15> w,
-                       const Fixed<15> d,
+                       const Fixed<31> w,
+                       const Fixed<31> d,
                        Source & source);
    };
 }

@@ -85,8 +85,8 @@ namespace pearlrt {
       \note the leading digits for the hours part max be larger than 2
       */
       static int fromD(Duration&c,
-                       const Fixed<15> w,
-                       const Fixed<15> d,
+                       const Fixed<31> w,
+                       const Fixed<31> d,
                        Source & source);
    };
 }

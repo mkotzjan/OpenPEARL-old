@@ -50,8 +50,8 @@
 namespace pearlrt {
 
    int GetDuration::fromD(Duration& dur ,
-                          const Fixed<15> w,
-                          const Fixed<15> d,
+                          const Fixed<31> w,
+                          const Fixed<31> d,
                           Source & source) {
       int width = w.x;
       int decimals = d.x;

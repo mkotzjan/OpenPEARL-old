@@ -104,7 +104,7 @@ namespace pearlrt {
       */
       static void fromB1(
          BitString<S> &bitstring,
-         const Fixed<15> w,
+         const Fixed<31> w,
          Source & source) {
          if (w.x < 0) {
             throw theBitFormatSignal;
@@ -147,7 +147,7 @@ namespace pearlrt {
       */
       static void fromB4(
          BitString<S> &bitstring,
-         const Fixed<15> w,
+         const Fixed<31> w,
          Source & source) {
          if (w.x < 0) {
             throw theBitFormatSignal;

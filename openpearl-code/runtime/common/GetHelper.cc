@@ -50,7 +50,7 @@
 namespace pearlrt {
 
 
-   GetHelper::GetHelper(const Fixed<15> w, Source * s) {
+   GetHelper::GetHelper(const Fixed<31> w, Source * s) {
       width = w.x;
       source = s;
       delimiter = 0;

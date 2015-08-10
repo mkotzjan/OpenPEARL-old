@@ -83,9 +83,9 @@ namespace pearlrt {
 
       */
       static void fromF(Fixed<S> &f,
-                        const Fixed<15> w,
-                        const Fixed<15> d,
-                        const Fixed<15> p,
+                        const Fixed<31> w,
+                        const Fixed<31> d,
+                        const Fixed<31> p,
                         Source & source) {
          Fixed63 value;
 

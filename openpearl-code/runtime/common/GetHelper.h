@@ -78,7 +78,7 @@ namespace pearlrt {
       \param w the input field width
       \param s the source object
       */
-      GetHelper(const Fixed<15> w,
+      GetHelper(const Fixed<31> w,
                 Source * s);
 
       /**

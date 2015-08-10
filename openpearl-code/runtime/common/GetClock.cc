@@ -54,8 +54,8 @@ of a new day. Without special treatment of a time zone, GMT is used.
 namespace pearlrt {
 
    int GetClock::fromT(Clock&c ,
-                       const Fixed<15> w,
-                       const Fixed<15> d,
+                       const Fixed<31> w,
+                       const Fixed<31> d,
                        Source & source) {
       int width = w.x;
       int decimals = d.x;
