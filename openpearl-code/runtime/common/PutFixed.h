@@ -70,38 +70,11 @@ namespace pearlrt {
    //PUT x TO console BY F(3);
    // the console object should provide access to the data sink object
    // width=3, decimals=0, scale=0
-   pearlrt::PutFixed<15>:toF(x, 3, 0, 0, console.getSink());
+   pearlrt::PutFixed<15>:toF(x, (pearlrt::Fixed<31>)3, 
+                                (pearlrt::Fixed<31>)0, 
+                                (pearlrt::Fixed<31>)0, 
+                                console.getSink());
    \endverbatim
-   Producing the output of '__3' (where _ denotes a space
-
-   Required output behavior depending an width, decimals and
-   scale at the example x=123:
-
-   <table>
-   <tr>
-       <td>value</td><td>width</td><td>decimals</td><td>scale</td>
-       <td>output</td>
-   </tr>
-   <tr><td>123</td><td>3</td><td> 0</td><td>0</td><td>"123"</td></tr>
-   <tr><td> 123</td><td> 5 </td><td> 0 </td><td> 0  </td>
-       <td> "__123"</td></tr>
-   <tr><td> 123</td><td> 7 </td><td> 2 </td><td> 0  </td>
-       <td> "_123.00"</td></tr>
-   <tr><td> 1234</td><td> 7 </td><td> 2 </td><td> 0 </td>
-       <td> "1234.00"</td></tr>
-   <tr><td> 12345</td><td> 7 </td><td> 2 </td><td> 0 </td>
-       <td> "*******" , throwing a signal</td></tr>
-   <tr><td> -123</td><td> 7 </td><td> 2 </td><td>  0 </td>
-      <td> "-123.00"</td></tr>
-   <tr><td>  123</td><td> 7 </td><td> 2  </td><td>  1 </td>
-      <td> "1230.00"</td></tr>
-   <tr><td>   123</td><td> 7 </td><td> 2 </td><td> -1 </td>
-      <td> "__12.30"</td></tr>
-    <tr><td> 123  </td><td> 7 </td><td> -2 </td><td> -1 </td>
-      <td> nothing, throwing a signal</td></tr>
-   <tr><td> 123  </td><td> 2 </td><td> 2 </td><td> 0 </td>
-      <td> "**" (in all cases of (w<d or d<0) ) </td></tr>
-    </table>
    */
    template<int S> class PutFixed {
    private:
@@ -124,9 +97,6 @@ namespace pearlrt {
       to avoid floating point
              variables<br>
       The value will be set right adjusted into the output field.
-
-      \note in difference to the language report, d>=w causes
-            an error behavior of "***"-output
 
       \note in difference to the language report, a signal is throw
             if the current value does not fit into the format
@@ -194,9 +164,10 @@ namespace pearlrt {
             x = x / y;
             digits ++;
          }
+Log::info("value= %d d=%d w= %d s= %d", fixedValue.x, w.x, d.x, s.x);
 
          postPointDigits = d.x;
-         prePointDigits = digits + s.x;
+         prePointDigits = digits - s.x;
 
          if (prePointDigits  < 1) {
             prePointDigits = 1;
