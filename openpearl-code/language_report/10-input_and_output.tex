@@ -1105,7 +1105,7 @@ it causes that not the number itself, but its
 value multiplied by 10$^{**}$p is transferred.
 \end{removed}
 \begin{added}
-the bahavior is described separatelly for input and output.
+the behavior is described separatelly for input and output.
 \end{added}
 
 \begin{removed}
@@ -1120,8 +1120,8 @@ It is important that
  integers and floats can be transferred with the fixed
 format. 
 The processing of fractional fixed point numbers is
-possible by scaling. These are converted to integers upon input and to
-fractional numbers again upon output.
+possible by scaling. The interal integer value is converted to a fractional 
+number on output. The conversion works invers on input.
 \end{added}
 
 \begin{removed}
@@ -1191,9 +1191,9 @@ number rounded without decimal point is written out.
 \item Except for the zero immediately in front of the decimal point,
 leading zeros are suppressed.
 \item if the output value does not fit into the given field width 
-   (also regarding p), the FixedValueSignal is induced.
+   (also regarding p and negative sign), the FixedValueSignal is induced.
 \item The scale factor p causes that not the number itself, but its
-value multiplied by 10$^{**}$-p is transferred.
+value divided by 10$^{**}$p is transferred.
 \end{enumerate}
 \item {\bf Input}
 \begin{enumerate}
@@ -1234,8 +1234,8 @@ value  & format   & output \\ \hline
 22.8   & F(5)     & \_\_\_23 \\
 212.73 & F(9,2,2) & \_21273.00 \\
 212.73 & F(9,2)   & \_\_\_212.73 \\
-21273 & F(9,2,-2)   & \_\_\_212.73 \\
-212 & F(9,2,+2)   & \_21200.00 \\
+21273 & F(9,2,2)   & \_\_\_212.73 \\
+212 & F(9,2,-2)   & \_21200.00 \\
 \end{tabular}
 \end{added}
 
@@ -1243,16 +1243,16 @@ value  & format   & output \\ \hline
 Example for input:
 
 \begin{tabular}{llll}
-       &          & \multicolumn{2}{c}{input as}  \\ 
-       &          & FIXED & FLOAT  \\ \hline
+external       &          & \multicolumn{2}{c}{input as}  \\ 
+value       &          & FIXED & FLOAT  \\ \hline
 13.5   & F(7,1)   &  14 & 13.5   \\
 13.5   & F(5)     &  14 & 13.5   \\
 275.2  & F(4,1)   & 275 & 275.2 \\
 \_21273.00 & F(9,2,2) & 213 & 212.73 \\
 \ \ \ 212.73 &  F(9,2)&  213 & 213,73 \\
-\_\_\_212.73 & F(9,2,-2) & 21273 & 21273.0 \\
-\_\_\_21273 & F(9,2,-2) & 21273 & 21273.0 \\
-\_21273.00 & F(9,2,+2)   & 213 & 212.73 \\
+\_\_\_212.73 & F(9,2,2) & 21273 & 21273.0 \\
+\_\_\_21273 & F(9,2,2) & 21273 & 21273.0 \\
+\_21273.00 & F(9,2,-2)   & 213 & 212.73 \\
 \end{tabular}
 
 \end{added}
