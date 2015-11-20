@@ -1,0 +1,11 @@
+menu "Installation Settings"
+config INSTALL_Target
+	string "Installation Location"
+	default "/usr/local"
+	help
+	The language system will be copied to the given location.
+	The compile and build script will go into the subdirectory 'bin'.
+        The libraries will go into 'lib'.
+        The header files will go into 'include'. 
+endmenu
+

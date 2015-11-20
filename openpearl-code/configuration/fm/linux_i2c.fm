@@ -1,0 +1,17 @@
+config LINUX_I2C
+       boolean "support for i2c bus components (experimental)"
+       default n
+       help
+       This option enables the system dation I2CBUS which is necessary
+       to communicate with any i2c components.
+
+if LINUX_I2C = y
+menu I2C-Components
+config LINUX_I2C_LM75
+	boolean "LM75 temperatur sensor"
+        default n
+	help
+	This option enable the LM75 system dation for temperatur measurements.
+endmenu
+endif
+

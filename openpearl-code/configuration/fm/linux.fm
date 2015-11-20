@@ -1,0 +1,48 @@
+config LINUX
+	boolean "Select the generic Linux runtime system"
+	default y
+	help
+	This will cause to create the OpenPEARL runtime systems for linux
+        systems.
+	Usually select this.
+
+config LINUX_tests
+	depends on LINUX
+	boolean "build low level test applications"
+	default y
+	help
+	This will create the low level test application of the linux runtime
+        system. These tests should be run at least once to make shure that
+	the runtime system interacts properly with your linux installation.
+	Usually select this.
+
+
+menu Drivers
+	depends on LINUX
+
+comment "The standard drivers are build automatically "
+comment "--> StdStream, Disc, Pipe                    "
+
+#config LINUX_Console
+#	boolean "system dation 'Console' (experimental)"
+#	default n
+#	help
+#	the 'Console' dation provides the possibility direct keyboard 
+#        input to a dedicated task using a special input prefix (:<tname>:)
+#        at the beginning of an input line.
+#        Note that ether StdStream(0) or Console may be used at the same time
+
+config LINUX_Octopus
+	boolean "octopus i/o board support"
+	default n
+	help
+	the octopus io board provides access to digital i/o port
+	via an usb interface. This option provides OctopusDigIn,
+        OctopusDigOut system dations.
+        This feature requires that the octopus-library is already
+        installed on the system an the libusb-devel
+        package is installed.
+
+#source fm/linux_i2c.fm
+
+endmenu

@@ -1,0 +1,66 @@
+config FreeRTOS_lpc1768
+        boolean  "Select the FreeRTOS port for the runtime sytem"
+	default n
+	help
+	This port is in work. Build and execution problems 
+        may occur selecting this option. 
+
+choice
+depends on FreeRTOS_lpc1768
+   prompt  "Select System Timer"
+    default FreeRTOSSystemTimer
+    help
+    Exactly one timer solution must be selected for the timed tasking
+    operations.
+
+ config FreeRTOSSystemTimer 
+     bool "SystemTimer1MS"
+     help 
+     The system time is based on a 1ms timer. This limits the precision
+     of delay to this time increment.
+
+
+ config FreeRTOSHRTimer 
+     bool "HR-Timer (experimental)"
+     help
+     The system time is based on a high precision timer, whos operation
+     is updated on each new timer request in the system.
+     This should leed to delay opertation on a time base of 1us.
+     Currently this feature does not work properly.
+
+endchoice
+
+
+menu "Drivers"
+depends on FreeRTOS_lpc1768
+config LPC1768_USB_Keyboard
+     bool "USB keyboard support"
+     default n
+     help
+     This option provides the usage of an standard usb keyboard
+     device via the usb interface.
+     Only 1 usb device may be attached.
+
+config LPC1768_USB_Disc
+     bool "USB mass storage support"
+     default n
+     help
+     This option provides mass storage access via the usb interface.
+     1 common usb flash disc device may be attached.
+
+config LPC1768_UART
+     bool "UART support"
+     default n
+     help
+     This option enables the system dation and driver for the two uart
+     channels
+
+config LPC1768_HY32A
+     bool "HY32A support display support"
+     default n
+     help
+     This option enables the system dation and driver for the onboard
+     color grafic module
+
+endmenu
+
