@@ -1,6 +1,6 @@
 # super makefile for SmallPearl
 # 
-.PHONY: runtime compiler help build all
+.PHONY: runtime compiler help build all menuconfig
 
 help:
 	@echo "*************************************"
@@ -16,19 +16,20 @@ all:	build install
 build: runtime compiler
 
 runtime:
-	(cd runtime/linux; make all; )
+	(cd runtime; make all; )
 
 compiler:
 	(cd compiler/src; make all; )
 
 install: clean build
-	(cd runtime/linux; make install; )
+	(cd runtime; make install; )
 	(cd compiler/src; make install; )
 	cp prl_bin /usr/local/bin
 
 clean:
-#	(cd runtime/FreeRTOS_lpc1768; make clean; )
-	(cd runtime/linux; make clean; )
+	(cd runtime; make clean; )
 	(cd compiler/src; make clean; )
 	(cd testsuite; make clean; )
 	
+menuconfig:
+	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
