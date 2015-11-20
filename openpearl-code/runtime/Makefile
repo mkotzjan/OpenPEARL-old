@@ -64,5 +64,6 @@ install: all
 #---------------------------------------------------------
 clean: 
 	(cd $(IC_DIR); make clean;)
+	(cd doc; make clean;)
 	$(foreach tgt, $(targets),(cd $(tgt); make clean;))
 
