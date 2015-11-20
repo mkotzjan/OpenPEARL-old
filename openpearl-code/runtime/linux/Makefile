@@ -1,6 +1,6 @@
 #/*
 # [The "BSD license"]
-# Copyright (c) 2012-2013 Rainer Mueller
+# Copyright (c) 2012-2015 Rainer Mueller
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,27 +27,41 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #*/
 
-# pearl runtime system
+# read system configarion setting from menuconfig
+include ../../configuration/.config
+
+# pearl runtime system for linux
+# this makefile is only called from the superior makefile
+# if CONFIG_LINUX is set to y
 
 INCLUDES = -I . -I ../common
-_CXXFLAGS = -Wall -g  -fstack-protector
-_CXXFLAGS += -pthread
-_CXXFLAGS += -fno-non-call-exceptions
-CXXFLAGS = $(INCLUDES) $(_CXXFLAGS)
+CXXFLAGS = -Wall -g  -fstack-protector
+CXXFLAGS += -pthread
+CXXFLAGS += -fno-non-call-exceptions
+CXXFLAGS += $(INCLUDES)
 LDFLAGS = -lpthread -lrt 
+
+#LINK.o = @echo link $<; $(LINK.cc)
+LINK.o = $(LINK.cc)
+
+# shortcut for link command, since the implicit link rules of 
+# make produces problems if the dependencies reside in different
+# targets. Thus an explicit rule is added for the targets (especially
+# in the tests/ directory
+LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+
+# make silent compilations 
+COMPILE.cc = @echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
 # helper commands include composer, deleted white spaces
 IC_DIR = ../includeComposer
 IC = $(IC_DIR)/ic
 DWS = $(IC_DIR)/dws
 
-#only for octopus at90
-#-lusb -loctopus 
-
 DEPENDFILE = .depend
 
-# import lists of common files for all implementations
-include ../common/Files.common
+phony = _all
+_all: all
 
 SRCANDH = \
 	TaskTimer.cc \
@@ -58,107 +72,97 @@ SRCANDH = \
 	UnixSignal.cc \
 	Clock.cc  
 
-#TaskList.cc \
-#	FileSource.cc FileSink.cc \
-
 SRCONLY =os.cc \
 	TaskMonitor.cc \
 	Log.cc  
 
+# ---------------------------------------
+# import lists of common files for all implementations
+# and add prefix of directory common to file lists
+include ../common/Files.common
+CXX_COMMON := $(addprefix ../common/,$(CXX_COMMON))
+HDR_COMMON := $(addprefix ../common/,$(HDR_COMMON))
 
-SRC = $(SRCANDH) $(SRCONLY)
+# ---------------------------------------
+# list of file for checkformat
+CHECK_FILES = $(sort $(SRC) $(SRCONLY) $(SRC_H) \
+		     $(CXX_COMMON) $(HDR_COMMON) 
 
-ALL_SRCS = $(SRC) $(SRC_COMMON)
+
+# -----------------------------------
+# add driver specific stuff to file lists
+
+ifeq ($(CONFIG_LINUX_Octopus),y) 
+   SRCANDH += drivers/Octopus.cc
+   SRCANDH += drivers/OctopusDigitalOut.cc
+   SRCANDH += drivers/OctopusDigitalIn.cc
+   CHECK_FILES += drivers/Octopus.cc drivers/Octopus.h
+   CHECK_FILES += drivers/OctopusDigitalOut.cc drivers/OctopusDigitalOut.h
+   CHECK_FILES += drivers/OctopusDigitalIn.cc drivers/OctopusDigitalIn.h
+   INCLUDES += -I ./drivers 
+   INCLUDES += -I ../drivers 
+   LDFLAGS +=  -lusb -loctopus
+endif
+
+targets := plib.a
+
+ifeq ($(CONFIG_LINUX_tests),y)
+  include tests/Makefile.inc
+  CHECK_FILES += $(GTEST_SRC) $(GTEST_DATION_SRC) $(TEST_SRC)
+endif
+
+# ------------------------------------
+CHECK_FILES = $(sort $(CHECK_FILES))
+SRC = $(SRCANDH) $(SRCONLY) $(CXX_COMMON)
+#$(warning src = $(SRC))
+
+PLIB_OBJ = $(SRC:%.cc=%.o)
+#$(warning plibobj = $(PLIB_OBJ))
+
+ALL_SRCS = $(SRC) $(TEST_SRCS) $(TEST_DATION_SRCS) $(GTEST_SRCS)
+#$(warning allsrc = $(ALL_SRCS))
+
 
 SRC_H = $(SRCANDH:%.cc=%.h) PearlIncludes.h  $(HDR_COMMON)
 
 OBJS = $(ALL_SRCS:%.cc=%.o)
-# ----------------------------------------
-# file lists for tests - init values
-# these values are extended in tests/Makefile
 
-TESTS =
-TEST_SRCS =
-TEST_DATION_SRCS =
-GTEST_SRCS =
+# ------------------------------
 
-# ---------------------------------------
+phony += all
+all: depend  $(targets)
 
-
-# --------------------
-# select desired drivers for the installation
-# only drivers which compile on all machines may be selected 
-# at commit!
-#DRIVERS = Octopus
-DRIVERS =
-
-#
-CHECK_FILES = $(sort $(SRC) $(SRCONLY) $(SRC_H) $(SRC_COMMON) $(HDR_COMMON))
-
-.PHONY: clean depend help all doc drivers tests
-
-# -----------------------------------
-# add driver specific stuff to file lists
-$(warning Info: DRIVERS=$(DRIVERS))
-
-ifeq (Octopus,$(DRIVERS)) 
-	SRC += drivers/Octopus.cc
-	SRC += drivers/OctopusDigitalOut.cc
-	SRC += drivers/OctopusDigitalIn.cc
-	CHECK_FILES += drivers/Octopus.cc drivers/Octopus.h
-	CHECK_FILES += drivers/OctopusDigitalOut.cc drivers/OctopusDigitalOut.h
-	CHECK_FILES += drivers/OctopusDigitalIn.cc drivers/OctopusDigitalIn.h
-	INCLUDES += -I ./drivers 
-	INCLUDES += -I ../drivers 
-	TEST_DATION_SRCS += OctopusDigitalOutTest.cc
-	TEST_DATION_SRCS += OctopusDigitalInOutTest.cc
-	LDFLAGS +=  -lusb -loctopus
-else
-endif
-#$(warning Info: SRC=$(SRC))
-#$(warning Info: LDFLAGS=$(LDFLAGS))
-#$(warning Info: CXXFLAGS=$(CXXFLAGS))
-#$(warning Info: TEST_DATION_SRCS=$(TEST_DATION_SRCS))
-
-CXXFLAGS4SUB = $(_CXXFLAGS) $(INCLUDES) 
-LDFLAGS4SUB = $(LDFLAGS)
-export CXXFLAGS4SUB LDFLAGS4SUB 
-export TEST_SRCS TEST_DATION_SRCS GTEST_SRCS 
-
-all: depend  plib.a
-
+phony += help
 help:
 	@echo "-----------------"
 	@echo "make all         : build the pearl library plib.a"
 	@echo "make clean       : remove all generated files"
 	@echo "make checkformat : apply code style checks"
 	@echo "make doc         : generate Doxygen documentation in HTML"
-	@echo "make tests       : build the test programs in ./tests"
-	@echo "make install     : install to /usr/local/lib and /usr/local/include"
+	@echo "make install     : install to $(CONFIG_INSTALL_Target) in lib and include"
 	@echo "-----------------"
 	@echo
 
-tests:  all
-	make -C tests
-
+phony += install
 install: all
-	(cd $(IC_DIR); make;)
 	rm -f pearl.h
 	$(IC) -c $(INCLUDES)  <PearlIncludes.h | $(DWS) >pearl.h
-	cat ../LICENSE.BSD sysincs.h pearl.h >/usr/local/include/PearlIncludes.h
-	cp plib.a /usr/local/lib
+	cat ../LICENSE.BSD sysincs.h pearl.h \
+		>$(CONFIG_INSTALL_Target)/include/PearlIncludes.h
+	cp plib.a $(CONFIG_INSTALL_Target)/lib
 	rm -f pearl.h sysincs.h
 
-drivers:
-	$(foreach f,$(DRIVERS), make -C drivers $(f);)
+plib.a: $(PLIB_OBJ)
+	@echo build archive ... plib.a
+	ar r plib.a $(PLIB_OBJ) 
 
-plib.a: $(OBJS)
-	ar r plib.a $(OBJS) 
-# --------------------------------------------------
+# -------------------------------------------------
 # additional rules to enable make to build the autogenerated files
 #
 ../common/Signals.hh: ../common/Signals.ods
-	(cd ../common; perl GenerateSignalDefinitions.pl GENERIC LINUX;)
+	@echo create signal definitions from spreadsheet
+	@(cd ../common; \
+	  perl GenerateSignalDefinitions.pl GENERIC LINUX 2>signals.log;)
 
 ../common/Signals.hcc: ../common/Signals.ods
 	(cd ../; perl GenerateSignalDefinitions.pl GENERIC LINUX;)
@@ -166,39 +170,45 @@ plib.a: $(OBJS)
 ../Signals.cc: ../Signals.hh ../Signals.hcc
 
 #---------------------------------------------------------
+phony += clean
 clean: 
-	rm -f $(OBJS)
-	rm -f pearl_log.txt
-	rm -f plib.a
-	rm -rf latex
-	rm -rf html
-	rm -rf .depend
-	rm -f ../common/tests/*.new
-	rm -f ../common/tests/*.diff
-	rm -f ../common/*.new
-	rm -f ../common/*.diff
-	rm -f *.new
-	rm -f *.diff
-	rm -f *.log
-	rm -f drivers/*.new
-	rm -f drivers/*.diff
-	rm -f core
-	rm -f ../common/Signals.hh ../common/Signals.hcc
-	rm -f ../common/signallist.tex 
-	rm -f ../common/sysincs.h 
-	(cd $(IC_DIR); make clean;)
-	make -C tests clean
+	@echo cleaning created files in various directories
+	@rm -f $(OBJS)
+	@rm -f pearl_log.txt
+	@rm -f plib.a
+	@rm -rf latex
+	@rm -rf html
+	@rm -f .depend
+	@rm -f ../common/tests/*.new
+	@rm -f ../common/tests/*.diff
+	@rm -f ../common/*.new
+	@rm -f ../common/*.diff
+	@rm -f *.new
+	@rm -f *.diff
+	@rm -f *.log
+	@rm -f drivers/*.new
+	@rm -f drivers/*.diff
+	@rm -f core
+	@rm -f ../common/Signals.hh ../common/Signals.hcc
+	@rm -f ../common/signallist.tex 
+	@rm -f ../common/signals.log
+	@rm -f sysincs.h  pearl.h
 
+phony += checkformat
 checkformat: 
 	@$(foreach f,$(CHECK_FILES),../codestyle/check.sh $(f);)
 	make -C tests checkformat
 
+phony += doc
 doc:
 	doxygen doc_stuff/Doxyfile
 #	(cd latex; make pdf; cd ..)
 
-
+phony += depend
 depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
-	$(CC) -MM  $(INCLUDES) $(ALL_SRCS) > $(DEPENDFILE)
+	@echo update dependencies ...
+	@$(CC) -MM  $(INCLUDES) $(ALL_SRCS) > $(DEPENDFILE)
 
 -include .depend
+
+.PHONY: $(phony)

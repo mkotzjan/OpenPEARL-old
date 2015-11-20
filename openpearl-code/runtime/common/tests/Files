@@ -1,26 +1,32 @@
+# define a list of test sources
+# the relative path must be added by the target specific makefile
+#
 
-GTEST_SRCS += \
-	../../common/tests/BitTests.cc\
-	../../common/tests/CharacterTests.cc\
-	../../common/tests/ClockTests.cc\
-	../../common/tests/DurationTests.cc\
-	../../common/tests/Fixed63Tests.cc\
-	../../common/tests/FixedTests.cc \
-	../../common/tests/FloatTests.cc \
-	 ../../common/tests/GetBitStringTests.cc  \
-	 ../../common/tests/GetCharacterTests.cc \
-	 ../../common/tests/GetClockTests.cc \
-	 ../../common/tests/GetDurationTests.cc \
-	../../common/tests/GetFixedTests.cc \
-	../../common/tests/GetUtils.cc \
-	 ../../common/tests/PutBitStringTests.cc\
-	../../common/tests/PutCharacterTests.cc\
-	 ../../common/tests/PutClockTests.cc\
-	 ../../common/tests/PutDurationTests.cc\
-	../../common/tests/PutFixedTests.cc\
-	../../common/tests/RefCharSinkTests.cc\
-	 ../../common/tests/RefCharSourceTests.cc \
-	 ../../common/tests/RefCharTests.cc\
-	../../common/tests/SizeTests.cc 
-
-
+CXX_COMMON_TESTS = \
+	BitTests.cc\
+	CharacterTests.cc\
+	ClockTests.cc\
+	DurationTests.cc\
+	Fixed63Tests.cc\
+	FixedTests.cc \
+	FloatTests.cc \
+	GetBitStringTests.cc  \
+	GetCharacterTests.cc \
+	GetClockTests.cc \
+	GetDurationTests.cc \
+	GetFixedTests.cc \
+	GetUtils.cc \
+	PutBitStringTests.cc\
+	PutCharacterTests.cc\
+	PutClockTests.cc\
+	PutDurationTests.cc\
+	PutFixedTests.cc\
+	RefCharSinkTests.cc\
+	RefCharSourceTests.cc \
+	RefCharTests.cc\
+	SizeTests.cc \
+	sematest.cc \
+	sematerminate.cc \
+	interruptTest.cc \
+	SampleBasicDationTests.cc
+	

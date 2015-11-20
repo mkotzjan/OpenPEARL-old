@@ -11,7 +11,7 @@
 #    notice, this list of conditions and the following disclaimer.
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
-#    documentation a../common/or other materials provided with the distribution.
+#    documentation aor other materials provided with the distribution.
 # 3. The name of the author may not be used to endorse or promote products
 #    derived from this software without specific prior written permission.
 #
@@ -29,50 +29,53 @@
 # pearl runtime system portable components
 
 # list of files which are independend of the target platform
-# give the path name as valid from the platform specific folder
+#
+# give the path name relative to this directory. The target specific 
+# makefile will add a prefix with the relatove path corresponding to
+# the target specific makefile
 
-SRC_COMMON = \
-	../common/Duration.cc  \
-	../common/PutDuration.cc ../common/GetDuration.cc \
-	../common/Signals.cc \
-	../common/ScheduleSignalAction.cc \
-	../common/Fixed63.cc \
-	../common/Prio.cc \
-	../common/Character.cc ../common/RefChar.cc \
-	../common/Interrupt.cc \
-	../common/Source.cc \
-	../common/RefCharSink.cc ../common/RefCharSource.cc \
-	../common/SystemDationNBSource.cc ../common/SystemDationNBSink.cc \
-	../common/PutClock.cc ../common/GetClock.cc \
-	../common/GetHelper.cc ../common/PutHelper.cc \
-	../common/TaskWhenLinks.cc \
-	../common/TaskCommon.cc \
-	../common/TaskList.cc \
-	../common/MutexCommon.cc ../common/CSemaCommon.cc \
-	../common/Semaphore.cc ../common/PriorityQueue.cc \
-	../common/DationRW.cc \
-	../common/DationPG.cc \
-	../common/DationTS.cc \
-	../common/UserDationNB.cc ../common/UserDation.cc \
-	../common/DationDim.cc  ../common/DationDim1.cc \
-	../common/DationDim2.cc ../common/DationDim3.cc \
-	../common/FloatHelper.cc \
-	../common/SoftInt.cc \
-	../common/Control.cc \
-	../common/SampleBasicDation.cc
+CXX_COMMON = \
+	Duration.cc  \
+	PutDuration.cc GetDuration.cc \
+	Signals.cc \
+	ScheduleSignalAction.cc \
+	Fixed63.cc \
+	Prio.cc \
+	Character.cc RefChar.cc \
+	Interrupt.cc \
+	Source.cc \
+	RefCharSink.cc RefCharSource.cc \
+	SystemDationNBSource.cc SystemDationNBSink.cc \
+	PutClock.cc GetClock.cc \
+	GetHelper.cc PutHelper.cc \
+	TaskWhenLinks.cc \
+	TaskCommon.cc \
+	TaskList.cc \
+	MutexCommon.cc CSemaCommon.cc \
+	Semaphore.cc PriorityQueue.cc \
+	DationRW.cc \
+	DationPG.cc \
+	DationTS.cc \
+	UserDationNB.cc UserDation.cc \
+	DationDim.cc  DationDim1.cc \
+	DationDim2.cc DationDim3.cc \
+	FloatHelper.cc \
+	SoftInt.cc \
+	Control.cc \
+	SampleBasicDation.cc
 
-HDR_COMMON = $(SRC_COMMON:%.cc=%.h) \
-	../common/BitString.h \
-	../common/PutBitString.h ../common/GetBitString.h \
-	../common/Sink.h ../common/RefCharSink.h \
-	../common/Fixed.h ../common/PutFixed.h ../common/GetFixed.h \
-	../common/Device.h ../common/Dation.h ../common/UserDation.h \
-	../common/PutCharacter.h \
-	../common/Log.h ../common/Float.h \
-	../common/TaskTimerCommon.h \
-	../common/TaskMonitor.h \
-	../common/compare.h \
-	../common/SystemDation.h \
-	../common/SystemDationNB.h
+HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
+	BitString.h \
+	PutBitString.h GetBitString.h \
+	Sink.h RefCharSink.h \
+	Fixed.h PutFixed.h GetFixed.h \
+	Device.h Dation.h UserDation.h \
+	PutCharacter.h \
+	Log.h Float.h \
+	TaskTimerCommon.h \
+	TaskMonitor.h \
+	compare.h \
+	SystemDation.h \
+	SystemDationNB.h
 
 
