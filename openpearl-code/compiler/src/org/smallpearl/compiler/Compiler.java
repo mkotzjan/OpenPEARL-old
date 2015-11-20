@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.2";
+    static String version = "v0.5";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();

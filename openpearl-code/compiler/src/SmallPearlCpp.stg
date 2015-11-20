@@ -1126,16 +1126,80 @@ user_variable(name) ::= <%
 
 /* --------------------- LOOPS -------------------------- */
 
-LoopStatement(variable,from,by,to,while_cond,body) ::= <%
-for(<if(variable)>(pearlrt::Fixed\<31>) <variable> = <endif>
-    <if(from)><from><else>(pearlrt::Fixed\<31>)(1)<endif>;
-    <if(to)><variable> \< <to><endif>
-    <if(while_cond)>, <while_cond><endif>;
-    <if(by)><variable> = <variable> + (pearlrt::Fixed\<31>)(<by>)<else>(pearlrt::Fixed\<31>)(<variable>)++<endif>
-    ) {
-    <body>
+LoopStatement(variable,from,by,to,while_cond,body) ::= <<
+{
+    <if(variable)>
+        pearlrt::Fixed\<31> <user_variable(variable)>;
+        <if(from)>
+        pearlrt::Fixed\<31> a_value =  (pearlrt::Fixed\<31>) <from>;
+        <else>
+        pearlrt::Fixed\<31> a_value = (pearlrt::Fixed\<31>)(1);
+        <endif>
+
+        <if(to)>
+        pearlrt::Fixed\<31> e_value =  (pearlrt::Fixed\<31>) <to>;
+        <endif>
+
+        <if(by)>
+        pearlrt::Fixed\<31> s_value =  (pearlrt::Fixed\<31>) <by>;
+        <else>
+        pearlrt::Fixed\<31> s_value = (pearlrt::Fixed\<31>)(1);
+        <endif>
+    <endif>
+
+    <if(variable)>
+        <if(to)>
+            while ( ( s_value > 0 && a_value \<= e_value) ||
+                  ( s_value \< 0 && a_value >= e_value) )
+            {<\n>
+                <user_variable(variable)> = a_value;
+
+                <if(while_cond)>
+                    if (<while_cond>)
+                        break;
+                <endif>
+                <body>;
+                a_value = a_value + s_value;
+            }
+        <else>
+            while ( 1 )
+            {
+                <user_variable(variable)> = a_value;
+
+                <if(while_cond)>
+                    if (<while_cond>)
+                        break;
+                <endif>
+                <body>;
+                a_value = a_value + s_value;
+            }
+        <endif>
+    <else>
+        <if(to)>
+            while ( ( s_value > 0 && a_value \<= e_value) ||
+                  ( s_value \< 0 && a_value >= e_value) )
+            {
+                <if(while_cond)>
+                    if (<while_cond>)
+                        break;
+                <endif>
+                <body>;
+                a_value = a_value + s_value;
+            }
+        <else>
+            while ( 1 )
+            {
+                <if(while_cond)>
+                    if (<while_cond>)
+                        break;
+                <endif>
+                <body>;
+                a_value = a_value + s_value;
+            }
+        <endif>
+    <endif>
 }
-%>
+>>
 
 /* --------------------- PROCEDURES -------------------------- */
 
