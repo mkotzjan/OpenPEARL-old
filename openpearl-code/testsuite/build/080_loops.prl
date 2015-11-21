@@ -27,6 +27,10 @@ T1: TASK MAIN;
      local_var := local_var + i;
   END;
 
+  TO 10 REPEAT
+     local_var := local_var + 1;
+  END;
+
 
 END;
 
