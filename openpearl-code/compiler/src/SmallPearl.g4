@@ -576,6 +576,7 @@ unlabeled_statement:
     | returnStatement
     | gotoStatement
     | loopStatement
+    | exitStatement
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -629,6 +630,15 @@ returnStatement
 
 gotoStatement
     : 'GOTO' ID ';'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ExitStatement ::=
+//   EXIT [ Identifier§BlockOrLoop ] ;
+////////////////////////////////////////////////////////////////////////////////
+
+exitStatement
+    : 'EXIT' ID? ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -693,7 +703,7 @@ loopStatement:
     'REPEAT'
     ( scalarVariableDeclaration | dationDeclaration )*
     statement*
-    'END' ID? ';'
+    loopStatement_end ';'
     ;
 
 loopStatement_for:
@@ -714,6 +724,10 @@ loopStatement_to:
 
 loopStatement_while:
     'WHILE' expression
+    ;
+
+loopStatement_end:
+    'END' ID?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
