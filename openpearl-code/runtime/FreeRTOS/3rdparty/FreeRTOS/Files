@@ -1,6 +1,0 @@
-RTOSCSRC += tasks.c
-RTOSCSRC += list.c 
-RTOSCSRC += queue.c
-RTOSCSRC += timers.c
-RTOSCSRC += portable/MemMang/heap_3.c
-

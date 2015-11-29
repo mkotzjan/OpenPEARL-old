@@ -54,15 +54,16 @@ build := -f scripts/Makefile.build obj
 
 # Basic helpers built in scripts/
 PHONY += scripts_basic
+ 
 scripts_basic:
 	$(Q)$(MAKE) $(build)=scripts/basic
 
-
 config: scripts_basic FORCE
-	$(Q)mkdir -p include/linux include/config
+	mkdir -p include/linux include/config
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
 %config: scripts_basic FORCE
+	mkdir -p include/linux include/config
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
 clean:
@@ -71,9 +72,11 @@ clean:
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
 		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \) \
 		-type f -print | xargs rm -f -v
+	rm -rf include
 
 # rebuild includes for build process after altered configuration
-include/autoconf.h: .config
+include/autoconf.h: .config 
+	(cd scripts/kconfig; cc conf.c zconf.tab.c -o conf)
 	./scripts/kconfig/conf -s fm/main.fm
 	
 

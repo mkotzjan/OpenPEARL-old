@@ -55,6 +55,16 @@ int endInclude();
 int sendToOutput(char * s, int length);
 int keepComment = 1;
 
+#define INCLUDEDEPTH 	20
+static struct FileStack{
+   int sp;
+   struct IncStackElem {
+       YY_BUFFER_STATE entry;
+       char fn[128];
+       int line;
+   } stack[INCLUDEDEPTH];
+} fileStack = {0};
+  
 %}
 
  /* -------------------------------- definitions ------------------*/
@@ -113,7 +123,11 @@ filenamechar	digit|letter|.
                   BEGIN 0;
 		  return CSTRING;
                 }
-<STRING>\n      { fprintf(stderr,"invalid string"); exit(1); }
+<STRING>\n      { fprintf(stderr,"%s:%d: ***error  : invalid string\n",
+                          fileStack.stack[fileStack.sp].fn, 
+                          fileStack.stack[fileStack.sp].line);
+		  exit(1);
+                }
 <STRING>.       { *s++ = *yytext; }
 
 "/*"		{BEGIN COMMENT; 
@@ -121,6 +135,11 @@ filenamechar	digit|letter|.
                      ECHO;
 		  }
                 }
+<COMMENT>\n    {if (keepComment && isOutputOn()){
+                   ECHO;
+               }
+               fileStack.stack[fileStack.sp].line ++;
+               }
 <COMMENT>.    {if (keepComment && isOutputOn()){
                    ECHO;
                } }
@@ -151,8 +170,10 @@ filenamechar	digit|letter|.
 <LINECOMMENT>\n {
 		   ECHO;
                    BEGIN 0;
+                   fileStack.stack[fileStack.sp].line ++;
                 }
 \n		{
+                  fileStack.stack[fileStack.sp].line ++;
                   if (isOutputOn()){
                        ECHO;
                    }
@@ -169,7 +190,7 @@ int yywarp() {
 
 /* send characters to yyout, checking if max 2 \n are in sequence */
 
-#define SYSINCS	200
+#define SYSINCS	500
 static struct SysIncList{
      int nbr;
      char fileName[SYSINCS][30];
@@ -188,16 +209,21 @@ void addToSysIncList(char * fileName) {
           strcpy(sysIncFiles.fileName[sysIncFiles.nbr], fileName);
           sysIncFiles.nbr ++;
        } else {
-          fprintf(stderr, "system include <%s> too long\n",fileName);
+           fprintf(stderr,"%s:%d: ***error  : system include <%s> too long\n",
+                          fileStack.stack[fileStack.sp].fn, 
+                          fileStack.stack[fileStack.sp].line,
+                          fileName);
           _exit(1);
        }
     } else {
-       fprintf(stderr, "system include list overflow\n");
+           fprintf(stderr,"%s:%d: ***error  : system include list overflow\n",
+                          fileStack.stack[fileStack.sp].fn, 
+                          fileStack.stack[fileStack.sp].line);
        _exit(1);
     }
 }
 
-#define DEFINEENTRIES	200
+#define DEFINEENTRIES	500
 static struct DefineList{
      int nbr;
      char defName[DEFINEENTRIES][60];
@@ -226,24 +252,34 @@ int isInDefines(char * name) {
 
 void addToDefines(char * name) {
    int i;
+   int alreadyDefined = 0;
    for (i=0; i<defineList.nbr; i++) {
        if (strcmp(defineList.defName[i], name) == 0) {
-           fprintf(stderr,"multiple definition of %s", name);
-           _exit(1);
+           fprintf(stderr,"%s:%d: ***warning: multiple definition of %s\n",
+                  fileStack.stack[fileStack.sp].fn, 
+                  fileStack.stack[fileStack.sp].line,
+                   name);
+           alreadyDefined = 1;
        }
    }
-  
-   if (defineList.nbr < DEFINEENTRIES) {
-       if (strlen(name) < sizeof(defineList.defName[0])) {
-          strcpy(defineList.defName[defineList.nbr], name);
-          defineList.nbr ++;
+   if (alreadyDefined == 0) { 
+      if (defineList.nbr < DEFINEENTRIES) {
+          if (strlen(name) < sizeof(defineList.defName[0])) {
+             strcpy(defineList.defName[defineList.nbr], name);
+             defineList.nbr ++;
+          } else {
+             fprintf(stderr,"%s:%d: ***error  : define entry <%s> too long\n",
+                  fileStack.stack[fileStack.sp].fn, 
+                  fileStack.stack[fileStack.sp].line,
+		  name);
+             _exit(1);
+          }
        } else {
-          fprintf(stderr, "define entry <%s> too long\n",name);
+          fprintf(stderr,"%s:%d: ***error  : define list overflow\n",
+                  fileStack.stack[fileStack.sp].fn, 
+                  fileStack.stack[fileStack.sp].line);
           _exit(1);
        }
-    } else {
-       fprintf(stderr, "define list overflow\n");
-       _exit(1);
     }
 }
 
@@ -275,7 +311,9 @@ void pushOutputLevel(int stateThen, int stateElse, int copyElseEndif) {
       outputControlStack.entryElse[outputControlStack.sp] = stateElse;
       outputControlStack.copyElseEndif[outputControlStack.sp] = copyElseEndif;
    } else {
-      fprintf(stderr,"#if depth exceeded \n");
+      fprintf(stderr,"%s:%d: ***error  : #if depth exceeded \n",
+                     fileStack.stack[fileStack.sp].fn, 
+                     fileStack.stack[fileStack.sp].line);
       _exit(1);
    }
 }
@@ -290,15 +328,18 @@ void popOutputLevel() {
    if (outputControlStack.sp > 0) {
       outputControlStack.sp--;
    } else {
-      fprintf(stderr,"#if nesting wrong \n");
+      fprintf(stderr,"%s:%d: ***error  : #if nesting wrong\n",
+                     fileStack.stack[fileStack.sp].fn, 
+                     fileStack.stack[fileStack.sp].line);
       _exit(1);
    }
 }
 
-#define INC_PATH_DEPTH  10
+#define INC_PATH_DEPTH  100
+#define INC_PATH_NAME_LENGTH   100
 static struct IncPaths{
    int nbr;
-   char entry[INC_PATH_DEPTH][30];
+   char entry[INC_PATH_DEPTH][INC_PATH_NAME_LENGTH];
 } incPaths = {0};
   
 void add2IncList(char * p) {
@@ -306,32 +347,38 @@ void add2IncList(char * p) {
         if (strlen(p) < sizeof(incPaths.entry[0])) {
            strcpy(incPaths.entry[incPaths.nbr++], p);
         } else {
-           fprintf(stderr, "include path element too long (%s)\n", p);
+           fprintf(stderr,"%s:%d: ***error  : "
+			"include path element too long (%s) (%d required)\n",
+                     fileStack.stack[fileStack.sp].fn, 
+                     fileStack.stack[fileStack.sp].line,
+                     p, strlen(p));
            _exit(1);
         }
      } else {
-        fprintf(stderr, "include path list overflow\n", p);
+           fprintf(stderr,"%s:%d: ***error  : "
+                          "include path list overflow\n",
+                     fileStack.stack[fileStack.sp].fn, 
+                     fileStack.stack[fileStack.sp].line,
+ 		      p);
         _exit(1);
      }
 }
-#define INCLUDEDEPTH 	20
-static struct FileStack{
-   int sp;
-   YY_BUFFER_STATE entry[INCLUDEDEPTH];
-} fileStack = {0};
-  
+
 void doInclude(char * fileName) {
    char fn[128];
    int i;
 
-   fprintf(yyout,"/**** included from %s ******/\n", fileName);
+//   fprintf(yyout,"/**** included from %s ******/\n", fileName);
 
    if ( fileStack.sp >= INCLUDEDEPTH ) {
-      fprintf( stderr, "Includes nested too deeply" );
+           fprintf(stderr,"%s:%d: ***error  : "
+                          "includes nested too deep\n",
+                     fileStack.stack[fileStack.sp].fn, 
+                     fileStack.stack[fileStack.sp].line);
       _exit( 1 );
    }
 
-  fileStack.entry[fileStack.sp++] = YY_CURRENT_BUFFER;
+  fileStack.stack[fileStack.sp].entry = YY_CURRENT_BUFFER;
   strcpy(fn,fileName);   
   yyin = fopen( fn, "r" );
   if (yyin == 0 && fn[0] != '/') {
@@ -343,9 +390,17 @@ void doInclude(char * fileName) {
       }
   }
   if ( ! yyin ) {
-     fprintf(stderr," could not open %s\n",fileName);
+           fprintf(stderr,"%s:%d: ***error  : "
+                    "could not open %s\n",
+                     fileStack.stack[fileStack.sp].fn, 
+                     fileStack.stack[fileStack.sp].line,
+                     fileName);
      _exit(1);
   } 
+  fileStack.sp++;
+  strncpy(fileStack.stack[fileStack.sp].fn, fn, sizeof(fileStack.stack[0].fn));
+  fileStack.stack[fileStack.sp].line = 1;
+
   yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
   //printf("switch to buffer %s\n",fileName);
 } 
@@ -354,7 +409,7 @@ int endInclude() {
    if (--fileStack.sp < 0) {
         return -1; // no more files
    } 
-   yy_switch_to_buffer(fileStack.entry[fileStack.sp] );
+   yy_switch_to_buffer(fileStack.stack[fileStack.sp].entry );
    //printf("returned to prev buffer (sp=%d)\n",fileStack.sp);
    return 0; // ok
 }
@@ -364,6 +419,8 @@ int main(int narg, char **argv) {
     FILE * fp;
     int i;	 
 
+    strcpy(fileStack.stack[0].fn,"<stdin>");
+    fileStack.stack[0].line = 1;
     /* read options */
     while ((i=getopt(narg,argv,"cI:?")) != -1) {
        switch (i) {
@@ -415,8 +472,11 @@ int main(int narg, char **argv) {
 				addToSysIncList(buf);
 				break;
 			   default:
-				fprintf(stderr," *** strange #include statement");
-				fprintf(stderr,"    ret = %d  buf=>%s<\n",ret,buf);
+           			fprintf(stderr,"%s:%d: ***error  : "
+				        " *** strange #include statement\n",
+                                      fileStack.stack[fileStack.sp].fn, 
+                                      fileStack.stack[fileStack.sp].line);
+				      fprintf(stderr,"    ret = %d  buf=>%s<\n",ret,buf);
 				_exit(1);
 			   }
                         }
@@ -424,7 +484,10 @@ int main(int narg, char **argv) {
          case DEFINE:   if (isOutputOn()) {
                            ret = yylex();
                            if (ret !=  IDENTIFIER) {
-			      fprintf(stderr,"identifer expected\n");
+           			fprintf(stderr,"%s:%d: ***error  : "
+			                     "identifer expected\n",
+                                      fileStack.stack[fileStack.sp].fn, 
+                                      fileStack.stack[fileStack.sp].line);
                               _exit(1);
                            }
 			   printf("\n#define %s", buf);
@@ -443,7 +506,10 @@ int main(int narg, char **argv) {
 			break;
          case IFDEF:    ret = yylex();
                         if (ret !=  IDENTIFIER) {
-			   fprintf(stderr,"*** IFDEF identifer expected\n");
+           			fprintf(stderr,"%s:%d: ***error  : "
+			                  "IFDEF identifer expected\n",
+                                      fileStack.stack[fileStack.sp].fn, 
+                                      fileStack.stack[fileStack.sp].line);
                            _exit(1);
                         }
                         //printf("IFDEF %d\n", isInDefines(buf));

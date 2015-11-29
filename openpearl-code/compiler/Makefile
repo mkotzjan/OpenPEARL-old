@@ -37,7 +37,7 @@ all : force_look
 	
 clean :
 	@$(ECHO) cleaning up in .
-	-for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
+	(for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done)
 
 force_look :
 	@true

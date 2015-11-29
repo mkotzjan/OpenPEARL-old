@@ -454,13 +454,15 @@ namespace pearlrt {
    int Task::switchToThreadPrioMax() {
       int cp;
       cp = uxTaskPriorityGet(NULL);
-      Log::info("%s: switch to from %d to max prio", name, cp);
+      Log::info("%s: switch to from %d to max prio", pcTaskGetTaskName(NULL),
+            /* name, */ cp);
       return cp;
    }
 
    void Task::switchToThreadPrioCurrent(int cp) {
       vTaskPrioritySet(NULL, cp);
-      Log::info("%s: switch back to %d  prio", name, cp);
+      Log::info("%s: switch back to %d  prio", pcTaskGetTaskName(NULL), /*name,*/
+               cp);
    }
 
 }

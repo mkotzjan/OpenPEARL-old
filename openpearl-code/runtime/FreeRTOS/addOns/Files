@@ -1,0 +1,5 @@
+ADDONCSRC = assert.c	 \
+	clock.c  	\
+	FreeRTOSHooks.c	\
+	timer.c
+

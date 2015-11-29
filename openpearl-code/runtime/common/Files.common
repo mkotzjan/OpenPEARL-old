@@ -36,6 +36,7 @@
 
 CXX_COMMON = \
 	Duration.cc  \
+	Clock.cc  \
 	PutDuration.cc GetDuration.cc \
 	Signals.cc \
 	ScheduleSignalAction.cc \

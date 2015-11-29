@@ -1,26 +1,29 @@
-config FreeRTOS_lpc1768
-        boolean  "Select the FreeRTOS port for the runtime sytem"
+config LPC1768
+        boolean  "Select the runtime sytem for the Landtiger board"
 	default n
 	help
+	This port targets the LPC1768 Landtiger board. Target specific 
+	i/o-setting is done directly in the source code.
+	
 	This port is in work. Build and execution problems 
         may occur selecting this option. 
 
 choice
-depends on FreeRTOS_lpc1768
+depends on LPC1768
    prompt  "Select System Timer"
-    default FreeRTOSSystemTimer
+    default LPC1768_FreeRTOSSystemTimer
     help
     Exactly one timer solution must be selected for the timed tasking
     operations.
 
- config FreeRTOSSystemTimer 
+ config LPC1768_FreeRTOSSystemTimer 
      bool "SystemTimer1MS"
      help 
      The system time is based on a 1ms timer. This limits the precision
      of delay to this time increment.
 
 
- config FreeRTOSHRTimer 
+ config LPC1768_FreeRTOSHRTimer 
      bool "HR-Timer (experimental)"
      help
      The system time is based on a high precision timer, whos operation
@@ -32,7 +35,7 @@ endchoice
 
 
 menu "Drivers"
-depends on FreeRTOS_lpc1768
+depends on LPC1768
 config LPC1768_USB_Keyboard
      bool "USB keyboard support"
      default n

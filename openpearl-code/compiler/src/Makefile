@@ -28,6 +28,7 @@
 ###############################################################################
 
 include ../Makefile.inc
+include ../../configuration/.config
 
 ##
 ## antlr generates out of SmallPearl.g4 the following files:
@@ -81,10 +82,15 @@ test:
     
 ###############################################################################
 
-install:
-	cp prl_c $(INSTALL_DIR)
-	cp smallpearl_compiler.jar $(INSTALL_DIR)
+install: prl_cc.inc
+#	cp prl_c $(INSTALL_DIR)
+#	cp smallpearl_compiler.jar $(INSTALL_DIR)
+	cp smallpearl_compiler.jar $(CONFIG_INSTALL_Target)/bin
 
+.PHONY: prl_cc.inc
+prl_cc.inc:
+	echo 'java -cp $(CONFIG_INSTALL_Target)/bin/smallpearl_compiler.jar:$(CONFIG_COMPILER_ANTLR)  org/smallpearl/compiler/Compiler $$fn.prl --output $$fn.cc' > ../prl_cc.inc
+	
 ###############################################################################
 
 clean:
@@ -95,6 +101,7 @@ clean:
 	$(RM) org/smallpearl/compiler/SmallPearlParser.java
 	$(RM) org/smallpearl/compiler/SmallPearlVisitor.java
 	$(RM) org/smallpearl/compiler/*.class
+	$(RM) ../prl_cc.inc
 
 ###############################################################################
 

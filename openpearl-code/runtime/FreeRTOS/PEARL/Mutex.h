@@ -39,7 +39,7 @@
 #include "FreeRTOS.h" // from FreeRTOS
 #include "semphr.h"   // from FreeRTOS
 
-#include <MutexCommon.h>
+#include "MutexCommon.h"
 
 namespace pearlrt {
 

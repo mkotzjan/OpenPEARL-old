@@ -1,5 +1,7 @@
 # super makefile for SmallPearl
 # 
+include configuration/.config
+
 .PHONY: runtime compiler help build all menuconfig
 
 help:
@@ -21,15 +23,20 @@ runtime:
 compiler:
 	(cd compiler/src; make all; )
 
-install: clean build
+install: clean
 	(cd runtime; make install; )
 	(cd compiler/src; make install; )
-	cp prl_bin /usr/local/bin
+	runtime/includeComposer/ic  <prl.inc >prl
+	rm -f sysincs.h		# are created by includeComposer but not needed here
+	cp prl $(CONFIG_INSTALL_Target)/bin
 
 clean:
 	(cd runtime; make clean; )
 	(cd compiler/src; make clean; )
 	(cd testsuite; make clean; )
+	(cd language_report; make clean; )
+	(cd configuration; make clean;)
+	rm -f prl
 	
 menuconfig:
 	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
