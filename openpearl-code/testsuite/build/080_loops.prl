@@ -18,7 +18,6 @@ T1: TASK MAIN;
      local_var := local_var + i;
   END;
 
-
   FOR i FROM start TO 10 WHILE local_var < 10 REPEAT
      local_var := local_var + i;
   END;
@@ -27,10 +26,33 @@ T1: TASK MAIN;
      local_var := local_var + i;
   END;
 
-  TO 10 REPEAT
+  WHILE local_var < 10 REPEAT
      local_var := local_var + 1;
   END;
 
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !! Here are some strange possible constructs:
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  FROM 1 REPEAT
+     local_var := local_var + 1;
+     EXIT loop_010;
+  END loop_010;
+
+  BY 1 REPEAT
+     local_var := local_var + 1;
+     EXIT loop_011;
+  END loop_011;
+
+  TO 10 REPEAT
+     local_var := local_var + 1;
+     EXIT loop_012;
+  END loop_012;
+
+  REPEAT
+     local_var := local_var + 1;
+     EXIT loop_013;
+  END loop_013;
 
 END;
 

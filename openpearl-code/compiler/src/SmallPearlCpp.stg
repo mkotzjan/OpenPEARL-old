@@ -308,6 +308,15 @@ goto_statement(label) ::= <<
 goto <label>;
 >>
 
+ExitStatement(label) ::= <<
+<if(label)>
+    goto <user_label(label)>;
+<else>
+    break;
+<endif>
+>>
+
+
 return_statement(expression) ::= <<
 return (<expression>);
 >>
@@ -1124,79 +1133,78 @@ user_variable(name) ::= <%
     _<name>
 %>
 
+user_label(name) ::= <%
+    _<name>
+%>
+
 /* --------------------- LOOPS -------------------------- */
 
-LoopStatement(variable,from,by,to,while_cond,body) ::= <<
+LoopStatement(srcLine,variable,from,by,to,while_cond,body,label_end) ::= <<
 {
-    <if(variable)>
-        pearlrt::Fixed\<31> <user_variable(variable)>;
-        <if(from)>
-        pearlrt::Fixed\<31> a_value =  (pearlrt::Fixed\<31>) <from>;
-        <else>
-        pearlrt::Fixed\<31> a_value = (pearlrt::Fixed\<31>)(1);
-        <endif>
+    <if(from)>
+    pearlrt::Fixed\<31> a_value =  (pearlrt::Fixed\<31>) <from>;
+    <else>
+    pearlrt::Fixed\<31> a_value = (pearlrt::Fixed\<31>)(1);
+    <endif>
 
-        <if(to)>
-        pearlrt::Fixed\<31> e_value =  (pearlrt::Fixed\<31>) <to>;
-        <endif>
+    <if(to)>
+    pearlrt::Fixed\<31> e_value =  (pearlrt::Fixed\<31>) <to>;
+    <endif>
 
-        <if(by)>
-        pearlrt::Fixed\<31> s_value =  (pearlrt::Fixed\<31>) <by>;
-        <else>
-        pearlrt::Fixed\<31> s_value = (pearlrt::Fixed\<31>)(1);
-        <endif>
+    <if(by)>
+    pearlrt::Fixed\<31> s_value =  (pearlrt::Fixed\<31>) <by>;
+    <else>
+    pearlrt::Fixed\<31> s_value = (pearlrt::Fixed\<31>)(1);
     <endif>
 
     <if(variable)>
-        <if(to)>
-            while ( ( s_value > 0 && a_value \<= e_value) ||
-                  ( s_value \< 0 && a_value >= e_value) )
-            {<\n>
-                <user_variable(variable)> = a_value;
+    pearlrt::Fixed\<31> <user_variable(variable)> = a_value;
+    <endif>
 
-                <if(while_cond)>
-                    if (<while_cond>)
-                        break;
-                <endif>
-                <body>;
-                a_value = a_value + s_value;
-            }
-        <else>
-            while ( 1 )
-            {
-                <user_variable(variable)> = a_value;
+    <if(to)>
+        while ( ( s_value > 0 && a_value \<= e_value) ||
+              ( s_value \< 0 && a_value >= e_value) )
+        {<\n>
+            <if(variable)>
+            <user_variable(variable)> = a_value;
+            <endif>
 
-                <if(while_cond)>
-                    if (<while_cond>)
-                        break;
-                <endif>
-                <body>;
+            <if(while_cond)>
+            if (!(<while_cond>))
+                break;
+            <endif>
+
+            <body>
+
+            me->setLocation(<srcLine>, filename);
+
+            if ( (s_value > 0) && (a_value \<= e_value - s_value) ||
+                 (s_value \< 0) && ( a_value >= e_value - s_value)) {
                 a_value = a_value + s_value;
+            } else {
+                break;
             }
-        <endif>
+        }
     <else>
-        <if(to)>
-            while ( ( s_value > 0 && a_value \<= e_value) ||
-                  ( s_value \< 0 && a_value >= e_value) )
-            {
-                <if(while_cond)>
-                    if (<while_cond>)
-                        break;
-                <endif>
-                <body>;
-                a_value = a_value + s_value;
-            }
-        <else>
-            while ( 1 )
-            {
-                <if(while_cond)>
-                    if (<while_cond>)
-                        break;
-                <endif>
-                <body>;
-                a_value = a_value + s_value;
-            }
-        <endif>
+        while ( 1 )
+        {<\n>
+            <if(variable)>
+            <user_variable(variable)> = a_value;
+            <endif>
+            <if(while_cond)>
+            if (!(<while_cond>))
+                break;
+            <endif>
+
+            <body>
+
+            me->setLocation(<srcLine>, filename);
+            a_value = a_value + s_value;
+        }
+    <endif>
+
+    <if(label_end)>
+        <user_label(label_end)>;
     <endif>
 }
 >>
@@ -1208,7 +1216,6 @@ ProcedureDeclaration(id,listOfFormalParameters,body,resultAttribute,globalAttrib
 <id>(<listOfFormalParameters>)
 {
     <body>
-}
 
 
 >>

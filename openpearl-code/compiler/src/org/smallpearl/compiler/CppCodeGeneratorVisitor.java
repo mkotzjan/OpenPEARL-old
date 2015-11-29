@@ -818,6 +818,18 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitUnarySubtractiveExpression((SmallPearlParser.UnarySubtractiveExpressionContext) ctx));
             } else if (ctx instanceof SmallPearlParser.ExponentiationExpressionContext) {
                 st.add("code", visitExponentiationExpression((SmallPearlParser.ExponentiationExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.LtRelationalExpressionContext) {
+                st.add("code", visitLtRelationalExpression((SmallPearlParser.LtRelationalExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.GeRelationalExpressionContext) {
+                st.add("code", visitGeRelationalExpression((SmallPearlParser.GeRelationalExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.NeRelationalExpressionContext) {
+                st.add("code", visitNeRelationalExpression((SmallPearlParser.NeRelationalExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.EqRelationalExpressionContext) {
+                st.add("code", visitEqRelationalExpression((SmallPearlParser.EqRelationalExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.GtRelationalExpressionContext) {
+                st.add("code", visitGtRelationalExpression((SmallPearlParser.GtRelationalExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.LeRelationalExpressionContext) {
+                st.add("code", visitLeRelationalExpression((SmallPearlParser.LeRelationalExpressionContext) ctx));
             }
         }
         return st;
@@ -908,6 +920,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             statement.add("code", visitReturnStatement(ctx.returnStatement()));
         } else if (ctx.loopStatement() != null) {
             statement.add("code", visitLoopStatement(ctx.loopStatement()));
+        } else if (ctx.exitStatement() != null) {
+            statement.add("code", visitExitStatement(ctx.exitStatement()));
         }
 
         return statement;
@@ -3007,6 +3021,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitLoopStatement(SmallPearlParser.LoopStatementContext ctx) {
         ST st = group.getInstanceOf("LoopStatement");
 
+        st.add("srcLine", ctx.start.getLine());
+
         if ( ctx.loopStatement_for() != null) {
             st.add( "variable", ctx.loopStatement_for().ID().toString());
         }
@@ -3023,8 +3039,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             st.add( "to", getExpression(ctx.loopStatement_to().expression()));
         }
 
-        if ( ctx.loopStatement_while() != null) {
-            st.add( "while_cond", getExpression(ctx.loopStatement_while().expression()));
+
+        if ( ctx.loopStatement_while() != null && ctx.loopStatement_while().expression() != null) {
+            ST wc = getExpression(ctx.loopStatement_while().expression());
+            String s = wc.toString();
+            if ( wc.toString().length() > 0 )
+                st.add( "while_cond", wc);
         }
 
         for (int i = 0; i < ctx.scalarVariableDeclaration().size(); i++) {
@@ -3035,8 +3055,24 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             st.add("body", visitStatement(ctx.statement(i)));
         }
 
+        if ( ctx.loopStatement_end().ID() != null) {
+            st.add( "label_end", ctx.loopStatement_end().ID().toString());
+        }
+
         return st;
     }
+
+    @Override
+    public ST visitExitStatement(SmallPearlParser.ExitStatementContext ctx) {
+        ST st = group.getInstanceOf("ExitStatement");
+
+        if ( ctx.ID() != null) {
+            st.add("label", ctx.ID().toString());
+        }
+
+        return st;
+    }
+
 
     @Override
     public ST visitProcedureDeclaration(SmallPearlParser.ProcedureDeclarationContext ctx) {

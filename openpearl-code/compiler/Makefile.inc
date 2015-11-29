@@ -38,7 +38,7 @@ RANLIB	     = ranlib
 #RM	     = rm
 ECHO	     = echo
 SHELL	     = /bin/sh
-ANTLR        = /usr/local/lib/antlr-4.0-complete.jar
+ANTLR        = /usr/local/lib/antlr-4.5-complete.jar
 #ANTLR       = /opt/antlr/antlr.jar
 
 ################################
