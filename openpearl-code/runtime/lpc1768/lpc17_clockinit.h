@@ -27,14 +27,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SYS_SYSTEMINIT_H_
-#define SYS_SYSTEMINIT_H_
+#ifndef LPC17CLOCKINIT_H_
+#define LPC17CLOCKINIT_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum systeminit{
+enum lpc17_clockinit{
 	CpuClock,
 	ClockRTC,
 	ClockTimer0,
@@ -42,10 +42,10 @@ enum systeminit{
 	ClockDebug
 };
 
-void systeminit(enum systeminit);
+static void lpc17_clockinit(enum lpc17_clockinit);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* SYS_SYSTEMINIT_H_ */
+#endif /* LPC17CLOCKINIT_H_ */

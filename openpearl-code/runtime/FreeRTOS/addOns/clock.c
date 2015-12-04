@@ -33,27 +33,41 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <time.h>
+#include <sys/time.h>  // gettimeofday()
 #include <sys/errno.h>
+#include "time_addons.h"
 
 static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts);
-int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp) = &clock_gettime_cb_notready;
+static int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp) = &clock_gettime_cb_notready;
 
+/* added global function */
+void set_clock_gettime_cb(int (*new_clock_gettime_cb)(clockid_t clock_id,
+                                      struct timespec *tp)) {
+    clock_gettime_cb = new_clock_gettime_cb;
+}
+
+/* prototype in <time.h>  */
 struct tm *localtime_r(const time_t *_time, struct tm * tm){
 	//always assume localtime was UTC
 	gmtime_r(_time, tm);
 	return tm;
 }
 
+/* prototype in <time.h>  */
 struct tm *localtime(const time_t *_time){
 	//always assume localtime was UTC
 	static struct tm tm;//needs not be thread safe, says susv3
 	return localtime_r(_time, &tm);
 }
 
+/* prototype in <time.h>  */
 extern int clock_gettime(clockid_t clock_id, struct timespec *ts){
 	return (*clock_gettime_cb)(clock_id, ts);
 }
 
+/* 
+  default time base, just returning (0,0) and sets the errno variable
+*/
 static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts){
 	ts->tv_nsec=0;
 	ts->tv_sec=0;
@@ -61,7 +75,7 @@ static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts){
 	return -1;
 }
 
-#include <sys/time.h>
+/* prototype in <sys/time.h>  */
 int gettimeofday(struct timeval *__p, void *__tz){
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);

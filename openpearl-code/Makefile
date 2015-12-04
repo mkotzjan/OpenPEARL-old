@@ -2,7 +2,7 @@
 # 
 include configuration/.config
 
-.PHONY: runtime compiler help build all menuconfig
+.PHONY: install runtime compiler help build all menuconfig
 
 help:
 	@echo "*************************************"
@@ -23,12 +23,24 @@ runtime:
 compiler:
 	(cd compiler/src; make all; )
 
-install: clean
+install: configuration/include/autoconf.h 
+	(cd runtime; make clean; )
+	(cd compiler/src; make clean; )
 	(cd runtime; make install; )
 	(cd compiler/src; make install; )
 	runtime/includeComposer/ic  <prl.inc >prl
-	rm -f sysincs.h		# are created by includeComposer but not needed here
+	rm -f sysincs.h	# is created by includeComposer but not needed here
 	cp prl $(CONFIG_INSTALL_Target)/bin
+
+# create rule to run menuconfig, if no configuration/include/autoconf.h exists
+#ifeq ($(wildcard "configuration/include/autoconf.h")),)
+
+
+.PHONY: configuration/include/autoconf.h
+configuration/include/autoconf.h: 
+ifneq ($(wildcard ./configuration/include/autoconf.*),./configuration/include/autoconf.h)
+	make menuconfig
+endif
 
 clean:
 	(cd runtime; make clean; )
@@ -37,6 +49,6 @@ clean:
 	(cd language_report; make clean; )
 	(cd configuration; make clean;)
 	rm -f prl
-	
+
 menuconfig:
 	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )

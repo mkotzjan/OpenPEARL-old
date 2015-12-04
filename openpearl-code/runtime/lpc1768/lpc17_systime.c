@@ -35,9 +35,11 @@
 #include "systeminit.h"
 #include "FreeRTOSConfig.h"
 
+#ifdef UNUSED
 extern int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp);
 extern void (*nsec_clock_gettime)(uint64_t*);
 extern int (*timerarm)(int64_t);
+#endif
 
 static volatile time_t unixtime;
 static volatile uint64_t unixtime_nsec_offset=0;
@@ -107,9 +109,11 @@ void systeminit_timer0(){
 	LPC_TIMER0->TCR=1;//enable
 	NVIC_SetPriority(TIMER0_IRQn,configMAX_SYSCALL_INTERRUPT_PRIORITY);
 	NVIC_EnableIRQ(TIMER0_IRQn);
+#ifdef UNSUED
 	timerarm = &timerarm_cb_systime;
 	clock_gettime_cb = &clock_gettime_timer0;
 	nsec_clock_gettime = &nsec_clock_gettime_timer0;
+#endif
 }
 
 static void nsec_clock_gettime_debug(uint64_t *nsectime){

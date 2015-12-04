@@ -80,10 +80,10 @@ namespace pearlrt {
    int cccc = 1;
 
    void TaskCommon::mutexLock() {
-//      Log::info("MUTEX TASK: LOCKING...cccc= %d", cccc);
+//      Log::debug("MUTEX TASK: LOCKING...cccc= %d", cccc);
       mutexTasks.request();
       cccc --;
-//      Log::info("MUTEX TASK: LOCKED   cccc= %d", cccc);
+//      Log::debug("MUTEX TASK: LOCKED   cccc= %d", cccc);
    }
 
    void TaskCommon::mutexUnlock() {
@@ -94,7 +94,7 @@ namespace pearlrt {
       }
 /*
       else {
-         Log::info("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
+         Log::debug("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
       }
 */
       mutexTasks.release();
@@ -242,7 +242,7 @@ namespace pearlrt {
       mutexLock();
 
       if ((condition & ~ PRIO) != 0) {
-         Log::info("task %s: delayed activate task %s", me->getName(), name);
+         Log::debug("task %s: delayed activate task %s", me->getName(), name);
 
          try {
             // test calculation of system priority.
@@ -268,7 +268,7 @@ namespace pearlrt {
          mutexUnlock();
          throw theTaskRunningSignal;
       } else {
-         Log::info("task %s: activate %s with prio %d",
+         Log::debug("task %s: activate %s with prio %d",
                    me->getName(), name, p.x);
          currentPrio = p;
 
@@ -605,7 +605,7 @@ namespace pearlrt {
       //struct itimerspec its;
       bool schedActivateWasSet = false;
 
-      Log::info("task %s: prevent %s start", me->getName(), name);
+      Log::debug("task %s: prevent %s start", me->getName(), name);
       mutexLock();
 
       // check if number of pending must be reduced
@@ -656,7 +656,7 @@ namespace pearlrt {
       mutexLock();
 
       if (taskState == Task::TERMINATED) {
-         Log::info("task %s: scheduled activate: starts", name);
+         Log::debug("task %s: scheduled activate: starts", name);
 //         internalDirectActivate(schedActivateData.prio, false);
          directActivate(schedActivateData.prio);
 //         activateDone.request();
@@ -684,7 +684,7 @@ namespace pearlrt {
       if (taskState == Task::SUSPENDED ||
             taskState == Task::SEMA_SUSPENDED_BLOCKED ||
             taskState == Task::RUNNING) {
-         Log::info("task %s: scheduled continue: timeout reached", name);
+//         Log::debug("task %s: scheduled continue: timeout reached", name);
 
          if (schedContinueData.prio.x != 0) {
             continueFromOtherTask(PRIO, Prio(schedContinueData.prio));
@@ -692,7 +692,7 @@ namespace pearlrt {
             continueFromOtherTask(0, Prio());
          }
 
-         Log::info("task %s: scheduled continue done", name);
+//         Log::debug("task %s: scheduled continue done", name);
 
       } else {
          Log::warn("task %s: scheduled continue: skipped", name);
@@ -737,7 +737,7 @@ namespace pearlrt {
          }
       } else {
          if (taskState == Task::TERMINATED) {
-            Log::info("task %s: scheduled activate (when): starts", name);
+            Log::debug("task %s: scheduled activate (when): starts", name);
 //            internalDirectActivate(schedActivateData.prio, false);
             directActivate(schedActivateData.prio);
 //            activateDone.request();

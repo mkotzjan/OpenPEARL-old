@@ -26,30 +26,12 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #include <stdint.h>
-#include "systeminit.h"
-
-#ifndef SYSTEMCONFIG_H_
-#define SYSTEMCONFIG_H_
-
-/* This is used as a worst case time to initialize the RTC with, if it doesn't
- * have a more recent, correct time */
-#ifndef UNIXSTAMP
-	#define UNIXSTAMP 1432932917 //Fri May 29 12:55:17 2015
-#endif
-
 /* System oscillator rate and RTC oscillator rate
  * lpc library needs those to calculate various clocks
  * */
-//const uint32_t OscRateIn = 12000000;
-//const uint32_t RTCOscRateIn = 32768;
-// moved into lpc17_oscillators.c
+const uint32_t OscRateIn = 12000000;
+const uint32_t RTCOscRateIn = 32768;
 
-/* SystemInit is called on startup. Needed due to the linkerscript, but dependencies
- * are probably preferrable */
-/* Variables used in here will get overwritten before main() is started!!!
- * with newlib hardware_init_hook and software_init hook make more sense*/
-void SystemInit() {
-}
 
-#endif /* SYSTEMCONFIG_H_ */

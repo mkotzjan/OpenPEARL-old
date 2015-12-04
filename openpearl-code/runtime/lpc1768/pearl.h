@@ -7,7 +7,6 @@
 #include <string>
 #include <cmath>
 #include <math.h>
-#include <time.h>
 
 
 #define TASK_H_
@@ -126,13 +125,6 @@ class IllegalSchedulingSignal : public TaskSignal {
  IllegalSchedulingSignal() {
    type = (char*)"illegal scheduling condition";
    rstNum = 106;
- };
-};
-class PriorityNotMapableSignal : public TaskSignal {
- public:
- PriorityNotMapableSignal() {
-   type = (char*)"priority is not mapable to linux range";
-   rstNum = 105;
  };
 };
 class ArithmeticSignal : public Signal {
@@ -440,7 +432,6 @@ extern TaskRunningSignal theTaskRunningSignal;
 extern TaskSuspendedSignal theTaskSuspendedSignal;
 extern TaskTerminatedSignal theTaskTerminatedSignal;
 extern IllegalSchedulingSignal theIllegalSchedulingSignal;
-extern PriorityNotMapableSignal thePriorityNotMapableSignal;
 extern ArithmeticSignal theArithmeticSignal;
 extern FixedRangeSignal theFixedRangeSignal;
 extern FixedDivideByZeroSignal theFixedDivideByZeroSignal;
@@ -1135,7 +1126,7 @@ namespace pearlrt {
 #define configUSE_PREEMPTION 1
 #define configUSE_IDLE_HOOK 	0
 #define configMAX_PRIORITIES ( 260 )
-#define configUSE_TICK_HOOK 	0
+#define configUSE_TICK_HOOK 	1
 #define configCPU_CLOCK_HZ 	( ( unsigned long ) 96000000 )
 #define configTICK_RATE_HZ 	( ( TickType_t ) 1000 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 80 )
@@ -1150,9 +1141,11 @@ namespace pearlrt {
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION   0
 #define INCLUDE_xTaskGetSchedulerState  1
 #define INCLUDE_xTaskResumeFromISR	1
+#define configUSE_TIMERS 1
+#define configCHECK_FOR_STACK_OVERFLOW  	1
 #define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 1)
 #define configTIMER_QUEUE_LENGTH  50
-#define configTIMER_TASK_STACK_DEPTH	80
+#define configTIMER_TASK_STACK_DEPTH	500
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 #define configUSE_COUNTING_SEMAPHORES 	1
 #define configUSE_ALTERNATIVE_API  0
@@ -1717,9 +1710,6 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
 
 
 
-
-
-#define configUSE_TIMERS 0
 
 
 
@@ -4064,67 +4054,24 @@ namespace pearlrt {
    };
 }
 
+#define AUTOCONF_INCLUDED
+#define CONFIG_COMPILER_ANTLR "/usr/local/lib/antlr-4.0-complete.jar"
+#define CONFIG_LPC1768_FreeRTOSSystemTimer 1
+#define CONFIG_LPC1768 1
+#define CONFIG_INSTALL_Target "/usr/local"
+
 #define TASKTIMERINCLUDED
+ 
 
 
 
-
-
-
-
-namespace pearlrt {
-
-   class TaskTimer : public TaskTimerCommon {
-   public:
-
-      typedef void (*TimerCallback)(TaskCommon*);
-   private:
-      int counts;
-      int countsBackup;
-      TaskCommon* task;
-      TimerCallback callback;
-      int signalNumber;
-      timer_t timer;
-      struct itimerspec its;
-      struct {
-         void *cb;
-         void *th;
-      	  }timer_callback;
-   public:
-
-      TaskTimer();
-
-      void set(
-         int condition,
-         Clock at,
-         Duration after,
-         Duration all,
-         Clock until,
-         Duration during);
-
-      int cancel();
-   private:
-
-      int stop();
-   public:
-
-      int start();
-
-      bool isActive();
-
-      bool isSet();
-
-      static void init(int p);
-
-      void create(TaskCommon * task, int signalNumber, TimerCallback cb);
-
-      void update();
-
-      void detailedStatus(char * id, char * line);
-   };
-}
 
  
+
+
+
+
+#define TIMERS_H
 
 
 
@@ -4657,6 +4604,191 @@ void *pvTaskIncrementMutexHeldCount( void );
 
 
 
+
+
+
+
+
+
+
+
+#define tmrCOMMAND_EXECUTE_CALLBACK_FROM_ISR 	( ( BaseType_t ) -2 )
+
+#define tmrCOMMAND_EXECUTE_CALLBACK  ( ( BaseType_t ) -1 )
+
+#define tmrCOMMAND_START_DONT_TRACE  ( ( BaseType_t ) 0 )
+
+#define tmrCOMMAND_START  	    ( ( BaseType_t ) 1 )
+
+#define tmrCOMMAND_RESET   ( ( BaseType_t ) 2 )
+
+#define tmrCOMMAND_STOP   	( ( BaseType_t ) 3 )
+
+#define tmrCOMMAND_CHANGE_PERIOD  ( ( BaseType_t ) 4 )
+
+#define tmrCOMMAND_DELETE   ( ( BaseType_t ) 5 )
+
+
+#define tmrFIRST_FROM_ISR_COMMAND  ( ( BaseType_t ) 6 )
+
+#define tmrCOMMAND_START_FROM_ISR  ( ( BaseType_t ) 6 )
+
+#define tmrCOMMAND_RESET_FROM_ISR  ( ( BaseType_t ) 7 )
+
+#define tmrCOMMAND_STOP_FROM_ISR  ( ( BaseType_t ) 8 )
+
+#define tmrCOMMAND_CHANGE_PERIOD_FROM_ISR ( ( BaseType_t ) 9 )
+
+
+
+typedef void * TimerHandle_t;
+
+
+typedef void (*TimerCallbackFunction_t)( TimerHandle_t xTimer );
+
+
+typedef void (*PendedFunction_t)( void *, uint32_t );
+
+
+TimerHandle_t xTimerCreate( const char * const pcTimerName, const TickType_t xTimerPeriodInTicks, const UBaseType_t uxAutoReload, void * const pvTimerID, TimerCallbackFunction_t pxCallbackFunction ) PRIVILEGED_FUNCTION; 
+
+
+void *pvTimerGetTimerID( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
+
+
+void vTimerSetTimerID( const TimerHandle_t xTimer, void *pvNewID ) PRIVILEGED_FUNCTION;
+
+
+BaseType_t xTimerIsTimerActive( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
+
+
+TaskHandle_t xTimerGetTimerDaemonTaskHandle( void );
+
+
+
+#define xTimerStart( xTimer, xTicksToWait ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_START, ( xTaskGetTickCount() ), NULL, ( xTicksToWait ) )
+
+
+
+#define xTimerStop( xTimer, xTicksToWait ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_STOP, 0U, NULL, ( xTicksToWait ) )
+
+
+
+#define xTimerChangePeriod( xTimer, xNewPeriod, xTicksToWait ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_CHANGE_PERIOD, ( xNewPeriod ), NULL, ( xTicksToWait ) )
+
+
+
+#define xTimerDelete( xTimer, xTicksToWait ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_DELETE, 0U, NULL, ( xTicksToWait ) )
+
+
+
+#define xTimerReset( xTimer, xTicksToWait ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_RESET, ( xTaskGetTickCount() ), NULL, ( xTicksToWait ) )
+
+
+
+#define xTimerStartFromISR( xTimer, pxHigherPriorityTaskWoken ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_START_FROM_ISR, ( xTaskGetTickCountFromISR() ), ( pxHigherPriorityTaskWoken ), 0U )
+
+
+
+#define xTimerStopFromISR( xTimer, pxHigherPriorityTaskWoken ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_STOP_FROM_ISR, 0, ( pxHigherPriorityTaskWoken ), 0U )
+
+
+
+#define xTimerChangePeriodFromISR( xTimer, xNewPeriod, pxHigherPriorityTaskWoken ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_CHANGE_PERIOD_FROM_ISR, ( xNewPeriod ), ( pxHigherPriorityTaskWoken ), 0U )
+
+
+
+#define xTimerResetFromISR( xTimer, pxHigherPriorityTaskWoken ) xTimerGenericCommand( ( xTimer ), tmrCOMMAND_RESET_FROM_ISR, ( xTaskGetTickCountFromISR() ), ( pxHigherPriorityTaskWoken ), 0U )
+
+
+
+BaseType_t xTimerPendFunctionCallFromISR( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, BaseType_t *pxHigherPriorityTaskWoken );
+
+ 
+BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend, void *pvParameter1, uint32_t ulParameter2, TickType_t xTicksToWait );
+
+
+const char * pcTimerGetTimerName( TimerHandle_t xTimer ); 
+
+
+BaseType_t xTimerCreateTimerTask( void ) PRIVILEGED_FUNCTION;
+BaseType_t xTimerGenericCommand( TimerHandle_t xTimer, const BaseType_t xCommandID, const TickType_t xOptionalValue, BaseType_t * const pxHigherPriorityTaskWoken, const TickType_t xTicksToWait ) PRIVILEGED_FUNCTION;
+
+
+
+
+
+
+
+
+
+
+
+
+
+namespace pearlrt {
+
+   class TaskTimer : public TaskTimerCommon {
+   public:
+
+      typedef void (*TimerCallback)(TaskCommon*);
+   private:
+      int counts;
+      int countsBackup;
+      TaskCommon* task;
+      TimerCallback callback;
+      int signalNumber;
+      TimerHandle_t timer;
+      TickType_t    startPeriod;
+      TickType_t    cyclicPeriod;
+      bool          isInStartPeriod;
+   public:
+
+      TaskTimer();
+
+      void set(
+         int condition,
+         Clock at,
+         Duration after,
+         Duration all,
+         Clock until,
+         Duration during);
+
+      int cancel();
+   private:
+
+      int stop();
+   public:
+
+      int start();
+
+      bool isActive();
+
+      bool isSet();
+
+      static void init(int p);
+
+      void create(TaskCommon * task, int signum, TimerCallback cb);
+
+      void update();
+
+      void detailedStatus(char * id, char * line);
+   };
+}
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
 namespace pearlrt {
 
    class Task : public TaskCommon {
@@ -4722,6 +4854,12 @@ namespace pearlrt {
  C_##x x((char*)#x,prio, ismain); 	\
  void C_##x::task(pearlrt::Task * me)
 
+
+#define AUTOCONF_INCLUDED
+#define CONFIG_COMPILER_ANTLR "/usr/local/lib/antlr-4.0-complete.jar"
+#define CONFIG_LPC1768_FreeRTOSSystemTimer 1
+#define CONFIG_LPC1768 1
+#define CONFIG_INSTALL_Target "/usr/local"
 
 
 

@@ -244,87 +244,7 @@ lpc17_uart_retarget.o: lpc17_uart_retarget.c \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/romapi_17xx_40xx.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/iap.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h
-lpc17_systime.o: lpc17_systime.c \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sys_config.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/cmsis.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/config_175x_6x/cmsis_175x_6x.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/config_175x_6x/sys_config.h \
- ../cortexM/CMSIS/Include/core_cm3.h \
- ../cortexM/CMSIS/Include/core_cmInstr.h \
- ../cortexM/CMSIS/Include/core_cmFunc.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip_lpc175x_6x.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sysctl_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/clock_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/iocon_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/adc_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/can_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/dac_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/enet_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpdma_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpio_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpioint_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/i2c_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/i2s_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/mcpwm_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/pmu_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/qei_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/ritimer_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/rtc_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/spi_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/ssp_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/timer_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/uart_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/ring_buffer.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/usb_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/wwdt_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/fmc_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/romapi_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/iap.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h \
- systeminit.h FreeRTOSConfig.h
-lpc17_systime_rtcsynced.o: lpc17_systime_rtcsynced.c \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sys_config.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/cmsis.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/config_175x_6x/cmsis_175x_6x.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/config_175x_6x/sys_config.h \
- ../cortexM/CMSIS/Include/core_cm3.h \
- ../cortexM/CMSIS/Include/core_cmInstr.h \
- ../cortexM/CMSIS/Include/core_cmFunc.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip_lpc175x_6x.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sysctl_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/clock_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/iocon_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/adc_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/can_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/dac_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/enet_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpdma_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpio_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpioint_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/i2c_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/i2s_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/mcpwm_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/pmu_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/qei_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/ritimer_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/rtc_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/spi_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/ssp_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/timer_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/uart_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/ring_buffer.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/usb_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/wwdt_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/fmc_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/romapi_17xx_40xx.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/iap.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h
+lpc17_oscillators.o: lpc17_oscillators.c
 lpc17_rtc.o: lpc17_rtc.c \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
@@ -364,8 +284,9 @@ lpc17_rtc.o: lpc17_rtc.c \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/fmc_17xx_40xx.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/romapi_17xx_40xx.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/iap.h \
- ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h
-lpc17_systeminit.o: lpc17_systeminit.c SystemConfig.h systeminit.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h \
+ ../FreeRTOS/addOns/./time_addons.h
+lpc17_clockinit.o: lpc17_clockinit.c lpc17_clockinit.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sys_config.h \
@@ -406,6 +327,20 @@ lpc17_systeminit.o: lpc17_systeminit.c SystemConfig.h systeminit.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/iap.h \
  ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h \
  FreeRTOSConfig.h
+Clock.o: ../FreeRTOS/PEARL/Clock.cc ../common/Clock.h ../common/Fixed63.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/Character.h \
+ ../FreeRTOS/PEARL/./Mutex.h ../FreeRTOS/FreeRTOS/include/FreeRTOS.h \
+ FreeRTOSConfig.h ../FreeRTOS/FreeRTOS/include/projdefs.h \
+ ../FreeRTOS/FreeRTOS/include/portable.h \
+ ../FreeRTOS/FreeRTOS/include/deprecated_definitions.h \
+ ../FreeRTOS/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h \
+ ../FreeRTOS/FreeRTOS/include/mpu_wrappers.h \
+ ../FreeRTOS/FreeRTOS/include/semphr.h \
+ ../FreeRTOS/FreeRTOS/include/queue.h ../common/MutexCommon.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Clock.h ../common/Signals.h ../common/BitString.h
 CSema.o: ../FreeRTOS/PEARL/CSema.cc ../FreeRTOS/PEARL/./CSema.h \
  ../common/CSemaCommon.h ../FreeRTOS/FreeRTOS/include/FreeRTOS.h \
  FreeRTOSConfig.h ../FreeRTOS/FreeRTOS/include/projdefs.h \
@@ -457,9 +392,55 @@ main.o: ../FreeRTOS/PEARL/main.cc ../FreeRTOS/FreeRTOS/include/FreeRTOS.h \
  ../common/CSemaCommon.h ../common/UserDation.h ../common/SystemDation.h \
  ../common/Dation.h ../common/Device.h ../common/TaskCommon.h \
  ../common/RefChar.h ../common/TaskTimerCommon.h \
- ../FreeRTOS/PEARL/TaskTimer.h ../common/Log.h ../common/Fixed.h \
+ ../FreeRTOS/PEARL/TaskTimer.h \
+ ../FreeRTOS/PEARL/../../../configuration/include/autoconf.h \
+ ../FreeRTOS/PEARL/TaskTimerFreeRTOSSystemTimer.h \
+ ../FreeRTOS/FreeRTOS/include/timers.h \
+ ../FreeRTOS/FreeRTOS/include/task.h ../common/Log.h ../common/Fixed.h \
  ../common/TaskTimerCommon.h ../common/Signals.h ../common/TaskList.h \
- ../FreeRTOS/PEARL/./Task.h
+ ../FreeRTOS/PEARL/./Task.h ../FreeRTOS/PEARL/Post.h
+Post.o: ../FreeRTOS/PEARL/Post.cc \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sys_config.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/cmsis.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/config_175x_6x/cmsis_175x_6x.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/config_175x_6x/sys_config.h \
+ ../cortexM/CMSIS/Include/core_cm3.h \
+ ../cortexM/CMSIS/Include/core_cmInstr.h \
+ ../cortexM/CMSIS/Include/core_cmFunc.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/chip_lpc175x_6x.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/sysctl_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/clock_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/iocon_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/adc_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/can_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/dac_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/enet_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpdma_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpio_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/gpioint_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/i2c_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/i2s_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/mcpwm_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/pmu_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/qei_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/ritimer_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/rtc_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/spi_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/ssp_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/timer_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/uart_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/ring_buffer.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/lpc_types.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/usb_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/wwdt_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/fmc_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/romapi_17xx_40xx.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/iap.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/../chip_common/error.h \
+ ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx/rtc_17xx_40xx.h \
+ ../FreeRTOS/PEARL/Post.h lpc17_rtc.h
 Mutex.o: ../FreeRTOS/PEARL/Mutex.cc \
  ../FreeRTOS/FreeRTOS/include/FreeRTOS.h FreeRTOSConfig.h \
  ../FreeRTOS/FreeRTOS/include/projdefs.h \
@@ -506,35 +487,15 @@ Task.o: ../FreeRTOS/PEARL/Task.cc ../FreeRTOS/PEARL/Task.h \
  ../common/UserDation.h ../common/SystemDation.h ../common/Dation.h \
  ../common/Device.h ../common/TaskCommon.h ../common/RefChar.h \
  ../common/TaskTimerCommon.h ../FreeRTOS/PEARL/TaskTimer.h \
+ ../FreeRTOS/PEARL/../../../configuration/include/autoconf.h \
+ ../FreeRTOS/PEARL/TaskTimerFreeRTOSSystemTimer.h \
+ ../FreeRTOS/FreeRTOS/include/timers.h \
+ ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h \
  ../common/Log.h ../common/Fixed.h ../common/TaskTimerCommon.h \
  ../common/Signals.h ../FreeRTOS/FreeRTOS/include/task.h \
- ../FreeRTOS/FreeRTOS/include/list.h ../common/TaskMonitor.h \
- ../common/TaskList.h ../FreeRTOS/PEARL/./Task.h \
+ ../common/TaskMonitor.h ../common/TaskList.h ../FreeRTOS/PEARL/./Task.h \
  ../FreeRTOS/PEARL/PrioMapper.h ../common/Semaphore.h \
  ../common/PriorityQueue.h
-TaskTimer.o: ../FreeRTOS/PEARL/TaskTimer.cc ../common/Signals.h \
- ../common/Signals.hh ../FreeRTOS/PEARL/TaskTimer.h ../common/Clock.h \
- ../common/Fixed63.h ../common/BitString.h ../common/Fixed.h \
- ../common/Signals.h ../common/IfThenElseTemplate.h \
- ../common/NumberOfBytes.h ../common/Log.h ../common/Character.h \
- ../FreeRTOS/PEARL/./Mutex.h ../FreeRTOS/FreeRTOS/include/FreeRTOS.h \
- FreeRTOSConfig.h ../FreeRTOS/FreeRTOS/include/projdefs.h \
- ../FreeRTOS/FreeRTOS/include/portable.h \
- ../FreeRTOS/FreeRTOS/include/deprecated_definitions.h \
- ../FreeRTOS/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h \
- ../FreeRTOS/FreeRTOS/include/mpu_wrappers.h \
- ../FreeRTOS/FreeRTOS/include/semphr.h \
- ../FreeRTOS/FreeRTOS/include/queue.h ../common/MutexCommon.h \
- ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
- ../common/Clock.h ../common/Duration.h ../common/Log.h ../common/Fixed.h \
- ../common/TaskCommon.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
- ../common/Prio.h ../FreeRTOS/PEARL/./CSema.h ../common/CSemaCommon.h \
- ../common/UserDation.h ../common/SystemDation.h ../common/Dation.h \
- ../common/Device.h ../common/TaskCommon.h ../common/RefChar.h \
- ../common/TaskTimerCommon.h ../common/TaskTimerCommon.h \
- ../FreeRTOS/PEARL/Task.h ../common/BitString.h ../common/Prio.h \
- ../common/Interrupt.h ../FreeRTOS/FreeRTOS/include/task.h \
- ../FreeRTOS/FreeRTOS/include/list.h
 TaskMonitor.o: ../FreeRTOS/PEARL/TaskMonitor.cc ../common/TaskMonitor.h \
  ../FreeRTOS/PEARL/./Mutex.h ../FreeRTOS/FreeRTOS/include/FreeRTOS.h \
  FreeRTOSConfig.h ../FreeRTOS/FreeRTOS/include/projdefs.h \
@@ -547,6 +508,33 @@ TaskMonitor.o: ../FreeRTOS/PEARL/TaskMonitor.cc ../common/TaskMonitor.h \
  ../common/Log.h ../common/Character.h ../common/Signals.h \
  ../common/Signals.hh ../common/Fixed.h ../common/Fixed63.h \
  ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h
+TaskTimerFreeRTOSSystemTimer.o: \
+ ../FreeRTOS/PEARL/TaskTimerFreeRTOSSystemTimer.cc ../common/Signals.h \
+ ../common/Signals.hh ../FreeRTOS/PEARL/TaskTimer.h \
+ ../FreeRTOS/PEARL/../../../configuration/include/autoconf.h \
+ ../FreeRTOS/PEARL/TaskTimerFreeRTOSSystemTimer.h \
+ ../FreeRTOS/FreeRTOS/include/FreeRTOS.h FreeRTOSConfig.h \
+ ../FreeRTOS/FreeRTOS/include/projdefs.h \
+ ../FreeRTOS/FreeRTOS/include/portable.h \
+ ../FreeRTOS/FreeRTOS/include/deprecated_definitions.h \
+ ../FreeRTOS/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h \
+ ../FreeRTOS/FreeRTOS/include/mpu_wrappers.h \
+ ../FreeRTOS/FreeRTOS/include/timers.h \
+ ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h \
+ ../common/Clock.h ../common/Fixed63.h ../common/BitString.h \
+ ../common/Fixed.h ../common/Signals.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/Character.h \
+ ../FreeRTOS/PEARL/./Mutex.h ../FreeRTOS/FreeRTOS/include/semphr.h \
+ ../FreeRTOS/FreeRTOS/include/queue.h ../common/MutexCommon.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Clock.h ../common/Duration.h ../common/Log.h ../common/Fixed.h \
+ ../common/TaskCommon.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h ../FreeRTOS/PEARL/./CSema.h ../common/CSemaCommon.h \
+ ../common/UserDation.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/TaskCommon.h ../common/RefChar.h \
+ ../common/TaskTimerCommon.h ../common/TaskTimerCommon.h \
+ ../FreeRTOS/PEARL/Task.h ../common/BitString.h ../common/Prio.h \
+ ../common/Interrupt.h ../FreeRTOS/FreeRTOS/include/task.h
 Duration.o: ../common/Duration.cc ../common/Duration.h \
  ../common/Fixed63.h ../common/Float.h ../common/FloatHelper.h \
  ../common/Signals.h ../common/Signals.hh ../common/Fixed.h \
@@ -561,19 +549,6 @@ Duration.o: ../common/Duration.cc ../common/Duration.h \
  ../FreeRTOS/FreeRTOS/include/semphr.h \
  ../FreeRTOS/FreeRTOS/include/queue.h ../common/MutexCommon.h \
  ../common/Clock.h
-Clock.o: ../common/Clock.cc ../common/Clock.h ../common/Fixed63.h \
- ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
- ../common/Signals.hh ../common/IfThenElseTemplate.h \
- ../common/NumberOfBytes.h ../common/Log.h ../common/Character.h \
- ../FreeRTOS/PEARL/./Mutex.h ../FreeRTOS/FreeRTOS/include/FreeRTOS.h \
- FreeRTOSConfig.h ../FreeRTOS/FreeRTOS/include/projdefs.h \
- ../FreeRTOS/FreeRTOS/include/portable.h \
- ../FreeRTOS/FreeRTOS/include/deprecated_definitions.h \
- ../FreeRTOS/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h \
- ../FreeRTOS/FreeRTOS/include/mpu_wrappers.h \
- ../FreeRTOS/FreeRTOS/include/semphr.h \
- ../FreeRTOS/FreeRTOS/include/queue.h ../common/MutexCommon.h \
- ../common/Duration.h ../common/Float.h ../common/FloatHelper.h
 PutDuration.o: ../common/PutDuration.cc ../common/PutDuration.h \
  ../common/Duration.h ../common/Fixed63.h ../common/Float.h \
  ../common/FloatHelper.h ../common/Signals.h ../common/Signals.hh \
@@ -776,11 +751,14 @@ TaskCommon.o: ../common/TaskCommon.cc ../FreeRTOS/PEARL/./Task.h \
  ../common/UserDation.h ../common/SystemDation.h ../common/Dation.h \
  ../common/Device.h ../common/TaskCommon.h ../common/RefChar.h \
  ../common/TaskTimerCommon.h ../FreeRTOS/PEARL/./TaskTimer.h \
+ ../FreeRTOS/PEARL/./../../../configuration/include/autoconf.h \
+ ../FreeRTOS/PEARL/./TaskTimerFreeRTOSSystemTimer.h \
+ ../FreeRTOS/FreeRTOS/include/timers.h \
+ ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h \
  ../common/Log.h ../common/Fixed.h ../common/TaskTimerCommon.h \
  ../common/Signals.h ../FreeRTOS/FreeRTOS/include/task.h \
- ../FreeRTOS/FreeRTOS/include/list.h ../FreeRTOS/PEARL/./PrioMapper.h \
- ../common/TaskList.h ../common/TaskMonitor.h ../common/Semaphore.h \
- ../common/PriorityQueue.h
+ ../FreeRTOS/PEARL/./PrioMapper.h ../common/TaskList.h \
+ ../common/TaskMonitor.h ../common/Semaphore.h ../common/PriorityQueue.h
 TaskList.o: ../common/TaskList.cc ../common/TaskList.h \
  ../FreeRTOS/PEARL/./Task.h ../common/BitString.h ../common/Fixed.h \
  ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
@@ -802,9 +780,13 @@ TaskList.o: ../common/TaskList.cc ../common/TaskList.h \
  ../common/UserDation.h ../common/SystemDation.h ../common/Dation.h \
  ../common/Device.h ../common/TaskCommon.h ../common/RefChar.h \
  ../common/TaskTimerCommon.h ../FreeRTOS/PEARL/./TaskTimer.h \
+ ../FreeRTOS/PEARL/./../../../configuration/include/autoconf.h \
+ ../FreeRTOS/PEARL/./TaskTimerFreeRTOSSystemTimer.h \
+ ../FreeRTOS/FreeRTOS/include/timers.h \
+ ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h \
  ../common/Log.h ../common/Fixed.h ../common/TaskTimerCommon.h \
  ../common/Signals.h ../FreeRTOS/FreeRTOS/include/task.h \
- ../FreeRTOS/FreeRTOS/include/list.h ../common/compare.h
+ ../common/compare.h
 MutexCommon.o: ../common/MutexCommon.cc ../common/MutexCommon.h
 CSemaCommon.o: ../common/CSemaCommon.cc ../common/CSemaCommon.h
 Semaphore.o: ../common/Semaphore.cc ../common/TaskCommon.h \
@@ -828,9 +810,13 @@ Semaphore.o: ../common/Semaphore.cc ../common/TaskCommon.h \
  ../common/Semaphore.h ../FreeRTOS/PEARL/./Task.h ../common/BitString.h \
  ../common/Prio.h ../common/Clock.h ../common/Duration.h \
  ../common/Interrupt.h ../common/TaskCommon.h \
- ../FreeRTOS/PEARL/./TaskTimer.h ../common/Log.h ../common/Fixed.h \
- ../common/TaskTimerCommon.h ../common/Signals.h \
+ ../FreeRTOS/PEARL/./TaskTimer.h \
+ ../FreeRTOS/PEARL/./../../../configuration/include/autoconf.h \
+ ../FreeRTOS/PEARL/./TaskTimerFreeRTOSSystemTimer.h \
+ ../FreeRTOS/FreeRTOS/include/timers.h \
  ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h \
+ ../common/Log.h ../common/Fixed.h ../common/TaskTimerCommon.h \
+ ../common/Signals.h ../FreeRTOS/FreeRTOS/include/task.h \
  ../common/PriorityQueue.h
 PriorityQueue.o: ../common/PriorityQueue.cc ../common/PriorityQueue.h \
  ../common/TaskCommon.h ../common/Fixed.h ../common/Signals.h \
@@ -1095,13 +1081,6 @@ port.o: ../FreeRTOS/FreeRTOS/portable/GCC/ARM_CM3/port.c \
  ../FreeRTOS/FreeRTOS/include/mpu_wrappers.h \
  ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h
 assert.o: ../FreeRTOS/addOns/assert.c
-clock.o: ../FreeRTOS/addOns/clock.c
+clock.o: ../FreeRTOS/addOns/clock.c ../FreeRTOS/addOns/time_addons.h
 FreeRTOSHooks.o: ../FreeRTOS/addOns/FreeRTOSHooks.c
-timer.o: ../FreeRTOS/addOns/timer.c \
- ../FreeRTOS/FreeRTOS/include/FreeRTOS.h FreeRTOSConfig.h \
- ../FreeRTOS/FreeRTOS/include/projdefs.h \
- ../FreeRTOS/FreeRTOS/include/portable.h \
- ../FreeRTOS/FreeRTOS/include/deprecated_definitions.h \
- ../FreeRTOS/FreeRTOS/portable/GCC/ARM_CM3/portmacro.h \
- ../FreeRTOS/FreeRTOS/include/mpu_wrappers.h \
- ../FreeRTOS/FreeRTOS/include/task.h ../FreeRTOS/FreeRTOS/include/list.h
+Signals.o: ../common/Signals.hh

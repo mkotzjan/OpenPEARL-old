@@ -1,11 +1,20 @@
 PEARL_FREERTOS_SRC += \
+	Clock.cc \
 	CSema.cc \
 	Log.cc \
 	main.cc \
+	Post.cc \
 	Mutex.cc \
 	PrioMapper.cc \
 	Task.cc \
-	TaskTimer.cc \
 	TaskMonitor.cc 
+
+ifeq ($(CONFIG_LPC1768_FreeRTOSSystemTimer),y)
+PEARL_FREERTOS_SRC += TaskTimerFreeRTOSSystemTimer.cc
+endif
+ifeq ($(CONFIG_LPC1768_FreeRTOSHRTimer),y)
+PEARL_FREERTOS_SRC += TaskTimerHRTimer.cc
+endif
+
 
 PEARL_FREERTOS_INC = .

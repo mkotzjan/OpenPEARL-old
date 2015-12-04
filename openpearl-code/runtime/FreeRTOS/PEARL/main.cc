@@ -52,7 +52,7 @@
 #include "Signals.h"
 #include "TaskList.h"
 #include "Task.h"
-//#include "TimerList.h"
+#include "Post.h"
 #include "Log.h"
 #include "Clock.h"
 //#include "LPC1768Function.h"
@@ -64,39 +64,31 @@ __attribute__((weak)) int main(void) {
    char line[40];
 
 
-// prvSetupHardware();
-//intDebugMessage("main started\r\n");
-//LED_On(7);
-   //ED_On(5);
-// LED_On(3);
-// LED_On(1);
-// LED_Off(7);
-   Log::info("Defined Tasks");
-   Log::info("main started");
+   Post::print();
+   //Post::config();
+
    /*
     * This task starts all PEARL90 main tasks, afterwards the
     * task suspends itself until another task resume it
     */
-// LED_On(7);
-// LED_On(5);
-// LED_On(3);
-// LED_On(1);
-// LED_Off(7);
    Log::info("Defined Tasks");
-   sprintf(line, "%-10.10s %4s %s", "Name", "Prio", "isMain");
+  
+   // format with sprintf, since Log does not allow format parameters
+   sprintf(line,"%-10.10s %4s %s", "Name", "Prio", "isMain");
    Log::info(line);
    TaskList::Instance().sort(); // sort taskList
 
    for (int i = 0; i < TaskList::Instance().size(); i++) {
       Task *t = TaskList::Instance().getTaskByIndex(i);
-      sprintf(line, "%-10.10s  %3d  %2d", t->getName(),
+
+      // format with sprintf, since Log does not allow format parameters
+      sprintf(line,"%-10.10s  %3d  %2d", t->getName(),
               (t->getPrio()).x,
               t->getIsMain());
       Log::info(line);
       t->init();
    }
 
-// LED_Off(5);
 
    if (TaskList::Instance().size() == 0) {
       printf("no task defined --> exit.\n");
@@ -119,7 +111,7 @@ __attribute__((weak)) int main(void) {
    /* Start the scheduler. */
    vTaskStartScheduler();
    Log::error("main.c: Scheduler terminated");
-   /* IDLE task is declared in LPC1768Function.cc */
+   while(1); // make endless loop in this case to avoid other strange effects
 }
 
 void vConfigureTimerForRunTimeStats(void) {

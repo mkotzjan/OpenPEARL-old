@@ -348,11 +348,15 @@ static void TaskTimerSort(void *pcParameters){
 			if(table[timindex].next == timindex){ //end of active list
 				timer_put(timindex,lastunsorted);
 				goto TTSBegin;}
-			if(!(table[timindex].next < MAXTIMER))
+			if(!(table[timindex].next < MAXTIMER)) {
+	printf("serious fault in  TaskTimerSort\n");
 				for(;;)//this is a serious fault and should never happen
 					vTaskSuspend(NULL);
+                        }
 		}
+	printf("TaskTimerSort supend\n");
 		vTaskSuspend(NULL);
+	printf("TaskTimerSort resumed\n");
 	}
 }
 
@@ -394,6 +398,7 @@ static void TaskClacker(void *pcParameters){
 						  void (*cb)(void *arg_ptr);
 						  void *th;
 				}*callback = pcParameters;
+printf("StarterTask: do callback\n");
 			callback->cb(callback->th);
 			vTaskDelete(NULL);
 		}
@@ -417,11 +422,17 @@ static void TaskClacker(void *pcParameters){
 				LEAVECRITICAL;
 				(*nsec_clock_gettime)(&timestamp);
 			}while(fail<0);
-			if(table[firstactive].value.nsec_value > timestamp)
+			if(table[firstactive].value.nsec_value > timestamp) {
+printf("TaskClacker suspend at 1\n");
 				vTaskSuspend(NULL);
+printf("TaskClacker resumed at 1\n");
+                        }
 		}
-		else
+		else {
+printf("TaskClacker suspend at 2\n");
 			vTaskSuspend(NULL);
+printf("TaskClacker resumed at 2\n");
+                }
 	}
 }
 

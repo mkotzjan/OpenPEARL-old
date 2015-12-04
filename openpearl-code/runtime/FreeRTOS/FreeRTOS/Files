@@ -1,7 +1,9 @@
 RTOSCSRC = tasks.c
 RTOSCSRC += list.c 
+ifeq ($(CONFIG_LPC1768_FreeRTOSSystemTimer),y)
 RTOSCSRC += queue.c
 RTOSCSRC += timers.c
+endif
 RTOSCSRC += portable/MemMang/heap_3.c
 RTOSCSRC += portable/GCC/ARM_CM3/port.c
 

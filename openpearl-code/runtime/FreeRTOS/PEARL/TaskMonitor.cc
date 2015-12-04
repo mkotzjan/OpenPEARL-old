@@ -62,14 +62,14 @@ namespace pearlrt {
    void TaskMonitor::incPendingTasks() {
       mutex.lock();
       nbrPendingTasks ++;
-      Log::info("TaskMonitor: inc: %d task active/pending", nbrPendingTasks);
+      Log::debug("TaskMonitor: inc: %d task active/pending", nbrPendingTasks);
       mutex.unlock();
    }
 
    void TaskMonitor::decPendingTasks() {
       mutex.lock();
       nbrPendingTasks --;
-      Log::info("TaskMonitor: dec: %d task active/pending", nbrPendingTasks);
+      Log::debug("TaskMonitor: dec: %d task active/pending", nbrPendingTasks);
       mutex.unlock();
 
       if (nbrPendingTasks == 0) {

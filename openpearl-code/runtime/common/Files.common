@@ -36,7 +36,6 @@
 
 CXX_COMMON = \
 	Duration.cc  \
-	Clock.cc  \
 	PutDuration.cc GetDuration.cc \
 	Signals.cc \
 	ScheduleSignalAction.cc \
@@ -67,6 +66,7 @@ CXX_COMMON = \
 
 HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \
+	Clock.h  \
 	PutBitString.h GetBitString.h \
 	Sink.h RefCharSink.h \
 	Fixed.h PutFixed.h GetFixed.h \

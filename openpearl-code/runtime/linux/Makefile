@@ -72,6 +72,7 @@ SRCANDH = \
 	UnixSignal.cc 
 
 SRCONLY =os.cc \
+	Clock.cc \
 	TaskMonitor.cc \
 	Log.cc  
 

@@ -27,10 +27,14 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "SystemConfig.h"
-#include "systeminit.h"
+#include "lpc17_clockinit.h"
 #include "chip.h"
 #include "FreeRTOSConfig.h"
+
+/* This is used as a worst case time to initialize the RTC with,
+   if it doesn't have a more recent, correct time
+*/
+#define UNIXSTAMP 1432932917 //Fri May 29 12:55:17 2015
 
 static void realinit_CpuClock();
 static void realinit_ClockRTC();
@@ -38,13 +42,22 @@ static void realinit_ClockTimer0();
 static void realinit_ClockMonotonicRealtime();
 static void realinit_Clock64bit();
 
+/*
+   clock init version to setup via rtc interrupt
+*/
 void software_init_hook(){
-	systeminit(ClockTimer0);
-	//systeminit(ClockMonotonicRealtime);
-	//	systeminit(ClockDebug);
+	lpc17_clockinit(ClockTimer0);
+	//lpc17_clockinit(ClockMonotonicRealtime);
+	//	lpc17_clockinit(ClockDebug);
+}
+/*
+clock init via reset handler
+*/
+void SystemInit() {
+	lpc17_clockinit(ClockRTC);
 }
 
-void systeminit(enum systeminit sysinit){
+static void lpc17_clockinit(enum lpc17_clockinit sysinit){
 	static unsigned int initialized = 0;
 
 	if(initialized&(1<<sysinit))
@@ -55,19 +68,19 @@ void systeminit(enum systeminit sysinit){
 		realinit_CpuClock();
 		break;
 	case ClockRTC:
-		systeminit(CpuClock);
+		lpc17_clockinit(CpuClock);
 		realinit_ClockRTC();
 		break;
 	case ClockTimer0:
-		systeminit(ClockRTC);
+		lpc17_clockinit(ClockRTC);
 		realinit_ClockTimer0();
 		break;
 	case ClockMonotonicRealtime:
-		systeminit(ClockRTC);
+		lpc17_clockinit(ClockRTC);
 		realinit_ClockMonotonicRealtime();
 		break;
 	case ClockDebug:
-		systeminit(ClockRTC);
+		lpc17_clockinit(ClockRTC);
 		realinit_Clock64bit();
 		break;
 	}
@@ -120,17 +133,22 @@ static void realinit_ClockRTC(){
 	void systeminit_rtc_settime(unsigned int fallbackstamp);
 	Chip_RTC_Init(LPC_RTC);
 	Chip_RTC_Enable(LPC_RTC, ENABLE);
-	systeminit_rtc_settime(UNIXSTAMP);
+	lpc17_systeminit_rtc_settime(UNIXSTAMP);
 }
 
 static void realinit_ClockTimer0(){
+#ifdef UNUSED
 	void systeminit_timer0();
 	systeminit_timer0();
+	systeminit_debug_settime();
+#endif
 }
 
 static void realinit_Clock64bit(){
+#ifdef UNUSED
 	void systeminit_debug_settime();
 	systeminit_debug_settime();
+#endif
 }
 
 static void realinit_ClockMonotonicRealtime(){
@@ -154,7 +172,7 @@ static void realinit_ClockMonotonicRealtime(){
 	NVIC_EnableIRQ(TIMER0_IRQn);
 }
 
-void systeminit_USBClock(){
+void lpc17_clockinit_USBClock(){
 	/* Disconnect and disable PLL*/
 	LPC_SYSCON->PLL[1].PLLCON = 0;pllfeed(1);
 	/* USBClock M=4, P=2  */

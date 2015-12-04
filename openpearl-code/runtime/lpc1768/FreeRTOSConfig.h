@@ -86,7 +86,7 @@
 #define configUSE_PREEMPTION		1
 #define configUSE_IDLE_HOOK			0
 #define configMAX_PRIORITIES		( 260 )  
-#define configUSE_TICK_HOOK			0
+#define configUSE_TICK_HOOK			1
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 96000000 )
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 80 )
@@ -102,9 +102,13 @@
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION   0 /* added */
 #define INCLUDE_xTaskGetSchedulerState  1	/* added */
 #define INCLUDE_xTaskResumeFromISR	1	/* added */
+//#ifdef CONFIG_LPC1768_FreeRTOSSystemTimer
+#define configUSE_TIMERS		1
+//#endif
+#define configCHECK_FOR_STACK_OVERFLOW  	1
 #define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 1) 
 #define configTIMER_QUEUE_LENGTH  50
-#define configTIMER_TASK_STACK_DEPTH	80 //200 is not enough for info log level, afterwards malloc fails with queue length 50. Don't use info log level for now
+#define configTIMER_TASK_STACK_DEPTH	500 //200 is not enough for info log level, afterwards malloc fails with queue length 50. Don't use info log level for now
 
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 

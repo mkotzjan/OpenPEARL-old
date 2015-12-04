@@ -86,7 +86,7 @@ namespace pearlrt {
       bool freeRtosRunning;
       int freeRtosPrio = PrioMapper::getInstance()->fromPearl(prio.x);
 
-      Log::info("%s::directActivate freeRTOSprio=%d", name, freeRtosPrio);
+      Log::debug("%s::directActivate freeRTOSprio=%d", name, freeRtosPrio);
 
       BaseType_t taskCreation = pdFALSE;
 
@@ -120,7 +120,7 @@ namespace pearlrt {
          throw theInternalTaskSignal;
       }
 
-      Log::info("%s::activated ", name);
+      Log::debug("%s::activated ", name);
 
       if (freeRtosRunning) {
          enableScheduling();
@@ -136,7 +136,7 @@ namespace pearlrt {
 
    void Task::tskfunc(void* param) {
       Task* me = ((Task*)param);
-      Log::info("%s: starts", me->getName());
+      Log::debug("%s: starts", me->getName());
 
       try {
          me->task(me);
@@ -157,7 +157,7 @@ namespace pearlrt {
 
    void Task::terminateMySelf() {
       TaskHandle_t oldTaskHandle = xth;
-      Log::info("%s: terminateSelf", name);
+      Log::debug("%s: terminateSelf", name);
 
       // set the calling tasks priority to maximum to be shure that
       // the following code - especially the restarting of the task itself
@@ -185,7 +185,7 @@ namespace pearlrt {
    }
 
    void Task::terminateFromOtherTask() {
-      Log::info("%s: terminateFromOtherTask", name);
+      Log::debug("%s: terminateFromOtherTask", name);
       int cp; // current calling tasks priority
 
       // set the calling threads priority to maximum priority
@@ -247,7 +247,7 @@ namespace pearlrt {
 
    void Task::suspendMySelf() {
       int cp; // current calling threads priority
-      Log::info("%s: suspendMyself  taskState=%d", name, taskState);
+      Log::debug("%s: suspendMyself  taskState=%d", name, taskState);
 
       switch (taskState) {
       case RUNNING:
@@ -274,7 +274,7 @@ namespace pearlrt {
       taskState = RUNNING;
       switchToThreadPrioCurrent(cp);
 
-      Log::info("   task %s: continue from suspend done", name);
+      Log::debug("   task %s: continue from suspend done", name);
 
    }
 
@@ -320,6 +320,8 @@ namespace pearlrt {
 
    void Task::continueFromOtherTask(int condition, Prio prio) {
       int cp; // current calling threads priority
+	      // this may be the timer-task from FreeRTOS in case
+              // of timed continue
 
       cp = switchToThreadPrioMax();
 
@@ -439,30 +441,36 @@ namespace pearlrt {
 
       int p = PrioMapper::getInstance()->fromPearl(prio);
       vTaskPrioritySet(xth, p);
+//      Log::debug("%s: change thread prio from %d to %d",name, currentPrio.x,p);
    }
 
    void Task::disableScheduling() {
-      Log::info("vTaskSuspendAll();");
+//      Log::debug("vTaskSuspendAll();");
       vTaskSuspendAll();
    }
 
    void Task::enableScheduling() {
       xTaskResumeAll();
-      Log::info("xTaskResumeAll();");
+//      Log::debug("xTaskResumeAll();");
    }
 
    int Task::switchToThreadPrioMax() {
       int cp;
       cp = uxTaskPriorityGet(NULL);
-      Log::info("%s: switch to from %d to max prio", pcTaskGetTaskName(NULL),
-            /* name, */ cp);
+//      Log::debug("%s: switch  task %s from %d to max prio",
+//              pcTaskGetTaskName(NULL),
+//              name,
+//              cp);
+      vTaskPrioritySet(NULL, 257);
       return cp;
    }
 
    void Task::switchToThreadPrioCurrent(int cp) {
       vTaskPrioritySet(NULL, cp);
-      Log::info("%s: switch back to %d  prio", pcTaskGetTaskName(NULL), /*name,*/
-               cp);
+//      Log::debug("%s: switch task %s back to prio %d", 
+//                pcTaskGetTaskName(NULL), 
+//                name,
+//                cp);
    }
 
 }

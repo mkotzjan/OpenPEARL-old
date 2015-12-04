@@ -1,6 +1,12 @@
 /*
+ * time_addons.h
+ *
+ *  Created on: 04.12.2015
+ *      Author: r. mueller
+ */
+/*
  [The "BSD license"]
- Copyright (c) 2015 Jonas Meyer
+ Copyright (c) 2015 rainer mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -26,30 +32,23 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <stdint.h>
-#include "systeminit.h"
 
-#ifndef SYSTEMCONFIG_H_
-#define SYSTEMCONFIG_H_
+/**
+\file
 
-/* This is used as a worst case time to initialize the RTC with, if it doesn't
- * have a more recent, correct time */
-#ifndef UNIXSTAMP
-	#define UNIXSTAMP 1432932917 //Fri May 29 12:55:17 2015
-#endif
+This module extends the function interface of the UNIX time.h.
+This extension is used in the adaption layer for FreeRTOS for time.h
+*/
 
-/* System oscillator rate and RTC oscillator rate
- * lpc library needs those to calculate various clocks
- * */
-//const uint32_t OscRateIn = 12000000;
-//const uint32_t RTCOscRateIn = 32768;
-// moved into lpc17_oscillators.c
+/**
+adjust the time base function.
 
-/* SystemInit is called on startup. Needed due to the linkerscript, but dependencies
- * are probably preferrable */
-/* Variables used in here will get overwritten before main() is started!!!
- * with newlib hardware_init_hook and software_init hook make more sense*/
-void SystemInit() {
-}
+Depending on the selected time base, there are different functions
+which deliver the current time. This may be the RTC or other sources
 
-#endif /* SYSTEMCONFIG_H_ */
+\param new_clock_gettime_cb pointer to a clock_gettime function
+
+*/
+void set_clock_gettime_cb(int (*new_clock_gettime_cb)(clockid_t clock_id,
+                                              struct timespec *tp));
+

@@ -42,10 +42,11 @@ int __attribute__((used)) _read (int fd, char *ptr, int len)
   /* Read "len" of char to "ptr" from file id "fd"
    * Return number of char read.
    * Need implementing with UART here. */
+    int received=0; 
+
 	if (!initiated) {
 		retarget_init();
 	}
-    int received=0; 
     while (received<len) { 
        while((Chip_UART_ReadLineStatus(UART_SELECTION) & UART_LSR_RDR) == 0);
        *ptr = Chip_UART_ReadByte(UART_SELECTION);
