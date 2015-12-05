@@ -1,6 +1,6 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012-2013 Marcel Schaible
+ *  Copyright (c) 2012-2016 Marcel Schaible
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.5";
+    static String version = "v0.6";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -133,6 +133,9 @@ public class Compiler {
                 BuildSymbolTableVisitor buildSymbolTableVisitor = new BuildSymbolTableVisitor(verbose);
                 buildSymbolTableVisitor.visit(tree);
 
+                ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug);
+                expressionTypeVisitor.visit(tree);
+
                 if (!nosemantic) {
                     SemanticCheckVisitor semanticCheckVisitor = new SemanticCheckVisitor(verbose);
                     semanticCheckVisitor.visit(tree);
@@ -141,6 +144,8 @@ public class Compiler {
                 if (exportSystemPart) {
                     SystemPartExport(lexer.getSourceName(),tree);
                 }
+
+
 
 //                try {
                     CppGenerate(lexer.getSourceName(), tree);

@@ -1,6 +1,6 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012-2014 Marcel Schaible
+ *  Copyright (c) 2012-2016 Marcel Schaible
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,26 @@
 package org.smallpearl.compiler;
 
 public abstract class TypeDefinition {
-    private String name;
+    private String m_name;
+
+    public TypeDefinition() {
+        this.m_name = null;
+    }
 
     public TypeDefinition(String name) {
-        this.name = name;
+        this.m_name = name;
+    }
+
+    public Void setName(String name) {
+        this.m_name = name;
+        return null;
     }
 
     public String getName() {
-        if (name == null) {
+        if (this.m_name == null) {
             return "~NO NAME~";
         } else {
-            return name;
+            return this.m_name;
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012-2014 Marcel Schaible
+ *  Copyright (c) 2012-2016 Marcel Schaible
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,17 +29,28 @@
 
 package org.smallpearl.compiler;
 
-public class TypeFixed extends TypeDefinition {
-    private int size;
 
-    TypeFixed(String name, int size) {
-        super(name);
-        this.size = size;
+public class TypeFixed extends TypeDefinition {
+    public static final int FIXED_DEFAULT_PRECISION = 15;
+
+    private int m_precision;
+
+    TypeFixed() {
+        super("FIXED");
+        this.m_precision = FIXED_DEFAULT_PRECISION;
+    }
+
+    TypeFixed(int precision) {
+        super("FIXED");
+        this.m_precision = precision;
+    }
+
+    public Integer getPrecision() {
+        return m_precision;
     }
 
     public String toString() {
-
-        return "TypeFixed:" + this.getName() + " size=" + this.size;
+        return "TypeFixed:" + this.getName() + " m_precision=" + this.m_precision;
     }
 
 }

@@ -1482,11 +1482,14 @@ expression
     | expression op=('CAT'|'><') expression                 # catExpression
     | expression op=('CSHIFT'|'<>') expression              # cshiftExpression
     | expression op='SHIFT' expression                      # shiftExpression
-    | expression op='**' <assoc=right> expression                         # exponentiationExpression
-    | expression op=('*'|'/') expression                    # multiplicativeExpression
+    | expression op='**' <assoc=right> expression           # exponentiationExpression
+    | expression op='*' expression                          # multiplicativeExpression
+    | expression op='/' expression                          # divideExpression
+    | expression op='//' expression                         # divideIntegerExpression
     | expression op='REM' expression                        # remainderExpression
     | expression op='FIT' expression                        # fitExpression
-    | expression op=('+'|'-') expression                    # additiveExpression
+    | expression op='+' expression                          # additiveExpression
+    | expression op='-' expression                          # subtractiveExpression
     | expression unaryLiteralExpression                     # unarySignedLiteralExpression
     | expression op=( '=='|'EQ') expression                 # eqRelationalExpression
     | expression op=( '/='|'NE') expression                 # neRelationalExpression
