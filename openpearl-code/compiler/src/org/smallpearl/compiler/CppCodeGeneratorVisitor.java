@@ -1412,7 +1412,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitTaskContinuation(SmallPearlParser.TaskContinuationContext ctx) {
         ST st = group.getInstanceOf("TaskContinuation");
-        st.add("task", ctx.ID().toString());
+
+        if (ctx.ID() != null) {
+            st.add("task", ctx.ID().toString());
+        }
 
         if (ctx.startCondition() instanceof SmallPearlParser.StartConditionATContext) {
             SmallPearlParser.StartConditionATContext c = (SmallPearlParser.StartConditionATContext) ctx.startCondition();
