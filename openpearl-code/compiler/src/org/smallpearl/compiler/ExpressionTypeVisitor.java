@@ -479,9 +479,44 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAbsExpression(SmallPearlParser.AbsExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitAbsExpressionContext");
+            System.out.println("ExpressionTypeVisitor: visitAbsExpression");
+
+        visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFixed(((TypeFixed) op).getPrecision());
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: AbsExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat) op).getPrecision());
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: AbsExpression: rule#2");
+        }
+        else if ( op instanceof TypeDuration) {
+            res = new TypeDuration(((TypeDuration) op).getPrecision());
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: AbsExpression: rule#3");
+        }
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -499,8 +534,44 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSignExpression(SmallPearlParser.SignExpressionContext ctx) {
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitSignExpressionContext");
+            System.out.println("ExpressionTypeVisitor: visitSignExpression");
+
+        visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFixed(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SignExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFixed(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SignExpression: rule#2");
+        }
+        else if ( op instanceof TypeDuration) {
+            res = new TypeFixed(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SignExpression: rule#3");
+        }
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -623,9 +694,92 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitDivideExpression(SmallPearlParser.DivideExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitDivideExpression");
+
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            Integer precision = Math.max( ((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
+            res = new TypeFixed(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#1");
+        }
+        else if ( op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            Integer precision = Math.max( ((TypeFixed) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
+            res = new TypeFloat(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#2");
+        }
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            Integer precision = Math.max( ((TypeFloat) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
+            res = new TypeFloat(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#3");
+        }
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            Integer precision = Math.max( ((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
+            res = new TypeFloat(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#4");
+        }
+        else if ( op1 instanceof TypeDuration && op2 instanceof TypeFixed) {
+            Integer precision = Math.max( ((TypeDuration) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
+            res = new TypeDuration(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#5");
+        }
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeDuration) {
+            Integer precision = Math.max( ((TypeFloat) op1).getPrecision(), ((TypeDuration) op2).getPrecision());
+            res = new TypeDuration(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#6");
+        }
+        else if ( op1 instanceof TypeDuration && op2 instanceof TypeFloat) {
+            Integer precision = Math.max( ((TypeDuration) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
+            res = new TypeDuration(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#7");
+        }
+        else if ( op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeDuration(31);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: DivideExpression: rule#7");
+        }
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
@@ -692,9 +846,47 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitRemainderExpression(SmallPearlParser.RemainderExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitRemainderExpression");
+
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            Integer precision = Math.max( ((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
+            res = new TypeFixed(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitRemainderExpression: rule#1");
+        }
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            Integer precision = Math.max( ((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
+            res = new TypeFloat(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitRemainderExpression: rule#1");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -711,9 +903,46 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitExponentiationExpression(SmallPearlParser.ExponentiationExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitExponentationExpression");
+            System.out.println("ExpressionTypeVisitor: visitExponentiationExpression");
+
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            Integer precision = Math.max( ((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
+            res = new TypeFixed(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ExponentiationExpression: rule#1");
+        }
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            Integer precision = Math.max( ((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
+            res = new TypeFloat(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ExponentiationExpression: rule#1");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
@@ -732,9 +961,47 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitFitExpression(SmallPearlParser.FitExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitFitExpression");
+
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            Integer precision = ((TypeFixed) op2).getPrecision();
+            res = new TypeFixed(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: FitExpression: rule#1");
+        }
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            Integer precision = ((TypeFloat) op2).getPrecision();
+            res = new TypeFloat(precision);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: FitExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -757,73 +1024,281 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSqrtExpression(SmallPearlParser.SqrtExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSqrtExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SqrtExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SqrtExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitSinExpression(SmallPearlParser.SinExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSinExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SinExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: SinExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitCosExpression(SmallPearlParser.CosExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitCosExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: CosExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: CosExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitExpExpression(SmallPearlParser.ExpExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitExpExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ExpExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ExpExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitLnExpression(SmallPearlParser.LnExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitLnExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: LnExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: LnExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitTanExpression(SmallPearlParser.TanExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTanExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: TanExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: TanExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitAtanExpression(SmallPearlParser.AtanExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitAtanExpression");
+            System.out.println("ExpressionTypeVisitor: visitATanExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ATanExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ATanExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitTanhExpression(SmallPearlParser.TanhExpressionContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTanhExpression");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: TanhExpression: rule#1");
+        }
+        else if ( op instanceof TypeFloat) {
+            res = new TypeFloat(((TypeFloat)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: TanhExpression: rule#2");
+        }
+
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -847,14 +1322,34 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
     //            |              |           |              | the operand
     // ROUND op   | FLOAT(g)     |           | FIXED(g)     | next integer according to DIN
 
-
-
     @Override
     public Void visitTOFIXED(SmallPearlParser.TOFIXEDContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTOFIXED");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeBit) {
+            res = new TypeFixed(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: TOFLOAT: rule#1");
+        }
+        else if ( op instanceof TypeChar) {
+            throw new NotYetImplementedException("CHARACTER", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -916,23 +1411,62 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitTOCHAR(SmallPearlParser.TOCHARContext ctx) {
-        throw new NotYetImplementedException("TOCHAR", ctx.start.getLine(), ctx.start.getCharPositionInLine());    }
+        throw new NotYetImplementedException("TOCHAR", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+    }
 
     @Override
     public Void visitENTIER(SmallPearlParser.ENTIERContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitENTIER");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFloat) {
+            res = new TypeBit(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ENTIER: rule#1");
+        }
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
     @Override
     public Void visitROUND(SmallPearlParser.ROUNDContext ctx) {
-        // TODO:
+        TypeDefinition op;
+        TypeDefinition res;
+
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitROUND");
+
         visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if ( op instanceof TypeFloat) {
+            res = new TypeBit(((TypeFixed)op).getPrecision());
+            m_properties.put(ctx, res);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: ROUND: rule#1");
+        }
+        else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return null;
     }
 
@@ -957,10 +1491,21 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSemaTry(SmallPearlParser.SemaTryContext ctx) {
-        // TODO:
+        TypeDefinition res;
+
         if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitSemaTryContext");
-        throw new NotYetImplementedException("ExpressionTypeVisitor:visitSemaTry", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            System.out.println("ExpressionTypeVisitor: visitSemaTry");
+
+        if (ctx.ID() == null ) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        res = new TypeBit(1);
+        m_properties.put(ctx, res);
+        if (m_debug)
+          System.out.println("ExpressionTypeVisitor: TRY: rule#1");
+
+        return null;
     }
 
     @Override

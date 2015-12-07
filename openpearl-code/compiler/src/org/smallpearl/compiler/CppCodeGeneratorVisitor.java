@@ -47,16 +47,18 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private int m_verbose;
     private boolean m_debug;
     private String m_sourceFileName;
+    private ExpressionTypeVisitor m_expressionTypeVisitor;
 
     public enum Type {BIT, CHAR, FIXED}
 
     public static final double pi = java.lang.Math.PI;
 
-    public CppCodeGeneratorVisitor(String sourceFileName, String filename, int verbose, boolean debug) {
+    public CppCodeGeneratorVisitor(String sourceFileName, String filename, int verbose, boolean debug,ExpressionTypeVisitor expressionTypeVisitor) {
 
         m_debug = debug;
         m_verbose = verbose;
         m_sourceFileName = sourceFileName;
+        m_expressionTypeVisitor = expressionTypeVisitor;
 
         if (m_verbose > 1) {
             System.out.println("Generating Cpp code");
@@ -3024,6 +3026,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitLoopStatement(SmallPearlParser.LoopStatementContext ctx) {
         ST st = group.getInstanceOf("LoopStatement");
+        TypeDefinition fromType = null;
+        TypeDefinition byType = null;
+        TypeDefinition toType = null;
+        Integer rangePrecision = 31;
 
         st.add("srcLine", ctx.start.getLine());
 
@@ -3032,17 +3038,36 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         if ( ctx.loopStatement_from() != null) {
+            fromType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_from().expression());
             st.add("from", getExpression(ctx.loopStatement_from().expression()));
         }
 
         if ( ctx.loopStatement_by() != null) {
+            byType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_by().expression());
             st.add("by", getExpression(ctx.loopStatement_by().expression()));
         }
 
         if ( ctx.loopStatement_to() != null) {
+            toType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_to().expression());
             st.add( "to", getExpression(ctx.loopStatement_to().expression()));
         }
 
+        if ( fromType != null && toType != null) {
+            rangePrecision = Math.max(((TypeFixed)fromType).getPrecision(), ((TypeFixed)toType).getPrecision());
+            st.add("fromPrecision",((TypeFixed)fromType).getPrecision());
+            st.add("toPrecision",((TypeFixed)toType).getPrecision());
+        }
+        else if ( fromType != null && toType == null) {
+            rangePrecision = ((TypeFixed)fromType).getPrecision();
+            st.add("fromPrecision",((TypeFixed)fromType).getPrecision());
+        }
+        else if ( fromType == null && toType != null) {
+            rangePrecision = ((TypeFixed)toType).getPrecision();
+            st.add("toPrecision",((TypeFixed)toType).getPrecision());
+        }
+
+        st.add("byPrecision",rangePrecision);
+        st.add("rangePrecision",rangePrecision);
 
         if ( ctx.loopStatement_while() != null && ctx.loopStatement_while().expression() != null) {
             ST wc = getExpression(ctx.loopStatement_while().expression());

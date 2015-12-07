@@ -1139,26 +1139,26 @@ user_label(name) ::= <%
 
 /* --------------------- LOOPS -------------------------- */
 
-LoopStatement(srcLine,variable,from,by,to,while_cond,body,label_end) ::= <<
+LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,while_cond,body,label_end) ::= <<
 {
     <if(from)>
-    pearlrt::Fixed\<31> a_value =  (pearlrt::Fixed\<31>) <from>;
+    pearlrt::Fixed\<<fromPrecision>\> a_value =  (pearlrt::Fixed\<<fromPrecision>\>) <from>;
     <else>
-    pearlrt::Fixed\<31> a_value = (pearlrt::Fixed\<31>)(1);
+    pearlrt::Fixed\<<fromPrecision>\> a_value = (pearlrt::Fixed\<<fromPrecision>\>)(1);
     <endif>
 
     <if(to)>
-    pearlrt::Fixed\<31> e_value =  (pearlrt::Fixed\<31>) <to>;
+    pearlrt::Fixed\<<toPrecision>\> e_value =  (pearlrt::Fixed\<<toPrecision>\>) <to>;
     <endif>
 
     <if(by)>
-    pearlrt::Fixed\<31> s_value =  (pearlrt::Fixed\<31>) <by>;
+    pearlrt::Fixed\<<byPrecision>\> s_value =  (pearlrt::Fixed\<<byPrecision>\>) <by>;
     <else>
-    pearlrt::Fixed\<31> s_value = (pearlrt::Fixed\<31>)(1);
+    pearlrt::Fixed\<<byPrecision>\> s_value = (pearlrt::Fixed\<<byPrecision>\>)(1);
     <endif>
 
     <if(variable)>
-    pearlrt::Fixed\<31> <user_variable(variable)> = a_value;
+    pearlrt::Fixed\<<rangePrecision>\> <user_variable(variable)> = a_value;
     <endif>
 
     <if(to)>

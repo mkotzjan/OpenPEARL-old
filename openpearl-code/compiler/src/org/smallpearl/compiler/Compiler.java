@@ -148,7 +148,7 @@ public class Compiler {
 
 
 //                try {
-                    CppGenerate(lexer.getSourceName(), tree);
+                    CppGenerate(lexer.getSourceName(), tree, expressionTypeVisitor);
 /*                }
                 catch(Exception ex) {
                     System.err.println(ex.getMessage());
@@ -292,8 +292,8 @@ public class Compiler {
         return true;
     }
 
-    private static Void CppGenerate(String sourceFileName, ParserRuleContext tree) {
-        CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor(sourceFileName, groupFile, verbose, debug);
+    private static Void CppGenerate(String sourceFileName, ParserRuleContext tree, ExpressionTypeVisitor expressionTypeVisitor) {
+        CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor(sourceFileName, groupFile, verbose, debug, expressionTypeVisitor);
         ST code = cppCodeGenerator.visit(tree);
 
         if ( debugSTG ) {
