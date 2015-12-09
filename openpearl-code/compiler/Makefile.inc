@@ -38,16 +38,20 @@ RANLIB	     = ranlib
 #RM	     = rm
 ECHO	     = echo
 SHELL	     = /bin/sh
-ANTLR        = /usr/local/lib/antlr-4.5-complete.jar
+# ANTLR is obsolete -> use $(CONFIG_COMPILER_ANTLR) from menuconfig tool
+#ANTLR        = /usr/local/lib/antlr-4.5-complete.jar
 #ANTLR       = /opt/antlr/antlr.jar
 
 ################################
 # Where to install the compiler:
 ################################
-ifndef OPENPEARL_INSTALL_DIR
-       INSTALL_DIR  = /usr/local/bin
-else
-       INSTALL_DIR = $(OPENPEARL_INSTALL_DIR)
-endif
+#
+# obsolete --> use $(CONFIG_INSTALL_Target) from menuconfig tool
+#
+#ifndef OPENPEARL_INSTALL_DIR
+#       INSTALL_DIR  = /usr/local/bin
+#else
+#       INSTALL_DIR = $(OPENPEARL_INSTALL_DIR)
+#endif
 
 #.SILENT :

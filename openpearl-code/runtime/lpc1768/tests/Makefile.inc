@@ -28,36 +28,34 @@
 #
 
 #
-# pearl runtime system tests
+# pearl runtime system tests for lpc1768 plattform
 
 # overwiew of liste:
 # targets - list of test application to build
-# GTEST_SRC        - list of module to be added to the google testframe 
+# GTEST_SRC        - list of module to be added to the "mini" google testframe 
 #                    for data type tests
-# GTEST_DATION_SRC - list of module to be added to the google testframe 
+# GTEST_DATION_SRC - list of module to be added to the "mini" google testframe 
 #                    for dation tests
 # TEST_SRCS        - list of modules for standalone tests
 
-#PLIB := $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a
-PLIB := libOpenPEARLlinux.a
+PLIB = OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a
 
 targets +=  \
-	tests/DataTypeTests \
-	tests/log_test tests/api  tests/lot_of_tasks  \
+	tests/DataTypeTests1 \
+	tests/DataTypeTests2 \
 	tests/susp_cont_test \
 	tests/sched_demo \
-	tests/interruptTest \
 	tests/SampleBasicDationTests \
 	tests/sematest tests/sematerminate  \
-	tests/signalTest\
-	tests/DationTests \
-	tests/DationSuspendTerminateTests 
+	tests/signalTest
+
+#	tests/interruptTest \
+#	tests/DationTests \
+#	tests/DationSuspendTerminateTests 
 	
 
-GTEST_SRCS = tests/gtest_main.cc 
-GTEST_DATION_SRCS = tests/gtest_main.cc 
-
-TEST_SRCS +=  tests/log_test.cc 
+GTEST_SRCS = tests/simpleTests.cc 
+GTEST_DATION_SRCS = tests/simpleTests.cc 
 
 GTEST_SRCS += tests/PrioTests.cc
 GTEST_SRCS += tests/PrioMapperTests.cc
@@ -69,19 +67,17 @@ GTEST_DATION_SRCS += tests/gtest_main.cc tests/myTests.cc  \
   tests/StdStreamTests.cc \
   tests/DationRWTests.cc tests/DationPGTests.cc
 
-ifeq ($(CONFIG_LINUX_Octopus),y)
-  GTEST_DATION_SRCS += OctopusDigitalOutTest.cc
-  GTEST_DATION_SRCS += OctopusDigitalInOutTest.cc
-endif
 
 # ----------------------------------------
 # include test application code from the common stuff
 include ../common/tests/Files
 #TEST_SRCS += $(addprefix ../common/tests/,$(CXX_COMMON_TESTS))
-GTEST_SRCS += $(addprefix ../common/tests/,$(CXX_COMMON_GTESTS))
-
+GTEST_SRCS1 = $(addprefix ../common/tests/,$(CXX_COMMON_TESTS1))
+GTEST_SRCS2 = $(addprefix ../common/tests/,$(CXX_COMMON_TESTS2))
 # ----------------------------------------
 GTEST_OBJS =$(GTEST_SRCS:.cc=.o)
+GTEST_OBJS1 =$(GTEST_SRCS1:.cc=.o)
+GTEST_OBJS2 =$(GTEST_SRCS2:.cc=.o)
 
 GTEST_DATION_OBJS =$(GTEST_DATION_SRCS:.cc=.o)
 
@@ -96,14 +92,14 @@ tests/signalTest: tests/signalTest.o $(PLIB)
 tests/interruptTest: ../common/tests/interruptTest.o $(PLIB)
 	$(LINK)
 
-tests/SampleBasicDationTests: ../common/tests/SampleBasicDationTests.o plib.a
+tests/SampleBasicDationTests: ../common/tests/SampleBasicDationTests.o $(PLIB)
 	$(LINK)
 
 tests/api: tests/api.o $(PLIB)
 	$(LINK)
 
 tests/sched_demo: ../common/tests/sched_demo.o \
-	../common/tests/round_robin_test.o $(PLIB) 
+	../common/tests/round_robin_test.o $(PLIB)
 	$(LINK)
 
 tests/susp_cont_test: ../common/tests/susp_cont_test.o $(PLIB)
@@ -112,10 +108,13 @@ tests/susp_cont_test: ../common/tests/susp_cont_test.o $(PLIB)
 tests/lot_of_tasks: tests/lot_of_tasks.o $(PLIB)
 	$(LINK)
 
-tests/DataTypeTests: $(GTEST_OBJS) $(PLIB) /usr/local/lib/libgtest.a
+tests/DataTypeTests1: $(GTEST_OBJS) $(GTEST_OBJS1) $(PLIB)
 	$(LINK)
 
-tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) /usr/local/lib/libgtest.a
+tests/DataTypeTests2: $(GTEST_OBJS) $(GTEST_OBJS2) $(PLIB)
+	$(LINK)
+
+tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) 
 	$(LINK)
 
 tests/log_test: tests/log_test.o $(PLIB)

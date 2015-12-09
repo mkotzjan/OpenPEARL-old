@@ -65,12 +65,12 @@ all: gen javac install
 ###############################################################################
 
 gen ./check_cmds.sh $(ANTLR_GENERATED_FILES) : SmallPearl.g4 
-	java -jar $(ANTLR) -no-listener -visitor -o org/smallpearl/compiler $(ANTLR_FLAGS) SmallPearl.g4
+	java -jar $(CONFIG_COMPILER_ANTLR) -no-listener -visitor -o org/smallpearl/compiler $(ANTLR_FLAGS) SmallPearl.g4
 
 ###############################################################################
 
 javac:
-	javac -cp .:$(ANTLR)  org/smallpearl/compiler/Compiler.java
+	javac -cp .:$(CONFIG_COMPILER_ANTLR)  org/smallpearl/compiler/Compiler.java
 	rm -f smallpearl_compiler.jar
 	jar cf smallpearl_compiler.jar org/smallpearl/compiler/*.class \
 		SmallPearlCpp.stg SystemPartExport.stg

@@ -81,26 +81,28 @@ targets.inc:
 prl_bin:
 
 install: cc_bin.inc run_bin.inc targets.inc
-	(cd $(IC_DIR); make;)
-	cat LICENSE.BSD >$(INSTALL_PEARLINCLUDES)
+	@echo "[install] runtime "
+	@(cd $(IC_DIR); make;)
+	@cat LICENSE.BSD >$(INSTALL_PEARLINCLUDES)
 ifeq ($(CONFIG_LINUX),y) 
-	(cd linux; make -B install;)
+	@(cd linux; make -B install;)
 	@echo "#define LINUX	1" >>$(INSTALL_PEARLINCLUDES)
 	@echo "#if TARGET == LINUX" >> $(INSTALL_PEARLINCLUDES)
-	cat linux/pearl.h >>$(INSTALL_PEARLINCLUDES)
+	@cat linux/pearl.h >>$(INSTALL_PEARLINCLUDES)
 	@echo "#endif" >> $(INSTALL_PEARLINCLUDES)
 endif
 ifeq ($(CONFIG_LPC1768),y) 
-	(cd lpc1768; make -B install;)
+	@(cd lpc1768; make -B install;)
 	@echo "#define LPC1768	2" >> $(INSTALL_PEARLINCLUDES)
 	@echo "#if TARGET == LPC1768" >> $(INSTALL_PEARLINCLUDES)
-	cat lpc1768/pearl.h >>$(INSTALL_PEARLINCLUDES)
+	@cat lpc1768/pearl.h >>$(INSTALL_PEARLINCLUDES)
 	@echo "#endif" >> $(INSTALL_PEARLINCLUDES)
 endif
 
 
 .PHONY: cc_bin.inc
 cc_bin.inc:
+	@echo "[create] $@ "
 	@echo "# auto generated " > cc_bin.inc
 ifeq ($(CONFIG_LINUX),y) 
 	@echo 'if [ "$$PLATTFORM" == "linux" ] ; then' >> cc_bin.inc
@@ -115,6 +117,7 @@ endif
 
 .PHONY: run_bin.inc
 run_bin.inc:
+	@echo "[create] $@ "
 	@echo "# auto generated " > run_bin.inc
 ifeq ($(CONFIG_LINUX),y) 
 	@echo 'if [ "$$PLATTFORM" == "linux" ] ; then' >> run_bin.inc
@@ -130,9 +133,10 @@ endif
 
 #---------------------------------------------------------
 clean: 
-	(cd $(IC_DIR); make clean;)
-	(cd doc; make clean;)
-	$(foreach tgt, $(targets), (cd $(tgt); make clean;);)
-	rm -f cc_bin.inc run_bin.inc targets.inc
-	echo "runtime/clean done"
+	@echo "[clean] runtime"
+	@(cd $(IC_DIR); make clean;)
+	@(cd doc; make clean;)
+	@$(foreach tgt, $(targets), (cd $(tgt); make clean;);)
+	@rm -f cc_bin.inc run_bin.inc targets.inc
+	@echo "runtime/clean done"
 

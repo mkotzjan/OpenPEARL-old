@@ -79,4 +79,10 @@ namespace pearlrt {
       return sys;
    }
 
+   int PrioMapper::getSystemPrio() {
+      // FreeRTOS prios are running until MAX -1
+      return configMAX_PRIORITIES - 1;
+   }
+ 
+
 }

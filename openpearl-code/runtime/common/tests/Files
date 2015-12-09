@@ -2,7 +2,7 @@
 # the relative path must be added by the target specific makefile
 #
 
-CXX_COMMON_TESTS = \
+CXX_COMMON_TESTS1 := \
 	BitTests.cc\
 	CharacterTests.cc\
 	ClockTests.cc\
@@ -10,6 +10,9 @@ CXX_COMMON_TESTS = \
 	Fixed63Tests.cc\
 	FixedTests.cc \
 	FloatTests.cc \
+	SizeTests.cc 
+
+CXX_COMMON_TESTS2 := \
 	GetBitStringTests.cc  \
 	GetCharacterTests.cc \
 	GetClockTests.cc \
@@ -23,10 +26,14 @@ CXX_COMMON_TESTS = \
 	PutFixedTests.cc\
 	RefCharSinkTests.cc\
 	RefCharSourceTests.cc \
-	RefCharTests.cc\
-	SizeTests.cc \
+	RefCharTests.cc
+
+CXX_COMMON_TESTS := $(CXX_COMMON_TESTS1) $(CXX_COMMON_TESTS2)
+
+CXX_COMMON_GTESTS := $(CXX_COMMON_TESTS)
+	
+CXX_COMMON_TESTS += SampleBasicDationTests.cc \
 	sematest.cc \
 	sematerminate.cc \
-	interruptTest.cc \
-	SampleBasicDationTests.cc
+	interruptTest.cc 
 	

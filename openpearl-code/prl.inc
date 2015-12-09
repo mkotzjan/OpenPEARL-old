@@ -8,7 +8,10 @@
 #include "runtime/targets.inc"
 
 INTERFACE=/dev/ttyUSB0
-PLATTFORM=${OpenPEARLTarget};
+if [ "${OpenPEARLTarget}" = "" ]
+then
+   PLATTFORM=linux
+endif
 COMPILEONLY=
 RUN=
 HELP=
@@ -40,8 +43,9 @@ then
    echo "Usage $0 [parameters] file"
    echo "   Parameters: " 
    echo "    -c compile only until C++ source" 
-   echo "    -b <plattform> build for plattform (defaults to LINUX)" 
+   echo "    -b <plattform> build for plattform (defaults to linux)" 
    echo "        or OpenPEARLTarget environment variable" 
+   echo "        known plattforms: $plattforms"
    echo "    -r run application on MCU" 
    echo "    -i <interface> download interface for MCU (default /dev/ttyUSB0)" 
    echo "    -h this page" 

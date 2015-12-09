@@ -78,32 +78,25 @@ SPCTASK(t1);
 DCLTASK(t1, pearlrt::Prio(1), pearlrt::BitString<1>(0)) {
 }
 
-#ifndef SIMPLE_TESTS
-FILE * fp;
-#endif
 
 static int print_ok_nok(const char * test, int current, int expected) {
    int ok = 1;
-#ifndef SIMPLE_TESTS
-   fprintf(fp, "size of %-30.30s = %4d", test, current);
+
+   printf("size of %-30.30s = %4d", test, current);
 
    if (current == expected) {
-      fprintf(fp, ":  ok\n");
+      printf(":  ok\n");
    } else {
-      fprintf(fp, ": fail (%d instead of %d)\n", current, expected);
+      printf(": fail (%d instead of %d)\n", current, expected);
       ok = 0;
    }
 
-#endif
    return ok;
 }
 
 
 TEST(SizeTests, Test) {
    int siz;
-#ifndef SIMPLE_TESTS
-   fp = fopen("SizeTests.log", "w");
-#endif
    pearlrt::Fixed<7> f7, f734[3][4];
    pearlrt::Fixed<15> f15, f1534[3][4];
    pearlrt::Fixed<31> f31, f3134[3][4];
@@ -111,9 +104,7 @@ TEST(SizeTests, Test) {
    pearlrt::Duration d;
    pearlrt::Clock c;
    pearlrt::Character<30> c30, c31[5];
-#ifndef SIMPLE_TESTS
-   fprintf(fp , "\n --- I/O data types --\n");
-#endif
+
    siz = sizeof(f7);
    print_ok_nok("Fixed7", siz, 1);
    EXPECT_EQ(sizeof(f7), 1);
@@ -140,25 +131,23 @@ TEST(SizeTests, Test) {
    EXPECT_EQ(sizeof(c30), 30);
    print_ok_nok("Character(30) Array[5]", sizeof(c31), 150);
    EXPECT_EQ(sizeof(c31), 150);
-#ifndef SIMPLE_TESTS
-   fprintf(fp, "\n --- Informative Data --\n");
+
+   printf("\n --- Informative Data --\n");
    {
       pearlrt::CSema s;
-      fprintf(fp, "sizeof(CSema) = %d\n", (int)sizeof(s));
+      printf("sizeof(CSema) = %d\n", (int)sizeof(s));
    }
    {
       pearlrt::Mutex s;
-      fprintf(fp, "sizeof(Mutex) = %d\n", (int)sizeof(s));
+      printf("sizeof(Mutex) = %d\n", (int)sizeof(s));
    }
    {
       pearlrt::Semaphore s(0, "");
-      fprintf(fp, "sizeof(PEARL Semaphore) = %d\n", (int)sizeof(s));
+      printf("sizeof(PEARL Semaphore) = %d\n", (int)sizeof(s));
    }
    {
-      fprintf(fp, "sizeof(PEARL Task TCB) = %d\n", (int)sizeof(t1));
+      printf("sizeof(PEARL Task TCB) = %d\n", (int)sizeof(t1));
    }
-   fclose(fp);
-#endif
 }
 
 /**

@@ -1,10 +1,20 @@
 # read system configuration setting from menuconfig
 include ../../configuration/.config
 
+
 include makefile.conf
 CC := $(CROSS)$(CC)
 CXX := $(CROSS)$(CXX)
 AR := $(CROSS)$(AR)
+
+# make silent compilations
+COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(TARGET_ARCH) -c
+COMPILE.cc = @echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK.o = $(LINK.cc)
+#LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+LINK = @echo link $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
+
+
 
 IC_DIR = ../includeComposer
 IC = $(IC_DIR)/ic
@@ -56,8 +66,8 @@ BOARDSUPPORT := startup_lpc1768.S $(LPCOpen_CSRC)
 BOARDSUPPORT += lpc17_uart_retarget.c
 BOARDSUPPORT += lpc17_oscillators.c
 ifeq ($(CONFIG_LPC1768_FreeRTOSHRTimer),y)
-BOARDSUPPORT += lpc17_systime.c
-BOARDSUPPORT += lpc17_systime_rtcsynced.c
+  BOARDSUPPORT += lpc17_systime.c
+  BOARDSUPPORT += lpc17_systime_rtcsynced.c
 endif
 BOARDSUPPORT += lpc17_rtc.c
 BOARDSUPPORT += lpc17_clockinit.c
@@ -75,6 +85,7 @@ CXXFLAGS += $(INCS)
 
 # ----------------- all input sources for dependencies
 SRCS = $(BOARDSUPPORT)  $(CXXSRCS) $(CSRC)
+CHECK_FILES = $(sort  $(SRCS))
 
 # ------------------- all files not to be added into lib
 BOARDSUPPORT_OBJ := lpc1768_boardsupport.o \
@@ -84,9 +95,24 @@ INCLUDES := $(addsuffix .h,$(basename $(CXXSRCS)))
 PLIB_OBJS := $(addsuffix .o,$(basename $(CXXSRCS)))
 PLIB_OBJS += $(addsuffix .o,$(basename $(CSRC)))
 
-.PHONY: all clean
+phony = all clean
 
 targets := OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a
+
+_all: all
+
+ifeq ($(CONFIG_LPC1768_tests),y)
+  include tests/Makefile.inc
+  CHECK_FILES += $(GTEST_SRC) $(GTEST_DATION_SRC) $(TEST_SRC)
+  OBJ := $(addsuffix .o,$(basename $(CXX_COMMON_TESTS)))
+$(warning OBJ=$(OBJ))
+
+  OBJ := $(addprefix ../common/tests/,$(OBJ))
+$(warning OBJ=$(OBJ))
+endif
+
+CHECK_FILES := $(sort $(CHECK_FILES))
+
 all: depend $(targets)
 
 startup_lpc1768.o: startup_lpc1768.S
@@ -95,33 +121,32 @@ startup_lpc1768.o: startup_lpc1768.S
 #       @$(CC) $^ $(CFLAGS) -D__NO_SYSTEM_INIT -c
 
 OpenPEARLlpc1768_board.o: $(addsuffix .o,$(basename $(BOARDSUPPORT)))
-	@echo $(BOARDSUPPORT)
-	@echo $(BOARDSUPPORT)
-	@echo $(basename $(BOARDSUPPORT))
-	@echo $(addsuffix .o,$(basename $(BOARDSUPPORT)))
-	$(CC) -nostdlib -Xlinker -r $(NOHOST) $(CFLAGS) $(INCS) -o $@ $^
+	@echo "[create] $@"
+	@$(CC) -nostdlib -Xlinker -r $(NOHOST) $(CFLAGS) $(INCS) -o $@ $^
 
-.PHONY: libOpenPEARLlpc1768.a
+phony += libOpenPEARLlpc1768.a
 libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
-	echo $(PLIB_OBJS)
-	$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
+	@echo "[create] $@"
+	@$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
 
-.PHONY: depend
-depend: $(SRCS) ../common/Signals.hh ../common/Signals.hcc
-	@$(CC) -MM $(CFLAGS) $(INCS) $^ >.depend
+phony += depend
+depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
+	@echo "[create] .depend"
+	$(CXX) -MM $(CFLAGS) $(INCS) $^ >.depend
 
-.PHONY:clean
+phony += clean
 clean:
-	rm -f $(BOARDSUPPORT_OBJ)
-	rm -f $(targets)
-	rm -f cc_bin.inc run_bin.inc
-	rm -f $(PLIB_OBJS)
+	@rm -f $(BOARDSUPPORT_OBJ)
+	@rm -f $(targets)
+	@rm -f cc_bin.inc run_bin.inc
+	@rm -f .depend pearl.h
+	@rm -f $(PLIB_OBJS) $(OBJ)
 
 
 tests/task1: tests/task1.cc libopenpearl.a lpc1768_boardsupport.o
 	$(CXX) $^ -o $@ $(CFLAGS) $(CXXFLAGS) $(LFLAGS)
 
-.PHONY: install
+phony += install
 install: all
 	rm -f pearl2.h
 	$(IC) -c $(INCS)  <PearlIncludes.h | $(DWS) >pearl2.h
@@ -153,6 +178,10 @@ install: all
 
 ../Signals.cc: ../Signals.hh ../Signals.hcc
 
+phony +=  checkformat
+checkformat:
+	@$(foreach f,$(CHECK_FILES),../codestyle/check.sh $(f);)
+
 
 #cpp: tests/cpp.hex
 #	lpc21isp -control -term -hex $< /dev/ttyUSB0 115200 12000
@@ -164,3 +193,16 @@ install: all
 #	$(CROSS)$(CXX) $(CXXFLAGS) $(INCS) $(CFLAGS) -c -o $@ $^
 
 -include .depend
+
+phony += info
+info:
+	@echo "Makefile Summary"
+	@echo "targets: " $(targets)
+	@echo "CFLAGS " $(CFLAGS)
+	@echo "INCS " $(INCS)
+	@echo "CXXFLAGS " $(CXXFLAGS)
+	@echo "LFLAGS " $(LFLAGS)
+	@echo "LDFLAGS " $(LDFLAGS)
+	@echo "PHONY " $(phony)
+
+.PHONY: $(phony)

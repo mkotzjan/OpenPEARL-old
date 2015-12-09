@@ -8,6 +8,18 @@ config LPC1768
 	This port is in work. Build and execution problems 
         may occur selecting this option. 
 
+config LPC1768_tests
+	depends on LPC1768
+	boolean "build low level test applications"
+	default y
+	help
+	This will create the low level test application of the runtime
+        system for the LPC1768 microcontroller. 
+        These tests should be run at least once to make shure that
+	the runtime system interacts properly with your configuration
+        with hardware and toolchain.
+	Usually select this.
+
 choice
 depends on LPC1768
    prompt  "Select System Timer"
