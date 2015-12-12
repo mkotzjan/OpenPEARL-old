@@ -11,7 +11,7 @@ INTERFACE=/dev/ttyUSB0
 if [ "${OpenPEARLTarget}" = "" ]
 then
    PLATTFORM=linux
-endif
+fi
 COMPILEONLY=
 RUN=
 HELP=
