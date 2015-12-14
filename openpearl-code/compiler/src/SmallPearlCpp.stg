@@ -417,8 +417,8 @@ expression(code,id,bitstring,operator) ::= <%
 %>
 
 literal(integer,float,string,time,duration) ::= <%
-<if(integer)>((pearlrt::Fixed\<31>)(<integer>))<endif>
-<if(float)>(pearlrt::Float\<24>)(<float>)<endif>
+<if(integer)><integer><endif>
+<if(float)><float><endif>
 <if(string)>"<string>"<endif>
 <if(time)>pearlrt::Clock(<time>)<endif>
 <if(duration)>pearlrt::Duration(<duration>)<endif>
@@ -1204,7 +1204,7 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
     <endif>
 
     <if(label_end)>
-        <user_label(label_end)>;
+        <user_label(label_end)>:
     <endif>
 }
 >>
