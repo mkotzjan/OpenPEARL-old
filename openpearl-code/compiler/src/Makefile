@@ -82,7 +82,7 @@ test:
     
 ###############################################################################
 
-install: prl_cc.inc
+install: gen javac prl_cc.inc
 #	cp prl_c $(INSTALL_DIR)
 #	cp smallpearl_compiler.jar $(INSTALL_DIR)
 	cp smallpearl_compiler.jar $(CONFIG_INSTALL_Target)/bin
