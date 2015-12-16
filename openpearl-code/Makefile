@@ -1,6 +1,6 @@
 # super makefile for SmallPearl
 # 
-include configuration/.config
+-include configuration/.config
 
 .PHONY: install runtime compiler help build all menuconfig
 
@@ -39,6 +39,7 @@ install: configuration/include/autoconf.h
 .PHONY: configuration/include/autoconf.h
 configuration/include/autoconf.h: 
 ifneq ($(wildcard ./configuration/include/autoconf.*),./configuration/include/autoconf.h)
+	(cd configuration; make include/autoconf.h; cd ..)
 	make menuconfig
 endif
 

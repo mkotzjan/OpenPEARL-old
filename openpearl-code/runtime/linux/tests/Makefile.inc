@@ -96,7 +96,7 @@ tests/signalTest: tests/signalTest.o $(PLIB)
 tests/interruptTest: ../common/tests/interruptTest.o $(PLIB)
 	$(LINK)
 
-tests/SampleBasicDationTests: ../common/tests/SampleBasicDationTests.o plib.a
+tests/SampleBasicDationTests: ../common/tests/SampleBasicDationTests.o $(PLIB)
 	$(LINK)
 
 tests/api: tests/api.o $(PLIB)
