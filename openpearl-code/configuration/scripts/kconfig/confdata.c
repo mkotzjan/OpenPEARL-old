@@ -715,6 +715,7 @@ int conf_write_autoconf(void)
 		       " * Automatically generated C config: don't edit\n"
 		       " * %s"
 		       " */\n"
+		       "#ifndef AUTOCONF_INCLUDED\n"
 		       "#define AUTOCONF_INCLUDED\n",
 		       ctime(&now));
 
@@ -778,6 +779,7 @@ int conf_write_autoconf(void)
 			break;
 		}
 	}
+	fprintf(out_h, "#endif  /* of AUTOCONF_INCLUDED */");
 	fclose(out);
 	fclose(tristate);
 	fclose(out_h);
