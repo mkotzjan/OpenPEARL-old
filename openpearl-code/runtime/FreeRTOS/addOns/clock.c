@@ -32,56 +32,74 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/* ----------------------------------------
+  Modifications:
+  Dec 2015 : r. mueller : internal time base completly in nsec as uint_64t.
+                          the conversion to struct timespec are done
+                          in this module
+*/
+
 #include <time.h>
 #include <sys/time.h>  // gettimeofday()
 #include <sys/errno.h>
 #include "time_addons.h"
 
-static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts);
-static int (*clock_gettime_cb)(clockid_t clock_id, struct timespec *tp) = &clock_gettime_cb_notready;
+static int clock_gettime_cb_notready(uint64_t * nsec);
+static int (*clock_gettime_cb)(uint64_t  *nsec) = &clock_gettime_cb_notready;
 
 /* added global function */
-void set_clock_gettime_cb(int (*new_clock_gettime_cb)(clockid_t clock_id,
-                                      struct timespec *tp)) {
-    clock_gettime_cb = new_clock_gettime_cb;
+void set_clock_gettime_cb(int (*new_clock_gettime_cb)(uint64_t *nsec)) {
+   clock_gettime_cb = new_clock_gettime_cb;
+}
+
+void clock_gettime_nsec(uint64_t * nsec) {
+   (*clock_gettime_cb)(nsec);
 }
 
 /* prototype in <time.h>  */
-struct tm *localtime_r(const time_t *_time, struct tm * tm){
-	//always assume localtime was UTC
-	gmtime_r(_time, tm);
-	return tm;
+struct tm *localtime_r(const time_t *_time, struct tm * tm) {
+   //always assume localtime was UTC
+   gmtime_r(_time, tm);
+   return tm;
 }
 
 /* prototype in <time.h>  */
-struct tm *localtime(const time_t *_time){
-	//always assume localtime was UTC
-	static struct tm tm;//needs not be thread safe, says susv3
-	return localtime_r(_time, &tm);
+struct tm *localtime(const time_t *_time) {
+   //always assume localtime was UTC
+   static struct tm tm;//needs not be thread safe, says susv3
+   return localtime_r(_time, &tm);
 }
 
 /* prototype in <time.h>  */
-extern int clock_gettime(clockid_t clock_id, struct timespec *ts){
-	return (*clock_gettime_cb)(clock_id, ts);
+extern int clock_gettime(clockid_t clock_id, struct timespec *ts) {
+   uint64_t now;
+
+   (*clock_gettime_cb)(&now);
+   ts->tv_nsec = now % 1000000000;
+   ts->tv_sec = now / 1000000000;
+   return (0);  // return success
 }
 
-/* 
+/*
   default time base, just returning (0,0) and sets the errno variable
 */
-static int clock_gettime_cb_notready(clockid_t clock_id, struct timespec *ts){
-	ts->tv_nsec=0;
-	ts->tv_sec=0;
-	errno = EAGAIN;
-	return -1;
+static int clock_gettime_cb_notready(uint64_t * nsec) {
+   *nsec = 0;
+   errno = EAGAIN;
+   return -1;
 }
 
 /* prototype in <sys/time.h>  */
-int gettimeofday(struct timeval *__p, void *__tz){
-	struct timespec ts;
-	clock_gettime(CLOCK_REALTIME, &ts);
-	if(__tz)
-		return ENOSYS;
-	__p->tv_usec=ts.tv_nsec/1000;
-	__p->tv_sec=ts.tv_sec;
-	return 0;
+int gettimeofday(struct timeval *__p, void *__tz) {
+   struct timespec ts;
+   clock_gettime(CLOCK_REALTIME, &ts);
+
+   if (__tz) {
+      return ENOSYS;
+   }
+
+   __p->tv_usec = ts.tv_nsec / 1000;
+   __p->tv_sec = ts.tv_sec;
+   return 0;
 }

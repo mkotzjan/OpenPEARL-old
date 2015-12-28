@@ -1,9 +1,23 @@
 \section{System Overview}
 
+PEARL tasks on a PEARL application are mapped the pthreads in a single
+process.  The thread scheduling is done by the system scheduler of the 
+linux system. If the apllication runs with normal user priviledges, the
+completly fair scheduler (CFS) is used and PEARL priorities are not
+regarded at task scheduling. In run with root priviledges, the 
+\texttt{SCHED\_FIFO} scheduler is used, which provides the 
+PEARL-specific preemtive priority scheduling with the lack of some 
+priority levels.
+
+The timing functions are taken from the native itimer system.
+The clock resolution is defined by the settings in the linux system.
+
 \subsection{Tasks}
 The tasks are realized as static objects of type Task.
 The tasks ctor adds itself into a list which contains all tasks.
 This list is used for lookup reasons. 
+The macros \texttt{DCLTASK} and \texttt{SPCTASK} are provided in 
+\texttt{Task.h}. They map the PEARL-tasks to the class \texttt{Task}.
 
 \subsection{System Initialisation}
 The PEARL application is started from the main, which is located in 

@@ -45,6 +45,8 @@
 #define GENERICTASK_H_
 
 #include "Task.h"
+#include "Prio.h"
+#include "BitString.h"
 
 
 /*********************************************************************//**

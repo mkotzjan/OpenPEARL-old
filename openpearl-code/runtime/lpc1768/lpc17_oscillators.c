@@ -28,6 +28,7 @@
 */
 
 #include <stdint.h>
+
 /* System oscillator rate and RTC oscillator rate
  * lpc library needs those to calculate various clocks
  * */

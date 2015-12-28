@@ -72,14 +72,18 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 500;
+      stackDepth = 1000;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }
 
    void Task::init() {
-      ((TaskTimer*)schedActivateData.taskTimer)->create(this, 0, activateHandler);
-      ((TaskTimer*)schedContinueData.taskTimer)->create(this, 0, continueHandler);
+      ((TaskTimer*)schedActivateData.taskTimer)->create(this,
+                                                        0,
+                                                        activateHandler);
+      ((TaskTimer*)schedContinueData.taskTimer)->create(this,
+                                                        0,
+                                                        continueHandler);
    }
 
    void Task::directActivate(const Fixed<15>& prio) {
@@ -320,8 +324,8 @@ namespace pearlrt {
 
    void Task::continueFromOtherTask(int condition, Prio prio) {
       int cp; // current calling threads priority
-	      // this may be the timer-task from FreeRTOS in case
-              // of timed continue
+      // this may be the timer-task from FreeRTOS in case
+      // of timed continue
 
       cp = switchToThreadPrioMax();
 
@@ -467,8 +471,8 @@ namespace pearlrt {
 
    void Task::switchToThreadPrioCurrent(int cp) {
       vTaskPrioritySet(NULL, cp);
-//      Log::debug("%s: switch task %s back to prio %d", 
-//                pcTaskGetTaskName(NULL), 
+//      Log::debug("%s: switch task %s back to prio %d",
+//                pcTaskGetTaskName(NULL),
 //                name,
 //                cp);
    }

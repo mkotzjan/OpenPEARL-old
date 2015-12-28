@@ -83,7 +83,7 @@ TEST(Duration, Operations) {
          }
       } catch (pearlrt::DurationRangeSignal &s) {
          test = 1;
-         printf(".. duration overflow works (%d days)\n", i + preset.x);
+         printf(".. duration overflow works (%d days)\n", (int)(i + preset.x));
       }
 
       ASSERT_EQ(test, 1);
@@ -103,7 +103,8 @@ TEST(Duration, Operations) {
          }
       } catch (pearlrt::DurationRangeSignal &s) {
          test = 1;
-         printf(".. duration underflow works (%d days)\n", i + preset.x);
+         printf(".. duration underflow works (%d days)\n",
+                  (int)(i + preset.x));
       }
 
       ASSERT_EQ(test, 1);

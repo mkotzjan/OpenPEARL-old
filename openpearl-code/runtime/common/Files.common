@@ -35,6 +35,7 @@
 # the target specific makefile
 
 CXX_COMMON = \
+	Clock.cc  \
 	Duration.cc  \
 	PutDuration.cc GetDuration.cc \
 	Signals.cc \
@@ -66,7 +67,6 @@ CXX_COMMON = \
 
 HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \
-	Clock.h  \
 	PutBitString.h GetBitString.h \
 	Sink.h RefCharSink.h \
 	Fixed.h PutFixed.h GetFixed.h \

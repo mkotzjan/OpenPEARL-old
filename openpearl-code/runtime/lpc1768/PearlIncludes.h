@@ -36,10 +36,9 @@ The compiler does not needed to know all header files of the run time system.
 Only this file mus be included.
 
 */
-
+#include "TaskCommon.h"
 #include "Task.h"
 #include "GenericTask.h"
-#include "TaskCommon.h"
 #include "TaskTimer.h"
 #include "TaskTimerCommon.h"
 #include "TaskMonitor.h"
@@ -104,4 +103,7 @@ Only this file mus be included.
 //#include "Octopus.h"
 //#include "OctopusDigitalIn.h"
 //#include "OctopusDigitalOut.h"
+
+#include "Lpc17xxRTC.h"
+#include "Lpc17xxClock.h"
 

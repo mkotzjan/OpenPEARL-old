@@ -47,15 +47,17 @@ targets +=  \
 	tests/sched_demo \
 	tests/SampleBasicDationTests \
 	tests/sematest tests/sematerminate  \
-	tests/signalTest
+	tests/signalTest \
+	tests/clockTest
 
 #	tests/interruptTest \
 #	tests/DationTests \
 #	tests/DationSuspendTerminateTests 
 	
+INCS += ../ugtest
 
-GTEST_SRCS = tests/simpleTests.cc 
-GTEST_DATION_SRCS = tests/simpleTests.cc 
+GTEST_SRCS = ../ugtest/simpleTests.cc 
+GTEST_DATION_SRCS = ../ugtest/simpleTests.cc 
 
 GTEST_SRCS += tests/PrioTests.cc
 GTEST_SRCS += tests/PrioMapperTests.cc
@@ -128,3 +130,13 @@ tests/sematerminate: ../common/tests/sematerminate.o $(PLIB)
 
 tests/DationSuspendTerminateTests: tests/DationSuspendTerminateTests.o $(PLIB)
 	$(LINK)
+
+tests/x: tests/x.o $(PLIB)
+	$(LINK)
+
+tests/clockTest: tests/clockTest.o $(PLIB)
+	$(LINK)
+
+tests/Post: tests/Post.o $(PLIB)
+	$(LINK)
+

@@ -33,6 +33,12 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
 \file
 
@@ -41,14 +47,42 @@ This extension is used in the adaption layer for FreeRTOS for time.h
 */
 
 /**
-adjust the time base function.
+register the time base function.
 
 Depending on the selected time base, there are different functions
 which deliver the current time. This may be the RTC or other sources
 
-\param new_clock_gettime_cb pointer to a clock_gettime function
-
+\param set  arm the timer to inform timer.c about the timeout
+\param get  pointer to the function, which return the current time
 */
-void set_clock_gettime_cb(int (*new_clock_gettime_cb)(clockid_t clock_id,
-                                              struct timespec *tp));
+void register_timer_source( void (*set)(uint64_t ns),
+                             int (*get)(uint64_t * ns));
+
+
+/**
+register the time base function.
+
+configure clock.c to work with a proper time base
+
+\param get  pointer to the function, which return the current time
+*/
+void set_clock_gettime_cb(int (*get)(uint64_t *ns));
+
+/**
+get current time in nsec 
+
+\param nsec pointer to uint64_t value which receives the curent time
+*/
+void clock_gettime_nsec(uint64_t * nsec);
+
+/**
+trigger the timer task to check which timers reached their timeout 
+
+This function must be invoked from the time base classes.
+*/
+void resume_timer_task_from_ISR();
+
+#ifdef __cplusplus
+}
+#endif
 

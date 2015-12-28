@@ -1,0 +1,61 @@
+\section{System Overview}
+FreeRTOS is used as scheduler. Processor specific parts are
+realized with the help of LPCOpen. LTO ist used.
+
+All system specific parts are located in \texttt{./lpc1768}. 
+These componts are:
+Makefile, linker script, peripheral dependent stuff like real time clock,..
+
+All objects are packed in the PEARL-library 
+\verb|libOpenPEARLlpc1768.a|. The \texttt{weak} symbols are
+packed into \texttt{OpenPEARLlpc1768\_board.o}.
+
+\section{System Initialization}
+The system initialization  is controlled by the following files:
+\begin{description}
+\item[lpc1768/OpenPEARLlpc1768.ld] is the linker script. This files is derived from
+   the samples from the Launchpad cross-tool-chain file gcc.ld. 
+   Only the ram and rom sizes were modified to fit the LPC1768 
+\item[lpc1768/startup\_lpc1768.S] contains the interrupt vector table and the 
+   reset handling routine. The reset handler 
+   \begin{enumerate}
+   \item copies the preset values from flash memory to RAM
+   \item clears the BSS section 
+   \item  calls the SystemInit() function
+   \item  branches to the initialization of glibc (\_start); glibc
+      initializes inself and the static objects and branches into \verb|main()|
+   \end{enumerate}
+\item[lpc1768/lpc17\_SystemInit.c] contains the actions, which must be executed
+   before the clib is started. Up to now only the systems core clock is 
+   set.
+\item [lpc1768/lpc17\_uart\_retarget.c] contains some functions, which redirects console 
+   input and output to the UART0.  This allows the use of printf(), 
+   scanf(), cin and cout in the application. The UART initialization is done 
+   upon first usage of any i/o-operation of this module.
+\item[FreeRTOS/PEARL/main.cc] contains the application start code.
+ The major steps are:
+  \begin{enumerate}
+  \item send a list of defined tasks to the Log::debug-interface
+  \item activate all \verb|MAIN| tasks according their priority
+  \item initialize the real time clock (RTC)
+  \item initialize the software time from the RTC
+  \item start the FreeRTOS scheduler 
+  \end{enumerate}
+  The termination is done in the class \verb|TaskMonitor|. 
+\end{description}
+
+\section{Time Base}
+The LPC1768 is a Cortex-M processor. FreeRTOS uses the systick timer 
+for the sytem tick interrupt. 
+\begin{description}
+\item[FreeRTOS/addOns/CortexMclock.cc] provides a more precise value to
+ the current time than on tick.
+This is done
+by the calulation of the fraction, which is passed in the current tick.
+This calulation is based on the Cortex-M specific systick registers
+{\em SYSTICK\_CURRENT\_VALUE\_REG} and {\em SYSTICK\_LOAD\_REG}.
+\item[lpc17/Lpc17xxRTC.cc] provides a system time bases which is 
+initialized with the RTC value at system start.
+\item[lpc1768/lpc17xxClock.cc] provides a pseudo device in order
+   to specify the time base for the PEARL apllication individually.
+\end{description}

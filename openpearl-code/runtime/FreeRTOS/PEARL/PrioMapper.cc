@@ -83,6 +83,6 @@ namespace pearlrt {
       // FreeRTOS prios are running until MAX -1
       return configMAX_PRIORITIES - 1;
    }
- 
+
 
 }

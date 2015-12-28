@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include "Post.h"
-#include "lpc17_rtc.h"
+#include "Lpc17xxRTC.h"
 
 // labels from the linker script
 extern "C" {
@@ -28,8 +28,8 @@ void Post::print(void) {
    printf("            code: %p\n", &__etext);
    printf("      data(copy): 0x%x \n", &__data_end__ - &__data_start__);
    bytes = (int)(&__etext) + (__data_end__ - __data_start__);
-   printf("           total: %d (%2d %%)\n", 
-             bytes, bytes * 100 / (512 * 1024));
+   printf("           total: %d (%2d %%)\n",
+          bytes, bytes * 100 / (512 * 1024));
 
    printf("RAM usage:\n");
    printf("           data: %p - %p \n", &__data_start__, &__data_end__);
@@ -38,11 +38,11 @@ void Post::print(void) {
            (&__bss_end__ - &__bss_start__);
    printf("          total: %d (%2d %%)\n", bytes, bytes * 100 / (32 * 1024));
 
-   clock_gettime(CLOCK_REALTIME,&ts);
+   clock_gettime(CLOCK_REALTIME, &ts);
    tm = *(gmtime(&ts.tv_sec));
 
    /*
-   printf("%d %02d.%02d.%04d %02d:%02d:%02d\n ", 
+   printf("%d %02d.%02d.%04d %02d:%02d:%02d\n ",
           tm.tm_wday, tm.tm_mday, tm.tm_mon+1, tm.tm_year+1900,
           tm.tm_hour, tm.tm_min, tm.tm_sec);
    */
@@ -61,14 +61,15 @@ void Post::config(void) {
       fgets(line, sizeof(line) - 1, stdin);
 
       if (7 == sscanf(line, "RTC: %d %d:%d:%d:%d:%d:%d",
-                &tm.tm_wday,
-                &tm.tm_year,&tm.tm_mon,&tm.tm_mday,
-		&tm.tm_hour,&tm.tm_min,&tm.tm_sec)) {
+                      &tm.tm_wday,
+                      &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+                      &tm.tm_hour, &tm.tm_min, &tm.tm_sec)) {
          tm.tm_mon--;
-         tm.tm_year-=1900;
+         tm.tm_year -= 1900;
          printf(" set RTC to: ");
          printf(asctime(&tm));
-         rtc_settime(&tm);
+         pearlrt::Lpc17xxRTC rtc;
+         rtc.set(&tm);
       } else if (strncmp(line, "RUN", 3) == 0) {
          printf("exit POST ... run application\n");
          return;

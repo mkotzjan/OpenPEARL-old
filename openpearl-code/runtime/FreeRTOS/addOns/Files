@@ -1,9 +1,8 @@
 ADDONCSRC = assert.c	 \
 	clock.c  	\
-	FreeRTOSHooks.c	
-
-ifeq ($(CONFIG_LPC1768_FreeRTOSHRTimer),y)
-	timer.c
-endif
+	FreeRTOSClock.cc \
+	FreeRTOSHooks.c	 \
+	FreeRTOSClock.cc \
+	timer.c 
 
 ADDONINCS = .

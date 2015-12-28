@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2015 Jonas Meyer
+ Copyright (c) 2015 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,25 +27,53 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef LPC17CLOCKINIT_H_
-#define LPC17CLOCKINIT_H_
+#ifndef LPC17XX_CLOCK_INCLUDED
+#define LPC17XX_CLOCK_INCLUDED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-enum lpc17_clockinit{
-	CpuClock,
-	ClockRTC,
-	ClockTimer0,
-	ClockMonotonicRealtime,
-	ClockDebug
-};
+/**
+\file
 
-static void lpc17_clockinit(enum lpc17_clockinit);
+\brief select the clock source by defining a system device
+*/
 
-#ifdef __cplusplus
+
+namespace pearlrt {
+
+   /**
+   \brief Clock Source for the LPC1768-Landtiger
+
+   With this class it is possible to define the clock source
+   for an application. The parameter selects one of the possible
+   clock sources.
+
+   Usage:
+   \verbatim
+   SYSTEM;
+      myClock : Lpc17xxClock(1); ! 0=Systick, 1=RTC initial time + Systick
+   PROBLEM;
+      ! no access to this device in the problem part
+   \endverbatim
+
+   */
+
+   class Lpc17xxClock {
+
+   private:
+
+   public:
+
+      /**
+      Constructor to setup the clock
+
+            \param typeOfClock selector of the desired clock system
+                             0=Systick only (no absolute time),
+                               1=RTC used as initial time; update by systick
+                               ... others follow
+
+            \throws IllegalParamSignal, illegal parameter
+           */
+      Lpc17xxClock(const int typeOfClock);
+   };
 }
 #endif
-
-#endif /* LPC17CLOCKINIT_H_ */

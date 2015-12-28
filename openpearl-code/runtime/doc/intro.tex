@@ -22,14 +22,21 @@ are stored in parallel folders which are named according the content.
 \item[linux] contains the linux specific parts, as well as the common
    linux device drivers. 
 \item[FreeRTOS] contains the FreeRTOS specific parts
-   The file \verb|Files| contains lists which are used in the
-  plattform specific  \verb|Makefile|
-\item[FreeRTOS\_lpc1768] constains the processor and board specific
-   files for the FreeRTOS port.
-\item[FreeRTOS\_V8.1.2] contains the files from the FreeRTOS system.
-  Theses files must be downloaded separately in order of licensing.
-   The file \verb|Files| contains lists which are used in the
-  plattform specific  \verb|Makefile|
+  \begin{description}
+  \item[FreeRTOS] contains FreeRTOS V8.1.2
+  \item [PEARL] contains the FreeRTOS specific classes of the runtime system
+  \item[addOns] contains modules, which extend ether the c-library, or
+                FreeRTOS
+  \end{description}
+\item[cortex-M] contains files for the target system on base of theARM-Cortex-M
+   processor
+   \begin{description}
+   \item[CMSIS] contains the Cortex-M-System-Interface routines
+   \item[LPCOpen] contains the access libriaries for NXP-processors and
+              gcc compiler
+   \end{description}
+\item[lpc1768] constains the processor and board specific
+   files for the FreeRTOS port for the Landtiger target board.
 \item[includeComposer] contains helper an application to generate 
    one include file for the complete runtime system
 \item[codeStyle] contains source code formating check routines
@@ -41,6 +48,50 @@ plattform independent part is named as e.q. {\em TaskCommon} and the
 plattform depended part is names eq. {\em Task}. This provides a simple
 interface towards the compiler, since the compiler just instanciates
 an object of type {\em Task}.
+
+\section{Build System}
+The build system for the complete OpenPEARL system is based on the 
+configuarion tools of the Linux system and make.
+Only \texttt{make menuconfig} is tested.
+
+On top level, there are two commands required
+\begin{enumerate}
+\item \texttt{make menuconfig}
+\item \texttt{make install}
+\end{enumerate}
+
+The configuration part provides for the different parts of the system
+some configuration files in the folder \texttt{./configuration/fm/}.
+The configuration tool generates include files for \texttt{make} and
+\texttt{C/C++}.
+
+The top level makefile delegates the job to the main parts
+ (compiler, runtime sytem).
+
+The runtime system delegates the build process to specific makefiles 
+for each target system. A result, there are
+\begin{itemize}
+\item a include files (\texttt{PearlIncludes.h} for all target systems
+\item plattform specific libraries and linker files for each target system
+\item one compile/linkrun command (\texttt{prl})
+\end{itemize}
+The install directory may be specified in the configuration tool.
+
+The target specific makefile work similar to the linux kernel make file.
+The contributing directories are included bei makefile extensions and
+path substitutions.
+
+In order to distinguish the different targets in the common header include
+file, each target system is assigned with an unique number.
+
+\begin{tabular}{|r|l|}
+\hline
+number & target system \\
+\hline
+1 & linux \\
+2 & lpc1768 for the Landtiger board \\
+\hline
+\end{tabular}
 
 \section{Companion Tools}
 \subsection{Include Composer}

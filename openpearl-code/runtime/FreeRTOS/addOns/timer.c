@@ -2,11 +2,12 @@
  * timer.c
  *
  *  Created on: 27.05.2015
- *      Author: quitte
+ *      Author: jonas meyer, rainer mueller
  */
 /*
  [The "BSD license"]
  Copyright (c) 2015 Jonas Meyer
+               2015 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -33,499 +34,772 @@
  that SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+
+/* ------------------------
+   Modifications
+   dec 2015: r. mueller : only 1 timer thread which waits for continuation
+                          from the isr
+                          there is a linked list of active timers
+                          on timer_settime - the timer is removed from the list
+                                             if the timespec is 0
+                                           - the timer is removed and inserted
+                                             to the list, else
+                          the list of timers is sorted according the
+                          next timeout
+*/
+
+
 #include <time.h>
-#include <errno.h> //not actually useful, at least not threadsafe,yet. It could however be added.
+
+//not actually useful, at least not threadsafe,yet. It could however be added.
+#include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
+#include "time_addons.h"
+#include "FreeRTOSClock.h"
 
 #define MAXTIMER configTIMER_QUEUE_LENGTH
 #define ENTERCRITICAL taskDISABLE_INTERRUPTS();DMB();
 #define LEAVECRITICAL DMB();taskENABLE_INTERRUPTS()
 
-static inline void DMB(void) { asm volatile ("dmb" ::: "memory"); }
-
 static TaskHandle_t xClackerTaskHandle;
-static TaskHandle_t xTimerSortTaskHandle;
-static void TaskClacker(void *);
-static void TaskTimerSort(void *);
+static void clackerTask(void *);
+static void retrigger_timer();
 
+
+struct internalTimerSpec {
+   uint64_t nsec_value;
+   uint64_t nsec_interval;
+};
+
+struct tableEntry {
+   timer_t next;			// used in free and active list
+   timer_t prev;                        // used only in active list
+   struct sigevent *__restrict evp;	//actually a pointer the callback struct
+   // which consists of
+   //   the pointer to the function
+   //    and its argument.
+   struct internalTimerSpec value;      // initial delay and interval in nsec
+};
+
+static struct tableEntry timerTable[MAXTIMER];
+static timer_t unused = -1;            // points to no timer
+static timer_t expires_next = -1;       // points to no timer
+
+static QueueHandle_t timer_queue;
+
+// function pointer to define next timeout
+static void (*timer_set)(uint64_t ns) = NULL;
+
+/* various flags for internal control of the itimer subsystem */
+static struct {
+   unsigned tableinitialized: 1;
+} tablestate = {0};
+
+static void itimerspec2internaltimerspec(
+   const struct itimerspec *const a,
+   struct internalTimerSpec	*const b) {
+   b->nsec_value    = (uint64_t)(a->it_value.tv_sec) * 1e9    +
+                      a->it_value.tv_nsec;
+   b->nsec_interval = (uint64_t)(a->it_interval.tv_sec) * 1e9 +
+                      a->it_interval.tv_nsec;
+}
+
+static void dump_timers() {
+   timer_t i;
+
+   printf("dump_timers: expires_next=%u\n", expires_next);
+   i = expires_next;
+
+   while (i != -1) {
+      printf("#%d: at %"PRIu64"  all %"PRIu64" \n",
+             i, timerTable[i].value.nsec_value,
+             timerTable[i].value.nsec_interval);
+      i = timerTable[i].next;
+   }
+}
+/*
+static void internaltimerspec2itimerspec(
+   const struct internalTimerSpec *const a,
+   struct itimerspec *const b) {
+   b->it_value.tv_sec     = a->nsec_value / 1e9;
+   b->it_value.tv_nsec    = a->nsec_value - b->it_value.tv_sec;
+   b->it_interval.tv_sec  = a->nsec_interval / 1e9;
+   b->it_interval.tv_nsec = a->nsec_interval - b->it_value.tv_sec;
+}
+*/
+
+/**
+retrigger the timer for the next relevant value
+
+\returns 0, if timer was retriggered
+\returns 1, if the timer reached its timeout in the meantime
+*/
+static void retrigger_timer() {
+   uint64_t now;
+   uint64_t delta;
+
+   if (timer_set) {  // is there a real timer registered ?
+      if (expires_next != -1) {
+         clock_gettime_nsec(&now);
+
+         if (timerTable[expires_next].value.nsec_value > now) {
+            delta = timerTable[expires_next].value.nsec_value - now;
+//          printf("retrigger timer: %d  delta: %"PRIu64" \n",
+//                 (int)expires_next, delta);
+            (*timer_set)(delta);
+            return;
+         }
+
+//         printf("retrigger was too slow --> resumetimertask\n");
+         resume_timer_task_from_ISR();
+         return;
+      }
+   } else {
+      printf("ERROR no real timer defined\n");
+   }
+}
+
+static void timer_init_if_necessary() {
+   int i = 0;
+
+   if (! tablestate.tableinitialized) {
+      if (timer_set == NULL) {
+         // no timer defined by the user as static object
+         // enforce the FreeRTOS tick based clock
+         selectFreeRTOSClock();
+      }
+
+      unused = 0;
+      expires_next = -1;
+
+      timerTable[0].next = 1;
+      timerTable[0].prev = -1;
+
+      for (i = 1; i < MAXTIMER - 1; i++) {
+         timerTable[i].next = i + 1;
+         timerTable[i].prev = i - 1;
+      }
+
+      timerTable[MAXTIMER - 1].next = -1;
+      timerTable[MAXTIMER - 1].prev = MAXTIMER - 2;
+
+      timer_queue = xQueueCreate(10, 1);
+
+      xTaskCreate(clackerTask,
+                  "ClackerTask", 1000, NULL,
+                  configMAX_PRIORITIES - 1,
+                  &xClackerTaskHandle); //stack 50 war nicht nur schlecht
+
+      tablestate.tableinitialized = 1;
+   }
+}
+
+static timer_t find_free_timer_and_remove_from_free_list() {
+   timer_t i = unused;
+
+   if (i != -1) {
+      // free timer available
+      unused = timerTable[i].next;
+   }
+
+   return i;
+}
+
+static void insert_timer_into_free_list(timer_t t) {
+   timerTable[t].next = unused;
+   unused = t;
+}
+
+static void remove_timer_from_active_list(timer_t t) {
+   // pedandic check if timer is really in active list
+   int i;
+   int timer_found = 0;
+
+   i = expires_next;
+
+   while (i != -1 && timer_found == 0) {
+      if (i == t) {
+         timer_found = 1;
+
+         if (i == expires_next) {
+            // remove first element from list
+            expires_next =  timerTable[i].next;
+         }
+      }
+
+      i = timerTable[i].next;
+   }
+
+   if (timer_found == 0) {
+      // ok: delete non active timer -- nothing more to do
+      return;
+   }
+
+   timerTable[timerTable[t].next].prev = timerTable[t].prev;
+   timerTable[timerTable[t].prev].next = timerTable[t].next;
+}
+
+
+static void insert_timer_into_active_list(timer_t t) {
+   int i = expires_next;
+   int last_i;
+
+   if (expires_next == -1) {
+      // first element in list
+      expires_next = t;
+      timerTable[t].next = -1; // no next element
+      timerTable[t].prev = -1; // no previous element
+   } else {
+      last_i = i;
+
+      while (i >= 0 &&
+             timerTable[t].value.nsec_value >=
+             timerTable[i].value.nsec_value) {
+         last_i = i;
+         i = timerTable[i].next;
+      }
+
+      if (i == -1) {
+         // append to the end
+         timerTable[last_i].next = t;
+         timerTable[t].prev = last_i;
+         timerTable[t].next = -1;
+      } else if (last_i == i) {
+         // insert before first element
+         timerTable[t].next = i;
+         timerTable[t].prev = -1;
+         timerTable[expires_next].prev = t;
+         expires_next = t;
+      } else {
+         // insert between elements last_i and i
+         timerTable[t].next = i;
+         timerTable[t].prev = last_i;
+         timerTable[last_i].next = t;
+         timerTable[i].prev = t;
+      }
+   }
+}
+
+static inline void DMB(void) {
+   asm volatile("dmb" ::: "memory");
+}
+
+
+/*
+checks the value of the given timespec
+
+\returns -1: if ts is illegal (negative values)
+          0: if ts is zero
+          1: if ts is positive
+*/
+static int timerspecOk(const struct timespec * ts) {
+   // test for illegal value
+   if (ts->tv_sec < 0) {
+      return -1;
+   }
+
+   if (ts->tv_nsec < 0) {
+      return -1;
+   }
+
+   if (ts->tv_nsec >= 1000000000) {
+      return -1;
+   }
+
+   // test for zero
+   if (ts->tv_sec == 0 && ts->tv_nsec == 0) {
+      return 0;
+   }
+
+   return 1;
+}
+
+/*
+checks the value of the given itimespec
+
+\returns -1: if ts is illegal (negative values)
+          0: if ts is zero
+          1: if ts is positive
+*/
+static int itimerspecOk(const struct itimerspec * its) {
+   int testValue1;
+   int testValue = timerspecOk(&(its->it_value));
+
+   if (testValue == -1) {
+      return -1;
+   }
+
+   testValue1 = timerspecOk(&(its->it_interval));
+
+   if (testValue1 == -1) {
+      return -1;
+   }
+
+   // both values are ok
+   // the result must be 0, if both are zero
+   //                    1 else
+   // --> just add both and trim into 0/1 by double negation
+   return !!(testValue + testValue1);
+}
+
+void register_timer_source(void (*set)(uint64_t ns),
+                           int (*get)(uint64_t  * ns)) {
+   timer_set = set;
+   set_clock_gettime_cb(get);
+}
+
+int timer_create(clockid_t clock_id,
+                 struct sigevent *__restrict evp,
+                 timer_t *__restrict timerid) {
+   /*[EINVAL] The specified clock ID is not defined.*/
+
+   timer_t firstfree;
+
+   timer_init_if_necessary();
+
+
+   ENTERCRITICAL;
+
+   firstfree = find_free_timer_and_remove_from_free_list();
+
+   if (firstfree < 0) {
+      LEAVECRITICAL;
+      errno = EAGAIN;
+      return -1;
+   }
+
+   *timerid = firstfree;
+   timerTable[firstfree].evp = evp;
+   LEAVECRITICAL;
+
+   return 0;
+}
+
+int timer_delete(timer_t thatindex) {
+
+   timer_init_if_necessary();
+
+   if (thatindex >= MAXTIMER) {
+      errno = EINVAL;
+      return -1;
+   }
+
+   ENTERCRITICAL;
+
+   remove_timer_from_active_list(thatindex);
+   insert_timer_into_free_list(thatindex);
+
+   retrigger_timer();
+
+   LEAVECRITICAL;
+   return 0;
+}
+
+int timer_settime(const timer_t timerid, const int flags,
+                  const struct itimerspec *const value,
+                  struct itimerspec *const ovalue) {
+   uint64_t now;
+
+   timer_init_if_necessary();
+
+   /*
+   printf("timer_settime(tid=%d val=%ld:%ld rept=%ld:%ld\n", (int)timerid,
+                  (long int)value->it_value.tv_sec,
+                  (long int)value->it_value.tv_nsec,
+                  (long int)value->it_interval.tv_sec,
+                  (long int)value->it_interval.tv_nsec);
+   */
+
+   if (timerid > MAXTIMER) {
+      errno = EINVAL;
+      return -1;
+   }
+
+   switch (itimerspecOk(value)) {
+   case -1: // illegal itimerspec value
+      return -1;
+
+   case 0:  // set with time 0 --> kill timer
+//         printf("timer_settime: kill timer %d\n", (int)timerid);
+
+
+      ENTERCRITICAL;
+//printf("settime: remove timer: %d, next = %d\n", timerid, expires_next);
+      remove_timer_from_active_list(timerid);
+//printf("settime1: remove timer: %d, next = %d\n", timerid, expires_next);
+      retrigger_timer();
+      LEAVECRITICAL;
+      break;
+
+   case 1:  // set with time > 0 --> add/modify timer
+      clock_gettime_nsec(&now);
+//         printf("timer_settime: add/modify timer %d\n", (int)timerid);
+      ENTERCRITICAL;
+      itimerspec2internaltimerspec(value, &timerTable[timerid].value);
+      timerTable[timerid].value.nsec_value += now;
+//    printf("internalTimeSpec value %"PRIu64"\n",
+//            timerTable[timerid].value.nsec_value);
+      insert_timer_into_active_list(timerid);
+//dump_timers();
+      retrigger_timer();
+      LEAVECRITICAL;
+      break;
+   }
+
+   return 0; // success
+}
+
+void resume_timer_task_from_ISR() {
+   char dummy = 1;
+
+//printf("clack\n");
+   if (xClackerTaskHandle) {
+      if (!xQueueSendFromISR(timer_queue, &dummy, NULL)) {
+         printf("error at xQuereSendFromISR\n");
+      }
+
+      //xTaskResumeFromISR(xClackerTaskHandle);
+      //The yield is _very_ important for performance
+      portYIELD_FROM_ISR(xClackerTaskHandle);
+   }
+}
+
+static void clackerTask(void *pcParameters) {
+   uint64_t now, timeout;
+   int timerid;
+   char dummy;
+
+   struct Callback {
+      void (*cb)(void *arg_ptr);
+      void *th;
+   }*callback;
+
+   while (1) {
+      //vTaskSuspend(NULL);
+      if (!xQueueReceive(timer_queue, &dummy, portMAX_DELAY)) {
+         printf("error at xQueueReceive\n");
+      }
+
+
+//printf("clackerTask: clack\n");
+//dump_timers();
+      // check, which timers reached their timeout
+
+      clock_gettime_nsec(&now);
+
+      ENTERCRITICAL;
+
+      do {
+         timerid = expires_next;
+
+         if (timerid >= 0) {
+            timeout = timerTable[timerid].value.nsec_value;
+
+//printf("clack: timerid=%d  timeout=%"PRIu64" now= %"PRIu64" \n",
+//          timerid, timeout, now);
+            if (timeout < now) {
+               // timeout reached
+               // --> remove timer from list and
+               // --> reinsert if timer is set periodic
+//printf("timeout reached\n");
+               remove_timer_from_active_list(timerid);
+
+               if (timerTable[timerid].value.nsec_interval) {
+                  timerTable[timerid].value.nsec_value +=
+                     timerTable[timerid].value.nsec_interval;
+//printf("reinserted after interval \n");
+                  insert_timer_into_active_list(timerid);
+//dump_timers();
+               }
+
+               // invoke timer callback method
+               callback = (struct Callback*) timerTable[timerid].evp;
+//            printf("call of callback %p(%p) \n",
+//                     callback->cb, callback->th);
+               callback->cb(callback->th);
+//            printf("callback done \n");
+            }
+         }
+      } while (timerid >= 0 && timeout < now);
+
+      retrigger_timer();
+      LEAVECRITICAL;
+   }
+}
+
+#ifdef TOBEDELETED
 static void nsec_clock_gettime_wait(uint64_t*);
 static int timerarm_wait(int64_t alarm);
 
 void (*nsec_clock_gettime)(uint64_t*) = nsec_clock_gettime_wait;
 int (*timerarm)(int64_t alarm) = timerarm_wait;
 
-struct internaltimerspec{
-	uint64_t nsec_value;
-	uint64_t nsec_interval;
+struct internaltimerspec {
+   uint64_t nsec_value;
+   uint64_t nsec_interval;
 };
 
-struct tableentry{
-	timer_t				next;
-	timer_t				prev;
-	struct sigevent *__restrict evp;	//actually a pointer callback and its argument.
-	struct internaltimerspec	value;
+struct tableentry {
+   timer_t next;
+   timer_t prev;
+   struct sigevent *__restrict evp;	//actually a pointer callback
+   // and its argument.
+   struct internaltimerspec value;
 };
 
 //list entry points
-static volatile timer_t firstfree=0;
-static volatile timer_t firstactive=0;
-static volatile timer_t firstunsorted=0;
-static volatile timer_t lastunsorted=0;//fifo, to not starve low frequency jobs
+static volatile timer_t firstfree = 0;
+static volatile timer_t firstactive = 0;
+static volatile timer_t firstunsorted = 0;
+static volatile timer_t lastunsorted = 0; //fifo, to not starve
+// low frequency jobs
 
-static struct{
-	unsigned full:1;
-	unsigned active:1;
-	unsigned unsorted:1;
-	unsigned tableinitialized:1;
-	unsigned sorttaskreset:1;
-}tablestate = {0};
 
-//effectively 3 disjunct lists in the same table. others are dangling.
-//due to delete being applicable to any list all of them need to be bidirected
-//lists are terminated at both ends by next == index or prev == index
-//that way it is possible to put a timer between a single timer.
-static struct tableentry table[(timer_t)MAXTIMER];//endof range is special and marks the end of things
+// effectively 3 disjunct lists in the same table. others are dangling.
+// due to delete being applicable to any list all of them need to be bidirected
+// lists are terminated at both ends by next == index or prev == index
+// that way it is possible to put a timer between a single timer.
 
-static void nsec_clock_gettime_wait(uint64_t *alarm){
-	while(*nsec_clock_gettime == &nsec_clock_gettime_wait)
-		DMB();
-	nsec_clock_gettime(alarm);
+//endof range is special and marks the end of things
+static struct tableentry table[(timer_t)MAXTIMER];
+
+static void nsec_clock_gettime_wait(uint64_t *alarm) {
+   while (*nsec_clock_gettime == &nsec_clock_gettime_wait) {
+      DMB();
+   }
+
+   nsec_clock_gettime(alarm);
 }
 
-static int timerarm_wait(int64_t alarm){
-	while(*timerarm == &timerarm_wait)
-		DMB();
-	return (*timerarm)(alarm);
+static int timerarm_wait(int64_t alarm) {
+   while (*timerarm == &timerarm_wait) {
+      DMB();
+   }
+
+   return (*timerarm)(alarm);
 }
 
-void TimerResumeClackerFromISR(){
-	if(xClackerTaskHandle){
-		xTaskResumeFromISR(xClackerTaskHandle);
-		//The yield is _very_ important for performance
-		portYIELD_FROM_ISR(xClackerTaskHandle);
-	}
+void TimerResumeClackerFromISR() {
+   if (xClackerTaskHandle) {
+      xTaskResumeFromISR(xClackerTaskHandle);
+      //The yield is _very_ important for performance
+      portYIELD_FROM_ISR(xClackerTaskHandle);
+   }
 }
 
-static void timer_init(){
-	int i=0;
-	table[0].prev=0;
-	table[0].next=1;
-	for(i=1;i<MAXTIMER;i++){
-		table[i].next=i+1;
-		table[i].prev=i-1;
-	}
-	table[MAXTIMER-1].next=MAXTIMER-1;
-	xTaskCreate(TaskTimerSort,"SortTask",50,NULL,configMAX_PRIORITIES-2,&xTimerSortTaskHandle);
-	xTaskCreate(TaskClacker,"ClackerTask",200,NULL,configMAX_PRIORITIES-1,&xClackerTaskHandle);//stack 50 war nicht nur schlecht
-	tablestate.tableinitialized=1;
+static void timer_init() {
+   int i = 0;
+   table[0].prev = 0;
+   table[0].next = 1;
+
+   for (i = 1; i < MAXTIMER; i++) {
+      table[i].next = i + 1;
+      table[i].prev = i - 1;
+   }
+
+   table[MAXTIMER - 1].next = MAXTIMER - 1;
+   xTaskCreate(TaskTimerSort,
+               "SortTask", 50, NULL,
+               configMAX_PRIORITIES - 2,
+               &xTimerSortTaskHandle);
+   xTaskCreate(TaskClacker,
+               "ClackerTask", 200, NULL,
+               configMAX_PRIORITIES - 1,
+               &xClackerTaskHandle); //stack 50 war nicht nur schlecht
+   tablestate.tableinitialized = 1;
 }
 
-static void itimerspectointernaltimerspec(const struct itimerspec			*const a,
-												struct internaltimerspec	*const b){
-	b->nsec_value    = (uint64_t)a->it_value.tv_sec*1e9    + a->it_value.tv_nsec;
-	b->nsec_interval = (uint64_t)a->it_interval.tv_sec*1e9 + a->it_interval.tv_nsec;
-}
-
-static void internaltimerspectoitimerspec(const struct internaltimerspec	*const a,
-												struct itimerspec			*const b){
-	b->it_value.tv_sec     = a->nsec_value/1e9;
-	b->it_value.tv_nsec    = a->nsec_value - b->it_value.tv_sec;
-	b->it_interval.tv_sec  = a->nsec_interval/1e9;
-	b->it_interval.tv_nsec = a->nsec_interval - b->it_value.tv_sec;
-}
-
-static int checktimerspec(const struct timespec * ts){
-	if(ts->tv_sec<0)
-		return -1;
-	if(ts->tv_nsec<0)
-		return -1;
-	if(ts->tv_nsec>=1000000000)
-		return -1;
-	return 0;
-}
-
-static int checkitimerspec(const struct itimerspec * its){
-	if(checktimerspec(&its->it_value)==-1)
-		return -1;
-	if(checktimerspec(&its->it_interval)==-1)
-		return -1;
-	return 0;
-}
 
 typedef void critical;//just a reminder, not an actual type
-static critical dangle(const timer_t thatindex){
-	struct tableentry * const that = &table[thatindex];
-	//the free list is handled by the timer_create/delete pair
-	if(thatindex == lastunsorted)
-		lastunsorted = that->prev;
-	if(thatindex == firstunsorted)
-		firstunsorted = that->next;
-	if(thatindex == firstactive)
-		firstactive = that->next;
+static critical dangle(const timer_t thatindex) {
+   struct tableentry * const that = &table[thatindex];
 
-	if(that->next == that->prev){
-		if(thatindex == firstactive)
-			tablestate.active = 0;
-		if(thatindex == firstunsorted)
-			tablestate.unsorted = 0;
-	}
-	that->next = that->prev = thatindex;
-	tablestate.sorttaskreset=1;
+   //the free list is handled by the timer_create/delete pair
+   if (thatindex == lastunsorted) {
+      lastunsorted = that->prev;
+   }
+
+   if (thatindex == firstunsorted) {
+      firstunsorted = that->next;
+   }
+
+   if (thatindex == firstactive) {
+      firstactive = that->next;
+   }
+
+   if (that->next == that->prev) {
+      if (thatindex == firstactive) {
+         tablestate.active = 0;
+      }
+
+      if (thatindex == firstunsorted) {
+         tablestate.unsorted = 0;
+      }
+   }
+
+   that->next = that->prev = thatindex;
+   tablestate.sorttaskreset = 1;
 }
 
 /*the timer must be dangling already*/
-static critical putfirstunsorted(const timer_t thatindex){
-	struct tableentry *const that = &table[thatindex];
-	if(!tablestate.unsorted)
-		firstunsorted = lastunsorted = thatindex;
-	that->next = firstunsorted;
-	table[that->next].prev = thatindex;
-	firstunsorted = thatindex;
-	tablestate.unsorted=1;
+static critical putfirstunsorted(const timer_t thatindex) {
+   struct tableentry *const that = &table[thatindex];
+
+   if (!tablestate.unsorted) {
+      firstunsorted = lastunsorted = thatindex;
+   }
+
+   that->next = firstunsorted;
+   table[that->next].prev = thatindex;
+   firstunsorted = thatindex;
+   tablestate.unsorted = 1;
 }
 
-int timer_create(clockid_t clock_id, struct sigevent *__restrict evp, timer_t *__restrict timerid){
-	/*[EINVAL] The specified clock ID is not defined.*/
-	if(!tablestate.tableinitialized)
-		timer_init();
-	ENTERCRITICAL;
-	if(tablestate.full){
-		LEAVECRITICAL;
-		errno = EAGAIN;
-		return -1;
-	}
-	*timerid = firstfree;
-	struct tableentry *const that = &table[firstfree];
-	if(that->next == firstfree)
-		tablestate.full = 1;
-	firstfree = that->next;
-	that->evp=evp;
-	//dangle the timer, this is the first timer in a list
-	table[that->next].prev = that->next;
-	that->next=*timerid;
-	that->prev=*timerid;
-	LEAVECRITICAL;
-	return 0;
+int timer_create(clockid_t clock_id,
+                 struct sigevent *__restrict evp,
+                 timer_t *__restrict timerid) {
+   /*[EINVAL] The specified clock ID is not defined.*/
+   if (!tablestate.tableinitialized) {
+      timer_init();
+   }
+
+   ENTERCRITICAL;
+
+   if (tablestate.full) {
+      LEAVECRITICAL;
+      errno = EAGAIN;
+      return -1;
+   }
+
+   *timerid = firstfree;
+   struct tableentry *const that = &table[firstfree];
+
+   if (that->next == firstfree) {
+      tablestate.full = 1;
+   }
+
+   firstfree = that->next;
+   that->evp = evp;
+   //dangle the timer, this is the first timer in a list
+   table[that->next].prev = that->next;
+   that->next = *timerid;
+   that->prev = *timerid;
+   LEAVECRITICAL;
+   return 0;
 }
 
 int timer_settime(const timer_t timerid, const int flags,
-       const struct itimerspec *const value,
-       struct itimerspec *const ovalue){
-	struct tableentry *const that = &table[timerid];
-	uint64_t nsectimestamp;
-	nsec_clock_gettime(&nsectimestamp);
+                  const struct itimerspec *const value,
+                  struct itimerspec *const ovalue) {
+   struct tableentry *const that = &table[timerid];
+   uint64_t nsectimestamp;
 
-	if(timerid>MAXTIMER){
-		errno = EINVAL; return -1;}
-	if(checkitimerspec(value)==-1){
-		errno = EINVAL; return -1;}
+   nsec_clock_gettime(&nsectimestamp);
+//printf("timer_settime(tid=%d val=%ld:%ld rept=%ld:%ld\n", timerid,
+   value->it_value.tv_sec, value->it_value.tv_nsec,
+         value->it_interval.tv_sec, value->it_interval.tv_nsec);
 
-	struct internaltimerspec loadvalue,ovalprep;
-	itimerspectointernaltimerspec(value, &loadvalue);
-
-	if(!loadvalue.nsec_value)
-		loadvalue.nsec_value = loadvalue.nsec_interval;
-	if(flags!=TIMER_ABSTIME&&loadvalue.nsec_value)
-		loadvalue.nsec_value+=nsectimestamp;
-	ENTERCRITICAL;
-	ovalprep = that->value;
-	that->value = loadvalue;
-	dangle(timerid);
-	if(loadvalue.nsec_value)
-		putfirstunsorted(timerid);
-	LEAVECRITICAL;
-
-	if(ovalue){
-		ovalprep.nsec_value -=nsectimestamp;
-		internaltimerspectoitimerspec(&ovalprep,ovalue);
-	}
-	if(xTimerSortTaskHandle)
-		vTaskResume(xTimerSortTaskHandle);
-	return 0;
+   if (timerid > MAXTIMER) {
+   errno = EINVAL;
+   return -1;
 }
 
-int timer_delete(timer_t thatindex){
-	if(thatindex>=MAXTIMER){
-		errno = EINVAL;
-		return -1;
-	}
-	ENTERCRITICAL;
-	struct tableentry *const that = &table[thatindex];
-	dangle(thatindex);
-	//fixup free list: put the freed timer as the first free of the chain of free timers
-	if(!tablestate.full)
-		that->next = firstfree;
-	firstfree = thatindex;
-	table[that->next].prev = thatindex;
-	tablestate.full=0;
-	that->value.nsec_value = that->value.nsec_interval =0;
-	LEAVECRITICAL;
-	return 0;
+if (checkitimerspec(value) == -1) {
+      errno = EINVAL;
+      return -1;
+   }
+
+   struct internaltimerspec loadvalue, ovalprep;
+
+   itimerspectointernaltimerspec(value, &loadvalue);
+
+   if (!loadvalue.nsec_value) {
+   loadvalue.nsec_value = loadvalue.nsec_interval;
 }
 
-int timer_gettime(timer_t timerid, struct itimerspec *value){
-	if(timerid>MAXTIMER){
-		errno = EINVAL;
-		return -1;
-	}
-	uint64_t nsectimestamp;
-	(*nsec_clock_gettime)(&nsectimestamp);
-
-	struct internaltimerspec valprep;
-
-	ENTERCRITICAL;
-	valprep = table[timerid].value;
-	LEAVECRITICAL;
-
-	valprep.nsec_value -=nsectimestamp;
-	internaltimerspectoitimerspec(&valprep,value);
-	return 0;
+if (flags != TIMER_ABSTIME && loadvalue.nsec_value) {
+   loadvalue.nsec_value += nsectimestamp;
 }
 
-int timer_getoverrun(timer_t timerid){
-	errno = ENOTSUP;
-	return -1;
+ENTERCRITICAL;
+ovalprep = that->value;
+that->value = loadvalue;
+dangle(timerid);
+
+if (loadvalue.nsec_value) {
+   putfirstunsorted(timerid);
+   }
+
+   LEAVECRITICAL;
+
+   if (ovalue) {
+   ovalprep.nsec_value -= nsectimestamp;
+   internaltimerspectoitimerspec(&ovalprep, ovalue);
+   }
+
+   if (xTimerSortTaskHandle) {
+   vTaskResume(xTimerSortTaskHandle);
+   }
+
+   return 0;
 }
 
-static void TaskTimerSort(void *pcParameters){
-	timer_t timindex;
-	timindex = firstactive;
-	/*Nested functions are a non-standard GCC extension
-	 * just cut and paste if it is an issue */
-	void timer_put(	timer_t previndex,
-							const timer_t nextindex){
-		struct tableentry *const prev = &table[previndex];
-		struct tableentry *const next = &table[nextindex];
+int timer_delete(timer_t thatindex) {
+   if (thatindex >= MAXTIMER) {
+      errno = EINVAL;
+      return -1;
+   }
 
-		ENTERCRITICAL;
-		struct tableentry *const that = &table[lastunsorted];
-		const unsigned int thatindex = lastunsorted;
-		if(tablestate.sorttaskreset){
-			LEAVECRITICAL;return;}
-		if(!tablestate.unsorted){
-			LEAVECRITICAL;return;}
-		if(!tablestate.active){
-			if(!(thatindex==previndex&&previndex==nextindex)){
-			LEAVECRITICAL;return;}}
-		if(!(prev->value.nsec_value <= that->value.nsec_value)){
-			LEAVECRITICAL;return;}
-		if(!(next->value.nsec_value >= that->value.nsec_value)){
-			LEAVECRITICAL;return;}
-		if(prev->prev == previndex)
-			firstactive = previndex;
-		if(that->next == that->prev)//lastunsorted == firstunsorted
-			tablestate.unsorted = 0;
-		lastunsorted = that->prev;
-		table[that->prev].next = that->prev;
-		table[previndex].next = thatindex;
-		table[nextindex].prev = thatindex;
-		that->prev=previndex;
-		that->next=nextindex;
-		tablestate.active = 1;
-		LEAVECRITICAL;
-		vTaskResume(xClackerTaskHandle);
-	}
-	for(;;){
-		TTSBegin://used to match flow diagram
-		tablestate.sorttaskreset=0;
-		timindex = firstactive;
-		if(tablestate.unsorted){
-			if(!tablestate.active){
-				timer_put(lastunsorted,lastunsorted);
-				goto TTSBegin;}
-			if(table[lastunsorted].value.nsec_value < table[firstactive].value.nsec_value){
-				timer_put(lastunsorted, firstactive);
-				goto TTSBegin;}
-		}
-		while(tablestate.unsorted){
-			timindex = table[timindex].next;
-			if(table[lastunsorted].value.nsec_value < table[timindex].value.nsec_value){
-				timer_put(table[timindex].prev, timindex);
-				goto TTSBegin;}
-			if(table[timindex].next == timindex){ //end of active list
-				timer_put(timindex,lastunsorted);
-				goto TTSBegin;}
-			if(!(table[timindex].next < MAXTIMER)) {
-	printf("serious fault in  TaskTimerSort\n");
-				for(;;)//this is a serious fault and should never happen
-					vTaskSuspend(NULL);
-                        }
-		}
-	printf("TaskTimerSort supend\n");
-		vTaskSuspend(NULL);
-	printf("TaskTimerSort resumed\n");
-	}
+   ENTERCRITICAL;
+   struct tableentry *const that = &table[thatindex];
+   dangle(thatindex);
+
+   //fixup free list:
+   //  put the freed timer as the first free of the chain of free timers
+   if (!tablestate.full) {
+      that->next = firstfree;
+   }
+
+   firstfree = thatindex;
+   table[that->next].prev = thatindex;
+   tablestate.full = 0;
+   that->value.nsec_value = that->value.nsec_interval = 0;
+   LEAVECRITICAL;
+   return 0;
 }
 
-static void TaskClacker(void *pcParameters){
-	static uint64_t timestamp=0;
-	void activateEntry(){
-		ENTERCRITICAL;
-		struct tableentry * const that = &table[firstactive];
-		struct { void (*cb)(void *arg_ptr);
-				 void *th;
-				}*callback = (void *)(that->evp);
-		const unsigned int thatindex = firstactive;
+int timer_gettime(timer_t timerid, struct itimerspec *value) {
+   if (timerid > MAXTIMER) {
+      errno = EINVAL;
+      return -1;
+   }
 
-		if(!(that->value.nsec_value < timestamp)){
-			LEAVECRITICAL;return;}
-		if(that->next == thatindex)
-			tablestate.active = 0;
-		firstactive = that->next;
-		table[that->next].prev = that->next;
-		//dangle
-		that->prev = that->next = thatindex;
-		//timer reload
-		if(that->value.nsec_interval){
-			that->value.nsec_value += that->value.nsec_interval;
-			if(that->value.nsec_value<timestamp)
-				that->value.nsec_value = that->value.nsec_interval + timestamp;
-			putfirstunsorted(thatindex);
-		}
-		else
-			that->value.nsec_value = 0;
-		tablestate.sorttaskreset = 1;
-		LEAVECRITICAL;
+   uint64_t nsectimestamp;
+   (*nsec_clock_gettime)(&nsectimestamp);
 
-		/*callback->cb(callback->th); can be used instead of a FreeRTOS Task,
-		 *  if locking the clacker is acceptable
-		 *  Careful with nested Tasks! containing function must not exit!*/
-		void StarterTask(void *pcParameters){
-			struct {
-						  void (*cb)(void *arg_ptr);
-						  void *th;
-				}*callback = pcParameters;
-printf("StarterTask: do callback\n");
-			callback->cb(callback->th);
-			vTaskDelete(NULL);
-		}
-		xTaskCreate(StarterTask,"StarterTask",configTIMER_TASK_STACK_DEPTH,callback,configMAX_PRIORITIES-3,NULL);
-		if(tablestate.sorttaskreset)
-			vTaskResume(xTimerSortTaskHandle);
-	}
+   struct internaltimerspec valprep;
 
-	for(;;){
-		if(tablestate.active)
-			do{//the double while reduces the gettime calls
-				while((table[firstactive].value.nsec_value < timestamp) && tablestate.active)
-					activateEntry();
-				(*nsec_clock_gettime)(&timestamp);
-			}while((table[firstactive].value.nsec_value < timestamp) && tablestate.active);
-		if(tablestate.active){//no harm in being called early
-			int fail=0;
-			do{
-				ENTERCRITICAL;
-				fail = (*timerarm)(table[firstactive].value.nsec_value-timestamp);
-				LEAVECRITICAL;
-				(*nsec_clock_gettime)(&timestamp);
-			}while(fail<0);
-			if(table[firstactive].value.nsec_value > timestamp) {
-printf("TaskClacker suspend at 1\n");
-				vTaskSuspend(NULL);
-printf("TaskClacker resumed at 1\n");
-                        }
-		}
-		else {
-printf("TaskClacker suspend at 2\n");
-			vTaskSuspend(NULL);
-printf("TaskClacker resumed at 2\n");
-                }
-	}
+   ENTERCRITICAL;
+   valprep = table[timerid].value;
+   LEAVECRITICAL;
+
+   valprep.nsec_value -= nsectimestamp;
+   internaltimerspectoitimerspec(&valprep, value);
+   return 0;
 }
 
-/*This is not correct. For example it doesn't recognize that a list may be 1 long.
-Still it proved useful. Don't take its results as canon!
-void timer_table_check_dbg(){
-	ENTERCRITICAL;
-	unsigned int dangling =0;
-	unsigned int active = 0;
-	unsigned int unsorted = 0;
-	unsigned int free = 0;
-	uint64_t tstamp;
-	int error = 0;
-	int i=0;
-	nsec_clock_gettime(&tstamp);
-	printf("checking table...\n");
-	printf("time now is %" PRIu64 "\n",tstamp);
-	for(i=0;i<MAXTIMER;i++){
-		if(table[i].next == table[i].prev)
-			dangling++;
-	}
-	if(tablestate.active){
-		printf("table is active. next activation %" PRIu64 "\n",table[firstactive].value.nsec_value);
-		printf("in %" PRIu64 "ns\n", tstamp - table[firstactive].value.nsec_value);
-		printf("in s:%"PRIu64 "\n", (tstamp - table[firstactive].value.nsec_value)/((uint64_t)1e9));
-		active++;
-		i=firstactive;
-		if(table[i].prev != i){
-			printf("Front of active is not terminated\n");
-			error++;
-		}
-		while(table[i].next != i){
-			i=table[i].next;
-			active++;
-			if(i == MAXTIMER){
-				printf("End of active unterminated\n");
-				error++;
-				break;
-			}
-		}
-	}
-	if(tablestate.unsorted){
-		printf("table not sorted\n");
-		unsorted++;
-		i=firstunsorted;
-		if(table[i].prev != i){
-			printf("Front of unsorted is not terminated\n");
-		}
-		while((table[i].next) != i && (i < MAXTIMER)){
-			i=table[i].next;
-			unsorted++;
-			if(i == MAXTIMER){
-				printf("End of unsorted unterminated\n");
-				error++;
-				break;
-			}
-			if(i != lastunsorted){
-				printf("lastunsorted does not match end of unsorted");
-			}
-		}
-	}
-	if(!tablestate.full){
-		printf("table not full\n");
-		free++;
-		i=firstfree;
-		if(table[i].prev != i){
-			printf("Front of free is not terminated\n");
-		}
-		while((table[i].next) != i && (i < MAXTIMER)){
-			i=table[i].next;
-			unsorted++;
-			if(i == MAXTIMER){
-				printf("End of free unterminated\n");
-				error++;
-				break;
-			}
-		}
-	}
-
-	if((dangling + unsorted + active + free) != MAXTIMER){
-		printf("table size %i does not match number of entries %u\n",MAXTIMER,
-				(dangling + unsorted + active + free));
-		error++;
-	}
-	printf("dangling: %u \n",dangling);
-	printf("active:   %u \n", active);
-	printf("unsorted: %u\n", unsorted);
-	printf("free:     %u\n", free);
-
-	LEAVECRITICAL;
-	if(error)
-		printf("errors found\n");
-	else
-		printf("No errors found in table\n");
+int timer_getoverrun(timer_t timerid) {
+   errno = ENOTSUP;
+   return -1;
 }
+
+
+/*
 */
+
+#endif

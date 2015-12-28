@@ -48,7 +48,6 @@ namespace pearlrt {
    }
 
    void UserDation::internalDationClose(const int p) {
-      Fixed<31>* intRst = NULL;
 
       assertOpen();
 

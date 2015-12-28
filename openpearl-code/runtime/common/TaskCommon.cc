@@ -92,11 +92,12 @@ namespace pearlrt {
       if (cccc > 1) {
          Log::error("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
       }
-/*
-      else {
-         Log::debug("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
-      }
-*/
+
+      /*
+            else {
+               Log::debug("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
+            }
+      */
       mutexTasks.release();
    }
 
@@ -269,7 +270,7 @@ namespace pearlrt {
          throw theTaskRunningSignal;
       } else {
          Log::debug("task %s: activate %s with prio %d",
-                   me->getName(), name, p.x);
+                    me->getName(), name, p.x);
          currentPrio = p;
 
          // kill scheduled activate

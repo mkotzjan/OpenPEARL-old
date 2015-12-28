@@ -223,7 +223,7 @@ void addToSysIncList(char * fileName) {
     }
 }
 
-#define DEFINEENTRIES	500
+#define DEFINEENTRIES	1000
 static struct DefineList{
      int nbr;
      char defName[DEFINEENTRIES][60];
@@ -395,6 +395,12 @@ void doInclude(char * fileName) {
                      fileStack.stack[fileStack.sp].fn, 
                      fileStack.stack[fileStack.sp].line,
                      fileName);
+           while (fileStack.sp) {
+             fprintf(stderr,"   called from %s:%d\n",
+                 fileStack.stack[fileStack.sp].fn,
+                 fileStack.stack[fileStack.sp].line);
+             fileStack.sp--;
+           }
      _exit(1);
   } 
   fileStack.sp++;
