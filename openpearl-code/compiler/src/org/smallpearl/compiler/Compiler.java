@@ -40,9 +40,10 @@ import java.util.List;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.6";
+    static String version = "v0.6.1";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -62,6 +63,7 @@ public class Compiler {
     static boolean lineSeparatorHasToBeModified = true;
     static boolean dumpDFA = false;
     static boolean dumpSymbolTable = true;
+    static boolean dumpConstantPool = true;
     static boolean debug = false;
     static boolean debugSTG=false;
     static boolean stacktrace=false;
@@ -72,7 +74,7 @@ public class Compiler {
     static int     lineWidth = 80;
 
     public static void main(String[] args) throws Exception {
-        int i;
+        int i, j;
         if (args.length < 1) {
             printHelp();
             return;
@@ -133,6 +135,9 @@ public class Compiler {
                 BuildSymbolTableVisitor buildSymbolTableVisitor = new BuildSymbolTableVisitor(verbose);
                 buildSymbolTableVisitor.visit(tree);
 
+                ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose,debug);
+                constantPoolVisitor.visit(tree);
+
                 ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug);
                 expressionTypeVisitor.visit(tree);
 
@@ -166,6 +171,11 @@ public class Compiler {
                     System.out.println(symtab);
                     symtab.getGlobalsDeclarations();
                 }
+
+                if (dumpConstantPool) {
+                    constantPoolVisitor.dump();
+                }
+
             }
 
             noOfErrors = parser.getNumberOfSyntaxErrors();
@@ -197,6 +207,7 @@ public class Compiler {
                 "                              of the Abtract Syntax Tree            \n" +
                 "  --dumpDFA                   Print DFA                             \n" +
                 "  --dumpSymbolTable           Print the symboltable                 \n" +
+                "  --dumpConstantPool          Print the constant pool               \n" +
                 "  --debug                     Generate debug information            \n" +
                 "  --debugSTG                  Start the stg debug gui               \n" +
                 "  --stacktrace                Print stacktrace in case of an        \n" +
@@ -246,6 +257,8 @@ public class Compiler {
                 dumpDFA = true;
             } else if (arg.equals("--dumpSymbolTable")) {
                 dumpSymbolTable = true;
+            } else if (arg.equals("--dumpConstantPool")) {
+                dumpConstantPool = true;
             } else if (arg.equals("--debug")) {
                 debug = true;
             } else if (arg.equals("--debugSTG")) {

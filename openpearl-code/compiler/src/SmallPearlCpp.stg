@@ -31,13 +31,20 @@ group smallpearl;
 
 /****************************************************************************/
 
-Prologue(src,headerfiles,namespaces,taskSpecifierList) ::= <<
+Prologue(src,headerfiles,namespaces,taskSpecifierList,ConstantPoolList) ::= <<
 #include \<PearlIncludes.h>
 
 const char* filename = (char*) "<src>";
 
 <if(headerfiles)> <headerfiles:headerfile(); separator="\n"> <endif>
 <if(namespaces)> <namespaces:using_namespace(); separator="\n"> <endif>
+
+<if(ConstantPoolList)>
+/////////////////////////////////////////////////////////////////////////////
+// CONSTANT POOL
+/////////////////////////////////////////////////////////////////////////////
+<ConstantPoolList>
+<endif>
 
 <if(taskSpecifierList)>
 /////////////////////////////////////////////////////////////////////////////
@@ -98,14 +105,18 @@ SystemPart(cpp_inlines) ::= <<
 
 /*********************** TASKSPECIFIERS ***********************/
 
-taskSpecifierList(taskSpecifiers) ::= <<
-<taskSpecifiers: {task|
-SPCTASK(_<task>);
-}>
->>
-
 TaskSpecifier(taskname) ::= <<
 <taskname: {task|SPCTASK(_<task>);}; separator="\n">
+>>
+
+/*********************** CONSTANT POOL ***********************/
+
+ConstantPoolList(constants) ::= <<
+<constants: {constant|<constant>}; separator="\n">
+>>
+
+ConstantPoolEntry(name,type,precision) ::= <<
+static const pearlrt::<type>\<<precision>\>         <name>(<precision>);
 >>
 
 /*********************** GLOBAL DECLARATIONS ***********************/

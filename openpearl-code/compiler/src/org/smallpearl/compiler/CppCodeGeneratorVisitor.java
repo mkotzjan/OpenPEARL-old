@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
+import sun.reflect.ConstantPool;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -98,8 +99,25 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         taskspec.add("taskname", t);
         prologue.add("taskSpecifierList", taskspec);
+        prologue.add("ConstantPoolList", generateConstantPool());
 
         return prologue;
+    }
+
+    private ST generateConstantPool() {
+        ST pool = group.getInstanceOf("ConstantPoolList");
+
+        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
+            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFixedValue ) {
+                ST entry = group.getInstanceOf("ConstantPoolEntry");
+                entry.add("name", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).toString());
+                entry.add("type", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getBaseType());
+                entry.add("precision", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getPrecision());
+                pool.add("constants", entry);
+            }
+        }
+
+        return pool;
     }
 
     private Double getDuration(SmallPearlParser.DurationConstantContext ctx) {
