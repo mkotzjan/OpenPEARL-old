@@ -20,30 +20,30 @@ config LPC1768_tests
         with hardware and toolchain.
 	Usually select this.
 
-choice
-depends on LPC1768
-   prompt  "Select System Timer"
-    default LPC1768_FreeRTOSSystemTimer
-    help
-    Exactly one timer solution must be selected for the timed tasking
-    operations.
-
- config LPC1768_FreeRTOSSystemTimer 
-     bool "SystemTimer1MS"
-     help 
-     The system time is based on a 1ms timer. This limits the precision
-     of delay to this time increment.
-
-
- config LPC1768_FreeRTOSHRTimer 
-     bool "HR-Timer (experimental)"
-     help
-     The system time is based on a high precision timer, whos operation
-     is updated on each new timer request in the system.
-     This should leed to delay opertation on a time base of 1us.
-     Currently this feature does not work properly.
-
-endchoice
+#choice
+#depends on LPC1768
+#   prompt  "Select System Timer"
+#    default LPC1768_FreeRTOSSystemTimer
+#    help
+#    Exactly one timer solution must be selected for the timed tasking
+#    operations.
+#
+# config LPC1768_FreeRTOSSystemTimer 
+#     bool "SystemTimer1MS"
+#     help 
+#     The system time is based on a 1ms timer. This limits the precision
+#     of delay to this time increment.
+#
+#
+# config LPC1768_FreeRTOSHRTimer 
+#     bool "HR-Timer (experimental)"
+#     help
+#     The system time is based on a high precision timer, whos operation
+#     is updated on each new timer request in the system.
+#     This should leed to delay opertation on a time base of 1us.
+#     Currently this feature does not work properly.
+#
+#endchoice
 
 
 menu "Drivers"
