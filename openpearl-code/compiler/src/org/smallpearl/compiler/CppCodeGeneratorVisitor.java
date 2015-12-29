@@ -113,6 +113,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 entry.add("name", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).toString());
                 entry.add("type", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getBaseType());
                 entry.add("precision", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getPrecision());
+                entry.add("value", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getValue());
                 pool.add("constants", entry);
             }
         }
@@ -1278,7 +1279,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST literal = group.getInstanceOf("literal");
 
         if (ctx.IntegerConstant() != null) {
-            literal.add("integer", ctx.IntegerConstant().getText());
+            try {
+                Integer value = Integer.parseInt(ctx.IntegerConstant().toString());
+                ConstantFixedValue fixed_value = new ConstantFixedValue(value);
+                literal.add("integer", fixed_value);
+            } catch (NumberFormatException ex) {
+                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().getText();
 
@@ -3072,8 +3081,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if ( fromType != null && toType != null) {
             rangePrecision = Math.max(((TypeFixed)fromType).getPrecision(), ((TypeFixed)toType).getPrecision());
-            st.add("fromPrecision",((TypeFixed)fromType).getPrecision());
-            st.add("toPrecision",((TypeFixed)toType).getPrecision());
+            st.add("fromPrecision",rangePrecision);
+            st.add("toPrecision",rangePrecision);
         }
         else if ( fromType != null && toType == null) {
             rangePrecision = ((TypeFixed)fromType).getPrecision();

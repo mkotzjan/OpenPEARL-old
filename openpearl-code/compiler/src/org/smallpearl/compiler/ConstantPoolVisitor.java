@@ -57,6 +57,11 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
         }
 
         m_properties = new ParseTreeProperty<TypeDefinition>();
+
+        // Add commonly used constants:
+        add(new ConstantFixedValue(0));
+        add(new ConstantFixedValue(1));
+        add(new ConstantFixedValue(-1));
     }
 
     private Void add(ConstantValue value) {

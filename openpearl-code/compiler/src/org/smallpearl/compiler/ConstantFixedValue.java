@@ -66,7 +66,7 @@ public class ConstantFixedValue extends ConstantValue {
         if ( m_value < 0 ) {
             name += "_NEG";
         }
-        else {
+        else if ( m_value > 0 ) {
             name += "_POS";
         }
 

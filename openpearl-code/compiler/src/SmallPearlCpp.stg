@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2012-2014 Marcel Schaible
+ Copyright (c) 2012-2016 Marcel Schaible
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -115,8 +115,8 @@ ConstantPoolList(constants) ::= <<
 <constants: {constant|<constant>}; separator="\n">
 >>
 
-ConstantPoolEntry(name,type,precision) ::= <<
-static const pearlrt::<type>\<<precision>\>         <name>(<precision>);
+ConstantPoolEntry(name,type,precision,value) ::= <<
+static const pearlrt::<type>\<<precision>\>         <name>(<value>);
 >>
 
 /*********************** GLOBAL DECLARATIONS ***********************/
@@ -1153,35 +1153,41 @@ user_label(name) ::= <%
 LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,while_cond,body,label_end) ::= <<
 {
     <if(from)>
-    pearlrt::Fixed\<<fromPrecision>\> a_value =  (pearlrt::Fixed\<<fromPrecision>\>) <from>;
+    pearlrt::Fixed\<<fromPrecision>\> a_value;
+    a_value = <from>;
     <else>
-    pearlrt::Fixed\<<fromPrecision>\> a_value = (pearlrt::Fixed\<<fromPrecision>\>)(1);
+    pearlrt::Fixed\<15> a_value(1);
     <endif>
 
     <if(to)>
-    pearlrt::Fixed\<<toPrecision>\> e_value =  (pearlrt::Fixed\<<toPrecision>\>) <to>;
+    pearlrt::Fixed\<<toPrecision>\> e_value;
+    e_value = <to>;
     <endif>
 
     <if(by)>
-    pearlrt::Fixed\<<byPrecision>\> s_value =  (pearlrt::Fixed\<<byPrecision>\>) <by>;
+    pearlrt::Fixed\<<byPrecision>\> s_value;
+    s_value = <by>;
     <else>
-    pearlrt::Fixed\<<byPrecision>\> s_value = (pearlrt::Fixed\<<byPrecision>\>)(1);
+    pearlrt::Fixed\<15> s_value(1);
     <endif>
 
     <if(variable)>
-    pearlrt::Fixed\<<rangePrecision>\> <user_variable(variable)> = a_value;
+    pearlrt::Fixed\<<rangePrecision>\> <user_variable(variable)>;
+    <user_variable(variable)> = a_value;
     <endif>
 
     <if(to)>
-        while ( ( s_value > 0 && a_value \<= e_value) ||
-              ( s_value \< 0 && a_value >= e_value) )
+        while ((((s_value > CONSTANT_FIXED_0_1).getBoolean()) &&
+                ((a_value \<= e_value).getBoolean())) ||
+                (((s_value \< CONSTANT_FIXED_0_1).getBoolean()) &&
+                ((a_value >= e_value).getBoolean())))
         {<\n>
             <if(variable)>
             <user_variable(variable)> = a_value;
             <endif>
 
             <if(while_cond)>
-            if (!(<while_cond>))
+            if (!(<while_cond>).getBoolean())
                 break;
             <endif>
 
@@ -1189,8 +1195,10 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
 
             me->setLocation(<srcLine>, filename);
 
-            if ( (s_value > 0) && (a_value \<= e_value - s_value) ||
-                 (s_value \< 0) && ( a_value >= e_value - s_value)) {
+            if (((s_value > CONSTANT_FIXED_0_1).getBoolean() &&
+                 (a_value \<= (e_value - s_value)).getBoolean()) ||
+                ((s_value \< CONSTANT_FIXED_0_1).getBoolean() &&
+                (a_value >= (e_value - s_value)).getBoolean())) {
                 a_value = a_value + s_value;
             } else {
                 break;
@@ -1200,10 +1208,12 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
         while ( 1 )
         {<\n>
             <if(variable)>
+            pearlrt::Fixed\<<rangePrecision>\> <user_variable(variable)>;
             <user_variable(variable)> = a_value;
             <endif>
+
             <if(while_cond)>
-            if (!(<while_cond>))
+            if (!(<while_cond>).getBoolean())
                 break;
             <endif>
 
@@ -1215,7 +1225,7 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
     <endif>
 
     <if(label_end)>
-        <user_label(label_end)>:
+        <user_label(label_end)>: ;
     <endif>
 }
 >>
