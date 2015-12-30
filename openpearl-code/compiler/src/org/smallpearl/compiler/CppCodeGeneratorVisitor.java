@@ -1259,8 +1259,33 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitUnarySubtractiveExpression(SmallPearlParser.UnarySubtractiveExpressionContext ctx) {
         ST expr = group.getInstanceOf("expression");
 
-        expr.add("code", ctx.op.getText());
-        expr.add("code", visit(ctx.expression()));
+        if (ctx.getChild(1) instanceof SmallPearlParser.BaseExpressionContext) {
+            SmallPearlParser.BaseExpressionContext base_ctx = (SmallPearlParser.BaseExpressionContext) (ctx.getChild(1));
+
+            if (base_ctx.primaryExpression() != null) {
+                SmallPearlParser.PrimaryExpressionContext primary_ctx = base_ctx.primaryExpression();
+
+                if (primary_ctx.getChild(0) instanceof SmallPearlParser.LiteralContext) {
+                    SmallPearlParser.LiteralContext literal_ctx = (SmallPearlParser.LiteralContext) (primary_ctx.getChild(0));
+
+                    if (literal_ctx.IntegerConstant() != null) {
+                        try {
+                            Integer value = -1 * Integer.parseInt(literal_ctx.IntegerConstant().toString());
+                            Integer precision = Integer.toBinaryString(Math.abs(value)).length() + 1;
+                            ConstantFixedValue fixed_value = new ConstantFixedValue(value);
+                            expr.add("code", fixed_value);
+                        } catch (NumberFormatException ex) {
+                            throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
+                        }
+                    }
+                }
+                else {
+                    expr.add("code", ctx.op.getText());
+                    expr.add("code", visit(ctx.expression()));
+                }
+            }
+        }
+
         return expr;
     }
 
@@ -3128,7 +3153,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         return st;
     }
-
 
     @Override
     public ST visitProcedureDeclaration(SmallPearlParser.ProcedureDeclarationContext ctx) {

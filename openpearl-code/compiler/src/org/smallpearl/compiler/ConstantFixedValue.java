@@ -36,15 +36,11 @@ public class ConstantFixedValue extends ConstantValue {
     ConstantFixedValue(Integer value) {
         m_value = value.longValue();
         m_precision = Long.toBinaryString(Math.abs(m_value)).length();
-        if ( m_value < 0 )
-            m_precision++;
     }
 
     ConstantFixedValue(Long value) {
         m_value = value;
         m_precision = Long.toBinaryString(Math.abs(m_value)).length();
-        if ( m_value < 0 )
-            m_precision++;
     }
 
     public Long getValue() {
