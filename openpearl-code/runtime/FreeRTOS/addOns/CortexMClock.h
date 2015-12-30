@@ -31,6 +31,15 @@
 #include <time.h>
 #include <inttypes.h>
 
+
+/**
+\file
+
+\brief a system clock with time interpolation between two system ticks
+
+The implementation uses the registers of the systick timer.
+These registers are avaliable on all Cortex-M processors
+*/
 namespace pearlrt {
 
    /**
@@ -45,7 +54,7 @@ namespace pearlrt {
       static uint64_t tickBasedTime;
       static int ticks;
 
-      static int gettimeCallback(uint64_t * nsec);
+      static void gettime(uint64_t * nsec);
       static void setTimeOut(uint64_t nsec);
 
    public:
@@ -54,14 +63,14 @@ namespace pearlrt {
       register the RTC based time as system time base
 
       */
-      void registerTimeBase();
+      static void registerTimeBase();
 
       /**
       set the internal time 
 
       \param time the new internal time
       */
-      void set(const struct tm * time);
+      static void set(const struct tm * time);
 
       /**
       increment internal time by 1ms

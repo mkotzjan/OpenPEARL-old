@@ -35,6 +35,11 @@
 #include "FreeRTOSConfig.h"
 #include "FreeRTOSClock.h"
 
+/**
+\file
+
+\brief implementation of the time base on FreeRTOS ticks
+*/
 
 namespace pearlrt {
 
@@ -47,11 +52,12 @@ namespace pearlrt {
    }
 
    void FreeRTOSClock::registerTimeBase() {
-      register_timer_source(setTimeOut, gettimeCallback);
+      register_timer_source(setTimeOut, gettime);
    }
 
-// local time, after FreeRTOS was started
+   // local time, after FreeRTOS was started
    uint64_t FreeRTOSClock::tickBasedTime;
+
    void FreeRTOSClock::setTimeOut(uint64_t nsec) {
       static const uint64_t nsPerSec = 1000000000;
       uint64_t t;
@@ -75,9 +81,8 @@ namespace pearlrt {
 //printf("FreeRTOSClock: armed after %d ticks\n", ticks);
    }
 
-   int FreeRTOSClock::gettimeCallback(uint64_t *nsec) {
+   void FreeRTOSClock::gettime(uint64_t *nsec) {
       *nsec = tickBasedTime;
-      return 0;
    }
 
    void FreeRTOSClock::tick(void) {
@@ -95,6 +100,12 @@ namespace pearlrt {
 
 }
 extern "C" {
+   /**
+      select the FreeRTOSClock as clock source
+
+      This function is used in timer.c to perform the default
+      timer configuration.
+   */
    void selectFreeRTOSClock() {
       pearlrt::FreeRTOSClock::registerTimeBase();
    }

@@ -160,7 +160,7 @@ namespace pearlrt {
    }
 
    void Lpc17xxRTC::registerTimeBase() {
-      register_timer_source(setTimeOut, gettimeCallback);
+      register_timer_source(setTimeOut, gettime);
    }
 
    /**
@@ -222,7 +222,8 @@ namespace pearlrt {
       ticks = t;
 //printf("Lpc17xxRTC: armed after %d ticks\n", ticks);
    }
-   int Lpc17xxRTC::gettimeCallback(uint64_t * ns) {
+
+   void Lpc17xxRTC::gettime(uint64_t * ns) {
       RTC_TIME_T time;
       struct tm tm;
       static const uint64_t  nsPerSec = 1000000000L;
@@ -246,18 +247,27 @@ namespace pearlrt {
 //printf("RTC::gettime returns %"PRIu64" \n", *ns);
 
       /*
-      printf("Lpc17ccRTC::gettime_callback returns: %ld:%ld\n",
+      printf("Lpc17ccRTC::gettime returns: %ld:%ld\n",
              ts->tv_sec, ts->tv_nsec);
       */
-      return 0;
+   }
+
+   void Lpc17xxRTC::enableInterrupt() {
+      LPC_RTC->CIIR = 1; //interrupt on second increment
+      //TODO: double check
+      LPC_RTC->RTC_AUXEN = 0; //disable the oscillator fail flag
+      LPC_RTC->ILR = 3; //clear interrupt flags
+      //   NVIC->ISER[0] = (1<<RTC_IRQn);
+      NVIC_SetPriority(RTC_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY);
+      NVIC_EnableIRQ(RTC_IRQn);
    }
 
    void Lpc17xxRTC::tick(void) {
       if (noTicksYet) {
          // read current time from RTC
-         gettimeCallback(&tickBasedTime);  // read RTC as time base
-         // and tell rtc_clock_gettime_cb to use the software based timer
-         // from now on
+         gettime(&tickBasedTime);  // read RTC as time base
+
+         // set flag to use the software increment from now on
          noTicksYet = 0;
       } else {
          // increment the tick based time on each FreeRTOS-Tick

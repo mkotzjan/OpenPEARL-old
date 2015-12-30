@@ -49,7 +49,7 @@
 #include "Log.h"
 #include "Task.h"
 
-struct sigevent{};//shoehorn for casting
+static struct sigevent {}; //shoehorn for casting
 
 namespace pearlrt {
    void TaskTimer::update() {
@@ -77,20 +77,23 @@ namespace pearlrt {
       countsBackup = 0;
    }
 
-   static void freeRtosTimerCallback(void* tt_ptr){
-	  TaskTimer* tt = (TaskTimer*)tt_ptr;
-   	   tt->update();
-      }
+   static void freeRtosTimerCallback(void* tt_ptr) {
+      TaskTimer* tt = (TaskTimer*)tt_ptr;
+      tt->update();
+   }
 
    void TaskTimer::create(TaskCommon * task, int signalNumber,
                           TimerCallback cb) {
 
-	  this->timer_callback.cb = (void *)&freeRtosTimerCallback;
-	  this->timer_callback.th = (void *)this;
+      this->timer_callback.cb = (void *)&freeRtosTimerCallback;
+      this->timer_callback.th = (void *)this;
       this->signalNumber = signalNumber;
       this->callback = cb;
       this->task = task;
-      if (timer_create(CLOCK_REALTIME,(sigevent *)&timer_callback , &timer) == -1) {
+
+      if (timer_create(CLOCK_REALTIME,
+                       (sigevent *)&timer_callback,
+                       &timer) == -1) {
          Log::error("task %s: could not create timer for signal %d",
                     task->getName(), signalNumber);
          throw theInternalTaskSignal;

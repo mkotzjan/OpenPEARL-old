@@ -154,8 +154,11 @@ namespace pearlrt {
       */
       virtual void task(Task * me) = 0;
 
-      /* call task job*/
-      static void tskfunc(void* parm);
+      /** call task job
+      \param param a dummy parameter, since FreeRTOS allows to
+               pass a parameter to the tasks code
+      */
+      static void tskfunc(void* param);
 
       /**
         change the tasks priority to the new PEARL prio
@@ -175,9 +178,9 @@ namespace pearlrt {
 
       /**
        change the prioriy of the calling thread to (previous)
-       priority which is given as parameter
+       priority, which is given as parameter
 
-       \param prio the previous priority
+       \param cp the previous priority
       */
       void switchToThreadPrioCurrent(int cp) ;
 

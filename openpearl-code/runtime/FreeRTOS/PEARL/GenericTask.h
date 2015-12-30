@@ -38,7 +38,7 @@
 
 /*********************************************************************//**
  * @file
- * @brief	PEARL90 C/C++ macros
+ * @brief	OpenPEARL C/C++ macros
  **********************************************************************/
 
 #ifndef GENERICTASK_H_
@@ -49,14 +49,16 @@
 #include "BitString.h"
 
 
-/*********************************************************************//**
- * @def
- * @brief	SPECIFY TASK macro
- * generate class name with prefix C_ and leave the objects name
- * without change, since the compiler uses the objects name for
- * the tasking operations.
- * The task class and object resides in the namespace of the application
- **********************************************************************/
+/**
+  \brief	SPECIFY TASK macro
+
+  generate class name with prefix C_ and leave the objects name
+  without change, since the compiler uses the objects name for
+  the tasking operations.
+  The task class and object resides in the namespace of the application
+
+  \param x the user defined name of the task
+*/
 #define SPCTASK(x) \
     class C_##x : public pearlrt::Task {				\
     public:								\
@@ -66,17 +68,22 @@
     }; 									\
     extern class C_##x x
 
-/*********************************************************************//**
- * @def
- * @brief	DECLARE TASK macro
- * generate the task object and the header of the task()-method
- * the compiler adds the task()-methods body immediatelly after
- * this (expanded) macro.
- * For explanations on the decoration scheme see SPCTASK
- * The task class and object resides in the namespace of the application
- **********************************************************************/
+/**
+  \brief	DECLARE TASK macro
 
-#define DCLTASK(x, prio, ismain) 	\
+  generate the task object and the header of the task()-method
+  the compiler adds the task()-methods body immediatelly after
+  this (expanded) macro.
+  For explanations on the decoration scheme see SPCTASK
+  The task class and object resides in the namespace of the application
+
+  \param x the user defined name of the task
+  \param prio the user supplied priority of the task
+  \param ismain a pearlrt::BitString<1> value to specify whether the task
+                 has a MAIN attribute set
+ */
+
+#define DCLTASK(x, prio, ismain) 			\
  C_##x x((char*)#x,prio, ismain);			\
  void C_##x::task(pearlrt::Task * me)
 

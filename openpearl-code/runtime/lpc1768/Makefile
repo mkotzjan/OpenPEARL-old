@@ -12,11 +12,11 @@ AR := $(CROSS)$(AR)
 
 # make silent compilations
 COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(TARGET_ARCH) -c
-#COMPILE.cc = @echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-COMPILE.cc = echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+#COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(LINK.cc)
-#LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
-LINK = @echo link $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
+LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+#LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
 
 
 
@@ -81,14 +81,10 @@ BOARDSUPPORT += lpc17_uart_retarget.c
 BOARDSUPPORT += lpc17_oscillators.c
 BOARDSUPPORT += lpc17_SystemInit.c
 BOARDSUPPORT += Lpc17xxRTC.cc
+BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
 CHECK_FILES += $(BOARDSUPPORT)
-CHECK_FILES += Lpc17xxRTC.h
-CHECK_FILES += Lpc17xxClock.h
 BOARDSUPPORT += startup_lpc1768.S 
-
-  CHECK_FILES += lpc17_systime.c
-  CHECK_FILES += lpc17_systime_rtcsynced.c
 
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
 # ---------------- add remaining board depending modules
@@ -99,7 +95,7 @@ ifeq ($(CONFIG_LPC1768_tests),y)
   CHECK_FILES += $(GTEST_SRC) $(GTEST_DATION_SRC) $(TEST_SRC)
   OBJ := $(addsuffix .o,$(basename $(CXX_COMMON_TESTS)))
   OBJ := $(addprefix ../common/tests/,$(OBJ))
-  $(warning OBJ=$(OBJ))
+  #$(warning OBJ=$(OBJ))
   $(warning targets=$(targets))
 endif
 
@@ -125,7 +121,7 @@ PLIB_OBJS += $(addsuffix .o,$(basename $(CSRC)))
 
 CHECK_FILES := $(sort $(CHECK_FILES))
 
-$(warning BOARDSUPPORT_OBJ=$(BOARDSUPPORT_OBJ))
+#$(warning BOARDSUPPORT_OBJ=$(BOARDSUPPORT_OBJ))
 
 all: depend $(targets)
 
@@ -145,7 +141,7 @@ libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 phony += depend
 depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
 	@echo "[create] .depend"
-	$(CXX) -MM $(CFLAGS) $(INCS) $^ >.depend
+	@$(CXX) -MM $(CFLAGS) $(INCS) $^ >.depend
 
 phony += clean
 clean:
@@ -159,6 +155,11 @@ clean:
 	@rm -f $(PLIB_OBJS) $(OBJ)
 	@rm -f $(addsuffix .diff,$(CHECK_FILES))
 	@rm -f $(addsuffix .new,$(CHECK_FILES))
+
+phony += doc
+doc:
+	doxygen doc_stuff/Doxyfile
+#	(cd latex; make pdf; cd ..)
 
 tests/task1: tests/task1.cc libopenpearl.a OpenPEARLlpc1768_board.o
 	$(CXX) $^ -o $@ $(CFLAGS) $(CXXFLAGS) $(LFLAGS)

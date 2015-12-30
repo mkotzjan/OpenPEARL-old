@@ -56,7 +56,6 @@ namespace pearlrt {
    \endverbatim
 
    */
-
    class Lpc17xxClock {
 
    private:
@@ -66,13 +65,14 @@ namespace pearlrt {
       /**
       Constructor to setup the clock
 
-            \param typeOfClock selector of the desired clock system
-                             0=Systick only (no absolute time),
-                               1=RTC used as initial time; update by systick
-                               ... others follow
+      \param typeOfClock selector of the desired clock system
+                  <ul>
+		  <li>0=Systick only (no absolute time),
+                  <li>1=RTC used as initial time; update by systick
+                  <li> ... others follow
+                  </ul>
 
-            \throws IllegalParamSignal, illegal parameter
-           */
+      */
       Lpc17xxClock(const int typeOfClock);
    };
 }

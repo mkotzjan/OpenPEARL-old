@@ -112,12 +112,12 @@ static void itimerspec2internaltimerspec(
 static void dump_timers() {
    timer_t i;
 
-   printf("dump_timers: expires_next=%u\n", expires_next);
+   printf("dump_timers: expires_next=%d\n", (int)expires_next);
    i = expires_next;
 
    while (i != -1) {
       printf("#%d: at %"PRIu64"  all %"PRIu64" \n",
-             i, timerTable[i].value.nsec_value,
+             (int)i, timerTable[i].value.nsec_value,
              timerTable[i].value.nsec_interval);
       i = timerTable[i].next;
    }
@@ -348,7 +348,7 @@ static int itimerspecOk(const struct itimerspec * its) {
 }
 
 void register_timer_source(void (*set)(uint64_t ns),
-                           int (*get)(uint64_t  * ns)) {
+                           void (*get)(uint64_t  * ns)) {
    timer_set = set;
    set_clock_gettime_cb(get);
 }

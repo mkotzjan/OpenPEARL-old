@@ -51,6 +51,12 @@ namespace pearlrt {
       The RTC behaves a little strange. After inserting the battery
       it takes several attempts to start the rtc. After the first successful
       start in runs without problems.
+
+      On system start, the RTC gives the current time. As long as FreeRTOS
+      is running, the internal clock value is incremented with the 
+      system tick hook. 
+      The time betwenn two ticks is calculated from the systick register
+      values.
    */
    class Lpc17xxRTC {
    private:
@@ -59,7 +65,7 @@ namespace pearlrt {
       static int noTicksYet; //< flag to detect whether FreeRTOS is running
       static uint64_t tickBasedTime;
 
-      static int gettimeCallback(uint64_t * nsec);
+      static void gettime(uint64_t * nsec);
       static void setTimeOut(uint64_t nsec);
 
    public:
@@ -67,7 +73,7 @@ namespace pearlrt {
        start the RTC
 
       */
-      void start();
+      static void start();
 
 
       /**
@@ -76,7 +82,7 @@ namespace pearlrt {
        \returns true if value seems to be ok
        \returns false else
       */
-      bool valueOk(void);
+      static bool valueOk(void);
 
       /**
        test whether RTC is running
@@ -88,20 +94,20 @@ namespace pearlrt {
        \returns true if the RTC is running
        \returns false else
       */
-      bool isRunning(void);
+      static bool isRunning(void);
 
       /**
       set the RTC to the given time
 
-      \param time  new value for the RTC
+      \param tm  new value for the RTC
       */
-      void set(const struct tm * tm);
+      static void set(const struct tm * tm);
 
       /**
       register the RTC based time as system time base
 
       */
-      void registerTimeBase();
+      static void registerTimeBase();
 
       /**
       increment internal time by 1ms
@@ -109,6 +115,11 @@ namespace pearlrt {
       To be called from vApplicationTickHook()
       */
       static void tick(void);
+
+      /**
+       enable 1s interrupt
+      */
+      static void enableInterrupt();
    };
 }
 #endif

@@ -79,11 +79,11 @@ namespace pearlrt {
 
    void Task::init() {
       ((TaskTimer*)schedActivateData.taskTimer)->create(this,
-                                                        0,
-                                                        activateHandler);
+            0,
+            activateHandler);
       ((TaskTimer*)schedContinueData.taskTimer)->create(this,
-                                                        0,
-                                                        continueHandler);
+            0,
+            continueHandler);
    }
 
    void Task::directActivate(const Fixed<15>& prio) {
@@ -445,11 +445,11 @@ namespace pearlrt {
 
       int p = PrioMapper::getInstance()->fromPearl(prio);
       vTaskPrioritySet(xth, p);
-//      Log::debug("%s: change thread prio from %d to %d",name, currentPrio.x,p);
+//    Log::debug("%s: change thread prio from %d to %d",name, currentPrio.x,p);
    }
 
    void Task::disableScheduling() {
-//      Log::debug("vTaskSuspendAll();");
+//    Log::debug("vTaskSuspendAll();");
       vTaskSuspendAll();
    }
 

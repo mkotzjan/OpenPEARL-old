@@ -44,7 +44,14 @@ The system initialization  is controlled by the following files:
   The termination is done in the class \verb|TaskMonitor|. 
 \end{description}
 
-\section{Time Base}
+\section{Interrupt Levels}
+The Cortex-M systems provide different interrupt levels for peripheral devices.
+The FreeRTOS system requires that interrupt service routines, which call
+FreeRTOS function have the interrupt level 
+\texttt{configMAX\_SYSCALL\_INTERRUPT\_PRIORITY} or worse. 
+This must be regarded in each driver of a peripheral device.
+
+\section{Principle of the Time Base}
 The LPC1768 is a Cortex-M processor. FreeRTOS uses the systick timer 
 for the sytem tick interrupt. 
 \begin{description}
@@ -54,8 +61,57 @@ This is done
 by the calulation of the fraction, which is passed in the current tick.
 This calulation is based on the Cortex-M specific systick registers
 {\em SYSTICK\_CURRENT\_VALUE\_REG} and {\em SYSTICK\_LOAD\_REG}.
-\item[lpc17/Lpc17xxRTC.cc] provides a system time bases which is 
+\item[lpc17/Lpc17xxRTC.cc] provides a system time base, which is 
 initialized with the RTC value at system start.
-\item[lpc1768/lpc17xxClock.cc] provides a pseudo device in order
-   to specify the time base for the PEARL apllication individually.
+\item[lpc17/Lpc17xxTimer0.cc] provides a system time base, which works 
+with the TIMER0.
 \end{description}
+
+\section{System Time Base Selection}
+Lpc17xxClock provides a pseudo device in order
+   to specify the time base for the PEARL application individually. E.g.
+
+\begin{verbatim}
+SYSTEM;
+  myClock: Lpc17xxClock(1);  ! start with the time in the RTC
+\end{verbatim}
+
+The following modes are avaliable:
+\begin{description}
+\item[Lpc17xxClock(0)] the default time base. It starts at 1.1.1970 0:00
+   and works with the systick based relative ticks with a resolution of 1 ms.
+\item[Lpc17xxClock(1)] is similar to Lpc17xxClock(1), but it provides
+   interpolated time values  for the \texttt{NOW}-function 
+   from the registers of the systick timer.
+\item[Lpc17xxClock(2)] differs from \texttt{Lpc17xxClock(1)} by the fact 
+    that the initial date and time is taken from the RTC.
+    In case that the RTC does not contain a useful value, the RTC
+    is initialized with the default date of 1.1.2016 0:0:0.
+    If the RTC does not start, the programs exits.
+\item[Lpc17xxClock(3)] operates with a separate timer. This method
+    provides a clock resolution of $10 \mu s$. The initial time is taken
+    from the RTC like described in \texttt{Lpc17xxClock(2)}.
+\item[Lpc17xxClock(4)] is similar to \texttt{Lpc17xxClock(3)}. 
+    The difference is a synchronisation to the 1 seconds tick of the RTC.
+    This causes small drifts in frequency but there is no gap in time 
+    between resets. The synchronisation starts after 2 seconda.
+    It takes approximatelly  5 seconds to enshure a time difference of
+     less that $10\mu s$.
+\end{description}
+
+The preferred clocks are 
+\begin{itemize}
+\item \texttt{Lpc17xxClock(3)} for closed loop control systems
+\item \texttt{Lpc17xxClock(4)} for open loop control systems
+\end{itemize} 
+
+
+\section{Power-On-Self-Test (POST)}
+This module provides some information about the system usage.
+
+Tests are not implemented yet.
+
+\em{The way of selecting this module is not solved yet. It may be possible to 
+select this during system configuration - or by a pseudo system device}
+
+

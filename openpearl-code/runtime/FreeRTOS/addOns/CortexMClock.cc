@@ -26,6 +26,15 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  that SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/**
+\file
+
+\brief a system clock source, with time interpolation between two
+    ticks
+
+*/
+
 #include <time.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -52,7 +61,7 @@ namespace pearlrt {
    }
 
    void CortexMClock::registerTimeBase() {
-      register_timer_source(setTimeOut, gettimeCallback);
+      register_timer_source(setTimeOut, gettime);
    }
 
 // local time, after FreeRTOS was started
@@ -80,7 +89,7 @@ namespace pearlrt {
 //printf("CortexMClock: armed after %d ticks\n", ticks);
    }
 
-   int CortexMClock::gettimeCallback(uint64_t *nsec) {
+   void CortexMClock::gettime(uint64_t *nsec) {
       *nsec = tickBasedTime;
 
       // fetch sub milli seconds from the systick timer
@@ -90,8 +99,6 @@ namespace pearlrt {
          tickRatio /= portNVIC_SYSTICK_LOAD_REG;
          *nsec += (1 - tickRatio) * 1000000; // 1 ms = 1000000 ns
       }
-
-      return 0;
    }
 
    void CortexMClock::tick(void) {

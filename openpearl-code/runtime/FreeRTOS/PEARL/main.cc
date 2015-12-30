@@ -30,12 +30,21 @@
 
 /**
 	\file
-	\brief PEARL90 entry
+	\brief OpenPEARL entry
 
-	system start
+	system start 
 
- */
+\mainpage
 
+The OpenPEARL system for the LPC1768-Landtiger board is based on the 
+FreeRTOS scheduler.
+
+Most of the classes are plattform independent.
+This documentation consists of the plattform dependent and plattform
+independent parts.
+
+
+*/
 
 
 //#include <debug_frmwrk.h>
@@ -59,10 +68,16 @@
 
 using namespace pearlrt;
 /*-----------------------------------------------------------*/
+/**
+main entry to the OpenPearl application
 
+Show the list of defined tasks, activate all "MAIN"-tasks
+and start FreeRTOS-scheduler
+
+\returns nothing - will never return!
+*/
 __attribute__((weak)) int main(void) {
    char line[40];
-
 
    Post::print();
    //Post::config();
@@ -72,9 +87,9 @@ __attribute__((weak)) int main(void) {
     * task suspends itself until another task resume it
     */
    Log::info("Defined Tasks");
-  
+
    // format with sprintf, since Log does not allow format parameters
-   sprintf(line,"%-10.10s %4s %s", "Name", "Prio", "isMain");
+   sprintf(line, "%-10.10s %4s %s", "Name", "Prio", "isMain");
    Log::info(line);
    TaskList::Instance().sort(); // sort taskList
 
@@ -82,7 +97,7 @@ __attribute__((weak)) int main(void) {
       Task *t = TaskList::Instance().getTaskByIndex(i);
 
       // format with sprintf, since Log does not allow format parameters
-      sprintf(line,"%-10.10s  %3d  %2d", t->getName(),
+      sprintf(line, "%-10.10s  %3d  %2d", t->getName(),
               (t->getPrio()).x,
               t->getIsMain());
       Log::info(line);
@@ -111,12 +126,29 @@ __attribute__((weak)) int main(void) {
    /* Start the scheduler. */
    vTaskStartScheduler();
    Log::error("main.c: Scheduler terminated");
-   while(1); // make endless loop in this case to avoid other strange effects
+
+   while (1); // make endless loop in this case to avoid other strange effects
 }
 
+/**
+vConfigurateTimerForRunTimeStats
+
+is a FreeRTOS hook function, which may be useful for system 
+diagnosis 
+\note add useful code to vConfigureTimerForRunTimeStats
+
+*/
 void vConfigureTimerForRunTimeStats(void) {
 }
 
+/**
+vApplicationIdleHook
+
+is called by FreeRTOS, if no other task is runnable and the correponding
+flag is set in FreeRTOSconfig.h
+
+\note add useful code to vApplicationIdleHook
+*/
 void vApplicationIdleHook(void) {
    Log::info("idle..");
 }

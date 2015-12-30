@@ -42,23 +42,84 @@
 #include "Lpc17xxRTC.h"
 #include "FreeRTOSClock.h"
 #include "CortexMClock.h"
+#include "Lpc17xxTimer0.h"
 
 static void (*tickHook)(void) = pearlrt::FreeRTOSClock::tick;
+static bool synchronize2RTC = false;
 
 extern "C" {
+   /**
+   vApplicationTickHook
+
+   This function is called by FrrRTOS in each timer tick.
+   This implementation performs the timeout operation for the
+   tick based timers in the LPC1768 port of OpenPEARL
+
+   The concrete operations are set when the concrete time base is
+   selected. This is done in the ctor of the class Lpc17xxClock.
+   */
    void vApplicationTickHook(void) {
       if (tickHook) {
          // invoke the current tick hook function if one is set
          (*tickHook)();
       }
    }
+
+   /**
+   TIMER0_IRQHandler
+
+    This function is the interruot service routine of the timer0
+    of the LPC1768.
+    This timer is used for clock sources with a resolution of 10 usec.
+    This function is called, if timer0 is enabled, which is selected
+    in the ctor of the class Lpc17xxClock.
+   */
+   void TIMER0_IRQHandler() {
+      pearlrt::Lpc17xxTimer0::tick();
+   }
+
+   /**
+   RTC_IRQHandler
+
+   This function is the interrupt service routine of the real time clock (RTC)
+   of the LPC1768.
+   The RTC is used with interrzpt, when the timer0 should run synchronized
+   with the RTC. This is necessary in some cases to avoid large differences
+   between these two clock sources.
+   */
+   void RTC_IRQHandler() {
+      static uint64_t last_time;
+      static int starting = 2;  // it takes 2 RTC interrupts to stabilize
+      // the time
+      static bool firstInterrupt = true;
+      uint64_t now;
+      int delta;
+
+      if (firstInterrupt) {
+         printf("RTC: first tick\n");
+         pearlrt::Lpc17xxTimer0::start();
+         pearlrt::Lpc17xxTimer0::gettime(&now);
+      } else {
+         pearlrt::Lpc17xxTimer0::gettime(&now);
+
+         if (starting == 0 && synchronize2RTC) {
+            delta = 1000000000 - (now - last_time);
+            printf("RTC: tick diff to last time %d\n", delta);
+            pearlrt::Lpc17xxTimer0::drift(delta);
+         } else {
+            starting --;
+         }
+      }
+
+      firstInterrupt = false;
+      last_time = now;
+      LPC_RTC->ILR = 3;
+   }
 }
 
 namespace pearlrt {
 
    Lpc17xxClock::Lpc17xxClock(const int typeOfClock) {
-      Lpc17xxRTC rtc;
-      CortexMClock cortexMClock;
       static const struct tm  defaultDate = {0, 0, 0,
                 1, 0, 2016 - 1900,
                 5, 0, 0
@@ -70,8 +131,8 @@ namespace pearlrt {
          throw theIllegalParamSignal;
 
       case 0: // only systick
-              // no absolute time from RTC desired
-         
+         // no absolute time from RTC desired
+
          // lets assume to be midnight of 1.1.2016 right now
          FreeRTOSClock::set(&defaultDate);
 
@@ -82,25 +143,25 @@ namespace pearlrt {
          break;
 
       case 1: // only systick and subsystick time
-              // no absolute time from RTC desired
-         
+         // no absolute time from RTC desired
+
          // lets assume to be midnight of 1.1.2016 right now
-         cortexMClock.set(&defaultDate);
+         CortexMClock::set(&defaultDate);
 
          // tell time.c to take the current time from this function
          // and set the tickHook function pointer to the according method
          tickHook = CortexMClock::tick;
-         cortexMClock.registerTimeBase();
+         CortexMClock::registerTimeBase();
          break;
 
       case 2: // take current time from RTC
-         if (rtc.valueOk()) {
+         if (Lpc17xxRTC::valueOk()) {
             printf("date/time is reasonable\n");
          } else {
             printf("ridiculous date/time\n");
-            rtc.set(&defaultDate);
+            Lpc17xxRTC::set(&defaultDate);
 
-            if (rtc.valueOk()) {
+            if (Lpc17xxRTC::valueOk()) {
                printf("date/time is reasonable now\n");
             } else {
                printf("still ridiculous date/time --> RTC dead?\n");
@@ -108,11 +169,11 @@ namespace pearlrt {
             }
          }
 
-         if (!rtc.isRunning()) {
+         if (!Lpc17xxRTC::isRunning()) {
             printf("RTC is not running --> start it\n");
-            rtc.start();
+            Lpc17xxRTC::start();
 
-            if (!rtc.isRunning()) {
+            if (!Lpc17xxRTC::isRunning()) {
                printf("RTC start was not successful --> RTC dead??\n");
                exit(1);  // exit ok??
             }
@@ -121,7 +182,22 @@ namespace pearlrt {
          // tell time.c to take the current time from this function
          // and set the tickHook function pointer to the according method
          tickHook = Lpc17xxRTC::tick;
-         rtc.registerTimeBase();
+         Lpc17xxRTC::registerTimeBase();
+         break;
+
+      case 3: // Timer 0 with start at RTC seconds tick
+         synchronize2RTC = false;
+         tickHook = NULL;   // nothing to do Lpc17xxTimer0::tick;
+         Lpc17xxTimer0::registerTimeBase();
+         Lpc17xxRTC::enableInterrupt();
+         break;
+
+      case 4: // Timer 0 with start at RTC seconds tick and synchronisation
+         // to RTC 1 second interrupt
+         tickHook = NULL;   // nothing to do Lpc17xxTimer0::tick;
+         synchronize2RTC = true;
+         Lpc17xxTimer0::registerTimeBase();
+         Lpc17xxRTC::enableInterrupt();
          break;
       }
    }

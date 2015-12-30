@@ -56,7 +56,7 @@ which deliver the current time. This may be the RTC or other sources
 \param get  pointer to the function, which return the current time
 */
 void register_timer_source( void (*set)(uint64_t ns),
-                             int (*get)(uint64_t * ns));
+                            void (*get)(uint64_t * ns));
 
 
 /**
@@ -66,7 +66,7 @@ configure clock.c to work with a proper time base
 
 \param get  pointer to the function, which return the current time
 */
-void set_clock_gettime_cb(int (*get)(uint64_t *ns));
+void set_clock_gettime_cb(void (*get)(uint64_t *ns));
 
 /**
 get current time in nsec 

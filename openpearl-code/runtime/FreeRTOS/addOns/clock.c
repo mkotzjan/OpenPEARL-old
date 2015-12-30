@@ -45,11 +45,11 @@
 #include <sys/errno.h>
 #include "time_addons.h"
 
-static int clock_gettime_cb_notready(uint64_t * nsec);
-static int (*clock_gettime_cb)(uint64_t  *nsec) = &clock_gettime_cb_notready;
+static void clock_gettime_cb_notready(uint64_t * nsec);
+static void (*clock_gettime_cb)(uint64_t  *nsec) = &clock_gettime_cb_notready;
 
 /* added global function */
-void set_clock_gettime_cb(int (*new_clock_gettime_cb)(uint64_t *nsec)) {
+void set_clock_gettime_cb(void (*new_clock_gettime_cb)(uint64_t *nsec)) {
    clock_gettime_cb = new_clock_gettime_cb;
 }
 
@@ -84,10 +84,8 @@ extern int clock_gettime(clockid_t clock_id, struct timespec *ts) {
 /*
   default time base, just returning (0,0) and sets the errno variable
 */
-static int clock_gettime_cb_notready(uint64_t * nsec) {
+static void clock_gettime_cb_notready(uint64_t * nsec) {
    *nsec = 0;
-   errno = EAGAIN;
-   return -1;
 }
 
 /* prototype in <sys/time.h>  */

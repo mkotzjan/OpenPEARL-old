@@ -5,7 +5,8 @@ TEXFILES = runtime.tex changeLog.tex codeGen.tex dataTypes.tex inOutput.tex \
 	../linux/doc/os.tex ../linux/doc/tasking.tex  \
 	../linux/doc/interrupts.tex \
 	../common/signallist.tex \
-	../FreeRTOS/doc/basics.tex
+	../FreeRTOS/doc/basics.tex \
+	../lpc1768/doc/basics.tex
 
 all: runtime.pdf  $(TEXFILES)
 

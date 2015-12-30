@@ -26,10 +26,18 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  that SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #ifndef FREERTOSCLOCK_INCLUDED_H_
 #define FREERTOSCLOCK_INCLUDED_H_
 #include <time.h>
 #include <inttypes.h>
+
+/**
+   \file
+
+   \brief system clock based on FreeRTOS ticks
+
+*/
 
 #ifdef __cplusplus
 namespace pearlrt {
@@ -46,7 +54,7 @@ namespace pearlrt {
       static uint64_t tickBasedTime;
       static int ticks;
 
-      static int gettimeCallback(uint64_t * nsec);
+      static void gettime(uint64_t * nsec);
       static void setTimeOut(uint64_t nsec);
 
    public:
