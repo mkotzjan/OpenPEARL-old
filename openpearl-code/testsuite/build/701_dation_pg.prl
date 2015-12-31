@@ -13,7 +13,7 @@ __cpp__(
 /*  */
 PROBLEM;
 
-   SPC disc DATION INOUT /* SYSTEM */ ALL;
+   SPC disc DATION INOUT SYSTEM  ALL;
 /* expected C++ code keyword SYSTEM ALL -> 
    static_cast<pearlrt::SystemDationNB*>
 

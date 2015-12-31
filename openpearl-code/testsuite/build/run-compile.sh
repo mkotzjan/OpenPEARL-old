@@ -10,11 +10,11 @@ for test in $TESTS
 do
 	nooftests=$(($nooftests + 1))
 
-	prl_c $test.prl >$test.out 2>&1
+	prl -c -b linux $test.prl >$test.out 2>&1
 	rc=$?
      
         base=`basename $test .prl`
-	prl_bin $base  1> /dev/null 2>&1
+	prl -b linux $base.cc  1> /dev/null 2>&1
 	rcbin=$?
 
 	if [ $rc -eq 0 ]
