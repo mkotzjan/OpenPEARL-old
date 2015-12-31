@@ -480,6 +480,19 @@ namespace pearlrt {
       }
 
       /**
+      cast operator
+
+      convert the Fixed<S> into a Fixed<T>
+      
+      \returns the value in type Fixed<P>
+      \throws FixedRangeSignal in case of exeeding the data range
+      */
+      template<int P> operator Fixed<P> () const {
+         Fixed<P> result(x);
+         return result;
+      } 
+
+      /**
       return the abs value of the Fixed
 
       \throws FixedRangexception, if x had the  minimum value
