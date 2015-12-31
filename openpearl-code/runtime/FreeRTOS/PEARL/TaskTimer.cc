@@ -49,7 +49,7 @@
 #include "Log.h"
 #include "Task.h"
 
-static struct sigevent {}; //shoehorn for casting
+struct sigevent {}; //shoehorn for casting
 
 namespace pearlrt {
    void TaskTimer::update() {
