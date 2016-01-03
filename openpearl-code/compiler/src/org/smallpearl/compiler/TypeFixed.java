@@ -50,7 +50,7 @@ public class TypeFixed extends TypeDefinition {
     }
 
     public String toString() {
-        return "TypeFixed:" + this.getName() + " m_precision=" + this.m_precision;
+        return this.getName() + "(" + this.m_precision + ")";
     }
 
 }

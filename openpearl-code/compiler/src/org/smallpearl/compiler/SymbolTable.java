@@ -32,21 +32,6 @@ package org.smallpearl.compiler;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-/**
- * Symboltable is ...
- * This information includes:
- * <ul>
- * <li>The Component to draw on
- * <li>A translation origin for rendering and clipping coordinates
- * (see <a href="#setXORMode">setXORMode</a>)
- * </ul>
- * <p/>
- * Coordinates are infinitely thin and lie between the pixels of the
- * output device.
- * <p/>
- *
- * @author Marcel Schaible
- */
 
 public class SymbolTable {
     private ScopeStack scopeStack = new ScopeStack();
@@ -110,11 +95,16 @@ public class SymbolTable {
         pushScope(baseScope);
     }
 
-    public void defineProcedure(Symbol s) {
-        Position occ = new Position(s.getLine(), s.getColumn());
-        ProcedureDef procedure = new ProcedureDef(s.getName(), occ, getCurrentScope());
-        addToCurrentScope(procedure);
-        pushScope(procedure);
+//    public void defineProcedure(Symbol s) {
+//        Position occ = new Position(s.getLine(), s.getColumn());
+//        ProcedureDef procedure = new ProcedureDef(s.getName(), occ, getCurrentScope());
+//        addToCurrentScope(procedure);
+//        pushScope(procedure);
+//    }
+
+    public void defineProcedure(ProcedureDef proc) {
+        addToCurrentScope(proc);
+        pushScope(proc);
     }
 
     public void defineTask(Symbol s, int priority) {
@@ -172,7 +162,7 @@ public class SymbolTable {
         }
     }
 
-    private ScopeDef getCurrentScope() {
+    public ScopeDef getCurrentScope() {
         if (scopeStack.empty())
             return null;
         return (ScopeDef) scopeStack.peek();
@@ -256,8 +246,11 @@ public class SymbolTable {
         }
     }
 
-    public LinkedList<TemporarySemaphoreArray>  getTemporarySemaphoreArrays() { return temporarySemaphoreArrays; }
+    public Void getProcedureDeclarations() {
+        return null;
+    }
 
+    public LinkedList<TemporarySemaphoreArray>  getTemporarySemaphoreArrays() { return temporarySemaphoreArrays; }
 
     public Void defineTemporarySemaphoreArray( TemporarySemaphoreArray arr) {
         boolean found = false;

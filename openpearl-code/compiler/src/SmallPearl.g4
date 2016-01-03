@@ -878,7 +878,7 @@ semaTry
 //
 // BoltStatement ::=
 //      RESERVE Name§Bolt [ , Name§Bolt ] ... ;
-//￼￼￼￼| FREE    Name§Bolt [ , Name§Bolt ] ... ;
+//    | FREE    Name§Bolt [ , Name§Bolt ] ... ;
 //    | ENTER   Name§Bolt [ , Name§Bolt ] ... ;
 //    | LEAVE   Name§Bolt [ , Name§Bolt ] ... ;
 ////////////////////////////////////////////////////////////////////////////////
@@ -1334,7 +1334,7 @@ dationDeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
 typeDation
-    : 'DATION' sourceSinkAttribute systemDation? classAttribute
+    : 'DATION' sourceSinkAttribute  systemDation?  classAttribute
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

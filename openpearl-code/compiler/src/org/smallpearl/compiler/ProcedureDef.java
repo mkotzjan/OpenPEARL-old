@@ -29,10 +29,16 @@
 
 package org.smallpearl.compiler;
 
+import java.util.ArrayList;
+
 public class ProcedureDef extends ScopeDef {
+    private TypeDefinition  m_returnType;
+    private ArrayList<Argument> m_arguments;
 
     ProcedureDef(String name, Position pos, ScopeDef parentScope) {
         super(name, pos, parentScope);
+        m_returnType = null;
+        m_arguments = null;
     }
 
     public int getType() {
@@ -40,7 +46,25 @@ public class ProcedureDef extends ScopeDef {
     }
 
     public String toString() {
-        return "procedure " + getName();
+        return "procedure:" + getName() + " with args:" + m_arguments + " with retrun type:" + m_returnType;
     }
 
+    public void addArgument(Argument argument) {
+        if ( m_arguments == null) {
+            m_arguments = new ArrayList<Argument>();
+        }
+        m_arguments.add(argument);
+    }
+
+    public ArrayList<Argument> getArguments() {
+        return m_arguments;
+    }
+
+    public void setReturnType(TypeDefinition returnType) {
+        m_returnType = returnType;
+    }
+
+    public TypeDefinition getReturnType() {
+        return m_returnType;
+    }
 }

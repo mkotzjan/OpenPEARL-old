@@ -43,7 +43,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.6.1";
+    static String version = "v0.6.2";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -170,6 +170,7 @@ public class Compiler {
                     SymbolTable symtab = SymbolTable.getSymbolTable();
                     System.out.println(symtab);
                     symtab.getGlobalsDeclarations();
+                    symtab.getProcedureDeclarations();
                 }
 
                 if (dumpConstantPool) {
@@ -380,8 +381,6 @@ public class Compiler {
 
         return null;
     }
-
-
 
     static String getStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
