@@ -1,8 +1,9 @@
 ADDONCSRC = assert.c	 \
 	clock.c  	\
 	FreeRTOSClock.cc \
-	FreeRTOSHooks.c	 \
+	FreeRTOSHooks.cc	 \
 	FreeRTOSClock.cc \
-	timer.c 
+	timer.c 	\
+	heap_1_2.c
 
 ADDONINCS = .

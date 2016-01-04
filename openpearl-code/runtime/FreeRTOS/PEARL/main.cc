@@ -64,7 +64,7 @@ independent parts.
 #include "Post.h"
 #include "Log.h"
 #include "Clock.h"
-//#include "LPC1768Function.h"
+#include "chip.h"
 
 using namespace pearlrt;
 /*-----------------------------------------------------------*/
@@ -78,9 +78,27 @@ and start FreeRTOS-scheduler
 */
 __attribute__((weak)) int main(void) {
    char line[40];
+   uint32_t resetReason;
+ 
+   // obtain the reset reason
+   resetReason = Chip_SYSCTL_GetSystemRSTStatus();
 
-   Post::print();
-   //Post::config();
+   // clear the reset condition, since the device accumulates them
+   Chip_SYSCTL_ClearSystemRSTStatus(resetReason);
+   if (resetReason & SYSCTL_RST_POR) {
+      printf("Power On RESET\n");
+      Post::print();
+      //Post::config();
+   } 
+   if (resetReason & SYSCTL_RST_EXTRST) {
+      printf("External RESET\n");
+   } 
+   if (resetReason & SYSCTL_RST_WDT) {
+      printf("Watchdog RESET\n");
+   } 
+   if (resetReason & SYSCTL_RST_BOD) {
+      printf("Brown-out RESET\n");
+   } 
 
    /*
     * This task starts all PEARL90 main tasks, afterwards the

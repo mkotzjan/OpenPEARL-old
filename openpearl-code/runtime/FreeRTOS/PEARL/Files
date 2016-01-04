@@ -2,7 +2,6 @@ PEARL_FREERTOS_SRC += \
 	CSema.cc \
 	Log.cc \
 	main.cc \
-	Post.cc \
 	Mutex.cc \
 	PrioMapper.cc \
 	Task.cc \

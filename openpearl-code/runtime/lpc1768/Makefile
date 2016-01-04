@@ -38,7 +38,7 @@ include ../FreeRTOS/FreeRTOS/Files
 CSRC += $(addprefix ../FreeRTOS/FreeRTOS/,$(RTOSCSRC))
 INCS += $(addprefix ../FreeRTOS/FreeRTOS/,$(RTOSINCS))
 
-# -------------------- add FreeRTOS add on files to project
+# -------------------- add FreeRTOS addOn files to project
 include ../FreeRTOS/addOns/Files
 CSRC += $(addprefix ../FreeRTOS/addOns/,$(ADDONCSRC))
 CHECK_FILES += $(addprefix ../FreeRTOS/addOns/,$(ADDONCSRC))
@@ -61,7 +61,7 @@ CHECK_FILES += $(addprefix ../common/,$(CXX_COMMON))
 INCS += ../common
 
 #---------------------------------
-# LPCopen V2.xx stuff
+# required parts of LPCopen V2.xx 
 # directory, includes directories for LPCopen V2.xx
 LPCOpen= ../cortexM/LPCOpen/lpc_chip/chip_17xx_40xx
 INCS += $(LPCOpen) $(LPCOpen)/../chip_common $(LPCOpen)/config_175x_6x 
@@ -81,6 +81,7 @@ BOARDSUPPORT += lpc17_uart_retarget.c
 BOARDSUPPORT += lpc17_oscillators.c
 BOARDSUPPORT += lpc17_SystemInit.c
 BOARDSUPPORT += Lpc17xxRTC.cc
+BOARDSUPPORT += Post.cc
 BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
 CHECK_FILES += $(BOARDSUPPORT)

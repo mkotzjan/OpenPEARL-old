@@ -72,7 +72,7 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 1000;
+      stackDepth = 400;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }
@@ -184,6 +184,10 @@ namespace pearlrt {
             mutexUnlock();
          }
       }
+{
+int f = uxTaskGetStackHighWaterMark(NULL);
+printf("Task %s stack useage: %d\n", name, f);
+}
 
       vTaskDelete(oldTaskHandle);
    }
@@ -475,6 +479,10 @@ namespace pearlrt {
 //                pcTaskGetTaskName(NULL),
 //                name,
 //                cp);
+   }
+   TaskHandle_t Task::getFreeRTOSTaskHandle() {
+      if (taskState != TERMINATED) return xth;
+      return NULL;
    }
 
 }

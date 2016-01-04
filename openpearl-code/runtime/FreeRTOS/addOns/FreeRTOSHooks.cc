@@ -1,4 +1,9 @@
 #include <stdio.h>
+#include "TaskList.h"
+#include "Task.h"
+#include "FreeRTOS.h"
+static void dumpStacks() ;
+extern "C" {
 void vApplicationStackOverflowHook() {
    printf("Stack Overflow\n");
 
@@ -10,3 +15,8 @@ void vApplicationMallocFailedHook() {
 
    for (;;);
 }
+
+void vApplicationIdleHook() {
+}
+};
+

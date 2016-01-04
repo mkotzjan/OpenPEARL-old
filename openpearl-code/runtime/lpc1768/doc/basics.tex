@@ -111,7 +111,13 @@ This module provides some information about the system usage.
 
 Tests are not implemented yet.
 
-\em{The way of selecting this module is not solved yet. It may be possible to 
-select this during system configuration - or by a pseudo system device}
+The POST may be selected via a pseudo device in the systempart of the 
+OpenPEARL application.
+
+\begin{description}
+\item[Post(0)] invokes the POST module to display the POST status
+\item[Post(1)] in addition to Post(0), the module wait for user input
+   to e.q. set the RTC
+\end{description}
 
 

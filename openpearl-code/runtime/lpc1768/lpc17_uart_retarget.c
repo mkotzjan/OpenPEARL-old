@@ -15,7 +15,7 @@ static bool initiated = false;
 static void retarget_init();
 
 static void sendChar(char cc) {
-   while (Chip_UART_ReadLineStatus(UART_SELECTION) == 0);
+   while ((Chip_UART_ReadLineStatus(UART_SELECTION) & UART_LSR_TEMT) == 0);
 
    Chip_UART_SendByte(UART_SELECTION, cc);
 }

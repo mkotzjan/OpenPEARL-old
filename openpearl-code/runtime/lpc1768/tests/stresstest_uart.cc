@@ -10,23 +10,17 @@ SPCTASK(TASK4);
 SPCTASK(pokeCanary);
 
 void printTimeAndDay(int line) {
-//      struct timespec ts;
-      char buf[26];
-//      clock_gettime(0,&ts);
-//      ts.tv_sec+=2*60*60;//Mitteleuropaeische Sommerzeit
-//      ctime_r(&ts.tv_sec, buf);
-//      vTaskPrioritySet(NULL,289);
-//      printf(buf);
+	pearlrt::Log::error("printDateAndTime message");	
 }
 
 static void Canary(void *pcParameters){
 
 	while(true){
-	printf("Canary: RTOSCanary @1\n");
-	vTaskDelay(1100);
-	printf("Canary: RTOSCanary @2\n");
-	vTaskDelay(1100);
-		}
+		printf("Canary: RTOSCanary @1\n");
+		vTaskDelay(1100);
+		printf("Canary: RTOSCanary @2\n");
+		vTaskDelay(1100);
+	}
 }
 
 DCLTASK(pokeCanary, pearlrt::Prio(100), pearlrt::BitString<1>(0)) {
@@ -40,6 +34,7 @@ DCLTASK(pokeCanary, pearlrt::Prio(100), pearlrt::BitString<1>(0)) {
 	printf("            Canary: pokeCanary @2\n");
 		i=0;
 	}
+	printf("            Canary: exit\n");
 
 }
 
@@ -54,20 +49,20 @@ DCLTASK(TASK1, pearlrt::Prio(110), pearlrt::BitString<1>(1)) {
               pearlrt::Duration(2.0));  // all
 
 
-   TASK2.activate(me);
+//   TASK2.activate(me);
 
    TASK3.activate(me,pearlrt::Task::AFTER |pearlrt::Task::ALL,
            pearlrt::Prio(), pearlrt::Clock(),
               pearlrt::Duration(20.3333),   // after
               pearlrt::Duration(1.0));  // all
 
-/*
+
    TASK4.activate(me,pearlrt::Task::AFTER |pearlrt::Task::ALL,
               pearlrt::Prio(), pearlrt::Clock(),
                  pearlrt::Duration(0.50),   // after
-                 pearlrt::Duration(0.05));  // all
+                 pearlrt::Duration(1.05));  // all
 
-*/
+
    for (;;) {
 
       printf("Task1:8Hz @1\n");

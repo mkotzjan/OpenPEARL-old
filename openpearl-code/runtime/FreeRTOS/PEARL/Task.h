@@ -194,6 +194,13 @@ namespace pearlrt {
       */
       static void enableScheduling();
 
+      /**
+      return the FreeRTOS hanle for diagnosic purpuses 
+      \return the FreeRTOS handle of the current task, if the task is not
+              terminated
+      \return NULL else
+      */
+      TaskHandle_t getFreeRTOSTaskHandle();
    };
 
 }
