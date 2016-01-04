@@ -116,7 +116,7 @@ ConstantPoolList(constants) ::= <<
 >>
 
 ConstantPoolEntry(name,type,precision,value) ::= <<
-static const pearlrt::<type>\<<precision>\>         <name>(<value>);
+static /*const*/ pearlrt::<type>\<<precision>\>         <name>(<value>);
 >>
 
 /*********************** GLOBAL DECLARATIONS ***********************/
@@ -810,13 +810,17 @@ fromA(<element><if(fieldwidth)>,(pearlrt::Fixed\<31>)(<fieldwidth>)<endif>)
 
 /******************************** CALL Statement *********************************/
 
-CallStatement(callee, args) ::= <<
-FUNCTION <callee>( <args; wrap="\n      c", separator=","> )
+CallStatement(callee, ListOfActualParameters) ::= <<
+<callee>( me<if(ListOfActualParameters)>, <ListOfActualParameters><endif>);
 >>
 
-ListOfActualParametersContext(arg) ::= <<
-( <arg> )
->>
+ListOfActualParameters(ActualParameters) ::= <%
+<ActualParameters: {param|<param>} ; separator=", ">
+%>
+
+ActualParameters(ActualParameter) ::= <%
+<ActualParameter: {param|<param>} ; separator=", ">
+%>
 
 /******************************** CPP INLINING *********************************/
 
@@ -1234,9 +1238,10 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
 
 ProcedureDeclaration(id,listOfFormalParameters,body,resultAttribute,globalAttribute) ::= <<
 <if(resultAttribute)><resultAttribute><else>void<endif>
-<id>(<listOfFormalParameters>)
+<id>(pearlrt::Task *me<if(listOfFormalParameters)>, <listOfFormalParameters><endif>)
 {
     <body>
+}
 
 
 >>

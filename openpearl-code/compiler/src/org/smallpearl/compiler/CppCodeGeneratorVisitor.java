@@ -2598,13 +2598,28 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitCallStatement(SmallPearlParser.CallStatementContext ctx) {
         ST stmt = group.getInstanceOf("CallStatement");
-// TODO: visitCallStatement: Implement
-//        stmt.add("callee", ctx.ID());
-//        stmt.add("args", visitList_of_actual_parameters(ctx.list_of_actual_parameters()));
 
-        throw new NotYetImplementedException("callStatement", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        stmt.add("callee", ctx.ID());
+        if ( ctx.listOfActualParameters() != null ) {
+            stmt.add("ListOfActualParameters", visitListOfActualParameters(ctx.listOfActualParameters()));
+        }
 
-        // return stmt;
+        return stmt;
+    }
+
+    @Override
+    public ST visitListOfActualParameters(SmallPearlParser.ListOfActualParametersContext ctx) {
+        ST stmt = group.getInstanceOf("ActualParameters");
+
+        if ( ctx.expression() != null ) {
+            for (int i = 0; i < ctx.expression().size(); i++) {
+                ST param = group.getInstanceOf("ActualParameters");
+                param.add("ActualParameter", getExpression(ctx.expression(i)));
+                stmt.add("ActualParameter", param);
+            }
+        }
+
+        return stmt;
     }
 
     @Override
