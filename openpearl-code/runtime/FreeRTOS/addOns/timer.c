@@ -62,6 +62,7 @@
 #include "time_addons.h"
 #include "FreeRTOSClock.h"
 
+#define TIMER_STACK_SIZE 1000
 #define MAXTIMER configTIMER_QUEUE_LENGTH
 #define ENTERCRITICAL taskDISABLE_INTERRUPTS();DMB();
 #define LEAVECRITICAL DMB();taskENABLE_INTERRUPTS()
@@ -166,6 +167,14 @@ static void retrigger_timer() {
 
 static void timer_init_if_necessary() {
    int i = 0;
+   StructParameters_t createParameters;
+   static StackType_t timerStack[TIMER_STACK_SIZE];
+   static TCB_t timerTcb;
+
+   createParameters.pvParameter = NULL;
+   createParameters.tcb = NULL;
+   createParameters.stack = timerStack;
+   createParameters.tcb = &timerTcb;
 
    if (! tablestate.tableinitialized) {
       if (timer_set == NULL) {
@@ -191,7 +200,7 @@ static void timer_init_if_necessary() {
       timer_queue = xQueueCreate(10, 1);
 
       xTaskCreate(clackerTask,
-                  "ClackerTask", 1000, NULL,
+                  "ClackerTask", TIMER_STACK_SIZE, &createParameters,
                   configMAX_PRIORITIES - 1,
                   &xClackerTaskHandle); //stack 50 war nicht nur schlecht
 

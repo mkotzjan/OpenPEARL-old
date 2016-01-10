@@ -6,14 +6,15 @@ _all: all
 
 
 include makefile.conf
+
 CC := $(CROSS)$(CC)
 CXX := $(CROSS)$(CXX)
 AR := $(CROSS)$(AR)
 
 # make silent compilations
 COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(TARGET_ARCH) -c
-COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-#COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+#COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(LINK.cc)
 LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 #LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
@@ -86,8 +87,8 @@ BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
 CHECK_FILES += $(BOARDSUPPORT)
 BOARDSUPPORT += startup_lpc1768.S 
-
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
+
 # ---------------- add remaining board depending modules
 # ----------------- add test applications
 TESTOBJ:=
@@ -103,6 +104,10 @@ endif
 # ------------------------ finalize variables 
 INCS:=$(addprefix -I ,$(INCS))
 PURECXXFLAGS := $(CXXFLAGS)
+ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
+PURECXXFLAGS += -finstrument-functions 
+endif
+
 PURECFLAGS := $(CFLAGS)
 CFLAGS += $(INCS)
 CXXFLAGS += $(INCS)
@@ -137,7 +142,8 @@ OpenPEARLlpc1768_board.o: $(BOARDSUPPORT_OBJ)
 
 libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@echo "[create] $@"
-	@$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
+	@rm   -f libOpenPEARLlpc1768.a
+	$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
 
 phony += depend
 depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
@@ -162,11 +168,8 @@ doc:
 	doxygen doc_stuff/Doxyfile
 #	(cd latex; make pdf; cd ..)
 
-tests/task1: tests/task1.cc libopenpearl.a OpenPEARLlpc1768_board.o
-	$(CXX) $^ -o $@ $(CFLAGS) $(CXXFLAGS) $(LFLAGS)
-
 phony += install
-install: all
+install: all cc_bin run_bin
 	rm -f pearl2.h
 	$(IC) -c $(INCS)  <PearlIncludes.h | $(DWS) >pearl2.h
 	cat sysincs.h pearl2.h >pearl.h
@@ -175,10 +178,21 @@ install: all
 	mkdir -p $(CONFIG_INSTALL_Target)/lib/ldscripts
 	cp OpenPEARLlpc1768.ld $(CONFIG_INSTALL_Target)/lib/ldscripts
 	cp OpenPEARLlpc1768_board.o $(CONFIG_INSTALL_Target)/lib
-	#
+
+phony += cc_bin
+cc_bin:
 	# create cc_bin.inc
-	echo '$(CXX) -DTARGET=2 $(PURECFLAGS) $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' > cc_bin.inc 
-	#
+	#echo 'if [ ! -e stacksize.h ] ; then' > cc_bin.inc
+	#  echo 'echo "// stack size definitions " > stacksize.h' >>cc_bin.inc
+	#  echo 'echo "#define STACKDEFAULTSIZE 500 ">>stacksize.h' >> cc_bin.inc
+	#  echo 'echo "#define RAM1 __attribute__((section RAM1))" >>stacksize.h' >>cc_bin.inc
+	#  echo 'echo "// add your stack definitions below"  >> stacksize.h ' >> cc_bin.inc
+	#  echo '"// use the pattern #define STACK_<taskname>  <size>" >>stacksize.h' >> cc_bin.inc
+	#echo 'fi' >> cc_bin.inc
+	echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' >> cc_bin.inc 
+
+phony += run_bin
+run_bin:
 	# create run_bin.inc
 	echo "# auto generated " > run_bin.inc
 	echo 'objcopy -O ihex $$fn $$fn.hex' >>run_bin.inc
@@ -200,15 +214,6 @@ install: all
 phony +=  checkformat
 checkformat:
 	@$(foreach f,$(CHECK_FILES),../codestyle/check.sh $(f);)
-
-#cpp: tests/cpp.hex
-#	lpc21isp -control -term -hex $< /dev/ttyUSB0 115200 12000
-
-#firsttest: tests/firsttest.hex
-#	lpc21isp -control -term -hex $< /dev/ttyUSB0 115200 12000
-
-#Post.o: src/Post.cc
-#	$(CROSS)$(CXX) $(CXXFLAGS) $(INCS) $(CFLAGS) -c -o $@ $^
 
 -include .depend
 

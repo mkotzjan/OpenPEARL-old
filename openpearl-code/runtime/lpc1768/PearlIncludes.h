@@ -36,6 +36,14 @@ The compiler does not needed to know all header files of the run time system.
 Only this file mus be included.
 
 */
+extern "C" {
+   // include FreeRTOS Stuff in extern C brace
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "StackMacros.h"
+};
+
 #include "TaskCommon.h"
 #include "Task.h"
 #include "GenericTask.h"
@@ -104,6 +112,7 @@ Only this file mus be included.
 //#include "OctopusDigitalIn.h"
 //#include "OctopusDigitalOut.h"
 
+#include "Post.h"
 #include "Lpc17xxRTC.h"
 #include "Lpc17xxClock.h"
 

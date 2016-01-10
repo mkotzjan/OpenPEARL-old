@@ -90,7 +90,8 @@
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 100000000 )
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 80 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 15 * 1024 ) )
+#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 2 * 1024 ) )
+#define configUSE_STATIC_STACK_AND_TCB	1	// <<< added
 #define configUSE_MALLOC_FAILED_HOOK	1
 #define configMAX_TASK_NAME_LEN		( 12 )
 #define configUSE_TRACE_FACILITY	0
@@ -132,7 +133,9 @@ to exclude the API function. */
 #define INCLUDE_vTaskSuspend				1
 #define INCLUDE_vTaskDelayUntil				1
 #define INCLUDE_vTaskDelay					1
+#define INCLUDE_xTaskGetCurrentTaskHandle	1    // added
 #define INCLUDE_uxTaskGetStackHighWaterMark	1
+#define INCLUDE_xTaskGetCurrentFreeStack	1	/* added */
 #define INCLUDE_pcTaskGetTaskName	1
 
 /* This demo makes use of one or more example stats formatting functions.  These

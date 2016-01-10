@@ -72,7 +72,7 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 400;
+      stackDepth = 800;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }
@@ -88,6 +88,8 @@ namespace pearlrt {
 
    void Task::directActivate(const Fixed<15>& prio) {
       bool freeRtosRunning;
+      StructParameters_t taskParams;
+
       int freeRtosPrio = PrioMapper::getInstance()->fromPearl(prio.x);
 
       Log::debug("%s::directActivate freeRTOSprio=%d", name, freeRtosPrio);
@@ -111,9 +113,13 @@ namespace pearlrt {
       }
 
       //this-> FreeRTOSPriority = prio;
+      taskParams.pvParameter = (void*) this;
+      taskParams.tcb = &tcb;
+      taskParams.stack = stack;
+
       taskCreation = xTaskCreate(&tskfunc,
                                  (const char*) this->name,
-                                 this->stackDepth, this,
+                                 this->stackDepth, &taskParams,
                                  freeRtosPrio, &xth);
 
       if (taskCreation) {
@@ -186,7 +192,7 @@ namespace pearlrt {
       }
 {
 int f = uxTaskGetStackHighWaterMark(NULL);
-printf("Task %s stack useage: %d\n", name, f);
+printf("Task %s stack usage: %d\n", name, f);
 }
 
       vTaskDelete(oldTaskHandle);

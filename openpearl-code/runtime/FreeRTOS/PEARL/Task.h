@@ -75,6 +75,13 @@ namespace pearlrt {
       hide default ctor
       */
       Task();
+
+      /* the FreeRTOS task control block */
+      TCB_t tcb;
+
+      /* the FreeRTOS stack */
+      StackType_t stack[800];
+
    public:
       /**
       ctor for task object

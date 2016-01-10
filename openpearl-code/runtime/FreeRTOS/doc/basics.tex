@@ -19,14 +19,14 @@ The FreeRTOS system has the following disadvantages:
 
 \section{System Architecture}
 There are some problems with the linker and \texttt{weak} symbols.
-The effect is that \texttt{weak} symbols are not overwritte, if
+The effect is that \texttt{weak} symbols are not overwritten, if
 a corresponding strong symbol resides in a library.
-\texttt{weak} symbols are used in the interrupt vector table. This
-leads to
+\texttt{weak} symbols are usually used in the interrupt vector table.
+This leads to
 \begin{enumerate}
 \item an object file which contains the interrupt service handlers like
    reset-handler, timer and other device service routines
-\item a runline library with the remaining object files
+\item a runtime library with the remaining object files
 \end{enumerate}
 
 \subsection{System Initialization}
@@ -70,10 +70,10 @@ in many cases with relative times.
 
 FreeRTOS provides a tick based system time. The resolution is specified
 in the file \texttt{FreeRTOSConfig.h} --- 
-usually set in OpenPEARL to $1 ms$.
+set in OpenPEARL to $1 ms$.
 
 Some applications many require absolute times and more precise timing.
-Thats the reason why the FreeRTOS provided timers are not used. 
+That's the reason why the FreeRTOS provided timers are not used. 
 There is an implemtation of the \texttt{itimer} system. This 
 implementation allows the specification of a time source.
 This system was introduced  by Jonas Meyer in his thesis.
@@ -85,7 +85,72 @@ The absolute time is set to 1.1.2016 0:0:0 at system startup.
 
 Other time sources are plattform specific and described there.
 
-\subsection{Added Features to FreeRTOS and glib-c}
+\section{Modification in FreeRTOS}
+FreeRTOS was modified in the following points:
+\begin{description}
+\item[static tcb and stack:]  Normally FreeRTOS places task control blocks (tcb)
+   and task stack in the heap storage. This may procude memory fragmentation,
+   when application tasks are deleted and restarted in a random sequence.
+
+   A new configuration item in \texttt{FreeRTOSConfig.h}  changes this
+   behavior. If \texttt{configUSE\_STATIC\_STACK\_AND\_TCB} is set to 1
+   the function \texttt{xTaskCreate} assumes a pointer to a struct with
+   pointers to the previous applications parameters and two new pointers
+   to the tasks control block (with type \texttt{TCB\_t}) and tasks stack
+   (type \texttt{StackEntry\_t *}). The application is expected to be
+   responsible to pass valid pointers.
+\item[getTaskCurrentFreeStack] is a new function which returns the number
+   of free stack element (of size 32 bit) on the current active tasks stack.
+   This feature is enabled by the option
+    \texttt{INCLUDE\_xTaskGetCurrentFreeStack}
+\end{description}
+
+\section{Stack Checking}
+The gcc tool chain provides the possibility of code instrumentation
+for tracing. The option \texttt{-finstrument-functions} additional
+function call at each function entry and exit of the compilation unit.
+The corresponding functions must be supplied by the application program.
+
+The signature of the functions is:
+\begin{verbatim}
+extern "C" {
+void __cyg_profile_func_enter(void*this_fn, void* call_site)
+     __attribute__((no_instrument_function));
+
+void __cyg_profile_func_exit(void*this_fn, void* call_site)
+     __attribute__((no_instrument_function));
+};
+\end{verbatim}
+
+The configuration option \texttt{CONFIG\_LPC1768\_CHECK\_STACK\_OVERFLOW}
+controls the usage of the compiler option and inclusion of the
+module \texttt{FreeRTOS/addOns/checkStackOverflow.cc}.
+
+
+In case of the remaining stack of less than 100 elements (400 bytes), or a
+remaining unused size of less than 100 elements wil cause the raising
+of the StackOverflowSignal. This signal is intended to be non catchable
+by the application program.
+
+\section{Stack Size and Allocation Control}
+The build proces checks whether there is a file named \texttt{stacksize.h}
+in the current working directory. If this file does not exist it is created
+with default settings.
+This default file should be modified by the application engineer
+to set the desired stack size and location for the PEARL tasks.
+
+To define a PEARL tasks stack size, a C macro must be provided.
+If there is no specific macro, the default styk size of the port will be used.
+The naming scheme is:
+\verb|#define STACK_<taskname> size|, where \texttt{taskname}
+must be substutuded by the exact application tasks name. The size
+defines the number of steck elements for this task. This size must be larger
+than the minimum stack size.
+E.g. for the application task \texttt{DisplaySeriel} should have
+a stack size of 1000 elements (4kB) the definition would look
+like \verb|#define STACK_DisplaySeriel 1000|.
+
+\section{Added Features to FreeRTOS and glib-c}
 There are some additional functions in \texttt{FreeRTOS/addOns},
  which supply the toolchain
 with UNIX-like time functions like gettimeofday.
@@ -131,8 +196,6 @@ In short:
 
 \subsection{To be done}
   \begin{itemize}
-  \item allocate static TCB+Stack as patch for FreeRTOS to avoid 
-    memory fragementation due to ACTIVATE/TERMINATE cycles.
   \item provide aute restart at task termination
   \item provide device drivers for the standard devices (UART, SD, Ethernet)
 

@@ -6,4 +6,8 @@ ADDONCSRC = assert.c	 \
 	timer.c 	\
 	heap_1_2.c
 
+ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
+ADDONCSRC += testStackOverflow.cc
+endif
+
 ADDONINCS = .

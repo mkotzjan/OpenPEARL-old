@@ -68,6 +68,7 @@
     }; 									\
     extern class C_##x x
 
+
 /**
   \brief	DECLARE TASK macro
 
@@ -82,7 +83,6 @@
   \param ismain a pearlrt::BitString<1> value to specify whether the task
                  has a MAIN attribute set
  */
-
 #define DCLTASK(x, prio, ismain) 			\
  C_##x x((char*)#x,prio, ismain);			\
  void C_##x::task(pearlrt::Task * me)

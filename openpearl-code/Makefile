@@ -31,6 +31,7 @@ install: configuration/include/autoconf.h
 	runtime/includeComposer/ic  <prl.inc >prl
 	rm -f sysincs.h	# is created by includeComposer but not needed here
 	cp prl $(CONFIG_INSTALL_Target)/bin
+	chmod a+x $(CONFIG_INSTALL_Target)/bin/prl
 
 # create rule to run menuconfig, if no configuration/include/autoconf.h exists
 #ifeq ($(wildcard "configuration/include/autoconf.h")),)

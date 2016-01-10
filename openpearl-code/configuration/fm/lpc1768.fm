@@ -8,6 +8,22 @@ config LPC1768
 	This port is in work. Build and execution problems 
         may occur selecting this option. 
 
+config LPC1768_CHECK_STACK_OVERFLOW
+	depends on LPC1768
+	boolean "check stack overflow in application code"
+	default n
+	help
+	This will add some code on each funtion entry (and exit)
+        in order to check the corrent value of the stack pointer.
+	If the stack pointer is near to/or beyond of the stack limit
+        a non catchable exception is raised and the task is terminated.
+	
+	This option is EXPERIMENTAL. Buillt and runtime problems may occur.
+	
+	This option relies on the -finstrument-functions option of 
+	the g++ compiler.	
+
+#choice
 config LPC1768_tests
 	depends on LPC1768
 	boolean "build low level test applications"
