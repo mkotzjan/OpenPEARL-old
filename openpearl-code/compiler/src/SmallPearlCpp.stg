@@ -1271,8 +1271,8 @@ FormalParameters(FormalParameter) ::= <%
 <FormalParameter: {param|<param>} ; separator=", ">
 %>
 
-FormalParameter(id,type) ::= <%
-<type> <user_argument(id)>
+FormalParameter(id,type,assignmentProtection,passIdentical) ::= <%
+<if(assignmentProtection)>const <endif><type>  <if(passIdentical)>&<endif><user_argument(id)>
 %>
 
 ParameterType(type) ::= <%

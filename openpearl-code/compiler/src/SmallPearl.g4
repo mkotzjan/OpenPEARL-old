@@ -446,7 +446,16 @@ listOfFormalParameters :
 ////////////////////////////////////////////////////////////////////////////////
 
 formalParameter :
-    ( ID | '(' ID ( ',' ID)* ')' ) parameterType
+    ( ID | '(' ID ( ',' ID)* ')' ) assignmentProtection? parameterType passIdentical?
+    ;
+
+
+assignmentProtection :
+    'INV'
+    ;
+
+passIdentical:
+    'IDENTICAL' | 'IDENT'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

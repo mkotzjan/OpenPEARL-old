@@ -3215,6 +3215,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 ST param = group.getInstanceOf("FormalParameter");
                 param.add("id", ctx.ID(i));
                 param.add("type", visitParameterType(ctx.parameterType()));
+
+                if ( ctx.assignmentProtection() != null ) {
+                    param.add("assignmentProtection", "");
+                }
+
+                if ( ctx.passIdentical() != null ) {
+                    param.add("passIdentical", "");
+                }
+
                 st.add( "FormalParameter", param);
             }
         }

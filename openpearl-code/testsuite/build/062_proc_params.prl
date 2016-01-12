@@ -25,7 +25,7 @@ proc_003: PROC ( p1 FIXED, p2 FIXED(15) );
    p2 := p1;      		!! access of parameters
 END;
 
-/*
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Procedure Declaration with ident multiple parameters
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -41,7 +41,6 @@ proc_005: PROC ( p1 FIXED, p2 INV FIXED(15) IDENT );
    p1 := p1 +1;      		!! access of parameters
    p2 := p1;      		!! must produce compilation error (INV)
 END;
-*/
 
 T1: TASK MAIN;
    DCL f FIXED;
@@ -51,8 +50,8 @@ T1: TASK MAIN;
    CALL proc_002(f);
    CALL proc_003(f, f15);
    CALL proc_003(f, f15+1);
-!   CALL proc_004(f, f15);
-!   CALL proc_005(f, f15);
+   CALL proc_004(f, f15);
+   CALL proc_005(f, f15);
 
 END;
 
