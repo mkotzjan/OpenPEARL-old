@@ -1152,6 +1152,10 @@ user_label(name) ::= <%
     _<name>
 %>
 
+user_argument(name) ::= <%
+    _<name>
+%>
+
 /* --------------------- LOOPS -------------------------- */
 
 LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,while_cond,body,label_end) ::= <<
@@ -1268,7 +1272,7 @@ FormalParameters(FormalParameter) ::= <%
 %>
 
 FormalParameter(id,type) ::= <%
-<type> <id>
+<type> <user_argument(id)>
 %>
 
 ParameterType(type) ::= <%
