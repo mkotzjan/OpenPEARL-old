@@ -1185,9 +1185,9 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
     <endif>
 
     <if(to)>
-        while ((((s_value > CONSTANT_FIXED_0_1).getBoolean()) &&
+        while ((((s_value > CONSTANT_FIXED_POS_0_1).getBoolean()) &&
                 ((a_value \<= e_value).getBoolean())) ||
-                (((s_value \< CONSTANT_FIXED_0_1).getBoolean()) &&
+                (((s_value \< CONSTANT_FIXED_POS_0_1).getBoolean()) &&
                 ((a_value >= e_value).getBoolean())))
         {<\n>
             <if(variable)>
@@ -1203,9 +1203,9 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
 
             me->setLocation(<srcLine>, filename);
 
-            if (((s_value > CONSTANT_FIXED_0_1).getBoolean() &&
+            if (((s_value > CONSTANT_FIXED_POS_0_1).getBoolean() &&
                  (a_value \<= (e_value - s_value)).getBoolean()) ||
-                ((s_value \< CONSTANT_FIXED_0_1).getBoolean() &&
+                ((s_value \< CONSTANT_FIXED_POS_0_1).getBoolean() &&
                 (a_value >= (e_value - s_value)).getBoolean())) {
                 a_value = a_value + s_value;
             } else {
