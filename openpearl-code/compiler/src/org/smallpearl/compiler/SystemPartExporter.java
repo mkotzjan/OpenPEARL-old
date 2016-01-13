@@ -90,6 +90,19 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
             }
         }
 
+        SymbolTable symtab = SymbolTable.getSymbolTable();
+        LinkedList<TaskDef> tasks = symtab.getTasks();
+        ST tasklist = group.getInstanceOf("TaskList");
+
+        for (int i = 0; i < tasks.size(); i++) {
+            TaskDef task = tasks.get(i);
+            ST curTask = group.getInstanceOf("Task");
+            curTask.add("name", task.getName());
+            tasklist.add( "tasks", curTask);
+        }
+
+        module.add("TaskList", tasklist);
+
         return module;
     }
 

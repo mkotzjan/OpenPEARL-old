@@ -29,11 +29,12 @@
 
 group openpearl;
 
-Module(sourcefile,name,SystemPart) ::= <<
+Module(sourcefile,name,SystemPart,TaskList) ::= <<
 \<?xml version="1.0">
 \<module name="<name>"  sourcefile="<sourcefile>">
 <SystemPart>
 \</module>
+<TaskList>
 >>
 
 SystemPart(decls) ::= <<
@@ -68,4 +69,14 @@ Username_Parameters(params) ::= <<
   \<parameters>
     <params: {param| \<param><param>\</param> }; separator="\n">
   \</parameters>
+>>
+
+TaskList(tasks) ::= <<
+\<tasks>
+ <tasks: {task|<task>}; separator="\n">
+\</tasks>
+>>
+
+Task(name) ::= <<
+    \<task><name>\</task>
 >>
