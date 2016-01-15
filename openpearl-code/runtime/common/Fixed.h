@@ -50,6 +50,13 @@ the next most integral data type will be used to store the internal value.
 #include "Signals.h"
 #include "Fixed63.h"
 
+#include "../../configuration/include/autoconf.h"
+#ifdef CONFIG_LPC1768_CHECK_STACK_OVERFLOW
+  // disable stack checking for the template methods in the applicaton code
+# define NOSTACKCHECK __attribute__((no_instrument_function))
+#else
+# define NOSTACKCHECK /* nothing */
+#endif
 
 namespace pearlrt {
 #include "IfThenElseTemplate.h"
@@ -239,7 +246,7 @@ namespace pearlrt {
 
       struct LessThan32Bits {
          static Fixed add(const Fixed & lhs,
-                          const Fixed & rhs)  {
+                          const Fixed & rhs) NOSTACKCHECK  {
             Fixed h;
             LongerNativeType r;
             h.x = rhs.x + lhs.x;
@@ -435,7 +442,7 @@ namespace pearlrt {
        default constructor initializes the data field with an
       empty bit string (all bits 0)
       */
-      Fixed() {
+      Fixed() NOSTACKCHECK {
          x = 0;
       }
 
@@ -450,7 +457,7 @@ namespace pearlrt {
 
        \param y the preset value, given as a c++ native integral value
       */
-      Fixed(LongerNativeType y) {
+      Fixed(LongerNativeType y) NOSTACKCHECK {
          if (y > maxValue || y < minValue) {
             throw theFixedRangeSignal;
          }
@@ -637,7 +644,7 @@ namespace pearlrt {
        \returns result  of the operation
        \throws FixedRangeSignal, if numerical overflow or pow(0,0)
       */
-      template<int P>Fixed pow(const Fixed<P>& rhs)const {
+      template<int P>Fixed pow(const Fixed<P>& rhs) const {
          Fixed result(1);
          Fixed base(x);
          int64_t exp = rhs.x;
@@ -714,7 +721,7 @@ namespace pearlrt {
            range of the fixed type
    */
    template<int S, int P>
-   Fixed < (S > P) ? S : P > operator+ (Fixed<S> lhs, const Fixed<P> & rhs)  {
+   Fixed < (S > P) ? S : P > operator+ (Fixed<S> lhs, const Fixed<P> & rhs) {
       Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
       return l.add(r);
    }
@@ -728,7 +735,7 @@ namespace pearlrt {
            range of the fixed type
    */
    template<int S, int P>
-   Fixed < (S > P) ? S : P > operator- (Fixed<S> lhs, const Fixed<P> & rhs)  {
+   Fixed < (S > P) ? S : P > operator- (Fixed<S> lhs, const Fixed<P> & rhs) {
       Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
       return l.substract(r);
    }
@@ -742,7 +749,7 @@ namespace pearlrt {
            range of the fixed type
    */
    template<int S, int P>
-   Fixed < (S > P) ? S : P > operator* (Fixed<S> lhs, const Fixed<P> & rhs)  {
+   Fixed < (S > P) ? S : P > operator* (Fixed<S> lhs, const Fixed<P> & rhs) {
       Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
       return l.multiply(r);
    }
@@ -757,7 +764,7 @@ namespace pearlrt {
    \throws FixedDivideByZeroSignal if the divisor was 0
    */
    template<int S, int P>
-   Fixed < (S > P) ? S : P > operator/ (Fixed<S> lhs, const Fixed<P> & rhs)  {
+   Fixed < (S > P) ? S : P > operator/ (Fixed<S> lhs, const Fixed<P> & rhs) {
       Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
       return l.divide(r);
    }
@@ -771,7 +778,7 @@ namespace pearlrt {
    \throws FixedDivideByZeroSignal if the divisor was 0
    */
    template<int S, int P>
-   Fixed < (S > P) ? S : P > operator% (Fixed<S> lhs, const Fixed<P> & rhs)  {
+   Fixed < (S > P) ? S : P > operator% (Fixed<S> lhs, const Fixed<P> & rhs) {
       Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
       return l.modulo(r);
    }

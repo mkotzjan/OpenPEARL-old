@@ -5,7 +5,7 @@
  *      Author: jonas meyer, rainer mueller
  */
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2015 Jonas Meyer
                2015 Rainer Mueller
  All rights reserved.
@@ -57,18 +57,22 @@
 #include <stdio.h>
 
 #include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
 #include "task.h"
 #include "queue.h"
 #include "time_addons.h"
 #include "FreeRTOSClock.h"
+#include "allTaskPriorities.h"
 
-#define TIMER_STACK_SIZE 1000
+#define TIMER_STACK_SIZE 400
+#define STACKLIMIT 100	// limit of minimum free stack for the timer task
+
 #define MAXTIMER configTIMER_QUEUE_LENGTH
 #define ENTERCRITICAL taskDISABLE_INTERRUPTS();DMB();
 #define LEAVECRITICAL DMB();taskENABLE_INTERRUPTS()
 
-static TaskHandle_t xClackerTaskHandle;
-static void clackerTask(void *);
+static TaskHandle_t xTimerTaskHandle;
+static void timerTask(void *);
 static void retrigger_timer();
 
 
@@ -91,7 +95,7 @@ static struct tableEntry timerTable[MAXTIMER];
 static timer_t unused = -1;            // points to no timer
 static timer_t expires_next = -1;       // points to no timer
 
-static QueueHandle_t timer_queue;
+static QueueHandle_t timerQueue;
 
 // function pointer to define next timeout
 static void (*timer_set)(uint64_t ns) = NULL;
@@ -171,11 +175,6 @@ static void timer_init_if_necessary() {
    static StackType_t timerStack[TIMER_STACK_SIZE];
    static TCB_t timerTcb;
 
-   createParameters.pvParameter = NULL;
-   createParameters.tcb = NULL;
-   createParameters.stack = timerStack;
-   createParameters.tcb = &timerTcb;
-
    if (! tablestate.tableinitialized) {
       if (timer_set == NULL) {
          // no timer defined by the user as static object
@@ -197,12 +196,20 @@ static void timer_init_if_necessary() {
       timerTable[MAXTIMER - 1].next = -1;
       timerTable[MAXTIMER - 1].prev = MAXTIMER - 2;
 
-      timer_queue = xQueueCreate(10, 1);
+      /* the interrupt service routine sends messages to this 
+      queue on each expiration of the timer. The length is
+      set to something above 1 but not too large...
+      maybe this schould be replaced by a counting semaphore...
+      */
+      timerQueue = xQueueCreate(10, 1);
 
-      xTaskCreate(clackerTask,
-                  "ClackerTask", TIMER_STACK_SIZE, &createParameters,
-                  configMAX_PRIORITIES - 1,
-                  &xClackerTaskHandle); //stack 50 war nicht nur schlecht
+      createParameters.pvParameter = NULL;
+      createParameters.stack = timerStack;
+      createParameters.tcb = &timerTcb;
+
+      xTaskCreate(timerTask,
+                  "timerTask", TIMER_STACK_SIZE, &createParameters,
+                  PRIO_TASK_TIMER, &xTimerTaskHandle);
 
       tablestate.tableinitialized = 1;
    }
@@ -227,6 +234,7 @@ static void insert_timer_into_free_list(timer_t t) {
 static void remove_timer_from_active_list(timer_t t) {
    // pedandic check if timer is really in active list
    int i;
+   int next;
    int timer_found = 0;
 
    i = expires_next;
@@ -238,6 +246,12 @@ static void remove_timer_from_active_list(timer_t t) {
          if (i == expires_next) {
             // remove first element from list
             expires_next =  timerTable[i].next;
+
+            if (expires_next != -1) {
+               timerTable[expires_next].prev = -1; // is first entry now
+            }
+
+            return;   // easy case -- first entry removed
          }
       }
 
@@ -249,8 +263,16 @@ static void remove_timer_from_active_list(timer_t t) {
       return;
    }
 
-   timerTable[timerTable[t].next].prev = timerTable[t].prev;
-   timerTable[timerTable[t].prev].next = timerTable[t].next;
+   next = timerTable[t].next;
+
+   if (next != -1) {
+      // usual case: mid entry removed
+      timerTable[next].prev = timerTable[t].prev;
+      timerTable[timerTable[t].prev].next = next;
+   } else {
+      // last entry removed
+      timerTable[timerTable[t].prev].next = next;
+   }
 }
 
 
@@ -263,6 +285,7 @@ static void insert_timer_into_active_list(timer_t t) {
       expires_next = t;
       timerTable[t].next = -1; // no next element
       timerTable[t].prev = -1; // no previous element
+      return;
    } else {
       last_i = i;
 
@@ -466,22 +489,22 @@ int timer_settime(const timer_t timerid, const int flags,
 void resume_timer_task_from_ISR() {
    char dummy = 1;
 
-//printf("clack\n");
-   if (xClackerTaskHandle) {
-      if (!xQueueSendFromISR(timer_queue, &dummy, NULL)) {
+   if (xTimerTaskHandle) {
+      if (!xQueueSendFromISR(timerQueue, &dummy, NULL)) {
          printf("error at xQuereSendFromISR\n");
       }
 
-      //xTaskResumeFromISR(xClackerTaskHandle);
+      //xTaskResumeFromISR(xTimerTaskHandle);
       //The yield is _very_ important for performance
-      portYIELD_FROM_ISR(xClackerTaskHandle);
+      portYIELD_FROM_ISR(xTimerTaskHandle);
    }
 }
 
-static void clackerTask(void *pcParameters) {
+static void timerTask(void *pcParameters) {
    uint64_t now, timeout;
    int timerid;
    char dummy;
+   int freeStack;
 
    struct Callback {
       void (*cb)(void *arg_ptr);
@@ -489,14 +512,10 @@ static void clackerTask(void *pcParameters) {
    }*callback;
 
    while (1) {
-      //vTaskSuspend(NULL);
-      if (!xQueueReceive(timer_queue, &dummy, portMAX_DELAY)) {
+      if (!xQueueReceive(timerQueue, &dummy, portMAX_DELAY)) {
          printf("error at xQueueReceive\n");
       }
 
-
-//printf("clackerTask: clack\n");
-//dump_timers();
       // check, which timers reached their timeout
 
       clock_gettime_nsec(&now);
@@ -509,306 +528,50 @@ static void clackerTask(void *pcParameters) {
          if (timerid >= 0) {
             timeout = timerTable[timerid].value.nsec_value;
 
-//printf("clack: timerid=%d  timeout=%"PRIu64" now= %"PRIu64" \n",
-//          timerid, timeout, now);
             if (timeout < now) {
                // timeout reached
                // --> remove timer from list and
                // --> reinsert if timer is set periodic
-//printf("timeout reached\n");
                remove_timer_from_active_list(timerid);
 
                if (timerTable[timerid].value.nsec_interval) {
                   timerTable[timerid].value.nsec_value +=
                      timerTable[timerid].value.nsec_interval;
-//printf("reinserted after interval \n");
                   insert_timer_into_active_list(timerid);
-//dump_timers();
                }
 
                // invoke timer callback method
                callback = (struct Callback*) timerTable[timerid].evp;
-//            printf("call of callback %p(%p) \n",
-//                     callback->cb, callback->th);
                callback->cb(callback->th);
-//            printf("callback done \n");
             }
          }
       } while (timerid >= 0 && timeout < now);
 
       retrigger_timer();
       LEAVECRITICAL;
-   }
-}
+      freeStack = uxTaskGetCurrentFreeStack();
 
-#ifdef TOBEDELETED
-static void nsec_clock_gettime_wait(uint64_t*);
-static int timerarm_wait(int64_t alarm);
-
-void (*nsec_clock_gettime)(uint64_t*) = nsec_clock_gettime_wait;
-int (*timerarm)(int64_t alarm) = timerarm_wait;
-
-struct internaltimerspec {
-   uint64_t nsec_value;
-   uint64_t nsec_interval;
-};
-
-struct tableentry {
-   timer_t next;
-   timer_t prev;
-   struct sigevent *__restrict evp;	//actually a pointer callback
-   // and its argument.
-   struct internaltimerspec value;
-};
-
-//list entry points
-static volatile timer_t firstfree = 0;
-static volatile timer_t firstactive = 0;
-static volatile timer_t firstunsorted = 0;
-static volatile timer_t lastunsorted = 0; //fifo, to not starve
-// low frequency jobs
-
-
-// effectively 3 disjunct lists in the same table. others are dangling.
-// due to delete being applicable to any list all of them need to be bidirected
-// lists are terminated at both ends by next == index or prev == index
-// that way it is possible to put a timer between a single timer.
-
-//endof range is special and marks the end of things
-static struct tableentry table[(timer_t)MAXTIMER];
-
-static void nsec_clock_gettime_wait(uint64_t *alarm) {
-   while (*nsec_clock_gettime == &nsec_clock_gettime_wait) {
-      DMB();
-   }
-
-   nsec_clock_gettime(alarm);
-}
-
-static int timerarm_wait(int64_t alarm) {
-   while (*timerarm == &timerarm_wait) {
-      DMB();
-   }
-
-   return (*timerarm)(alarm);
-}
-
-void TimerResumeClackerFromISR() {
-   if (xClackerTaskHandle) {
-      xTaskResumeFromISR(xClackerTaskHandle);
-      //The yield is _very_ important for performance
-      portYIELD_FROM_ISR(xClackerTaskHandle);
-   }
-}
-
-static void timer_init() {
-   int i = 0;
-   table[0].prev = 0;
-   table[0].next = 1;
-
-   for (i = 1; i < MAXTIMER; i++) {
-      table[i].next = i + 1;
-      table[i].prev = i - 1;
-   }
-
-   table[MAXTIMER - 1].next = MAXTIMER - 1;
-   xTaskCreate(TaskTimerSort,
-               "SortTask", 50, NULL,
-               configMAX_PRIORITIES - 2,
-               &xTimerSortTaskHandle);
-   xTaskCreate(TaskClacker,
-               "ClackerTask", 200, NULL,
-               configMAX_PRIORITIES - 1,
-               &xClackerTaskHandle); //stack 50 war nicht nur schlecht
-   tablestate.tableinitialized = 1;
-}
-
-
-typedef void critical;//just a reminder, not an actual type
-static critical dangle(const timer_t thatindex) {
-   struct tableentry * const that = &table[thatindex];
-
-   //the free list is handled by the timer_create/delete pair
-   if (thatindex == lastunsorted) {
-      lastunsorted = that->prev;
-   }
-
-   if (thatindex == firstunsorted) {
-      firstunsorted = that->next;
-   }
-
-   if (thatindex == firstactive) {
-      firstactive = that->next;
-   }
-
-   if (that->next == that->prev) {
-      if (thatindex == firstactive) {
-         tablestate.active = 0;
+      if (freeStack < STACKLIMIT) {
+         printf(
+            "TimerTask: current free stack only %d free elements"
+            "TimerTask terminates\n",
+            freeStack);
+         vTaskDelete(NULL);
+      } else {
+//       printf("TimerTask: current free stack %d free elements\n",
+//             freeStack);
       }
 
-      if (thatindex == firstunsorted) {
-         tablestate.unsorted = 0;
+      freeStack = uxTaskGetStackHighWaterMark(NULL);
+
+      if (freeStack < STACKLIMIT) {
+         printf("TimerTask: stack used up to %d free elements"
+                "TimerTask terminates\n",
+                freeStack);
+         vTaskDelete(NULL);
+      } else {
+         printf("TimerTask: stack used up to %d free elements\n", freeStack);
       }
    }
-
-   that->next = that->prev = thatindex;
-   tablestate.sorttaskreset = 1;
 }
 
-/*the timer must be dangling already*/
-static critical putfirstunsorted(const timer_t thatindex) {
-   struct tableentry *const that = &table[thatindex];
-
-   if (!tablestate.unsorted) {
-      firstunsorted = lastunsorted = thatindex;
-   }
-
-   that->next = firstunsorted;
-   table[that->next].prev = thatindex;
-   firstunsorted = thatindex;
-   tablestate.unsorted = 1;
-}
-
-int timer_create(clockid_t clock_id,
-                 struct sigevent *__restrict evp,
-                 timer_t *__restrict timerid) {
-   /*[EINVAL] The specified clock ID is not defined.*/
-   if (!tablestate.tableinitialized) {
-      timer_init();
-   }
-
-   ENTERCRITICAL;
-
-   if (tablestate.full) {
-      LEAVECRITICAL;
-      errno = EAGAIN;
-      return -1;
-   }
-
-   *timerid = firstfree;
-   struct tableentry *const that = &table[firstfree];
-
-   if (that->next == firstfree) {
-      tablestate.full = 1;
-   }
-
-   firstfree = that->next;
-   that->evp = evp;
-   //dangle the timer, this is the first timer in a list
-   table[that->next].prev = that->next;
-   that->next = *timerid;
-   that->prev = *timerid;
-   LEAVECRITICAL;
-   return 0;
-}
-
-int timer_settime(const timer_t timerid, const int flags,
-                  const struct itimerspec *const value,
-                  struct itimerspec *const ovalue) {
-   struct tableentry *const that = &table[timerid];
-   uint64_t nsectimestamp;
-
-   nsec_clock_gettime(&nsectimestamp);
-//printf("timer_settime(tid=%d val=%ld:%ld rept=%ld:%ld\n", timerid,
-   value->it_value.tv_sec, value->it_value.tv_nsec,
-         value->it_interval.tv_sec, value->it_interval.tv_nsec);
-
-   if (timerid > MAXTIMER) {
-   errno = EINVAL;
-   return -1;
-}
-
-if (checkitimerspec(value) == -1) {
-      errno = EINVAL;
-      return -1;
-   }
-
-   struct internaltimerspec loadvalue, ovalprep;
-
-   itimerspectointernaltimerspec(value, &loadvalue);
-
-   if (!loadvalue.nsec_value) {
-   loadvalue.nsec_value = loadvalue.nsec_interval;
-}
-
-if (flags != TIMER_ABSTIME && loadvalue.nsec_value) {
-   loadvalue.nsec_value += nsectimestamp;
-}
-
-ENTERCRITICAL;
-ovalprep = that->value;
-that->value = loadvalue;
-dangle(timerid);
-
-if (loadvalue.nsec_value) {
-   putfirstunsorted(timerid);
-   }
-
-   LEAVECRITICAL;
-
-   if (ovalue) {
-   ovalprep.nsec_value -= nsectimestamp;
-   internaltimerspectoitimerspec(&ovalprep, ovalue);
-   }
-
-   if (xTimerSortTaskHandle) {
-   vTaskResume(xTimerSortTaskHandle);
-   }
-
-   return 0;
-}
-
-int timer_delete(timer_t thatindex) {
-   if (thatindex >= MAXTIMER) {
-      errno = EINVAL;
-      return -1;
-   }
-
-   ENTERCRITICAL;
-   struct tableentry *const that = &table[thatindex];
-   dangle(thatindex);
-
-   //fixup free list:
-   //  put the freed timer as the first free of the chain of free timers
-   if (!tablestate.full) {
-      that->next = firstfree;
-   }
-
-   firstfree = thatindex;
-   table[that->next].prev = thatindex;
-   tablestate.full = 0;
-   that->value.nsec_value = that->value.nsec_interval = 0;
-   LEAVECRITICAL;
-   return 0;
-}
-
-int timer_gettime(timer_t timerid, struct itimerspec *value) {
-   if (timerid > MAXTIMER) {
-      errno = EINVAL;
-      return -1;
-   }
-
-   uint64_t nsectimestamp;
-   (*nsec_clock_gettime)(&nsectimestamp);
-
-   struct internaltimerspec valprep;
-
-   ENTERCRITICAL;
-   valprep = table[timerid].value;
-   LEAVECRITICAL;
-
-   valprep.nsec_value -= nsectimestamp;
-   internaltimerspectoitimerspec(&valprep, value);
-   return 0;
-}
-
-int timer_getoverrun(timer_t timerid) {
-   errno = ENOTSUP;
-   return -1;
-}
-
-
-/*
-*/
-
-#endif

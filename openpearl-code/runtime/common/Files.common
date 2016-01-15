@@ -72,7 +72,7 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	Fixed.h PutFixed.h GetFixed.h \
 	Device.h Dation.h UserDation.h \
 	PutCharacter.h \
-	Log.h Float.h \
+	Float.h \
 	TaskTimerCommon.h \
 	TaskMonitor.h \
 	compare.h \

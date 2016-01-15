@@ -20,7 +20,6 @@
 */
 
 #include <cstdarg>   // for va_start,..
-//#include <unistd.h>
 
 #include "Clock.h"
 #include "PutClock.h"
@@ -29,20 +28,65 @@
 #include "RefCharSink.h"
 #include "Log.h"
 
+#include "FreeRTOSConfig.h"
+#include "task.h"	// FreeRTOS functions
+
 extern "C" {
    extern int _write(int, const void* data, int size);
 };
 
 namespace pearlrt {
+
+// formatting an output is done during in separate task if scheduler
+// is running. This safes a lot of tasks stack
+#define LOGSTACKSIZE 400
+   static TCB_t        logTcb;
+   static StackType_t  logStack[LOGSTACKSIZE];
+   static SemaphoreHandle_t logDone, logReady, logGo;
+   static TaskHandle_t      logTaskHandle;
+   static const Character<7>* commonType;
+   static const char * commonFormat;
+   static va_list commonArgs;
+
 #define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
    bool Log::initialized = false;
    int Log::logLevel = Log::WARN | Log::ERROR | Log::INFO | Log::DEBUG ;
    Mutex Log::mutex;
 
+   void Log::logTask(void * p) {
+      while (1) {
+         // signal that log task is ready to do the job
+         xSemaphoreGive(logReady);
+
+         // wait for new log job
+         xSemaphoreTake(logGo, portMAX_DELAY);
+
+         // new job arrived
+         Log::doitSync(*commonType, commonFormat, commonArgs);
+
+         // and tell application task that the log job is finished
+         xSemaphoreGive(logDone);
+      }
+   }
+
    Log::Log() {
+      StructParameters_t createParameters; // for task creation
       initialized = true;
       mutex.name("Log");
+
+      createParameters.pvParameter = NULL;
+      createParameters.stack       = logStack;
+      createParameters.tcb         = &logTcb;
+      
+      // set the priority to the same as the idle tasks priority
+      // the tasks priority will follow the calling tasks priority
+      xTaskCreate(logTask, "Log", LOGSTACKSIZE, &createParameters,
+                  0, &logTaskHandle);
+
+      logReady = xSemaphoreCreateBinary();
+      logDone  = xSemaphoreCreateBinary();
+      logGo    = xSemaphoreCreateBinary();
    }
 
    Log* Log::getInstance() {
@@ -178,6 +222,24 @@ namespace pearlrt {
    void Log::doit(const Character<7>& type,
                   const char * format,
                   va_list args) {
+      if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
+         xSemaphoreTake(logReady, portMAX_DELAY);
+         commonType = &type;
+         commonFormat = format;
+         commonArgs = args;
+
+         // set the priority of the log task to the same as the calling task
+         vTaskPrioritySet(logTaskHandle, uxTaskPriorityGet(NULL)); 
+         xSemaphoreGive(logGo);
+         xSemaphoreTake(logDone, portMAX_DELAY);
+      } else {
+         doitSync(type, format, args);
+      }
+   }
+
+   void Log::doitSync(const Character<7>& type,
+                      const char * format,
+                      va_list args) {
       Character<128> line;
       const char * rp;   // pointer in format string
       RefCharacter rc(line);
@@ -300,7 +362,7 @@ namespace pearlrt {
 
    void Log::info(const char * format, ...) {
       if (logLevel & Log::INFO) {
-         Character<7> type("INFO:");
+         static const Character<7> type("INFO:");
          va_list args;
          va_start(args, format);
          Log::getInstance()->doit(type, format, args);
@@ -310,7 +372,7 @@ namespace pearlrt {
 
    void Log::error(const char * format, ...) {
       if (logLevel & Log::ERROR) {
-         Character<7> type("ERROR:");
+         static const Character<7> type("ERROR:");
          va_list args;
          va_start(args, format);
          Log::getInstance()->doit(type, format, args);
@@ -320,7 +382,7 @@ namespace pearlrt {
 
    void Log::warn(const char * format, ...) {
       if (logLevel & Log::WARN) {
-         Character<7> type("WARN:");
+         static const Character<7> type("WARN:");
          va_list args;
          va_start(args, format);
          Log::getInstance()->doit(type, format, args);
@@ -330,7 +392,7 @@ namespace pearlrt {
 
    void Log::debug(const char * format, ...) {
       if (logLevel & Log::DEBUG) {
-         Character<7> type("DEBUG:");
+         static const Character<7> type("DEBUG:");
          va_list args;
          va_start(args, format);
          Log::getInstance()->doit(type, format, args);

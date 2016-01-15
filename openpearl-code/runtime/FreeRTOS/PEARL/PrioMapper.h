@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 

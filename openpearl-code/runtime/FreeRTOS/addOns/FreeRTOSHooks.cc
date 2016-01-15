@@ -4,21 +4,24 @@
 #include "FreeRTOS.h"
 static void dumpStacks() ;
 extern "C" {
-void vApplicationStackOverflowHook() {
-   printf("Stack Overflow\n");
-   printf("Task=%s\n",pcTaskGetTaskName(NULL));
+   void vApplicationStackOverflowHook() {
+      printf("Stack Overflow\n");
+      printf("Task=%s\n", pcTaskGetTaskName(NULL));
 
-   for (;;);
-}
+      for (;;);
+   }
 
-void vApplicationMallocFailedHook() {
-   printf("malloc failed!\n");
-   printf("Task=%s\n",pcTaskGetTaskName(NULL));
+   void vApplicationMallocFailedHook() {
+      printf("malloc failed!\n");
+      printf("Task=%s\n", pcTaskGetTaskName(NULL));
 
-   for (;;);
-}
+      for (;;);
+   }
 
-void vApplicationIdleHook() {
-}
-};
+   void vApplicationIdleHook() {
+      /* do nothing - just be prepared if somebody sets the switch in the
+         FreeRTOSConfig.h
+      */
+      }
+      };
 

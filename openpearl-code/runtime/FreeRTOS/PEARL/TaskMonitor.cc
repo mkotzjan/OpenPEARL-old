@@ -43,6 +43,7 @@ stops the system when no more activity may occur
 
 #include "TaskMonitor.h"
 #include "Log.h"
+#include "task.h"   // vTaskEndScheduler()
 
 namespace pearlrt {
 
@@ -74,7 +75,8 @@ namespace pearlrt {
 
       if (nbrPendingTasks == 0) {
 //        kill(pid, SIGRTMIN + 4); // indicate that last task exited
-         printf("last task exited \n");
+         vTaskEndScheduler();
+         printf("last task exited -- end.\n");
          exit(0);
       }
    }

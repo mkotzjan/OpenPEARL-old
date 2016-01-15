@@ -32,11 +32,11 @@
 	\file
 	\brief OpenPEARL entry
 
-	system start 
+	system start
 
 \mainpage
 
-The OpenPEARL system for the LPC1768-Landtiger board is based on the 
+The OpenPEARL system for the LPC1768-Landtiger board is based on the
 FreeRTOS scheduler.
 
 Most of the classes are plattform independent.
@@ -82,35 +82,30 @@ and start FreeRTOS-scheduler
 __attribute__((weak)) int main(void) {
    char line[40];
    uint32_t resetReason;
- 
+
    // obtain the reset reason
    resetReason = Chip_SYSCTL_GetSystemRSTStatus();
 
-#if CONFIG_LPC1768_CHECK_STACK_OVERFLOW == 1
-	// enforce linkage; LTO would remove required modules, since
- 	// the need is not visible from call graph 
-	extern "C" {
-          extern void __cyg_profile_func_enter(void*this_fn, void* call_site);
-	};
-
-	__cyg_profile_func_enter(NULL, NULL);
-#endif
    // clear the reset condition, since the device accumulates them
    Chip_SYSCTL_ClearSystemRSTStatus(resetReason);
+
    if (resetReason & SYSCTL_RST_POR) {
-      printf("Power On RESET post_setting is %d\n",Post::getPostStatus());
+      printf("Power On RESET post_setting is %d\n", Post::getPostStatus());
       Post::print();
       //Post::config();
-   } 
+   }
+
    if (resetReason & SYSCTL_RST_EXTRST) {
       printf("External RESET\n");
-   } 
+   }
+
    if (resetReason & SYSCTL_RST_WDT) {
       printf("Watchdog RESET\n");
-   } 
+   }
+
    if (resetReason & SYSCTL_RST_BOD) {
       printf("Brown-out RESET\n");
-   } 
+   }
 
 
    /*
@@ -156,16 +151,15 @@ __attribute__((weak)) int main(void) {
    Log::info("system startup complete");
    /* Start the scheduler. */
    vTaskStartScheduler();
-   Log::error("main.c: Scheduler terminated");
-
-   while (1); // make endless loop in this case to avoid other strange effects
+   Log::error("main.c: could not create idle task");
+   exit(1);
 }
 
 /**
 vConfigurateTimerForRunTimeStats
 
-is a FreeRTOS hook function, which may be useful for system 
-diagnosis 
+is a FreeRTOS hook function, which may be useful for system
+diagnosis
 \note add useful code to vConfigureTimerForRunTimeStats
 
 */

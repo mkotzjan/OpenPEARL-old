@@ -52,6 +52,14 @@ the next most integral data type will be used.
 #include "Signals.h"
 #include "Log.h"
 
+#include "../../configuration/include/autoconf.h"
+#ifdef CONFIG_LPC1768_CHECK_STACK_OVERFLOW
+  // disable stack checking for the template methods in the applicaton code
+# define NOSTACKCHECK __attribute__((no_instrument_function))
+#else
+# define NOSTACKCHECK /* nothing */
+#endif
+
 namespace pearlrt {
 #include "NumberOfBytes.h"
 
@@ -169,7 +177,7 @@ namespace pearlrt {
        default constructor initializes the data field with an
       empty bit string (all bits 0)
       */
-      BitString() {
+      BitString() NOSTACKCHECK {
          x = 0;
       }
 
@@ -185,7 +193,7 @@ namespace pearlrt {
             value. Eg. '011'B1 denotes a BIT(3) value and '0'B4 is a BIT(4)
             value.
       */
-      BitString(DataType y) {
+      BitString(DataType y) NOSTACKCHECK {
          x = y;
          x <<= shiftSize;
          x &= mask;

@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2013-2014 Florian Mahlecke
  All rights reserved.
 
@@ -51,6 +51,7 @@
 #include "Semaphore.h"
 #include "Log.h"
 #include "FreeRTOS.h"
+#include "allTaskPriorities.h"
 
 namespace pearlrt {
 
@@ -151,14 +152,15 @@ namespace pearlrt {
       try {
          me->task(me);
       } catch (Signal & p) {
-         char line[256];
-         printf("++++++++++++++++++++++++++++++\n");
-         sprintf(line, "%s:%d Task: %s   terminated due to: %s",
-                 me->getLocationFile(), me->getLocationLine(),
-                 me->getName(), p.which());
-         printf("%s\n", line);
-         pearlrt::Log::error(line);
-         printf("++++++++++++++++++++++++++++++\n");
+         {
+            int f = uxTaskGetStackHighWaterMark(NULL);
+            printf("Task stack usage: %d\n", f);
+         }
+         Log::error("++++++++++++++++++++++++++++++");
+         Log::error("%s:%d Task: %s   terminated due to: %s",
+                    me->getLocationFile(), me->getLocationLine(),
+                    me->getName(), p.which());
+         Log::error("++++++++++++++++++++++++++++++");
       }
 
       me->terminate(me);
@@ -190,10 +192,11 @@ namespace pearlrt {
             mutexUnlock();
          }
       }
-{
-int f = uxTaskGetStackHighWaterMark(NULL);
-printf("Task %s stack usage: %d\n", name, f);
-}
+
+      {
+         int f = uxTaskGetStackHighWaterMark(NULL);
+         printf("Task %s stack usage: %d\n", name, f);
+      }
 
       vTaskDelete(oldTaskHandle);
    }
@@ -203,7 +206,7 @@ printf("Task %s stack usage: %d\n", name, f);
       int cp; // current calling tasks priority
 
       // set the calling threads priority to maximum priority
-      // to enshure the excution of this function without task switch
+      // to enshure the execution of this function without task switch
       cp = switchToThreadPrioMax();
 
       switch (taskState) {
@@ -455,39 +458,32 @@ printf("Task %s stack usage: %d\n", name, f);
 
       int p = PrioMapper::getInstance()->fromPearl(prio);
       vTaskPrioritySet(xth, p);
-//    Log::debug("%s: change thread prio from %d to %d",name, currentPrio.x,p);
    }
 
    void Task::disableScheduling() {
-//    Log::debug("vTaskSuspendAll();");
       vTaskSuspendAll();
    }
 
    void Task::enableScheduling() {
       xTaskResumeAll();
-//      Log::debug("xTaskResumeAll();");
    }
 
    int Task::switchToThreadPrioMax() {
       int cp;
       cp = uxTaskPriorityGet(NULL);
-//      Log::debug("%s: switch  task %s from %d to max prio",
-//              pcTaskGetTaskName(NULL),
-//              name,
-//              cp);
-      vTaskPrioritySet(NULL, 257);
+      vTaskPrioritySet(NULL, PRIO_TASK_MAX_PRIO);
       return cp;
    }
 
    void Task::switchToThreadPrioCurrent(int cp) {
       vTaskPrioritySet(NULL, cp);
-//      Log::debug("%s: switch task %s back to prio %d",
-//                pcTaskGetTaskName(NULL),
-//                name,
-//                cp);
    }
+
    TaskHandle_t Task::getFreeRTOSTaskHandle() {
-      if (taskState != TERMINATED) return xth;
+      if (taskState != TERMINATED) {
+         return xth;
+      }
+
       return NULL;
    }
 

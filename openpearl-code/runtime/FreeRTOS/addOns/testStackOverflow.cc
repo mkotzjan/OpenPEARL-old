@@ -4,26 +4,50 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-extern "C" {
-void __cyg_profile_func_enter(void*this_fn, void* call_site)
-     __attribute__((no_instrument_function)); 
+/** minimum number of required free stack elements
+  in an application thread
+*/
 
-void __cyg_profile_func_exit(void*this_fn, void* call_site)
-     __attribute__((no_instrument_function));
+#define STACKLIMIT 250
+
+extern "C" {
+
+   void __cyg_profile_func_enter(void*this_fn, void* call_site)
+   __attribute__((no_instrument_function));
+
+   void __cyg_profile_func_exit(void*this_fn, void* call_site)
+   __attribute__((no_instrument_function));
+}
+
 
 void __cyg_profile_func_enter(void* this_fn, void*call_site) {
    int x;
    x = xTaskGetSchedulerState();
+
    if (x > 1) {
       x = uxTaskGetCurrentFreeStack();
-      printf("%s: entering %p stack at %p free elements %d ",
-       pcTaskGetTaskName(NULL), (int*)this_fn, &x, x);
+
+      if (x < STACKLIMIT) {
+         // we do not know the current task
+         // just print the message about stack usage.
+         // the termination message will contain the task name
+         pearlrt::Log::error("current free stack only %d free elements", x);
+         throw pearlrt::theStackOverflowSignal;
+      }
+
       x = uxTaskGetStackHighWaterMark(NULL);
-      printf("  High Watermark: %d\n",x);
+
+      if (x < STACKLIMIT) {
+         // we do not know the current task
+         // just print the message about stack usage.
+         // the termination message will contain the task name
+         pearlrt::Log::error("stack used up to %d free elements", x);
+         throw pearlrt::theStackOverflowSignal;
+      }
    }
 }
+
 void __cyg_profile_func_exit(void* this_fn, void*call_site) {
-//   printf("  exiting %p\n", (int*)this_fn);
-}
+   /* do nothing -- just satisfy the symbol  */
 }
 

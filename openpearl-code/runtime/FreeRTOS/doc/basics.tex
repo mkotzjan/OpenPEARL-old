@@ -16,6 +16,8 @@ The FreeRTOS system has the following disadvantages:
 \item ... and more ?? ... 
 \end{enumerate}
 
+Item 1 is trated by a modification of FreeRTOS with static TCB and stack
+and an user supplied heap manager, with implements a pool allocation pattern.
 
 \section{System Architecture}
 There are some problems with the linker and \texttt{weak} symbols.
@@ -78,6 +80,34 @@ There is an implemtation of the \texttt{itimer} system. This
 implementation allows the specification of a time source.
 This system was introduced  by Jonas Meyer in his thesis.
 
+\subsection{Timer-Task}
+The principle of operation of the implementation of the timer facility is
+that there are two lists of timer entries. A timer entry contains 
+the information about an initial delay and a repetition rate of the timer.
+This is similar to the itimer of POSIX.
+The operation is cyclic:
+\begin{enumerate}
+\item the definition of a new timer inserts the correspondig timer entry
+   in the sorted list of active timers
+\item The timer entry which elapses first defines the setup of a hardware timer.
+\item As soon as the hardware timer elapses, the interrupt service  routine
+triggers the timer task to continue.
+\item The timer task checks which timers have elapsed and performs the 
+callback of the defined timer. This callback is implemented in the
+class TaskTimerCommon.
+\item if an elapsed timer should operate repetitive, the timer is rescheduled
+   at the time $currentSchedule + period$. \
+	If the elapsed timer is a oneshot timer, it is added in the free-list.
+\item the next timer entry in the active list defines the new delay for the
+  next hardware timer delay. This delay is limited to one second. If the 
+  desired period is longer than one second, several iterations are required.
+\end{itemize}
+
+The implementation of the hardware specific part
+(e.g. interrupt service routine) must be implemented in the concrete
+timer facilities. The FreeRTOSClock provides this bevavior on base
+of the 1ms system tick.
+
 \subsection{class FreeRTOSClock}
 The class TaskTimer provides the FreeRTOS tick as
 base for itimers.
@@ -89,7 +119,7 @@ Other time sources are plattform specific and described there.
 FreeRTOS was modified in the following points:
 \begin{description}
 \item[static tcb and stack:]  Normally FreeRTOS places task control blocks (tcb)
-   and task stack in the heap storage. This may procude memory fragmentation,
+   and task stack in the heap storage. This may produce memory fragmentation,
    when application tasks are deleted and restarted in a random sequence.
 
    A new configuration item in \texttt{FreeRTOSConfig.h}  changes this
@@ -99,10 +129,14 @@ FreeRTOS was modified in the following points:
    to the tasks control block (with type \texttt{TCB\_t}) and tasks stack
    (type \texttt{StackEntry\_t *}). The application is expected to be
    responsible to pass valid pointers.
-\item[getTaskCurrentFreeStack] is a new function which returns the number
+\item[getTaskCurrentFreeStack] is a new function, which returns the number
    of free stack element (of size 32 bit) on the current active tasks stack.
    This feature is enabled by the option
     \texttt{INCLUDE\_xTaskGetCurrentFreeStack}
+\item[setAutoRestartTask(taskhandle, onOff)] is a new function, which 
+    allows scheduling of the automatic restart of a task at its end of
+    execution (vTaskDelete()). This feature is only available, if
+    \texttt{configUSE\_STATIC\_STACK\_AND\_TCB} is selected. 
 \end{description}
 
 \section{Stack Checking}
@@ -127,28 +161,32 @@ controls the usage of the compiler option and inclusion of the
 module \texttt{FreeRTOS/addOns/checkStackOverflow.cc}.
 
 
-In case of the remaining stack of less than 100 elements (400 bytes), or a
-remaining unused size of less than 100 elements wil cause the raising
-of the StackOverflowSignal. This signal is intended to be non catchable
-by the application program.
+In case of the remaining stack of less than 250 elements (1000 bytes), or a
+remaining unused size of less than 250 elements will cause the raising
+of the signal StackOverflowSignal. This signal is intended to be non catchable
+by the application program. 
+The compiler arm-non-eabi-g++ v4.9.3 proved to need approximatelly 190 stack elements to perform the stack unrolling, the limit should not be set with caution.
+
+The monitoring of functions of the template classes for Fixed and Bit 
+is switched off for runtime efficiency.
 
 \section{Stack Size and Allocation Control}
-The build proces checks whether there is a file named \texttt{stacksize.h}
-in the current working directory. If this file does not exist it is created
-with default settings.
-This default file should be modified by the application engineer
-to set the desired stack size and location for the PEARL tasks.
-
-To define a PEARL tasks stack size, a C macro must be provided.
-If there is no specific macro, the default styk size of the port will be used.
-The naming scheme is:
-\verb|#define STACK_<taskname> size|, where \texttt{taskname}
-must be substutuded by the exact application tasks name. The size
-defines the number of steck elements for this task. This size must be larger
-than the minimum stack size.
-E.g. for the application task \texttt{DisplaySeriel} should have
-a stack size of 1000 elements (4kB) the definition would look
-like \verb|#define STACK_DisplaySeriel 1000|.
+%The build process checks whether there is a file named \texttt{stacksize.h}
+%in the current working directory. If this file does not exist it is created
+%with default settings.
+%This default file should be modified by the application engineer
+%to set the desired stack size and location for the PEARL tasks.
+%
+%To define a PEARL tasks stack size, a C macro must be provided.
+%If there is no specific macro, the default styk size of the port will be used.
+%The naming scheme is:
+%\verb|#define STACK_<taskname> size|, where \texttt{taskname}
+%must be substutuded by the exact application tasks name. The size
+%defines the number of steck elements for this task. This size must be larger
+%than the minimum stack size.
+%E.g. for the application task \texttt{DisplaySeriel} should have
+%a stack size of 1000 elements (4kB) the definition would look
+%like \verb|#define STACK_DisplaySeriel 1000|.
 
 \section{Added Features to FreeRTOS and glib-c}
 There are some additional functions in \texttt{FreeRTOS/addOns},
@@ -157,6 +195,8 @@ with UNIX-like time functions like gettimeofday.
 \begin{description}
 \item[clock.c]provides gettimeofday and some more
 \item[timer.c] provides the itimers
+\item[testStackOverflow.cc] provides the implementation of the 
+  stack checking profiling function
 \end{description}
 
 Implementation of FreeRTOS Hooks:
@@ -187,17 +227,42 @@ In short:
      methods. This class is working on base of the itimer extension 
      in \texttt{FreeRTOS/addOns}
   \item[class PrioMapper] provides a 1:1 mapping of PEARL to FreeRTOS
-      priorities
+      priorities. Furthermore is provides the list of other used
+      priorities in the system for background threads like the timer task.
+      For details about the list of background task, please 
+      check the doxgen documenation of the class PrioMapper.
   \end{description}
 }
 \end{itemize}
 
+\section{Logging}
+The logging is done slightly different to the linux version.
+In order to safe stack in the application tasks, the formatting is passed
+to a special log-task which runs with high priority.
+The logging class checks for each logging request if the FreeRTOS scheduler
+is running. If the scheduler is not running - the formatting is done in the 
+context of the calling thread. If the scheduler is running, the parameters
+are passed to the log-task.
+This mechanism reduces the stack usage of the logging down to 17 words. This
+is important for the case of logging the stack overflow situation.
+
+\section{Device Driver}
+The device drivers should be implemented with zero-copy principle.
+If a background task is suitable for the device operation, the 
+tasks priority must be registered in the class PrioMapper. The usage
+of the the same priority for several devices is ok.
+
+Usually, the device driver is called in the context of the calling thread.
+The operation of the driver job is passed to an interrupt service routine and
+the calling thread is blocked by a FreeRTOS mechanism e.q. semaphore.
+At completion of the driver job in the isr the calling thread is continued.
 
 
 \subsection{To be done}
   \begin{itemize}
-  \item provide aute restart at task termination
+  \item provide auto restart at task termination
   \item provide device drivers for the standard devices (UART, SD, Ethernet)
+   \item device wait queue for tasks in begin/end-sequnce??
 
   \end{itemize}
 

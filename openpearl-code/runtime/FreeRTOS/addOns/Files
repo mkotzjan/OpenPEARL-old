@@ -6,8 +6,9 @@ ADDONCSRC = assert.c	 \
 	timer.c 	\
 	heap_1_2.c
 
-ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
-ADDONCSRC += testStackOverflow.cc
-endif
+#####
+#ADDONCSRC += testStackOverflow.cc
+# testStackOverFlow is added to BOARDSUPPORT to enforce the linkage
+# of the required functions in tasks.c
 
 ADDONINCS = .

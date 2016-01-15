@@ -45,10 +45,7 @@
 #include "Signals.h"
 #include "PrioMapper.h"
 #include "FreeRTOS.h"
-
-#if configMAX_PRIORITIES < 260
-#error PrioMapper: configMAX_PRIORITIES too small
-#endif
+#include "allTaskPriorities.h"
 
 namespace pearlrt {
 
@@ -56,13 +53,12 @@ namespace pearlrt {
 
 
    PrioMapper::PrioMapper() {
-      max = configMAX_PRIORITIES - 4;  // timer task has configMAX_PRIORITIES-1
-      min = 1;                       // idle task has priority 0
+#if ((PRIO_PEARL_PRIO_MAX - PRIO_PEARL_PRIO_MIN) < 255)
+# error "PRIO range was set too small"
+#endif
+      max = PRIO_PEARL_PRIO_MAX;
+      min = PRIO_PEARL_PRIO_MIN;       // idle task has priority 0
 
-      if (max < 256) {
-         Log::error((char*) "PrioMapper: configMAX_PRIORITIES too small");
-         //exit(1);
-      }
    }
 
    PrioMapper* PrioMapper::getInstance() {
