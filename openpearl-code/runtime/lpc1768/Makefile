@@ -13,8 +13,8 @@ AR := $(CROSS)$(AR)
 
 # make silent compilations
 COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(TARGET_ARCH) -c
-#COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+#COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(LINK.cc)
 LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 #LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
@@ -87,6 +87,10 @@ BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
 CHECK_FILES += $(BOARDSUPPORT)
 BOARDSUPPORT += startup_lpc1768.S 
+ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
+BOARDSUPPORT += ../FreeRTOS/addOns/testStackOverflow.cc
+endif
+
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
 
 # ---------------- add remaining board depending modules
@@ -131,10 +135,12 @@ CHECK_FILES := $(sort $(CHECK_FILES))
 
 all: depend $(targets)
 
+tests/testStackOverflow.s: tests/testStackOverflow.cc
+	$(CXX) $^ -S $(CXXFLAGS)  $(PURECXXFLAGS)
+
 startup_lpc1768.o: startup_lpc1768.S
 	@echo "[assemble] startup_ARMCM3.S"
 	@$(CC) $^ $(CFLAGS) -c
-#       @$(CC) $^ $(CFLAGS) -D__NO_SYSTEM_INIT -c
 
 OpenPEARLlpc1768_board.o: $(BOARDSUPPORT_OBJ)
 	@echo "[create] $@"
@@ -143,7 +149,7 @@ OpenPEARLlpc1768_board.o: $(BOARDSUPPORT_OBJ)
 libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@echo "[create] $@"
 	@rm   -f libOpenPEARLlpc1768.a
-	$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
+	@$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
 
 phony += depend
 depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
@@ -182,14 +188,7 @@ install: all cc_bin run_bin
 phony += cc_bin
 cc_bin:
 	# create cc_bin.inc
-	#echo 'if [ ! -e stacksize.h ] ; then' > cc_bin.inc
-	#  echo 'echo "// stack size definitions " > stacksize.h' >>cc_bin.inc
-	#  echo 'echo "#define STACKDEFAULTSIZE 500 ">>stacksize.h' >> cc_bin.inc
-	#  echo 'echo "#define RAM1 __attribute__((section RAM1))" >>stacksize.h' >>cc_bin.inc
-	#  echo 'echo "// add your stack definitions below"  >> stacksize.h ' >> cc_bin.inc
-	#  echo '"// use the pattern #define STACK_<taskname>  <size>" >>stacksize.h' >> cc_bin.inc
-	#echo 'fi' >> cc_bin.inc
-	echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' >> cc_bin.inc 
+	echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' > cc_bin.inc 
 
 phony += run_bin
 run_bin:
@@ -204,10 +203,10 @@ run_bin:
 ../common/Signals.hh: ../common/Signals.ods
 	@echo create signal definitions from spreadsheet
 	@(cd ../common; \
-	 perl GenerateSignalDefinitions.pl GENERIC 2>signals.log;)
+	 perl GenerateSignalDefinitions.pl GENERIC LPC1768 2>signals.log;)
 
 ../common/Signals.hcc: ../common/Signals.ods
-	(cd ../common; perl GenerateSignalDefinitions.pl GENERIC; )
+	(cd ../common; perl GenerateSignalDefinitions.pl GENERIC LPC1768; )
 
 ../Signals.cc: ../Signals.hh ../Signals.hcc
 

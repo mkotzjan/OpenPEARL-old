@@ -54,14 +54,5 @@ FreeRTOS function have the interrupt level
 \texttt{configMAX\_SYSCALL\_INTERRUPT\_PRIORITY} or worse. 
 This must be regarded in each driver of a peripheral device.
 
-\subsection{Data Regions for Stacks}
-In addition to the stach size definition, which is valid for all FreeRTOS
-ports, the LPC1768 port allows the definition of the memory
-region for the stack.
-
-The LPC1768 provides two RAM regions. Normal data are stored in the first
-(larger) ram region. To locate a task stack in the second region
-a C macro must be provided like:
-\verb|#define STACKREGION_DisplaySeriel RAM1|.
 
 

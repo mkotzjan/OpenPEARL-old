@@ -7,7 +7,7 @@ TEXFILES = runtime.tex changeLog.tex codeGen.tex dataTypes.tex inOutput.tex \
 	../common/signallist.tex \
 	../FreeRTOS/doc/basics.tex \
 	../lpc1768/doc/os.tex \
-	../lpc1768/doc/basics.tex
+	../lpc1768/doc/system.tex
 
 all: runtime.pdf  $(TEXFILES)
 
