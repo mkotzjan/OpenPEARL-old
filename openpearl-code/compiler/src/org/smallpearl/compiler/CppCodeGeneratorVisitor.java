@@ -956,6 +956,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.if_statement() != null) {
             statement.add("code", visitIf_statement(ctx.if_statement()));
         }
+        else if ( ctx.case_statement() != null) {
+            statement.add("code", visitCase_statement(ctx.case_statement()));
+        }
 
         return statement;
     }
@@ -1055,6 +1058,67 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         return statement;
+    }
+
+
+    @Override
+    public ST visitCase_statement(SmallPearlParser.Case_statementContext ctx) {
+        ST st = group.getInstanceOf("CaseStatement");
+
+        if ( ctx.case_statement_selection1() != null ) {
+            st.add("casestatement1", visitCase_statement_selection1(ctx.case_statement_selection1()));
+        }
+        else if ( ctx.case_statement_selection2() != null ) {
+            st.add("casestatement2", visitCase_statement_selection2(ctx.case_statement_selection2()));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection1(SmallPearlParser.Case_statement_selection1Context ctx) {
+        ST st = group.getInstanceOf("CaseStatement1");
+        ST st_alt = group.getInstanceOf("CaseAlternatives");
+
+        st.add("expression", getExpression(ctx.expression()));
+
+        for( int i = 0; i < ctx.case_statement_selection1_alt().size(); i++) {
+            SmallPearlParser.Case_statement_selection1_altContext alt = ctx.case_statement_selection1_alt(i);
+
+            ST cur_alt = visitCase_statement_selection1_alt(alt);
+            cur_alt.add("alt", i);
+            st_alt.add( "Alternatives", cur_alt);
+        }
+
+        st.add("alternatives", st_alt);
+
+        if ( ctx.case_statement_selection_out() != null ) {
+            st.add("out", visitCase_statement_selection_out(ctx.case_statement_selection_out()));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection1_alt(SmallPearlParser.Case_statement_selection1_altContext ctx) {
+        ST st = group.getInstanceOf("CaseAlternative");
+
+        for ( int i = 0; i < ctx.statement().size(); i++) {
+            st.add("statements", visitStatement(ctx.statement(i)));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection_out(SmallPearlParser.Case_statement_selection_outContext ctx) {
+        ST st = group.getInstanceOf("CaseOut");
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection2(SmallPearlParser.Case_statement_selection2Context ctx) {
+        throw new NotYetImplementedException( "CaseStatement2", ctx.start.getLine(), ctx.start.getCharPositionInLine());
     }
 
     @Override

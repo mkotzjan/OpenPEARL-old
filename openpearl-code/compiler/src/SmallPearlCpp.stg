@@ -1278,3 +1278,38 @@ FormalParameter(id,type,assignmentProtection,passIdentical) ::= <%
 ParameterType(type) ::= <%
 <type>
 %>
+
+/* --------------------- CASE STATEMENT ------------------------- */
+CaseStatement(casestatement1,casestatement2) ::= <<
+<casestatement1>
+<casestatement2>
+>>
+
+CaseStatement1(expression,alternatives,out) ::= <<
+switch (<expression>) {
+    <alternatives>
+    <out>
+}
+>>
+
+CaseAlternatives(Alternatives) ::= <%
+<Alternatives: {alt|<alt>}>
+%>
+
+CaseAlternative(alt, statements) ::= <<
+case <alt>: {
+    <statements>
+    break;
+} // end case <alt><\n>
+>>
+
+CaseRange(from, to) ::= <%
+    <from> ... <to>
+%>
+
+CaseOut(statements) ::= <%
+    default: {<\n>
+        <statements>
+        break;<\n>
+    } // end default<\n>
+%>
