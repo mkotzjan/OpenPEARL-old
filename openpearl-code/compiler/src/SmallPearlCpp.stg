@@ -1292,6 +1292,13 @@ switch (<expression>) {
 }
 >>
 
+CaseStatement2(expression,alternatives,out) ::= <<
+switch (<expression>) {
+    <alternatives>
+    <out>
+}
+>>
+
 CaseAlternatives(Alternatives) ::= <%
 <Alternatives: {alt|<alt>}>
 %>
@@ -1303,8 +1310,23 @@ case <alt>: {
 } // end case <alt><\n>
 >>
 
+CaseIndexList(indices) ::= <%
+    <indices>
+%>
+
+CaseAlternative2(alts, statements) ::= <<
+<alts: {alt|<alt>}>{
+    <statements>
+    break;
+} // end case<\n>
+>>
+
 CaseRange(from, to) ::= <%
-    <from> ... <to>
+    case <from> ... <to> :<\n>
+%>
+
+CaseIndex(index) ::= <%
+    case <index> :<\n>
 %>
 
 CaseOut(statements) ::= <%

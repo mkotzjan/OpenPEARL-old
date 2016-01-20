@@ -1118,7 +1118,65 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     @Override
     public ST visitCase_statement_selection2(SmallPearlParser.Case_statement_selection2Context ctx) {
-        throw new NotYetImplementedException( "CaseStatement2", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        ST st = group.getInstanceOf("CaseStatement2");
+        ST st_alt = group.getInstanceOf("CaseAlternatives");
+
+        st.add("expression", getExpression(ctx.expression()));
+
+        for( int i = 0; i < ctx.case_statement_selection2_alt().size(); i++) {
+            SmallPearlParser.Case_statement_selection2_altContext alt = ctx.case_statement_selection2_alt(i);
+
+            if ( alt.case_list() != null ) {
+                // TODO
+            }
+
+            ST cur_alt = visitCase_statement_selection2_alt(alt);
+            st_alt.add( "Alternatives", cur_alt);
+        }
+
+        st.add("alternatives", st_alt);
+
+        if ( ctx.case_statement_selection_out() != null ) {
+            st.add("out", visitCase_statement_selection_out(ctx.case_statement_selection_out()));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection2_alt(SmallPearlParser.Case_statement_selection2_altContext ctx) {
+        ST st = group.getInstanceOf("CaseAlternative2");
+
+        st.add("alts", visitCase_list(ctx.case_list()));
+
+        for ( int i = 0; i < ctx.statement().size(); i++) {
+            st.add("statements", visitStatement(ctx.statement(i)));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_list(SmallPearlParser.Case_listContext ctx) {
+        ST st = group.getInstanceOf("CaseIndexList");
+
+        for (int i = 0; i < ctx.index_section().size(); i++){
+            SmallPearlParser.Index_sectionContext index = ctx.index_section(i);
+
+            if ( index.expression().size() == 1) {
+                ST st_index = group.getInstanceOf("CaseIndex");
+                st_index.add("index", getExpression(index.expression(0)));
+                st.add("indices", st_index);
+            }
+            else if ( index.expression().size() == 2) {
+                ST st_range = group.getInstanceOf("CaseRange");
+                st_range.add("from", getExpression(index.expression(0)));
+                st_range.add("to", getExpression(index.expression(1)));
+                st.add("indices", st_range);
+            }
+        }
+
+        return st;
     }
 
     @Override
