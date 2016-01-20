@@ -40,6 +40,7 @@ import sun.reflect.ConstantPool;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 
 public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implements SmallPearlVisitor<ST> {
@@ -49,6 +50,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private boolean m_debug;
     private String m_sourceFileName;
     private ExpressionTypeVisitor m_expressionTypeVisitor;
+    private boolean m_map_to_const = true;
 
     public enum Type {BIT, CHAR, FIXED}
 
@@ -1125,11 +1127,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         for( int i = 0; i < ctx.case_statement_selection2_alt().size(); i++) {
             SmallPearlParser.Case_statement_selection2_altContext alt = ctx.case_statement_selection2_alt(i);
-
-            if ( alt.case_list() != null ) {
-                // TODO
-            }
-
             ST cur_alt = visitCase_statement_selection2_alt(alt);
             st_alt.add( "Alternatives", cur_alt);
         }
@@ -1164,14 +1161,26 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             SmallPearlParser.Index_sectionContext index = ctx.index_section(i);
 
             if ( index.expression().size() == 1) {
+                boolean old_map_to_const = m_map_to_const; // very ugly, but did not found proper solution yet :-(
                 ST st_index = group.getInstanceOf("CaseIndex");
-                st_index.add("index", getExpression(index.expression(0)));
+
+                m_map_to_const = false;
+                ST expr = getExpression(index.expression(0));
+                m_map_to_const = old_map_to_const;
+
+                st_index.add("index", expr);
                 st.add("indices", st_index);
             }
             else if ( index.expression().size() == 2) {
+                boolean old_map_to_const = m_map_to_const; // very ugly, but did not found proper solution yet :-(
+
                 ST st_range = group.getInstanceOf("CaseRange");
+
+                m_map_to_const = false;
                 st_range.add("from", getExpression(index.expression(0)));
                 st_range.add("to", getExpression(index.expression(1)));
+                m_map_to_const = old_map_to_const;
+
                 st.add("indices", st_range);
             }
         }
@@ -1428,8 +1437,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = Integer.parseInt(ctx.IntegerConstant().toString());
-                ConstantFixedValue fixed_value = new ConstantFixedValue(value);
-                literal.add("integer", fixed_value);
+                if (m_map_to_const) {
+                    ConstantFixedValue fixed_value = new ConstantFixedValue(value);
+                    literal.add("integer", fixed_value);
+                }
+                else {
+                    literal.add("integer", value);
+                }
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }

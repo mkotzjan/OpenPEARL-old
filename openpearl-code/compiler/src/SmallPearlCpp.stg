@@ -1286,14 +1286,14 @@ CaseStatement(casestatement1,casestatement2) ::= <<
 >>
 
 CaseStatement1(expression,alternatives,out) ::= <<
-switch (<expression>) {
+switch (<expression>.x) {
     <alternatives>
     <out>
 }
 >>
 
 CaseStatement2(expression,alternatives,out) ::= <<
-switch (<expression>) {
+switch (<expression>.x) {
     <alternatives>
     <out>
 }
