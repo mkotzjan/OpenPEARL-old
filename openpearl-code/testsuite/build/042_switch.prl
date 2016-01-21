@@ -25,6 +25,20 @@ T1: TASK MAIN;
   FIN;
 END;
 
+/*
+T2: TASK;
+  DCL f1 FIXED(15) INIT(1);
+
+  CASE f1
+   ALT (3 , 4 )
+   ALT (6:7)
+   ALT (9:11,13:19)
+   OUT
+  FIN;
+
+END;
+*/
+
 MODEND;
 
 
