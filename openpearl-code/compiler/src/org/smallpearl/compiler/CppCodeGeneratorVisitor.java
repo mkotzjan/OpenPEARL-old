@@ -40,6 +40,7 @@ import sun.reflect.ConstantPool;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 
 public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implements SmallPearlVisitor<ST> {
@@ -49,6 +50,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private boolean m_debug;
     private String m_sourceFileName;
     private ExpressionTypeVisitor m_expressionTypeVisitor;
+    private boolean m_map_to_const = true;
 
     public enum Type {BIT, CHAR, FIXED}
 
@@ -956,6 +958,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.if_statement() != null) {
             statement.add("code", visitIf_statement(ctx.if_statement()));
         }
+        else if ( ctx.case_statement() != null) {
+            statement.add("code", visitCase_statement(ctx.case_statement()));
+        }
 
         return statement;
     }
@@ -1055,6 +1060,132 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         return statement;
+    }
+
+
+    @Override
+    public ST visitCase_statement(SmallPearlParser.Case_statementContext ctx) {
+        ST st = group.getInstanceOf("CaseStatement");
+
+        if ( ctx.case_statement_selection1() != null ) {
+            st.add("casestatement1", visitCase_statement_selection1(ctx.case_statement_selection1()));
+        }
+        else if ( ctx.case_statement_selection2() != null ) {
+            st.add("casestatement2", visitCase_statement_selection2(ctx.case_statement_selection2()));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection1(SmallPearlParser.Case_statement_selection1Context ctx) {
+        ST st = group.getInstanceOf("CaseStatement1");
+        ST st_alt = group.getInstanceOf("CaseAlternatives");
+
+        st.add("expression", getExpression(ctx.expression()));
+
+        for( int i = 0; i < ctx.case_statement_selection1_alt().size(); i++) {
+            SmallPearlParser.Case_statement_selection1_altContext alt = ctx.case_statement_selection1_alt(i);
+
+            ST cur_alt = visitCase_statement_selection1_alt(alt);
+            cur_alt.add("alt", i);
+            st_alt.add( "Alternatives", cur_alt);
+        }
+
+        st.add("alternatives", st_alt);
+
+        if ( ctx.case_statement_selection_out() != null ) {
+            st.add("out", visitCase_statement_selection_out(ctx.case_statement_selection_out()));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection1_alt(SmallPearlParser.Case_statement_selection1_altContext ctx) {
+        ST st = group.getInstanceOf("CaseAlternative");
+
+        for ( int i = 0; i < ctx.statement().size(); i++) {
+            st.add("statements", visitStatement(ctx.statement(i)));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection_out(SmallPearlParser.Case_statement_selection_outContext ctx) {
+        ST st = group.getInstanceOf("CaseOut");
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection2(SmallPearlParser.Case_statement_selection2Context ctx) {
+        ST st = group.getInstanceOf("CaseStatement2");
+        ST st_alt = group.getInstanceOf("CaseAlternatives");
+
+        st.add("expression", getExpression(ctx.expression()));
+
+        for( int i = 0; i < ctx.case_statement_selection2_alt().size(); i++) {
+            SmallPearlParser.Case_statement_selection2_altContext alt = ctx.case_statement_selection2_alt(i);
+            ST cur_alt = visitCase_statement_selection2_alt(alt);
+            st_alt.add( "Alternatives", cur_alt);
+        }
+
+        st.add("alternatives", st_alt);
+
+        if ( ctx.case_statement_selection_out() != null ) {
+            st.add("out", visitCase_statement_selection_out(ctx.case_statement_selection_out()));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_statement_selection2_alt(SmallPearlParser.Case_statement_selection2_altContext ctx) {
+        ST st = group.getInstanceOf("CaseAlternative2");
+
+        st.add("alts", visitCase_list(ctx.case_list()));
+
+        for ( int i = 0; i < ctx.statement().size(); i++) {
+            st.add("statements", visitStatement(ctx.statement(i)));
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase_list(SmallPearlParser.Case_listContext ctx) {
+        ST st = group.getInstanceOf("CaseIndexList");
+
+        for (int i = 0; i < ctx.index_section().size(); i++){
+            SmallPearlParser.Index_sectionContext index = ctx.index_section(i);
+
+            if ( index.expression().size() == 1) {
+                boolean old_map_to_const = m_map_to_const; // very ugly, but did not found proper solution yet :-(
+                ST st_index = group.getInstanceOf("CaseIndex");
+
+                m_map_to_const = false;
+                ST expr = getExpression(index.expression(0));
+                m_map_to_const = old_map_to_const;
+
+                st_index.add("index", expr);
+                st.add("indices", st_index);
+            }
+            else if ( index.expression().size() == 2) {
+                boolean old_map_to_const = m_map_to_const; // very ugly, but did not found proper solution yet :-(
+
+                ST st_range = group.getInstanceOf("CaseRange");
+
+                m_map_to_const = false;
+                st_range.add("from", getExpression(index.expression(0)));
+                st_range.add("to", getExpression(index.expression(1)));
+                m_map_to_const = old_map_to_const;
+
+                st.add("indices", st_range);
+            }
+        }
+
+        return st;
     }
 
     @Override
@@ -1306,8 +1437,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = Integer.parseInt(ctx.IntegerConstant().toString());
-                ConstantFixedValue fixed_value = new ConstantFixedValue(value);
-                literal.add("integer", fixed_value);
+                if (m_map_to_const) {
+                    ConstantFixedValue fixed_value = new ConstantFixedValue(value);
+                    literal.add("integer", fixed_value);
+                }
+                else {
+                    literal.add("integer", value);
+                }
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
