@@ -4,6 +4,7 @@ ADDONCSRC = assert.c	 \
 	FreeRTOSHooks.cc	 \
 	FreeRTOSClock.cc \
 	timer.c 	\
+	service.c 	\
 	heap_1_2.c
 
 #####

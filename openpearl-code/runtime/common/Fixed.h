@@ -242,6 +242,17 @@ namespace pearlrt {
       */
       NativeType x;
 
+      /** 
+       the current value of the Fixed as native type.
+       The internal type is an int. The length depends on the length
+       of Fixed<S>
+
+	\returns the value of the Fixed as native type
+      */
+      NativeType get() const NOSTACKCHECK {
+	return x; 
+      }
+
    private:
 
       struct LessThan32Bits {

@@ -65,6 +65,7 @@ independent parts.
 #include "Log.h"
 #include "Clock.h"
 #include "chip.h"
+#include "service.h"
 
 // read options from menuconfig
 #include "../../../../configuration/include/autoconf.h"
@@ -107,6 +108,8 @@ __attribute__((weak)) int main(void) {
       printf("Brown-out RESET\n");
    }
 
+   // start background service task
+   init_service();
 
    /*
     * This task starts all PEARL90 main tasks, afterwards the
@@ -147,6 +150,10 @@ __attribute__((weak)) int main(void) {
          t->activate(t);
       }
    }
+
+   // all heap elements should be allocated now !
+   // dump unused size to log
+   Log::info("Free Heap size: %d", xPortGetFreeHeapSize());
 
    Log::info("system startup complete");
    /* Start the scheduler. */

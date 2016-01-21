@@ -208,6 +208,7 @@ void *pvPortMalloc(size_t xWantedSize) {
             /* and remove the found block from the freeBlockList */
             pxPreviousBlock->pxNextFreeBlock = pxBlock->pxNextFreeBlock;
             traceMALLOC(pvReturn, xWantedSize);
+            xFreeBytesRemaining -= pxBlock->xBlockSize;
          } else {
             pxPreviousBlock = pxBlock;
             pxBlock = pxBlock->pxNextFreeBlock;
@@ -244,6 +245,7 @@ void *pvPortMalloc(size_t xWantedSize) {
             ((BlockLink_t*)pvReturn)->pxNextFreeBlock = (BlockLink_t*)NULL;
             pvReturn += heapSTRUCT_SIZE;
 //printf("prvMalloc: new block at %p size=%d\n", pvReturn, xWantedSize);
+            xFreeBytesRemaining -= xWantedSize + heapSTRUCT_SIZE;
          }
 
          traceMALLOC(pvReturn, xWantedSize);

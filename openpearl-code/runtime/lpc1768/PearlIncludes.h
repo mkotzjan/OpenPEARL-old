@@ -100,7 +100,7 @@ extern "C" {
 //#include "Pipe.h"
 //#include "Disc.h"
 //#include "UnixSignal.h"
-//#include "SoftInt.h"
+#include "SoftInt.h"
 
 //#include "Float.h"
 #include "compare.h"

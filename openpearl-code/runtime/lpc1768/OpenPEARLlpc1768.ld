@@ -9,9 +9,11 @@ MEMORY
 {
   FLASH (rx) : ORIGIN = 0x0, LENGTH = 512k  /*0x20000 128K */
   RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 32k /* 0x2000  8K */
+  RAM1 (rwx) : ORIGIN = 0x2007C000, LENGTH = 32k /* 0x2000  8K */
 }
 
 EXTERN (vTaskSwitchContext)
+
 
 /* Linker script to place sections and symbol values. Should be used together
  * with other linker script that defines memory regions FLASH and RAM.
@@ -165,14 +167,27 @@ SECTIONS
 		. = ALIGN(4);
 		__bss_end__ = .;
 	} > RAM
-	
+
+	R1  (NOLOAD) :
+	{
+		. = ALIGN(4);
+		__bss2_start__ = .;
+    *("R1")
+	/*	*(.bss*)
+		*(COMMON)
+*/
+		. = ALIGN(4);
+		__bss2_end__ = .;
+
+	} > RAM1
+
 	.heap (COPY):
 	{
 		__end__ = .;
 		PROVIDE(end = .);
 		*(.heap*)
 		__HeapLimit = .;
-	} > RAM
+	} > RAM1
 
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign
@@ -180,11 +195,11 @@ SECTIONS
 	.stack_dummy (COPY):
 	{
 		*(.stack*)
-	} > RAM
+	} > RAM1
 
 	/* Set stack top to end of RAM, and stack limit move down by
 	 * size of stack_dummy section */
-	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+	__StackTop = ORIGIN(RAM1) + LENGTH(RAM1);
 	__StackLimit = __StackTop - SIZEOF(.stack_dummy);
 	PROVIDE(__stack = __StackTop);
 	

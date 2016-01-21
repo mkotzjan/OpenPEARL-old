@@ -80,7 +80,7 @@ namespace pearlrt {
       TCB_t tcb;
 
       /* the FreeRTOS stack */
-      StackType_t stack[800];
+      StackType_t stack[400];
 
    public:
       /**
@@ -123,6 +123,8 @@ namespace pearlrt {
                                  Prio prio);
    private:
       void continueSuspended();
+      static void restartTaskStatic(Task*t);
+      void restartTask();
    public:
 
       /**

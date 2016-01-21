@@ -13,6 +13,7 @@ extern "C" {
    extern unsigned char __etext;
    extern unsigned char __data_start__, __data_end__;
    extern unsigned char __bss_start__, __bss_end__;
+   extern unsigned char __bss2_start__, __bss2_end__;
 };
 namespace pearlrt {
 int Post::postStatus = -1;   // preset - no post required
@@ -45,11 +46,15 @@ void Post::print(void) {
           bytes, bytes * 100 / (512 * 1024));
 
    printf("RAM usage:\n");
-   printf("           data: %p - %p \n", &__data_start__, &__data_end__);
-   printf("           bss : %p - %p\n", &__bss_start__, &__bss_end__);
    bytes = (&__data_end__ - &__data_start__) +
            (&__bss_end__ - &__bss_start__);
-   printf("          total: %d (%2d %%)\n", bytes, bytes * 100 / (32 * 1024));
+   printf("      RAM1 : %d (%2d %%)\n", bytes, bytes * 100 / (32 * 1024));
+   printf("           data: %p - %p \n", &__data_start__, &__data_end__);
+   printf("           bss : %p - %p\n", &__bss_start__, &__bss_end__);
+
+   bytes = (&__bss2_end__ - &__bss2_start__);
+   printf("      RAM2 : %d (%2d %%)\n", bytes, bytes * 100 / (32 * 1024));
+   printf("           bss2: %p - %p\n", &__bss2_start__, &__bss2_end__);
 
    clock_gettime(CLOCK_REALTIME, &ts);
    tm = *(gmtime(&ts.tv_sec));

@@ -52,6 +52,7 @@
 #include "Log.h"
 #include "FreeRTOS.h"
 #include "allTaskPriorities.h"
+#include "service.h"
 
 namespace pearlrt {
 
@@ -73,7 +74,7 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 800;
+      stackDepth = 400;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }
@@ -106,7 +107,7 @@ namespace pearlrt {
 
       // the scheduling may only be stopped, if the scheduler
       // was started - the creation of MAIN-tasks need no
-      // stop/start of the scheduler, since it is started later
+      // stop/start of the scheduler, since FreeRTOS is started later
       freeRtosRunning = xTaskGetSchedulerState();
 
       if (freeRtosRunning) {
@@ -178,10 +179,13 @@ namespace pearlrt {
       taskState = TERMINATED;
 
       if (schedActivateOverrun) {
+         ServiceJob s = {(void (*)(void *))restartTaskStatic, this};
+
          Log::error("%s: terminates with schedOverrun flag - start task again",
                     name);
          schedActivateOverrun = false;
-         directActivate(schedActivateData.prio);
+	 //         directActivate(schedActivateData.prio);
+         add_service(&s);
          mutexUnlock();
       } else {
          if (schedActivateData.taskTimer->isActive() == false &&
@@ -487,5 +491,12 @@ namespace pearlrt {
       return NULL;
    }
 
+   void Task::restartTaskStatic(Task * t) {
+         t->restartTask();
+   }
+
+   void Task::restartTask() {
+	directActivate(schedActivateData.prio);
+   }
 }
 

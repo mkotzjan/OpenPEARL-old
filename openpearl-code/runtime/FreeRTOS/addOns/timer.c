@@ -46,6 +46,10 @@
                                              to the list, else
                           the list of timers is sorted according the
                           next timeout
+
+   jan 2016: r. mueller : timerTask moved into separate module to perform
+			  more background services
+			  --> automatic task restart at its TERMINATE
 */
 
 
@@ -63,16 +67,13 @@
 #include "time_addons.h"
 #include "FreeRTOSClock.h"
 #include "allTaskPriorities.h"
-
-#define TIMER_STACK_SIZE 400
-#define STACKLIMIT 100	// limit of minimum free stack for the timer task
+#include "service.h"
 
 #define MAXTIMER configTIMER_QUEUE_LENGTH
 #define ENTERCRITICAL taskDISABLE_INTERRUPTS();DMB();
 #define LEAVECRITICAL DMB();taskENABLE_INTERRUPTS()
 
-static TaskHandle_t xTimerTaskHandle;
-static void timerTask(void *);
+static void timerJob(void *);
 static void retrigger_timer();
 
 
@@ -94,8 +95,6 @@ struct tableEntry {
 static struct tableEntry timerTable[MAXTIMER];
 static timer_t unused = -1;            // points to no timer
 static timer_t expires_next = -1;       // points to no timer
-
-static QueueHandle_t timerQueue;
 
 // function pointer to define next timeout
 static void (*timer_set)(uint64_t ns) = NULL;
@@ -171,9 +170,6 @@ static void retrigger_timer() {
 
 static void timer_init_if_necessary() {
    int i = 0;
-   StructParameters_t createParameters;
-   static StackType_t timerStack[TIMER_STACK_SIZE];
-   static TCB_t timerTcb;
 
    if (! tablestate.tableinitialized) {
       if (timer_set == NULL) {
@@ -195,21 +191,6 @@ static void timer_init_if_necessary() {
 
       timerTable[MAXTIMER - 1].next = -1;
       timerTable[MAXTIMER - 1].prev = MAXTIMER - 2;
-
-      /* the interrupt service routine sends messages to this 
-      queue on each expiration of the timer. The length is
-      set to something above 1 but not too large...
-      maybe this schould be replaced by a counting semaphore...
-      */
-      timerQueue = xQueueCreate(10, 1);
-
-      createParameters.pvParameter = NULL;
-      createParameters.stack = timerStack;
-      createParameters.tcb = &timerTcb;
-
-      xTaskCreate(timerTask,
-                  "timerTask", TIMER_STACK_SIZE, &createParameters,
-                  PRIO_TASK_TIMER, &xTimerTaskHandle);
 
       tablestate.tableinitialized = 1;
    }
@@ -487,91 +468,53 @@ int timer_settime(const timer_t timerid, const int flags,
 }
 
 void resume_timer_task_from_ISR() {
-   char dummy = 1;
+   static ServiceJob s = {timerJob, NULL};
 
-   if (xTimerTaskHandle) {
-      if (!xQueueSendFromISR(timerQueue, &dummy, NULL)) {
-         printf("error at xQuereSendFromISR\n");
-      }
+   add_service_from_ISR(&s);
 
-      //xTaskResumeFromISR(xTimerTaskHandle);
-      //The yield is _very_ important for performance
-      portYIELD_FROM_ISR(xTimerTaskHandle);
-   }
 }
 
-static void timerTask(void *pcParameters) {
+static void timerJob(void *pcParameters) {
    uint64_t now, timeout;
    int timerid;
-   char dummy;
-   int freeStack;
 
    struct Callback {
       void (*cb)(void *arg_ptr);
       void *th;
    }*callback;
 
-   while (1) {
-      if (!xQueueReceive(timerQueue, &dummy, portMAX_DELAY)) {
-         printf("error at xQueueReceive\n");
-      }
+   // got trigger --> lets see which timer(s) expired 
 
-      // check, which timers reached their timeout
+   clock_gettime_nsec(&now);
 
-      clock_gettime_nsec(&now);
+   ENTERCRITICAL;
 
-      ENTERCRITICAL;
+   do {
+      timerid = expires_next;
 
-      do {
-         timerid = expires_next;
+      if (timerid >= 0) {
+         timeout = timerTable[timerid].value.nsec_value;
 
-         if (timerid >= 0) {
-            timeout = timerTable[timerid].value.nsec_value;
+         if (timeout < now) {
+            // timeout reached
+            // --> remove timer from list and
+            // --> reinsert if timer is set periodic
+            remove_timer_from_active_list(timerid);
 
-            if (timeout < now) {
-               // timeout reached
-               // --> remove timer from list and
-               // --> reinsert if timer is set periodic
-               remove_timer_from_active_list(timerid);
-
-               if (timerTable[timerid].value.nsec_interval) {
-                  timerTable[timerid].value.nsec_value +=
-                     timerTable[timerid].value.nsec_interval;
-                  insert_timer_into_active_list(timerid);
-               }
-
-               // invoke timer callback method
-               callback = (struct Callback*) timerTable[timerid].evp;
-               callback->cb(callback->th);
+            if (timerTable[timerid].value.nsec_interval) {
+               timerTable[timerid].value.nsec_value +=
+                  timerTable[timerid].value.nsec_interval;
+               insert_timer_into_active_list(timerid);
             }
+
+            // invoke timer callback method
+            callback = (struct Callback*) timerTable[timerid].evp;
+            callback->cb(callback->th);
          }
-      } while (timerid >= 0 && timeout < now);
-
-      retrigger_timer();
-      LEAVECRITICAL;
-      freeStack = uxTaskGetCurrentFreeStack();
-
-      if (freeStack < STACKLIMIT) {
-         printf(
-            "TimerTask: current free stack only %d free elements"
-            "TimerTask terminates\n",
-            freeStack);
-         vTaskDelete(NULL);
-      } else {
-//       printf("TimerTask: current free stack %d free elements\n",
-//             freeStack);
       }
+   } while (timerid >= 0 && timeout < now);
 
-      freeStack = uxTaskGetStackHighWaterMark(NULL);
-
-      if (freeStack < STACKLIMIT) {
-         printf("TimerTask: stack used up to %d free elements"
-                "TimerTask terminates\n",
-                freeStack);
-         vTaskDelete(NULL);
-      } else {
-         printf("TimerTask: stack used up to %d free elements\n", freeStack);
-      }
-   }
+   retrigger_timer();
+   LEAVECRITICAL;
 }
 

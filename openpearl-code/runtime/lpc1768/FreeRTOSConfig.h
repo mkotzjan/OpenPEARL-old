@@ -92,6 +92,7 @@
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 80 )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( 2 * 1024 ) )
 #define configUSE_STATIC_STACK_AND_TCB	1	// <<< added
+#define configUSE_TASK_AUTORESTART	1	// <<< added
 #define configUSE_MALLOC_FAILED_HOOK	1
 #define configMAX_TASK_NAME_LEN		( 12 )
 #define configUSE_TRACE_FACILITY	0
@@ -103,11 +104,9 @@
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION   0 /* added */
 #define INCLUDE_xTaskGetSchedulerState  1	/* added */
 #define INCLUDE_xTaskResumeFromISR	1	/* added */
+#define INCLUDE_vTaskSetAutoRestart	1	// <<< added
 
-//#ifndef AUTOCONF_INCLUDED
-//#include "../../configuration/include/autoconf.h"
-//#endif
-
+// we use our own timer task!
 #define configUSE_TIMERS		0
 #define configCHECK_FOR_STACK_OVERFLOW  	1
 #define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES - 1) 

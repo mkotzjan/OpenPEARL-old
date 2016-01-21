@@ -168,6 +168,8 @@ clean:
 	@rm -f $(PLIB_OBJS) $(OBJ)
 	@rm -f $(addsuffix .diff,$(CHECK_FILES))
 	@rm -f $(addsuffix .new,$(CHECK_FILES))
+	@rm -rf html
+	@rm -rf latex
 
 phony += doc
 doc:
