@@ -3,28 +3,63 @@ MODULE(irupt);
 PROBLEM;
 
 SPC ctrlc INTERRUPT;
+! extern pearlrt::Interrupt * _ctrlc ;
 SPC int1 INTERRUPT;
+! extern pearlrt::Interrupt * _int1 ;
 
 
 T1: TASK MAIN;
 
 
     ENABLE ctrlc;
+!   _ctrlc->enable();
 
     WHEN ctrlc ACTIVATE T2 PRIO 10;
+/*
+	T2.activate(me, pearlrt::Task::PRIO | pearlrt::Task::WHEN,
+                  pearlrt::Prio(10),
+                  pearlrt::Clock(),
+                  pearlrt::Duration(),
+                  pearlrt::Duration(),
+                  pearlrt::Clock(),
+                  pearlrt::Duration(),
+                  _ctrlc);
+
+*/
     WHEN ctrlc ACTIVATE T3 AFTER 10 SEC ALL 5 SEC DURING 20 SEC PRIO 30;
+/*
+	T3.activate(me, pearlrt::Task::PRIO | 
+       pearlrt::Task::AFTER | pearlrt::TASK::ALL | pearlrt::TASK::DURING |
+       pearlrt::Task::WHEN,
+                  pearlrt::Prio(30),
+                  pearlrt::Clock(),
+                  pearlrt::Duration(10.0),
+                  pearlrt::Duration(5.0),
+                  pearlrt::Clock(),
+                  pearlrt::Duration(20.0),
+                  _ctrlc);
+*/
     WHEN ctrlc RESUME;
+/*
+    me ->resume(pearlrt::Task::WHEN,
+               pearlrt::Clock(), pearlrt::Duration(), _ctrlc);
+*/
+
 
 END;
 
 T2: TASK;
     ENABLE int1;
+!   _int1->enable();
     TRIGGER int1;
+!   _int1->trigger();
 END;
 
 T3: TASK;
     DISABLE int1;
+!   _int1->disable();
     TRIGGER int1;
+!   _int1->trigger();
 END;
 
 MODEND;
