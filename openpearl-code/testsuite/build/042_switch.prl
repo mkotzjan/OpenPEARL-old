@@ -15,7 +15,7 @@ T1: TASK MAIN;
          __cpp__('printf("failure \\n";'
                  'pearlrt::Control:setExitCode(1);');
      ALT /* 3 */ 
-         __cpp__('printf("success \\n";'
+         __cpp__('printf("success \\n";');
      ALT /* 4 */ 
          __cpp__('printf("failure \\n";'
                  'pearlrt::Control:setExitCode(1);');
