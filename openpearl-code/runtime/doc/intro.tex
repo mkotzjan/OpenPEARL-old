@@ -167,11 +167,13 @@ The following extensions provided by gcc are used:
    If this featureis not available, the compiler must produce a switch 
    statement instead of the {\em computed goto} to resolve
    the current goto target.
-\item[\_attribute\_(format)] is used in the log facility to check
+\item[\_\_attribute\_\_(format)] is used in the log facility to check
    proper argument matching according the printf-semantic.
    This option may be removed without problems, as long as the logging
    calls are correct.
-\item[\_attribute\_(used)] is used in the FreeRTOS port to bypass linkage
+\item[\_\_attribute\_\_(used)] is used in the FreeRTOS port to bypass linkage
    problems which appear with FreeRTOS and LTO (Link Time Optimization)
+\item[\_\_attribute\_\_((section("...")))] is used to control the
+   memory usage for the microcontroller.
 \end{description}
    

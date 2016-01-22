@@ -168,14 +168,12 @@ SECTIONS
 		__bss_end__ = .;
 	} > RAM
 
-	R1  (NOLOAD) :
+	PEAL_APPLICATION  (NOLOAD) :
 	{
 		. = ALIGN(4);
 		__bss2_start__ = .;
-    *("R1")
-	/*	*(.bss*)
-		*(COMMON)
-*/
+   		 *("PEARL_APPLICATION")
+   		 *("FREERTOS_HEAP")
 		. = ALIGN(4);
 		__bss2_end__ = .;
 

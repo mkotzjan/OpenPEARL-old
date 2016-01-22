@@ -104,7 +104,9 @@ static void prvHeapInit(void);
 static int xHeapHasBeenInitialised = pdFALSE;
 
 /* Allocate the memory for the heap. */
-static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ]
+	 __attribute__((section ("FREERTOS_HEAP")));
+
 static size_t xNextFreeByte = (size_t) 0;
 
 /* Define the linked list structure.  This is used to link free blocks in order

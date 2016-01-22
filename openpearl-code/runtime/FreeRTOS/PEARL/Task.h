@@ -80,7 +80,7 @@ namespace pearlrt {
       TCB_t tcb;
 
       /* the FreeRTOS stack */
-      StackType_t stack[400];
+      StackType_t stack[600];
 
    public:
       /**

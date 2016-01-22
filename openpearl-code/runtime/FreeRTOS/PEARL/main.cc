@@ -93,7 +93,9 @@ __attribute__((weak)) int main(void) {
    if (resetReason & SYSCTL_RST_POR) {
       printf("Power On RESET post_setting is %d\n", Post::getPostStatus());
       Post::print();
-      //Post::config();
+      if (Post::getPostStatus() == 1) {
+         Post::config();
+      }
    }
 
    if (resetReason & SYSCTL_RST_EXTRST) {
@@ -153,7 +155,7 @@ __attribute__((weak)) int main(void) {
 
    // all heap elements should be allocated now !
    // dump unused size to log
-   Log::info("Free Heap size: %d", xPortGetFreeHeapSize());
+   Log::info("Free Heap size: %d byte", xPortGetFreeHeapSize());
 
    Log::info("system startup complete");
    /* Start the scheduler. */

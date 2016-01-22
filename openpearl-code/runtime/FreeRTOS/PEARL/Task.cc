@@ -74,7 +74,7 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 400;
+      stackDepth = 600;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }

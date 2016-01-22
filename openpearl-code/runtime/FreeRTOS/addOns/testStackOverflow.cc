@@ -4,7 +4,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-/** minimum number of required free stack elements
+/** minimum number of required free stack elements (words of 4 bytes)
   in an application thread
 */
 

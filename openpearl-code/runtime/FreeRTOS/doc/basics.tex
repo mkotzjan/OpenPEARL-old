@@ -64,6 +64,33 @@ The following elements of gtest are provided:
 \item[ASSERT\_...] is defined for all listed EXPECT-versions. 
 \end{description}
 
+\section{Service Task}
+There is a high priority task, which perform service jobs from 
+other tasks.
+The priority of the service task is above all PEARL application
+tasks.
+This is similar to jobs in an conventionel operating
+system. 
+
+The servive tasks receives the jobs via a FreeRTOS message queue. 
+The queue entries consist of a struct like:
+\begin{verbatim}
+typedef struct { 
+  void (*job)(void*param);
+  void * param;
+} ServiceJob;
+\end{verbatim}
+The first entry is a pointer to a function, which receives the second entry
+as parameter.
+
+This service task is used by the
+\begin{description}
+\item[timer facility], when a time period has expired
+\item[OpenPEARL tasks], if they need a direct restart at their
+     termination in cases of interrupt overrun.
+\item[interrupt devices] to trigger the internal treatment
+\end{description}
+
 \section{Time Base}
 The presence of a real time clock (RTC) is not guaranteed on a
 microprocessor system.
@@ -80,7 +107,7 @@ There is an implemtation of the \texttt{itimer} system. This
 implementation allows the specification of a time source.
 This system was introduced  by Jonas Meyer in his thesis.
 
-\subsection{Timer-Task}
+\subsection{Timer-Treatment}
 The principle of operation of the implementation of the timer facility is
 that there are two lists of timer entries. A timer entry contains 
 the information about an initial delay and a repetition rate of the timer.
@@ -101,12 +128,15 @@ class TaskTimerCommon.
 \item the next timer entry in the active list defines the new delay for the
   next hardware timer delay. This delay is limited to one second. If the 
   desired period is longer than one second, several iterations are required.
-\end{itemize}
+\end{enumerate}
 
 The implementation of the hardware specific part
 (e.g. interrupt service routine) must be implemented in the concrete
 timer facilities. The FreeRTOSClock provides this bevavior on base
 of the 1ms system tick.
+
+Each timer informs the service task about time exprirations and 
+sends its own callback function pointer for further treatment.
 
 \subsection{class FreeRTOSClock}
 The class TaskTimer provides the FreeRTOS tick as
@@ -133,10 +163,6 @@ FreeRTOS was modified in the following points:
    of free stack element (of size 32 bit) on the current active tasks stack.
    This feature is enabled by the option
     \texttt{INCLUDE\_xTaskGetCurrentFreeStack}
-\item[setAutoRestartTask(taskhandle, onOff)] is a new function, which 
-    allows scheduling of the automatic restart of a task at its end of
-    execution (vTaskDelete()). This feature is only available, if
-    \texttt{configUSE\_STATIC\_STACK\_AND\_TCB} is selected. 
 \end{description}
 
 \section{Stack Checking}
@@ -170,23 +196,45 @@ The compiler arm-non-eabi-g++ v4.9.3 proved to need approximatelly 190 stack ele
 The monitoring of functions of the template classes for Fixed and Bit 
 is switched off for runtime efficiency.
 
+\section{Heap usage}
+FreeRTOS uses for several resources like tcp, stacks, queues, semaphores 
+on the heap.
+For OpenPEARL, the heap is configured as static data array of a fixed size.
+A new heap allocator (heap\_1\_2.c) provides a {\em pool allocation pattern}
+for heap elements to avoid memory fragmentation, if any heap element
+of freed and allocated cyclic.
+
+Usually FreeRTOS tasks locate stack and tcb on the heap. 
+These elements are allocates and released at task start and termination.
+This would produce heap fragmentation, when task stacks have different lengths.
+To avoid the fragmentation, stacks and tcbs are allocated static in the
+application code.
+
+A OpenPEARL task needs aside from the applications data:
+
+\begin{tabular}{lcc}
+    & .bss & FreeRTOS Heap \\
+tcb & 300 byte & 88 byte \\
+stack & 30 - 2400 byte & - \\
+\end{tabular} 
+
+Note: Stack checking requires a unused buffer of 800 bytes!
+
+Semphores and queues are not deleted during the lifetime of an 
+OpenPEARL-application. They are still allocted on the heap of the application.
+Note: All OpenPEARL semaphores uses one (1!) FreeRTOS semaphore together.
+
+The heap of the c-library is made available by the linker script. 
+Maybe some C++-objects are allocated in this heap.
+This should only be used, if these objects are never deleted.
+
+
 \section{Stack Size and Allocation Control}
-%The build process checks whether there is a file named \texttt{stacksize.h}
-%in the current working directory. If this file does not exist it is created
-%with default settings.
-%This default file should be modified by the application engineer
-%to set the desired stack size and location for the PEARL tasks.
-%
-%To define a PEARL tasks stack size, a C macro must be provided.
-%If there is no specific macro, the default styk size of the port will be used.
-%The naming scheme is:
-%\verb|#define STACK_<taskname> size|, where \texttt{taskname}
-%must be substutuded by the exact application tasks name. The size
-%defines the number of steck elements for this task. This size must be larger
-%than the minimum stack size.
-%E.g. for the application task \texttt{DisplaySeriel} should have
-%a stack size of 1000 elements (4kB) the definition would look
-%like \verb|#define STACK_DisplaySeriel 1000|.
+{\em missing part; 
+proposal: pseudo devices allow the specification of stack size.
+
+this will be solved together with the cross module linker
+}
 
 \section{Added Features to FreeRTOS and glib-c}
 There are some additional functions in \texttt{FreeRTOS/addOns},
@@ -197,6 +245,7 @@ with UNIX-like time functions like gettimeofday.
 \item[timer.c] provides the itimers
 \item[testStackOverflow.cc] provides the implementation of the 
   stack checking profiling function
+\item[service.c] provides the service task
 \end{description}
 
 Implementation of FreeRTOS Hooks:
@@ -222,7 +271,8 @@ In short:
 \item {
   \begin{description}
   \item[class Task] provides the required plattform specific implementation
-     of the tasking methods
+     of the tasking methods. The automatic restart of a task in case of
+     \verb|WHEN ... ACTIVATE| overruns is treated by the service task.
   \item[class TaskTimer] provides the time related stuff for the tasking
      methods. This class is working on base of the itimer extension 
      in \texttt{FreeRTOS/addOns}
@@ -260,7 +310,6 @@ At completion of the driver job in the isr the calling thread is continued.
 
 \subsection{To be done}
   \begin{itemize}
-  \item provide auto restart at task termination
   \item provide device drivers for the standard devices (UART, SD, Ethernet)
    \item device wait queue for tasks in begin/end-sequnce??
 
