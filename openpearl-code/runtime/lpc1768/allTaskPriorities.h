@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2015 Rainer Mueller
  All rights reserved.
 
@@ -27,53 +27,53 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef LPC17XX_CLOCK_INCLUDED
-#define LPC17XX_CLOCK_INCLUDED
+#ifndef ALLTASKPRIORITIES_INCLUDED
+#define ALLTASKPRIORITIES_INCLUDED
 
+#include "FreeRTOSConfig.h"
 
 /**
 \file
 
-\brief select the clock source by defining a system device
+List of task priorities of other system tasks in the complete application.
+
+This list provides the overview of all tasks known by FreeRTOS in the
+OpenPEARL application.
+
+There may be tasks for background operations below all PEARL apllications
+as well as tasks which must run with better priorities
+
 */
 
+/*
+idle task of FreeRTOS runs with prio 0!
+--> let's start with priority 1 as lowest (not important) priority
+*/
 
-namespace pearlrt {
+/**
+priority range for PEARL tasks is from PRIO_PEARL_PRIO_MIN 
+to PRIO_PEARL_PRIO_MAX
+*/
+#define PRIO_PEARL_PRIO_MIN 	1
+#define PRIO_PEARL_PRIO_MAX  	(PRIO_PEARL_PRIO_MIN+255)
 
-   /**
-   \brief Clock Source for the LPC1768-Landtiger
+/** 
+  the timer task (FreeRTOS/addOns/timer.c) receives the notifications
+  from the interrupt service routine. When a time period expired a 
+  reschedule may be necessary.
+  No application task may run with better priority than this task to enshure
+  the correct detection of timeouts
+*/
+#define PRIO_TASK_SERVICE	(PRIO_PEARL_PRIO_MAX+1)
 
-   With this class it is possible to define the clock source
-   for an application. The parameter selects one of the possible
-   clock sources.
+/**
+  The startup and shutdown of application task may not be interrupted
+  by other application tasks. This allows a run-to-completion behavior 
+*/
+#define PRIO_TASK_MAX_PRIO 	(PRIO_TASK_SERVICE+1)
 
-   Usage:
-   \verbatim
-   SYSTEM;
-      myClock : Lpc17xxClock(1); ! 0=Systick, 1=RTC initial time + Systick
-   PROBLEM;
-      ! no access to this device in the problem part
-   \endverbatim
+#if (PRIO_TASK_MAX_PRIO >= configMAX_PRIORITIES) 
+# error "configMAX_PRIORITIES too small"
+#endif
 
-   */
-   class Lpc17xxClock {
-
-   private:
-
-   public:
-
-      /**
-      Constructor to setup the clock
-
-      \param typeOfClock selector of the desired clock system
-                  <ul>
-        <li>0=Systick only (no absolute time),
-                  <li>1=RTC used as initial time; update by systick
-                  <li> ... others follow
-                  </ul>
-
-      */
-      Lpc17xxClock(const int typeOfClock);
-   };
-}
 #endif

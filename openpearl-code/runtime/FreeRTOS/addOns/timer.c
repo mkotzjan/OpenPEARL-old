@@ -483,7 +483,7 @@ static void timerJob(void *pcParameters) {
       void *th;
    }*callback;
 
-   // got trigger --> lets see which timer(s) expired 
+   // got trigger --> lets see which timer(s) expired
 
    clock_gettime_nsec(&now);
 

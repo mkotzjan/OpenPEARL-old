@@ -53,8 +53,8 @@ namespace pearlrt {
       start in runs without problems.
 
       On system start, the RTC gives the current time. As long as FreeRTOS
-      is running, the internal clock value is incremented with the 
-      system tick hook. 
+      is running, the internal clock value is incremented with the
+      system tick hook.
       The time betwenn two ticks is calculated from the systick register
       values.
    */

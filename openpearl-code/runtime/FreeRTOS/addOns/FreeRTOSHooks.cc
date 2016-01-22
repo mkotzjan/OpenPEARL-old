@@ -22,6 +22,6 @@ extern "C" {
       /* do nothing - just be prepared if somebody sets the switch in the
          FreeRTOSConfig.h
       */
-      }
-      };
+   }
+};
 

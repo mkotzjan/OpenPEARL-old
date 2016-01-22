@@ -55,22 +55,22 @@ static StackType_t serviceStack[SERVICE_STACK_SIZE];
 static QueueHandle_t serviceQueue;
 
 void init_service() {
-      StructParameters_t createParameters;
+   StructParameters_t createParameters;
 
-      /* the interrupt service routine sends messages to this 
-      queue on each expiration of the timer. The length is
-      set to something above 1 but not too large...
-      maybe this schould be replaced by a counting semaphore...
-      */
-      serviceQueue = xQueueCreate(30, sizeof(ServiceJob));
+   /* the interrupt service routine sends messages to this
+   queue on each expiration of the timer. The length is
+   set to something above 1 but not too large...
+   maybe this schould be replaced by a counting semaphore...
+   */
+   serviceQueue = xQueueCreate(30, sizeof(ServiceJob));
 
-      createParameters.pvParameter = NULL;
-      createParameters.stack = serviceStack;
-      createParameters.tcb = &serviceTcb;
+   createParameters.pvParameter = NULL;
+   createParameters.stack = serviceStack;
+   createParameters.tcb = &serviceTcb;
 
-      xTaskCreate(serviceTask,
-                  "serviceTask", SERVICE_STACK_SIZE, &createParameters,
-                  PRIO_TASK_SERVICE, &xServiceTaskHandle);
+   xTaskCreate(serviceTask,
+               "serviceTask", SERVICE_STACK_SIZE, &createParameters,
+               PRIO_TASK_SERVICE, &xServiceTaskHandle);
 
 }
 
@@ -104,6 +104,7 @@ static void serviceTask(void *pcParameters) {
       if (!xQueueReceive(serviceQueue, &s, portMAX_DELAY)) {
          printf("error at xQueueReceive\n");
       }
+
       s.job(s.param);
 
       freeStack = uxTaskGetCurrentFreeStack();

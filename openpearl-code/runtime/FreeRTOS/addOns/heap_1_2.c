@@ -105,7 +105,7 @@ static int xHeapHasBeenInitialised = pdFALSE;
 
 /* Allocate the memory for the heap. */
 static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ]
-	 __attribute__((section ("FREERTOS_HEAP")));
+__attribute__((section("FREERTOS_HEAP")));
 
 static size_t xNextFreeByte = (size_t) 0;
 
@@ -175,7 +175,8 @@ void *pvPortMalloc(size_t xWantedSize) {
 
    if (xWantedSize & portBYTE_ALIGNMENT_MASK) {
       /* Byte alignment required. */
-      xWantedSize += (portBYTE_ALIGNMENT - (xWantedSize & portBYTE_ALIGNMENT_MASK));
+      xWantedSize += (portBYTE_ALIGNMENT -
+                      (xWantedSize & portBYTE_ALIGNMENT_MASK));
    }
 
 #endif
@@ -217,19 +218,22 @@ void *pvPortMalloc(size_t xWantedSize) {
          }
       }
 
-      /* If we found NO EXACTLY fitting block allocate from the static 
+      /* If we found NO EXACTLY fitting block allocate from the static
          heap storage */
       if (pvReturn == NULL) {
          if (pucAlignedHeap == NULL) {
             /* Ensure the heap starts on a correctly aligned boundary. */
-            pucAlignedHeap = (uint8_t *)(((portPOINTER_SIZE_TYPE) &ucHeap[ portBYTE_ALIGNMENT ]) & (~((portPOINTER_SIZE_TYPE) portBYTE_ALIGNMENT_MASK)));
+            pucAlignedHeap = (uint8_t *)
+                             (((portPOINTER_SIZE_TYPE) &ucHeap[ portBYTE_ALIGNMENT ]) &
+                              (~((portPOINTER_SIZE_TYPE) portBYTE_ALIGNMENT_MASK))
+                             );
          }
 
          /* Check there is enough room left for the allocation. */
-         if (((xNextFreeByte + xWantedSize + heapSTRUCT_SIZE) < 
-			configADJUSTED_HEAP_SIZE) &&
-               ((xNextFreeByte + xWantedSize + heapSTRUCT_SIZE) > 
-			xNextFreeByte)) {  /* Check for overflow. */
+         if (((xNextFreeByte + xWantedSize + heapSTRUCT_SIZE) <
+               configADJUSTED_HEAP_SIZE) &&
+               ((xNextFreeByte + xWantedSize + heapSTRUCT_SIZE) >
+                xNextFreeByte)) {  /* Check for overflow. */
             /* Return the next free byte then increment the index past
              * this block.
              * insert the linked list elements just before the returned pointer
@@ -260,7 +264,7 @@ void *pvPortMalloc(size_t xWantedSize) {
       if (pvReturn == NULL) {
          extern void vApplicationMallocFailedHook(void);
          printf("prvMalloc: heap full: wanted size = %d xNextFreeByte=%d\n",
-			 xWantedSize, xNextFreeByte);
+                xWantedSize, xNextFreeByte);
          vApplicationMallocFailedHook();
       }
    }

@@ -1,0 +1,72 @@
+\section{Devices}
+
+\subsection{Lpc17xxDigitalIn}
+The device Lpc17xxDigitalIn provides digital input bits on all
+GPIO bits of the LPC1768. It is {\em NOT} checked, whether the 
+required bits are in use by other devices.
+
+The LPC1768 provides 5 GPIO ports, numbered from 0 to 4.
+Each port has a maximum of 32 bits.
+It is stated in the user manual, that a lot of bits are not
+available.
+
+Synopsis: \verb|Lpc17xxDigitalIn(port, start, width)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,1,2,3,4
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     are 31..0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..32.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by reading a BIT(width)-value from the
+opened system dation.
+Writing other data than BIT-types  may cause a signal, if the size of the
+data does not match the required size according the width.
+
+\subsection{Lpc17xxDigitalOut}
+The device Lpc17xxDigitalOut provides digital output bits on all
+GPIO bits of the LPC1768. It is {\em NOT} checked, whether the 
+required bits are in use by other devices.
+
+The LPC1768 provides 5 GPIO ports, numbered from 0 to 4.
+Each port has a maximum of 32 bits.
+It is stated in the user manual, that a lot of bits are not
+available.
+
+Synopsis: \verb|Lpc17xxDigitalOut(port, start, width)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,1,2,3,4
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     are 31..0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..32.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by writing a BIT(width)-value to the
+opened system dation.
+Writing other data than BIT-types  may cause a signal, if the size of the
+data does not match the required size according the width.
+
+\subsection{Lpc17xxInterrupt}
+The devive Lpc17xxInterrupt provides interrupt sources from GPIO inputs.
+The LPC1768 can produce interrupts on both edges of the GPIO ports 0 and 2.
+The Lpc17xxInterrupt device produces interrupts only on the falling edge. 
+Synopsis: \verb|Lpc17xxInterrupt(port, bit)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,2
+\item[bit] specifies the number of the  bit to monitor.
+ Valid numbers are 31..0. 
+\end{description}
+
+Note: The LPC1768 does monitor only bits
+0-11 and 15-30 on port 0 and 0-13 on port 2.
+
+The landtiger board has Key1 on P2.11 and SW2 an P2.10
+the joystick is on P1.25-29
+

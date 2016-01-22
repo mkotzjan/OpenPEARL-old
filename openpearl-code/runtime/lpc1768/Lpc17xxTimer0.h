@@ -42,7 +42,7 @@ namespace pearlrt {
    /**
       Wrapper class for LPC1768 Timer0 functions
 
-      On system start, the RTC gives the current time. 
+      On system start, the RTC gives the current time.
       The TIMER0 is configured to trigger an interrupt each second
       as well as at the end of a requested time period.
 
@@ -57,12 +57,12 @@ namespace pearlrt {
 
       static void setTimeOut(uint64_t nsec);
 
-     static unsigned int ticks2nsec(unsigned int ticks);
-       static unsigned int nsec2ticks(unsigned int nsecs);
+      static unsigned int ticks2nsec(unsigned int ticks);
+      static unsigned int nsec2ticks(unsigned int nsecs);
 
    public:
       /**
-       start the timer 
+       start the timer
 
       Configure the timer to produce an interrupt each second.
       */
@@ -70,7 +70,7 @@ namespace pearlrt {
 
       /**
       receive the drift to time reference
-     
+
       change the time base to meet th time reference better
       \param drift nsec difference to reference clock in a 1 seconds period
       */

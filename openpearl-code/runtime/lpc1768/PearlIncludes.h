@@ -108,9 +108,8 @@ extern "C" {
 #include "SampleBasicDation.h"
 
 // drivers
-//#include "Octopus.h"
-//#include "OctopusDigitalIn.h"
-//#include "OctopusDigitalOut.h"
+#include "Lpc17xxDigitalIn.h"
+#include "Lpc17xxDigitalOut.h"
 
 #include "Post.h"
 #include "Lpc17xxRTC.h"

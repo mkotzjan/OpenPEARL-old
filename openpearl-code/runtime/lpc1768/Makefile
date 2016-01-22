@@ -85,7 +85,10 @@ BOARDSUPPORT += Lpc17xxRTC.cc
 BOARDSUPPORT += Post.cc
 BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
+BOARDSUPPORT += Lpc17xxDigitalIn.cc
+BOARDSUPPORT += Lpc17xxDigitalOut.cc
 CHECK_FILES += $(BOARDSUPPORT)
+CHECK_FILES += $(addsuffix .h,$(basename $(BOARDSUPPORT)))
 BOARDSUPPORT += startup_lpc1768.S 
 ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
 BOARDSUPPORT += ../FreeRTOS/addOns/testStackOverflow.cc
