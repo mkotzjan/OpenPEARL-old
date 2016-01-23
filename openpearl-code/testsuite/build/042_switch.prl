@@ -9,19 +9,19 @@ T1: TASK MAIN;
 
   CASE f3
      ALT /* 1 */ 
-         __cpp__('printf("failure \\n";'
-                 'pearlrt::Control:setExitCode(1);');
+         __cpp__('printf("failure \\n");'
+                 'pearlrt::Control::setExitCode(1);');
      ALT /* 2 */ 
-         __cpp__('printf("failure \\n";'
-                 'pearlrt::Control:setExitCode(1);');
+         __cpp__('printf("failure \\n");'
+                 'pearlrt::Control::setExitCode(1);');
      ALT /* 3 */ 
-         __cpp__('printf("success \\n";');
+         __cpp__('printf("success \\n");');
      ALT /* 4 */ 
-         __cpp__('printf("failure \\n";'
-                 'pearlrt::Control:setExitCode(1);');
+         __cpp__('printf("failure \\n");'
+                 'pearlrt::Control::setExitCode(1);');
      OUT /* all other cases */
-         __cpp__('printf("failure \\n";'
-                 'pearlrt::Control:setExitCode(1);');
+         __cpp__('printf("failure \\n");'
+                 'pearlrt::Control::setExitCode(1);');
   FIN;
 END;
 

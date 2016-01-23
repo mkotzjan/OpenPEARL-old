@@ -1088,7 +1088,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             SmallPearlParser.Case_statement_selection1_altContext alt = ctx.case_statement_selection1_alt(i);
 
             ST cur_alt = visitCase_statement_selection1_alt(alt);
-            cur_alt.add("alt", i);
+            cur_alt.add("alt", i+1);
             st_alt.add( "Alternatives", cur_alt);
         }
 
