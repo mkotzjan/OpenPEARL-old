@@ -910,6 +910,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         stmt.add("srcColumn", ctx.start.getCharPositionInLine());
 
         if (ctx != null && ctx.children != null) {
+            if ( ctx.label_statement() != null ) {
+                for (int i = 0; i < ctx.label_statement().size(); i++) {
+                    stmt.add("code", visitLabel_statement(ctx.label_statement(i)));
+                }
+            }
             for (ParseTree c : ctx.children) {
                 if (c instanceof SmallPearlParser.Unlabeled_statementContext) {
                     stmt.add("code", visitUnlabeled_statement((SmallPearlParser.Unlabeled_statementContext) c));
@@ -922,6 +927,20 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         return stmt;
+    }
+
+    @Override
+    public ST visitLabel_statement(SmallPearlParser.Label_statementContext ctx) {
+        ST st = group.getInstanceOf("label_statement");
+        st.add( "label", ctx.ID().getText());
+        return st;
+    }
+
+    @Override
+    public ST visitGotoStatement(SmallPearlParser.GotoStatementContext ctx) {
+        ST st = group.getInstanceOf("goto_statement");
+        st.add( "label", ctx.ID().getText());
+        return st;
     }
 
     @Override
@@ -946,7 +965,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             statement.add("code", visitLoopStatement(ctx.loopStatement()));
         } else if (ctx.exitStatement() != null) {
             statement.add("code", visitExitStatement(ctx.exitStatement()));
+        } else if (ctx.gotoStatement() != null) {
+            statement.add("code", visitGotoStatement(ctx.gotoStatement()));
         }
+
 
         return statement;
     }

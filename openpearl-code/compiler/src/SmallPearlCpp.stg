@@ -315,8 +315,12 @@ simpleConstruct(_construct) ::= <<
  <_construct>
  >>
 
+label_statement(label) ::= <<
+<user_label(label)>:<\n>
+>>
+
 goto_statement(label) ::= <<
-goto <label>;
+goto <user_label(label)>;
 >>
 
 ExitStatement(label) ::= <<
@@ -326,7 +330,6 @@ ExitStatement(label) ::= <<
     break;
 <endif>
 >>
-
 
 return_statement(expression) ::= <<
 return (<expression>);
