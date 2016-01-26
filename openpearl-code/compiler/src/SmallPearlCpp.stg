@@ -299,15 +299,15 @@ iochannel(id) ::= "<id>"
 
 identifier(id) ::= "<id>"
 
-statement(srcFilename,srcLine,srcColumn,code,cpp) ::= <<
+statement(srcFilename,srcLine,srcColumn,label,code,cpp) ::= <<
+<if(label)><label><endif>
 <if(cpp)>
 <cpp_inline(cpp)>
-<else>
+<endif>
 <if(srcFilename)>
 me->setLocation(<srcLine>, filename);
 <endif>
-<code>
-<endif>
+<if(code)><code><endif>
 >>
 
 simpleConstruct(_construct) ::= <<
@@ -315,9 +315,9 @@ simpleConstruct(_construct) ::= <<
  <_construct>
  >>
 
-label_statement(label) ::= <<
+label_statement(label) ::= <%
 <user_label(label)>:<\n>
->>
+%>
 
 goto_statement(label) ::= <<
 goto <user_label(label)>;

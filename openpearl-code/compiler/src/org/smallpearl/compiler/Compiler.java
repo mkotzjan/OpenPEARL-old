@@ -43,7 +43,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.6.2";
+    static String version = "v0.6.3";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -65,9 +65,9 @@ public class Compiler {
     static boolean dumpSymbolTable = true;
     static boolean dumpConstantPool = true;
     static boolean debug = false;
-    static boolean debugSTG=false;
-    static boolean stacktrace=false;
-    static boolean exportSystemPart=false;
+    static boolean debugSTG = false;
+    static boolean stacktrace = false;
+    static boolean exportSystemPart = false;
     static int     noOfErrors = 0;
     static int     noOfWarnings = 0;
     static int     warninglevel = 255;
@@ -94,8 +94,15 @@ public class Compiler {
                 System.exit(-2);
             }
 
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(DescriptiveErrorListener.INSTANCE);
+
             CommonTokenStream tokens = new CommonTokenStream(lexer);
+
             SmallPearlParser parser = new SmallPearlParser(tokens);
+            parser.removeErrorListeners();
+            parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
+
             parser.setBuildParseTree(true);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +189,7 @@ public class Compiler {
             noOfErrors = parser.getNumberOfSyntaxErrors();
 
             System.out.flush();
+            System.out.println("");
             System.out.println("Number of errors in " + inputFiles.get(i) + " encountered: " + noOfErrors);
 
             if ( noOfErrors == 0 ) {

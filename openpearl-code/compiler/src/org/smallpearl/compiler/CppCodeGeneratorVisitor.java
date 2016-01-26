@@ -909,19 +909,22 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         stmt.add("srcLine", ctx.start.getLine());
         stmt.add("srcColumn", ctx.start.getCharPositionInLine());
 
-        if (ctx != null && ctx.children != null) {
+        if (ctx != null) {
             if ( ctx.label_statement() != null ) {
                 for (int i = 0; i < ctx.label_statement().size(); i++) {
-                    stmt.add("code", visitLabel_statement(ctx.label_statement(i)));
+                    stmt.add("label", visitLabel_statement(ctx.label_statement(i)));
                 }
             }
-            for (ParseTree c : ctx.children) {
-                if (c instanceof SmallPearlParser.Unlabeled_statementContext) {
-                    stmt.add("code", visitUnlabeled_statement((SmallPearlParser.Unlabeled_statementContext) c));
-                } else if (c instanceof SmallPearlParser.Block_statementContext) {
-                    stmt.add("code", visitBlock_statement((SmallPearlParser.Block_statementContext) c));
-                } else if (c instanceof SmallPearlParser.Cpp_inlineContext) {
-                    stmt.add("cpp", visitCpp_inline((SmallPearlParser.Cpp_inlineContext) c));
+
+            if (ctx.children != null) {
+                for (ParseTree c : ctx.children) {
+                    if (c instanceof SmallPearlParser.Unlabeled_statementContext) {
+                        stmt.add("code", visitUnlabeled_statement((SmallPearlParser.Unlabeled_statementContext) c));
+                    } else if (c instanceof SmallPearlParser.Block_statementContext) {
+                        stmt.add("code", visitBlock_statement((SmallPearlParser.Block_statementContext) c));
+                    } else if (c instanceof SmallPearlParser.Cpp_inlineContext) {
+                        stmt.add("cpp", visitCpp_inline((SmallPearlParser.Cpp_inlineContext) c));
+                    }
                 }
             }
         }
