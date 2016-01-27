@@ -46,7 +46,7 @@ public class ProcedureDef extends ScopeDef {
     }
 
     public String toString() {
-        return "procedure:" + getName() + " with args:" + m_arguments + " with retrun type:" + m_returnType;
+        return "procedure:" + getName() + " with args:" + m_arguments + " with return type:" + m_returnType;
     }
 
     public void addArgument(Argument argument) {

@@ -425,9 +425,14 @@ TaskContinuation(task,Condition,priority,at,after) ::= <<
 <endif>
 >>
 
-expression(code,id,bitstring,operator) ::= <%
+expression(code,id,bitstring,operator,functionCall) ::= <%
 <if(id)><id><elseif(code)><code; wrap><elseif(bitstring)>pearlrt::BitString\<<bitstring>\><endif>
 <if(operator)><operator><endif>
+<if(functionCall)><functionCall><endif>
+%>
+
+FunctionCall(callee,ListOfActualParameters) ::= <%
+<callee>( me<if(ListOfActualParameters)>, <ListOfActualParameters><endif>)
 %>
 
 literal(integer,float,string,time,duration) ::= <%
@@ -1147,6 +1152,10 @@ block_statement(code,id) ::= <<
 // BLOCK END <if(id)>Block-ID:<id><endif>
 >>
 
+user_procedure(name) ::= <%
+    _<name>
+%>
+
 user_variable(name) ::= <%
     _<name>
 %>
@@ -1245,7 +1254,7 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
 
 ProcedureDeclaration(id,listOfFormalParameters,body,resultAttribute,globalAttribute) ::= <<
 <if(resultAttribute)><resultAttribute><else>void<endif>
-<id>(pearlrt::Task *me<if(listOfFormalParameters)>, <listOfFormalParameters><endif>)
+<user_procedure(id)>(pearlrt::Task *me<if(listOfFormalParameters)>, <listOfFormalParameters><endif>)
 {
     <body>
 }

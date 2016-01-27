@@ -51,6 +51,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private String m_sourceFileName;
     private ExpressionTypeVisitor m_expressionTypeVisitor;
     private boolean m_map_to_const = true;
+    private SymbolTable m_symtab;
 
     public enum Type {BIT, CHAR, FIXED}
 
@@ -62,6 +63,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         m_verbose = verbose;
         m_sourceFileName = sourceFileName;
         m_expressionTypeVisitor = expressionTypeVisitor;
+        m_symtab = SymbolTable.getSymbolTable();
 
         if (m_verbose > 1) {
             System.out.println("Generating Cpp code");
@@ -1308,8 +1310,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             expression.add("code", visitPrimaryExpression(ctx.primaryExpression()));
         }
 
-//        System.out.println("visitBaseExpression: expression=" + expression.getAttributes().toString());
-
         return expression;
 
     }
@@ -1329,7 +1329,24 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 expression.add("code", visitLiteral(ctx.literal()));
             }
         } else if (ctx.ID() != null) {
-            expression.add("id", getUserVariable(ctx.ID().getText()));
+            System.out.println( "Symbol="+ctx.ID().toString());
+            Definition def = m_symtab.lookup(ctx.ID().toString());
+
+            if ( def instanceof ProcedureDef) {
+                ST functionCall = group.getInstanceOf("FunctionCall");
+                functionCall.add("callee", getUserVariable(ctx.ID().getText()));
+
+                ProcedureDef procdef = (ProcedureDef)def;
+
+                if ( ctx.listOfActualParameters() != null ){
+                    functionCall.add("ListOfActualParameters", visitListOfActualParameters(ctx.listOfActualParameters()));
+                }
+
+                expression.add("functionCall", functionCall);
+            }
+            else {
+                expression.add("id", getUserVariable(ctx.ID().getText()));
+            }
         } else if (ctx.semaTry() != null) {
             expression.add("code", visitSemaTry(ctx.semaTry()));
         }

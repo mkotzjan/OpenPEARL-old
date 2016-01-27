@@ -79,7 +79,13 @@ public class BuildSymbolTableVisitor extends SmallPearlBaseVisitor<Void> impleme
 
         for (ParseTree c : ctx.children) {
             if (c instanceof SmallPearlParser.ResultAttributeContext) {
-//                throw new NotYetImplementedException("Result Type", ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                TypeDefinition resultType;
+                TypeVisitor typeVisitor = new TypeVisitor(m_verbose);
+                resultType = typeVisitor.visit(((SmallPearlParser.ResultAttributeContext) c).resultType());
+                if (m_verbose > 0) {
+                    System.out.println("ResultType:" + resultType);
+                }
+                procedure.setReturnType(resultType);
             } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
                 throw new NotYetImplementedException("Global Attribute", ctx.start.getLine(), ctx.start.getCharPositionInLine());
             } else if (c instanceof SmallPearlParser.ListOfFormalParametersContext) {

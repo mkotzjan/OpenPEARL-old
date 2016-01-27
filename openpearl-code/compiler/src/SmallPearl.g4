@@ -1628,6 +1628,7 @@ numericLiteralNegative
 primaryExpression
 	: '(' expression ')'
     | ID
+    | ID listOfActualParameters?
     | literal
     | semaTry
     | monadicExplicitTypeConversionOperators
@@ -1950,21 +1951,21 @@ length_definition
 
 BlockComment
     :   '/*' .*? '*/'
-        -> skip
+        -> channel(HIDDEN)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 LineComment
     :   '!' ~[\r\n]*
-        -> skip
+        -> channel(HIDDEN)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 Whitespace
     :   [ \t]+
-        -> skip
+        -> channel(HIDDEN)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1973,7 +1974,7 @@ Newline
     :   (   '\r' '\n'?
         |   '\n'
         )
-        -> skip
+        -> channel(HIDDEN)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
