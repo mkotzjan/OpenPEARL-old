@@ -29,9 +29,7 @@
 
 package org.smallpearl.compiler;
 
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.stringtemplate.v4.*;
 
 import java.io.FileNotFoundException;
@@ -43,7 +41,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.6.3";
+    static String version = "v0.6.4";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -100,6 +98,7 @@ public class Compiler {
             CommonTokenStream tokens = new CommonTokenStream(lexer);
 
             SmallPearlParser parser = new SmallPearlParser(tokens);
+
             parser.removeErrorListeners();
             parser.addErrorListener(DescriptiveErrorListener.INSTANCE);
 
