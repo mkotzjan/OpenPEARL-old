@@ -45,9 +45,7 @@ public class DescriptiveErrorListener extends BaseErrorListener {
         String sourceName = recognizer.getInputStream().getSourceName();
 
         System.err.println(sourceName + ":" + line + ":" + charPositionInLine + ": ERROR : Syntax error :" + msg);
-        System.err.println("line "+line+":"+charPositionInLine+" "+msg);
-        underlineError(recognizer,(Token)offendingSymbol,
-                line, charPositionInLine);
+        underlineError(recognizer,(Token)offendingSymbol, line, charPositionInLine);
     }
 
     protected void underlineError(Recognizer recognizer,
