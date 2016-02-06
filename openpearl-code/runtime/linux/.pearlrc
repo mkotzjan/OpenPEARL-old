@@ -1,4 +1,4 @@
-LogLevel    0x0f   (1=debug, 2=info, 4=warn, 8=error)
+LogLevel    0x0c   (1=debug, 2=info, 4=warn, 8=error)
 ! -------------------------------------
 ! PEARL runtime configuration file (.pearlrc)
 ! this file is searched in the current directory (first)

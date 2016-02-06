@@ -77,7 +77,7 @@ namespace pearlrt {
    }
 
    CSema TaskCommon::mutexTasks(1);
-   int cccc = 1;
+   static volatile int cccc = 1;
 
    void TaskCommon::mutexLock() {
 //      Log::debug("MUTEX TASK: LOCKING...cccc= %d", cccc);
@@ -94,9 +94,9 @@ namespace pearlrt {
       }
 
       /*
-            else {
-               Log::debug("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
-            }
+                else {
+                     Log::debug("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
+                  }
       */
       mutexTasks.release();
    }
@@ -739,9 +739,7 @@ namespace pearlrt {
       } else {
          if (taskState == Task::TERMINATED) {
             Log::debug("task %s: scheduled activate (when): starts", name);
-//            internalDirectActivate(schedActivateData.prio, false);
             directActivate(schedActivateData.prio);
-//            activateDone.request();
          } else {
             if (schedActivateOverrun) {
                // warn that this activation is skipped

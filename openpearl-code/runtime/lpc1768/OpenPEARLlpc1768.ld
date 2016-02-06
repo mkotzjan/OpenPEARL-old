@@ -109,7 +109,7 @@ SECTIONS
 	/* To clear multiple BSS sections,
 	 * uncomment .zero.table section and,
 	 * define __STARTUP_CLEAR_BSS_MULTIPLE in startup_ARMCMx.S */
-	/*
+	
 	.zero.table :
 	{
 		. = ALIGN(4);
@@ -120,7 +120,7 @@ SECTIONS
 		LONG (__bss2_end__ - __bss2_start__)
 		__zero_table_end__ = .;
 	} > FLASH
-	*/
+
 
 	__etext = .;
 		
@@ -168,7 +168,7 @@ SECTIONS
 		__bss_end__ = .;
 	} > RAM
 
-	PEAL_APPLICATION  (NOLOAD) :
+	PEARL_APPLICATION  (NOLOAD) :
 	{
 		. = ALIGN(4);
 		__bss2_start__ = .;

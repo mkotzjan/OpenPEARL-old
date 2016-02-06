@@ -40,6 +40,7 @@ CXXFLAGS += -pthread
 CXXFLAGS += -fno-non-call-exceptions
 CXXFLAGS += $(INCLUDES)
 LDFLAGS = -lpthread -lrt 
+CXXFLAGS += -DTARGET=1
 
 #LINK.o = @echo link $<; $(LINK.cc)
 LINK.o = $(LINK.cc)

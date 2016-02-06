@@ -43,7 +43,7 @@ PLIB := libOpenPEARLlinux.a
 
 targets +=  \
 	tests/DataTypeTests \
-	tests/log_test tests/api  tests/lot_of_tasks  \
+	tests/api  tests/lot_of_tasks  \
 	tests/susp_cont_test \
 	tests/sched_demo \
 	tests/interruptTest \
@@ -57,7 +57,6 @@ targets +=  \
 GTEST_SRCS = tests/gtest_main.cc 
 GTEST_DATION_SRCS = tests/gtest_main.cc 
 
-TEST_SRCS +=  tests/log_test.cc 
 
 GTEST_SRCS += tests/PrioTests.cc
 GTEST_SRCS += tests/PrioMapperTests.cc

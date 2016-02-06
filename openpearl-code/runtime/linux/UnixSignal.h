@@ -96,6 +96,24 @@ namespace pearlrt {
       */
       static bool treat(int sig);
 
+      /**
+      enable interrupt in interrupt emitting device
+
+      the device shall only trigger the treatment, if the interrupt
+      is enabled by the application. This method is called from the 
+      enable()-method.
+      */
+      void devEnable();
+
+      /**
+      disable interrupt in interrupt emitting device
+
+      the device shall only trigger the treatment, if the interrupt
+      is enabled by the application. This method is called from the 
+      disable()-method.
+      */
+      void devDisable();
+
    };
 }
 

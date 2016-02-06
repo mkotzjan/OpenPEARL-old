@@ -45,7 +45,15 @@ Several classes support the tasking operations:
    the task state and tasking operation, as well as plattform independent
    parts of the tasking operations. Theses operations delegate the concrete
    plattform specific operation to the plattform specific implementation
-   in the class \verb|Task|.
+   in the class \verb|Task|. The api methods in TaskCommon perform some
+    parameter checks and look the mutex for all tasks before delegating 
+    the job to the plattform specific implementation. 
+    The mutex must be unlocked by the target specific implementation 
+    after completion of the job. Some operation may need to release and 
+    rerequest the mutex in the target specific job --- e.g. suspend,
+    which has to block the task until it is continued by another task
+    or a scheduded continue.
+
 \item[class TaskList] provides a list of all defined PEARL tasks
 \item[class TaskMonitor] keeps track of all scheduled and active tasks and
    detects the end of the application.
@@ -69,6 +77,7 @@ All tasking related methods, which check or modify  the tasks state lock the
 mutex variable. Some parts of execution are delegated to plattform specific
 code. For details about unlocking the mutex please check the code
 documentation from doxygen.
+
 
 
 \section{Specification and Declaration}

@@ -93,6 +93,7 @@ __attribute__((weak)) int main(void) {
    if (resetReason & SYSCTL_RST_POR) {
       printf("Power On RESET post_setting is %d\n", Post::getPostStatus());
       Post::print();
+
       if (Post::getPostStatus() == 1) {
          Post::config();
       }

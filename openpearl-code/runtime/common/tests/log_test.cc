@@ -83,6 +83,16 @@ int main() {
    Log::warn("warn message");
    Log::error("error message");
    Log::error("too long message %s", longText);
+   Log::debug("hex value %x (1)", 1);
+   Log::debug("hex value %x (12)", 0x12);
+   Log::debug("hex value %x (123)", 0x123);
+   Log::debug("hex value %x (1234)", 0x1234);
+   Log::debug("hex value %x (12345)", 0x12345);
+   Log::debug("hex value %x (123456)", 0x123456);
+   Log::debug("hex value %x (1234567)", 0x1234567);
+   Log::debug("hex value %x (12345678)", 0x12345678);
+   Log::debug("hex value %x (FEDCBA87)", 0xFEDCBA87);
+
 }
 
 /**

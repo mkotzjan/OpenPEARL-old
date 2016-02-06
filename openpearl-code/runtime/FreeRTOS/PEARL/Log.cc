@@ -35,18 +35,23 @@ extern "C" {
    extern int _write(int, const void* data, int size);
 };
 
+#define LOGTASK
+
 namespace pearlrt {
 
+#ifdef LOGTASK
 // formatting an output is done during in separate task if scheduler
 // is running. This safes a lot of tasks stack
 #define LOGSTACKSIZE 400
    static TCB_t        logTcb;
    static StackType_t  logStack[LOGSTACKSIZE];
-   static SemaphoreHandle_t logDone, logReady, logGo;
+   static SemaphoreHandle_t logDone, logBusy, logGo;
    static TaskHandle_t      logTaskHandle;
    static const Character<7>* commonType;
    static const char * commonFormat;
    static va_list commonArgs;
+   static bool schedulerWasStarted = false;
+#endif
 
 #define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
@@ -55,9 +60,10 @@ namespace pearlrt {
    Mutex Log::mutex;
 
    void Log::logTask(void * p) {
+#ifdef LOGTASK
+      schedulerWasStarted = true;
+
       while (1) {
-         // signal that log task is ready to do the job
-         xSemaphoreGive(logReady);
 
          // wait for new log job
          xSemaphoreTake(logGo, portMAX_DELAY);
@@ -65,9 +71,11 @@ namespace pearlrt {
          // new job arrived
          Log::doitSync(*commonType, commonFormat, commonArgs);
 
-         // and tell application task that the log job is finished
+         // and tell application task that the log job was done
          xSemaphoreGive(logDone);
       }
+
+#endif
    }
 
    Log::Log() {
@@ -75,18 +83,20 @@ namespace pearlrt {
       initialized = true;
       mutex.name("Log");
 
+#ifdef LOGTASK
       createParameters.pvParameter = NULL;
       createParameters.stack       = logStack;
       createParameters.tcb         = &logTcb;
-      
+
       // set the priority to the same as the idle tasks priority
       // the tasks priority will follow the calling tasks priority
       xTaskCreate(logTask, "Log", LOGSTACKSIZE, &createParameters,
                   0, &logTaskHandle);
 
-      logReady = xSemaphoreCreateBinary();
+      logBusy = xSemaphoreCreateMutex();
       logDone  = xSemaphoreCreateBinary();
       logGo    = xSemaphoreCreateBinary();
+#endif
    }
 
    Log* Log::getInstance() {
@@ -151,7 +161,11 @@ namespace pearlrt {
          wrk >>= 1;
       }
 
-      outDigits = (nbrOfSetBits + 4) / 4;
+      outDigits = (nbrOfSetBits + 3) / 4 ;
+
+      if (!outDigits) {
+         outDigits = 1;   // minimum 1 digit for 0
+      }
 
       while (outDigits > 0) {
          index = (value >> 4 * (outDigits - 1)) & 0x0f;
@@ -214,7 +228,7 @@ namespace pearlrt {
 
       while (l > 0) {
          rc.add((val / powers[l - 1]) + '0');
-         val /= 10;
+         val %= powers[l - 1];
          l --;
       }
    }
@@ -222,19 +236,35 @@ namespace pearlrt {
    void Log::doit(const Character<7>& type,
                   const char * format,
                   va_list args) {
-      if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
-         xSemaphoreTake(logReady, portMAX_DELAY);
-         commonType = &type;
-         commonFormat = format;
-         commonArgs = args;
+#ifdef LOGTASK
 
-         // set the priority of the log task to the same as the calling task
-         vTaskPrioritySet(logTaskHandle, uxTaskPriorityGet(NULL)); 
-         xSemaphoreGive(logGo);
-         xSemaphoreTake(logDone, portMAX_DELAY);
+      if (schedulerWasStarted) {
+
+         // only 1 log job possible at one time
+         xSemaphoreTake(logBusy, portMAX_DELAY);
+         {
+            commonType = &type;
+            commonFormat = format;
+            commonArgs = args;
+
+            // set the priority of the log task to the same as the calling task
+            vTaskPrioritySet(logTaskHandle, uxTaskPriorityGet(NULL));
+
+            // start to log job
+            xSemaphoreGive(logGo);
+
+            // wait until log job is finished
+            xSemaphoreTake(logDone, portMAX_DELAY);
+         }
+         xSemaphoreGive(logBusy);
+
       } else {
+#endif
          doitSync(type, format, args);
+#ifdef LOGTASK
       }
+
+#endif
    }
 
    void Log::doitSync(const Character<7>& type,
@@ -353,9 +383,11 @@ namespace pearlrt {
          mutex.unlock();
       } catch (CharacterTooLongSignal s) {
          mutex.lock();
-         _write(1, line.get(), strlen(line.get()));
+         _write(1, line.get(), sizeof(line));
          _write(1, ERRORMESSAGE, strlen(ERRORMESSAGE));
          mutex.unlock();
+      } catch (...) {
+         _write(1, "Log got other signal\n", 21);
       }
    }
 

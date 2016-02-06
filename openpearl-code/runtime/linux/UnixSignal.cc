@@ -205,7 +205,17 @@ namespace pearlrt {
       isSet |= 1 << sigNum;
    }
 
+   void UnixSignal::devEnable() {
+      // the signals are treated via the signalfd() - file
+      // is tís difficult to modify the mask in running mode
+      // we keep them always on
+   }
 
+   void UnixSignal::devDisable() {
+      // the signals are treated via the signalfd() - file
+      // is tís difficult to modify the mask in running mode
+      // we keep them always on
+   }
 }
 
 

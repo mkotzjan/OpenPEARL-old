@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,41 +27,69 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SOFTINT_INCLUDED
-#define SOFTINT_INCLUDED
+#ifndef LPC17XXINTERRUPT_INCLUDED
+#define LPC17XXINTERRUPT_INCLUDED
 
-#include <signal.h>
 #include "Interrupt.h"
 
 namespace pearlrt {
    /**
    \file
 
-   \brief pseudo interrupt source
+   \brief GPIO an LPC17xx as interrupt source
    */
 
    /**
-   This class provides some software interrupt sources
+   This class provides some interrupt sources via the LPC17xx GPIO
 
    */
-   class SoftInt : public Interrupt {
+   class Lpc17xxInterrupt : public Interrupt {
    private:
-      static int isSet;   //< bitmap of signals in use
+      // the lpc17xx emits one interrupt for all active gpio bits
+      // --> we need a list of defined interrupts to find the
+      //     corresponding c++ object
+      static Lpc17xxInterrupt * listOfInterrupts;
+      Lpc17xxInterrupt * next;
+
+      static int bitsInUse[2];
+
+      int port;  // port number of the gpio interrupt source
+      int bit;  // bit number of the gpio interrupt source
 
    public:
       /**
-      create a interrupt handler for the given SoftInt
+      define an interrupt  for the given GPIO bit
 
+      \param port the number of the gpio block, valid number are 0 and 2
+      \param bit  the number of the bit; note that not all bits may be used
 
-      \param nbr software interrupt number, which must be in the range 1..32
+      \throws theIllegalParamSignal if port:bit does not adress a valid
+                         gpio bit with interrupt support
       */
-      SoftInt(int nbr);
+      Lpc17xxInterrupt(int port, int bit);
+
+      /**
+      scan interrupt status registers for active bits
+      and pass the triggering job of  the corresponding interrupt object
+      to the service task
+
+      This is the C++ part of the interrupt service routine
+      */
+      static void isrPart2();
+
+      /**
+      callback to be called from the service task to trigger the
+      treatment of the interrupt handling in the application
+
+      \param irupt  pointer to the Lpc17xxInterrupt object
+      */
+      static void doServiceJob(Lpc17xxInterrupt * irupt);
 
       /**
       enable interrupt in interrupt emitting device
 
       the device shall only trigger the treatment, if the interrupt
-      is enabled by the application. This method is called from the 
+      is enabled by the application. This method is called from the
       enable()-method.
       */
       void devEnable();
@@ -70,7 +98,7 @@ namespace pearlrt {
       disable interrupt in interrupt emitting device
 
       the device shall only trigger the treatment, if the interrupt
-      is enabled by the application. This method is called from the 
+      is enabled by the application. This method is called from the
       disable()-method.
       */
       void devDisable();

@@ -110,6 +110,7 @@ extern "C" {
 // drivers
 #include "Lpc17xxDigitalIn.h"
 #include "Lpc17xxDigitalOut.h"
+#include "Lpc17xxInterrupt.h"
 
 #include "Post.h"
 #include "Lpc17xxRTC.h"

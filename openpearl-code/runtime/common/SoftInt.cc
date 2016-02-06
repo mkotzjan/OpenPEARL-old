@@ -55,6 +55,13 @@ namespace pearlrt {
       isSet |= 1 << nbr;
    }
 
+   void SoftInt::devEnable() {
+      // nothing to do for pure software interrupts
+   }
+
+   void SoftInt::devDisable() {
+      // nothing to do for pure software interrupts
+   }
 }
 
 

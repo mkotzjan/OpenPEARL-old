@@ -53,7 +53,7 @@ the next most integral data type will be used.
 #include "Log.h"
 
 #include "../../configuration/include/autoconf.h"
-#ifdef CONFIG_LPC1768_CHECK_STACK_OVERFLOW
+#if (TARGET == 2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1)
   // disable stack checking for the template methods in the applicaton code
 # define NOSTACKCHECK __attribute__((no_instrument_function))
 #else
@@ -649,5 +649,6 @@ namespace pearlrt {
    };
 
 }
+# undef NOSTACKCHECK
 #endif
 

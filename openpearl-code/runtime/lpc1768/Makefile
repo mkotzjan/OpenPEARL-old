@@ -16,8 +16,8 @@ COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(TARGET_ARCH) -c
 COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 #COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(LINK.cc)
-LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
-#LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
+#LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
 
 
 
@@ -87,6 +87,7 @@ BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
 BOARDSUPPORT += Lpc17xxDigitalIn.cc
 BOARDSUPPORT += Lpc17xxDigitalOut.cc
+BOARDSUPPORT += Lpc17xxInterrupt.cc
 CHECK_FILES += $(BOARDSUPPORT)
 CHECK_FILES += $(addsuffix .h,$(basename $(BOARDSUPPORT)))
 BOARDSUPPORT += startup_lpc1768.S 
@@ -118,6 +119,7 @@ endif
 PURECFLAGS := $(CFLAGS)
 CFLAGS += $(INCS)
 CXXFLAGS += $(INCS)
+CXXFLAGS += -DTARGET=2
 
 # ----------------- all input sources for dependencies
 SRCS = $(BOARDSUPPORT)  $(CXXSRCS) $(CSRC) $(LPCOpen_CSRC)

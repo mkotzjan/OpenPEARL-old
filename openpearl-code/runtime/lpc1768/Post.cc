@@ -9,7 +9,7 @@
 
 // labels from the linker script
 extern "C" {
-// lables defined as char to get the difference in bytes instead of ints
+// labels defined as char to get the difference in bytes instead of ints
    extern unsigned char __etext;
    extern unsigned char __data_start__, __data_end__;
    extern unsigned char __bss_start__, __bss_end__;
@@ -30,9 +30,15 @@ namespace pearlrt {
       }
    }
    void Post::print(void) {
+      static const struct tm  defaultDate = {0, 0, 0,
+                1, 0, 2016 - 1900,
+                5, 0, 0
+      }; // 1.1.2016 0:00:00
+
       int bytes;
-      struct timespec ts;
       struct tm tm;
+      uint64_t ns;
+      time_t sec;
 
       printf("------------\n");
       printf("POST summary\n");
@@ -56,16 +62,28 @@ namespace pearlrt {
       printf("      RAM2 : %d (%2d %%)\n", bytes, bytes * 100 / (32 * 1024));
       printf("           bss2: %p - %p\n", &__bss2_start__, &__bss2_end__);
 
-      clock_gettime(CLOCK_REALTIME, &ts);
-      tm = *(gmtime(&ts.tv_sec));
+      if (Lpc17xxRTC::valueOk()) {
+         Lpc17xxRTC::gettime(&ns);
+         sec = ns / 1E9;
+         //tm = *(gmtime(&sec));
+         tm = *(localtime(&sec));
+         printf("RTC is active: ");
+         printf(ctime(&sec));
+         printf("------------\n");
+      } else {
+         printf("RTC has ridiculous time\n");
+         Lpc17xxRTC::set(&defaultDate);
+      }
 
-      /*
-      printf("%d %02d.%02d.%04d %02d:%02d:%02d\n ",
-             tm.tm_wday, tm.tm_mday, tm.tm_mon+1, tm.tm_year+1900,
-             tm.tm_hour, tm.tm_min, tm.tm_sec);
-      */
-      printf(ctime(&ts.tv_sec));
-      printf("------------\n");
+      while (!Lpc17xxRTC::isRunning()) {
+         printf("RTC is not running --> start it\n");
+         Lpc17xxRTC::start();
+
+         if (!Lpc17xxRTC::isRunning()) {
+            printf("RTC start was not successful --> hardware problem?"
+                   " try again\n");
+         }
+      }
    }
 
    void Post::config(void) {
@@ -75,6 +93,7 @@ namespace pearlrt {
       while (1) {
          printf("commands: \n");
          printf("RTC: DOW YYYY:MM:DD:HH:MIN:SEC  set full date (DOW:1=Mon)\n");
+         printf("RUN                             start application\n");
 
          fgets(line, sizeof(line) - 1, stdin);
 

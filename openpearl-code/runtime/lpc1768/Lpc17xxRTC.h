@@ -65,10 +65,18 @@ namespace pearlrt {
       static int noTicksYet; //< flag to detect whether FreeRTOS is running
       static uint64_t tickBasedTime;
 
-      static void gettime(uint64_t * nsec);
       static void setTimeOut(uint64_t nsec);
 
    public:
+      /**
+      get current time from RTC in nsec
+
+      This method is puclic in RTC, since Post needs direct access to the RTC
+
+      \param nsec pointer to the uint64_t value for the nanoseconds value
+       */
+
+      static void gettime(uint64_t * nsec);
       /**
        start the RTC
 

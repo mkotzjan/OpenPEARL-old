@@ -72,7 +72,7 @@ tasks.
 This is similar to jobs in an conventionel operating
 system. 
 
-The servive tasks receives the jobs via a FreeRTOS message queue. 
+The service task receives the jobs via a FreeRTOS message queue. 
 The queue entries consist of a struct like:
 \begin{verbatim}
 typedef struct { 
@@ -311,7 +311,7 @@ At completion of the driver job in the isr the calling thread is continued.
 \subsection{To be done}
   \begin{itemize}
   \item provide device drivers for the standard devices (UART, SD, Ethernet)
-   \item device wait queue for tasks in begin/end-sequnce??
+  \item device wait queue for tasks in begin/end-sequence?
 
   \end{itemize}
 

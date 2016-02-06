@@ -31,6 +31,9 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
    POSSIBILITY OF SUCH DAMAGE.
    ---------------------------------------------------------------------------*/
+
+#define __STARTUP_CLEAR_BSS_MULTIPLE
+
 	.syntax	unified
 	.arch	armv7-m
 
@@ -272,7 +275,9 @@ Reset_Handler:
 	.weak	Default_Handler
 	.type	Default_Handler, %function
 Default_Handler:
-	b	.
+        b      lpc17_default_handler
+/*	b	.
+i*/
 	.size	Default_Handler, . - Default_Handler
 
 /*    Macro to define default handlers. Default handler

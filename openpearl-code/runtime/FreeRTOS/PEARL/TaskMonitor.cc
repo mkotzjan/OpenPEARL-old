@@ -74,8 +74,11 @@ namespace pearlrt {
       mutex.unlock();
 
       if (nbrPendingTasks == 0) {
-//        kill(pid, SIGRTMIN + 4); // indicate that last task exited
-         vTaskEndScheduler();
+         // we dont kill the scheduler. FreeRTOS will present a assert-warning
+         // if we would do. 
+         //    vTaskEndScheduler();
+         // Just print the end message to show the user that his application
+         // has finished
          printf("last task exited -- end.\n");
          exit(0);
       }

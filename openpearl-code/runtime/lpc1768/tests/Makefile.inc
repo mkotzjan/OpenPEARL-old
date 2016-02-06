@@ -48,9 +48,10 @@ targets +=  \
 	tests/SampleBasicDationTests \
 	tests/sematest tests/sematerminate  \
 	tests/signalTest \
-	tests/clockTest
-
-#	tests/interruptTest \
+	tests/clockTest \
+	tests/interruptTest \
+	tests/gpioInterrupt \
+	tests/log_test \
 #	tests/DationTests \
 #	tests/DationSuspendTerminateTests 
 	
@@ -88,7 +89,13 @@ GTEST_DATION_OBJS =$(GTEST_DATION_SRCS:.cc=.o)
 #  due to problems von implicit rules, the link command is 
 #  given as explicit rule
 
+tests/gpioInterrupt: tests/gpioInterrupt.o $(PLIB)
+	$(LINK)
+
 tests/signalTest: tests/signalTest.o $(PLIB)
+	$(LINK)
+
+tests/log_test: ../common/tests/log_test.o $(PLIB)
 	$(LINK)
 
 tests/interruptTest: ../common/tests/interruptTest.o $(PLIB)
@@ -117,9 +124,6 @@ tests/DataTypeTests2: $(GTEST_OBJS) $(GTEST_OBJS2) $(PLIB)
 	$(LINK)
 
 tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) 
-	$(LINK)
-
-tests/log_test: tests/log_test.o $(PLIB)
 	$(LINK)
 
 tests/sematest: ../common/tests/sematest.o $(PLIB)

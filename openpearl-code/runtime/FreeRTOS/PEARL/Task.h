@@ -80,7 +80,7 @@ namespace pearlrt {
       TCB_t tcb;
 
       /* the FreeRTOS stack */
-      StackType_t stack[600];
+      StackType_t stack[800];
 
    public:
       /**
@@ -163,11 +163,21 @@ namespace pearlrt {
       */
       virtual void task(Task * me) = 0;
 
-      /** call task job
-      \param param a dummy parameter, since FreeRTOS allows to
-               pass a parameter to the tasks code
+      /**
+      the FreeRTOS thread code must be a void function with a void* as
+      parameter.
+      \param param pointer to the tasks object data
       */
       static void tskfunc(void* param);
+
+      /**
+      task entry initilization
+
+      this method is called in startup of the application task.
+
+      */
+      void entry();
+
 
       /**
         change the tasks priority to the new PEARL prio
@@ -192,16 +202,6 @@ namespace pearlrt {
        \param cp the previous priority
       */
       void switchToThreadPrioCurrent(int cp) ;
-
-      /**
-      enter region without scheduling
-      */
-      static void disableScheduling();
-
-      /**
-      leave region without scheduling
-      */
-      static void enableScheduling();
 
       /**
       return the FreeRTOS hanle for diagnosic purpuses 

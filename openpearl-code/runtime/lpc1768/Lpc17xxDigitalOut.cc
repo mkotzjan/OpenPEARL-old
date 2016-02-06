@@ -88,7 +88,7 @@ namespace pearlrt {
       if ((Lpc17xxBits[port] & mask) != mask) {
          Log::error("Lpc17xxDigitalOut: not (all) requested bits are "
                     "available (%x)",
-                    Lpc17xxBits[port] & mask);
+                    (unsigned int)(Lpc17xxBits[port] & mask));
          throw theIllegalParamSignal;
       }
 

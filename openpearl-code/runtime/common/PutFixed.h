@@ -164,7 +164,6 @@ namespace pearlrt {
             x = x / y;
             digits ++;
          }
-Log::info("value= %d d=%d w= %d s= %d", fixedValue.x, w.x, d.x, s.x);
 
          postPointDigits = d.x;
          prePointDigits = digits - s.x;

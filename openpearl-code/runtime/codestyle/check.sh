@@ -32,25 +32,26 @@
    BASEDIR=$(dirname $0)
 
    rm -f $1.new $1.diff
-   astyle --options=$BASEDIR/astyle.opt <$1 >$1.new
-#   diff -q $1 $1.new
-   diff --ifdef=NEWFORMAT $1 $1.new >$1.diff
-   d=$?
-   if [ "$d" != "0" ]
+   if [ -e $1 ]
    then
-      echo "*** file " $1 "seems to be not well formatted"
-      echo " ** check "$1.diff " for version NEWFORMAT"
-      echo " ** in case you agree with the new format copy "$1.new " to " $1
-      exit 1
-   fi
+      astyle --options=$BASEDIR/astyle.opt <$1 >$1.new
+      diff --ifdef=NEWFORMAT $1 $1.new >$1.diff
+      d=$?
+      if [ "$d" != "0" ]
+      then
+         echo "*** file " $1 "seems to be not well formatted"
+         echo " ** check "$1.diff " for version NEWFORMAT"
+         echo " ** in case you agree with the new format copy "$1.new " to " $1
+         exit 1
+      fi
 
-   awk -f $BASEDIR/longlines.awk $1
-   long=$?
-   if [ "$long" != "0" ] 
-   then
-      echo "*** long lines found --> truncate them manually"
-      exit 1
+      awk -f $BASEDIR/longlines.awk $1
+      long=$?
+      if [ "$long" != "0" ] 
+      then
+         echo "*** long lines found --> truncate them manually"
+         exit 1
+      fi
    fi
-
    exit 0
  

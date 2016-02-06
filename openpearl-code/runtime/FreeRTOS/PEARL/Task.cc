@@ -74,7 +74,7 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 600;
+      stackDepth = 800;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }
@@ -91,6 +91,7 @@ namespace pearlrt {
    void Task::directActivate(const Fixed<15>& prio) {
       bool freeRtosRunning;
       StructParameters_t taskParams;
+      int cp;  // current prio of calling task
 
       int freeRtosPrio = PrioMapper::getInstance()->fromPearl(prio.x);
 
@@ -98,23 +99,21 @@ namespace pearlrt {
 
       BaseType_t taskCreation = pdFALSE;
 
-//      if ((schedActivateData.taskTimer->isActive() == false) &&
-//          (schedActivateData.whenRegistered == false) &&
-//           schedActivateOverrun == false) {
-//         TaskMonitor::Instance().incPendingTasks();
-//      }
-
+      /*
+      note: the call of TaskMonitor::...::incPendingTasks()
+            is already done in Taskcommon::activate()
+      */
 
       // the scheduling may only be stopped, if the scheduler
       // was started - the creation of MAIN-tasks need no
       // stop/start of the scheduler, since FreeRTOS is started later
-      freeRtosRunning = xTaskGetSchedulerState();
+      freeRtosRunning =
+         (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED);
 
       if (freeRtosRunning) {
-         disableScheduling();
+         cp = switchToThreadPrioMax();
       }
 
-      //this-> FreeRTOSPriority = prio;
       taskParams.pvParameter = (void*) this;
       taskParams.tcb = &tcb;
       taskParams.stack = stack;
@@ -135,9 +134,8 @@ namespace pearlrt {
       Log::debug("%s::activated ", name);
 
       if (freeRtosRunning) {
-         enableScheduling();
+         switchToThreadPrioCurrent(cp);
       }
-
    }
 
 
@@ -145,9 +143,14 @@ namespace pearlrt {
       suspendMySelf();
    }
 
+   void Task::entry() {
+      schedActivateOverrun = false;
+   }
 
    void Task::tskfunc(void* param) {
       Task* me = ((Task*)param);
+
+      me->entry();
       Log::debug("%s: starts", me->getName());
 
       try {
@@ -176,24 +179,35 @@ namespace pearlrt {
       // the following code - especially the restarting of the task itself
       // until vTaskDelete() is executed without task switch
       switchToThreadPrioMax();
-      taskState = TERMINATED;
 
       if (schedActivateOverrun) {
+         /* leave the tasks state to NOT TERMINATED.
+            This make the system insensitiv to retriggering the
+            task activation during the time until the automatic restart
+            of the task
+         */
          ServiceJob s = {(void (*)(void *))restartTaskStatic, this};
 
-         Log::error("%s: terminates with schedOverrun flag - start task again",
+         Log::debug("%s: terminates with schedOverrun flag - start task again",
                     name);
-         schedActivateOverrun = false;
-	 //         directActivate(schedActivateData.prio);
+
+         /* note: the current task prio is "RunToCompletion"
+                  there will be no taskswitch on a single core
+                  cpu, when the service tasks receives the job
+                  to start the task --> this tasks completes and
+                  then it will be restarted
+         */
+         printf("dispatch restart\n");
          add_service(&s);
-         mutexUnlock();
       } else {
+         /* set the tasks state to terminated */
+         taskState = TERMINATED;
+
          if (schedActivateData.taskTimer->isActive() == false &&
                schedActivateData.whenRegistered == false) {
-            mutexUnlock();
             TaskMonitor::Instance().decPendingTasks();
          } else {
-            mutexUnlock();
+            // do nothing
          }
       }
 
@@ -202,6 +216,7 @@ namespace pearlrt {
          printf("Task %s stack usage: %d\n", name, f);
       }
 
+      mutexUnlock();
       vTaskDelete(oldTaskHandle);
    }
 
@@ -220,9 +235,14 @@ namespace pearlrt {
          break;
 
       case SEMA_BLOCKED:
+         // update the OpenPEARL internal list
          Semaphore::removeFromWaitQueue(this);
-         taskState = Task::RUNNING;
-         blockParams.semaBlock.release();
+
+         // in FreeRTOS it is easy to kill a task - even if it waits for
+         // a semaphore. No need to continue and kill it
+         //     blockParams.semaBlock.release(); // this statement is required 
+         // only in the linux environment. I leave this reminder to make
+         // clear that this is no copy error
          break;
 
       case SUSPENDED:
@@ -234,15 +254,18 @@ namespace pearlrt {
 
       case SEMA_SUSPENDED_BLOCKED:
          Log::debug("   task %s: terminateRemote susp_blocked task", name);
-         taskState = Task::RUNNING;
-         blockParams.semaBlock.release();  // unblock
+
+         // in FreeRTOS it is easy to kill a task - even if it waits for
+         // a semaphore. No need to continue and kill it
+         //     blockParams.semaBlock.release(); // this statement is required 
+         // only in the linux environment. I leave this reminder to make
+         // clear that this is no copy error
          break;
 
       default:
          Log::error("   task %s: unhandled taskState (%d) at TERMINATE",
                     name, taskState);
          mutexUnlock();
-         switchToThreadPrioCurrent(cp);
          throw theInternalTaskSignal;
       }
 
@@ -250,6 +273,8 @@ namespace pearlrt {
       taskState = TERMINATED;
       vTaskDelete(this->xth);
 
+      // test if the a scheduled activation was not performed due to 
+      // the task was still active. Restart the task right now
       if (schedActivateOverrun) {
          schedActivateOverrun = false;
          directActivate(schedActivateData.prio);
@@ -464,14 +489,6 @@ namespace pearlrt {
       vTaskPrioritySet(xth, p);
    }
 
-   void Task::disableScheduling() {
-      vTaskSuspendAll();
-   }
-
-   void Task::enableScheduling() {
-      xTaskResumeAll();
-   }
-
    int Task::switchToThreadPrioMax() {
       int cp;
       cp = uxTaskPriorityGet(NULL);
@@ -492,11 +509,14 @@ namespace pearlrt {
    }
 
    void Task::restartTaskStatic(Task * t) {
-         t->restartTask();
+      t->restartTask();
    }
 
    void Task::restartTask() {
-	directActivate(schedActivateData.prio);
+      // directActivate must be called with all tasks mutex beeing locked
+      mutexLock();
+      directActivate(schedActivateData.prio);
+      mutexUnlock();
    }
 }
 

@@ -142,6 +142,26 @@ namespace pearlrt {
                the interrupt is triggered
       */
       void unregisterContinue(TaskWhenLinks* t);
+
+      protected:
+      /**
+      enable interrupt in interrupt emitting device
+
+      the device shall only trigger the treatment, if the interrupt
+      is enabled by the application. This method is called from the 
+      enable()-method.
+      */
+      virtual void devEnable()=0;
+
+      /**
+      disable interrupt in interrupt emitting device
+
+      the device shall only trigger the treatment, if the interrupt
+      is enabled by the application. This method is called from the 
+      disable()-method.
+      */
+      virtual void devDisable()=0;
+
    };
 
 }

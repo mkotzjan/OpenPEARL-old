@@ -76,7 +76,7 @@ void init_service() {
 
 void add_service_from_ISR(ServiceJob * s) {
    if (xServiceTaskHandle) {
-      if (!xQueueSendFromISR(serviceQueue, s, NULL)) {
+      if (pdTRUE != xQueueSendFromISR(serviceQueue, s, NULL)) {
          printf("error at xQuereSendFromISR\n");
       }
 
@@ -105,13 +105,18 @@ static void serviceTask(void *pcParameters) {
          printf("error at xQueueReceive\n");
       }
 
+      /*
+      printf("ServiceTask: current free elements: %d and  stack %d elements"
+             " --> invoke job\n",
+              uxQueueSpacesAvailable(serviceQueue), freeStack);
+      */
       s.job(s.param);
 
       freeStack = uxTaskGetCurrentFreeStack();
 
       if (freeStack < STACKLIMIT) {
          printf(
-            "ServiceTask: current free stack only %d free elements"
+            "ServiceTask: current stack only %d free elements"
             "ServiceTask terminates\n",
             freeStack);
          vTaskDelete(NULL);
@@ -128,7 +133,7 @@ static void serviceTask(void *pcParameters) {
                 freeStack);
          vTaskDelete(NULL);
       } else {
-         printf("ServiceTask: stack used up to %d free elements\n", freeStack);
+//       printf("ServiceTask: stack used up to %d free elements\n", freeStack);
       }
    }
 }

@@ -90,6 +90,7 @@ namespace pearlrt {
       unsigned int testval;
 
       Chip_RTC_GetFullTime(LPC_RTC, &rtc_tm);
+      /*
       printf("RTC TIME: %lu.%lu.%lu %lu:%lu:%lu dow =%lu doy=%lu\n",
              rtc_tm.time[RTC_TIMETYPE_DAYOFMONTH],
              rtc_tm.time[RTC_TIMETYPE_MONTH],
@@ -99,7 +100,7 @@ namespace pearlrt {
              rtc_tm.time[RTC_TIMETYPE_SECOND],
              rtc_tm.time[RTC_TIMETYPE_DAYOFWEEK],
              rtc_tm.time[RTC_TIMETYPE_DAYOFYEAR]);
-
+       */
 
       testval = rtc_tm.time[RTC_TIMETYPE_SECOND];
 

@@ -54,10 +54,12 @@ namespace pearlrt {
 
    void Interrupt::enable() {
       isEnabled = true;
+      devEnable();
    }
 
    void Interrupt::disable() {
       isEnabled = false;
+      devDisable();
    }
 
    void Interrupt::trigger() {
