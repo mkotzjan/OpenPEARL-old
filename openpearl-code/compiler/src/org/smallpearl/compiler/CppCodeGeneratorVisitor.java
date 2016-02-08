@@ -1459,7 +1459,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST expr = group.getInstanceOf("expression");
 
         expr.add("code", visit(ctx.expression(0)));
-        expr.add("code", ctx.op.getText());
+        expr.add("code", "/");
         expr.add("code", visit(ctx.expression(1)));
 
         return expr;
