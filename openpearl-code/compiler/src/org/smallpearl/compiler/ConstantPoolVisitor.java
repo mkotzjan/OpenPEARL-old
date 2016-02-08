@@ -79,7 +79,7 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
             }
             else if ( value instanceof ConstantFloatValue) {
                 if (constantPool.get(i) instanceof ConstantFloatValue) {
-                    if ( ((ConstantFloatValue)(value)).getValue() == ((ConstantFloatValue)(constantPool.get(i))).getValue()) {
+                    if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(constantPool.get(i))).getValue()) == 0) {
                         found = true;
                         break;
                     }
@@ -111,12 +111,13 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
             System.out.println("string:(" + ctx.StringLiteral().toString() + ")");
         } else if (ctx.FloatingPointConstant() != null) {
             try {
-                Float value = Float.parseFloat(ctx.FloatingPointConstant().toString());
+                Double value = Double.parseDouble(ctx.FloatingPointConstant().toString());
+                String strval = ctx.FloatingPointConstant().toString();
                 Integer precision = 24;
+                add(new ConstantFloatValue(value,precision));
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-
         } else if (ctx.timeConstant() != null) {
         } else if (ctx.durationConstant() != null) {
         }
@@ -142,6 +143,7 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                             Integer value = -1 * Integer.parseInt(literal_ctx.IntegerConstant().toString());
                             Integer precision = Integer.toBinaryString(Math.abs(value)).length() + 1;
                             add(new ConstantFixedValue(value));
+                            System.out.println("fixed:(" + value + "," + precision + ")");
                         } catch (NumberFormatException ex) {
                             throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
                         }
@@ -151,7 +153,7 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                         try {
                             Float value = -1 * Float.parseFloat(literal_ctx.FloatingPointConstant().toString());
                             Integer precision = 24;
-                            System.out.println("float:(" + value + "," + precision + ")");
+                            add(new ConstantFloatValue(value));
                         } catch (NumberFormatException ex) {
                             throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
                         }

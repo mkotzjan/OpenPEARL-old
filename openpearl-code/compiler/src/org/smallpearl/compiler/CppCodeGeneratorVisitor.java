@@ -122,6 +122,17 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         }
 
+        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
+            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFloatValue ) {
+                ST entry = group.getInstanceOf("ConstantPoolEntry");
+                entry.add("name", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).toString());
+                entry.add("type", ((ConstantFloatValue)ConstantPoolVisitor.constantPool.get(i)).getBaseType());
+                entry.add("precision", ((ConstantFloatValue)ConstantPoolVisitor.constantPool.get(i)).getPrecision());
+                entry.add("value", ((ConstantFloatValue)ConstantPoolVisitor.constantPool.get(i)).getValue());
+                pool.add("constants", entry);
+            }
+        }
+
         return pool;
     }
 
@@ -836,8 +847,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitBaseExpression(((SmallPearlParser.BaseExpressionContext) ctx)));
             } else if (ctx instanceof SmallPearlParser.AdditiveExpressionContext) {
                 st.add("code", visitAdditiveExpression(((SmallPearlParser.AdditiveExpressionContext) ctx)));
+            } else if (ctx instanceof SmallPearlParser.SubtractiveExpressionContext) {
+                st.add("code", visitSubtractiveExpression(((SmallPearlParser.SubtractiveExpressionContext) ctx)));
             } else if (ctx instanceof SmallPearlParser.MultiplicativeExpressionContext) {
                 st.add("code", visitMultiplicativeExpression((SmallPearlParser.MultiplicativeExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.DivideExpressionContext) {
+                st.add("code", visitDivideExpression((SmallPearlParser.DivideExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.DivideIntegerExpressionContext) {
+                st.add("code", visitDivideIntegerExpression((SmallPearlParser.DivideIntegerExpressionContext) ctx));
             } else if (ctx instanceof SmallPearlParser.UnaryAdditiveExpressionContext) {
                 st.add("code", visitUnaryAdditiveExpression((SmallPearlParser.UnaryAdditiveExpressionContext) ctx));
             } else if (ctx instanceof SmallPearlParser.UnarySubtractiveExpressionContext) {
@@ -1231,8 +1248,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             stmt.add("rhs", visitBaseExpression(((SmallPearlParser.BaseExpressionContext) ctx.expression())));
         } else if (ctx.expression() instanceof SmallPearlParser.AdditiveExpressionContext) {
             stmt.add("rhs", visitAdditiveExpression(((SmallPearlParser.AdditiveExpressionContext) ctx.expression())));
+        } else if (ctx.expression() instanceof SmallPearlParser.SubtractiveExpressionContext) {
+            stmt.add("rhs", visitSubtractiveExpression(((SmallPearlParser.SubtractiveExpressionContext) ctx.expression())));
         } else if (ctx.expression() instanceof SmallPearlParser.MultiplicativeExpressionContext) {
             stmt.add("rhs", visitMultiplicativeExpression((SmallPearlParser.MultiplicativeExpressionContext) ctx.expression()));
+        } else if (ctx.expression() instanceof SmallPearlParser.DivideExpressionContext) {
+            stmt.add("rhs", visitDivideExpression((SmallPearlParser.DivideExpressionContext) ctx.expression()));
+        } else if (ctx.expression() instanceof SmallPearlParser.DivideIntegerExpressionContext) {
+            stmt.add("rhs", visitDivideIntegerExpression((SmallPearlParser.DivideIntegerExpressionContext) ctx.expression()));
         } else if (ctx.expression() instanceof SmallPearlParser.UnaryAdditiveExpressionContext) {
             stmt.add("rhs", visitUnaryAdditiveExpression((SmallPearlParser.UnaryAdditiveExpressionContext) ctx.expression()));
         } else if (ctx.expression() instanceof SmallPearlParser.UnarySubtractiveExpressionContext) {
@@ -1329,7 +1352,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 expression.add("code", visitLiteral(ctx.literal()));
             }
         } else if (ctx.ID() != null) {
-            System.out.println( "Symbol="+ctx.ID().toString());
             Definition def = m_symtab.lookup(ctx.ID().toString());
 
             if ( def instanceof ProcedureDef) {
@@ -1400,7 +1422,40 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     }
 
     @Override
+    public ST visitSubtractiveExpression(SmallPearlParser.SubtractiveExpressionContext ctx) {
+        ST expr = group.getInstanceOf("expression");
+
+        expr.add("code", visit(ctx.expression(0)));
+        expr.add("code", ctx.op.getText());
+        expr.add("code", visit(ctx.expression(1)));
+
+        return expr;
+    }
+
+    @Override
     public ST visitMultiplicativeExpression(SmallPearlParser.MultiplicativeExpressionContext ctx) {
+        ST expr = group.getInstanceOf("expression");
+
+        expr.add("code", visit(ctx.expression(0)));
+        expr.add("code", ctx.op.getText());
+        expr.add("code", visit(ctx.expression(1)));
+
+        return expr;
+    }
+
+    @Override
+    public ST visitDivideExpression(SmallPearlParser.DivideExpressionContext ctx) {
+        ST expr = group.getInstanceOf("expression");
+
+        expr.add("code", visit(ctx.expression(0)));
+        expr.add("code", ctx.op.getText());
+        expr.add("code", visit(ctx.expression(1)));
+
+        return expr;
+    }
+
+    @Override
+    public ST visitDivideIntegerExpression(SmallPearlParser.DivideIntegerExpressionContext ctx) {
         ST expr = group.getInstanceOf("expression");
 
         expr.add("code", visit(ctx.expression(0)));
@@ -1489,8 +1544,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-
-
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().getText();
 
@@ -1504,7 +1557,21 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
             literal.add("string", s);
         } else if (ctx.FloatingPointConstant() != null) {
-            literal.add("float", Double.valueOf(ctx.FloatingPointConstant().toString()));
+            // literal.add("float", Double.valueOf(ctx.FloatingPointConstant().toString()));
+
+            try {
+                Double value = Double.parseDouble(ctx.FloatingPointConstant().toString());
+                if (m_map_to_const) {
+                    ConstantFloatValue float_value = new ConstantFloatValue(value,24);
+                    literal.add("float", float_value);
+                }
+                else {
+                    literal.add("float", value);
+                }
+            } catch (NumberFormatException ex) {
+                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
         } else if (ctx.timeConstant() != null) {
             literal.add("time", getTime(ctx.timeConstant()));
         } else if (ctx.durationConstant() != null) {

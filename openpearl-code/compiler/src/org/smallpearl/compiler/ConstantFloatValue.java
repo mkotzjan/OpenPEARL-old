@@ -31,13 +31,26 @@ package org.smallpearl.compiler;
 
 public class ConstantFloatValue extends ConstantValue {
     private Double   m_value;
+    private Integer  m_precision;
 
     ConstantFloatValue(Float value) {
         m_value = value.doubleValue();
+        m_precision = 24;
+    }
+
+    ConstantFloatValue(Float value, Integer precision) {
+        m_value = value.doubleValue();
+        m_precision = precision;
     }
 
     ConstantFloatValue(Double value) {
         m_value = value;
+        m_precision = 53;
+    }
+
+    ConstantFloatValue(Double value, Integer precision) {
+        m_value = value;
+        m_precision = precision;
     }
 
     public Double getValue() {
@@ -46,6 +59,10 @@ public class ConstantFloatValue extends ConstantValue {
 
     public String getBaseType() {
         return "Float";
+    }
+
+    public Integer getPrecision() {
+        return m_precision;
     }
 
     public String toString() {
@@ -59,8 +76,8 @@ public class ConstantFloatValue extends ConstantValue {
             name += "_POS";
         }
 
-        name += "_" + value.toString();
+        name += "_" + value.toString().replace('.','_') + "_" + m_precision.toString();
+
         return name;
     }
-
 }

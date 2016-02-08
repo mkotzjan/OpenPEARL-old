@@ -33,6 +33,7 @@ group smallpearl;
 
 Prologue(src,headerfiles,namespaces,taskSpecifierList,ConstantPoolList) ::= <<
 #include \<PearlIncludes.h>
+#include \<cmath>
 
 const char* filename = (char*) "<src>";
 
@@ -959,35 +960,35 @@ MonadiciArithmeticOperator(operator,operand) ::= <%
 /* --------------------- Arithmetic Operators -------------------------- */
 
 ATAN(operand) ::= <%
-    (<operand>).atan()
+<operand>.atan()
 %>
 
 COS(operand) ::= <%
-   (<operand>).cos()
+<operand>.cos()
 %>
 
 EXP(operand) ::= <%
-    (<operand>).exp()
+<operand>.exp()
 %>
 
 LN(operand) ::= <%
-    (<operand>).ln()
+<operand>.ln()
 %>
 
 SIN(operand) ::= <%
-    (<operand>).sin()
+<operand>.sin()
 %>
 
 SQRT(operand) ::= <%
-    (<operand>).sqrt()
+<operand>.sqrt()
 %>
 
 TAN(operand) ::= <%
-    (<operand>).tan()
+<operand>.tan()
 %>
 
 TANH(operand) ::= <%
-    (<operand>).tanh()
+<operand>.tanh()
 %>
 
 /* --------------------- Relational Operators -------------------------- */
@@ -1024,11 +1025,11 @@ Exponentiation(lhs,rhs) ::= <%
 %>
 
 ABS(operand) ::= <%
-(<operand>).abs()
+<operand>.abs()
 %>
 
 SIGN(operand) ::= <%
-(<operand>).sign()
+<operand>.sign()
 %>
 
 SIZEOF(operand) ::= <%
