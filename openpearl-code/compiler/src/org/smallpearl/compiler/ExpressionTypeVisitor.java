@@ -931,9 +931,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ExponentiationExpression: rule#1");
         }
-        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = Math.max( ((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        else if ( op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeFloat(((TypeFloat) op1).getPrecision());
             m_properties.put(ctx, res);
 
             if (m_debug)
