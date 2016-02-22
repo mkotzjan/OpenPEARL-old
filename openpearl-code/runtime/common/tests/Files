@@ -5,12 +5,12 @@
 CXX_COMMON_TESTS1 := \
 	BitTests.cc\
 	CharacterTests.cc\
-	ClockTests.cc\
-	DurationTests.cc\
 	Fixed63Tests.cc\
 	FixedTests.cc \
 	FloatTests.cc \
-	SizeTests.cc 
+	SizeTests.cc \
+	DurationTests.cc\
+	ClockTests.cc
 
 CXX_COMMON_TESTS2 := \
 	GetBitStringTests.cc  \

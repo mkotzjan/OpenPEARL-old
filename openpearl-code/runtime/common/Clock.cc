@@ -86,14 +86,14 @@ namespace pearlrt {
 
    Clock::Clock(double sec) {
       // adjust time to one day
-      // this implementation is slow, but only present to enshure proper
-      // values. The compiler should check this.
+
+      // fmod returns a value with the same sign as 'sec'
+      // thus a negative result may occur. In this case we must
+      // correct this manually
+      sec = fmod(sec, 86400.0); 
+
       while (sec < 0) {
          sec += 86400.0;
-      }
-
-      while (sec >= 86400) {
-         sec -= 86400.0;
       }
 
       intval = sec * 1e6 + 0.5;

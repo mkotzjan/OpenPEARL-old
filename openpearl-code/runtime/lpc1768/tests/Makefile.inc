@@ -41,8 +41,8 @@
 PLIB = OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a
 
 targets +=  \
-#	tests/DataTypeTests1 \
-#	tests/DataTypeTests2 \
+	tests/DataTypeTests1 \
+	tests/DataTypeTests2 \
 #	tests/susp_cont_test \
 #	tests/sched_demo \
 #	tests/SampleBasicDationTests \

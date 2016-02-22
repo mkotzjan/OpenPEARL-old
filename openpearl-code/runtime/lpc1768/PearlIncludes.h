@@ -96,13 +96,9 @@ extern "C" {
 
 #include "Control.h"
 
-//#include "StdStream.h"
-//#include "Pipe.h"
-//#include "Disc.h"
-//#include "UnixSignal.h"
 #include "SoftInt.h"
 
-//#include "Float.h"
+#include "Float.h"
 #include "compare.h"
 
 #include "SampleBasicDation.h"
