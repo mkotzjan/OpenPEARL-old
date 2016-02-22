@@ -66,7 +66,7 @@ TEST(SystemDationNB, DeviceFileTest) {
    ASSERT_EQ(dir2.isDevicePath(), true);
    //check whether signals called for illegal path and no file
    ASSERT_THROW(pearlrt::Dir dir3((char*)"/home/tmp"),
-                pearlrt::NoFileInfoSignal);
+                pearlrt::IllegalPathSignal);
    ASSERT_THROW(pearlrt::Dir dir3((char*)"/etc/passwd"),
                 pearlrt::IllegalPathSignal);
 }

@@ -113,8 +113,6 @@ namespace pearlrt {
                   dation operations.
 
          \throws OpenFailedSignal in case of errors
-         \throws IllegalParamsSignal in case of errors
-         \throws NoFileInfoSignal in case of errors
          */
          DiscFile* dationOpen(const char * fileName, int openParams);
 
@@ -207,8 +205,6 @@ namespace pearlrt {
        \param nbrOfFiles denotes the number of files opened
               at one time on this folder/disc
 
-       \throws NoFileInfoSignal, if the folder attributes
-                     are not readable (folder not existent)
        \throws IllegalPathSignal, if dev denotes no folder name
        \throws IllegalPathSignal, if dev does not end with '/'
        \throws IllegalParamSignal, if the required number of
@@ -247,7 +243,7 @@ namespace pearlrt {
 
       \throws OpenFailedSignal in case of errors
       \throws IllegalParamsSignal in case of errors
-      \throws NoFileInfoSignal in case of errors
+      \throws IllegalPathSignal in case of errors
       */
       DiscFile* dationOpen(const char * fileName, int openParams);
 

@@ -108,7 +108,6 @@ namespace pearlrt {
 
          \throws OpenFailedSignal in case of errors
          \throws IllegalParamsSignal in case of errors
-         \throws NoFileInfoSignal in case of errors
          */
          PipeFile* dationOpen(const char * fileName, int openParams);
 
@@ -213,7 +212,7 @@ namespace pearlrt {
                Additional characters are ignored.
                The comparison is case sensitiv!
 
-       \throws NoFileInfoSignal, if the folder attributes
+       \throws IllegalPathSignal, if the folder attributes
                      are not readable (folder not existent)
        \throws IllegalPathSignal, if dev denotes no folder name
        \throws IllegalPathSignal, if dev does not end with '/'
@@ -253,7 +252,7 @@ namespace pearlrt {
 
       \throws OpenFailedSignal in case of errors
       \throws IllegalParamsSignal in case of errors
-      \throws NoFileInfoSignal in case of errors
+      \throws IllegalPathSignal in case of errors
       */
       PipeFile* dationOpen(const char * fileName, int openParams);
 

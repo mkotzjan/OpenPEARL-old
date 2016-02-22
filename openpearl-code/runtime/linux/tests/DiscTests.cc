@@ -61,7 +61,7 @@ TEST(Disc, path) {
          pearlrt::IllegalPathSignal);
       ASSERT_THROW(
          pearlrt::Disc disc3("/xxx/", 10),
-         pearlrt::NoFileInfoSignal);
+         pearlrt::IllegalPathSignal);
    }
 }
 

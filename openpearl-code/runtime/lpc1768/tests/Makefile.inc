@@ -41,18 +41,18 @@
 PLIB = OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a
 
 targets +=  \
-	tests/DataTypeTests1 \
-	tests/DataTypeTests2 \
-	tests/susp_cont_test \
-	tests/sched_demo \
-	tests/SampleBasicDationTests \
-	tests/sematest tests/sematerminate  \
-	tests/signalTest \
-	tests/clockTest \
-	tests/interruptTest \
-	tests/gpioInterrupt \
-	tests/log_test \
-#	tests/DationTests \
+#	tests/DataTypeTests1 \
+#	tests/DataTypeTests2 \
+#	tests/susp_cont_test \
+#	tests/sched_demo \
+#	tests/SampleBasicDationTests \
+#	tests/sematest tests/sematerminate  \
+#	tests/signalTest \
+#	tests/clockTest \
+#	tests/interruptTest \
+#	tests/gpioInterrupt \
+#	tests/log_test \
+	tests/DationTests \
 #	tests/DationSuspendTerminateTests 
 	
 INCS += ../ugtest
@@ -64,11 +64,12 @@ GTEST_SRCS += tests/PrioTests.cc
 GTEST_SRCS += tests/PrioMapperTests.cc
 
 
-GTEST_DATION_SRCS += tests/gtest_main.cc tests/myTests.cc  \
-  tests/DiscTests.cc tests/PipeTests.cc \
-  tests/UserDationNBTests.cc\
-  tests/StdStreamTests.cc \
-  tests/DationRWTests.cc tests/DationPGTests.cc
+GTEST_DATION_SRCS +=   \
+	tests/UartTests.cc
+#  tests/DiscTests.cc tests/PipeTests.cc \
+#  tests/UserDationNBTests.cc\
+#  tests/StdStreamTests.cc \
+#  tests/DationRWTests.cc tests/DationPGTests.cc
 
 
 # ----------------------------------------

@@ -88,6 +88,7 @@ BOARDSUPPORT += Lpc17xxClock.cc
 BOARDSUPPORT += Lpc17xxDigitalIn.cc
 BOARDSUPPORT += Lpc17xxDigitalOut.cc
 BOARDSUPPORT += Lpc17xxInterrupt.cc
+BOARDSUPPORT += Lpc17xxUart.cc
 CHECK_FILES += $(BOARDSUPPORT)
 CHECK_FILES += $(addsuffix .h,$(basename $(BOARDSUPPORT)))
 BOARDSUPPORT += startup_lpc1768.S 

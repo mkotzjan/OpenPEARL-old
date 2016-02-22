@@ -223,7 +223,7 @@ void addToSysIncList(char * fileName) {
     }
 }
 
-#define DEFINEENTRIES	1000
+#define DEFINEENTRIES	10000
 static struct DefineList{
      int nbr;
      char defName[DEFINEENTRIES][60];

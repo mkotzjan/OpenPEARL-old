@@ -68,7 +68,7 @@ namespace pearlrt {
       if (stat(devicePath, &attribut) == -1) {
          //can't get stat -> throw signal
          Log::error("Disc: could not locate %s", dev);
-         throw theNoFileInfoSignal;
+         throw theIllegalPathSignal;
       }
 
       if (!(attribut.st_mode & S_IFDIR)) {

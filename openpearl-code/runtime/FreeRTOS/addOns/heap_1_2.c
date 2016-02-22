@@ -70,7 +70,7 @@
 
 
 /*
- * This is a simple implementation of pvPortMalloc() and pvPortFree().
+ * This is a simple implementation of pvPortMalloc() and vPortFree().
  * Note that this implementation is a mixture of the FreeRTOS supplied files
  * heap_1.c and heap_2.c
  * pvPortMalloc returns ether a  previously freed memory segment of the EXACT

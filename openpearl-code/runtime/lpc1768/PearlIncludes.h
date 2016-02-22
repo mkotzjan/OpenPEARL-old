@@ -115,4 +115,5 @@ extern "C" {
 #include "Post.h"
 #include "Lpc17xxRTC.h"
 #include "Lpc17xxClock.h"
+#include "Lpc17xxUart.h"
 

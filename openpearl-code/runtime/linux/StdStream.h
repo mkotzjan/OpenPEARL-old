@@ -140,7 +140,6 @@ namespace pearlrt {
 
       \throws OpenFailedSignal in case of errors
       \throws IllegalParamsSignal in case of errors
-      \throws NoFileInfoSignal in case of errors
       */
       StdStream* dationOpen(const char * fileName, int openParams);
 

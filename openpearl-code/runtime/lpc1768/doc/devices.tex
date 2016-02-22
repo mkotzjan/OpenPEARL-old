@@ -53,9 +53,10 @@ Writing other data than BIT-types  may cause a signal, if the size of the
 data does not match the required size according the width.
 
 \subsection{Lpc17xxInterrupt}
-The devive Lpc17xxInterrupt provides interrupt sources from GPIO inputs.
+The device Lpc17xxInterrupt provides interrupt sources from GPIO inputs.
 The LPC1768 can produce interrupts on both edges of the GPIO ports 0 and 2.
 The Lpc17xxInterrupt device produces interrupts only on the falling edge. 
+
 Synopsis: \verb|Lpc17xxInterrupt(port, bit)|
 
 \begin{description}
@@ -71,4 +72,37 @@ The landtiger board has Key1 on P2.11 and SW2 an P2.10.
 For usage of SW2 the jumper JP5 must be closes (which is the
 usual position if working with lpc21isp download).
 
+
+\subsection{Lpc17xxUart}
+The device Lpc17xxUart provides access to the serial ports of the LPC1768.
+Since the LandTiger board provide access only to uart0 and uart2, which
+both lack of hardware control lines, no hardware handshake is provided 
+in the driver.
+The device provides the possibility of line editing as well as raw data
+transfer.
+The used terminal must support backspace for line edit functions!
+
+Synopsis: \verb|Lpc17xxUart(port, baud, bits, stopbits, parity, mode)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,2
+\item[baud] specifies the baud rate. The usual baud rates from 300 up to 115200 are supported.
+\end{description}
+\item[bits] the number of bits per character (5-8 are ok)
+\item[stopbits] the number of stopbits
+\item[parity] parity 'O', 'E', or 'N'
+\item[mode] provides additional switches
+   \begin{description}
+   \item [Bit 0] 1=line editing enabled; needs an input buffer size > 0
+   \item [Bit 1] 1=xon/xoff; 0=no protocol
+   \end{description}
+   Examples:
+   \begin{itemize}
+   \item  0x3 xon/xoff protocol and line editing
+   \item  0x0 raw data transfer
+   \end{itemize}
+\end{description}
+ 
+Note: If local edit is selected, the device may be used only in 
+half duplex mode.
 
