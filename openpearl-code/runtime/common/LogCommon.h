@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef LOG_INCLUDED
-#define LOG_INCLUDED
+#ifndef LOGCOMMON_INCLUDED
+#define LOGCOMMON_INCLUDED
 
 /**
 \file
@@ -37,24 +37,26 @@
 
 This module realizes a simple log facility the the PEARL runtime system.
 Depending on a statically set log-level, all incoming messages will
-be written to a log device, if the current log-level matches the given
-log request
+be written to a plattform specific logging output, if the current
+log-level matches the given log request
 
 Each log-request corresponds with a bit in log-level. If the bit
 is set, the message will be formatted and sent to the log file.
 
-If the maximum text width is exceeded the output is truncated
-at the maximum position.
-
-For details about lovlevels and supported formats, please check
-LocCommon
+The following formats are supported - all without width specification:
+<ul>
+<li>%d  - signed int
+<li>%x  - int
+<li>%u  - unsigned int
+<li>%s  - char * (c-strings)
+<li>%f  - doubles (including specification of the prcision like %.3f)
+<li>%c  - single char
+</ul>
 */
 
 #include <cstdarg>    // va_list
 #include "Character.h"
-#include "RefChar.h"
-#include "Mutex.h"
-#include "LogCommon.h"
+#include "Mutex.h"  // write is not thread safe -- mutex required
 
 namespace pearlrt {
 
@@ -66,74 +68,49 @@ namespace pearlrt {
       \todo realize configurable file name using
             a configuration file
    */
-   class Log : public LogCommon {
-   private:
-      static bool initialized;
-      static Mutex mutex;
-      Log();
-      static Log* getInstance();
-
+   class LogCommon {
    public:
-     /**
-      write an info log message with parameters
-
-      \param format the message format (like in printf) to be written
-      \param ... as required in format
-      */
-      static void info(const char * format, ...)
-      __attribute__((format(printf, 1, 2)));
       /**
-      write an error log message
-
-      \param format the message format (like in printf) to be written
-      \param ... as required in format
+        constants for log level setting
       */
-      static void error(const char * format, ...)
-      __attribute__((format(printf, 1, 2)));
+      enum LogLevel {DEBUG = 1, INFO = 2, WARN = 4, ERROR = 8};
 
-      static void warn(const char * format, ...)
-      __attribute__((format(printf, 1, 2)));
+   protected:
+      static int logLevel;
 
       /**
-      write a debugging log message
+      format a log message
 
-      \param format the message format (like in printf) to be written
-      \param ... as required in format
+      \param type type of the message
+      \param line the output buffer for the message
+      \param format the output format like in printf
+      \param args an arvg variable parameter list
+
       */
-      static void debug(const char * format, ...)
-      __attribute__((format(printf, 1, 2)));
-
-      /**
-      close the logging system
-      
-      do finalizing stuff if necessary 
-      */
-      static void exit();
-
-    private:
+      static void doFormat(const Character<7>& type, 
+                          RefCharacter &rc,
+                         const char * format,
+                       va_list args);
       /**
       write a log message
 
       \param type type of the message
       \param format the output format like in printf
       \param args an arvg variable parameter list
+
       */
-      void doit(const Character<7>& type, const char * format,
-                       va_list args);
-      /**
-       the task which formats the message when scheduler is running
- 
-       \param p dummy parameter, just to satisfy FreeRTOS
-      */
-      static void logTask(void * p);
+      virtual void doit(const Character<7>& type, 
+                         const char * format,
+                       va_list args)=0;
+
+   public:
 
       /**
-      write a log message
+       set log level
 
-      \param message the message to be written
+      \param level a binary coded value from the enumeration LogLevels
       */
-      static void doitSync(const Character<7>& type, const char * format,
-                       va_list args);
+      static void setLevel(int level);
    };
 
 }

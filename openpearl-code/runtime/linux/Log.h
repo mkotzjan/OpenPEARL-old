@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -49,20 +49,14 @@ own code, sonce printf() is known to be non signal safe.
 If the maximum text width is exceeded the output is truncated
 at the maximum position.
 
-The following formats are supported - all without width specification:
-<ul>
-<li>%d  - signed int
-<li>%x  - int
-<li>%u  - unsigned int
-<li>%s  - char * (c-strings)
-<li>%f  - doubles (including specification of the prcision like %.3f)
-<li>%c  - single char
-</ul>
+Details about log levels and supported formats are described in LogCommon.h
 */
 
 #include <cstdarg>    // va_list
 #include "Character.h"
+#include "RefChar.h"
 #include "Mutex.h"  // write is not thread safe -- mutex required
+#include "LogCommon.h"  // write is not thread safe -- mutex required
 
 namespace pearlrt {
 
@@ -74,31 +68,28 @@ namespace pearlrt {
       \todo realize configurable file name using
             a configuration file
    */
-   class Log {
-   public:
-      /**
-        constants for log level setting
-      */
-      enum LogLevel {DEBUG = 1, INFO = 2, WARN = 4, ERROR = 8};
+   class Log : public LogCommon {
    private:
       Log();
-      /**
-         singleton pattern resolve static initialize problem
-      */
-      static Log* getInstance();
       static int logFileHandle;
-      static int logLevel;
       static bool initialized;
       static Mutex mutex;
 
       /**
       write a log message
 
-      \param message the message to be written
+      \param type type of the message
+      \param format the output format like in printf
+      \param args an arvg variable parameter list
       */
-      static void doit(const Character<7>& type, const char * format,
+      void doit(const Character<7>& type, const char * format,
                        va_list args);
    public:
+      /**
+         singleton pattern resolve static initialize problem
+      */
+      static Log* getInstance();
+
       /**
       write an info log message with parameters
 
@@ -138,13 +129,6 @@ namespace pearlrt {
       close the logging system
       */
       static void exit();
-
-      /**
-       set log level
-
-      \param level a binary coded value from the enumeration LogLevels
-      */
-      static void setLevel(int level);
    };
 
 }

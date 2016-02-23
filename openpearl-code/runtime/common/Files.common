@@ -35,6 +35,7 @@
 # the target specific makefile
 
 CXX_COMMON = \
+	LogCommon.cc \
 	Clock.cc  \
 	Duration.cc  \
 	PutDuration.cc GetDuration.cc \

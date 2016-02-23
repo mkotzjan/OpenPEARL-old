@@ -1,0 +1,76 @@
+\section{Cortex-M Interrupt Priorities}
+
+\subsection{Cortex-M Basics}
+
+As descibed in \cite{yiu}, the Cortex-M processor supports
+ in principle up to 256 interrupt priorities.
+Lower numbers denote better priorities.
+The execution of interrupt service routines is carried out in order of
+the priority of the interrupt.
+There is also a grouping of interrupt priorities which defines, that 
+interrupts of the same group are executied sequentially in order of the
+priority.
+
+The cmsis library in LPCOpen defines \verb|#define NVIC_PRIO_BITS 5|
+
+This means, that only the upper 5 bits of the priority level is regarded.
+
+\begin{table}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+Bit 7 & Bit 6 & Bit 5 & Bit 4 & Bit 3 & Bit 2 & Bit 1 & Bit 0 \\
+\hline
+\multicolumn{5}{|c|}{Implemented}&\multicolumn{3}{c|}{Not implemented} \\
+\multicolumn{5}{|c|}{}           &\multicolumn{3}{c|}{read as 0} \\
+\hline
+\multicolumn{7}{|l|}{Preemption Priorities (Group=0)}& x \\
+\hline
+\multicolumn{4}{|l|}{Preemption Priorities (Group=3)}& sub & x & x & x \\
+\hline
+\end{tabular}
+\caption{Priority Level register with 5-bit implemented. With 
+priority grouping of 0, there are no subgroups due to 5 implemented
+interrupt priority bits.\cite{yiu}}
+\end{table}
+
+The cmsis-function  \verb|NVIC_SetPriority| shifts the given priority value 
+according the number of implemented priority bits. This leads to
+valid parameters from 0 to 31 --- reflecting the processor interrupts
+0,8,16, ...248.
+
+To set the interrupt grouping, the cmsis function 
+\verb|NVIC_SetPriorityGrouping| is supplied.
+The priority group (which is a plain number) defines the upmost bit of the
+interrupt priority as the most significant bit
+ of the socalled subpriority field.
+In reset state, the priority group is 0 resulting in preemptive interrupts
+ with numbers in bit[7:1] and a sub priority field bit[0].
+Since only the implementation of the LPC1768 supports only 5 priority bits, we
+get a sub priority field, which is always 0 and a 32 preemptive 
+interrupt levels. Interrupt priority grouping become effectiv with a group 3.
+
+\subsection{FreeRTOS Settings}
+FreeRTOS states
+\begin{itemize}
+\item  that there may be some grouping on interrupt priorities 
+by third party software. 
+\item the priority value in FreeRTOS are already left adjusted according the
+number in priority bits. 
+\end{itemize}
+FreeRTOS defines the priority of the kernel to be the highest number, which
+means the lowest interrupt priority. In our case it is 31, which results into
+248. 
+FreeRTOS reserves some priorities, which are dedicated to interrupts, which do not interact with FreeRTOS. They are never blocked by FreeRTOS.
+This level is defined as 5, resulting in priority 40.
+
+Interrupts from device drivers may use the interrupt levels from 5 to 30.
+All of them are preemptive. 
+The preemption of interrupts may leed to a stack problem, it is a part of
+system optimization to use different interrupt levels in the future.
+As long as interrupt preemption is not needed, all device drivers should use 
+a common interrupt priority of 10, which leaves space in both directions.
+Since there is no subpriority avaliable, the 
+interrupts are executed according the interrupt number --- 
+the smaller exception number is executed first.
+
+

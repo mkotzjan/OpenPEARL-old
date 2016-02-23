@@ -44,6 +44,7 @@ PLIB := libOpenPEARLlinux.a
 targets +=  \
 	tests/DataTypeTests \
 	tests/api  tests/lot_of_tasks  \
+	tests/log_test \
 	tests/susp_cont_test \
 	tests/sched_demo \
 	tests/interruptTest \
@@ -117,7 +118,7 @@ tests/DataTypeTests: $(GTEST_OBJS) $(PLIB) /usr/local/lib/libgtest.a
 tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) /usr/local/lib/libgtest.a
 	$(LINK)
 
-tests/log_test: tests/log_test.o $(PLIB)
+tests/log_test: ../common/tests/log_test.o $(PLIB)
 	$(LINK)
 
 tests/sematest: ../common/tests/sematest.o $(PLIB)

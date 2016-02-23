@@ -72,6 +72,8 @@ int main() {
       longText[i] = (i % 10) + '0';
    }
 
+   Log::getInstance()->setLevel(0x0f);
+
    Log::info("info message");
    Log::info("x=%d, y=%d", x, y);
    Log::info("f=%f f1=%.1f f2=%.2f f3=%.3f f4=%.4f f5=%.5f f6 = %.6f",
