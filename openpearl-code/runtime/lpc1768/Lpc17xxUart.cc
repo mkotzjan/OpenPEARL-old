@@ -286,9 +286,9 @@ namespace pearlrt {
                              UART_IER_THREINT);
 
          if (lpc_uart == (void*)LPC_UART0) {
-            NVIC_SetPriority(UART0_IRQn, 5);
+            NVIC_SetPriority(UART0_IRQn, 10);
          } else if (lpc_uart == (void*)LPC_UART2) {
-            NVIC_SetPriority(UART2_IRQn, 5);
+            NVIC_SetPriority(UART2_IRQn, 10);
          }
 
          interruptEnable(true);
@@ -472,19 +472,15 @@ namespace pearlrt {
    }
 
    void Lpc17xxUart::logError() {
-      if (status & PARITY_ERROR) {
-         Log::error("Lpc17xxUart: parity error");
-      }
-
+      // echo only one error reason, eg. BREAK will often
+      // come together with PARITY_ERROR
       if (status & BREAK_INDICATOR) {
          Log::error("Lpc17xxUart: break received");
-      }
-
-      if (status & FRAME_ERROR) {
+      } else if (status & FRAME_ERROR) {
          Log::error("Lpc17xxUart: frame error");
-      }
-
-      if (status & RECEIVE_OVERRUN) {
+      } else if (status & PARITY_ERROR) {
+         Log::error("Lpc17xxUart: parity error");
+      } else  if (status & RECEIVE_OVERRUN) {
          Log::error("Lpc17xxUart: receive overrun");
       }
    }

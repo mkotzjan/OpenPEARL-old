@@ -159,6 +159,7 @@ __attribute__((weak)) int main(void) {
    Log::info("Free Heap size: %d byte", xPortGetFreeHeapSize());
 
    Log::info("system startup complete");
+
    /* Start the scheduler. */
    vTaskStartScheduler();
    Log::error("main.c: could not create idle task");

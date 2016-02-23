@@ -6,6 +6,7 @@ TEXFILES = runtime.tex changeLog.tex codeGen.tex dataTypes.tex inOutput.tex \
 	../linux/doc/interrupts.tex \
 	../common/signallist.tex \
 	../FreeRTOS/doc/basics.tex \
+	../FreeRTOS/doc/interrupt_priorities.tex \
 	../lpc1768/doc/os.tex \
 	../lpc1768/doc/devices.tex \
 	../lpc1768/doc/system.tex

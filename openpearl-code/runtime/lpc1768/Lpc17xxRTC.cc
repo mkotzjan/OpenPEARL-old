@@ -259,7 +259,7 @@ namespace pearlrt {
       LPC_RTC->RTC_AUXEN = 0; //disable the oscillator fail flag
       LPC_RTC->ILR = 3; //clear interrupt flags
       //   NVIC->ISER[0] = (1<<RTC_IRQn);
-      NVIC_SetPriority(RTC_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY);
+      NVIC_SetPriority(RTC_IRQn, 5);  // best prio to get best time base
       NVIC_EnableIRQ(RTC_IRQn);
    }
 

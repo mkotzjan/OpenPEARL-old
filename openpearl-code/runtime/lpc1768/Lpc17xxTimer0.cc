@@ -112,8 +112,7 @@ namespace pearlrt {
       LPC_TIMER0->IR = (~0);//clear interrupts
       LPC_TIMER0->TCR = 1; //enable
 
-//      NVIC_SetPriority(TIMER0_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY);
-      NVIC_SetPriority(TIMER0_IRQn, 5);
+      NVIC_SetPriority(TIMER0_IRQn, 5); // best prio to get good time base
       NVIC_EnableIRQ(TIMER0_IRQn);
    }
 

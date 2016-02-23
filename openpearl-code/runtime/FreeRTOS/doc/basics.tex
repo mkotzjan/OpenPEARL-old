@@ -304,15 +304,53 @@ of the the same priority for several devices is ok.
 
 Usually, the device driver is called in the context of the calling thread.
 The operation of the driver job is passed to an interrupt service routine and
-the calling thread is blocked by a FreeRTOS mechanism e.q. semaphore.
+the calling thread is blocked by a FreeRTOS mechanism e.q. binary semaphore.
 At completion of the driver job in the isr the calling thread is continued.
 
+A device driver is ether derived from \verb|UserdationNB|,
+ \verb|SystemdationB| or \verb|Interrupt|.
+It must implement the virtual methods according their
+expected behavior. For details please check the doxygen documentation
+of these methods.
+
+The usual device driver does not support reentrant operations from
+different  tasks. 
+The mechanism of the \verb|USERDATION| enshures that only one dation
+operation is avtive at on time on the same userdation. In cases, where
+a system device may be used in more than one userdation, a buffering
+algorithmn must be implemented. 
+
+
+The usual kind of operation is:
+\begin{enumerate}
+\item provide an interrupt service routine with a name fitting to the
+   setting in \verb|startup_xxx.S|
+\item choose an interrupt priority, eg. 10
+\item check the device parameters in the ctor. The ctor is the last chance to
+   allocate any memory on the FreeRTOS-heap.
+\item provide the virtual methods from the base class. Mutual exclusion
+   between the API methods and the interrupt service routine may
+   be achived by disabling the corresponding interrupt in the NVIC.
+\item create test applications for 
+  \begin{enumerate}
+  \item google tests for e.g. tests in the ctor
+  \item sample PEARL application, maybe  written in C++ to verify
+        the device operation
+  \end{enumerate}
+\item add device description is the documentation, as
+  \begin{enumerate}
+  \item section in the plattform specific part
+  \item as entry in the table of devices
+  \end{enumerate}
+\end{enumerate}
+
+
+\input{interrupt_priorities.tex}
 
 \subsection{To be done}
   \begin{itemize}
-  \item provide device drivers for the standard devices (UART, SD, Ethernet)
+  \item provide device drivers for the standard devices (USB, SD, Ethernet)
   \item device wait queue for tasks in begin/end-sequence?
-
   \end{itemize}
 
 

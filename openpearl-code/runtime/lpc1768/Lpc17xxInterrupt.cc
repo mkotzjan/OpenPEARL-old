@@ -118,9 +118,7 @@ namespace pearlrt {
       LPC_GPIO[port].DIR &= ~(1 <<  bit); // set input mode
 
       if (bitsInUse[0] == 0 && bitsInUse[1] == 0) {
-         NVIC_SetPriority(EINT3_IRQn,
-                          5);
-//                           configMAX_SYSCALL_INTERRUPT_PRIORITY);
+         NVIC_SetPriority(EINT3_IRQn, 10);
          NVIC_EnableIRQ(EINT3_IRQn);
       }
 
