@@ -190,14 +190,14 @@ namespace pearlrt {
       case 0:
          Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_UART0);
          Chip_IOCON_SetPinMuxing(LPC_IOCON, pinmuxingUART0,
-                  sizeof(pinmuxingUART0) / sizeof(pinmuxingUART0[0]));
+                                 sizeof(pinmuxingUART0) / sizeof(pinmuxingUART0[0]));
          _lpc_uart = LPC_UART0;
          break;
 
       case 2:
          Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_UART2);
          Chip_IOCON_SetPinMuxing(LPC_IOCON, pinmuxingUART2,
-                  sizeof(pinmuxingUART2) / sizeof(pinmuxingUART2[0]));
+                                 sizeof(pinmuxingUART2) / sizeof(pinmuxingUART2[0]));
          _lpc_uart = LPC_UART2;
          break;
       }
@@ -433,8 +433,9 @@ namespace pearlrt {
       sendCommand.nbr = size;
 
       if (!(status & XOFF_RECEIVED)) {
-         sendCommand.nbr--;
-         Chip_UART_SendByte((LPC_USART_T*)lpc_uart, *(sendCommand.data++));
+         sendNextChar();
+//         sendCommand.nbr--;
+//         Chip_UART_SendByte((LPC_USART_T*)lpc_uart, *(sendCommand.data++));
       }
 
       interruptEnable(true);
@@ -563,6 +564,8 @@ namespace pearlrt {
       }
    }
 
+
+   // returns false if nothing to send
    bool Lpc17xxUart::sendNextChar() {
       LPC_USART_T * uart = (LPC_USART_T*) lpc_uart;
 
@@ -581,18 +584,21 @@ namespace pearlrt {
       } else if (sendCommand.nbr > 0) {
          char ch = *(sendCommand.data);
 
-         if (ch == '\n') {
+         if (lineEdit && (ch == '\n')) {
             // send \n  --> CR+LF must be transmitted
             if ((status & SEND_CR_LF) == 0) {
                ch = 0x0d; // CR
                // mark LF sending is pending
                status |= SEND_CR_LF;
                Chip_UART_SendByte(uart, ch);
+               // stay on the '\n' character
+               // the next RDA-interrupt leads to the else path
             } else {
                ch = 0x0a; // LF
                // mark LF as sent
                status &= ~SEND_CR_LF;
                sendCommand.nbr --;
+               sendCommand.data++;  // \n is treated --> next byte
                Chip_UART_SendByte(uart, ch);
             }
          } else {
@@ -601,7 +607,7 @@ namespace pearlrt {
             Chip_UART_SendByte(uart, *(sendCommand.data++));
          }
       } else {
-         return false;
+         return false;  
       }
 
       return true;

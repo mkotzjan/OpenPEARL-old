@@ -71,9 +71,17 @@ namespace pearlrt {
       static bool initialized;
       static Mutex mutex;
       Log();
-      static Log* getInstance();
 
    public:
+     /**
+     get access to the logger (Singleton pattern)
+
+     If the logger object does not exist yet, it is created.
+     
+     \returns pointer to the logger object
+     */ 
+      static Log* getInstance();
+
      /**
       write an info log message with parameters
 
