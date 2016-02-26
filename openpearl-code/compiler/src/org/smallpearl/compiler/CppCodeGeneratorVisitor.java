@@ -1356,7 +1356,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
             if ( def instanceof ProcedureDef) {
                 ST functionCall = group.getInstanceOf("FunctionCall");
-                functionCall.add("callee", getUserVariable(ctx.ID().getText()));
+                functionCall.add("callee", ctx.ID().getText());
 
                 ProcedureDef procdef = (ProcedureDef)def;
 
