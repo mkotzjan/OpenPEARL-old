@@ -659,11 +659,20 @@ belonging to the type check takes first place at run time.
 A variable character string pointer is not allowed as result value of a
 function. Type ``CHAR()'' may only be used in combination with ``REF'',
 i.e., parameter type ``CHAR()IDENT'' is not allowed.
+\end{tobedone}
 
 \section{Arrays}   % 5.10
 
 If possible, objects of the same kind are summarised in
 one identifier, and the various objects are addressed with indices.
+
+\begin{added}
+The value of the index must be within the range.
+If the value of any index is out of the defined index range
+an \verb|IndexOutOfRangeSignal| is induced.
+Each index value must fit into \verb|FIXED(31)|. 
+
+\end{added}
 
 Example:
 
@@ -768,7 +777,6 @@ the specified array has n+1 dimensions.
 
 In Section 1 of the Appendix it is described in tabular form, which
 objects may be combined to arrays.
-\end{tobedone}
 
 
 \section{Structures}   % 5.11
