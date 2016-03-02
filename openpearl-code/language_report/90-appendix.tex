@@ -77,6 +77,40 @@ the date in the form ``year--month--day''. Here an example for December 5,
 {\bf SPC} DATE {\bf PROC RETURNS ( CHAR(10) ) GLOBAL} ;
 \end{tobedone}
 
+\begin{added}
+\section{CPP-Insertions}
+The language translation is done in two steps.
+Step 1 translates PEARL into C++.
+Step 2 translates C++ into the plattform specific machine code.
+
+It is possible to insert C++ statements into the generated C++ 
+code. The position of the insertion is
+\begin{itemize}
+\item in system part: {\em not defined yet}
+\item on module level in the problem part 
+   it is not clearly defined, since the first compilation
+   steps adds some information for administration is between.
+\item in tasks and procedures just between the output of the surrounding
+generated output
+\end{itemize}
+
+The syntax is.
+
+CPP\_insertion ::=\\
+\x {\bf \_\_cpp\_\_} ( CharacterStringConstant ... );
+
+The CharacterStringConstants are expected in PEARL notation.
+Some characters must be marked with the switch symbol as shown in the table
+below:
+
+\begin{tabular}{l|l}
+C & PEARL \\
+\hline
+\verb|\| & \verb|\\| \\
+\verb|'| & \verb|\'|  \\
+\end{tabular}
+\end{added}
+
 \newpage
 \section{Syntax}    % A 3
 
