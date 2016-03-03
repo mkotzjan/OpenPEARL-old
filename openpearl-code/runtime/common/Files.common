@@ -35,6 +35,7 @@
 # the target specific makefile
 
 CXX_COMMON = \
+	Array.cc \
 	LogCommon.cc \
 	Clock.cc  \
 	Duration.cc  \

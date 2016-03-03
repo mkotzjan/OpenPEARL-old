@@ -42,6 +42,7 @@ Only this file mus be included.
 #include "TaskTimer.h"
 #include "TaskTimerCommon.h"
 #include "TaskMonitor.h"
+#include "Array.h"
 #include "Clock.h"
 #include "PutClock.h"
 #include "GetClock.h"

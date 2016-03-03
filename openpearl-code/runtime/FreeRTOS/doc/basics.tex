@@ -313,13 +313,16 @@ It must implement the virtual methods according their
 expected behavior. For details please check the doxygen documentation
 of these methods.
 
+UserdateionNB works internally only with the newline character to 
+perform a skip. The translation into carriage return and linefeed must
+be done in the driver if this is desired.
+
 The usual device driver does not support reentrant operations from
 different  tasks. 
 The mechanism of the \verb|USERDATION| enshures that only one dation
 operation is avtive at on time on the same userdation. In cases, where
 a system device may be used in more than one userdation, a buffering
 algorithmn must be implemented. 
-
 
 The usual kind of operation is:
 \begin{enumerate}

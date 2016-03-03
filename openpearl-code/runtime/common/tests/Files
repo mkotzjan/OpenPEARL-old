@@ -3,6 +3,7 @@
 #
 
 CXX_COMMON_TESTS1 := \
+	ArrayTests.cc\
 	BitTests.cc\
 	CharacterTests.cc\
 	Fixed63Tests.cc\

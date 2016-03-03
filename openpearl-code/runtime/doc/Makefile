@@ -1,4 +1,5 @@
-TEXFILES = runtime.tex changeLog.tex codeGen.tex dataTypes.tex inOutput.tex \
+TEXFILES = runtime.tex changeLog.tex codeGen.tex dataTypes.tex array.tex \
+	struct.tex inOutput.tex \
 	intro.tex log.tex semaphore.tex signals.tex task.tex \
 	literature.tex interrupt.tex\
 	../linux/doc/devices.tex ../linux/doc/logx86.tex \

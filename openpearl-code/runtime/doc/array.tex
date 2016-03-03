@@ -1,0 +1,186 @@
+\chapter{Arrays}
+
+{\em In this chapter, the decoration with prefix \verb|_| for user 
+supplied names is used as well as the explicit usage of namespace
+qualifiers.}
+
+PEARL supports multidemensional arrays with individual index
+boundaries. Different arrays may be passed to procedures if the
+number of dimensions are identical.
+Arrays may be part of data structures.
+
+\section{Array Data}
+The data storage for the array elements may be defined as a plain
+linear data array. The access of array elements is done via the 
+{\em array descriptor}. It is recommended to name the array
+descriptor like the according the user element and make
+a decoration for the data storage. 
+The calculation of the required number of data elements must be
+done in the PEARL$\rightarrow$C++ compiler.
+
+\section{Array Descriptor}
+The operations of arrays are done with the {\em array descriptor}
+and the pointer to the first element of the data storage.
+The descriptor is of the type \verb|Array *|.
+
+\begin{classSummary}
+ Class & \verb|Array>| \\
+ Specification & Array.h \\
+ Namespace & pearlrt \\
+ Implementation & Array.cc \\
+ \verb|offset(...)|      & returns the linear index 
+       			to the specified array element \\
+ \verb|upb(Fixed<31> idx)| & return upper bound of the
+			 specified index; index starts counting at 1\\
+ \verb|lwb(Fixed<31> idx)| & return lower bound of the
+			 specified index; index starts counting at 1 \\
+\end{classSummary}
+
+The definition of the array descriptor is done via a C-macro.
+The methods \verb|offset|, \verb|upb| and \verb|lwb| 
+will throw \verb|ArrayIndexOutOfBoundsSignal|
+if the index is out of the bounds.
+
+\begin{verbatim}
+#define DCLARRAY(name,dimensions,limits) \
+   pearlrt::ArrayDescriptor<dimensions> a_##name = { dimensions, limits }; \
+   pearlrt::Array b_##name((pearlrt::ArrayDescriptor<0>*)&a_##name); \
+   pearlrt::Array * name = &(b_##name);
+\end{verbatim}
+
+The parameters are:
+\begin{description}
+\item[name] the user supplied identifier, which will become
+    the name  of the array descriptor
+\item [dimensions] is a C integer constant with the number of 
+   array dimensions. This must be larger than 0.
+\item[limits] is a initializer list for the limits data structure.
+   The elements of the limits structure are also C integers
+   \begin{enumerate}
+   \item start index as integer
+   \item end index as integer
+   \item number of elements in next sub array
+   \end{enumerate}
+\end{description}
+
+The access to the array elements is done via the method \verb|offset|, 
+with gets a variadic parameter list with all array indices.
+
+Used prefix decoration scheme:
+
+\begin{tabular}{|l|l|}
+\hline
+data & data storage as linear array \\
+\hline
+a & array descriptor object \\
+\hline
+b & array object which stores the pointer of the array descriptor \\
+\hline
+\end{tabular}
+
+
+Example:
+
+\begin{PEARLCode}
+DCL x(10:20) FIXED(31); 
+DCL y(1,10,10:20) FLOAT(24); 
+TYPE MyStruct STRUCT [
+           dummy FIXED(31);
+           array1 (0:9,9:9) FIXED(31);
+           dummy2 FIXED(31);
+           ];
+DCL s(0:19) MyStruct;
+...
+x(10) := x(15);
+y(10,10) := 0.0;
+\end{PEARLCode}
+
+
+\begin{CppCode}
+// DCL x(10:20) FIXED(31); 
+static Fixed<31> data_x[11]; // 11 data elements
+                             // identifier with decoration
+DCLARRAY(x, 1, LIMITS{{10,20,1}});
+// - - - - - - 
+// DCL y(1,10,10:20) FLOAT(24); 
+ // 10*11 data elements
+ // identifier with decoration
+static pearlrt::Float<24> data_y[110];
+DCLARRAY(y, 2, LIMITS{{1,10,11},{10,20,1}});
+
+// - - - - - - 
+   typedef {
+      int dummyData1;
+      pearlrt::Fixed<31> data_array1[100]; // arrayData Fixed(0:9,0:9);
+      int dummyData2;
+   } MyStruct;
+   MyStruct data_s[20]; 
+   DCLARRAY(s, 1, LIMITS({{0,19,1}}));
+   DCLARRAY(s_array1, 2, LIMITS({{0,9,10},{0,9,1}}));
+
+...
+*(x->offset(pearlrt::Fixed<31>(10))) = *(x->offset(pearlrt::Fixed<31>(15)));
+*(y->offset(pearlrt::Fixed<31>(10), pearlrt::Fixed<31>(10)) = pearlrt::Float<24>(0.0);
+...
+   pearlrt::Fixed<31> testValue;
+
+   testValue = 
+       *(
+         (
+          (*(data_s+s->offset(pearlrt::Fixed<31>(2)) )).data_array1+
+             s_array1->offset(pearlrt::Fixed<31>(0),pearlrt::Fixed<31>(1)
+          )
+         )
+        );
+
+\end{CppCode}
+
+\section{Usage as Paramater}
+The array descriptor is a pointer, which may be passed as additional parameter
+to procedures. 
+Passing arrays of structs containing some array may lead to the requirement
+to pass more than one array descriptor in addition to the pointer to the 
+reals data object.
+By convention the array descriptors should be passed after the pointer to the
+data storage in the order of declaration of the array descriptors (DCLARRAY).
+
+\begin{PEARLCode}
+DCL x(10:20) FIXED(31); 
+TYPE MyStruct STRUCT [
+           dummy FIXED(31);
+           array1 (0:9,9:9) FIXED(31);
+           dummy2 FIXED(31);
+           ];
+DCL s(0:19) MyStruct;
+...
+CALL anyFunc(x);
+CALL otherAnyFunc(s);
+\end{PEARLCode}
+
+\begin{CppCode}
+// DCL x(10:20) FIXED(31); 
+ // 11 data elements
+ // identifier with decoration
+static pearlrt::Fixed<31> data_x[11];
+DCLARRAY(_x, 1, LIMITS{{10,20,1}});
+
+// - - - - - - 
+   typedef {
+      pearlrt::Fixed<31> _dummy1;
+      pearlrt::Fixed<31> data_array1[100]; // arrayData Fixed(0:9,0:9);
+      pearlrt::Fixed<31> _dummy2;
+   } _MyStruct;
+
+   _MyStruct data_s[20]; 
+   DCLARRAY(_s, 1, LIMITS({{0,19,1}}));
+   DCLARRAY(s_array1, 2, LIMITS({{0,9,10},{0,9,1}}));
+
+...
+   anyFunc(data_x, _x);
+   otherAnyFunc(data_s, s, s_array1);
+\end{CppCode}
+
+If a complete array should be written to a DATION with e.g. WRITE,
+the address of the first array element must be used.
+
+
