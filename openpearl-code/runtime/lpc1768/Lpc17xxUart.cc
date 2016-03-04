@@ -162,14 +162,24 @@ namespace pearlrt {
          throw theIllegalParamSignal;
       }
 
-      if ((mode & 0xfffc) != 0) {
+      if ((mode & 0xfffc0000) != 0) {
          Log::error("Lpc17xxUart: unknown mode bits set");
          throw theIllegalParamSignal;
       }
 
       // setup attribute values
-      lineEdit = (mode >> 0) & 0x01;
-      xonProtocol = (mode >> 1) & 0x01;
+      rxBufferSize = (mode & 0x0ffff);
+      lineEdit = (mode >> 16) & 0x01;
+      xonProtocol = (mode >> 17) & 0x01;
+
+      if (lineEdit && rxBufferSize > 0) {
+          rxBuffer = (char*)pvPortMalloc(rxBufferSize);
+          if (rxBuffer == 0) {
+             Log::error("Lpc17xxUart: could not allocate receive buffer");
+             throw theIllegalParamSignal;
+          }
+          rxRingBuffer.setup(rxBuffer,rxBufferSize);
+      }
 
       status = 0;  // not busy
       sendCommand.blockSema = xSemaphoreCreateBinary();
@@ -256,7 +266,7 @@ namespace pearlrt {
       mutex.name("Lpc17xxUartx");
       nbrOpenUserDations = 0;
 
-      lineEditEcho.setup(lineEditEchoBuffer, sizeof(lineEditEchoBuffer));
+      lineEditEcho.setup(echoBuffer, sizeof(echoBuffer));
 
       uartObject[_port / 2] = this;  // _port is ether 0 or 2 --> map to 0/1
 
@@ -341,6 +351,22 @@ namespace pearlrt {
       mutex.unlock();
    }
 
+   void Lpc17xxUart::copyRxRingBuffer() {
+       bool goOn = true;
+       char ch;
+       while (goOn && recvCommand.nbr > 0) {
+           goOn = rxRingBuffer.get(&ch);
+           if (goOn) {
+              *(recvCommand.data++) = ch;
+              recvCommand.nbr--;
+              recvCommand.nbrReceived ++;
+              if (ch == '\n') {
+                  goOn = false;   // stop delivery at end of line
+              }
+           }
+      }   
+    }
+
    void Lpc17xxUart::dationRead(void * destination, size_t size) {
       bool errorExit = false;
 
@@ -349,6 +375,7 @@ namespace pearlrt {
          throw theIllegalParamSignal;
       }
 
+      // request semaphores in ordered locking write->read
       if (lineEdit) {
          writeSema.request();
       }
@@ -356,6 +383,7 @@ namespace pearlrt {
       readSema.request();
       mutex.lock();
 
+      // disable uart interrupt and treat buffered input
       interruptEnable(false);
       status |= READ_IS_ACTIVE;
       recvCommand.data = (char*)destination;
@@ -374,19 +402,33 @@ namespace pearlrt {
          status &= ~HAS_UNGETCHAR;
       }
 
-      if (status & RXCHAR_IS_BUFFERED && recvCommand.nbr > 0) {
-         *(recvCommand.data++) = bufferedInputChar;
-         recvCommand.nbr--;
-         recvCommand.nbrReceived ++;
-         status &= ~RXCHAR_IS_BUFFERED;
-      }
+      if (!lineEdit) {
+         if (status & RXCHAR_IS_BUFFERED && recvCommand.nbr > 0) {
+            *(recvCommand.data++) = bufferedInputChar;
+            recvCommand.nbr--;
+            recvCommand.nbrReceived ++;
+            status &= ~RXCHAR_IS_BUFFERED;
+         }
 
-      if (recvCommand.nbr  > 0) {
-         interruptEnable(true);
-         xSemaphoreTake(recvCommand.blockSema, portMAX_DELAY);
-         interruptEnable(false);
+         if (recvCommand.nbr  > 0) {
+            interruptEnable(true);
+            // uart interrupt enabled --> wait until data are ready
+         
+            xSemaphoreTake(recvCommand.blockSema, portMAX_DELAY);
+            interruptEnable(false);
+         }
+      } else {
+         // lineEdit = true
+         copyRxRingBuffer();
+         if (recvCommand.nbr  > 0) {
+            interruptEnable(true);
+            // uart interrupt enabled --> wait until data are ready
+         
+            xSemaphoreTake(recvCommand.blockSema, portMAX_DELAY);
+            interruptEnable(false);
+            copyRxRingBuffer();
+         }
       }
-
       if ((status & READ_ERRORMASK) != 0) {
          errorExit = true;
          logError();
@@ -418,6 +460,7 @@ namespace pearlrt {
          throw theIllegalParamSignal;
       }
 
+      // request semaphores in ordered locking write->read
       writeSema.request();
 
       if (lineEdit) {
@@ -635,35 +678,42 @@ namespace pearlrt {
       } else if (lineEdit) {
          // requires local echo and character filtering
          if (ch == 0x08) {
-            // backspace
-            if (recvCommand.nbrReceived > 0) {
-               lineEditEcho.add(ch);
-               lineEditEcho.add(' ');
-               lineEditEcho.add(ch);
-               recvCommand.nbr ++;
-               recvCommand.data--;
-               recvCommand.nbrReceived --;
+            // backspace works only until begin of line
+            char ch1;
+            if (rxRingBuffer.last(&ch1)) { 
+               // previous entered characters available
+               if (ch1 != '\n') {
+                  lineEditEcho.add(ch);
+                  lineEditEcho.add(' ');
+                  lineEditEcho.add(ch);
+                  rxRingBuffer.forget();
+               } else {
+                  // send BELL; try to remove more chars as entered
+                  lineEditEcho.add(0x07);
+               }
             } else {
                // send BELL; try to remove more chars as entered
                lineEditEcho.add(0x07);
             }
-
-            charTreated = true;
          } else if (ch == 0x0d) {
             // CR
-            lineEditEcho.add(ch);
-            lineEditEcho.add(0x0a);
-            charTreated = true; // set marker to start echo chars
 
-            if (recvCommand.nbr > 0) {
-               *(recvCommand.data++) = '\n';
-               recvCommand.nbr --;
-               recvCommand.nbrReceived ++;
+            if (!rxRingBuffer.add('\n')) {
+               // buffer full
+               lineEditEcho.add(0x08);
+               lineEditEcho.add('?');
+            } else {
+               lineEditEcho.add(ch);
+               lineEditEcho.add(0x0a);
             }
 
             xSemaphoreGiveFromISR(recvCommand.blockSema, NULL);
          } else {
-            lineEditEcho.add(ch);
+            if (!rxRingBuffer.add(ch)) {
+               lineEditEcho.add(0x08); // BS
+               lineEditEcho.add(0x07);
+               lineEditEcho.add('?');  // show buffer full
+            }
          }
 
          lineStatus = Chip_UART_ReadLineStatus(uart);
@@ -672,7 +722,10 @@ namespace pearlrt {
             lineEditEcho.get(&ch);
             Chip_UART_SendByte(uart, ch);
          }
+
+         charTreated = true;    // in lineEdit all characters are treated
       }
+
 
       if (charTreated)  {
          return;

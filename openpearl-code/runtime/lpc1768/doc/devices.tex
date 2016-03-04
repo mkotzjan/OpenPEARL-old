@@ -92,8 +92,9 @@ Synopsis: \verb|Lpc17xxUart(port, baud, bits, stopbits, parity, mode)|
 \item[parity] parity 'O', 'E', or 'N'
 \item[mode] provides additional switches
    \begin{description}
-   \item [Bit 1] 1=xon/xoff; 0=no protocol
-   \item [Bit 0] 1=line editing enabled; needs an input buffer size > 0
+   \item[Bit 0-15] Input buffer size --- required for line edit function
+   \item [Bit 16] 1=line editing enabled; needs an input buffer size > 0
+   \item [Bit 17] 1=xon/xoff; 0=no protocol
    \end{description}
    Examples:
    \begin{itemize}
@@ -103,7 +104,13 @@ Synopsis: \verb|Lpc17xxUart(port, baud, bits, stopbits, parity, mode)|
 \end{description}
  
 Note: If local edit is selected, the device may be used only in 
-half duplex mode.
+half duplex mode. The input buffer is needed.
+All received characters are stored in the input buffer, which is 
+realized as a non blocking ring buffer. If the buffer is full, a  '?'
+(question mark) is displayed and the character is discarded. Backspace 
+must be used to remove the last character.
+On reception of carriage return (0x0d), the input buffer is returned to 
+the application.
 
 Note: The function \verb|printf| ends up in the function \verb|_write()|, which
 is implemented in e.q. \verb|lpc17_uart_retarget.c|. The implementation

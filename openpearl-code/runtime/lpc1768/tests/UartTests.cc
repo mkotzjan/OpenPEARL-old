@@ -53,10 +53,12 @@ TEST(Lpc17xxUart, ctor) {
      pearlrt::IllegalParamSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'W',0x0),
      pearlrt::IllegalParamSignal );
-   ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x8),
+   ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x80000),
      pearlrt::IllegalParamSignal );
-   ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x1),
+   ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x10000),
      pearlrt::IllegalParamSignal );
+   ASSERT_NO_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x10080));
+
 /*
    the heap allocation stops the system in case of exhausted heap
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x1FFFF),

@@ -58,14 +58,18 @@ namespace pearlrt {
    */
    class Lpc17xxUart : public SystemDationNB {
    private:
-      void* lpc_uart;  // pointer to port (in LPCOpen)
-      bool lineEdit;
-      bool xonProtocol;
-      Mutex mutex;
-      CSema writeSema;
-      CSema readSema;
-      int nbrOpenUserDations;
-      int status;    // status of the current operation
+      void* lpc_uart;	// pointer to port (in LPCOpen)
+      int rxBufferSize; // size of the receive buffer in line edit mode
+      int rxBytes;	// number of bytes in receive buffer in line edit mode
+      char * rxBuffer;  // receive buffer in line edit mode
+      RingBuffer<char> rxRingBuffer; 
+      bool lineEdit;    // line edit (BS) desired
+      bool xonProtocol; // operate with xon/xoff toe remore system
+      Mutex mutex; 	// mutex for objects data
+      CSema writeSema;  // semaphore to resume operation from interrupt
+      CSema readSema;  	// semaphore to resume operation from interrupt
+      int nbrOpenUserDations; // multiple dations counter
+      int status;  	// status of the current operation
       // for details see enum Lpc17xxUartStatus
       static Lpc17xxUart * uartObject[2];
       struct Job4Isr {
@@ -75,10 +79,12 @@ namespace pearlrt {
          SemaphoreHandle_t blockSema;
       } sendCommand, recvCommand;
 
-      char lineEditEchoBuffer[10];  // --> rename towards echoBuffer
-      RingBuffer<char> lineEditEcho;
-      char bufferedInputChar;
-      char unGetChar;
+      char echoBuffer[10]; 
+      RingBuffer<char> lineEditEcho; 
+      char bufferedInputChar;	// one char may be buffered even if no 
+				// input is active to run xon/xoff protocol
+				// this stores the last received character
+      char unGetChar;		// character for unget
 
    public:
       /**
@@ -92,17 +98,23 @@ namespace pearlrt {
       \param parity the desired type of parity ('O', 'E', 'N')
       \param mode multiplex parameter
                   <ul>
-                  <li>Bit 0: 1= line edit on
-                  <li>Bit 1: 1=xon/xoff protocol enabled
+		  <li>Bit 0-15: rx buffer size;
+			 (must be > 0) if line edit is selected
+                  <li>Bit 16: 1= line edit on
+                  <li>Bit 17: 1=xon/xoff protocol enabled
                   </ul>
       If lineEdit is selected, dationRead and dationWrite may only
       be used exclusive. Simultaneous calls for read and write are
       sequenced internally.
 
+      In lineEdit mode, the received characters are stored until a CR is
+      received.
+
       If no lineEdit is selected, the dation works in full duplex mode.
       Note that xoff-sending has higher priority than data sending.
 
       \throws theIllegalParamSignal in case of illegal parameter values
+                               or if the rxbuffer could not be allocated
       */
       Lpc17xxUart(int port, int baudRate, int bitsPerCharacter,
                   int stopBits, char parity, int mode);
@@ -135,6 +147,7 @@ namespace pearlrt {
       bool sendNextChar();
       void interruptEnable(bool on);
       void logError();
+      void copyRxRingBuffer();
 
    };
 }

@@ -30,7 +30,7 @@
 
 namespace pearlrt {
 
-   int LogCommon::logLevel = Log::WARN | Log::ERROR;// | Log::INFO | Log::DEBUG ;
+   int LogCommon::logLevel = Log::WARN | Log::ERROR | Log::INFO | Log::DEBUG ;
 
    static void addInt(int value, RefCharacter & rc) {
       int l;  // nbr of digits
