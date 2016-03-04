@@ -52,12 +52,14 @@ namespace pearlrt {
 
    for (i=0; i<descriptor->dim; i++) {
       if (index.x < descriptor->lim[i].low) {
-        Log::error("array index #%d out of bounds [%d,%d])\n",
-                 i, index.x, descriptor->lim[i].low,descriptor->lim[i].high);
+        Log::error("array index #%d out of bounds (%d) [%d,%d])\n",
+                 i, (int)index.x, 
+                 descriptor->lim[i].low,descriptor->lim[i].high);
         throw theArrayIndexOutOfBoundsSignal;
       } else if (index.x > descriptor->lim[i].high) {
-        Log::error("array index #%d out of bounds [%d,%d])\n",
-                 i, index.x, descriptor->lim[i].low,descriptor->lim[i].high);
+        Log::error("array index #%d out of bounds (%d) [%d,%d])\n",
+                 i, (int)index.x, 
+                 descriptor->lim[i].low,descriptor->lim[i].high);
         throw theArrayIndexOutOfBoundsSignal;
       } else {
          offset += (index.x - descriptor->lim[i].low) * descriptor->lim[i].size;
@@ -73,7 +75,7 @@ namespace pearlrt {
             return Fixed<31>(descriptor->lim[x.x-1].low);
          }
          Log::error("low: index %d out of range [1,%d]\n", 
-                    x.x, descriptor->dim);
+                    (int)x.x, descriptor->dim);
          throw theArrayIndexOutOfBoundsSignal;
       }
 
@@ -82,7 +84,7 @@ namespace pearlrt {
             return Fixed<31>(descriptor->lim[x.x-1].high);
          }
          Log::error("upb: index %d out of range [1,%d]\n", 
-                    x.x, descriptor->dim);
+                    (int)x.x, descriptor->dim);
          throw theArrayIndexOutOfBoundsSignal;
       }
 }
