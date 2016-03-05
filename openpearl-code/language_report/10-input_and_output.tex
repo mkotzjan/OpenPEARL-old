@@ -150,6 +150,8 @@ Example:
 \x ...
 \end{tabbing}
 
+\end{added}
+\begin{added}
 
 For the example of a system part as given below, a typical linux computer
 system is considered, with the following provided system names in OpenPEARL:
@@ -1924,10 +1926,12 @@ Example:
 \end{removed}
 
 {\bf PROBLEM};\\
-\x {\bf SPC} motor {\bf DATION OUT BASIC \addedtext{BIT(4)} };\\
+\x {\bf SPC} motor {\bf DATION OUT \addedtext{SYSTEM} \removedtext{BASIC}
+    \addedtext{BIT(4)} };\\
+\x \addedtext{{\bf DCL} m {\bf DATION OUT BASIC BIT(4) CREATED} ( motor );}\\
 \x {\bf DCL} on {\bf INV BIT}(4) {\bf INIT}('1010'B1);
 
-\x {\bf SEND} on {\bf TO} motor;
+\x {\bf SEND} on {\bf TO} m\removedtext{otor};
 
 \section{Error Handling in I/O Statements (RST)}    % 10.8
 \label{sec_dation_rst}

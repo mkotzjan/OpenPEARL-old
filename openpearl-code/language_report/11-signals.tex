@@ -50,7 +50,7 @@ FixedOverflowSignal and DationEOFSignal are system names.
 \x \x eof : DationEOFSignal;
 \x \x ...\\
 \x {\bf PROBLEM};\\
-\x \x {\bf SPC} ( overflow,eof ) {\bf SIGNAL};\\
+\x \x {\bf SPC} ( overflow, eof ) {\bf SIGNAL};\\
 \x \x ... \\
 {\bf MODEND};
 \end{added}
@@ -159,7 +159,7 @@ type Event.
 ...\\
 {\bf PROBLEM};\\
 \x {\bf SPC} \removedtext{EOF} \addedtext{eof} {\bf SIGNAL},\\
-\x \x Tape {\bf DATION INOUT ALL};\\
+\x \x Tape {\bf DATION INOUT \addedtext{SYSTEM} ALL};\\
 \x {\bf TYPE} Event ...;\\
 \x {\bf DCL} LogBook {\bf DATION IN} event {\bf DIM}($^*$) {\bf FORWARD CREATED}(tape);
 
