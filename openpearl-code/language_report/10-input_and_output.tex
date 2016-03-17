@@ -36,12 +36,13 @@ statements. A list of these devices and their system names can be
 found in the PEARL user manual of the corresponding target system. In
 the system part, freely selectable user names must be assigned to the
 system names of the needed devices. The devices can only be addressed in
-I/O statements of the problem part via these user names. If there are
+I/O statements of the problem part via these user names. 
+\begin{removed}
+If there are
 several devices of the same type, they can also be distinguished by an
 index added to the system name. Thus, a system name has the following
 general form:
 
-\begin{removed}
 SystemName ::=\\
 \x Identifier [ (nni$\S $index) ]
 
@@ -103,18 +104,67 @@ PEARL example for the system part:
 
 \begin{added}
 SystemName ::=\\
-\x Identifier$\S $SystemDationName [ (Constant$\S $Parameter [, Constant$\S $Parameter]...) ]
+\x Identifier$\S $SystemDationName [ (Constant$\S $Parameter [, Constant$\S $Parameter]...) ] $\mid$ \\
+\x Identifier$\S $SystemSignalName [ (Constant$\S $Parameter [, Constant$\S $Parameter]...) ] $\mid$ \\
+\x Identifier$\S $SystemInterruptName [ (Constant$\S $Parameter [, Constant$\S $Parameter]...) ] 
 
-For the example of a system part as given below, a typicla linux computer
-system with the following system names defined by OpenPEARL:
+For details about interrupts see chapter \ref{interrupts} and 
+signals see chapter \ref{signals}.
+
+Thus, a system part consists of a number of device associations of the
+following form:
+
+SystemAssociation ::=\\
+\x UserName: SystemName 
+
+UserName ::=\\
+\x Identifier
+
+Devices may be connected directly to the computer or they are connected 
+via an external bus to the computer. The bus interface is define
+as DeviceAssociation. The name of the device association may be 
+used for all external devices connected to the same bus.
+An external device at a bus is defined in the following form:
+
+BusDeviceAssociation ::=\\
+\x UserName: [ Identifier$\S $BusUserName -\,-\,-  ] SystemName 
+
+Especially for standalone running microcontrollers the system part
+may configure the behavior of the PEARL environment, like the
+definition of an error output channel. 
+
+ConfigurationElement ::=\\
+\x Identifier$\S $ConfigurationElement [ (Configuration$\S $Parameter\\
+\x \x \x \x \x \x [, Configuration$\S $Parameter]... ) ]
+
+ConfigurationParameter ::=\\
+\x  Constant$\S $Parameter $\mid$  UserName 
+
+Example:
+\begin{tabbing}
+\x dateout: \= \kill
+{\bf Module} (example); \> \\
+{\bf SYSTEM}; \> \\
+\x tty0:    \> Lpc17xxUart(0, 9600, 8, 1, 'E', 0);\\
+\x  \> ErrorLog(tty0, 'WE'); ! send errors and warnings to uart 0\\
+\x ...
+\end{tabbing}
+
+\end{added}
+\begin{added}
+
+For the example of a system part as given below, a typical linux computer
+system is considered, with the following provided system names in OpenPEARL:
 
 \begin{tabular}{ll@{\x}p{6cm}}
 SystemName & Parameter & Device \\ \hline
 StdStream  &  0 & standard input \\
 StdStream  &  1 & standard output \\
 Disc       & '/home', 10 & files for reading and writing are located in the given folder. The maximum of concurrent open files also specified. \\
-OctopusDigIn & ... & Digital input: Details are described in the plattform users guide \\
-OctopusDigOut & ... & Digital output: Details are described in the plattform users guide \\
+OctopusDigIn & ... & Digital input: Details are described in 
+		the plattform users guide \\
+OctopusDigOut & ... & Digital output: Details are described in 
+		the plattform users guide \\
 \end{tabular}
 
 PEARL example for the system part:
@@ -129,6 +179,8 @@ PEARL example for the system part:
 \x counter: \> OctopusDigitalIn('A',3,1); \\
 \x switch:  \> OctopusDigitalOut('B',3,1); \\
 \x motor:   \> OctopusDigitalOut('B',7,4); \\
+\x ic2bus1: \> I2CBus('/dev/i2c-0', 100000);\\
+\x temp:    \> i2cbus1 -\,-\.- LM75('48'B4); \\
 \x ... \> \\
 {\bf PROBLEM};\> \\
 \x ... \>
@@ -137,11 +189,13 @@ PEARL example for the system part:
 \end{added}
 
 The available devices and the associated system names must be taken from
-the corresponding user manual of a PEARL implementation. There it is
+the corresponding user manual of a PEARL implementation.
+\begin{removed} There it is
 also described, whether (and, if yes, how) system names can be changed.
 For most PEARL systems there is an additional possibility to integrate
 device drivers and their system names created by the user into the PEARL
 system and to address them with PEARL I/O statements.
+\end{removed} 
 
 \section{Specification and Declaration of Data Stations (DATION) in 
 the Problem Part}   % 10.2
@@ -312,6 +366,9 @@ Example:
 
 The attribute ALL includes all other possibilities of type of
 transmission data.
+\begin{added}
+No type checking occurs in this case.
+\end{added}
 
 Example:
 
@@ -320,14 +377,15 @@ File1 for the input of FIXED quantities and a file File2 for the
 input/output of FLOAT quantities with computer internal format are to be
 created.
 
-{\bf SYSTEM};\\
 \begin{removed}
-\x Disk: PSP31;
+{\bf SYSTEM};\\
+\x Disk: PSP31; \\
 {\bf PROBLEM};\\
 \x {\bf SPC} Disk {\bf DATION INOUT ALL} ...;\\
 \end{removed}
 \begin{added}
-\x Disk: Disc('/home',10);
+{\bf SYSTEM};\\
+\x Disk: Disc('/home',10);\\
 {\bf PROBLEM};\\
 \x {\bf SPC} Disk {\bf DATION INOUT SYSTEM ALL} ...;\\
 \end{added}
@@ -346,8 +404,14 @@ make up a 1-, 2-, or 3-dimensional array. For this, the number of data
 elements in a line, the number of lines in a page, and the number of
 pages must be denoted in the structure attribute:
 
+\begin{removed}
 Typology ::= \\
 \x {\bf DIM} ( \{ $^*$ $\mid$ pi \} [ , pi [ , pi ] ] ) [ {\bf TFU} [ {\bf MAX} ] ]
+\end{removed}
+\begin{added}
+Typology ::= \\
+\x {\bf DIM} ( \{ $^*$ $\mid$ pi \} [ , pi [ , pi ] ] ) 
+\end{added}
 
 The pi denotation furthest to the right always denotes the number of
 elements per line, the next (possibly lacking) pi denotation denotes
@@ -370,6 +434,7 @@ DIM (number of elements), or\\
 DIM ($^*$)
 \end{itemize}
 
+\begin{removed}
 Furthermore, the typology indicates, how many data elements are
 transmitted {\em at least} upon the execution of {\em one} data
 transmission statement:
@@ -392,6 +457,7 @@ This PUT statement has the effect that the five characters P, E, A, R,
 L are written out in one (new) line by Printer.
 \item TFU MAX corresponds to TFU.
 \end{itemize}
+\end{removed}
 
 The possible ways of accessing a data station are determined by the
 access attribute:
@@ -898,7 +964,7 @@ in the WRITE statements.
 \end{added}
 
 \begin{added}
-For dation with the ClassAttribute {\bf ALL} only 1 unlimited dimension
+For dation with the ClassAttribute {\bf ALL} only one unlimited dimension
 DIM(*) is supported in OpenPEARL.
 Absolute positioning is allowed only to POS(1) for DIRECT dations.
 No relative positioning is allowed.
@@ -947,7 +1013,12 @@ a := 5;\\
 x := 2.33;\\
 ...\\
 {\bf PUT TO} printer {\bf BY PAGE};\\
+\removedtext{
 {\bf PUT} a, x {\bf TO} printer {\bf BY LIST};
+}
+\addedtext{
+{\bf PUT} a, x {\bf TO} printer {\bf BY F(6), E(14,5), SKIP};
+}
 
 The execution results in the following printer layout:
 
@@ -1084,7 +1155,7 @@ in the PUT statements.
 \label{sec_dation_f_format}
 
 FixedFormat ::=\\
-\x {\bf F} (FieldWidth [ , DecimalPositions [ , ScaleFactor ] ] )
+\x {\bf F} (FieldWidth [ , DecimalPositions \removedtext{[ , ScaleFactor ]} ] )
 
 FieldWidth ::=\\
 \x Expression$\S $WithPositiveIntegerAsValue
@@ -1092,20 +1163,22 @@ FieldWidth ::=\\
 DecimalPositions ::=\\
 \x Expression$\S $WithNonNegativeIntegerAsValue
 
+\begin{removed}
 ScaleFactor ::=\\
 \x Expression$\S $WithIntegerAsValue
-
+\end{removed}
 The fixed format describes the external representation of decimal fixed
 point numbers. The field width w is the complete number of characters
 available for the decimal number; decimal positions d denote the number
-of digits behind the decimal point. The scale factor p can be both
-positive or negative; 
+of digits behind the decimal point. 
 \begin{removed}
+The scale factor p can be both
+positive or negative; 
 it causes that not the number itself, but its
 value multiplied by 10$^{**}$p is transferred.
 \end{removed}
 \begin{added}
-the behavior is described separatelly for input and output.
+The behavior is described separatelly for input and output.
 \end{added}
 
 \begin{removed}
@@ -1113,18 +1186,7 @@ It is important that only integers can be transferred with the fixed
 format, but also the processing of fractional fixed point numbers is
 possible by scaling. These are converted to integers upon input and to
 fractional numbers again upon output.
-\end{removed}
 
-\begin{added}
-It is important that 
- integers and floats can be transferred with the fixed
-format. 
-The processing of fractional fixed point numbers is
-possible by scaling. The interal integer value is converted to a fractional 
-number on output. The conversion works invers on input.
-\end{added}
-
-\begin{removed}
 \begin{enumerate}
 \item {\bf Output}
 \begin{enumerate}
@@ -1192,8 +1254,6 @@ number rounded without decimal point is written out.
 leading zeros are suppressed.
 \item if the output value does not fit into the given field width 
    (also regarding p and negative sign), the FixedValueSignal is induced.
-\item The scale factor p causes that not the number itself, but its
-value divided by 10$^{**}$p is transferred.
 \end{enumerate}
 \item {\bf Input}
 \begin{enumerate}
@@ -1205,8 +1265,7 @@ number in the following representation:
 \item Spaces preceding or following the number are ignored.
 \item If the entire field is empty, value 0 is read in.
 \item If no decimal point occurs in the representation, the last d
-digits are interpreted as positions following a decimal point. It must
-be p $\geq$ d.
+digits are interpreted as positions following a decimal point.
 \item If a decimal point occurs in front of the last b digits in the
 representation, then it has priority over the specification by d. In
 this case, the statement of d has no meaning. Nevertheless the value must
@@ -1217,8 +1276,6 @@ be reasonable in respect to the other rules.
     the FixedFormatSignal is induced
 \item If the data in the input field does not match a valid fixed 
    number, the FixedValueSignal is induced
-\item The scale factor p causes that not the number itself, but its
-value multiplied by 10$^{**}$p is transferred.
 \end{enumerate}
 \end{enumerate}
 
@@ -1232,10 +1289,7 @@ value  & format   & output \\ \hline
 -13.5   & F(7,2)   & \_-13.50  \\
 275.2  & F(4,1)   &  \x \x {\em FixedValueSignal!} \\
 22.8   & F(5)     & \_\_\_23 \\
-212.73 & F(9,2,2) & \_21273.00 \\
 212.73 & F(9,2)   & \_\_\_212.73 \\
-21273 & F(9,2,2)   & \_\_\_212.73 \\
-212 & F(9,2,-2)   & \_21200.00 \\
 \end{tabular}
 \end{added}
 
@@ -1248,11 +1302,7 @@ value       &          & FIXED & FLOAT  \\ \hline
 13.5   & F(7,1)   &  14 & 13.5   \\
 13.5   & F(5)     &  14 & 13.5   \\
 275.2  & F(4,1)   & 275 & 275.2 \\
-\_21273.00 & F(9,2,2) & 213 & 212.73 \\
 \ \ \ 212.73 &  F(9,2)&  213 & 213,73 \\
-\_\_\_212.73 & F(9,2,2) & 21273 & 21273.0 \\
-\_\_\_21273 & F(9,2,2) & 21273 & 21273.0 \\
-\_21273.00 & F(9,2,-2)   & 213 & 212.73 \\
 \end{tabular}
 
 \end{added}
@@ -1385,18 +1435,20 @@ value  & format    & output \\ \hline
 \end{tabular}
 \end{added}
 
-\subsection{The Character String Formats (A) and (S)}  % 10.5.3
+%\subsection{The Character String Formats (A) and (S)}  % 10.5.3
+\subsection{The Character String Formats (A)}  % 10.5.3
 \label{sec_dation_a_format}
 
 CharacterStringFormat ::=\\
-\x {\bf A} [ (Expression$\S $NumberCharacters) ] $\mid$ {\bf S} (Name$\S $NumberCharactersVariableFixed)
+\x {\bf A} [ (Expression$\S $NumberCharacters) ]
+  \removedtext{ $\mid$ {\bf S} (Name$\S $NumberCharactersVariableFixed) }
 
 The character formats describe the external representation of character
 strings (character quantities) of the form
 
 Character$^{...}$
 
-\subsubsection{Character String Format (A)}
+%\subsubsection{Character String Format (A)}
 
 The value of the expression in character string format means the total
 number w of the character positions available for the representation.
@@ -1458,6 +1510,7 @@ format
 \item A(2) is equivalent to text := 'PE\_\_\_';
 \end{itemize}
 
+\begin{removed}
 \subsubsection{Character String Format (S)}
 
 The variable in character string format must be of type FIXED.
@@ -1488,6 +1541,8 @@ Command lines are to be read in from the terminal.
 After the entry ``abc$<$RETURN$>$'' on the keyboard (the key
 $<$RETURN$>$ creates a record delimiter), the variable ``buffer''
 contains the characters ``abc'' and the variable ``length'' the value 3.
+\end{removed}
+
 
 \subsection{The Bit Format (B)}    % 10.5.4
 \label{sec_dation_b_format}
@@ -1664,6 +1719,7 @@ value               & format  & output \\ \hline
 
 The character \_ means a space.
 
+\begin{removed}
 \subsection{The List Format (LIST)}    % 10.5.7
 \label{sec_dation_list_format}
 
@@ -1703,6 +1759,7 @@ FIXED(15) & 127      & F(6)            & \_\_\_127 \\
 FLOAT(31) & 3.28E+28 & E(12,5,6)       & \_3.28000E+28\\
 BIT(8)    & 'EF'B4   & B(8)            & 11101111
 \end{tabular}
+\end{removed}
 
 \subsection{The R Format (R)}   % 10.5.8
 \label{sec_dation_r_format}
@@ -1769,14 +1826,31 @@ PositionConvert ::=\\
 
 All permitted formats have the same meaning as for the PUT and GET
 statements \addedtext{on FORWARD DATIONS}.
+\begin{removed}
 The only exception is the S format. In the convert
 statement, the number of characters, which at this point in time was
 read from Expression$\S $CharacterString or written into
 Name$\S $CharacterString, respectively, is assigned to the variable in S
 format.
+\end{removed}
 
 Example:
 
+\begin{added}
+\begin{tabbing}
+{\bf DCL} (index, conv\_error) \= {\bf FIXED},\\
+\x        value                \> {\bf FLOAT};\\
+\end{tabbing}
+
+{\bf DCL} string\_out {\bf CHAR}(40),\\
+\x string\_in {\bf CHAR}(20);\\
+...\\
+{\bf CONVERT} 'Index =', index {\bf TO} string\_out 
+    {\bf BY A}, {\bf F}(4), {\bf A};\\
+{\bf CONVERT} index, value {\bf FROM} string\_in {\bf BY RST}(conv\_error), {\bf F}(4), {\bf E}(10,2);
+\end{added}
+
+\begin{removed}
 \begin{tabbing}
 {\bf DCL} (index, conv\_error, number\_of\_bytes) \= {\bf FIXED},\\
 \x        value                                   \> {\bf FLOAT};\\
@@ -1785,8 +1859,10 @@ Example:
 {\bf DCL} string\_out {\bf CHAR}(40),\\
 \x string\_in {\bf CHAR}(20);\\
 ...\\
-{\bf CONVERT} 'Index =', index {\bf TO} string\_out {\bf BY A}, {\bf F}(4), {\bf S}(number\_of\_bytes);\\
+{\bf CONVERT} 'Index =', index {\bf TO} string\_out 
+    {\bf BY A}, {\bf F}(4), {\bf S}(number\_of\_bytes);\\
 {\bf CONVERT} index, value {\bf FROM} string\_in {\bf BY RST}(conv\_error), {\bf F}(4), {\bf E}(10,2);
+\end{removed}
 
 \section{The Take and Send Statements}    % 10.7
 \label{sec_take_send}
@@ -1796,6 +1872,7 @@ output of data. These statements are provided for the transmission of
 process data, and for the data exchange with user specific drivers,
 respectively. The data station must possess the class attribute BASIC.
 
+\begin{removed}
 TakeStatement ::=\\
 \x {\bf TAKE} [ Name$\S $Variable ] {\bf FROM} Name$\S $Dation\\
 \x \x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;
@@ -1808,26 +1885,53 @@ RST-S-CTRL-Format ::=\\
 \x {\bf RST} ( Name$\S $ErrorVariable-FIXED )\\
 \x $\mid$ {\bf S} ( Name$\S $Variable-FIXED )\\
 \x $\mid$ {\bf CONTROL} ( Expression [ , Expression [ , Expression ] ] )
+\end{removed}
+\begin{added}
+TakeStatement ::=\\
+\x {\bf TAKE} [ Name$\S $Variable ] {\bf FROM} Name$\S $Dation\\
+\x \x [ {\bf BY} RST-Format ] ;
 
+SendStatement ::=\\
+\x {\bf SEND} [ Expression ] {\bf TO} Name$\S $Dation\\
+\x \x [ {\bf BY} RST-Format  ] ;
+
+RST-Format ::=\\
+\x {\bf RST} ( Name$\S $ErrorVariable-FIXED );
+\end{added}
+
+\begin{removed}
 The types of the ``variable'' in the take statement or the
 ``expression'' in the send statement, respectively, are implementation
 dependent.
+\end{removed}
+\begin{added}
+The types of the ``variable'' in the take statement or the
+``expression'' in the send statement, respectively, must fit to 
+the type in the dation declaration. If the dation declaration 
+specifies ALL, no type checking occurs.
+\end{added}
 
+\begin{removed}
 The attribute definitions RST, S and CONTROL may be stated in any
 order, but only once, each. The meanings of the CONTROL and S formats
 are implementation dependent and, thus, to be found in the respective
 user manual of a PEARL implementation.
+\end{removed}
 
 Example:
 
+\begin{removed}
 {\bf SYSTEM};\\
 \x motor: DIGEA $^*$1$^*$1,4;
+\end{removed}
 
 {\bf PROBLEM};\\
-\x {\bf SPC} motor {\bf DATION OUT BASIC};\\
+\x {\bf SPC} motor {\bf DATION OUT \addedtext{SYSTEM} \removedtext{BASIC}
+    \addedtext{BIT(4)} };\\
+\x \addedtext{{\bf DCL} m {\bf DATION OUT BASIC BIT(4) CREATED} ( motor );}\\
 \x {\bf DCL} on {\bf INV BIT}(4) {\bf INIT}('1010'B1);
 
-\x {\bf SEND} on {\bf TO} motor;
+\x {\bf SEND} on {\bf TO} m\removedtext{otor};
 
 \section{Error Handling in I/O Statements (RST)}    % 10.8
 \label{sec_dation_rst}
@@ -1861,7 +1965,8 @@ or the system reaction) is carried out.
 \section{Interface for Additional Drivers}   % 10.9
 \label{sec_driver_interface}
 
-The diversity of --- particularly in the world of PCs --- existing I/O
+The diversity of --- particularly in the world of PCs 
+\addedtext{ and micro controllers} --- existing I/O
 controllers and devices does not allow the compiler supplier to account
 for all I/O devices in the system part and create system names for them.
 To be able to address special I/O devices from PEARL in spite of that

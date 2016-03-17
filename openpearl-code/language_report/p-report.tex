@@ -1,15 +1,9 @@
 \documentclass{book}
 \usepackage{geometry}  % paper size
 \geometry{a4paper}     % -"-
-\usepackage[color]{changebar} % use side change bars
-%\usepackage{color}  % use color marks
-% note: tcolorbox is required in the version from 2014
-%       the usual tex packages from the linux distributions
-%       are known to be too old (r. mueller: 28-dec-2014)
-\usepackage[skins,breakable]{tcolorbox}  
-\tcbuselibrary{breakable}
-
 \usepackage[pdftex]{hyperref}
+
+\usepackage[skins,breakable]{tcolorbox}
 
 %\textwidth16cm
 %\textheight24cm
@@ -48,147 +42,17 @@
 \fi
 \fi\endgroup
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\usepackage[normalem]{ulem}
-\usepackage{soul}
 \def\OpenPEARL{{\it OpenPEARL}}
-\colorlet{color-added}{yellow!55!} %{RGB}{0,127,127}
-\definecolor{color-removed}{RGB}{128,128,128}
-\colorlet{color-tobedone}{blue!5!}  %{RGB}{0,0, 15}
-\definecolor{color-modified}{RGB}{128,128,0}
 
+\input macrosShowChanges.tex
+%\input macrosShowResult.tex
+ 
 \begin{document}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newenvironment{tobedone}%
-{\begin{tcolorbox}[breakable,colback=blue!5!white,colframe=blue!75!black,title=TO BE DONE]
-\parskip\baselineskip
-}
-{\end{tcolorbox}}
-
-\newenvironment{removed}%
-{\begin{tcolorbox}[colback=black!50!white,colframe=black!75!black,title=REMOVED]
-\parskip\baselineskip
-}
-{\end{tcolorbox}}
-
-\newenvironment{added}%
-{\begin{tcolorbox}[colback=yellow!55!white,colframe=yellow!75!black,title=ADDED]
-\parskip\baselineskip
-}
-{\end{tcolorbox}}
-
-\newenvironment{modified}%
-{\begin{tcolorbox}[colback=orange!15!white,colframe=orange!75!black,title=MODIFIED]
-\parskip\baselineskip
-}
-{\end{tcolorbox}}
-
-
-
-\newcommand{\tobedoneblock}[1]{\cbcolor{color-tobedone}
-\cbstart 
-#1
-\cbend
-}
-\newcommand{\removedblock}[1]{
-\cbstart 
-\cbcolor{color-removed}
-\color{color-removed}
-#1
-\cbend
-\cbcolor{black}
-\color{black}
-}
-\newcommand{\addedblock}[1]{
-\cbstart 
-\cbcolor{color-added}
-#1
-\cbend
-\cbcolor{black}
-\color{black}
-}
-
-\newcommand{\tobedonetext}[1]{
-\cbstart
-\cbcolor{color-tobedone}
-\color{black}
-\sethlcolor{color-tobedone}
-\hl{\mbox{#1}}
-\cbend
-\cbcolor{black}
-\color{black}
-}
-
-\newcommand{\removedtext}[1]{
-\cbstart
-\cbcolor{color-removed}
-\color{black}
-\sethlcolor{color-removed}
-\hl{\mbox{#1}}
-\cbend
-\cbcolor{black}
-\color{black}
-}
-
-\newcommand{\addedtext}[1]{
-\cbstart
-\cbcolor{color-added}
-%\color{color-added}
-\color{black}
-\sethlcolor{color-added}
-\hl{\mbox{#1}}
-\cbend
-\cbcolor{black}
-\color{black}
-}
-
-%\newcommand{\tobedoneblock}[1]{\cbstart 
-%\colorbox{color-tobedone}{\begin{minipage}{\textwidth}
-%\parskip\baselineskip
-%#1
-%\end{minipage}
-%}
-%\cbend}
-
-%\newcommand{\tobedonetext}[1]{\cbstart
-%\sethlcolor{color-tobedone}
-%\hl{\mbox{#1}}
-%\cbend}
-
-%\newcommand{\removedblock}[1]{\cbstart 
-%\color{yellow}
-%\colorbox{color-deleted}{\begin{minipage}{\textwidth}
-%\parskip\baselineskip
-%#1
-%\end{minipage}}
-%\color{black}
-%\cbend}
-
-%\newcommand{\removedtext}[1]{\cbstart
-%\color{yellow}
-%\sethlcolor{color-deleted}
-%\hl{\mbox{#1}}
-%\color{black}
-%\cbend}
-
-%\newcommand{\addedblock}[1]{\cbstart 
-%\colorbox{color-new}{\begin{minipage}{\textwidth}
-%\parskip\baselineskip
-%#1
-%\end{minipage}
-%}
-%\cbend}
-
-%\newcommand{\addedtext}[1]{\cbstart
-%\sethlcolor{color-new}
-%\hl{\mbox{#1}}
-%\cbend}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{titlepage}
-\sethlcolor{yellow}
+%\sethlcolor{yellow}
 
 \begin{center}
 {\Huge \OpenPEARL} \\
@@ -198,7 +62,12 @@ Implementation Description \\
 %2014-Oct-23\\
 \today{}\\
 \vspace{10cm}
-\tobedonetext{???? GI FG 4.4.2 ????}
+\removedtext{GI FG 4.4.2}
+\begin{added}
+Arbeitskreis ''Compiler''\\
+GI Fachgruppe ''Echtzeitsysteme''
+\end{added}
+
 \end{center}
 \end{titlepage}
 

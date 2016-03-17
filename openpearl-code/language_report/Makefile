@@ -9,7 +9,9 @@ TEXFILES = 01-introduction.tex 		\
 	09-parallel_activities.tex	\
 	10-input_and_output.tex		\
 	11-signals.tex			\
-	90-appendix.tex
+	90-appendix.tex			\
+	macrosShowChanges.tex		\
+	macrosShowResult.tex
 
 .PHONY: clean final
 
