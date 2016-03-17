@@ -139,5 +139,75 @@ Lpc15xxUart      & 10 &  21(UART0), 23(UART2) \\
 The interrupt execution is preemptive, with lower priority first and 
 sequential within same priority starting with lower exception number first.
 
+\subsection{Hy32}
+The LCD graphocs display supports a resolution of 320x240 Pixel with
+a color resolution of 5 bit (red and blue) 6 bit (green).
+
+The display may be used in all 4 orientations. The decive supports
+text positioning and output with two fonts. The positioning is done with
+vt100 compatible esc-sequences.
+The device supports not scrolling, since only vertical scroll is supported 
+be the hy32 display.
+
+The following ANSI codes are supported. Note that CSI stand for
+control sequence initiator, which is an ESC-character abd and opening square 
+brace (\verb|"\033["| in c-notation):
+\begin{description}
+\item[{\em CSI}  {\em li};{\em col} H] 
+    Set position. {\em li} and {\em col} are the line
+    number and column number starting at 1 each. Both elements may contain
+    1 or 2 digits (without leading space). Example \verb|\033[01;01H|
+ is cursor home
+\item[{\em CSI}  1L] insert one line at current location. 
+\item[{\em CSI}  {\em n} J] 
+n=0: clear screen from current cursor location to the end of the 
+    screen
+\\
+n=1: clear screen from current cursor location to the beginning of the 
+    screen
+\\
+n=2: clear entire screen and set the cursor home
+\item[{\em CSI}  10] select normal font (8x12 dots/character) 
+\item[{\em CSI}  11] select alternate (bigger) font
+\item[{\em CSI}  {\em n} m] , with n = '0' .. '7' select color n-'0' for characters (see tavle below)
+\item[{\em CSI}  {\em n} m] , with n = '@' .. 'I' select color n-'@' for character background
+(see table below)
+
+\end{description}
+
+\begin{tabular}{|l|l|c|}
+\hline
+number & color  & rgb \\
+\hline
+0 & black  & 0,0,0\\
+1 & red  & 170,0,0\\
+2 & green & 0, 170, 0 \\
+3 & yellow & 255,255,0 ???\\
+4 & blue & 0,0,170\\
+5 & magenta & 170,0,170\\
+6 & cyan  0,170,170\\
+7 white & 255,255,255\\
+\hline
+\end{tabular}
+
+Screen capacity:
+
+\begin{tabular}{|l|l|l|l|}
+\hline
+Orientation & Font & Lines & Columns \\
+\hline
+ 0 & small & 26 & 30  \\
+   & big   & 18 & 15 \\
+\hline
+1 & small & 40 & 18 \\
+  & big &   14 & 20 \\
+\hline
+ 2 & small & 26 & 30  \\
+   & big   & 18 & 15 \\
+\hline
+3 & small & 40 & 18 \\
+  & big &   14 & 20 \\
+\hline
+\end{tabular}
 
 

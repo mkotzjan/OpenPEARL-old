@@ -113,3 +113,6 @@ extern "C" {
 #include "Lpc17xxClock.h"
 #include "Lpc17xxUart.h"
 
+#include "Hy32.h"
+#include "Hy32LowLevel.h"
+
