@@ -73,9 +73,9 @@ LPCOpen_CSRC += $(LPCOpen)/clock_17xx_40xx.c
 LPCOpen_CSRC += $(LPCOpen)/rtc_17xx_40xx.c
 LPCOpen_CSRC += $(LPCOpen)/iocon_17xx_40xx.c
 
-#CSRC += 3rdparty/display/hy32a.c
-#CSRC += 3rdparty/display/AsciiLib.c
-
+CSRC += Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.c
+CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.ca \
+	Hy32.h Hy32LowLevel.h
 # ------- add board specific stuff to project
 BOARDSUPPORT := 
 BOARDSUPPORT += lpc17_uart_retarget.c
@@ -107,7 +107,7 @@ ifeq ($(CONFIG_LPC1768_tests),y)
   OBJ := $(addsuffix .o,$(basename $(CXX_COMMON_TESTS)))
   OBJ := $(addprefix ../common/tests/,$(OBJ))
   #$(warning OBJ=$(OBJ))
-  $(warning targets=$(targets))
+#  $(warning targets=$(targets))
 endif
 
 # ------------------------ finalize variables 
@@ -156,6 +156,7 @@ libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@echo "[create] $@"
 	@rm   -f libOpenPEARLlpc1768.a
 	@$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
+
 
 phony += depend
 depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)

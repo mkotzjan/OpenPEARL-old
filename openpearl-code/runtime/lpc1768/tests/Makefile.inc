@@ -41,18 +41,18 @@
 PLIB = OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a
 
 targets +=  \
-	tests/DataTypeTests1 \
-	tests/DataTypeTests2 \
-	tests/susp_cont_test \
-	tests/sched_demo \
-	tests/SampleBasicDationTests \
-	tests/sematest tests/sematerminate  \
-	tests/signalTest \
-	tests/clockTest \
-	tests/interruptTest \
-	tests/gpioInterrupt \
+#	tests/DataTypeTests1 \
+#	tests/DataTypeTests2 \
+#	tests/susp_cont_test \
+#	tests/sched_demo \
+#	tests/SampleBasicDationTests \
+#	tests/sematest tests/sematerminate  \
+#	tests/signalTest \
+#	tests/clockTest \
+#	tests/interruptTest \
+#	tests/gpioInterrupt \
 	tests/log_test \
-	tests/DationTests \
+#	tests/DationTests \
 #	tests/DationSuspendTerminateTests 
 	
 INCS += ../ugtest
