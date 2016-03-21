@@ -14,6 +14,9 @@ TEXFILES = 01-introduction.tex 		\
 	macrosShowResult.tex
 
 .PHONY: clean final
+include ../configuration/.config
+
+ifeq ($(CONFIG_DOC_PREPORT),y)
 
 p-report.pdf:	p-report.tex $(TEXFILES)
 	pdflatex p-report.tex
@@ -22,6 +25,7 @@ final:
 	pdflatex p-report.tex
 	pdflatex p-report.tex
 	pdflatex p-report.tex
+endif
 
 clean:
 	rm -rf p-report.cb 

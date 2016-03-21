@@ -1,6 +1,10 @@
 \documentclass{book}
 \usepackage{geometry}  % paper size
 \geometry{a4paper}     % -"-
+
+%%%% read config settings from menuconfig
+\input{../configuration/include/autoconf.tex}
+
 \usepackage[pdftex]{hyperref}
 
 \usepackage[skins,breakable]{tcolorbox}
@@ -44,8 +48,17 @@
 
 \def\OpenPEARL{{\it OpenPEARL}}
 
+% --- select desired verion of the langage report
+% ----- check first if option was selected 
+% ----- and define it as not selected, if option was not defined
+\ifx\CONFIGxDOCxPREPORTxSHOWxCHANGES\undefined
+\def\CONFIGxDOCxPREPORTxSHOWxCHANGES{0}
+\fi
+\if\CONFIGxDOCxPREPORTxSHOWxCHANGES1
 \input macrosShowChanges.tex
-%\input macrosShowResult.tex
+\else
+\input macrosShowResult.tex
+\fi
  
 \begin{document}
 

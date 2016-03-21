@@ -1,4 +1,5 @@
 source fm/compiler.fm
 source fm/runtime.fm
+source fm/doc.fm
 source fm/install.fm
 

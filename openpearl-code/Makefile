@@ -28,6 +28,10 @@ install: configuration/include/autoconf.h
 	(cd compiler/src; make clean; )
 	(cd runtime; make install; )
 	(cd compiler/src; make install; )
+ifeq ($(CONFIG_DOC_PREPORT),y)
+	(cd language_report; make clean; )
+	(cd language_report; make final; )
+endif
 	runtime/includeComposer/ic  <prl.inc >prl
 	# is created by includeComposer but not needed here
 	@rm -f sysincs.h

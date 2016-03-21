@@ -667,12 +667,26 @@ out:
 	return res;
 }
 
+// substitude underscore by 'x' in the symbol name - LaTeX dislikes 
+// underscores in macro names
+static char* toLaTeX(char * s) {
+    static char returns[128];
+
+    strcpy(returns,s);
+    s = returns;
+    while (*s) {
+       if (*s == '_') *s = 'x'; 
+       s++;
+    }
+    return returns;
+}
+     
 int conf_write_autoconf(void)
 {
 	struct symbol *sym;
 	const char *str;
 	const char *name;
-	FILE *out, *tristate, *out_h;
+	FILE *out, *tristate, *out_h, *out_tex;;
 	time_t now;
 	int i, l;
 
@@ -700,6 +714,14 @@ int conf_write_autoconf(void)
 		return 1;
 	}
 
+	out_tex = fopen(".tmpconfig.tex", "w");
+	if (!out_tex) {
+		fclose(out_h);
+		fclose(out);
+		fclose(tristate);
+		return 1;
+	}
+
 	sym = sym_lookup("KERNELVERSION", 0);
 	sym_calc_value(sym);
 	time(&now);
@@ -718,6 +740,9 @@ int conf_write_autoconf(void)
 		       "#ifndef AUTOCONF_INCLUDED\n"
 		       "#define AUTOCONF_INCLUDED\n",
 		       ctime(&now));
+	fprintf(out_tex, "%%\n"
+			  "%% Automatically generated - do not edit\n"
+			  "\n");
 
 	for_all_symbols(i, sym) {
 		sym_calc_value(sym);
@@ -740,6 +765,8 @@ int conf_write_autoconf(void)
 					fprintf(tristate, "CONFIG_%s=Y\n",
 							sym->name);
 				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
+				fprintf(out_tex, "\\def\\CONFIGx%s{1}\n", 
+					toLaTeX(sym->name));
 				break;
 			}
 			break;
@@ -783,7 +810,10 @@ int conf_write_autoconf(void)
 	fclose(out);
 	fclose(tristate);
 	fclose(out_h);
-printf("make include/autoconf.h");
+	fclose(out_tex);
+
+        if (rename(".tmpconfig.tex", "include/autoconf.tex"))
+                return 1;
 
 	name = getenv("KCONFIG_AUTOHEADER");
 	if (!name)
