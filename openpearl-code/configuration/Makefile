@@ -73,6 +73,8 @@ clean:
 		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \) \
 		-type f -print | xargs rm -f -v
 	rm -rf include
+	rm -f scripts/kconfig/conf
+	rm -f scripts/kconfig/*.o
 
 # rebuild includes for build process after altered configuration
 include/autoconf.h: .config 
