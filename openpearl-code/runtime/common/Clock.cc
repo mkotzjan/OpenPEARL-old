@@ -90,7 +90,7 @@ namespace pearlrt {
       // fmod returns a value with the same sign as 'sec'
       // thus a negative result may occur. In this case we must
       // correct this manually
-      sec = fmod(sec, 86400.0); 
+      sec = fmod(sec, 86400.0);
 
       while (sec < 0) {
          sec += 86400.0;

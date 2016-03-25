@@ -76,21 +76,25 @@ namespace pearlrt {
       enum LogLevel {DEBUG = 1, INFO = 2, WARN = 4, ERROR = 8};
 
    protected:
+      /**
+        The current log level. This is a bitwise or'd value from
+        the enum LogLevel.
+      */
       static int logLevel;
 
       /**
       format a log message
 
       \param type type of the message
-      \param line the output buffer for the message
+      \param rc the output buffer for the message
       \param format the output format like in printf
       \param args an arvg variable parameter list
 
       */
       static void doFormat(const Character<7>& type, 
-                          RefCharacter &rc,
-                         const char * format,
-                       va_list args);
+                           RefCharacter &rc,
+                           const char * format,
+                           va_list args);
       /**
       write a log message
 
@@ -100,8 +104,8 @@ namespace pearlrt {
 
       */
       virtual void doit(const Character<7>& type, 
-                         const char * format,
-                       va_list args)=0;
+                        const char * format,
+                        va_list args)=0;
 
    public:
 

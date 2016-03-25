@@ -41,39 +41,7 @@
 namespace pearlrt {
 
    /**
-   \file
-
    \brief Lpc17xx uart support
-
-   The UART may me used with different policies:
-   <ul>
-   <li>
-   As connection to a terminal with line edit functions.
-   This means, that BS will remove the last entered character and CR
-   will abort the input before  all requested data is received.
-   On output \n is translated into CR + LF
-   In this mode, the connection may be used in half duplex only.
-   This means that ether an input or an output action may be active
-   at one time.
-   <li>In raw mode, all data are transfered as specified. No early
-   termination on input is possible. The line may be used in full duplex
-   mode.
-   </ul>
-   Besides theese modes of operation, the communication protocel xon/xoff
-   may be selected. This operates in both directions.
-   On output, the reception of an XOFF will stop the transmission of more
-   characters until an XON is received.
-   On input, an XOFF is emitted in case of the reception of a data byte
-   with no active input request. The next input action (dationRead()) will
-   take the buffered input character and sends an XON.
-
-   To achieve mutual exclusion between interrupt service routine and
-   API function calls, the specific NVI interrupt is cleared and
-   set accordingly.
-
-   The UART dation allows multiple open and close operations.
-   This provied the possibility to have a normal USERDATION on the
-   interface as well as the logging output.
 
    */
 
@@ -173,12 +141,14 @@ namespace pearlrt {
       xonProtocol = (mode >> 17) & 0x01;
 
       if (lineEdit && rxBufferSize > 0) {
-          rxBuffer = (char*)pvPortMalloc(rxBufferSize);
-          if (rxBuffer == 0) {
-             Log::error("Lpc17xxUart: could not allocate receive buffer");
-             throw theIllegalParamSignal;
-          }
-          rxRingBuffer.setup(rxBuffer,rxBufferSize);
+         rxBuffer = (char*)pvPortMalloc(rxBufferSize);
+
+         if (rxBuffer == 0) {
+            Log::error("Lpc17xxUart: could not allocate receive buffer");
+            throw theIllegalParamSignal;
+         }
+
+         rxRingBuffer.setup(rxBuffer, rxBufferSize);
       }
 
       status = 0;  // not busy
@@ -200,14 +170,14 @@ namespace pearlrt {
       case 0:
          Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_UART0);
          Chip_IOCON_SetPinMuxing(LPC_IOCON, pinmuxingUART0,
-                                 sizeof(pinmuxingUART0) / sizeof(pinmuxingUART0[0]));
+                     sizeof(pinmuxingUART0) / sizeof(pinmuxingUART0[0]));
          _lpc_uart = LPC_UART0;
          break;
 
       case 2:
          Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_UART2);
          Chip_IOCON_SetPinMuxing(LPC_IOCON, pinmuxingUART2,
-                                 sizeof(pinmuxingUART2) / sizeof(pinmuxingUART2[0]));
+                     sizeof(pinmuxingUART2) / sizeof(pinmuxingUART2[0]));
          _lpc_uart = LPC_UART2;
          break;
       }
@@ -277,7 +247,8 @@ namespace pearlrt {
       return (FORWARD | ANY | PRM | IN | OUT | INOUT);
    }
 
-   Lpc17xxUart* Lpc17xxUart::dationOpen(const char * idfValue, int openParams) {
+   Lpc17xxUart* Lpc17xxUart::dationOpen(const char * idfValue,
+                                        int openParams) {
       if (openParams & (Dation::IDF | Dation::CAN)) {
          Log::error("Lpc17xxUart: does not support IDF and CAN");
          throw theIllegalParamSignal;
@@ -352,20 +323,23 @@ namespace pearlrt {
    }
 
    void Lpc17xxUart::copyRxRingBuffer() {
-       bool goOn = true;
-       char ch;
-       while (goOn && recvCommand.nbr > 0) {
-           goOn = rxRingBuffer.get(&ch);
-           if (goOn) {
-              *(recvCommand.data++) = ch;
-              recvCommand.nbr--;
-              recvCommand.nbrReceived ++;
-              if (ch == '\n') {
-                  goOn = false;   // stop delivery at end of line
-              }
-           }
-      }   
-    }
+      bool goOn = true;
+      char ch;
+
+      while (goOn && recvCommand.nbr > 0) {
+         goOn = rxRingBuffer.get(&ch);
+
+         if (goOn) {
+            *(recvCommand.data++) = ch;
+            recvCommand.nbr--;
+            recvCommand.nbrReceived ++;
+
+            if (ch == '\n') {
+               goOn = false;   // stop delivery at end of line
+            }
+         }
+      }
+   }
 
    void Lpc17xxUart::dationRead(void * destination, size_t size) {
       bool errorExit = false;
@@ -413,22 +387,24 @@ namespace pearlrt {
          if (recvCommand.nbr  > 0) {
             interruptEnable(true);
             // uart interrupt enabled --> wait until data are ready
-         
+
             xSemaphoreTake(recvCommand.blockSema, portMAX_DELAY);
             interruptEnable(false);
          }
       } else {
          // lineEdit = true
          copyRxRingBuffer();
+
          if (recvCommand.nbr  > 0) {
             interruptEnable(true);
             // uart interrupt enabled --> wait until data are ready
-         
+
             xSemaphoreTake(recvCommand.blockSema, portMAX_DELAY);
             interruptEnable(false);
             copyRxRingBuffer();
          }
       }
+
       if ((status & READ_ERRORMASK) != 0) {
          errorExit = true;
          logError();
@@ -650,7 +626,7 @@ namespace pearlrt {
             Chip_UART_SendByte(uart, *(sendCommand.data++));
          }
       } else {
-         return false;  
+         return false;
       }
 
       return true;
@@ -680,7 +656,8 @@ namespace pearlrt {
          if (ch == 0x08) {
             // backspace works only until begin of line
             char ch1;
-            if (rxRingBuffer.last(&ch1)) { 
+
+            if (rxRingBuffer.last(&ch1)) {
                // previous entered characters available
                if (ch1 != '\n') {
                   lineEditEcho.add(ch);

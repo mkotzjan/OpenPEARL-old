@@ -37,7 +37,7 @@ extern "C" {
 };
 
 #define LOGTASK
-#define ERRORMESSAGE "\n                     **** above line truncated ****\n" 
+#define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
 namespace pearlrt {
 
@@ -100,8 +100,8 @@ namespace pearlrt {
    }
 
    Log* Log::getInstance() {
-       static Log * instance = new Log();
-       return (Log*) instance; 
+      static Log * instance = new Log();
+      return (Log*) instance;
    }
 
    void Log::doit(const Character<7>& type,
@@ -143,7 +143,7 @@ namespace pearlrt {
                       va_list args) {
       Character<128> line;
       RefCharacter rc(line);
-     
+
       try {
          doFormat(type, rc, format, args);
 

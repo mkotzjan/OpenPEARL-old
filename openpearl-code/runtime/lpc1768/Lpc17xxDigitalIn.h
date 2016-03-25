@@ -79,9 +79,8 @@ namespace pearlrt {
 
       \param openParam open parameters if given
       \param idf pointer to IDF-value if given
-      \param rstValue pointer to error variable if given
-      \tparam S the length of the filename; the parameter idf is not
-            requred for this device
+      \returns pointer to this object itself as working object in the 
+               user dation
       \throws NotAllowedSignal, if  dation is not closed and rst is not given
       */
       SystemDationB* dationOpen(const char * idf, int openParam);
@@ -90,8 +89,6 @@ namespace pearlrt {
       Close the OctopusDigitalIn
 
       \param closeParam close parameters if given
-      \param rstValue pointer to error variable if given
-
 
       \throws NotAllowedSignal, if  dation is not opened and rst is not given
       */
