@@ -55,6 +55,37 @@ namespace pearlrt {
    on the device. It should no problem, since the operations
    are secured by a mutex.
 
+
+   The UART may me used with different policies:
+   <ul>
+   <li>
+   As connection to a terminal with line edit functions.
+   This means, that BS will remove the last entered character and CR
+   will abort the input before  all requested data is received.
+   On output \n is translated into CR + LF
+   In this mode, the connection may be used in half duplex only.
+   This means that ether an input or an output action may be active
+   at one time.
+   <li>In raw mode, all data are transfered as specified. No early
+   termination on input is possible. The line may be used in full duplex
+   mode.
+   </ul>
+   Besides theese modes of operation, the communication protocel xon/xoff
+   may be selected. This operates in both directions.
+   On output, the reception of an XOFF will stop the transmission of more
+   characters until an XON is received.
+   On input, an XOFF is emitted in case of the reception of a data byte
+   with no active input request. The next input action (dationRead()) will
+   take the buffered input character and sends an XON.
+
+   To achieve mutual exclusion between interrupt service routine and
+   API function calls, the specific NVI interrupt is cleared and
+   set accordingly.
+
+   The UART dation allows multiple open and close operations.
+   This provied the possibility to have a normal USERDATION on the
+   interface as well as the logging output.
+
    */
    class Lpc17xxUart : public SystemDationNB {
    private:
@@ -62,7 +93,7 @@ namespace pearlrt {
       int rxBufferSize; // size of the receive buffer in line edit mode
       int rxBytes;	// number of bytes in receive buffer in line edit mode
       char * rxBuffer;  // receive buffer in line edit mode
-      RingBuffer<char> rxRingBuffer; 
+      RingBuffer<char> rxRingBuffer;
       bool lineEdit;    // line edit (BS) desired
       bool xonProtocol; // operate with xon/xoff toe remore system
       Mutex mutex; 	// mutex for objects data
@@ -79,11 +110,11 @@ namespace pearlrt {
          SemaphoreHandle_t blockSema;
       } sendCommand, recvCommand;
 
-      char echoBuffer[10]; 
-      RingBuffer<char> lineEditEcho; 
-      char bufferedInputChar;	// one char may be buffered even if no 
-				// input is active to run xon/xoff protocol
-				// this stores the last received character
+      char echoBuffer[10];
+      RingBuffer<char> lineEditEcho;
+      char bufferedInputChar;	// one char may be buffered even if no
+      // input is active to run xon/xoff protocol
+      // this stores the last received character
       char unGetChar;		// character for unget
 
    public:
@@ -98,8 +129,8 @@ namespace pearlrt {
       \param parity the desired type of parity ('O', 'E', 'N')
       \param mode multiplex parameter
                   <ul>
-		  <li>Bit 0-15: rx buffer size;
-			 (must be > 0) if line edit is selected
+        <li>Bit 0-15: rx buffer size;
+      	 (must be > 0) if line edit is selected
                   <li>Bit 16: 1= line edit on
                   <li>Bit 17: 1=xon/xoff protocol enabled
                   </ul>
@@ -130,6 +161,7 @@ namespace pearlrt {
 
        \param idfValue is not supported should be NULL
        \param openParam nothing supported; should be 0
+       \returns pointer to this object as working object
       */
       Lpc17xxUart * dationOpen(const char * idfValue, int openParam);
 
@@ -140,6 +172,13 @@ namespace pearlrt {
       void dationWrite(void * destination, size_t size);
       void dationUnGetChar(const char c);
 
+      /**
+       interrupt handler for both uart channels. 
+       This method is called from the real interrupt service routines
+       and delegates the operation to the concrete uart objects
+      
+      \param uartIndex numbe of the uart.
+      */
       static void irqHandler(int uartIndex);
    private:
       void treatInterrupt();

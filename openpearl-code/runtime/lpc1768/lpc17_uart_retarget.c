@@ -66,7 +66,8 @@ int __attribute__((used)) _read(int fd, char *ptr, int len) {
             ptr --;
          }
 
-         // test for newline -- \r is not transmitted by lpc21isp in terminal mode
+         // test for newline
+         // \r is not transmitted by lpc21isp in terminal mode
       } else if (*ptr == '\n') {
          sendChar(*ptr); // local echo
          *ptr = '\n';

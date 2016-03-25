@@ -41,7 +41,10 @@
 
 namespace pearlrt {
 
-   Hy32::Hy32(int orienation) {
+   const uint16_t Hy32::lineSpacingSmall = 2;
+   const uint16_t Hy32::lineSpacingBig = 2;
+
+   Hy32::Hy32(int orientation) {
       if (orientation < 0 || orientation > 3) {
          Log::error("Hy32: illegal orientation: %d", orientation);
          throw theIllegalParamSignal;
@@ -62,12 +65,14 @@ namespace pearlrt {
 
       xmax = device ->getXMax();
       ymax = device ->getYMax();
-      charWidth = device->getCharWidth();
-      charHeight = device->getCharHeight();
-      lineSpacing = 1;
 
       device->clear(colorMap[colorIndexBackground]);
-      device->setFont(0);
+      lineSpacing = lineSpacingSmall ;
+      device->setFont(0, lineSpacing);
+      adjustGeometry();
+
+      line = 0;
+      col = 0;
 
       mutex.name("Hy32");
       nbrOpenUserDations = 0;
@@ -120,11 +125,34 @@ namespace pearlrt {
       throw theIllegalParamSignal;
    }
 
+   uint16_t Hy32::xOfCurrentPos() {
+      return col * charWidth;
+   }
+
+   uint16_t Hy32::yOfCurrentPos() {
+      return line * (charHeight + lineSpacing);
+   }
+
+   void Hy32::adjustGeometry() {
+      charWidth = device->getCharWidth();
+      charHeight = device->getCharHeight();
+      lines = ymax / (charHeight + lineSpacing);
+      cols = xmax / charWidth;
+
+      if (col >= cols) {
+         col = cols - 1;
+      }
+
+      if (line >= lines) {
+         line = lines - 1;
+      }
+   }
+
    void Hy32::dationWrite(void * destination, size_t size) {
       static const char csiString[] = {'\033', '[', 0};
       char chString[2];
-
       char * ch;
+      uint16_t x0, y0; // pixel coordinates for clear
 
       if (nbrOpenUserDations == 0) {
          Log::error("Hy32: not opened");
@@ -141,17 +169,30 @@ namespace pearlrt {
             if ((*ch) == 0x1b) {
                state = 1;
             } else if ((*ch) == '\n') {
-              col = 0;
-              line ++;
+               col = 0;
+               line ++;
+
+               if (line >= lines) {
+                  line = 0;
+               }
             } else {
                chString[0] = *ch;
                chString[1] = 0;
-               device->text(col*charWidth, 
-                            line*(charHeight+lineSpacing)+lineSpacing/2,
+               device->text(col * charWidth,
+                            line * (charHeight + lineSpacing),
                             chString,
                             colorMap[colorIndexForeground],
                             colorMap[colorIndexBackground]);
                col ++;
+
+               if (col >= cols) {
+                  col = 0;
+                  line ++;
+
+                  if (line >= lines) {
+                     line = 0;
+                  }
+               }
             }
 
             break;
@@ -162,9 +203,9 @@ namespace pearlrt {
                p1 = 0;
                p2 = 0;
             } else {
-               device->text(col*charWidth, 
-                            line*(charHeight+lineSpacing)+lineSpacing/2,
-			    csiString,
+               device->text(col * charWidth,
+                            line * (charHeight + lineSpacing),
+                            csiString,
                             colorMap[colorIndexForeground],
                             colorMap[colorIndexBackground]);
                col += 2;
@@ -187,25 +228,90 @@ namespace pearlrt {
                   break;
 
                case 'J':  // clear
-printf("clear mode %d\n", p1);
+
+                  // the bahavior of the text cursor location is not
+                  // clearly defined
+                  // we implement the behavior of xterm and linux terminal
+                  // they leave the text cursor unchanged
+                  switch (p1) {
+                  case 0: // to end of screen
+                     x0 = xOfCurrentPos();
+                     y0 = yOfCurrentPos();
+
+                     if (col > 0) {
+                        device->rectangle(
+                           x0, y0,
+                           xmax, y0 + charHeight + lineSpacing - 1,
+                           colorMap[colorIndexBackground]);
+
+                        device->rectangle(
+                           0, y0 + charHeight + lineSpacing,
+                           xmax, ymax,
+                           colorMap[colorIndexBackground]);
+
+                     } else {
+                        device->rectangle(x0, y0, xmax, ymax,
+                                          colorMap[colorIndexBackground]);
+                     }
+
+                     break;
+
+                  case 1: // to begin of screen
+                     x0 = xOfCurrentPos();
+                     y0 = yOfCurrentPos();
+
+                     if (col > 0) {
+                        device->rectangle(
+                           0, 0, xmax, y0 - 1,
+                           colorMap[colorIndexBackground]);
+                        device->rectangle(
+                           0, y0,
+                           x0 - 1, y0 + charHeight + lineSpacing - 1,
+                           colorMap[colorIndexBackground]);
+                     } else {
+                        device->rectangle(0, 0, xmax, y0 - 1,
+                                          colorMap[colorIndexBackground]);
+                     }
+
+                     break;
+
+                  case 2: // complete screen
+                     device->clear(colorMap[colorIndexBackground]);
+                     break;
+                  }
+
+                  state = 0;
                   break;
 
                case 'm': // color/font
-                 if (p1 >= 0 && p1 <= 7) {
-                     colorIndexForeground = p1;
-                 } else if (p1 >= 40 && p1 <= 46 ) {
-                     colorIndexBackground = p1;
-                 } else {
-printf("color/font %d\n", p1);
-                 }
+                  if (p1 >= 30 && p1 <= 37) {
+                     colorIndexForeground = p1 - 30;
+                  } else if (p1 >= 40 && p1 <= 47) {
+                     colorIndexBackground = p1 - 40;
+                  } else if (p1 == 10) {
+                     lineSpacing = lineSpacingSmall;
+                     device->setFont(0, lineSpacing);
+                     adjustGeometry();
+                  } else if (p1 == 11) {
+                     lineSpacing = lineSpacingBig;
+                     device->setFont(1, lineSpacing);
+                     adjustGeometry();
+                  } else {
+                     // unknown command -- ignore it
+                     Log::warn("Hy32: illegal color/font: %d", p1);
+                  }
+
+                  state = 0;
+
                   break;
 
                default:   // illegal char
-                  printf("illegal esc sequence -- dump string missing\n");
+                  // unknown command -- ignore it
+                  Log::warn("Hy32: unkwnown esc sequence (%x)", *ch);
+                  state = 0;
                   break;
                }
 
-               state = 0;
             }
 
             break;
@@ -216,11 +322,22 @@ printf("color/font %d\n", p1);
             } else {
                switch (*ch) {
                case 'H': // set position
-printf("set cursor %d,%d\n", p1,p2);
+                  if (p1 > 0 && p2 > 0 && p1 <= lines && p2 <= cols) {
+                     line = p1-1;
+                     col = p2-1;
+                  } else {
+                     // illegal coordinate -- ignore it
+                     Log::warn("Hy32: coordinate (%d,%d) outside display area",
+                        p1, p2);
+                  }
+
+                  state = 0;
                   break;
 
                default:   // illegal char
-                  printf("illegal esc sequence -- dump string missing\n");
+                  // unknown command -- ignore it
+                  Log::warn("Hy32: unkwnown esc sequence (%x)", *ch);
+                  state = 0;
                   break;
                }
 

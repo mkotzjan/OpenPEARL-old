@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2015 Rainer Mueller
  All rights reserved.
 
@@ -28,7 +28,6 @@
 */
 
 /**
-\file
 
 \brief a system clock source, with time interpolation between two
     ticks

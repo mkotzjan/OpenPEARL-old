@@ -41,7 +41,14 @@ job is a function pointer to a callback routine
 param is a pointer, e.g. to the current object
 */
 typedef struct {
+   /**
+     the pointer to the callback function
+   */
    void (*job)(void *param);
+
+   /**
+      the parameter for the callback function
+   */
    void * param;
 } ServiceJob;
 

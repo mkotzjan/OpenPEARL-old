@@ -117,6 +117,86 @@ is implemented in e.q. \verb|lpc17_uart_retarget.c|. The implementation
 in \verb|lpc17_uart_retarget.c| works with simple polling on the line status
 register. This behavior does not cooperate von \verb|Lpc17xxUart(0,...)|
 
+
+\subsection{Hy32}
+The LCD graphics display supports a resolution of 320x240 Pixel with
+a color resolution of 5 bit (red and blue) 6 bit (green).
+
+The display may be used in all 4 orientations. The device supports
+text positioning and output with two fonts. The positioning is done with
+a subset of vt100 esc-sequences.
+The device supports no scrolling, since only vertical scroll is supported 
+by hardware.
+
+The following codes are supported. Note that CSI stand for
+control sequence initiator, which is an ESC-character abd and opening square 
+brace (\verb|"\033["| in C-notation):
+\begin{description}
+\item[{\em CSI}  {\em li};{\em col} H] 
+    Set position. {\em li} and {\em col} are the line
+    number and column number starting at 1 each. Both elements may contain
+    1 or 2 digits (without leading space). Example \verb|\033[01;01H|
+ is cursor home
+\item[{\em CSI}  {\em n} J]  clear screen\\
+n=0: fill screen from current cursor location to the end of the 
+    screen with the current background color
+\\
+n=1: fill screen from current cursor location to the beginning of the 
+    screen with the current background color
+\\
+n=2: fill entire screen with the current background color
+\item[{\em CSI}  {\em n} m] {\em set Grafic Rendition}
+    \begin{description}
+    \item[n=10] select normal font (here: small font)
+    \item[n=11] select alternate font (here: big font)
+    \item[n=30-37] set foreground color according table below (n=30+index)
+    \item[n=40-47] set background color according table below (n=40+index)
+    \end{description}
+\end{description}
+
+Note that the calculation of the text position is done according the 
+selected font(-size). If the font size is changed the new font geometry 
+is used to calculate the pixel adress. The vertical spacing between two lines
+is set to 2.
+
+Note that clearing the display does no affect the cursor location, 
+font selection and color setting.
+
+\begin{tabular}{|l|l|c|}
+\hline
+index & color  & rgb \\
+\hline
+0 & black  & 0,0,0\\
+1 & red  & 170,0,0\\
+2 & green & 0, 170, 0 \\
+3 & yellow & 255,255,0 ???\\
+4 & blue & 0,0,170\\
+5 & magenta & 170,0,170\\
+6 & cyan & 0,170,170\\
+7 &white & 255,255,255\\
+\hline
+\end{tabular}
+
+Screen capacity:
+
+\begin{tabular}{|l|l|l|l|}
+\hline
+Orientation & Font & Lines & Columns \\
+\hline
+ 0 & small & 22 & 30  \\
+   & big   & 14 & 15 \\
+\hline
+1 & small & 17 & 40 \\
+  & big &   13 & 20 \\
+\hline
+ 2 & small & 22 & 30  \\
+   & big   & 14 & 15 \\
+\hline
+3 & small & 17 & 40 \\
+  & big &   13 & 20 \\
+\hline
+\end{tabular}
+
 \subsection{Device Summary}
 Table \ref{lpc17_device_list} contains all avaliable device drivers 
 with additional information for the system overview.
@@ -124,7 +204,7 @@ with additional information for the system overview.
 \begin{table}
 \begin{tabular}{|l|r|r|}
 \hline
-Name             & Int\_Prio & Except\_nbr(s) \\
+Name             & Int\_Prio & Excepion Number(s) \\
 \hline
 Lpc17xxRTC       &  5 & 33 \\ 
 Lpc17xxTimer0    &  5 &  17 \\
@@ -138,76 +218,4 @@ Lpc15xxUart      & 10 &  21(UART0), 23(UART2) \\
 
 The interrupt execution is preemptive, with lower priority first and 
 sequential within same priority starting with lower exception number first.
-
-\subsection{Hy32}
-The LCD graphocs display supports a resolution of 320x240 Pixel with
-a color resolution of 5 bit (red and blue) 6 bit (green).
-
-The display may be used in all 4 orientations. The decive supports
-text positioning and output with two fonts. The positioning is done with
-vt100 compatible esc-sequences.
-The device supports not scrolling, since only vertical scroll is supported 
-be the hy32 display.
-
-The following ANSI codes are supported. Note that CSI stand for
-control sequence initiator, which is an ESC-character abd and opening square 
-brace (\verb|"\033["| in c-notation):
-\begin{description}
-\item[{\em CSI}  {\em li};{\em col} H] 
-    Set position. {\em li} and {\em col} are the line
-    number and column number starting at 1 each. Both elements may contain
-    1 or 2 digits (without leading space). Example \verb|\033[01;01H|
- is cursor home
-\item[{\em CSI}  1L] insert one line at current location. 
-\item[{\em CSI}  {\em n} J] 
-n=0: clear screen from current cursor location to the end of the 
-    screen
-\\
-n=1: clear screen from current cursor location to the beginning of the 
-    screen
-\\
-n=2: clear entire screen and set the cursor home
-\item[{\em CSI}  10] select normal font (8x12 dots/character) 
-\item[{\em CSI}  11] select alternate (bigger) font
-\item[{\em CSI}  {\em n} m] , with n = '0' .. '7' select color n-'0' for characters (see tavle below)
-\item[{\em CSI}  {\em n} m] , with n = '@' .. 'I' select color n-'@' for character background
-(see table below)
-
-\end{description}
-
-\begin{tabular}{|l|l|c|}
-\hline
-number & color  & rgb \\
-\hline
-0 & black  & 0,0,0\\
-1 & red  & 170,0,0\\
-2 & green & 0, 170, 0 \\
-3 & yellow & 255,255,0 ???\\
-4 & blue & 0,0,170\\
-5 & magenta & 170,0,170\\
-6 & cyan  0,170,170\\
-7 white & 255,255,255\\
-\hline
-\end{tabular}
-
-Screen capacity:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Orientation & Font & Lines & Columns \\
-\hline
- 0 & small & 26 & 30  \\
-   & big   & 18 & 15 \\
-\hline
-1 & small & 40 & 18 \\
-  & big &   14 & 20 \\
-\hline
- 2 & small & 26 & 30  \\
-   & big   & 18 & 15 \\
-\hline
-3 & small & 40 & 18 \\
-  & big &   14 & 20 \\
-\hline
-\end{tabular}
-
 

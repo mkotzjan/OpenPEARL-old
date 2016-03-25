@@ -90,6 +90,7 @@ namespace pearlrt {
       */
       static void info(const char * format, ...)
       __attribute__((format(printf, 1, 2)));
+
       /**
       write an error log message
 
@@ -99,6 +100,12 @@ namespace pearlrt {
       static void error(const char * format, ...)
       __attribute__((format(printf, 1, 2)));
 
+      /**
+      write a warn log message
+
+      \param format the message format (like in printf) to be written
+      \param ... as required in format
+      */
       static void warn(const char * format, ...)
       __attribute__((format(printf, 1, 2)));
 

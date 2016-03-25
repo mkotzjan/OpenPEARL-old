@@ -1,10 +1,39 @@
+/*
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "Hy32LowLevel.h"
 #include <stdlib.h> // abs()
-#include <stdio.h>
 
 #include "chip.h"
 #include "gpio_17xx_40xx.h"
-
+#include "Signals.h"
+#include "Log.h"
 
 namespace pearlrt {
 
@@ -97,14 +126,14 @@ namespace pearlrt {
    static uint16_t hy32Read(void) {
       uint16_t value;
 
-      //LPC_GPIO2->FIODIR &= ~(0xFF);              /* P2.0...P2.7 Input */
+      //LPC_GPIO2->FIODIR &= ~(0xFF);      /* P2.0...P2.7 Input */
       LPC_GPIO2->DIR = 0x000;
-      LCD_DIR(0);		   				           /* Interface B->A */
-      LCD_EN(0);	                               /* Enable 2B->2A */
-      wait_delay(30);							   /* delay some times */
-      value = LPC_GPIO2->PIN;                /* Read D8..D15 */
-      LCD_EN(1);	                               /* Enable 1B->1A */
-      wait_delay(30);							   /* delay some times */
+      LCD_DIR(0);		           /* Interface B->A */
+      LCD_EN(0);	                   /* Enable 2B->2A */
+      wait_delay(30);		           /* delay some times */
+      value = LPC_GPIO2->PIN;              /* Read D8..D15 */
+      LCD_EN(1);	                   /* Enable 1B->1A */
+      wait_delay(30);			   /* delay some times */
       value = (value << 8) | (0x0ff & LPC_GPIO2->PIN); /* Read D0..D7 */
       LCD_DIR(1);
       return  value;
@@ -266,14 +295,15 @@ namespace pearlrt {
             delay_ms(50);
          }
       } else {
-         printf("unknown display controller\n");
+         Log::error("Hy32LowLevel: unknown display controller %x", DeviceCode);
+         throw theInternalDationSignal;
       }
 
       switch (orientation) {
       default:
-         printf("illegal orientation %d\n", orientation);
-         orientation = 0;
-         break;
+         Log::error("Hy32LowLevel: illegal orientation requested %d",
+                    orientation);
+         throw theInternalDationSignal;
 
       case 0: // portrait connector down
          xmax = 239;
@@ -301,7 +331,7 @@ namespace pearlrt {
       }
 
       delay_ms(50);   /* delay 50 ms for safety */
-      setFont(0);
+      setFont(0, 2);
    }
 
    uint16_t Hy32LowLevel::color(uint16_t red, uint16_t green, uint16_t blue) {
@@ -339,22 +369,12 @@ namespace pearlrt {
       return (rgb);
    }
 
-   uint16_t LCD_GetPoint(uint16_t Xpos, uint16_t Ypos) {
-      uint16_t dummy;
-
-      setCursor(Xpos, Ypos);
-      hy32WriteIndex(0x0022);
-
-      dummy = hy32ReadData();   /* Empty read */
-      dummy = hy32ReadData();
-      return  dummy;
-   }
 #endif
 
    void Hy32LowLevel::setPoint(uint16_t x, uint16_t y, uint16_t color) {
       if (x > xmax || y > ymax) {
-         printf("point out of region (%d,%d)\n", x, y);
-         return;
+         Log::error("Hy32LowLevel: point out of region (%d,%d)", x, y);
+         throw theInternalDationSignal;
       }
 
       setCursor(x, y);
@@ -392,8 +412,22 @@ namespace pearlrt {
       }
    }
 
-// put one character
-// starting pos is upper left of the character box
+   void Hy32LowLevel::showLineSpacing(uint16_t x, uint16_t y,
+                                      uint16_t ls, uint16_t bkColor) {
+      uint16_t i, j;
+
+      // set upper or lower lineSpacing
+      for (i = 0; i < ls; i++) {
+         setPoint(x, y + i, bkColor);
+
+         for (j = 1; j < charWidth; j++) {
+            hy32WriteReg(0x0022, bkColor);
+         }
+      }
+   }
+
+   // put one character in small character set
+   // starting pos is upper left of the character box
    void Hy32LowLevel::putSmallChar(uint16_t Xpos, uint16_t Ypos, char ch,
                                    uint16_t charColor, uint16_t bkColor) {
       uint16_t i, j;
@@ -406,6 +440,11 @@ namespace pearlrt {
          charIsOk = 0;
       }
 
+      showLineSpacing(Xpos, Ypos, lineSpacingUp, bkColor);
+      Ypos += lineSpacingUp;
+
+      // display is set to autoincrement of write address from left to right
+      // set the adress and pixel only for first pixel in a row in the
       for (i = 0; i < charHeight; i++) {
          if (charIsOk) {
             tmp_char = SmallFont[charHeight * (ch - 32) + 4 + i];
@@ -413,8 +452,6 @@ namespace pearlrt {
             tmp_char = (i & 1) ? 0x55 : 0xaa;
          }
 
-         // display is set to autoincrement of write address from left to right
-         // set the adress and pixel only for first pixel in a row in the
          //character
          if ((tmp_char & 0x080) == 0x080) {
             pixel = charColor;
@@ -432,6 +469,10 @@ namespace pearlrt {
             hy32WriteReg(0x0022, pixel);
          }
       }
+
+      Ypos += charHeight;
+
+      showLineSpacing(Xpos, Ypos, lineSpacingDown, bkColor);
    }
 
 // put one character
@@ -447,6 +488,9 @@ namespace pearlrt {
       if (ch < 32 || ch > 127) {
          charIsOk = 0;
       }
+
+      showLineSpacing(Xpos, Ypos, lineSpacingUp, bkColor);
+      Ypos += lineSpacingUp;
 
       for (i = 0; i < charHeight; i++) {
          if (charIsOk) {
@@ -470,7 +514,7 @@ namespace pearlrt {
          // this speeds up by a factor of approximatelly 2
          for (j = 1; j < 8; j++) {
             pixel = (((tmp_char >> (7 - j)) & 0x01) == 0x01) ? charColor :
-                                                               bkColor;
+                    bkColor;
             hy32WriteReg(0x0022, pixel);
          }
 
@@ -487,20 +531,35 @@ namespace pearlrt {
             hy32WriteReg(0x0022, pixel);
          }
       }
+
+      Ypos += charHeight;
+
+      showLineSpacing(Xpos, Ypos, lineSpacingDown, bkColor);
    }
 
-   void Hy32LowLevel::setFont(int fontNumber) {
+   void Hy32LowLevel::setFont(int fontNumber, int lineSpacing) {
       if (fontNumber == 0 || fontNumber == 1) {
          font = fontNumber;
          charWidth = *fonts[font];
          charHeight = *(fonts[font] + 1);
       } else {
-         printf("Illegal font number\n");
+         Log::error("Hy32LowLevel: Illegal font number (%d)", fontNumber);
+         throw theInternalDationSignal;
       }
+
+      if (lineSpacing < 0 || lineSpacing > ymax - charHeight) {
+         Log::error("Hy32LowLevel: Illegal line spacing (%d)", lineSpacing);
+         throw theInternalDationSignal;
+      }
+
+      // distribute equally to top and bottom of line. If lineSpacing is
+      // odd, the lower part will be 1 pixel larger
+      lineSpacingUp = lineSpacing / 2;
+      lineSpacingDown = (lineSpacing + 1) / 2;
    }
 
-// print string
-// starting pos is upper left of the first character box
+   // print string
+   // starting pos is upper left of the first character box
    void Hy32LowLevel::text(uint16_t x, uint16_t y, const char *str,
                            const uint16_t Color, const uint16_t bkColor) {
       char TempChar;
@@ -554,7 +613,7 @@ namespace pearlrt {
       y0 = (y0 > ymax) ? ymax : y0;
       y1 = (y1 > ymax) ? ymax : y1;
 
-      // perform filling to x direction
+      // perform filling to x direction like the characters are written
       for (temp = y0; temp <= y1; temp ++) {
          setPoint(x0, temp, color);
 

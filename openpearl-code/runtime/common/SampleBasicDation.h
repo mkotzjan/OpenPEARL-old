@@ -81,6 +81,8 @@ namespace pearlrt {
 
       \param openParam open parameters if given
       \param idf pointer to IDF-value if given
+      \returns pointer to the SampleDationB object itself as working
+               object in the user dation
 
       \throws NotAllowedSignal, if  dation is not closed and rst is not given
       */

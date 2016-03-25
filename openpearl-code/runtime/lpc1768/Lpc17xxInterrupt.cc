@@ -40,7 +40,6 @@
 namespace pearlrt {
 
    /**
-   \file
 
    \brief Lpc17xx GPIO bits as interrupt source
    */
@@ -156,7 +155,6 @@ namespace pearlrt {
          break;
       }
    }
-   extern int cccc;
 }
 
 

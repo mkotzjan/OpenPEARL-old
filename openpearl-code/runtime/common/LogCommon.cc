@@ -30,7 +30,8 @@
 
 namespace pearlrt {
 
-   int LogCommon::logLevel = Log::WARN | Log::ERROR;// | Log::INFO | Log::DEBUG ;
+   int LogCommon::logLevel = Log::WARN | Log::ERROR;
+   //int LogCommon::logLevel = Log::WARN | Log::ERROR | Log::INFO | Log::DEBUG;
 
    static void addInt(int value, RefCharacter & rc) {
       int l;  // nbr of digits
@@ -156,9 +157,9 @@ namespace pearlrt {
    }
 
    void LogCommon::doFormat(const Character<7>& type,
-      		RefCharacter & rc,
-                  const char * format,
-                  va_list args) {
+                            RefCharacter & rc,
+                            const char * format,
+                            va_list args) {
       const char * rp;   // pointer in format string
       RefCharSink sink(rc);
       bool percentFound = false;
@@ -171,100 +172,100 @@ namespace pearlrt {
       char * sPtr;
       rc.clear();
 
-         Clock c = Clock::now();
-         PutClock::toT(c, 15, 6, sink);
-         rc.add(' ');
-         rc.add(type);
-         // simulate vsnprintf with formats %s, %d, %u
-         rp = format;
+      Clock c = Clock::now();
+      PutClock::toT(c, 15, 6, sink);
+      rc.add(' ');
+      rc.add(type);
+      // simulate vsnprintf with formats %s, %d, %u
+      rp = format;
 
-         while (*rp) {  // repeat until end of string
-            if (*rp == '%') {
-               percentFound = true;
-               decimalFound = false;
-               precisionComplete = false;
-               precision = 6;
+      while (*rp) {  // repeat until end of string
+         if (*rp == '%') {
+            percentFound = true;
+            decimalFound = false;
+            precisionComplete = false;
+            precision = 6;
+            rp ++;
+         } else if (decimalFound && precisionComplete == false) {
+            // read precision
+            if (*rp >= '0' && *rp <= '9') {
+               precision *= 10;
+               precision += (*rp) - '0';
                rp ++;
-            } else if (decimalFound && precisionComplete == false) {
-               // read precision
-               if (*rp >= '0' && *rp <= '9') {
-                  precision *= 10;
-                  precision += (*rp) - '0';
-                  rp ++;
-               } else {
-                  precisionComplete = true;
-               }
-            } else if (percentFound) {
-               switch (*(rp)) {
-               case '.':
-                  decimalFound = true;
-                  precisionComplete = false;
-                  precision = 0;
-                  rp ++;
-                  break;
-
-               case 'f':
-                  fVal = va_arg(args, double);
-                  addFloat(fVal, precision, rc);
-                  percentFound = false;
-                  rp ++;
-                  break;
-
-               case 'x':
-                  iVal = va_arg(args, int);
-                  addHexInt(iVal, rc);
-                  percentFound = false;
-                  rp ++;
-                  break;
-
-               case 'd':
-                  iVal = va_arg(args, int);
-                  addInt(iVal, rc);
-                  percentFound = false;
-                  rp ++;
-                  break;
-
-               case 'u':
-                  uiVal = va_arg(args, unsigned int);
-                  addUInt(uiVal, rc);
-                  percentFound = false;
-                  rp ++;
-                  break;
-
-               case 's':
-                  sPtr = va_arg(args, char *);
-
-                  while (*sPtr) {
-                     rc.add(*sPtr);
-                     sPtr ++;
-                  }
-
-                  percentFound = false;
-                  rp ++;
-                  break;
-
-               case 'c':
-                  iVal = va_arg(args, int);
-                  rc.add(iVal);
-                  percentFound = false;
-                  rp ++;
-                  break;
-
-               default:
-                  percentFound = false;
-                  rc.add('%');
-                  rc.add(*(rp + 1));
-                  rp += 2;
-                  break;
-               }
             } else {
-               rc.add(*rp);
-               rp ++;
+               precisionComplete = true;
             }
-         }
+         } else if (percentFound) {
+            switch (*(rp)) {
+            case '.':
+               decimalFound = true;
+               precisionComplete = false;
+               precision = 0;
+               rp ++;
+               break;
 
-         rc.add('\n');
-  }
+            case 'f':
+               fVal = va_arg(args, double);
+               addFloat(fVal, precision, rc);
+               percentFound = false;
+               rp ++;
+               break;
+
+            case 'x':
+               iVal = va_arg(args, int);
+               addHexInt(iVal, rc);
+               percentFound = false;
+               rp ++;
+               break;
+
+            case 'd':
+               iVal = va_arg(args, int);
+               addInt(iVal, rc);
+               percentFound = false;
+               rp ++;
+               break;
+
+            case 'u':
+               uiVal = va_arg(args, unsigned int);
+               addUInt(uiVal, rc);
+               percentFound = false;
+               rp ++;
+               break;
+
+            case 's':
+               sPtr = va_arg(args, char *);
+
+               while (*sPtr) {
+                  rc.add(*sPtr);
+                  sPtr ++;
+               }
+
+               percentFound = false;
+               rp ++;
+               break;
+
+            case 'c':
+               iVal = va_arg(args, int);
+               rc.add(iVal);
+               percentFound = false;
+               rp ++;
+               break;
+
+            default:
+               percentFound = false;
+               rc.add('%');
+               rc.add(*(rp + 1));
+               rp += 2;
+               break;
+            }
+         } else {
+            rc.add(*rp);
+            rp ++;
+         }
+      }
+
+      rc.add('\n');
+   }
 
    void LogCommon::setLevel(int level) {
       logLevel = level;

@@ -513,7 +513,7 @@ namespace pearlrt {
       /**
       return the abs value of the Fixed
 
-      \throws FixedRangexception, if x had the  minimum value
+      \throws FixedRangSignal, if x had the  minimum value
 
       \returns the abolute value of the Fixed
       */
@@ -551,7 +551,7 @@ namespace pearlrt {
       add operation (dyadic)
 
       \param rhs the second paramater of the difference
-      \returns difference between the internal value and the parameter
+      \returns sum of the internal value and the parameter
       \throws FixedRangeSignal if the difference would exceed the value
               range of the fixed type
       */
@@ -726,22 +726,25 @@ namespace pearlrt {
    /**
    add operation
 
+   \param lhs the first paramater of the addition
    \param rhs the second paramater of the addition
-   \returns sum of internal value and the parameter
+   \returns sum of the given parameters
    \throws FixedRangeSignal if the sum would exceed the value
            range of the fixed type
    */
    template<int S, int P>
    Fixed < (S > P) ? S : P > operator+ (Fixed<S> lhs, const Fixed<P> & rhs) {
-      Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
+      Fixed < (S > P) ? S : P > l(lhs.x);
+      Fixed < (S > P) ? S : P > r(rhs.x);
       return l.add(r);
    }
 
    /**
    minus operation
 
+   \param lhs the first paramater of the substraction
    \param rhs the second paramater of the substraction
-   \returns difference of internal value and the parameter
+   \returns difference of given parameter (lhs - rhs)
    \throws FixedRangeSignal if the difference would exceed the value
            range of the fixed type
    */
@@ -755,7 +758,7 @@ namespace pearlrt {
    multiply operation
 
    \param rhs the second paramater of the multiplication
-   \returns product of internal value and the parameter
+   \returns product of given parameters
    \throws FixedRangeSignal if the product would exceed the value
            range of the fixed type
    */
@@ -769,7 +772,7 @@ namespace pearlrt {
    divide operation
 
    \param rhs the second parameter of the division (divisor)
-   \returns fraction of internal value and the parameter
+   \returns fraction of given parameters 
    \throws FixedRangeSignal if the product would exceed the value
            range of the fixed type
    \throws FixedDivideByZeroSignal if the divisor was 0
@@ -785,7 +788,7 @@ namespace pearlrt {
 
    \param lhs the first parameter of the modulo
    \param rhs the second parameter of the modulo
-   \returns reminder of internal value and the parameter
+   \returns reminder of the given parameters
    \throws FixedDivideByZeroSignal if the divisor was 0
    */
    template<int S, int P>
