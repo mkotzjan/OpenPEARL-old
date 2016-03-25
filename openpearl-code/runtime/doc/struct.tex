@@ -10,9 +10,91 @@ taken to be identical. C and C++ structs as not compatible
 if multiply defined.
 
 \section{TYPE}
-The type statement should be mapped on \verb|typedef|.
+The type statement should be mapped on \verb|typedef| with a suitable prefix 
+(here \verb|type_|). For details about struct nameing see next section.
+
+Example:
+\begin{PEARLCode}
+TYPE complex STRUCT [
+     real FLOAT(53);
+     imaginary FLOAT(53);
+];
+\end{PEARLCode}
+
+\begin{CppCode}
+struct _SB53B53 {
+   pearlrt::Float<53> _real;
+   pearlrt::Float<53> _imaginary;
+};
+
+typedef struct _SB53B53 type_complex; 
+\end{CppCode}
 
 \section{STRUCT}
-The struct statement should be mapped to ...??
+The struct statement should be mapped to a named C++ struct and the identifier
+of the struct is derived from the struct components.
+The C++ standard states that a C++ compiler should support at least 1024
+characters for identifiers. The g++ has no limit for the length of identifiers.
 
-{\em this section is in work}
+Each possible data type for a struct component is mapped to a letter.
+The length has a maximum length of 64. C++ provides only 63 different caharacters for the use in identifiers, so we use 1-2 digits for the length.
+If the component is an array, the number of dimensions and the limits are
+passed as \verb|_| (underscore) separated list of decimal integers.
+
+Mapping of data types to letters:
+
+\begin{tabular}{|l|c|c|}
+\hline
+Datatype & letter & REF \\
+\hline
+FIXED & A &a\\
+FLOAT & B &b\\
+BIT  & C &c\\
+CHARACTER & D &d \\
+CLOCK  & E &e \\
+DURATION & F&f \\
+TASK & & g \\
+PROC  & & h \\
+\hline
+own type & Z &z\\
+\hline
+\end{tabular}
+
+Own data types are mapped to a pattern starting with Z and the identifier
+ length followed with the identifier.
+
+Example:
+\begin{PEARLCode}
+TYPE complex STRUCT [
+     real FLOAT(53);
+     imaginary FLOAT(53);
+];
+
+... STRUCT [ 
+    x FIXED(15);
+    y FLOAT(53);
+    b(1:4) BIT(64);
+    c(10,11) complex;
+    ] ...
+
+\end{PEARLCode}
+
+\begin{CppCode}
+struct _SB53B53 {
+   pearlrt::Float<53> _real;
+   pearlrt::Float<53> _imaginary;
+};
+
+typedef struct _SB53B53 type_complex; 
+
+struct _SA15B53C641_1_4Z12type_complex2_1_10_1_11
+{
+   pearlrt::Fixed<15> _x;
+   pearlrt::Float<53> _y;
+   pearlrt::BitString<64> _b[4];
+   type_complex _complex[110];
+};
+
+
+\end{CppCode}
+
