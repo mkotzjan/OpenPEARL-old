@@ -1,4 +1,4 @@
-# super makefile for SmallPearl
+# super makefile for OpenPEARL
 # 
 -include configuration/.config
 
@@ -6,7 +6,7 @@
 
 help:
 	@echo "*************************************"
-	@echo "master make for SmallPEARL"
+	@echo "master make for OpenPEARL"
 	@echo "make build:   build compiler and runtime"
 	@echo "make install: copy build stuff to /usr/local/... (must be root)"
 	@echo "make all:     build+install"
@@ -15,7 +15,7 @@ help:
 
 all:	build install
 
-build: runtime compiler
+build: configuration/include/autoconf.h runtime compiler
 
 runtime:
 	(cd runtime; make all; )
