@@ -11,14 +11,18 @@ TEXFILES = 01-introduction.tex 		\
 	11-signals.tex			\
 	90-appendix.tex			\
 	macrosShowChanges.tex		\
-	macrosShowResult.tex
+	macrosShowResult.tex		\
+	hyperMacros.tex
+
+BNFFILES=$(wildcard *.bnf)
+
 
 .PHONY: clean final
 include ../configuration/.config
 
 ifeq ($(CONFIG_DOC_PREPORT),y)
 
-p-report.pdf:	p-report.tex $(TEXFILES)
+p-report.pdf:	p-report.tex $(TEXFILES) $(BNFFILES)
 	pdflatex p-report.tex
 
 final:

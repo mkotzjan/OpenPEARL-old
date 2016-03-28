@@ -1,0 +1,4 @@
+\begin{added}
+\htgt{ConfigurationElement} ::=\\
+\x \hlink{Identifier}$\S $ConfigurationItem [ ( \hlink{ListOfConstants} ) ];\\
+\end{added}

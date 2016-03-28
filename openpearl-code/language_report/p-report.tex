@@ -5,7 +5,12 @@
 %%%% read config settings from menuconfig
 \input{../configuration/include/autoconf.tex}
 
-\usepackage[pdftex]{hyperref}
+\usepackage[pdftex,colorlinks,linkcolor=blue]{hyperref}
+%
+% ----- abbreviations for hyperlinks on syntax definitions
+\input{hyperMacros.tex}
+\renewcommand{\htgt}{\htgtOff}  % hypertargets of syntax elements are
+				% only in the appendix
 
 \usepackage[skins,breakable]{tcolorbox}
 

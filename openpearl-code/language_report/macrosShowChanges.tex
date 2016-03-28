@@ -3,10 +3,12 @@
 
 \usepackage{soul}
 
-\colorlet{color-added}{yellow!55!} %{RGB}{0,127,127}
+\colorlet{color-added}{yellow!55!}
+%\colorlet{color-removed}{yellow!55!}
 \definecolor{color-removed}{RGB}{128,128,128}
-\colorlet{color-tobedone}{blue!5!}  %{RGB}{0,0, 15}
+\colorlet{color-tobedone}{blue!5!}
 \definecolor{color-modified}{RGB}{128,128,0}
+\definecolor{color-accepted}{RGB}{0,200,0}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,7 +36,11 @@
 }
 {\end{tcolorbox}}
 
-
+\newenvironment{accepted}%
+{\begin{tcolorbox}[colback=green!15!white,colframe=green!75!black,title=ACCEPTED]
+\parskip\baselineskip
+}
+{\end{tcolorbox}}
 
 \newcommand{\tobedoneblock}[1]{\cbcolor{color-tobedone}
 \cbstart 
@@ -84,7 +90,6 @@
 \newcommand{\addedtext}[1]{
 \cbstart
 \cbcolor{color-added}
-%\color{color-added}
 \color{black}
 \sethlcolor{color-added}
 \hl{\mbox{#1}}
@@ -93,5 +98,16 @@
 \color{black}
 }
 
+
+\newcommand{\acceptedtext}[1]{
+\cbstart
+\cbcolor{color-accepted}
+\color{black}
+\sethlcolor{color-accepted}
+\hl{\mbox{#1}}
+\cbend
+\cbcolor{black}
+\color{black}
+}
 
 

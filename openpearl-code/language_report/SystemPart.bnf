@@ -1,0 +1,14 @@
+\begin{removed}
+SystemPart ::= \\
+\x {\bf SYSTEM} ;\\
+\x \x [ UserNameDeclaration$\S $ForDationInterruptOrSignal ] $^{...}$\\
+\end{removed}
+
+\begin{added}
+\htgt{SystemPart} ::= \\
+\x {\bf SYSTEM} ;\\
+\x \x [ \\
+\x \x \x \hlink{UserNameDeclaration}$\S $ForDationInterruptOrSignal $\mid$ \\
+\x \x \x  \hlink{ConfigurationElement} \\
+\x \x ] $^{...}$\\ 
+\end{added}
