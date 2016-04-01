@@ -260,18 +260,6 @@ TEST(StdStream, putGet) {
    console.toSkip(1);
    console.toF(x, (pearlrt::Fixed<31>)5, (pearlrt::Fixed<31>)2);
    console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<31>)5, 
-                  (pearlrt::Fixed<31>)1,
-                  (pearlrt::Fixed<31>)1);
-   console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<31>)5, 
-                  (pearlrt::Fixed<31>)1,
-                  (pearlrt::Fixed<31>)0);
-   console.toSkip(1);
-   console.toF(x, (pearlrt::Fixed<31>)5, 
-                  (pearlrt::Fixed<31>)1,
-                  (pearlrt::Fixed<31>)-1);
-   console.toSkip(1);
 
    pearlrt::StdStream stdIn(0);
    pearlrt::DationPG keyboard(&stdIn,

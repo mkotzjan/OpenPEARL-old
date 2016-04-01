@@ -263,15 +263,13 @@ namespace pearlrt {
        \param f value to be printed
        \param w width of the output field
        \param d number of decimals to be used
-       \param s scale of the value on output
        \tparam  S width of the fixed value type
        */
       template<int S>
       void toF(Fixed<S> & f,
                const Fixed<31> w,
-               const Fixed<31> d = 0,
-               const Fixed<31> s = 0) {
-         PutFixed<S>::toF(f, w, d, s, sink);
+               const Fixed<31> d = 0) {
+         PutFixed<S>::toF(f, w, d, sink);
       };
 
       /**
@@ -280,15 +278,13 @@ namespace pearlrt {
       \param f value to be read
       \param w width of the input field
       \param d number of decimals to be used
-      \param s scale of the value on output
       \tparam  S width of the fixed value type
       */
       template<int S>
       void fromF(Fixed<S> & f,
                  const Fixed<31> w,
-                 const Fixed<31> d = 0,
-                 const Fixed<31> s = 0) {
-         GetFixed<S>::fromF(f, w, d, s, source);
+                 const Fixed<31> d = 0) {
+         GetFixed<S>::fromF(f, w, d, source);
       };
 
 

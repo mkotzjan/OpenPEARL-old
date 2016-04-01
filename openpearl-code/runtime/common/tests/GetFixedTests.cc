@@ -67,15 +67,15 @@ TEST(GetFixed, conversions) {
       pearlrt::Character<30> d(" 12        X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 6, 0, 0, source));
+      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 6, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12)).getBoolean());
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 3, 0, 0, source));
+      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 3, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12)).getBoolean());
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 2, 0, 0, source));
+      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 2, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1)).getBoolean());
-      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 2, 0, 0, source));
+      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 2, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(2)).getBoolean());
    }
    // illegal w,d
@@ -85,13 +85,13 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 0, 0, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, 0, 0, source),
          pearlrt::FixedFormatSignal);
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, -1, 0, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, -1, 0, source),
          pearlrt::FixedFormatSignal);
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, -1, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, 6, -1, source),
          pearlrt::FixedFormatSignal);
    }
    // rounding
@@ -100,7 +100,7 @@ TEST(GetFixed, conversions) {
       pearlrt::Character<30> d(" 12345    X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 6, 1, 0, source));
+      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 6, 1, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1235)).getBoolean());
    }
    // negative
@@ -109,7 +109,7 @@ TEST(GetFixed, conversions) {
       pearlrt::Character<30> d("-12345    X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 6, 1, 0, source));
+      EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 6, 1, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(-1234)).getBoolean());
    }
    // range overflow
@@ -119,7 +119,7 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 0, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, 6, 0, source),
          pearlrt::FixedRangeSignal);
    }
    // range overflow
@@ -129,7 +129,7 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 0, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, 6, 0, source),
          pearlrt::FixedRangeSignal);
    }
    // internal overflow
@@ -139,7 +139,7 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 30, 0, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, 30, 0, source),
          pearlrt::FixedRangeSignal);
    }
    // skip wrong field
@@ -149,10 +149,10 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 4, 0, 0, source),
+         pearlrt::GetFixed<15>::fromF(f15, 4, 0, source),
          pearlrt::FixedValueSignal);
       EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 2, 0, 0, source));
+         pearlrt::GetFixed<15>::fromF(f15, 2, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(69)).getBoolean());
    }
    // skip remaining after field
@@ -162,10 +162,10 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 5, 0, 0, source));
+         pearlrt::GetFixed<15>::fromF(f15, 5, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(27)).getBoolean());
       EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 2, 0, 0, source));
+         pearlrt::GetFixed<15>::fromF(f15, 2, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(69)).getBoolean());
    }
    // precision and scale with given decimal point
@@ -175,20 +175,8 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 0, source));
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12)).getBoolean());
-      source.rewind();
-      EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 2, source));
-      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1234)).getBoolean());
-      source.rewind();
-      EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 3, source));
-      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12340)).getBoolean());
-      source.rewind();
-      EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, -1, source));
-      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1)).getBoolean());
    }
    // precision and scale without given decimal point
    {
@@ -197,20 +185,8 @@ TEST(GetFixed, conversions) {
       rc.setWork(d);
       source.rewind();
       EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 0, source));
+         pearlrt::GetFixed<15>::fromF(f15, 6, 2, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12)).getBoolean());
-      source.rewind();
-      EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 2, source));
-      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1234)).getBoolean());
-      source.rewind();
-      EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, 3, source));
-      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(12340)).getBoolean());
-      source.rewind();
-      EXPECT_NO_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 6, 2, -1, source));
-      EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1)).getBoolean());
    }
 }
 

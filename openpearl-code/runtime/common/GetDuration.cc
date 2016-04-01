@@ -55,8 +55,10 @@ namespace pearlrt {
                           Source & source) {
       int width = w.x;
       int decimals = d.x;
-      int hours = 0, min = 0;
-      double sec;
+      int number;
+      int hours = 0;
+      int  min = 0;
+      double sec = 0;
       int c1;
       double timeValue;
       double sign = 1.0 ;
@@ -64,6 +66,10 @@ namespace pearlrt {
       char logText[] = "illegal D-format field (at: xxxxx)";
       int setCharsAt = 28;
       int charsToSet = 5;
+
+      enum {NUMBER = 1, HRS = 2, MIN = 4, POINT = 8, SEC = 16, SPACE = 32};
+      int possibleElements = NUMBER | SPACE;
+      int remainingElements = HRS | MIN | SEC | POINT;
 
       if (width <= 0) {
          Log::debug("fromD: width <= 0");
@@ -78,37 +84,112 @@ namespace pearlrt {
       GetHelper helper(w, &source);
       helper.setDelimiters(GetHelper::EndOfLine);
 
-      if (helper.skipSpaces() == 0) {
-         if (helper.readString("-") == 0) {
-            sign = -1;
+      if (helper.skipSpaces() != 0) {
+         goto errorExit;
+      }
+
+      if (helper.readString("-") == 0) {
+         sign = -1;
+      }
+
+      do {
+
+         if (possibleElements & SPACE) {
+            if (helper.skipSpaces() != 0) {
+               goto errorExit;
+            }
          }
 
-         if (helper.readInteger(&hours, width) > 0) {
-            if (helper.readString(" HRS ") == 0) {
-               if (helper.readFixedInteger(&min, 2) > 0) {
-                  if (min <= 59 && helper.readString(" MIN ") == 0) {
-                     // read seconds
-                     width = helper.getRemainingWidth();
+         if (possibleElements & NUMBER) {
 
-                     if (helper.readSeconds(&sec, width, decimals) > 0) {
-                        if (sec < 60) {
-                           if (helper.readString(" SEC") == 0) {
-                              timeValue = sec;
-                              timeValue += ((hours * 60) + min) * 60;
-                              dur = Duration(timeValue * sign);
+            if (helper.readInteger(&number, width) > 0) {
+               possibleElements = SPACE | remainingElements; 
+            } else {
+               goto errorExit;
+            } 
+         } else {
+            if (possibleElements & (HRS | MIN | SEC | POINT)) {
+               c1 = helper.readChar();
+               switch (c1) {
+               default:
+                  goto errorExit;
 
-                              if ((hours = helper.skipSpaces()) < 0) {
-                                 return 0;
-                              }
-                           }
-                        }
+               case 'H':
+                  if (helper.readString("RS") != 0) {
+                     goto errorExit;
+                  }
+
+                  hours = number;
+                  remainingElements &= ~ HRS;
+                  possibleElements = SPACE | NUMBER | POINT; 
+                  break;
+
+               case 'M':
+                  if (helper.readString("IN") != 0) {
+                     goto errorExit;
+                  }
+
+                  min = number;
+                  remainingElements &= ~ MIN;
+                  possibleElements = SPACE | NUMBER | POINT; 
+                  break;
+
+               case 'S':
+                  if (helper.readString("EC") != 0) {
+                     goto errorExit;
+                  }
+
+                  remainingElements &= ~ (SEC | POINT);
+                  possibleElements = 0;
+                  sec = number;
+                  break;
+
+               case '.':
+                  sec = number;
+                  c1 = helper.readChar();
+                  double factor = 0.1;
+
+                  while (isdigit(c1)) {
+                     sec += factor * (c1 - '0');
+                     c1 = helper.readChar();
+                     factor /= 10.0;
+                  }
+                  while ( c1 == ' ') { 
+                     c1 = helper.readChar();
+                  }
+                  if (c1 == 'S') {
+                     if (helper.readString("EC") != 0) {
+                        goto errorExit;
                      }
+
+                     possibleElements = 0;
                   }
                }
             }
          }
+      } while (possibleElements);
+
+
+      timeValue = sec;
+      timeValue += ((hours * 60) + min) * 60;
+      dur = Duration(timeValue * sign);
+
+      if (sec >= 60) {
+         goto errorExit;
       }
 
+      if (min >= 60) {
+         goto errorExit;
+      }
+
+      if ( helper.skipSpaces() == -1) {
+         // end of field reached with spaces
+         return 0;
+      }
+
+      // else preform error exit routine
+
+errorExit:
       // format error at all else cases
       width = helper.getRemainingWidth();
 
@@ -131,3 +212,7 @@ namespace pearlrt {
       return theDurationValueSignal.whichRST();
    }
 }
+
+
+
+

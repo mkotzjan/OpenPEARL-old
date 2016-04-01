@@ -432,7 +432,7 @@ namespace pearlrt {
       throw theNoDataInFieldSignal;
    }
 
-   void GetHelper::readFixedByF(Fixed63 *f, int d, int p) {
+   void GetHelper::readFixedByF(Fixed63 *f, int d) {
       bool goOn = true;
       bool decimalPointFound = false;
       int digitsProcessed  = 0;
@@ -480,13 +480,11 @@ namespace pearlrt {
             }
 
             // if d > 0 : the value must be divided    d times by 10
-            // if p > 0 : the value must be divided    p times by 10
-            // if p < 0 : the value must be multiplied p times by 10
 
             if (!decimalPointFound) {
-               scale = d - p;;
+               scale = d;
             } else {
-               scale = postPointDigits - p;
+               scale = postPointDigits;
             }
 
             if (scale > 0) {

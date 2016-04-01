@@ -223,12 +223,11 @@ namespace pearlrt {
       \param value pointer to int64_t for the input value
       \param d number of decimals to simulate if no decimal point
                is in the field
-      \param p scale of the input value, it it multiplyed by 10^(-p)
 
       \throws FixedValueSignal if illegal characters were found
       \throws FixedFormatSignal if parameters were wrong
       */
-      void readFixedByF(Fixed63 * value, int d, int p);
+      void readFixedByF(Fixed63 * value, int d);
    };
 }
 #endif

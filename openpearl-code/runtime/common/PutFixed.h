@@ -72,7 +72,6 @@ namespace pearlrt {
    // width=3, decimals=0, scale=0
    pearlrt::PutFixed<15>:toF(x, (pearlrt::Fixed<31>)3, 
                                 (pearlrt::Fixed<31>)0, 
-                                (pearlrt::Fixed<31>)0, 
                                 console.getSink());
    \endverbatim
    */
@@ -104,7 +103,6 @@ namespace pearlrt {
       \param fixedValue the data to be formatted
       \param w the width of the output field.
       \param d the number of post decimal point digits.
-      \param s the scale value
       \param sink the destination for the generated character sequence
       \throws FixedFormatSignal if
                 format parameters are illegal<br>
@@ -115,7 +113,6 @@ namespace pearlrt {
          Fixed<S> fixedValue,
          Fixed<31> w,
          Fixed<31> d,
-         Fixed<31> s,
          Sink & sink) {
          Fixed<S> x, y, absValue; // internal workspace
          int32_t prePointDigits, postPointDigits;
@@ -133,11 +130,6 @@ namespace pearlrt {
          if ((d < (Fixed<31>)0).getBoolean() || (d >= w).getBoolean()) {
             Log::info("F: width and decimals violation");
             throw theFixedFormatSignal;
-            //for (i = 0; i < w.x; i++) {
-            //   sink.putChar('*');
-            //}
-            //
-            //return;
          }
 
          // test whether number fits into format
@@ -166,11 +158,7 @@ namespace pearlrt {
          }
 
          postPointDigits = d.x;
-         prePointDigits = digits - s.x;
-
-         if (prePointDigits  < 1) {
-            prePointDigits = 1;
-         }
+         prePointDigits = digits;
 
          leadingSpaces = w.x -
                          ((signNeeded ? 1 : 0) +
@@ -180,10 +168,6 @@ namespace pearlrt {
                          );
 
          if (leadingSpaces < 0) {
-            //for (i = 0; i < w.x; i++) {
-            //   sink.putChar('*');
-            //}
-
             Log::info("F: width too small");
             throw theFixedValueSignal;
          }

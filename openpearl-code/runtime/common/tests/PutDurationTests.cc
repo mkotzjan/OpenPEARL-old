@@ -63,13 +63,15 @@ TEST(PutDuration, PutTests) {
       pearlrt::PutDuration::toD(d, 30, -1, sink),
       pearlrt::DurationFormatSignal);
    rc.clear();
+   ASSERT_NO_THROW(
+      pearlrt::PutDuration::toD(d, 5, 0, sink));
    ASSERT_THROW(
-      pearlrt::PutDuration::toD(d, 19, 0, sink),
+      pearlrt::PutDuration::toD(d, 4, 0, sink),
       pearlrt::DurationFormatSignal);
    rc.clear();
    ASSERT_THROW(
-      pearlrt::PutDuration::toD(d, 26, 6, sink),
-      pearlrt::DurationFormatSignal);
+      pearlrt::PutDuration::toD(d, 11, 6, sink),
+      pearlrt::DurationValueSignal);
    rc.clear();
    pearlrt::PutDuration::toD(d, 27, 6, sink);
    EXPECT_STREQ(rc.getCstring(), " 0 HRS 00 MIN 01.000000 SEC");
@@ -91,11 +93,62 @@ TEST(PutDuration, PutTests) {
    EXPECT_STREQ(rc.getCstring(), " 9 HRS 08 MIN 03.16 SEC");
    rc.clear();
    d = pearlrt::Duration(-1);
-   ASSERT_THROW(
-      pearlrt::PutDuration::toD(d, 27, 6, sink),
-      pearlrt::DurationValueSignal);
+   pearlrt::PutDuration::toD(d, 27, 6, sink);
+   EXPECT_STREQ(rc.getCstring(), "-0 HRS 00 MIN 01.000000 SEC");
 }
 
+TEST(PutDuration, PutTestsShort) {
+   pearlrt::Character<100> wrk;
+   pearlrt::RefCharacter rc;
+   rc.setWork(wrk);
+   pearlrt::RefCharSink sink(rc);
+   pearlrt::Duration d(1.0);
+
+   rc.clear();
+   d = pearlrt::Duration(9 * 3600.0 + 8 * 60.0 + 3.1234);
+   ASSERT_THROW(
+   //                               12345678901234567890123
+   //                              " 9 HRS 08 MIN 03.12 SEC");
+      pearlrt::PutDuration::toD(d, 21, 2, sink),
+      pearlrt::DurationValueSignal);
+
+   rc.clear();
+   d = pearlrt::Duration(0 * 3600.0 + 8 * 60.0 + 3.1234);
+   pearlrt::PutDuration::toD(d, 21, 2, sink);
+   //                               12345678901234567890123
+   //                            "      8 MIN 03.12 SEC");
+   EXPECT_STREQ(rc.getCstring(), "      8 MIN 03.12 SEC");
+
+   rc.clear();
+   d = pearlrt::Duration(0 * 3600.0 + 8 * 60.0 + 3.1234);
+   ASSERT_THROW(
+   //                               12345678901234
+   //                              " MIN 03.12 SEC");
+      pearlrt::PutDuration::toD(d, 14, 2, sink),
+      pearlrt::DurationValueSignal);
+
+   rc.clear();
+   d = pearlrt::Duration(0 * 3600.0 + 0 * 60.0 + 3.1234);
+   pearlrt::PutDuration::toD(d, 8, 2, sink);
+   //                             12345678
+   //                            "3.12 SEC");
+   EXPECT_STREQ(rc.getCstring(), "3.12 SEC");
+
+   rc.clear();
+   d = pearlrt::Duration(-(0 * 3600.0 + 0 * 60.0 + 3.1234));
+   ASSERT_THROW(
+      pearlrt::PutDuration::toD(d, 8, 2, sink),
+      pearlrt::DurationValueSignal);
+
+   //EXPECT_STREQ(rc.getCstring(), " 9 HRS 08 MIN 03.16 SEC");
+
+   rc.clear();
+   d = pearlrt::Duration(1.0/3.0);
+   pearlrt::PutDuration::toD(d, 17, 10, sink);
+   //                             12345678901234567
+   EXPECT_STREQ(rc.getCstring(), " 0.3333330000 SEC");
+
+}
 /**
 \endcond
 */

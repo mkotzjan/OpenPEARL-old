@@ -68,13 +68,9 @@ namespace pearlrt {
 
       if a decimal point is encountered, the parameter d is obsolete.
 
-
-      the input value is scaled by 10**(-p);
-
       \param f the variable which gets the read value
       \param w the input field width
       \param d the decimal point position 
-      \param p the scale factor
       \param source the input stream
 
       \throws FixedFormatSignal if w is <= 0 or d<0
@@ -85,7 +81,6 @@ namespace pearlrt {
       static void fromF(Fixed<S> &f,
                         const Fixed<31> w,
                         const Fixed<31> d,
-                        const Fixed<31> p,
                         Source & source) {
          Fixed63 value;
 
@@ -96,7 +91,7 @@ namespace pearlrt {
          GetHelper helper(w, &source);
          helper.setDelimiters(GetHelper::EndOfLine);
          // do all actions inside a helper method to reduce code size
-         helper.readFixedByF(&value, d.x, p.x);
+         helper.readFixedByF(&value, d.x);
          f = Fixed<S>(value.get());
          return;
       }

@@ -104,6 +104,7 @@ TEST(GetDuration, conversions) {
       EXPECT_TRUE((dur == pearlrt::Duration((2 * 60 + 5) * 60 + 12.5))
                   .getBoolean());
    }
+#if 0
    // min width with implicit decimals
    {
       //                        123456789012345678901234567890
@@ -145,6 +146,7 @@ TEST(GetDuration, conversions) {
       EXPECT_TRUE((dur == pearlrt::Duration(-((12342 * 60 + 5) * 60 + 1.25)))
                   .getBoolean());
    }
+#endif
 }
 
 TEST(GetDuration, errorDetection) {
@@ -164,6 +166,7 @@ TEST(GetDuration, errorDetection) {
       EXPECT_EQ(pearlrt::theDurationValueSignal.whichRST(),
                 pearlrt::GetDuration::fromD(dur, 25, 2, source));
    }
+#if 0
    // only 1 digit sec
    {
       //                        123456789012345678901234567890
@@ -173,6 +176,7 @@ TEST(GetDuration, errorDetection) {
       EXPECT_EQ(pearlrt::theDurationValueSignal.whichRST(),
                 pearlrt::GetDuration::fromD(dur, 25, 2, source));
    }
+#endif
    // only 1 digit sec with implicit decimals
    {
       //                        123456789012345678901234567890
@@ -200,6 +204,7 @@ TEST(GetDuration, errorDetection) {
       EXPECT_EQ(pearlrt::theDurationValueSignal.whichRST(),
                 pearlrt::GetDuration::fromD(dur, 25, 2, source));
    }
+#if 0
    // only 1 digit min
    {
       //                        123456789012345678901234567890
@@ -210,7 +215,8 @@ TEST(GetDuration, errorDetection) {
       EXPECT_EQ(pearlrt::theDurationValueSignal.whichRST(),
                 pearlrt::GetDuration::fromD(dur, 25, 2, source));
    }
-   // only 1 digit min
+#endif
+   // X in field
    {
       //                        123456789012345678901234567890
       pearlrt::Character<30> d("12 HRS 5 MIN 2.5 SEC    X");
@@ -258,8 +264,8 @@ TEST(GetDuration, errorDetection) {
    // test for proper continuation after error in reading
    {
       pearlrt::Character<60>
-      //     12345678901234567890123456789012345678901234567890
-      //                              1234567890123456789012345678
+      // 12345678901234567890123456789012345678901234567890
+      //                          1234567890123456789012345678
       d("12 hrs 05 MIN 12.5       12 HRS 10 MIN 01 SECX");
       rc.setWork(d);
       source.rewind();
