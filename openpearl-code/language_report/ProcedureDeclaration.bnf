@@ -1,0 +1,7 @@
+\htgt{ProcedureDeclaration} ::=\\
+\x \hlink{Identifier} : \{ {\bf PROC $\mid$ PROCEDURE} \}
+	 [ \hlink{ListOfFormalParameters} ] \\
+\x [ \hlink{ResultAttribute} ] [ \hlink{GlobalAttribute} ] ;\\
+\x \x \hlink{ProcedureBody}\\
+\x {\bf END};\\
+

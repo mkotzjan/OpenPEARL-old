@@ -14,9 +14,14 @@ freely selectable user names can be assigned to them. Additionally, an
 error list can be defined to limit the signal scheduling to one or
 several particular error numbers.
 
+\begin{front}
 UserNameDeclaration$\S $For-SIGNAL ::= \\
 \x Identifier$\S $UserName : Identifier$\S $SIGNAL-SystemName\\
 \x \x [ ( Identifier$\S $ErrorNumber [ , Identifier$\S $ErrorNumber ] $^{...}$ ) ]
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The signals and their associated error numbers possible on a certain
 computer are described in the respective user manual, giving their
@@ -57,9 +62,14 @@ FixedOverflowSignal and DationEOFSignal are system names.
 
 The general form of the specification of signals reads:
 
+\begin{front}
 SIGNAL-Specification ::=\\
 \x \{ {\bf SPECIFY  $\mid$  SPC} \} Identifier\_or\_IdentifierList 
 {\bf SIGNAL} [ GlobalAttribute ] ;
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The reaction planned for the occurrence of a signal is scheduled with
 the following statement:
@@ -72,6 +82,7 @@ SchedulingSignalReaction ::=\\
 SignalReaction ::=\\
 \x UnlabeledStatement
 \end{removed}
+\begin{front}
 \begin{added}
 SchedulingSignalReaction ::=\\
 \x {\bf ON} Name$\S $Signal [ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
@@ -87,6 +98,15 @@ SignalReaction ::=\\
 \x SignalFinalStatement $\mid$ \\
 \x Block$\S $terminatedWithSignalFinalStatement ;
 \end{added}
+\end{front}
+\begin{grammar}
+
+\input{SignalStatement.bnf}
+\input{SignalFinalStatement.bnf}
+\input{SignalReaction.bnf}
+\input{InduceStatement.bnf}
+
+\end{grammar}
 
 Instead of UnlabeledStatement, all Statements besides the
 Statement SchedulingSignalReaction are permitted, particularly
@@ -142,6 +162,9 @@ The variant of the {\bf INDUCE} statement without a specified signal is
 only allowed inside a signal reaction. This will trigger the signal handler
 of the superior function or task with the identical signal.
 \end{added}
+\begin{grammar}
+\input{InduceStatement.bnf}
+\end{grammar}
 
 
 Whereas it is possible to react to asynchronous exception situations

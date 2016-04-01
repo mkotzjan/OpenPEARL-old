@@ -1,0 +1,6 @@
+\htgt{TypeOfTransmissionData} ::=\\
+\x {\bf ALL} $\mid$ \hlink{SimpleType} $\mid$
+	 \hlink{Indicator}$\S $ForRedeclaredType $\mid$
+	 \hlink{TypeStructure}\\
+\x $/^*$ A Structure as transfer type may not contain any reference variable $*/$\\
+

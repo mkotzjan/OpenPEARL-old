@@ -52,6 +52,7 @@ in a declaration by separating them by commas:
 
 Summarised, scalar variables can be declared as follows:
 
+\begin{front}
 ScalarVariableDeclaration ::=\\
 \x \{ {\bf DECLARE $\mid$ DCL} \} VariableDenotation [ , VariableDenotation ] $^{...}$ ;
 
@@ -69,15 +70,24 @@ SimpleType ::=\\
 \x TypeInteger $\mid$ TypeFloatingPointNumber $\mid$\\
 \x TypeBitString $\mid$ TypeCharacterString $\mid$\\
 \x TypeTime $\mid$ TypeDuration
+\end{front}
+\begin{grammar}
+\input{SimpleType.bnf}
+\end{grammar}
 
 The general form of specifying scalar variables reads as follows:
 
+\begin{front}
 ScalarVariableSpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} VariableDenotationS [ , VariableDenotationS ] $^{...}$;
 
 VariableDenotationS ::=\\
 \x IdentifierDenotation [ AllocationProtection ] TypeAttribute\\
 \x \{ GlobalAttribute $\mid$ IdentificationAttribute \}
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 Allocation protection and initialisation attribute are described in 5.14,
 identification and global attributes were already defined in 4.2 and
@@ -113,11 +123,20 @@ If no precision is given, the precision is derived from the constants.
 
 Variables for integers are declared with the type attribute FIXED.
 
+\begin{front}
 TypeInteger ::=\\
 \x {\bf FIXED} [ (Precision) ]
 
 Precision ::=\\
 \x IntegerWithoutPrecision\S GreaterZero
+\end{front}
+\begin{grammar}
+\input{Integer.bnf}
+
+\input{IntegerWithoutPrecision.bnf}
+
+\input{Precision.bnf}
+\end{grammar}
 
 The precision gives the number of bit positions in which the
 corresponding value of the variable (without signs) is represented. If
@@ -174,8 +193,13 @@ be defined with precision.
 Variables of type floating point number (with integers or floating point
 numbers as values) are declared with type attribute FLOAT.
 
+\begin{front}
 TypeFloatingPointNumber ::=\\
 \x {\bf FLOAT} [ (Precision) ]
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The statements of 5.2 are valid; 
 \removedtext{usual precisions are here 23 and 53, respectively.}
@@ -255,11 +279,16 @@ B2 & B1 & B3 & B1  & B4 & B1 \\
 
 Variables for bit strings are to be declared with type attribute BIT.
 
+\begin{front}
 TypeBitString ::=\\
 \x {\bf BIT} [ (Length) ]
 
 Length ::=\\
 \x IntegerWithoutPrecision\S GreaterZero
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 Length gives the number of elements of the bit string. If the length
 option is lacking, it had either to be defined in a length
@@ -313,8 +342,13 @@ $\backslash$' can be created (independently from the used editor).'
 Variables for character strings are declared by the type attribute
 CHARACTER.
 
+\begin{front}
 TypeCharacterString ::=\\
 \x \{ {\bf CHARACTER $\mid$ CHAR} \} [ (Length) ]
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 Length gives the number of characters. If no length is indicated, it had
 either to be defined in a length specification (see 5.6) or length 1 is
@@ -346,13 +380,17 @@ number and string objects are defined, whose precisions and lengths are
 not determined by notation (for constants) or declaration (for
 variables).
 
+\begin{front}
 \begin{tabbing}
 \x {\bf LENGTH} \= \kill
 LengthDefinition::=\\
 \x {\bf LENGTH} \{ \{ {\bf FIXED $\mid$ FLOAT} \} (precision)\\
               \x \> $\mid$ \{ {\bf BIT $\mid$ CHARACTER $\mid$ CHAR} \} (length) \};
 \end{tabbing}
-
+\end{front}
+\begin{grammar}
+\input{LengthDefinition.bnf}
+\end{grammar}
 Example:
 
 \begin{tabbing}
@@ -387,8 +425,13 @@ Example:
 
 Variables for times are declared with type attribute CLOCK.
 
+\begin{front}
 TypeClock ::=\\
 \x {\bf CLOCK}
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
 
 Example:
 
@@ -401,6 +444,7 @@ time:=12:30:00;
 \end{added}
 
 \section{Durations (DURATION)}   % 5.8
+\label{sec_type_duration}
 
 A duration constant is composed of stating an hour, a minute, and a
 second, however, single pieces of specifications may be lacking. An hour
@@ -422,8 +466,13 @@ contain precision specifications.
 Variables for durations have to be declared with the type attribute
 DURATION.
 
+\begin{front}
 TypeDuration ::=\\
 \x {\bf DURATION $\mid$ DUR}
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 Example:
 
@@ -483,6 +532,7 @@ operator CONT may be omitted on the right side of an assignment
 
 In general, it holds:
 
+\begin{front}
 TypeReference ::=\\
 \x {\bf REF} [ VirtDimensionList ] [ AssignmentProtection ]\\
 \x \{ SimpleType $\mid$ Identifier\S ForType $\mid$ TypeStructure $\mid$\\
@@ -495,6 +545,13 @@ VirtDimensionList ::=\\
 
 Dereferentiation ::=\\
 \x {\bf CONT} Name\S ReferenceVariable
+
+\end{front}
+\begin{grammar}
+\input{TypeReference.bnf}
+\input{VirtualDimensionList.bnf}
+\input{Dereferentiation.bnf}
+\end{grammar}
 
 The definition of the language form TypeReference shows, which type a
 variable may have, at which a reference variable shall point.
@@ -715,6 +772,7 @@ Koeff(2.0) \x  Koeff(2,1) \x  Koeff(2,2) \x  Koeff(2,3)
 
 The general form of a array declaration reads as follows:
 
+\begin{front}
 ArrayDeclaration ::=\\
 \x \{ {\bf DECLARE $\mid$ DCL} \} ArrayDenotation [ , ArrayDenotation ] $^{...}$ ;
 
@@ -731,6 +789,11 @@ BoundaryDenotation ::=\\
 Boundary ::=\\
 \x [ - ] IntegerWithoutPrecision $\mid$ Identifier\S NamedConstant $\mid$ \\
 \x ConstantExpression
+\end{front}
+\begin{grammar}
+\input{DimensionAttribute.bnf}
+\input{DimensionBoundaries.bnf}
+\end{grammar}
 
 Thus, even negative integers are allowed as dimension boundary. The
 upper boundary of a dimension, however, has always to be greater or
@@ -762,6 +825,7 @@ e.g.:
 
 The general specification form of an array reads:
 
+\begin{front}
 ArraySpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} ArrayDenotationS [ , ArrayDenotationS ] $^{...}$;
 
@@ -771,6 +835,10 @@ ArrayDenotationS ::=\\
 
 VirtualDimensionAttribute ::=\\
 \x ( [ , $^{...}$ ] )
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The number n of commas in the virtual dimension attribute informs that
 the specified array has n+1 dimensions.
@@ -932,6 +1000,7 @@ Person.Name.FirstName := 'OTTO';\\
 
 The general form of the structure declaration reads:
 
+\begin{front}
 StructureDeclaration ::=\\
 \x \{ {\bf DECLARE $\mid$ DCL} \} StructureDenotation [ , StructurDenotation ] $^{...}$ ;
 
@@ -948,16 +1017,29 @@ StructureComponent ::=\\
 TypeAttributeInStructureDeclaration ::=\\
 \x [ DimensionAttribute ] \\
 \x \{ SimpleType $\mid$ TypeReference $\mid$ Identifier\S ForType $\mid$ TypeStructure \}
+\end{front}
+\begin{grammar}
+\input{TypeStructure.bnf}
+
+\input{StructureComponent.bnf}
+
+\input{TypeAttributeInStructureComponent.bnf}
+
+\end{grammar}
 
 The general form of the structure specification reads:
 
+\begin{front}
 StructureSpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} StructureDenotationS [ , StructureDenotationS] $^{...}$ ;
 
 StructureDenotationS ::=\\
 \x IdentifierDenotation\S MainRecord [ VirtualDimensionAttribute ]\\
 \x [ AllocationProtection ] TypeRecord \{ GlobalAttribute $\mid$ IdentificationAttribute\}
-
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
 
 \section{Type Definition (TYPE)} % 5.12
 
@@ -1102,8 +1184,7 @@ OrderString(10).Succ:={\bf NIL};
 
 Generally, a new data type is defined as follows:
 
-TypeDefinition ::=\\
-\x {\bf TYPE} Identifier\S ForType \{ SimpleType $\mid$ TypeStructure \}
+\input{TypeDefinition.bnf}
 
 The definition of a new data type has to take place before its use.
 Besides, data types defined at module level, can be used in all tasks
@@ -1138,15 +1219,11 @@ protection (see 5.15), this is the only possibility of allocating
 values. The initialisation attribute is given as last attribute of the
 respective declaration:
 
-InitialisationAttribute ::=\\
-\x \{ {\bf INITIAL $\mid$ INIT} \} ( InitElement [ , InitElement ] $^{...}$ )
+\input{InitialisationAttribute.bnf}
 
-InitElement ::=\\
-\x Constant\\
-\x $\mid$ Identifier\S NamedConstant\\
-\x $\mid$ ConstantExpression\\
-\x ...
+\input{InitElement.bnf}
 
+\begin{front}
 Constant ::=\\
 \x Integer\\
 \x $\mid$ FloatingPointNumber\\
@@ -1154,6 +1231,10 @@ Constant ::=\\
 \x $\mid$ TimeConstant\\
 \x $\mid$ DurationConstant\\
 \x $\mid$ {\bf NIL}
+\end{front}
+\begin{grammar}
+\input{Constant.bnf}
+\end{grammar}
 
 The type of the given init element has to be compatible with the type of
 the declared variable in accordance with the rules for assignment (cf.
@@ -1297,17 +1378,13 @@ expressions may occur. These expressions may only contain constants
 (also named constants) as operands. They are evaluated by the compiler,
 and the results are inserted in the respective positions.
 
-ConstantExpression ::=\\
-\x \{ + $\mid$ - \} FloatingPointNumber\\
-\x $\mid$ \{ + $\mid$ - \} DurationConstant\\
-\x $\mid$ constant-FIXED-Expression
+\input{ConstantExpression.bnf}
 
-Constant-FIXED-Expression ::=\\
-\x Term [ \{ + $\mid$ - \} Term ] $^{...}$
+\input{Constant-FIXED-Expression.bnf}
 
-Term ::=\\
-\x Factor [ \{ $^*$ $\mid$ // $\mid$ {\bf REM} \} Factor ] $^{...}$
+\input{Term.bnf}
 
+\begin{front}
 Factor ::=\\
 \x [ + $\mid$ - ] \\
 \x \{ integer \\
@@ -1316,6 +1393,12 @@ Factor ::=\\
 \x \x $\mid$ Identifier\S NamedConstant\\
 \x \} \\
 \x [ {\bf FIT} constant-FIXED-Expression ]
+\end{front}
+\begin{grammar}
+\input{Factor.bnf}
+\end{grammar}
+
+
 
 Constant expressions of type FIXED can, e.g., be applied in the
 following positions:

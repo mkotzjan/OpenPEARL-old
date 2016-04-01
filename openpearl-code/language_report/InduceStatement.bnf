@@ -1,0 +1,4 @@
+\htgt{InduceStatement} ::=\\
+\x {\bf INDUCE} [ \hlink{Name}$\S $Signal 
+	[ {\bf RST} ( \hlink{Expression}$\S $ErrorNumber-FIXED ) ] ] ;\\
+

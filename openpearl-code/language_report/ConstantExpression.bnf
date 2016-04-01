@@ -1,0 +1,5 @@
+\htgt{ConstantExpression} ::=\\
+\{ + $\mid$ - \}  \hlink{FloatingPointNumber}\\
+\x $\mid$ \{ + $\mid$ - \} \hlink{DurationConstant}\\
+\x $\mid$ \hlink{Constant-FIXED-Expression}\\
+

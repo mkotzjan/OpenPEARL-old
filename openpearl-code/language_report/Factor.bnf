@@ -1,0 +1,11 @@
+\htgt{Factor} ::= \\
+\x [ + $\mid$ - ] \\
+\x \{ \hlink{Integer}\\
+\x \x $\mid$ ( \hlink{Constant-FIXED-Expression} )\\
+\x \x $\mid$ {\bf TOFIXED} \{ 
+	\hlink{CharacterStringConstant}$\S $OfLength1 
+	$\mid$ \hlink{BitStringConstant} \}\\
+\x \x $\mid$ \hlink{Identifier}$\S $Named-FIXED-Constant\\
+\x \} \\
+\x [ {\bf FIT} \hlink{Constant-FIXED-Expression} ]
+

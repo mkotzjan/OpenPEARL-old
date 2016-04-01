@@ -1,0 +1,3 @@
+\htgt{TypeStructure} ::=\\
+\x {\bf STRUCT [} \hlink{StructureComponent} 
+	[ , \hlink{StructureComponent} ] $^{...}$ {\bf ]} \\

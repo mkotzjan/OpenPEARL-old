@@ -1,0 +1,5 @@
+\htgt{DationAttribute} ::=\\
+\x \hlink{TypeDation}\\
+\x [ \hlink{GlobalAttribute} ]\\
+\x {\bf CREATED} ( \hlink{Indicator}$\S $UserNameForSytemDation )\\
+

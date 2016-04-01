@@ -1,0 +1,6 @@
+\htgt{SimpleType} ::=\\
+\x \{ {\bf FIXED $\mid$ FLOAT $\mid$ BIT $\mid$
+	 CHAR $\mid$ CHARACTER} \}\\
+\x \x [ ( \hlink{Constant-FIXED-Expression}$\S $PrecisionResp.Length ) ]\\
+\x $\mid$ {\bf CLOCK}\\
+\x $\mid$ \{ {\bf DUR $\mid$ DURATION} \}\\

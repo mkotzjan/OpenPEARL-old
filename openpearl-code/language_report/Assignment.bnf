@@ -1,0 +1,7 @@
+\htgt{Assignment} ::=\\
+\x \{ \{ \hlink{Name}$\S $Variable
+	 $\mid$ \hlink{Dereferentiation} 
+	$\mid$ \hlink{StringSelection}
+	$\mid$ \hlink{Name}$\S $Structure \}\\   
+\x \{ := $\mid$ = \} \} $^{...}$ \hlink{Expression} ;\\
+

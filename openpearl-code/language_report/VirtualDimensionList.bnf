@@ -1,0 +1,2 @@
+\htgt{VirtualDimensionList} ::=\\
+\x ( [ , $^{...}$ ] )\\

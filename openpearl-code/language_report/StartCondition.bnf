@@ -1,0 +1,9 @@
+\htgt{StartCondition} ::=\\
+\x {\bf AT} \hlink{Expression}$\S $Time [ \hlink{Frequency} ]\\
+\x $\mid$ {\bf AFTER} \hlink{Expression}$\S $Duration 
+	[ \hlink{Frequency} ]\\
+\x $\mid$ {\bf WHEN} \hlink{Name}$\S $Interrupt
+	 [ {\bf AFTER} \hlink{Expression}$\S $Duration ]
+	 [ \hlink{Frequency} ] \\
+\x $\mid$ \hlink{Frequency}\\
+

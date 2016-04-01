@@ -1,0 +1,6 @@
+\htgt{ParameterType} ::=\\
+\x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$
+		 \hlink{StructuredType} $\mid$ 
+	 	 \hlink{TypeReference} \} $\mid$\\   
+\x \x \hlink{TypeRealTimeObject} $\mid$ \hlink{TypeDation}\\
+

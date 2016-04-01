@@ -8,9 +8,16 @@ system part and/or a problem part.
 
 The general form of a PEARL program reads as follows:
 
+\begin{front}
 PEARL program ::=\\
 \x Module $^{...}$
+\end{front}
 
+\begin{grammar}
+\input{PEARL-Program.bnf}
+\end{grammar}
+
+\begin{front}
 Module ::=\\
 \x {\bf MODULE} [ (Identifier\S  OfTheModule) ];\\
 \x \x \{ SystemPart [ ProblemPart ] \} $\mid$ ProblemPart\\
@@ -18,9 +25,14 @@ Module ::=\\
 
 SystemPart ::=\\
 \x {\bf SYSTEM}; [ UserNameDeclaration $^{...}$ ]
+\end{front}
 
-ProblemPart::=\\
-\x {\bf PROBLEM}; [\{ Declaration $\mid$ Specification $\mid$ Identification\} $^{...}$ ]
+\begin{grammar}
+\input{Module.bnf}
+\input{SystemPart.bnf}
+\end{grammar}
+
+\input{ProblemPart.bnf}
 
 In the system part, the connections of the projected computer are
 described with the elements of the technical process (sensors,
@@ -188,11 +200,16 @@ in a different way: Object x shall be {\it identified} with name xx:
 
 In general, the form of identification reads as follows:
 
+\begin{front}
 Identification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier [ AllocationProtection ] Type IdentificationAttribute ;
 
 IdentificationAttribute ::=\\
 \x {\bf IDENT} (Name\S  Object)
+\end{front}
+\begin{grammar}
+Missing in grammar
+\end{grammar}
 
 The given type has to correspond to the type of the named object. More
 details are defined when presenting the various objects.
@@ -203,11 +220,7 @@ Blocks are used to structure task or procedure bodies and to influence
 the scope and the life-span of PEARL objects. A block is a summary of
 declarations and statements:
 
-Block::=\\
-\x {\bf BEGIN}\\
-\x [\{ Declaration $\mid$ Identification \} $^{...}$ ]\\
-\x [ Statement $^{...}$ ]\\
-\x {\bf END} [ Identifier\S  Block ] ;
+\input{Block.bnf}
 
 Blocks are regarded as statements and may thus only occur in tasks and
 procedures, but there even nested. The entry into a block takes
@@ -232,6 +245,12 @@ evaluation of its declaration and the execution of the end of the block
 takes place.
 
 % Klammern einfuegen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\begin{discuss}
+Das Systemgeraet PRINTER macht heutzutage wohl keinen Sinn mehr.
+Was soll damit dann passieren? Wie sollte so etwas in Linux aussehen?
+Wie soll so etwas bei Linux gehen? Drcukjob bei Programmende - aber das 
+endet ja nicht unbedingt ...
+\end{discuss}
 
 {\bf MODULE};\\
 \x {\bf SYSTEM};\\
@@ -333,8 +352,13 @@ the same module, in all other modules it must be defined.
 
 The general form of the global attribute reads:
 
+\begin{front}
 GlobalAttribute ::=\\
 \x {\bf GLOBAL} [ (Identifier\S OfaModule) ]
+\end{front}
+\begin{grammar}
+\input{GlobalAttribute.bnf}
+\end{grammar}
 
 When specifying an object, all attributes have to be taken over from its
 declaration, except for a given priority, precision or length. In the
@@ -371,8 +395,16 @@ presenting the objects.
 
 After the loading of a PEARL program, the PEARL run time system
 automatically starts all tasks marked by the attribute MAIN according
-to their priority.  All tasks provided with MAIN have to be declared in
+to their priority.  
+All tasks provided with MAIN have to be declared in
 the same module.
+\begin{discuss}
+streichen? 
+All tasks provided with MAIN have to be declared in
+the same module.
+
+Ist bei Kompatibilitaetspruefung auch pruefbar, aber macht das Sinn?
+\end{discuss}
 
 Example:
 

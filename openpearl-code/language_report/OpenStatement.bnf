@@ -1,0 +1,4 @@
+\htgt{OpenStatement} ::=\\
+\x {\bf OPEN} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{OpenParameter} 
+	[ , \hlink{OpenParameter} ] $^{...}$ ] ;\\
+

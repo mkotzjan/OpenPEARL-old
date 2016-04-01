@@ -1,0 +1,4 @@
+\htgt{FormalParameter} ::=\\
+\x \hlink{OneIdentifierOrList} [ \hlink{VirtualDimensionList} ]\\
+\x \x \hlink{ParameterType} [ {\bf IDENT $\mid$ IDENTICAL} ]\\
+

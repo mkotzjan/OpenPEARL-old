@@ -32,9 +32,13 @@ These examples show that an expression at least can be
 Identifiers, indexed identifiers and names of structure components are
 generally summarised under the notion ``Name'':
 
+\begin{front}
 Name ::= Identifier [ (Index [ , Index ] $^{...}$ ) ] [ . Name ] $^{...}$
-
-Index ::= Expression\S WithIntegerAsValue
+\end{front}
+\begin{grammar}
+\input{Name.bnf}
+\end{grammar}
+\input{Index.bnf}
 
 Examples:
 
@@ -54,12 +58,12 @@ variables; however, in the expression lists of the output statements
 
 In general, an expression has the form
 
-Expression::=\\
-\x [ MonadicOperator ] Operand [ DyadicOperator Expression ] $^{...}$
+\input{Expression.bnf}
 
 Monadic operators have only one operand, dyadic operators have two
 operands.
 
+\begin{front}
 MonadicOperator ::=\\
 \x + $\mid$ - {\bf $\mid$ NOT $\mid$ ABS $\mid$ SIGN $\mid$ LWB $\mid$ UPB $\mid$ SIZEOF $\mid$ CONT \\
 \x $\mid$ TOFIXED $\mid$ TOFLOAT $\mid$ TOBIT $\mid$ TOCHAR $\mid$ ENTIER $\mid$ ROUND} \\
@@ -74,6 +78,13 @@ DyadicOperator ::=\\
 Operand ::=\\
 \x Constant $\mid$ Name $\mid$ FunctionCall $\mid$ ConditionalExpression $\mid$ Dereferentiation $\mid$\\
 \x StringExcerpt $\mid$ (Expression)
+\end{front}
+\begin{grammar}
+\input{MonadicOperator.bnf}
+\input{DyadicOperator.bnf}
+\input{Operand.bnf}
+
+\end{grammar}
 
 Examples:
 
@@ -120,8 +131,7 @@ Examples:
 The importance of dereferentiation was treated in 5.6, References. The
 general form reads:
 
-Dereferentiation::=\\
-\x {\bf CONT} \{ Name\S Reference $\mid$ FunctionCall \}
+\input{Dereferentiation.bnf}
 
 The i-th bit of a bit string can be addressed with the help of the
 standard attribute BIT(i) which --- separated by a full-stop --- is mentioned
@@ -152,8 +162,14 @@ Furthermore, segments of bit or character strings containing several
 bits or characters can be addresses analogously; the general form of
 addressing is:
 
+\begin{front}
 StringPart::=\\
 \x Name\S String. \{ {\bf BIT $\mid$ CHAR $\mid$ CHARACTER} \} (Expression\S Start [ : Expression\S End ] )
+\end{front}
+\begin{grammar}
+\input{StringSelection.bnf}
+\end{grammar}
+
 
 The expressions Start and End must have integer values. End must be
 greater than or equal to Start, and both values must be within the
@@ -834,6 +850,7 @@ The operator definition allows to define new operators with freely
 selectable identifiers, or to extend the meaning of the previously
 introduced standard operators.
 
+\begin{front}
 OperatorDefinition ::=\\
 \x {\bf OPERATOR} OpName ( [ OpParameter , ] OpParameter )\\
 \x {\bf RETURNS} (ResultType);\\
@@ -848,6 +865,12 @@ OpParameter ::=\\
 
 ResultType ::=\\
 \x SimpleType $\mid$ StructuredType $\mid$ TypeReference
+\end{front}
+\begin{grammar}
+\input{OperatorDefinition.bnf}
+\input{OpName.bnf}
+\input{OpParameter.bnf}
+\end{grammar}
 
 The meaning is analogous to the one of a function procedure (cf. 8).
 
@@ -887,8 +910,7 @@ operator. For an operator declared with a new operator name not
 introduced in a standard way, a rank between 1 and 7 can be determined
 with the help of a rank declaration:
 
-PrecedenceDefinition ::=\\
-\x {\bf PRECEDENCE} OpName ( \{ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7 \} );
+\input{PrecedenceDefinition.bnf}
 
 If a precedence shall be defined for a new operator, this must take place
 before the operator definition; if no precedence definition is stated, the
@@ -907,15 +929,25 @@ Example:
 Assignments are implemented for scalar variables and for structures, but
 not for arrays.
 
+\begin{front}
 Assignment ::=\\
 \x ScalarAssignment $\mid$ StructureAssignment
+\end{front}
+\begin{grammar}
+\input{Assignment.bnf}
+\end{grammar}
 
 \subsection{Assignments for Scalar Variables}   % 6.3.1
 
 Assignments for scalar variables are defined as follows:
 
+\begin{front}
 ScalarAssignment ::=\\
 \x Name\S ScalarVariable \{ := $\mid$ = \} Expression;
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The statement causes that the value of the expression on the right side
 is assigned to the variable given on the left of the assignment sign
@@ -984,8 +1016,13 @@ messages.
 The values of all components of a structure can be assigned to another
 structure in one single assignment:
 
+\begin{front}
 StructureAssignment ::=\\
 \x Name\S Structure\_1 \{ := $\mid$ = \} ExpressionStructure\_2;
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The values of the components of Structure\_2 are assigned to the
 corresponding components of Structure\_1. Both structures must have the same
@@ -1042,8 +1079,13 @@ Monadic and Dyadic Operators).
 With the ``BY TYPE'' operator, the type of a variable address can be
 converted to any other pointer type.
 
+\begin{front}
 TypeConvertingExpression ::=\\
 \x Name {\bf BY TYPE} Type
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The type of the variable ``Name'' is converted into the given Type by
 operator ``BY TYPE''. The result of the type converting expression is
@@ -1051,7 +1093,8 @@ the address of ``Name'' with type ``Type''. This type conversion is a
 compiler internal action preventing an error message of the compiler. At
 run time, no action is executed; especially the content of ``Name''
 stays unchanged.
-
+\end{removed}
+\begin{removed}
 Example:
 
 Overloading of data objects upon assignment
@@ -1098,6 +1141,8 @@ this case, the data are always processed in accordance with their types,
 such programs are portable, if the space requirements of the overloading
 data structure do not go beyond the supported filler.
 
+\end{removed}
+\begin{removed}
 \subsection{The ``VOID'' Data Type}    % 6.4.2
 
 In contrast to the active type conversion by the ``BY TYPE'' operator,
@@ -1110,8 +1155,13 @@ the assignment of any data addresses to a pointer variable of type
 The ``VOID'' data type is written as structure description without
 components, and may only be used in combination with REF.
 
+\begin{front}
 VOID-DataType ::=\\
 \x {\bf STRUCT} [ ]
+\end{front}
+\begin{grammar}
+\input{Type-VOID.bnf}
+\end{grammar}
 
 A reference variable with this type can admit any variable address, the
 variable, however, cannot be altered directly. First, the address must
@@ -1156,6 +1206,8 @@ t: {\bf TASK};\\
 \x ptr\_var\_b := Malloc ({\bf SIZEOF} TYPE\_B);\\
 {\bf END}; ! t
 
+\end{removed}
+\begin{removed}
 This second form is particularly suitable for polymorphic procedures,
 i.e., procedures called with actual parameters of different types. The
 ``VOID'' data type serves on the one hand as indication in the procedure

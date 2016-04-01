@@ -1,0 +1,7 @@
+\htgt{TaskCoordinationStatement} ::=\\
+\x \{ {\bf REQUEST $\mid$ RELEASE}\} \hlink{Name}$\S $Sema 
+	[ , \hlink{Name}$\S $Sema ] $^{...}$ ;\\
+\x $\mid$ \{ {\bf RESERVE $\mid$ FREE $\mid$ ENTER $\mid$ LEAVE} \}
+	 \hlink{Name}$\S $Bolt [ , \hlink{Name}$\S $Bolt ] $^{...}$ ;\\
+
+

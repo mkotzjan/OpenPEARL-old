@@ -1,0 +1,2 @@
+\htgt{GlobalAttribute} ::=\\
+\x {\bf GLOBAL} [ ( \hlink{Indicator}$\S $Module ) ]\\

@@ -1,0 +1,6 @@
+\htgt{StringSelection} ::=\\
+\x \hlink{Name}$\S $String . \{ {\bf BIT $\mid$ CHAR $\mid$ CHARACTER} \}\\ 
+\x ( \{ \hlink{Constant-FIXED-Expression} [ : \hlink{Constant-FIXED-Expression} ]\\
+\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} + \hlink{Constant-FIXED-Expression} ]\\
+\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} ] \} )\\
+

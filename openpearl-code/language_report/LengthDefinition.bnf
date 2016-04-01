@@ -1,0 +1,4 @@
+\htgt{LengthDefinition} ::=\\
+\x {\bf LENGTH} \{ {\bf FIXED $\mid$ FLOAT
+                    $\mid$ BIT $\mid$ CHARACTER $\mid$ CHAR} \}
+                ( \hlink{Precision} ) ;\\

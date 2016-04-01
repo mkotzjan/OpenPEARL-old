@@ -1,0 +1,3 @@
+\htgt{TypeAttributeInStructureComponent} ::=\\
+\x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ 
+	\hlink{StructuredType} $\mid$ \hlink{TypeReference} \}\\

@@ -1,0 +1,6 @@
+\htgt{PositionConvert} ::= \\
+\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+\x $\mid$ {\bf X} [ ( \hlink{Expression} ) ]\\
+\x $\mid$ \{ {\bf POS $\mid$ ADV} \} ( \hlink{Expression} )\\
+\x $\mid$ {\bf SOP} ( \hlink{Name}$\S $PositionVariable-FIXED )\\
+

@@ -17,15 +17,26 @@ Such control statements are
 \item the exit statement
 \end{itemize}
 
+\begin{grammar}
+\input{SequentialControlStatement.bnf}
+\end{grammar}
+\begin{discuss}
+emptyStatement is missing
+\end{discuss}
+
 \section{Conditional Statement (IF)}   % 7.1
 
 With the help of the conditional statement, it is determined depending
 on the result of an expression with which statement the program
 execution is to continued.
 
+\begin{front}
 ConditionalStatement ::=\\
 \x {\bf IF} Expression {\bf THEN} Statement$^{...}$ {\bf [ ELSE} Statement$^{...}$ {\bf ] FIN};
-
+\end{front}
+\begin{grammar}
+\input{IfStatement.bnf}
+\end{grammar}
 The result of the expression must be of type BIT(1). If the expression
 provides value '1'B (true), the statements following THEN are evaluated;
 otherwise the statements following ELSE are evaluated.
@@ -63,11 +74,17 @@ provided in two (historically caused) forms is suitable: The older form
 allows only integers as distinction criteria; the newer one permits also
 characters. At first, the older form is described:
 
+\begin{front}
 StatementSelection1 ::=\\
 \x {\bf CASE} Expression\\
 \x \x \{ {\bf ALT} Statement$^{...} \}^{...}$\\
 \x \x [ {\bf OUT} Statement$^{...}$ ]\\
 \x {\bf FIN};
+\end{front}
+\begin{grammar}
+\input{CaseStatement.bnf}
+\input{CaseStatement1.bnf}
+\end{grammar}
 
 The number 1 is assigned to the statement sequence following the first
 ALT (alternative 1), the number 2 to the statement sequence following
@@ -130,25 +147,34 @@ out'').
 
 The general form of the empty statement reads:
 
-EmptyStatement ::=\\
-\x ;
+\input{EmptyStatement.bnf}
 
 The second form of the statement selection has the following form:
 
+\begin{front}
 StatementSelection2 ::= \\
 \x {\bf CASE} CaseIndex\\
 \x \{ {\bf ALT} (CaseList) Statement$^{...} \}^{...}$ \\
 \x [ {\bf OUT} Statement$^{...}$ ] \\
 \x {\bf FIN};
+\end{front}
+\begin{grammar}
+\input{CaseStatement2.bnf}
+\end{grammar}
 
-CaseIndex ::=\\
-\x Expression\S WithValueOfType-FIXED-or-CHAR(1)
+\input{CaseIndex.bnf}
 
+\begin{front}
 CaseList ::= \\
 \x IndexRange [ , Index-Range ]$^{...}$
 
 IndexRange ::= \\
 \x Constant [ : Constant ]
+\end{front}
+\begin{grammar}
+\input{CaseList.bnf}
+\input{IndexSection.bnf}
+\end{grammar}
 
 All given constants must be of type CaseIndex expression; CHAR(1) or
 FIXED are allowed.
@@ -220,6 +246,7 @@ num\_devices be the number of devices:
 
 In general, such ``program loops'' are constructed like this:
 
+\begin{front}
 repetition ::= \\
 \x [ {\bf FOR} Identifier\S ControlVariable ] \\
 \x [ {\bf FROM} Expression\S InitialValue ] \\
@@ -229,7 +256,10 @@ repetition ::= \\
 \x {\bf REPEAT} \\
 \x [ Declaration ]$^{...}$ [ Statement ]$^{...}$ \\
 \x {\bf END} [ Identifier\S Loop ] ;
-
+\end{front}
+\begin{grammar}
+\input{LoopStatement.bnf}
+\end{grammar}
 The declarations and statements following REPEAT, i.e., the loop body,
 are run so often as specified by the clauses given in front of them; the
 statement following END is carried out subsequently. However, it is also
@@ -400,8 +430,7 @@ a range exception.
 
 \section{GoTo Statement (GOTO)}   % 7.4
 
-GoToStatement ::=\\
-\x {\bf GOTO} Identifier\S Label;
+\input{GoToStatement.bnf}
 
 This statement has the result that program processing is continued at
 the program position determined by the label identifier. This program
@@ -434,8 +463,7 @@ EXIT, also blocks and loops nested several times can be exited
 deliberately, which must have an identifier (the jump target) at the
 corresponding end.
 
-ExitStatement ::= \\
-\x {\bf EXIT} [ Identifier\S BlockOrLoop ] ;
+\input{ExitStatement.bnf}
 
 If the identifier is missing, program processing is continued with the
 statement following the end of the block or the loop containing the exit

@@ -92,6 +92,7 @@ to the procedure as actual parameters, or
 The local declarations and the statements of the procedure form the
 procedure body.
 
+\begin{front}
 ProcedureDeclaration ::= \\
 \x Identifier: \{ {\bf PROCEDURE $\mid$ PROC} \} [ ListOfFormalParameters ]\\
 \x [ ResultAttribute ]\\
@@ -102,31 +103,52 @@ ProcedureDeclaration ::= \\
 ProcedureBody ::= \\
 \x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
 
-ListOfFormalParameters ::=\\
-\x (FormalParameter [ , FormalParameter ]$^{...}$)
+\end{front}
+\begin{grammar}
+\input{ProcedureDeclaration.bnf}
+\input{ProcedureBody.bnf}
+\end{grammar}
 
+\input{ListOfFormalParameters.bnf}
+
+\begin{front}
 FormalParameter ::=\\
 \x Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ AssignmentProtection ]\\
 \x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
+\end{front}
+\begin{grammar}
+\input{FormalParameter.bnf}
+\end{grammar}
 
-VirtualDimensionList ::=\\
-\x ( [ , $^{...}$ ] )
+\input{VirtualDimensionList.bnf}
+
+\begin{front}
 
 ParameterType ::= \\
 \x SimpleType $\mid$ TypeReference $\mid$ TypeStructure\\
 \x $\mid$ Identifier\S ForType $\mid$ TypeDation $\mid$ TypeRealTimeObject
+\end{front}
+\begin{grammar}
+\input{ParameterType.bnf}
+\end{grammar}
 
+\input{ResultAttribute.bnf}
+
+\begin{front}
 TypeRealTimeObject ::=\\
 \x {\bf SEMA $\mid$ BOLT $\mid$ IRPT $\mid$ INTERRUPT $\mid$ SIGNAL}
 
-ResultAttribute ::= \\
-\x {\bf RETURNS}(ResultType)
-
 ResultType ::= \\
 \x SimpleType $\mid$ TypeReference $\mid$ TypeStructure $\mid$ Identifier\S ForType
+\end{front}
+\begin{grammar}
+\input{TypeRealTimeObject.bnf}
+\input{ResultType.bnf}
+\end{grammar}
 
 The general form of the specification of a procedure reads as follows:
 
+\begin{front}
 ProcedureSpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\S Procedure \{ {\bf ENTRY $\mid$ [ : ] PROC} \} \\
 \x [ ListOfParametersFor-SPC ] [ResultAttribute ] GlobalAttribute ;
@@ -137,6 +159,10 @@ ListOfParametersFor-SPC ::=\\
 ParameterSpecification ::=\\
 \x [ Identifier ] [ VirtualDimensionList ] [ AssignmentProtection ] \\
 \x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 In the procedure specification, the (optionally) definable list of
 parameters is only of documentary importance; however, it is thus
@@ -200,11 +226,15 @@ programs.
 Subprogram procedures are called with the help of the keyword CALL or
 only with their identifiers:
 
+\begin{front}
 CallStatement ::=\\
 \x [ {\bf CALL} ] Name\S SubprogramProcedure [ ListOfActualParameters ] ;
+\end{front}
+\begin{grammar}
+\input{ProcedureCall.bnf}
+\end{grammar}
 
-ListOfActualParameters ::=\\
-\x (Expression [ , Expression ]$^{...}$)
+\input{ListOfActualParameters.bnf}
 
 Example:
 
@@ -223,9 +253,13 @@ The call of a function procedure does not take place as an independent
 statement, but within expressions upon stating the identifier and the
 actual parameters:
 
+\begin{front}
 FunctionCall ::= \\
 \x Name\S FunctionProcedure [ ListOfActualParameters ]
-
+\end{front}
+\begin{grammar}
+\input{FunctionCall.bnf}
+\end{grammar}
 Example:
 
 The function procedure Ari shall calculate the arithmetic average of an
@@ -337,25 +371,40 @@ these structures can be combined into new, abstract data structures.
 A declaration of reference variables for procedures contains the
 description of all parameter types, as well as the type of the result.
 
+\begin{front}
 ProcedureReferenceDeclaration ::= \\
 \x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ] [ {\bf INV} ]\\
 \x {\bf REF} TypeProcedure [ GlobalAttribute ] [ InitialisationAttribute ] ;
 
 TypeProcedure ::=\\
 \x {\bf PROC} [ ListOfParametersFor-SPC ] [ ResultAttribute ]
+\end{front}
+\begin{grammar}
+\input{TypeProcedure.bnf} 
+\end{grammar}
 
 The general form of the specification of procedure reference variables
 reads:
 
+\begin{front}
 ProcedureReferenceSpecification ::= \\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ {\bf INV} ]\\
 \x {\bf REF} TypeProcedure GlobalAttribute;
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The value assignment to a procedure reference variable takes place with
 the assignment:
 
+\begin{front}
 Assignment ::=\\
 \x Name\S RefProcVariable \{ := $\mid$ = \} Identifier\S Procedure;
+\end{front}
+\begin{grammar}
+\input{Assignment.bnf}
+\end{grammar}
 
 Only procedures declared at module level may be assigned here.
 

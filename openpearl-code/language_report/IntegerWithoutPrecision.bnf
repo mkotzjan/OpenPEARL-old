@@ -1,0 +1,2 @@
+\htgt{IntegerWithoutPrecision} ::=\\
+\x \hlink{Digit} $^{...}$ $\mid$ \{ 0 $\mid$ 1 \} $^{...}$ {\bf B}\\

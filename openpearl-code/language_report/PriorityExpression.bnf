@@ -1,0 +1,4 @@
+\htgt{PriorityExpression} ::=\\
+\x \{ {\bf PRIORITY $\mid$ PRIO} \} 
+	\hlink{Expression}$\S $PositiveInteger\\
+

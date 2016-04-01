@@ -117,7 +117,10 @@ C & PEARL \\
 
 \newpage
 \section{Syntax}    % A 3
+\begin{discuss}
+this section is duplicate with chapter  3
 
+\end{discuss}
 Following meta characters are used in the syntax description:\\ 
 
 \begin{tabular}{ll}
@@ -149,14 +152,9 @@ description.
 
 \subsection{Program}    % A 3.1
 
-PEARL-Program ::=\\
-\x Module $^{...}$\\
+\input{PEARL-Program.bnf}
 
-Module ::=\\
-\x {\bf MODULE} [ [ ( ] \hlink{Identifier}$\S $OfTheModule [ ) ] ] ;\\
-\x \{ \hlink{SystemPart} [ \hlink{ProblemPart} ] 
-	$\mid$ \hlink{ProblemPart} \} \\
-\x {\bf MODEND} ;
+\input{Module.bnf}
 
 \subsection{System Part}   % A 3.2
 
@@ -184,24 +182,13 @@ nngz ::= \\
 \htgt{Identifier} ::=\\
 \x \hlink{Letter} [ \hlink{Letter} $\mid$ \hlink{Digit} $\mid$ \_ ] $^{...}$\\
 
-\begin{tabbing}
-\x $\mid$ \= BitStringConstant \= $\mid$ \= \kill
-\htgt{Constant} ::= \> \> \> \\
-          \> \hlink{Integer}   \> $\mid$ \> \hlink{FloatingPointNumber}\\
-\x $\mid$ \> \hlink{BitStringConstant} \> $\mid$ \> \hlink{CharacterStringConstant}\\
-\x $\mid$ \> \hlink{TimeConstant} \> $\mid$ \> \hlink{DurationConstant}\\
-\x $\mid$ {\bf NIL} \\
+\input{Constant.bnf}
 
-\end{tabbing}
+\input{Integer.bnf} 
 
-\htgt{Integer} ::=\\
-\x \hlink{IntegerWithoutPrecision} [ ( \hlink{Precision} ) ]\\
+\input{IntegerWithoutPrecision.bnf}
 
-\htgt{IntegerWithoutPrecision} ::=\\
-\x \hlink{Digit} $^{...}$ $\mid$ \{ 0 $\mid$ 1 \} $^{...}$ {\bf B}\\
-
-\htgt{Precision} ::=\\
-\x \hlink{IntegerWithoutPrecision}\\
+\input{Precision.bnf}
 
 \htgt{FloatingPointNumber} ::=\\
 \x \hlink{FloatingPointNumberWithoutPrecision} [ ( \hlink{Precision} ) ]\\
@@ -252,31 +239,17 @@ nngz ::= \\
 \x \{ \hlink{IntegerWithoutPrecision} 
 	$\mid$ \hlink{FloatingPointNumberWithoutPrecision} \} {\bf SEC}
 
-\htgt{ConstantExpression} ::=\\
-\{ + $\mid$ - \}  \hlink{FloatingPointNumber}\\
-\x $\mid$ \{ + $\mid$ - \} \hlink{DurationConstant}\\
-\x $\mid$ \hlink{Constant-FIXED-Expression}\\
+\input{ConstantExpression.bnf}
 
-\htgt{Constant-FIXED-Expression} ::=\\
-\x \hlink{Term} [ \{ + $\mid$ - \} \hlink{Term} ] $^{...}$\\
+\input{Constant-FIXED-Expression.bnf} 
         
-\htgt{Term} ::= \\
-\x \hlink{Factor} [ \{ $^*$ $\mid$ // $\mid$ {\bf REM} \} \hlink{Factor} ] $^{...}$\\
+\input{Term.bnf}
 
-\htgt{Factor} ::= \\
-\x [ + $\mid$ - ] \\
-\x \{ \hlink{Integer}\\
-\x \x $\mid$ ( \hlink{Constant-FIXED-Expression} )\\
-\x \x $\mid$ {\bf TOFIXED} \{ \hlink{CharacterStringConstant}$\S $OfLength1 
-	$\mid$ \hlink{BitStringConstant} \}\\
-\x \x $\mid$ \hlink{Identifier}$\S $Named-FIXED-Constant\\
-\x \} \\
-\x [ {\bf FIT} \hlink{Constant-FIXED-Expression} ]
+\input{Factor.bnf}
 
 \subsection{Problem Part}   % A 3.4
 
-\htgt{ProblemPart} ::=\\
-\x {\bf PROBLEM}; [\{ Declaration $\mid$ Specification $\mid$ Identification \} $^{...}$ ]\\
+\input{ProblemPart.bnf}
 
 \subsubsection{Declaration}    % A 3.4.1
 
@@ -293,13 +266,9 @@ nngz ::= \\
 \end{removed}
 
 
-\htgt{LengthDefinition} ::=\\
-\x {\bf LENGTH} \{ {\bf FIXED $\mid$ FLOAT
-                    $\mid$ BIT $\mid$ CHARACTER $\mid$ CHAR} \}
-                ( \hlink{Precision} ) ;\\
+\input{LengthDefinition.bnf} 
 
-\htgt{TypeDefinition} ::=\\
-\x {\bf TYPE} \hlink{Identifier}$\S $ForType \{ \hlink{SimpleType} $\mid$ \hlink{TypeStructure} \} ;\\
+\input{TypeDefinition.bnf}
 
 \htgt{VariableDeclaration} ::=\\
 \x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{DeclareSentence} [ , \hlink{DeclareSentence} ] $^{...}$ ;\\
@@ -312,56 +281,31 @@ nngz ::= \\
 \htgt{OneIdentifierOrList} ::= \\
 \x \hlink{Identifier} $\mid$ ( \hlink{Identifier} [ , \hlink{Identifier} ] $^{...}$ ) \\
 
-\htgt{DimensionAttribute} ::=\\
-\x ( \hlink{DimensionBoundaries} [ , \hlink{DimensionBoundaries} ] $^{...}$ )\\
+\input{DimensionAttribute.bnf}
 
-\htgt{DimensionBoundaries} ::=\\
-\x [ \hlink{Constant-FIXED-Expression}$\S $ForLowerBoundary : ]\\
-\x \hlink{Constant-FIXED-Expression}$\S $ForUpperBoundary\\
+\input{DimensionBoundaries.bnf}
         
 \htgt{ProblemDataAttribute} ::=\\
 \x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} 
 	$\mid$ \hlink{TypeReference} \}\\
 \x [ \hlink{GlobalAttribute} ] [ \hlink{InitialisationAttribute} ]\\
 
-\htgt{SimpleType} ::=\\
-\x \{ {\bf FIXED $\mid$ FLOAT $\mid$ BIT $\mid$ CHAR $\mid$ CHARACTER} \}\\
-\x \x [ ( \hlink{Constant-FIXED-Expression}$\S $PrecisionResp.Length ) ]\\
-\x $\mid$ {\bf CLOCK}\\
-\x $\mid$ \{ {\bf DUR $\mid$ DURATION} \}\\
+\input{SimpleType.bnf}
 
 \htgt{StructuredType} ::=\\
 \x \hlink{TypeStructure} $\mid$ \hlink{Identifier}$\S $ForNewDefinedType\\
 
-\htgt{TypeStructure} ::=\\
-\x {\bf STRUCT [} \hlink{StructureComponent} 
-	[ , \hlink{StructureComponent} ] $^{...}$ {\bf ]} \\
+\input{TypeStructure.bnf}
 
-\htgt{StructureComponent} ::=\\
-\x \hlink{OneIdentifierOrList}$\S $ForStructureComponent 
-	[ \hlink{DimensionAttribute} ]\\
-\x \hlink{TypeAttributeInStructureComponent}\\
+\input{StructureComponent.bnf}
 
-\htgt{TypeAttributeInStructureComponent} ::=\\
-\x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ 
-	\hlink{StructuredType} $\mid$ \hlink{TypeReference} \}\\
+\input{TypeAttributeInStructureComponent.bnf}
 
-\htgt{TypeReference} ::=\\
-\x {\bf REF} \\
-\x \{ [ \hlink{VirtualDimensionList} ] [ {\bf INV} ] 
-	\{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} \}\\
-\x \x $\mid$ [ \hlink{VirtualDimensionList} ] 
-	\{ \hlink{TypeDation} $\mid$ {\bf SEMA $\mid$ BOLT} \}\\
-\x \x $\mid$ \hlink{TypeProcedure} $\mid$ 
-	{\bf TASK $\mid$ INTERRUPT $\mid$ IRPT $\mid$ SIGNAL}\\
-\x \x $\mid$ \hlink{Type-VOID} $\mid$ {\bf CHAR}( )\\
-\x \}\\
+\input{TypeReference.bnf}
 
-\htgt{VirtualDimensionList} ::=\\
-\x ( [ , $^{...}$ ] )\\
+\input{VirtualDimensionList.bnf}
 
-\htgt{Type-VOID} ::=\\
-\x {\bf STRUCT [ ]} \x $/^*$ only allowed in combination with REF $*/$\\
+\input{Type-VOID.bnf}
 
 \htgt{SemaAttribute} ::=\\
 \x {\bf SEMA} [ \hlink{GlobalAttribute} ]\\
@@ -371,116 +315,68 @@ nngz ::= \\
 \htgt{BoltAttribute} ::=\\
 \x {\bf BOLT} [ \hlink{GlobalAttribute} ]\\
 
-\htgt{GlobalAttribute} ::=\\
-\x {\bf GLOBAL} [ ( \hlink{Indicator}$\S $Module ) ]\\
+\input{GlobalAttribute.bnf}
 
-\htgt{InitialisationAttribute} ::=\\
-\x \{ {\bf INITIAL $\mid$ INIT} \} ( \hlink{InitElement} 
-	[ , \hlink{InitElement} ] $^{...}$ )\\
+\input{InitialisationAttribute.bnf}
 
-\htgt{InitElement} ::=\\
-\x \hlink{Constant}\\
-\x $\mid$ \hlink{Identifier}$\S $NamedConstant\\
-\x $\mid$ \hlink{ConstantExpression}\\
+\input{InitElement.bnf}
 
-\htgt{DationAttribute} ::=\\
-\x \hlink{TypeDation}\\
-\x [ \hlink{GlobalAttribute} ]\\
-\x {\bf CREATED} ( \hlink{Indicator}$\S $UserNameForSytemDation )\\
+\input{DationAttribute.bnf}
 
-\htgt{TypeDation} ::=\\
-\x {\bf DATION} \hlink{SourceSinkAttribute}  \hlink{ClassAttribute}\\
-\x [ \hlink{Topology} ] [ \hlink{AccessAttribute} ]\\
+\input{TypeDation.bnf}
 
-\htgt{SourceSinkAttribute} ::=\\
-\x {\bf IN $\mid$ OUT $\mid$ INOUT}\\
+\input{SourceSinkAttribute.bnf}
 
 \begin{removed}
 ClassAttribute ::= \\
 \x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData\\
 \end{removed}
+
 \begin{added}
-\htgt{ClassAttribute} ::= \\
-\x [ {\bf SYSTEM} ]                     /* system dation */\\
-\x \x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\ 
-\x \x {\bf BASIC}  \hlink{TypeOfTransmissionData} $\mid$  /* TAKE/SEND */\\
-\x \x  \hlink{TypeOfTransmissionData}               /* READ/WRITE */ \\
+\input{ClassAttribute.bnf}
+
 \end{added}
 
-\htgt{TypeOfTransmissionData} ::=\\
-\x {\bf ALL} $\mid$ \hlink{SimpleType} $\mid$ \hlink{Indicator}$\S $ForRedeclaredType $\mid$ \hlink{TypeStructure}\\
-\x $/^*$ A Structure as transfer type may not contain any reference variable $*/$\\
+\input{TypeOfTransmissionData.bnf}
 
-\htgt{Topology} ::=\\
-\x {\bf DIM} ( \{ $^*$ $\mid$ \hlink{Constant-FIXED-Expression} \}\\
-\x \x [ , \{ $^*$ $\mid$ \hlink{Constant-FIXED-Expression} \}\\
-\x \x \x [ , \{ $^*$ $\mid$ \hlink{Constant-FIXED-Expression} \} ] ] ) 
-\removedtext{[ {\bf TFU} [ {\bf MAX} ] ]}\\
-\x $\mid$ {\bf DIM} ( [ , [ , ] ] ) $/^*$ Virtual dimension declaration only permitted for SPC $*/$\\
+\input{Topology.bnf}
 
-\htgt{AccessAttribute} ::=\\
-\x \{ {\bf DIRECT $\mid$ FORWARD \removedtext{$\mid$ FORBACK}} \}\\
-\x [ {\bf NOCYCL $\mid$ CYCLIC} ]\\
-\x [ {\bf STREAM $\mid$ NOSTREAM} ]\\
+\input{AccessAttribute.bnf}
 
 \htgt{FormatDeclaration} ::= \\
 \x \hlink{Identifier} : {\bf FORMAT} ( \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ ) ;\\
 
-\htgt{ProcedureDeclaration} ::=\\
-\x \hlink{Identifier} : \{ {\bf PROC $\mid$ PROCEDURE} \} [ \hlink{ListOfFormalParameters} ] \\
-\x [ \hlink{ResultAttribute} ] [ \hlink{GlobalAttribute} ] ;\\
-\x \x \hlink{ProcedureBody}\\
-\x {\bf END};\\
+\input{ProcedureDeclaration.bnf}
 
-\htgt{ProcedureBody} ::=\\
-\x [\{ \hlink{Declaration} $\mid$ \hlink{Identification} \} $^{...}$ ] [ \hlink{Statement} $^{...}$ ] \\
+\input{ProcedureBody.bnf}
 
-\htgt{ListOfFormalParameters} ::=\\
-\x ( \hlink{FormalParameter} [ , \hlink{FormalParameter} ] $^{...}$ )\\
+\input{ListOfFormalParameters.bnf}
         
-\htgt{FormalParameter} ::=\\
-\x \hlink{OneIdentifierOrList} [ \hlink{VirtualDimensionList} ]\\
-\x \x \hlink{ParameterType} [ {\bf IDENT $\mid$ IDENTICAL} ]\\
+\input{FormalParameter.bnf}
 
-\htgt{ParameterType} ::=\\
-\x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} $\mid$ \hlink{TypeReference} \} $\mid$\\   
-\x \x \hlink{TypeRealTimeObject} $\mid$ \hlink{TypeDation}\\
+\input{ParameterType.bnf}
 
-\htgt{TypeRealTimeObject} ::=\\   
-\x {\bf SEMA $\mid$ BOLT} $\mid$ \{ {\bf INTERRUPT $\mid$ IRPT} \} $\mid$ {\bf SIGNAL}\\   
+\input{TypeRealTimeObject.bnf}
 
-\htgt{ResultAttribute} ::=\\
-\x {\bf RETURNS} ( \hlink{ResultType} )\\
+\input{ResultAttribute.bnf}
 
-\htgt{ResultType} ::=\\
-\x \hlink{SimpleType} $\mid$ \hlink{StructuredType} $\mid$ \hlink{TypeReference}\\
+\input{ResultType.bnf}
 
-\htgt{TaskDeclaration} ::=\\
-\x \hlink{Identifier} : {\bf TASK} [ \hlink{PriorityAttribute} ] [ {\bf MAIN} ]\\
-\x [ \hlink{GlobalAttribute} ]  ;\\
-\x \x \hlink{TaskBody}\\
-\x {\bf END} ;\\
+\input{TaskDeclaration.bnf}
 
-\htgt{TaskBody} ::=\\
-\x [\{ \hlink{Declaration} $\mid$ \hlink{Identification} \}$^{...}$] [\hlink{Statement}$^{...}$]
+\input{TaskBody.bnf}
         
-\htgt{PriorityAttribute} ::=\\
-\x \{ {\bf PRIORITY $\mid$ PRIO} \} \hlink{Constant-FIXED-Expression}$\S $GreaterZero\\
+\input{PriorityAttribute.bnf}
 
 \begin{removed}
-OperatorDefinition ::= \\
-\x {\bf OPERATOR} OpName ( OpParameter [ , OpParameter ] ) \hlink{ResultAttribute} ;\\
-\x \x \hlink{ProcedureBody}\\
-\x {\bf END} ; \\
+\input{OperatorDefinition.bnf}
 
-OpName ::=\\
-\x \hlink{Identifier} $\mid + \mid - \mid ^* \mid / \mid // \mid ^{**} \mid == \mid /= \mid <= \mid >= \mid < \mid > \mid <> \mid ><$\\
+\input{OpName.bnf}
 
-OpParameter ::=\\
-\x \hlink{Identifier} [ \hlink{VirtualDimensionList} ] \hlink{ParameterType} [ {\bf IDENT $\mid$ IDENTICAL} ] \\
+\input{OpParameter.bnf}
 
-PrecedenceDefinition ::= \\
-\x {\bf PRECEDENCE} OpName ( \{ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7 \} ) ;
+\input{PrecedenceDefinition.bnf}
+
 \end{removed}
 
 \subsection{Specification and Identification}    % A 3.4.2
@@ -517,9 +413,7 @@ PrecedenceDefinition ::= \\
 	[ \hlink{VirtualDimensionList} ]\\
 \x \hlink{ParameterType} [ {\bf IDENTICAL $\mid$ IDENT} ]\\
 
-\htgt{TypeProcedure} ::=\\
-\x {\bf PROC} [ \hlink{ParameterListFor-SPC} ]
-	 [ \hlink{ResultAttribute} ] $/^*$ for REF PROC $*/$\\
+\input{TypeProcedure.bnf}
 
 \htgt{TaskUsageAttribute} ::=\\
 \x {\bf TASK} \hlink{GlobalAttribute}\\
@@ -537,44 +431,31 @@ Type must become defined
 
 \subsection{Expressions}    % A 3.4.3
 
-\htgt{Expression} ::=\\
-\x [ \hlink{MonadicOperator} ] \hlink{Operand} [ \hlink{DyadicOperator}   \hlink{Expression} ] $^{...}$\\
+\input{Expression.bnf}
 
-\htgt{MonadicOperator} ::=\\
-\x + $\mid$ - $\mid$ \hlink{Identifier}$\S $MonadicOperator\\
+\input{MonadicOperator.bnf}
 
-\htgt{DyadicOperator} ::=\\
-\x $ + \mid - \mid ^* \mid / \mid // \mid ^{**} \mid < \mid > \mid <= \mid >= \mid == \mid /= \mid >< \mid <> \mid$\\
-\x \hlink{Identifier}$\S $DyadicOperator\\
+\input{DyadicOperator.bnf}
 
-\htgt{Operand} ::= \\
-\x \hlink{Constant} $\mid$ \hlink{Name} $\mid$ \hlink{FunctionCall} $\mid$ \hlink{ConditionalExpression}\\
-\x $\mid$ \hlink{Dereferentiation} $\mid$ \hlink{StringSelection} $\mid$ ( \hlink{Expression} ) $\mid$ ( \hlink{Assignment} ) \\
-\x $\mid$ {\bf PRIO} [ ( \hlink{Name}$\S $Task ) ] $\mid$ {\bf TASK} [ ( \hlink{Name}$\S $Task ) ] $\mid$ {\bf TRY} \hlink{Name}$\S $Sema\\
+\input{Operand.bnf}
 
-\htgt{Name} ::=\\
-\x \hlink{Identifier} [ ( \hlink{Index} [ , \hlink{Index} ] $^{...}$ ) ] [ . \hlink{Name} ]\\
+\input{Name.bnf}
 
-\htgt{Index} ::=\\
-\x \hlink{Expression}$\S $WithIntegerAsValue\\
+\input{Index.bnf}
 
-\htgt{FunctionCall} ::=\\
-\x \hlink{Identifier}$\S $FunctionProcedure [ \hlink{ListOfActualParameters} ]\\
+\input{FunctionCall.bnf}
 
-\htgt{ListOfActualParameters} ::= \\
-\x ( \hlink{Expression} [ , \hlink{Expression} ] $^{...}$ )\\
+\input{ListOfActualParameters.bnf}
 
-\htgt{ConditionalExpression} ::=\\
-\x {\bf IF} \hlink{Expression}$\S $OfType-BIT(1) {\bf THEN} \hlink{Expression} {\bf ELSE} \hlink{Expression} {\bf FIN}\\
+\begin{discuss}
+das wird nirgends genutzt!
 
-\htgt{Dereferentiation} ::=\\
-\x {\bf CONT} \{ \hlink{Name}$\S $Reference $\mid$ \hlink{FunctionCall} \}\\
+\input{ConditionalExpression.bnf}  %%% noch nicht in front genutzt!
+\end{discuss}
 
-\htgt{StringSelection} ::=\\
-\x \hlink{Name}$\S $String . \{ {\bf BIT $\mid$ CHAR $\mid$ CHARACTER} \}\\ 
-\x ( \{ \hlink{Constant-FIXED-Expression} [ : \hlink{Constant-FIXED-Expression} ]\\
-\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} + \hlink{Constant-FIXED-Expression} ]\\
-\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} ] \} )\\
+\input{Dereferentiation.bnf}
+
+\input{StringSelection.bnf}
 
 \subsection{Statements}    % A 3.4.4
 
@@ -585,77 +466,38 @@ Type must become defined
 \x \hlink{EmptyStatement} $\mid$ \hlink{Assignment} $\mid$ \hlink{Block} $\mid$ \hlink{SequentialControlStatement}\\
 \x $\mid$ \hlink{RealTimeStatement} $\mid$ \hlink{ConvertStatement} $\mid$ \hlink{I/O-Statement}\\
 
-\htgt{EmptyStatement} ::=\\
-\x ;\\
+\input{EmptyStatement.bnf}
 
-\htgt{Assignment} ::=\\
-\x \{ \{ \hlink{Name}$\S $Variable $\mid$ \hlink{Dereferentiation} $\mid$ \hlink{StringSelection} $\mid$ 
-\hlink{Name}$\S $Structure \}\\   
-\x \{ := $\mid$ = \} \} $^{...}$ \hlink{Expression} ;\\
+\input{Assignment.bnf}
 
-\htgt{Block} ::= \\
-\x {\bf BEGIN}\\
-\x \x [\{ \hlink{Declaration} $\mid$ \hlink{Identification} \}$^{...}$ ]\\ 
-\x \x [ \hlink{Statement} $^{...}$ ] \\
-\x {\bf END} [ \hlink{Identifier}$\S $Block ] ;\\
+\input{Block.bnf}
 
-\htgt{SequentialControlStatement} ::=\\
-\x \hlink{IfStatement} $\mid$ \hlink{CaseStatement} $\mid$ \hlink{LoopStatement} $\mid$ \hlink{ExitStatement}\\
-\x $\mid$ \hlink{ProcedureCall} $\mid$ \hlink{ReturnStatement} $\mid$ \hlink{GoToStatement}\\
+\input{SequentialControlStatement.bnf}
 
-\htgt{IfStatement} ::=\\
-\x {\bf IF} \hlink{Expression}$\S $OfType-BIT(1)\\
-\x \x {\bf THEN} [ \hlink{Statement} $^{...}$ ]\\ 
-\x \x [ {\bf ELSE} [ \hlink{Statement} $^{...}$ ] ]\\
-\x {\bf FIN} ;\\
+\input{IfStatement.bnf}
 
-\htgt{CaseStatement} ::=\\
-\x \hlink{CaseStatement1} $\mid$ \hlink{CaseStatement2}\\
+\input{CaseStatement.bnf}
 
-\htgt{CaseStatement1} ::=\\
-\x {\bf CASE} \hlink{Expression}$\S $WithIntegerAsValue\\
-\x \x \{ {\bf ALT} [ \hlink{Statement} $^{...}$ ] \} $^{...}$\\
-\x \x [ {\bf OUT} [ \hlink{Statement} $^{...}$ ] ]\\
-\x {\bf FIN} ;\\
+\input{CaseStatement1.bnf}
 
-\htgt{CaseStatement2} ::=\\
-\x {\bf CASE} \hlink{CaseIndex}\\
-\x \x \{ {\bf ALT} ( \hlink{CaseList} ) [ \hlink{Statement} $^{...}$ ] \} $^{...}$\\
-\x \x [ {\bf OUT} [ \hlink{Statement} $^{...}$ ] ]\\
-\x {\bf FIN} ;\\
+\input{CaseStatement2.bnf}
 
-\htgt{CaseIndex} ::=\\
-\x \hlink{Expression}$\S $WithValueOfType-FIXED-Or-CHAR(1)\\
+\input{CaseIndex.bnf}
 
-\htgt{CaseList} ::=\\
-\x \hlink{IndexSection} [ , \hlink{IndexSection} ] $^{...}$\\
+\input{CaseList.bnf}
 
-\htgt{IndexSection}::=\\
-\x \hlink{Constant-FIXED-Expression} [ : \hlink{Constant-FIXED-Expression} ]\\
-\x $\mid$ \hlink{CharacterStringConstant}$\S $OfLength1 [ : \hlink{CharacterStringConstant}$\S $OfLength1 ]\\
+\input{IndexSection.bnf}
 
-\htgt{LoopStatement} ::=\\
-\x [ {\bf FOR} \hlink{Indicator}$\S $ControlVariable ]\\
-\x [ {\bf FROM} \hlink{Expression}$\S $InitialValue ]\\
-\x [ {\bf BY} \hlink{Expression}$\S $StepLength ]\\
-\x [ {\bf TO} \hlink{Expression}$\S $EndValue ]\\
-\x [ {\bf WHILE} \hlink{Expression}$\S $Condition ]\\
-\x {\bf REPEAT}\\
-\x \x [\{ \hlink{Declaration} $\mid$ \hlink{Identification} \}$^{...}$ ]\\ 
-\x \x [ \hlink{Statement} $^{...}$ ] \\
-\x {\bf END} [ \hlink{Identifier}$\S $Loop ] ;\\
+\input{LoopStatement.bnf}
         
-\htgt{ExitStatement} ::=\\
-\x {\bf EXIT} [ \hlink{Identifier}$\S $BlockOrLoop ] ;\\
+\input{ExitStatement.bnf}
 
-\htgt{ProcedureCall} ::= \\
-\x [ {\bf CALL} ] \hlink{Name}$\S $SubprogramProcedure [ \hlink{ListOfActualParameters} ] ;\\
+\input{ProcedureCall.bnf}
 
 \htgt{ReturnStatement} ::= \\
 \x {\bf RETURN} [ ( \hlink{Expression} ) ] ;\\
 
-\htgt{GoToStatement} ::= \\
-\x {\bf GOTO} \hlink{Identifier}$\S $Label ; \\
+\input{GoToStatement.bnf}
 
 \htgt{RealTimeStatement} ::=\\
 \x \hlink{TaskControlStatement} $\mid$ \hlink{TaskCoordinationStatement}\\
@@ -666,97 +508,63 @@ Type must become defined
 \x $\mid$ \hlink{TaskSuspending} $\mid$ \hlink{TaskContinuing}\\   
 \x $\mid$ \hlink{TaskResuming} $\mid$ \hlink{TaskPreventing}\\
 
-\htgt{TaskStarting} ::=\\
-\x [ \hlink{StartCondition} ] {\bf ACTIVATE} \hlink{Name}$\S $Task [ \hlink{PriorityExpression} ] ;\\
+\input{TaskStarting.bnf}
 
-\htgt{PriorityExpression} ::=\\
-\x \{ {\bf PRIORITY $\mid$ PRIO} \} \hlink{Expression}$\S $PositiveInteger\\
+\input{PriorityExpression.bnf}
 
-\htgt{StartCondition} ::=\\
-\x {\bf AT} \hlink{Expression}$\S $Time [ \hlink{Frequency} ]\\
-\x $\mid$ {\bf AFTER} \hlink{Expression}$\S $Duration [ \hlink{Frequency} ]\\
-\x $\mid$ {\bf WHEN} \hlink{Name}$\S $Interrupt [ {\bf AFTER} \hlink{Expression}$\S $Duration ] [ \hlink{Frequency} ] \\
-\x $\mid$ \hlink{Frequency}\\
+\input{StartCondition.bnf}
 
-\htgt{Frequency} ::=\\
-\x {\bf ALL} \hlink{Expression}$\S $Duration\\
-\x [ \{ {\bf UNTIL} \hlink{Expression}$\S $Time \} $\mid$ \{ {\bf DURING} \hlink{Expression}$\S $Duration \} ]\\
+\input{Frequency.bnf}
 
-\htgt{TaskTerminating} ::=\\
-\x {\bf TERMINATE} [ \hlink{Name}$\S $Task ] ; \\
+\input{TaskTerminating.bnf}
 
-\htgt{TaskSuspending} ::=\\
-\x {\bf SUSPEND} [ \hlink{Name}$\S $Task ] ;\\
+\input{TaskSuspending.bnf}
 
-\htgt{TaskContinuing} ::=\\
-\x [ {\bf AT} \hlink{Expression}$\S $Time $\mid$ {\bf AFTER} \hlink{Expression}$\S $Duration $\mid$ {\bf WHEN} \hlink{Name}$\S $Interrupt ]\\
-\x {\bf CONTINUE} [ \hlink{Name}$\S $Task ] [ \hlink{PriorityAttribute} ] ;\\
+\input{TaskContinuing.bnf}
 
-\htgt{TaskResuming} ::=\\
-\x \{ {\bf AT} \hlink{Expression}$\S $Time $\mid$ {\bf AFTER} \hlink{Expression}$\S $Duration $\mid$ {\bf WHEN} \hlink{Name}$\S $Interrupt \}\\
-\x {\bf RESUME;}\\        
+\input{TaskResuming.bnf}
 
-\htgt{TaskPreventing} ::=\\
-\x {\bf PREVENT} [ \hlink{Name}$\S $Task ] ;\\
+\input{TaskPreventing.bnf}
 
-\htgt{TaskCoordinationStatement} ::=\\
-\x \{ {\bf REQUEST $\mid$ RELEASE}\} \hlink{Name}$\S $Sema [ , \hlink{Name}$\S $Sema ] $^{...}$ ;\\
-\x $\mid$ \{ {\bf RESERVE $\mid$ FREE $\mid$ ENTER $\mid$ LEAVE} \} \hlink{Name}$\S $Bolt [ , \hlink{Name}$\S $Bolt ] $^{...}$ ;\\
+\input{TaskCoordinationStatement.bnf}
 
-
-\htgt{InterruptStatement} ::=\\
-\x \{ {\bf ENABLE $\mid$ DISABLE $\mid$ TRIGGER} \} \hlink{Name}$\S $Interrupt ;\\
+\input{InterruptStatement.bnf}
 
 \begin{removed}
 SchedulingSignalReaction ::=\\
-\x {\bf ON} Name$\S $Signal \{ [ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
-\x \x SignalReaction $\mid$ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
+\x {\bf ON} Name$\S $Signal \{ [ 
+	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
+\x \x SignalReaction $\mid$ 
+	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
 
 SignalReaction::= UnlabeledStatement\\
 
 InduceStatement ::=\\
-\x {\bf INDUCE} Name$\S $Signal [ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
+\x {\bf INDUCE} Name$\S $Signal 
+	[ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
 \end{removed}
 
 \begin{added}
-\htgt{SignalStatement} ::=\\
-\x {\bf ON} \hlink{Name}$\S $Signal [ {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED ) ] :\\
-\x \x \hlink{SignalReaction} ;
+\input{SignalStatement.bnf}
 
-\htgt{SignalFinalStatement} ::= \\
-\x \hlink{ReturnStatement} $\mid$ \\
-\x \hlink{GoToStatement} $\mid$ \\
-\x \hlink{InduceStatement} $\mid$ \\
-\x {\bf TERMINATE} ;
+\input{SignalFinalStatement.bnf}
 
-\htgt{SignalReaction} ::=\\
-\x \hlink{SignalFinalStatement} $\mid$ \\
-\x \hlink{Block}$\S $terminatedWithSignalFinalStatement ;
+\input{SignalReaction.bnf}
 
-\htgt{InduceStatement} ::=\\
-\x {\bf INDUCE} [ \hlink{Name}$\S $Signal [ {\bf RST} ( \hlink{Expression}$\S $ErrorNumber-FIXED ) ] ] ;\\
+\input{InduceStatement.bnf} 
+
 \end{added}
 
 \htgt{ConvertStatement} ::=\\
 \x \hlink{ConvertToStatement} $\mid$ \hlink{ConvertFromStatement}\\
 
-\htgt{ConvertToStatement} ::= \\
-\x {\bf CONVERT} \hlink{Expression} [ , \hlink{Expression} ] $^{...}$ {\bf TO} \hlink{Name}$\S $CharacterStringVariable\\
-\x [ {\bf BY} \hlink{FormatOrPositionConvert} [ , \hlink{FormatOrPositionConvert} ] $^{...}$ ] ;\\
+\input{ConvertToStatement.bnf}
 
-\htgt{ConvertFromStatement} ::=\\
-\x {\bf CONVERT} \hlink{Name}$\S $Variable [ , \hlink{Name}$\S $Variable ] $^{...}$ {\bf FROM} \hlink{Expression}$\S $CharacterString\\
-\x [ {\bf BY} \hlink{FormatOrPositionConvert} [ , \hlink{FormatOrPositionConvert} ] $^{...}$ ] ;\\
+\input{ConvertFromStatement.bnf}
 
-\htgt{FormatOrPositionConvert} ::= \\
-\x [ \hlink{FormatFactor} ] \{ \hlink{Format} $\mid$ \hlink{PositionConvert} \}\\
-\x $\mid$ \hlink{FormatFactor} ( \hlink{FormatOrPositionConvert} [ , \hlink{FormatOrPositionConvert} ] $^{...}$ )\\
+\input{FormatOrPositionConvert.bnf}
 
-\htgt{PositionConvert} ::= \\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-\x $\mid$ {\bf X} [ ( \hlink{Expression} ) ]\\
-\x $\mid$ \{ {\bf POS $\mid$ ADV} \} ( \hlink{Expression} )\\
-\x $\mid$ {\bf SOP} ( \hlink{Name}$\S $PositionVariable-FIXED )\\
+\input{PositionConvert.bnf}
 
 \htgt{I/O-Statement} ::=\\
 \x \hlink{OpenStatement} $\mid$ \hlink{CloseStatement}\\
@@ -764,37 +572,21 @@ InduceStatement ::=\\
 \x $\mid$ \hlink{WriteStatement} $\mid$ \hlink{ReadStatement}\\
 \x $\mid$ \hlink{SendStatement} $\mid$ \hlink{TakeStatement}\\
          
-\htgt{OpenStatement} ::=\\
-\x {\bf OPEN} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{OpenParameter} [ , \hlink{OpenParameter} ] $^{...}$ ] ;\\
+\input{OpenStatement.bnf}
 
-\htgt{OpenParameter} ::=\\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-\x $\mid$ {\bf IDF} ( \{ \hlink{Name}$\S $CharacterStringVariable $\mid$ \hlink{CharacterStringConstant} \} )\\
-\x $\mid$ \{ {\bf OLD $\mid$ NEW $\mid$ ANY} \}\\
-\x $\mid$ \{ {\bf CAN $\mid$ PRM} \}\\
+\input{OpenParameter.bnf}
 
-\htgt{CloseStatement} ::=\\ 
-\x {\bf CLOSE} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{CloseParameter} [ , \hlink{CloseParameter} ] $^{...}$ ] ;\\
+\input{CloseStatement.bnf}
 
-\htgt{CloseParameter} ::=\\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-\x $\mid$ \{ {\bf CAN $\mid$ PRM} \}\\
+\input{CloseParameter.bnf}
 
-\htgt{PutStatement} ::=\\
-\x {\bf PUT} [ \{ \hlink{Expression} $\mid$ \hlink{Slice} \} [ , \{ \hlink{Expression} $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
-\x {\bf TO} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ ] ;\\
+\input{PutStatement.bnf}
 
-\htgt{GetStatement} ::=\\
-\x {\bf GET} [ \{ \hlink{Name} $\mid$ \hlink{Slice} \} [ , \{ \hlink{Name} $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
-\x {\bf FROM} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ ] ;\\
+\input{GetStatement.bnf}
 
-\htgt{WriteStatement} ::=\\
-\x {\bf WRITE} [ \{ \hlink{Expression} $\mid$ \hlink{Slice} \} [ , \{ \hlink{Expression} $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
-\x {\bf TO} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{Position} [ , \hlink{Position} ] $^{...}$ ] ; \\
+\input{WriteStatement.bnf}
         
-\htgt{ReadStatement} ::=\\
-\x {\bf READ} [ \{ \hlink{Name} $\mid$ \hlink{Slice} \} [ , \{ \hlink{Name} $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
-\x {\bf FROM} \hlink{Name}$\S $Dation [ {\bf BY} \hlink{Position} [ , \hlink{Position} ] $^{...}$ ] ;\\
+\input{ReadStatement.bnf}
         
 \begin{removed}
 SendStatement ::=\\
@@ -812,27 +604,17 @@ RST-S-CTRL-Format ::=\\
 \end{removed}
 
 \begin{added}
-\htgt{SendStatement} ::=\\
-\x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} \hlink{RST-Format} ] ;\\
+\input{SendStatement.bnf} 
 
-\htgt{TakeStatement} ::=\\
-\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} \hlink{RST-Format} ] ;\\
+\input{TakeStatement.bnf}
 
-\htgt{RST-Format} ::=\\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+\input{RST-Format.bnf}
+
 \end{added}
 
-\htgt{Slice} ::=\\
-\x \hlink{Name}$\S $Array ( [ \hlink{Index} , ] $^{...}$ \hlink{Index} : \hlink{Index} )\\
-\x $/^*$ Instead of the last array-index an index-slice is given to address 
-the respective one-dimensional array-slice which is processed by the I/O 
-in bottom-up order. $*/$\\
+\input{Slice.bnf}
 
-\htgt{FormatOrPosition} ::=\\
-\x [ \hlink{FormatFactor} ] \{ \hlink{Format} $\mid$ \hlink{Position} \}\\
-\x $\mid$ \hlink{FormatFactor} ( \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ )\\
+\input{FormatOrPosition.bnf}
       
 \begin{removed}  
 Factor ::=\\
@@ -841,26 +623,13 @@ Factor ::=\\
 .. and sustituted Factor by FormatFactor in Convert and Put/GET statements
 \end{removed}  
 \begin{added}  
-\htgt{FormatFactor} ::=\\
-\x ( \hlink{Expression}$\S $IntegerGreaterZero ) $\mid$ \hlink{IntegerWithoutPrecision}$\S $GreaterZero\\
+\input{FormatFactor.bnf}
+
 \end{added}  
 
-\htgt{Format} ::=\\
-\x \{ {\bf F $\mid$ E \addedtext{$\mid$ E3 }\} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] ) \\
-\x $\mid$ \{ {\bf B $\mid$ B1 $\mid$ B2 $\mid$ B3 $\mid$ B4 $\mid$ A} \} [ ( \hlink{Expression} ) ]\\
-\x $\mid$ \{ {\bf T $\mid$ D} \} ( \hlink{Expression} [ , \hlink{Expression} ] )\\
-\x $\mid$ {\bf LIST}\\
-\x $\mid$ {\bf R} ( \hlink{Identifier}$\S $Format )\\
-\begin{removed}
-\x $\mid$ {\bf S} ( \hlink{Name}$\S $LengthVariable-FIXED )\\
-\end{removed}
+\input{Format.bnf}
 
-\htgt{Position} ::=\\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-\x $\mid$ \{ {\bf X $\mid$ SKIP $\mid$ PAGE} \} [ ( \hlink{Expression} ) ]\\
-\x $\mid$ \{ {\bf POS $\mid$ ADV} \} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
-\x $\mid$ \{ {\bf COL $\mid$ LINE} \} ( \hlink{Expression} )\\
-\x $\mid$ {\bf SOP} ( \hlink{Name} [ , \hlink{Name} [ , \hlink{Name} ] ]  $/^*$ PositionVariables-FIXED $^*/$ )\\
+\input{Position.bnf}
 
 \twocolumn[\section{List of Keywords with Shortforms}   % A 4
 

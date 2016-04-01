@@ -1,0 +1,4 @@
+\htgt{TypeRealTimeObject} ::=\\   
+\x {\bf SEMA $\mid$ BOLT} $\mid$ 
+	\{ {\bf INTERRUPT $\mid$ IRPT} \} $\mid$ {\bf SIGNAL}\\   
+

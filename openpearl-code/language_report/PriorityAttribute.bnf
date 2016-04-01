@@ -1,0 +1,4 @@
+\htgt{PriorityAttribute} ::=\\
+\x \{ {\bf PRIORITY $\mid$ PRIO} \}
+	 \hlink{Constant-FIXED-Expression}$\S $GreaterZero\\
+

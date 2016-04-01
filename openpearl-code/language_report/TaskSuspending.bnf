@@ -1,0 +1,3 @@
+\htgt{TaskSuspending} ::=\\
+\x {\bf SUSPEND} [ \hlink{Name}$\S $Task ] ;\\
+

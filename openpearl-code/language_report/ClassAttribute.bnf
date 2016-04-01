@@ -1,0 +1,6 @@
+\htgt{ClassAttribute} ::= \\
+\x [ {\bf SYSTEM} ]                     /* system dation */\\
+\x \x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\ 
+\x \x {\bf BASIC}  \hlink{TypeOfTransmissionData} $\mid$  /* TAKE/SEND */\\
+\x \x  \hlink{TypeOfTransmissionData}               /* READ/WRITE */ \\
+

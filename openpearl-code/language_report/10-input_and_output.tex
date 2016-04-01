@@ -222,8 +222,13 @@ For the declarations from the above example, this can take place as:
 
 The general form reads:
 
+\begin{front}
 DationSpecification ::= \\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} IdentifierDenotation TypeDation [ GlobalAttribute ] ;
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The different attributes in a system dation specification describe the
 fundamental features of the physical device to be communicated with. The
@@ -240,9 +245,16 @@ All input/output statements described in the following refer to user
 dations --- the direct declaration of system dations leads to run time
 errors.
 
+\begin{front}
 DationDeclaration ::= \\
 \x \{{\bf DECLARE $\mid$ DCL}\} IdentifierDenotation TypeDation [GlobalAttribute]\\
 \x {\bf CREATED} (Name$\S $SystemDefDation);
+\end{front}
+\begin{grammar}
+some stuff not in grammar
+
+\input{DationAttribute.bnf}
+\end{grammar}
 
 Hence, no arrays of data stations may be declared. However, it is
 possible to declare arrays of references to data stations to enable also
@@ -252,15 +264,26 @@ The various attributes enable the detection of contradictions between
 the features of data stations and their way of using in I/O statements
 already at compilation time.
 
+\begin{front}
 TypeDation ::= \\
 \x {\bf DATION} SourceSinkAttribute ClassAttribute\\
 \x [ Structure ] [ AccessAttribute ]
+\end{front}
+\begin{grammar}
+\input{TypeDation.bnf}
+\end{grammar}
 
 Each data station is source and/or sink of a data transmission. The
 corresponding feature must be given upon declaration:
 
+\begin{front}
 SourceSinkAttribute ::= \\
 \x {\bf IN $\mid$ OUT $\mid$ INOUT}
+\end{front}
+\begin{grammar}
+%\input{DationAttribute.bnf}
+\input{SourceSinkAttribute.bnf}
+\end{grammar}
 
 IN means that this data station is a source for data, i.e., it may only
 appear in such data transmission statements which transmit these data
@@ -309,13 +332,10 @@ ClassAttribute ::= \\
 \x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData
 \end{removed}
 \begin{accepted}
-ClassAttribute ::= \\
-\x [ {\bf SYSTEM} ]  /* system dation */\\
-\x \x {\bf ALPHIC} $\mid$                  /* PUT/GET */ \\
-\x \x {\bf BASIC}  TypeOfTransmissionData $\mid$  /* TAKE/SEND */\\
-\x \x  TypeOfTransmissionData               /* READ/WRITE */ \\
+\input{ClassAttribute.bnf}
 \end{accepted}
 
+\begin{front}
 TypeOfTransmissionData ::=\\
 \x {\bf ALL} $\mid$ SimpleType $\mid$ CompoundType
 
@@ -332,6 +352,16 @@ IO-Structure ::=\\
 IO-StructureComponent := \\
 \x IdentifierDenotation\\
 \x \{ SimpleType $\mid$ IO-Structure $\mid$ Identifier$\S $ForNewTypeFromSimpleTypes \}
+\end{front}
+\begin{grammar}
+\input{TypeOfTransmissionData.bnf}
+
+already used:
+
+\input{SimpleType.bnf}
+\input{TypeStructure.bnf}
+
+\end{grammar}
 
 Hence, the type of the transmission data may also be a multiply
 structured structure or a newly defined type, but no component being of
@@ -399,7 +429,13 @@ Typology ::= \\
 Typology ::= \\
 \x {\bf DIM} ( \{ $^*$ $\mid$ pi \} [ , pi [ , pi ] ] ) 
 \end{accepted}
+\begin{grammar}
+\input{Topology.bnf}
+\end{grammar}
 
+\begin{discuss}
+pi must be substituded in next paragraph
+\end{discuss}
 The pi denotation furthest to the right always denotes the number of
 elements per line, the next (possibly lacking) pi denotation denotes
 the number of lines per page, and the following (possibly lacking) pi
@@ -449,9 +485,14 @@ L are written out in one (new) line by Printer.
 The possible ways of accessing a data station are determined by the
 access attribute:
 
+\begin{front}
 AccessAttribute ::= \\
 \x {\bf \{ DIRECT $\mid$ FORWARD \removedtext{$\mid$ FORBACK} \} [ NOCYCL $\mid$ CYCLIC ]}\\
 \x {\bf [ STREAM $\mid$ NOSTREAM ]}
+\end{front}
+\begin{grammar}
+\input{AccessAttribute.bnf}
+\end{grammar}
 
 DIRECT means that (based on a transmitted data element) any data element
 can directly be accessed, giving the position of the element
@@ -515,8 +556,7 @@ The characteristics of the system dation must fit to the specification:
 Before a data station may be used for the first time in a data
 transmission statement, it must be opened by the open statement:
 
-OpenStatement ::=\\
-\x {\bf OPEN} Name$\S $Dation [ {\bf BY} OpenParameter [ , OpenParameter ] $^{...}$ ] ;
+\input{OpenStatement.bnf}
 
 When executing the open statement, a data station with typology is
 positioned at its beginning.
@@ -528,11 +568,17 @@ under this name. Later on, the same or another program can create a user
 defined data station Table on Disk, identified with file TAB1 in the
 open statement.
 
+
+\begin{front}
 OpenParameter ::=\\
 \x {\bf IDF} ( \{Name$\S $CharacterVariable $\mid$ CharacterStringConstant \} ) $\mid$\\
 \x {\bf RST} (Name$\S $ErrorVariable-FIXED) $\mid$ \\
 \x \{ {\bf OLD $\mid$ NEW $\mid$ ANY} \} $\mid$ \\
 \x \{ {\bf CAN $\mid$ PRM} \}
+\end{front}
+\begin{grammar}
+\input{OpenParameter.bnf}
+\end{grammar}
 
 The open parameters of the open statement must belong to different
 subsets.
@@ -574,14 +620,18 @@ If open parameters are lacking, ANY and PRM are assumed.
 When executing the close statement, a file is closed; i.e., it is
 usable again not before the execution of an open statement.
 
-CloseStatement ::=\\
-\x {\bf CLOSE} Name$\S $Dation [ {\bf BY} CloseParameter [ , CloseParameter ] $^{...}$ ] ;
+\input{CloseStatement.bnf}
 
 The settings for closing a data station made in the open statement can
 be overwritten by a close statement:
 
+\begin{front}
 CloseParameter ::=\\
 \x {\bf CAN $\mid$ PRM $\mid$ RST} (Name$\S $ErrorVariable-FIXED)
+\end{front}
+\begin{grammar}
+\input{CloseParameter.bnf}
+\end{grammar}
 
 Generally, the following rules hold:
 \begin{itemize}
@@ -687,6 +737,7 @@ Measurement: {\bf TASK};\\
 
 The general forms of the read and write statements read:
 
+\begin{front}
 ReadStatement ::= \\
 \x {\bf READ} [ \{ Name$\S $Variable $\mid$ Segment \} [ , \{ Name$\S $Variable $\mid$ Segment \} ] $^{...}$ ]\\
 \x {\bf FROM} Name$\S $Dation [ {\bf BY} Position [ , Position ] $^{...}$ ] ;
@@ -712,6 +763,22 @@ AbsolutePosition ::=\\
 RelativePosition ::=\\
 \x \{ {\bf X $\mid$ SKIP $\mid$ PAGE} \} [ (Expression) ] $\mid$ \\
 \x {\bf ADV} ( [ [ Expression , ] Expression , ] Expression )
+\end{front}
+\begin{grammar}
+\input{ReadStatement.bnf}
+\input{WriteStatement.bnf}
+\input{Slice.bnf}
+\input{Position.bnf}
+
+Already used:
+
+\input{Index.bnf}
+ 
+\end{grammar}
+\begin{discuss}
+separation between absolute and relative pos is better
+\end{discuss}
+
 
 Upon entry with the read statement, the addressed data elements are
 read one after the other and correspondingly assigned to the variables
@@ -1034,6 +1101,7 @@ They are to be read into the variables article\_id, quantity, price:
 
 The general forms of the get and put statements read:
 
+\begin{front}
 GetStatement ::=\\
 \x {\bf GET} [ \{ Name$\S $Variable $\mid$ Segment \} [ , \{ Name$\S $Variable $\mid$ Segment \} ] $^{...}$ ]\\
 \x {\bf FROM} Name$\S $Dation [ {\bf BY} FormatPosition [ , FormatPosition ] $^{...}$ ] ;
@@ -1052,6 +1120,17 @@ Factor ::=\\
 Format ::=\\
 \x FixedFormat $\mid$ FloatFormat $\mid$ CharacterStringFormats $\mid$ BitFormat $\mid$\\
 \x TimeFormat $\mid$ DurationFormat $\mid$ ListFormat $\mid$ R-Format $\mid$ {\bf RST} (Name)
+\end{front}
+\begin{grammar}
+\input{GetStatement.bnf}
+\input{PutStatement.bnf}
+
+Factor was renamed into FormatFactor!
+
+\input{FormatOrPosition.bnf}
+\input{FormatFactor.bnf}
+\input{Format.bnf}
+\end{grammar}
 
 Upon input with the get statement, the addressed data elements are
 read one after the other and correspondingly assigned to the variables
@@ -1139,6 +1218,7 @@ in the PUT statements.
 \subsection{The Fixed Format (F)}   % 10.5.1
 \label{sec_dation_f_format}
 
+\begin{front}
 FixedFormat ::=\\
 \x {\bf F} (FieldWidth [ , DecimalPositions \removedtext{[ , ScaleFactor ]} ] )
 
@@ -1147,6 +1227,10 @@ FieldWidth ::=\\
 
 DecimalPositions ::=\\
 \x Expression$\S $WithNonNegativeIntegerAsValue
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 \begin{removed}
 ScaleFactor ::=\\
@@ -1207,6 +1291,10 @@ this case, the statement of d has no meaning. It must be p$\geq$ b.
 \item If w $\leq$ 0, no assignment takes place; an error is reported.
 \end{enumerate}
 \end{enumerate}
+
+\begin{discuss}
+is the virtual decimal point still desired?
+\end{discuss}
 
 Example:
 
@@ -1299,13 +1387,19 @@ value       &          & FIXED & FLOAT  \\ \hline
 FloatFormat ::=\\
 \x {\bf E} (FieldWidth [ , DecimalPositions [ , Significance ] ] )
 \end{removed}
+\begin{front}
 \begin{accepted}
 FloatFormat ::=\\
 \x {\bf E}[3] (FieldWidth [ , DecimalPositions [ , Significance ] ] )
 \end{accepted}
 
+
 Significance ::= \\
 \x Expression$\S $WithIntegerAsValue
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The float format describes the external representation of decimal
 floating point numbers of the form
@@ -1425,9 +1519,14 @@ value  & format    & output \\ \hline
 \subsection{The Character String Formats (A)}  % 10.5.3
 \label{sec_dation_a_format}
 
+\begin{front}
 CharacterStringFormat ::=\\
 \x {\bf A} [ (Expression$\S $NumberCharacters) ]
   \removedtext{ $\mid$ {\bf S} (Name$\S $NumberCharactersVariableFixed) }
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The character formats describe the external representation of character
 strings (character quantities) of the form
@@ -1533,8 +1632,13 @@ contains the characters ``abc'' and the variable ``length'' the value 3.
 \subsection{The Bit Format (B)}    % 10.5.4
 \label{sec_dation_b_format}
 
+\begin{front}
 BitFormat ::=\\
 \x \{ {\bf B $\mid$ B1 $\mid$ B2 $\mid$ B3 $\mid$ B4} \} [ ( Expression$\S $NumberCharacters) ]
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The bit format describes the external representation of bit strings (bit
 quantities), namely (cf. 5.4)
@@ -1603,8 +1707,13 @@ AB                         & B4(2)  &         10101011
 \subsection{The Time Format (T)}   % 10.5.5
 \label{sec_dation_t_format}
 
+\begin{front}
 TimeFormat ::= \\
 \x {\bf T} ( FieldWidth [ , DecimalPosition ] )
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The time format describes the external representation of time data. The
 field width means the total number w of the character positions
@@ -1642,6 +1751,13 @@ If w $<=$ 0 or d $<$ 0, no data is read and the ClockFormatSignal
 If the input field does not match a valid clock constant, the 
    ClockValueSignal is induced.
 \end{accepted}
+
+\begin{discuss}
+The current implementation accepts automatic decimals if no decimal point is given and $d > 0$. This behavior is defined in the F-format. It was removed 
+wheen the D-format was relaxed.
+
+Should this behavior be removed here and from the F format?
+\end{discuss}
 \end{enumerate}
 
 Examples:
@@ -1655,8 +1771,13 @@ value               & format  & output \\ \hline
 \subsection{The Duration Format (D)}   % 10.5.6
 \label{sec_dation_d_format}
 
+\begin{front}
 DurationFormat ::=\\
 \x {\bf D} ( FieldWidth [ , DecimalPosition ] )
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The duration format describes the external representation of durations.
 The value of the field width means the total number w of the character
@@ -1672,16 +1793,29 @@ the form
 [ [ [ [ [ Digit ] Digit\_HRS\_] Digit]  Digit\_MIN\_ ] Digit ] Digit [ . pi ]\_SEC
 
 \begin{accepted}
-If w $<=$ 0 or d $<$ 0, no data is written an the ClockFormatSignal
+If w $<=$ 0 or d $<$ 0, no data is written an the DurationFormatSignal
    is induced.
 
-If w is too small for the given clock value, the ClockValueSignal
+If w is too small for the given clock value, the DurationValueSignal
    is induced.
 
 \end{accepted}
 \begin{added}
 Leading fields with hours and minutes may be suppressed by 
 choosing a small value of w. 
+
+Examples:
+
+\begin{tabular}{lll}
+value               & format  & output \\ \hline
+11 hours 15 minutes & D(20)   & 11\_HRS\_15\_MIN\_00\_SEC \\
+100 milliseconds    & D(24,3) & \_0\_HRS\_00\_MIN\_00.100\_SEC \\
+100 milliseconds    & D(9,3) & 0.100\_SEC \\
+-100 milliseconds    & D(9,3) & DurationValueSignal \\
+-100 milliseconds    & D(9,2) & -0.10\_SEC \\
+\end{tabular}
+
+The character \_ means a space.
 \end{added}
 
 
@@ -1694,35 +1828,58 @@ If w $<=$ 0 or d $<$ 0, no data is read and the DurationFormatSignal
 
 \begin{accepted}
 A field of length w is read in, which must contain a duration in a
-permitted representation (see 1). Preceding and following spaces are
+permitted representation \removedtext{(see 1)}. Preceding and following spaces are
 ignored.
 
-If the input field does not match a valid clock constant, the 
-   ClockValueSignal is induced.
+If the input field does not match a valid duration constant, the 
+   DurationValueSignal is induced.
 
 \end{accepted}
 \begin{added}
-Leading fields with hours and minutes may be omitted. 
+A valid duration constant from chapter \ref{sec_type_duration} is accepted.
+No delimiting spaces are required.
+The value of d is not used in input. A decimal point is required in the
+input field for precisions better than 1 SEC.
+
+Examples:
+
+\begin{tabular}{lll}
+input               & format  & value \\ \hline
+11 HRS 15 MIN & D(20)   & 11\_HRS\_15\_MIN\_00\_SEC \\
+0.100 SEC    & D(24,3) & \_0\_HRS\_00\_MIN\_00.100\_SEC \\
+100 SEC    & D(24,3) & DurationValueSignal \\
+10MIN1SEC    & D(24,3) & \_0\_HRS\_10\_MIN\_01\_SEC \\
+-10MIN1SEC    & D(24,3) & -\_0\_HRS\_10\_MIN\_01\_SEC \\
+\end{tabular}
+
 \end{added}
 
 \end{enumerate}
 
+\begin{removed}
 Examples:
 
 \begin{tabular}{lll}
 value               & format  & output \\ \hline
 11 hours 15 minutes & D(20)   & 11\_HRS\_15\_MIN\_00\_SEC \\
 100 milliseconds    & D(24,3) & \_0\_HRS\_00\_MIN\_00.100\_SEC \\
-100 milliseconds    & D(9,3) & 0.100\_SEC
+100 milliseconds    & D(9,3) & 0.100\_SEC \\
 \end{tabular}
 
 The character \_ means a space.
+\end{removed}
+
 
 \subsection{The List Format (LIST)}    % 10.5.7
 \label{sec_dation_list_format}
 
+\begin{front}
 ListFormat ::=\\
 \x {\bf LIST}
+\end{front}
+\begin{grammar}
+not in grammar
+\end{grammar}
 
 The list format serves for the input/output of fixed, float, bit, char,
 clock, and dur quantities.
@@ -1766,8 +1923,13 @@ or put statement. The R format serves to describe these lists only
 once. For this, a list with the so-called format declaration is
 introduced.
 
+\begin{front}
 FormatDeclaration ::=\\
 \x Identifier : {\bf FORMAT} ( FormatPosition [ , FormatPosition ] $^{...}$ ) ;
+\end{front}
+\begin{grammar}
+not in gramamr
+\end{grammar}
 
 Example:
 
@@ -1804,6 +1966,7 @@ respectively, instead of a data station.
 
 The general forms of the convert statement are:
 
+\begin{front}
 ConvertToStatement ::=\\
 \x {\bf CONVERT} Expression [ , Expression ] $^{...}$ {\bf TO} Name$\S $CharacterString\\
 \x [ {\bf BY} FormatPositionConvert [ FormatPositionConvert ] $^{...}$ ] ;
@@ -1820,6 +1983,13 @@ FormatPositionConvert ::=\\
 PositionConvert ::=\\
 \x {\bf RST} ( Name$\S $ErrorVariable-FIXED ) $\mid$ {\bf X} ( Expression ) $\mid$ {\bf ADV} ( Expression ) $\mid$\\
 \x {\bf POS} ( Expression ) $\mid$ {\bf SOP} ( Name$\S $PositionVariable-FIXED )
+\end{front}
+\begin{grammar}
+\input{ConvertToStatement.bnf}
+\input{ConvertFromStatement.bnf}
+\input{FormatOrPositionConvert.bnf}
+\input{PositionConvert.bnf}
+\end{grammar}
 
 All permitted formats have the same meaning as for the PUT and GET
 statements \addedtext{on FORWARD DATIONS}.
@@ -1883,6 +2053,7 @@ RST-S-CTRL-Format ::=\\
 \x $\mid$ {\bf S} ( Name$\S $Variable-FIXED )\\
 \x $\mid$ {\bf CONTROL} ( Expression [ , Expression [ , Expression ] ] )
 \end{removed}
+\begin{grammar}
 \begin{accepted}
 TakeStatement ::=\\
 \x {\bf TAKE} [ Name$\S $Variable ] {\bf FROM} Name$\S $Dation\\
@@ -1895,6 +2066,7 @@ SendStatement ::=\\
 RST-Format ::=\\
 \x {\bf RST} ( Name$\S $ErrorVariable-FIXED );
 \end{accepted}
+\end{grammar}
 
 \begin{removed}
 The types of the ``variable'' in the take statement or the

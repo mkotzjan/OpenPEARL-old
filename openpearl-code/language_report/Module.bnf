@@ -1,0 +1,5 @@
+Module ::=\\
+\x {\bf MODULE} [ [ ( ] \hlink{Identifier}$\S $OfTheModule [ ) ] ] ;\\
+\x \{ \hlink{SystemPart} [ \hlink{ProblemPart} ] 
+	$\mid$ \hlink{ProblemPart} \} \\
+\x {\bf MODEND} ;

@@ -1,0 +1,6 @@
+\htgt{DyadicOperator} ::=\\
+\x $ + \mid - \mid ^* \mid / \mid // \mid ^{**} \mid 
+	< \mid > \mid <= \mid >= \mid == \mid /= \mid
+	 >< \mid <> \mid$\\
+\x \hlink{Identifier}$\S $DyadicOperator\\
+

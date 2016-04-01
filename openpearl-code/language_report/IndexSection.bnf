@@ -1,0 +1,6 @@
+\htgt{IndexSection}::=\\
+\x \hlink{Constant-FIXED-Expression} 
+	[ : \hlink{Constant-FIXED-Expression} ]\\
+\x $\mid$ \hlink{CharacterStringConstant}$\S $OfLength1 
+	[ : \hlink{CharacterStringConstant}$\S $OfLength1 ]\\
+

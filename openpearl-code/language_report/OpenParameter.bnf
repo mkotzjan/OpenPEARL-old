@@ -1,0 +1,7 @@
+\htgt{OpenParameter} ::=\\
+\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+\x $\mid$ {\bf IDF} ( \{ \hlink{Name}$\S $CharacterStringVariable
+	 $\mid$ \hlink{CharacterStringConstant} \} )\\
+\x $\mid$ \{ {\bf OLD $\mid$ NEW $\mid$ ANY} \}\\
+\x $\mid$ \{ {\bf CAN $\mid$ PRM} \}\\
+

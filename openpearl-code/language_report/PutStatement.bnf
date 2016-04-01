@@ -1,0 +1,8 @@
+\htgt{PutStatement} ::=\\
+\x {\bf PUT} [ \{ \hlink{Expression} $\mid$ \hlink{Slice} \}
+	 [ , \{ \hlink{Expression} 
+	   $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
+\x {\bf TO} \hlink{Name}$\S $Dation 
+	[ {\bf BY} \hlink{FormatOrPosition}
+	 [ , \hlink{FormatOrPosition} ] $^{...}$ ] ;\\
+

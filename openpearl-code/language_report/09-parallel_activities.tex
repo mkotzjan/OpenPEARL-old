@@ -76,16 +76,18 @@ statements are explained in 9.3.)
 
 The general form of a task declaration reads:
 
-TaskDeclaration ::=\\
-\x Identifier: {\bf TASK} [ PriorityAttribute ] [ {\bf MAIN} ] [ GlobalAttribute ] ;\\
-\x TaskBody \\
-\x {\bf END};
-
+\input{TaskDeclaration.bnf}
+\begin{front}
 PriorityAttribute ::= \\
 \x \{ {\bf PRIORITY $\mid$ PRIO} \} IntegerWithoutPrecision$\S $GreaterZero
 
 TaskBody ::= \\
 \x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
+\end{front}
+\begin{grammar}
+\input{PriorityAttribute.bnf}
+\input{TaskBody.bnf}
+\end{grammar}
 
 If no priority is given in a task declaration, priority 255 is assumed.
 \begin{added}
@@ -98,8 +100,13 @@ the PrioNotMappableSignal is induced.
 
 The general form of a task specification reads:
 
+\begin{front}
 TaskSpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier$\S $Task {\bf TASK} GlobalAttribute;
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
 
 Upon program or system start, the tasks marked with MAIN are started
 according to their priority. All MAIN tasks must be declared in the same
@@ -113,15 +120,25 @@ The control of all task activities is also possible via references to
 objects of type TASK. The declaration of corresponding reference
 variables can take place like this:
 
+\begin{front}
 TaskReferenceDeclaration ::= \\
 \x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ]\\
 \x [ AllocationProtection ] {\bf REF TASK} [ GlobalAttribute ] [ InitialisationAttribute ];
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
 
 The general form of the specification of task reference variables reads:
 
+\begin{front}
 TaskReferenceSpecification ::= \\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList [ VirtualDimensionList ] \\
 \x [ AllocationProtection ] {\bf REF TASK} GlobalAttribute;
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
 
 The following short example shows an application possibility for task
 reference variables:
@@ -233,8 +250,13 @@ dependence of time instants and interrupts. Thus, a task must first be
 {\bf scheduled} for the start by a task control statement of the
 syntax
 
+\begin{front}
 Task\_Start ::= \\
 \x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task;
+\end{front}
+\begin{grammar}
+\input{TaskStarting.bnf}
+\end{grammar}
 
 The start itself is managed by a real time operating system. If
 the StartCondition defined in the control statement is fulfilled,
@@ -255,15 +277,8 @@ immediately.
 With the start condition, tasks can be scheduled for cyclic (repeated)
 start, in accordance with the syntax definition
 
-StartCondition ::=\\
-\x {\bf AT} Expression$\S $Time [ Frequency ]\\
-\x $\mid$ {\bf AFTER} Expression$\S $Duration [ Frequency ]\\
-\x $\mid$ {\bf WHEN} Name$\S $Interrupt [ {\bf AFTER} Expression$\S $Duration ] [ Frequency ]\\
-\x $\mid$ Frequency
-
-Frequency ::= \\
-\x {\bf ALL} Expression$\S $Duration [ \{ {\bf UNTIL} Expression$\S $Time \}\\
-\x $\mid$ \{ {\bf DURING} Expression$\S $Duration \} ]
+\input{StartCondition.bnf}
+\input{Frequency.bnf}
 
 % Zeile zu lang; Umbruch vor ]
 
@@ -389,11 +404,20 @@ statement.
 The general form of the statement to start a task (i.e., to schedule a
 task to be started) reads:
 
+\begin{front}
 TaskStart ::=\\
 \x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task [ Priority ];
 
 Priority ::=\\
 \x \{ {\bf PRIORITY $\mid$ PRIO} \} Expression$\S $WithPositiveIntegerAsValue
+\end{front}
+\begin{grammar}
+\input{TaskStarting.bnf}
+\input{PriorityExpression.bnf}
+\end{grammar}
+\begin{discuss}
+TaskStarting already inserted in sec start condition
+\end{discuss}
 
 Executing such a start statement causes that the indicated task
 applies for the allocation of a processor immediately (form without
@@ -682,8 +706,13 @@ The task Pressure\_measurement shall measure all 5 seconds the pressure in a tan
 The premature termination of a task is achieved by following
 statement:
 
+\begin{front}
 TaskTermination ::= \\
 \x {\bf TERMINATE} [ Name$\S $Task ] ;
+\end{front}
+\begin{grammar}
+\input{TaskTerminating.bnf}
+\end{grammar}
 
 If the denotation Name$\S $Task is lacking, the statement refers to
 the task in whose body it is contained.
@@ -707,8 +736,13 @@ is encountered.  This is done to enshure the integrity of the i/o-behavior.
 
 By executing the statement
 
+\begin{front}
 TaskSuspension ::=\\
 \x {\bf SUSPEND} [ Name$\S $Task ] ;
+\end{front}
+\begin{grammar}
+\input{TaskSuspending.bnf}
+\end{grammar}
 
 the indicated task --- or the executing task, respectively, if
 Name$\S $Task is lacking --- is suspended, i.e., its execution is
@@ -738,11 +772,20 @@ A suspended task can be continued immediately, at a certain point in
 time, after a certain duration or after the occurrence of an interrupt by
 the following statement:
 
+\begin{front}
 TaskContinuation ::=\\
 \x [ SimpleStartCondition ] {\bf CONTINUE} [ Name$\S $Task ] [ Priority ]\
 
 SimpleStartCondition ::= \\
 \x {\bf AT} Expression$\S $Time $\mid$ {\bf AFTER} Expression$\S $Duration $\mid$ {\bf WHEN} Name$\S $Interrupt
+\end{front}
+\begin{grammar}
+\input{TaskContinuing.bnf}
+\end{grammar}
+\begin{discuss}
+simpleSTartCondition should be  in grammar
+\end{discuss}
+
 
 If Name$\S $Task is stated, the statement causes that the indicated task
 competes for the processor immediately (form without start condition) or
@@ -1102,8 +1145,16 @@ certain duration or until the occurrence of a certain point in time or an
 interrupt, respectively, (if it is to be delayed), the following
 statement is to be executed:
 
+\begin{front}
 TaskDelay ::= \\
 \x SimpleStartCondition {\bf RESUME};
+\end{front}
+\begin{grammar}
+\input{TaskResuming.bnf}
+\end{grammar}
+\begin{discuss}
+fehlt hier nicht eine [..] um die simpleStartCondition?
+\end{discuss}
 
 This statement if equivalent to the non-devisable combination of
 the statements
@@ -1140,8 +1191,13 @@ Sometimes it is necessary to cancel the schedules existing for a task,
 i.e., to take care that the start conditions related to this task become
 ineffective. This can be achieved with the following statement:
 
+\begin{front}
 TaskPrevent ::= \\
 \x {\bf PREVENT} [ Name$\S $Task ] ;
+\end{front}
+\begin{grammar}
+\input{TaskPreventing.bnf}
+\end{grammar}
 
 This statement does not terminate the corresponding task; if
 Name$\S $Task is not given, the statement effects the running task.
@@ -1452,6 +1508,7 @@ given, a list of semaphore variables is not allowed.
 The general forms for the declaration of semaphore variables as well as
 locking and release statements read:
 
+\begin{front}
 SemaDeclaration ::= \\
 \x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ] {\bf SEMA} [ GlobalAttribute ]\\
 \x [ {\bf PRESET} (IntegerWithoutPrecision [ , IntegerWithoutPrecision ] $^{...}$ ) ];
@@ -1464,6 +1521,15 @@ ReleaseStatement ::=\\
 
 TRY-Operator ::= \\
 \x {\bf TRY} Name$\S $Sema
+\end{front}
+\begin{grammar}
+semadecl is missing
+
+\input{TaskCoordinationStatement.bnf}
+
+TRY is missing
+
+\end{grammar}
 
 Thus, also arrays of semaphore variables are possible; the various
 elements are addressed by indices in the request and release
@@ -1483,10 +1549,16 @@ variables S1 and S2, respectively.
 
 The general form for the specification of semaphore variables reads:
 
+\begin{front}
 SemaSpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList\\
 \x \x [ VirtualDimensionAttribute ] {\bf SEMA} \\
 \x \x \{ GlobalAttribute $\mid$ IdentificationAttribute \};
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
+
 
 \begin{added}
 Possible problem situations:
@@ -1603,6 +1675,7 @@ semaphore variables.
 
 Generally, bolt variables can be declared and used as follows:
 
+\begin{front}
 BoltDeclaration ::=\\
 \x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList 
 [ DimensionAttribute ] {\bf BOLT}\\
@@ -1621,6 +1694,10 @@ BoltStatement ::= \> \> \\
 \x $\mid$ \> {\bf ENTER}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
 \x $\mid$ \> {\bf LEAVE}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;
 \end{tabbing}
+\end{front}
+\begin{grammar}
+integrated with sema 
+\end{grammar}
 
 Therefore, also arrays of bolt variables can be declared.
 
@@ -1672,9 +1749,14 @@ Supply:         \> {\bf TASK PRIORITY} 2;\\
 
 The general form of an interrupt specification reads:
 
+\begin{front}
 InterruptSpecification ::=\\
 \x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList \{ {\bf INTERRUPT $\mid$ IRPT} \}\\
 \x [ GlobalAttribute ];
+\end{front}
+\begin{grammar}
+missing in grammar
+\end{grammar}
 
 Most modern computers and operating systems, however, do not provide the
 possibility to address interrupt channels anymore, because hardware
@@ -1695,11 +1777,16 @@ statements related to it shall stay ineffective although the interrupt
 occurs, a disable statement is to be executed for this purpose, which
 in turn can be revoked again by executing an enable statement.
 
+\begin{front}
 DisableStatement ::= \\
 \x {\bf DISABLE} Name$\S $Interrupt;
 
 EnableStatement ::=  \\
 \x {\bf ENABLE} Name$\S $Interrupt;
+\end{front}
+\begin{grammar}
+\input{InterruptStatement.bnf}
+\end{grammar}
 
 The validity range of the disable statement starts with its
 execution and ends upon execution of an enable statement.
@@ -1734,9 +1821,19 @@ of interrupts, particularly if the technical process has not been
 connected to the computer, yet. For such simulations, the trigger
 statement is provided:
 
+\begin{front}
 TriggerStatement := \\
 {\bf TRIGGER} Name$\S $Interrupt;
+\end{front}
+\begin{grammar}
+included in InterruptStatement
+\end{grammar}
+\begin{discuss}
+InterruptStatement := \{ EnaleStatement $\mid$ DisableStatement $\mid$ TriggerStatement \}
 
+ would be better 
+
+\end{discuss}
 Example:
 
 \begin{tabbing}

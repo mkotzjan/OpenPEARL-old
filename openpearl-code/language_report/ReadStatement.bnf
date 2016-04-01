@@ -1,0 +1,7 @@
+\htgt{ReadStatement} ::=\\
+\x {\bf READ} [ \{ \hlink{Name} $\mid$ \hlink{Slice} \}
+	 [ , \{ \hlink{Name} $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
+\x {\bf FROM} \hlink{Name}$\S $Dation
+	 [ {\bf BY} \hlink{Position}
+		 [ , \hlink{Position} ] $^{...}$ ] ;\\
+        

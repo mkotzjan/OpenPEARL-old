@@ -1,0 +1,3 @@
+\htgt{MonadicOperator} ::=\\
+\x + $\mid$ - $\mid$ \hlink{Identifier}$\S $MonadicOperator\\
+

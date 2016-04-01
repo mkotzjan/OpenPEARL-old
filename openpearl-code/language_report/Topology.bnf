@@ -1,0 +1,10 @@
+\htgt{Topology} ::=\\
+\x {\bf DIM} ( \{ $^*$ $\mid$ \hlink{Constant-FIXED-Expression} \}\\
+\x \x [ , \{ $^*$ $\mid$ \hlink{Constant-FIXED-Expression} \}\\
+\x \x \x [ , \{ $^*$ $\mid$ \hlink{Constant-FIXED-Expression} \} ] ] ) 
+\removedtext{[ {\bf TFU} [ {\bf MAX} ] ]}\\
+\x $\mid$ 
+	{\bf DIM} ( [ , [ , ] ] )
+	 $/^*$ Virtual dimension declaration 
+	only permitted for SPC $*/$\\
+
