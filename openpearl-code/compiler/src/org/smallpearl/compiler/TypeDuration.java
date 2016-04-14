@@ -36,12 +36,12 @@ public class TypeDuration extends TypeDefinition {
     private int m_precision;
 
     TypeDuration() {
-        super("FIXED");
+        super("DURATION");
         this.m_precision = FIXED_DEFAULT_PRECISION;
     }
 
     TypeDuration(int precision) {
-        super("FIXED");
+        super("DURATION");
         this.m_precision = precision;
     }
 
@@ -50,7 +50,7 @@ public class TypeDuration extends TypeDefinition {
     }
 
     public String toString() {
-        return "TypeFixed:" + this.getName() + " m_precision=" + this.m_precision;
+        return "TypeDuration:" + this.getName() + " m_precision=" + this.m_precision;
     }
 
 }

@@ -31,26 +31,21 @@ package org.smallpearl.compiler;
 
 
 public class TypeClock extends TypeDefinition {
-    public static final int FIXED_DEFAULT_PRECISION = 15;
-
-    private int m_precision;
+    Double m_value = 0.0;
 
     TypeClock() {
-        super("FIXED");
-        this.m_precision = FIXED_DEFAULT_PRECISION;
+        super("CLOCK");
+
     }
 
-    TypeClock(int precision) {
-        super("FIXED");
-        this.m_precision = precision;
+    TypeClock(Double value) {
+        super("CLOCK");
+        m_value = value;
     }
 
-    public Integer getPrecision() {
-        return m_precision;
-    }
 
     public String toString() {
-        return "TypeFixed:" + this.getName() + " m_precision=" + this.m_precision;
+        return "TypeClock:" + this.getName() + " value=" + m_value;
     }
 
 }
