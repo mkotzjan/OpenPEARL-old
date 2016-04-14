@@ -23,7 +23,7 @@ runtime:
 compiler:
 	(cd compiler/src; make all; )
 
-install: configuration/include/autoconf.h 
+install: configuration/include/autoconf.h  flashinterface.inc
 	(cd runtime; make clean; )
 	(cd compiler/src; make clean; )
 	(cd runtime; make install; )
@@ -59,3 +59,16 @@ clean:
 
 menuconfig:
 	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
+
+flashinterface.inc: ./configuration/include/auto.conf
+	@awk -F"=" 							\
+	   'BEGIN { found = "CONFIG_INSTALL_FLASHINTERFACE_is_not_set" }\
+	    $$1=="CONFIG_INSTALL_FLASHINTERFACE" { found = $$2 }	\
+	    END {							\
+		    print "INTERFACE=" found	\
+                }'  $< >flashinterface.inc
+
+
+
+
+

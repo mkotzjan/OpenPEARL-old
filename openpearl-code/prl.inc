@@ -7,7 +7,9 @@
 #----- read list of supported targets
 #include "runtime/targets.inc"
 
-INTERFACE=/dev/ttyUSB0
+#INTERFACE=/dev/ttyUSB0
+#include "flashinterface.inc" 
+
 if [ "${OpenPEARLTarget}" = "" ]
 then
    PLATTFORM=linux

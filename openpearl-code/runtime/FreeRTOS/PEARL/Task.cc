@@ -210,12 +210,13 @@ namespace pearlrt {
             // do nothing
          }
       }
-
+#if 0
+      // this block is useful for stack optimizations
       {
          int f = uxTaskGetStackHighWaterMark(NULL);
          printf("Task %s stack usage: %d\n", name, f);
       }
-
+#endif
       mutexUnlock();
       vTaskDelete(oldTaskHandle);
    }

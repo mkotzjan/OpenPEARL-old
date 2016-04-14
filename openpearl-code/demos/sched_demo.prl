@@ -42,7 +42,83 @@ SPC termout DATION OUT SYSTEM ALPHIC;
 
  DCL console DATION OUT ALPHIC DIM(*,80) FORWARD /* GLOBAL */ CREATED(termout);
 
-!SPC rr_test PROC GLOBAL;
+/*
+DCL stop_rr_stop BIT(1) INIT('0'B1);
+
+rr_test: PROC;
+   DCL end CLOCK;
+
+   end := NOW() + 2 SEC;
+   AT end ACTIVATE RR1;
+   AT end ACTIVATE RR2;
+   AFTER 10 SEC RESUME;
+   stop_rr_test := '1'B1;
+END;
+
+rr_test_function: PROC (id FIXED);
+  DCL (min,max,sum,dur) DURATION;
+   DCL first(10) DURATION;
+   DCL loopcounter FIXED INIT(1);
+
+   max := 0 SEC;
+   min := 0 SEC;
+   WHILE stop_rr_test REPEAT
+      start := NOW();
+      commox_x = id;
+      WHILE common_x EQ id AND stop_rr_test EQ 0 REPEAT END;
+      IF NOT stop_rr_test THEN
+          dur := NOW() - start;
+          IF (loopcounter EQ 0) THEN
+              min := dur;
+              max := dur;
+              sum := dur;
+          ELSE
+              IF (dur < min) THEN
+                 min := dur;
+              FIN;
+              IF (dur > max) THEN
+                 max := dur;
+              FIN;
+              sum := sum + dur;
+          FIN;
+          loopcounter := loopcounter + 1;
+          IF loopcounter LE 10 THEN
+             first(loopcounter) := dur;
+          FIN;
+      FIN;
+   END;
+
+   IF stop_rr_test > 0 AND loopcounter EQ 0 THEN
+       PUT 'RR',id,': round robin seems to be off' TO console BY A,F(1),A,SKIP;
+   ELSE
+       PUT 'RR',id,':+++++++++++++++++++++++',
+                'round robin scheduling works' TO console
+           BY A,F(1),A,,SKIP,A,SKIP;
+       IF first(1) > 1 SEC THEN
+          PUT '   !!! first duration > 1 sec' TO console BY A, SKIP;
+          sum := sum - first(1);
+          loopcounter := loopcounter - 1;
+       FIN;
+       PUT 'RR',id,' time sline min:=',min TO console
+          BY A,F(1),A,DUR(30,6),SKIP;
+       PUT 'RR',id,' time sline max:=',max TO console
+          BY A,F(1),A,DUR(30,6),SKIP;
+       sum := sum / loopcounter;
+       PUT 'RR',id,' time sline avg:=',sum TO console
+          BY A,F(1),A,DUR(30,6),SKIP;
+   FIN;
+   
+END;
+
+
+RR1: TASK;
+   CALL rr_test_function(1);
+END
+
+RR2: TASK;
+   CALL rr_test_function(2);
+END
+*/
 
 TASK1: TASK PRIO 2 MAIN;
 ! --- declare text constants 
