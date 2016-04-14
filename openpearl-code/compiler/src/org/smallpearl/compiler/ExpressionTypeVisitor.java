@@ -202,14 +202,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#5");
         }
         else if ( op1 instanceof TypeDuration && op2 instanceof TypeClock) {
-            res = new TypeClock();
+            res = new TypeClock(0);
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#6");
         }
         else if ( op1 instanceof  TypeClock&& op2 instanceof TypeDuration) {
-            res = new TypeClock();
+            res = new TypeClock(0);
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -299,14 +299,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#5");
         }
         else if ( op1 instanceof TypeDuration && op2 instanceof TypeClock) {
-            res = new TypeClock();
+            res = new TypeClock(0);
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#6");
         }
         else if ( op1 instanceof  TypeClock&& op2 instanceof TypeDuration) {
-            res = new TypeClock();
+            res = new TypeClock(0);
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -1532,10 +1532,11 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             catch(NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
+
         } else if (ctx.timeConstant() != null) {
-            m_properties.put(ctx, new TypeClock(ctx.timeConstant().getText()));
+            // TODO:
         } else if (ctx.durationConstant() != null) {
-            m_properties.put(ctx, new TypeClock(ctx.durationConstant().getText()));
+            // TODO:
         }
 
         return null;
