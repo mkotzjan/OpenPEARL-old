@@ -1171,7 +1171,7 @@ user_argument(name) ::= <%
 
 /* --------------------- LOOPS -------------------------- */
 
-LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,while_cond,body,label_end) ::= <<
+LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,countLoopPass,while_cond,body,label_end) ::= <<
 {
     <if(from)>
     pearlrt::Fixed\<<fromPrecision>\> a_value;
@@ -1240,8 +1240,7 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
 
             <body>
 
-            me->setLocation(<srcLine>, filename);
-            a_value = a_value + s_value;
+            <if(countLoopPass)>a_value = a_value + s_value;<endif>
         }
     <endif>
 

@@ -3354,11 +3354,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             st.add("from", getExpression(ctx.loopStatement_from().expression()));
         }
 
-        if ( ctx.loopStatement_by() != null) {
-            byType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_by().expression());
-            st.add("by", getExpression(ctx.loopStatement_by().expression()));
-        }
-
         if ( ctx.loopStatement_to() != null) {
             toType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_to().expression());
             st.add( "to", getExpression(ctx.loopStatement_to().expression()));
@@ -3378,8 +3373,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             st.add("toPrecision",((TypeFixed)toType).getPrecision());
         }
 
-        st.add("byPrecision",rangePrecision);
         st.add("rangePrecision",rangePrecision);
+
+        if ( ctx.loopStatement_by() != null) {
+            byType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_by().expression());
+            st.add("by", getExpression(ctx.loopStatement_by().expression()));
+            st.add("byPrecision", rangePrecision);
+        }
 
         if ( ctx.loopStatement_while() != null && ctx.loopStatement_while().expression() != null) {
             ST wc = getExpression(ctx.loopStatement_while().expression());
@@ -3398,6 +3398,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if ( ctx.loopStatement_end().ID() != null) {
             st.add( "label_end", ctx.loopStatement_end().ID().toString());
+        }
+
+        if ((ctx.loopStatement_to() != null) || (ctx.loopStatement_for() != null) || (ctx.loopStatement_by() != null)) {
+            st.add( "countLoopPass", 1);
         }
 
         return st;
