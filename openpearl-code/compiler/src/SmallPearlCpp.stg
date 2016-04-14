@@ -1121,10 +1121,17 @@ static pearlrt::DationDim1 h_dim_<name>(<DIM1>); <\n>
 %>
 
 TypeDation(SourceSinkAttribute,SystemDation,ClassAttribute,AccessAttribute,Dim,StepSize) ::= <<
-pearlrt::Dation::<SourceSinkAttribute> | <AccessAttribute>, &h_dim_<Dim> <ClassAttribute>
+pearlrt::Dation::<SourceSinkAttribute><if(AccessAttribute)> | <AccessAttribute><endif>, &h_dim_<Dim><StepSize><ClassAttribute>
 >>
 
-ClassAttribute(alphic,basic,attribute) ::= <%
+StepSize(size) ::= <<
+TODO StepSize = <size>
+>>
+
+ClassAttribute(system,alphic,basic,attribute) ::= <%
+<if(system)>
+<endif>
+
 <if(alphic)>
 <endif>
 
@@ -1132,7 +1139,7 @@ ClassAttribute(alphic,basic,attribute) ::= <%
 <endif>
 
 <if(attribute)>
-,<attribute>
+, <attribute>
 <endif>
 %>
 
@@ -1140,7 +1147,7 @@ AccessAttribute(attribute) ::= <%
 <attribute: {attr|pearlrt::Dation::<attr>} ; separator=" |\n">
 %>
 
-TypeOfTransmissionData(all,type,size) ::= <%
+TypeOfTransmissionData(all,type) ::= <%
 <if(all)>0<endif>
 <if(type)>sizeof(<type>)<endif>
 %>
@@ -1239,7 +1246,6 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
             <endif>
 
             <body>
-
             <if(countLoopPass)>a_value = a_value + s_value;<endif>
         }
     <endif>
