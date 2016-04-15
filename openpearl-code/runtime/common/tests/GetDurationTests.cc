@@ -157,6 +157,17 @@ TEST(GetDuration, errorDetection) {
    pearlrt::RefCharSource source(rc);
    pearlrt::Duration dur;
    // error detection tests
+
+   // overflow in hours
+   {
+      //                        1234567890123456789012345678901234567890
+      pearlrt::Character<50> d("1234567890123 HRS 05 MIN 12 SEC        X");
+      rc.setWork(d);
+      source.rewind();
+      EXPECT_EQ(pearlrt::theDurationValueSignal.whichRST(),
+                pearlrt::GetDuration::fromD(dur, 35, 0, source));
+   }
+   
    // no 'SEC' tag
    {
       //                        123456789012345678901234567890
@@ -205,6 +216,7 @@ TEST(GetDuration, errorDetection) {
                 pearlrt::GetDuration::fromD(dur, 25, 2, source));
    }
 #if 0
+   // removed due to relaxed behavior of D-format
    // only 1 digit min
    {
       //                        123456789012345678901234567890

@@ -37,6 +37,7 @@
 */
 
 #include <stdint.h>
+#include <limits.h>
 #include <stdio.h>
 #include <ctype.h>
 
@@ -123,11 +124,18 @@ namespace pearlrt {
             return digitsProcessed;
          }
 
-         *x *= 10;
-         *x += ch - '0';
-         digitsProcessed ++;
+         // stop reading at MAX_INT
+         ch -= '0';
+         if ((INT_MAX - ch)/10 >= *x) {
+            *x *= 10;
+            *x += ch;
+            digitsProcessed ++;
+         } else {
+            source->unGetChar(ch +'0');
+            width ++;
+            return digitsProcessed;
+         }
       }
-
       return digitsProcessed;
    }
 
@@ -148,11 +156,18 @@ namespace pearlrt {
             return digitsProcessed;
          }
 
-         *x *= 10;
-         *x += ch - '0';
-         digitsProcessed ++;
+         // stop reading at MAX_INT
+         ch -= '0';
+         if ((INT_MAX - ch)/10 >= *x) {
+            *x *= 10;
+            *x += ch;
+            digitsProcessed ++;
+         } else {
+            source->unGetChar(ch +'0');
+            width ++;
+            return digitsProcessed;
+         }
       }
-
       return digitsProcessed;
    }
 
