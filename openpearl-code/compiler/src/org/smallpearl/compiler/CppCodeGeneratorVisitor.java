@@ -3342,11 +3342,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         TypeDefinition byType = null;
         TypeDefinition toType = null;
         Integer rangePrecision = 31;
+        Boolean loopCounterNeeded = false;
 
         st.add("srcLine", ctx.start.getLine());
 
         if ( ctx.loopStatement_for() != null) {
             st.add( "variable", ctx.loopStatement_for().ID().toString());
+            loopCounterNeeded = true;
         }
 
         if ( ctx.loopStatement_from() != null) {
@@ -3357,12 +3359,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if ( ctx.loopStatement_to() != null) {
             toType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_to().expression());
             st.add( "to", getExpression(ctx.loopStatement_to().expression()));
+            loopCounterNeeded = true;
         }
 
         if ( fromType != null && toType != null) {
             rangePrecision = Math.max(((TypeFixed)fromType).getPrecision(), ((TypeFixed)toType).getPrecision());
             st.add("fromPrecision",rangePrecision);
             st.add("toPrecision",rangePrecision);
+            loopCounterNeeded = true;
         }
         else if ( fromType != null && toType == null) {
             rangePrecision = ((TypeFixed)fromType).getPrecision();
@@ -3371,6 +3375,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         else if ( fromType == null && toType != null) {
             rangePrecision = ((TypeFixed)toType).getPrecision();
             st.add("toPrecision",((TypeFixed)toType).getPrecision());
+            loopCounterNeeded = true;
         }
 
         st.add("rangePrecision",rangePrecision);
@@ -3379,6 +3384,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             byType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_by().expression());
             st.add("by", getExpression(ctx.loopStatement_by().expression()));
             st.add("byPrecision", rangePrecision);
+            loopCounterNeeded = true;
         }
 
         if ( ctx.loopStatement_while() != null && ctx.loopStatement_while().expression() != null) {
@@ -3402,6 +3408,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if ((ctx.loopStatement_to() != null) || (ctx.loopStatement_for() != null) || (ctx.loopStatement_by() != null)) {
             st.add( "countLoopPass", 1);
+        }
+
+        if (loopCounterNeeded) {
+            st.add( "GenerateLoopCounter", 1);
         }
 
         return st;

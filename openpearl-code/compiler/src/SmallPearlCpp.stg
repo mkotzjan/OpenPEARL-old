@@ -1171,13 +1171,15 @@ user_argument(name) ::= <%
 
 /* --------------------- LOOPS -------------------------- */
 
-LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,countLoopPass,while_cond,body,label_end) ::= <<
+LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPrecision,by,byPrecision,to,toPrecision,countLoopPass,while_cond,body,label_end) ::= <<
 {
     <if(from)>
     pearlrt::Fixed\<<fromPrecision>\> a_value;
     a_value = <from>;
     <else>
+    <if(GenerateLoopCounter)>
     pearlrt::Fixed\<15> a_value(1);
+    <endif>
     <endif>
 
     <if(to)>
@@ -1189,7 +1191,9 @@ LoopStatement(srcLine,variable,rangePrecision,from,fromPrecision,by,byPrecision,
     pearlrt::Fixed\<<byPrecision>\> s_value;
     s_value = <by>;
     <else>
+    <if(GenerateLoopCounter)>
     pearlrt::Fixed\<15> s_value(1);
+    <endif>
     <endif>
 
     <if(variable)>
