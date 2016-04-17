@@ -1072,6 +1072,44 @@ DationSpecifications(decl) ::= <<
 <decl>
 >>
 
+DationSpecification(name,SpecifyTypeDation) ::= <<
+[** DationSpecification ***]
+extern pearlrt::Device *d_<name>;
+<SpecifyTypeDation>
+>>
+
+SpecifyTypeDation(SourceSinkAttribute,SystemDation,ClassAttribute) ::= <<
+[** SpecifyTypeDation ***]
+>>
+
+SpecificationSystemDationB(name,TypeDation,global) ::= <<
+extern pearlrt::Device *d_<name>;
+static pearlrt::SystemDationB* <user_variable(name)> = static_cast\<pearlrt::SystemDationB*>(d_<name>); <\n>
+
+>>
+
+SpecificationSystemDationNB(name,TypeDation,global) ::= <<
+extern pearlrt::Device *d_<name>;
+static pearlrt::SystemDationNB* <user_variable(name)> = static_cast\<pearlrt::SystemDationNB*>(d_<name>); <\n>
+
+>>
+
+SpecificationSystemDationPG(name,TypeDation,global) ::= <<
+extern pearlrt::DationPG <user_variable(name)>;
+
+>>
+
+SpecificationSystemDationTS(name,TypeDation,global) ::= <<
+extern pearlrt::DationTS <user_variable(name)>;
+
+>>
+
+SpecificationSystemDationRW(name,TypeDation,global) ::= <<
+extern pearlrt::DationRW <user_variable(name)>;
+
+>>
+
+
 DationSpecificationBasic(name,TypeDation,global) ::= <<
 extern pearlrt::Device *d_<name>;
 static pearlrt::SystemDationB* _<name> = static_cast\<pearlrt::SystemDationB*>(d_<name>); <\n>
@@ -1085,12 +1123,12 @@ static pearlrt::SystemDationNB* _<name> = static_cast\<pearlrt::SystemDationNB*>
 >>
 
 DationDeclarations(decl) ::= <<
-<decl>  <\n>
+<decl><\n>
 >>
 
 DationDeclaration(name,Dation,TypeDation,Id,Typology) ::= <<
-<if(Typology)><Typology><endif>  <\n>
-static pearlrt::<Dation> _<name>(_<Id>, <\n>    <TypeDation>); <\n>
+<if(Typology)><Typology><endif>
+pearlrt::<Dation> _<name>(_<Id>, <TypeDation>);
 >>
 
 Typology(name,DIM1,DIM1Unlimited,DIM2,DIM3) ::= <%
@@ -1121,7 +1159,7 @@ static pearlrt::DationDim1 h_dim_<name>(<DIM1>); <\n>
 %>
 
 TypeDation(SourceSinkAttribute,SystemDation,ClassAttribute,AccessAttribute,Dim,StepSize) ::= <<
-pearlrt::Dation::<SourceSinkAttribute> | <AccessAttribute>, &h_dim_<Dim> <ClassAttribute>
+<SourceSinkAttribute> <if(AccessAttribute)> | <AccessAttribute><endif><if(Dim)>, &h_dim_<Dim><endif><ClassAttribute>
 >>
 
 ClassAttribute(alphic,basic,attribute) ::= <%
@@ -1136,8 +1174,12 @@ ClassAttribute(alphic,basic,attribute) ::= <%
 <endif>
 %>
 
+SourceSinkAttribute(attribute) ::= <%
+pearlrt::Dation::<attribute>
+%>
+
 AccessAttribute(attribute) ::= <%
-<attribute: {attr|pearlrt::Dation::<attr>} ; separator=" |\n">
+<attribute: {attr|pearlrt::Dation::<attr>} ; separator=" | ">
 %>
 
 TypeOfTransmissionData(all,type,size) ::= <%
