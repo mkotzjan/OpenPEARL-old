@@ -597,7 +597,7 @@ catch(pearlrt::Signal &s) {
 >>
 
 take_id(dation,id) ::= <%
-<dation>.dationTake(&<id>, sizeof(<id>));
+<dation>.dationRead(&<id>, sizeof(<id>));
 %>
 
 send_statement(dation,elements) ::= <<
@@ -618,7 +618,7 @@ catch(pearlrt::Signal &s) {
 >>
 
 send_expression(dation,expression) ::= <%
-<dation>.dationSend(&<expression>, sizeof(<expression>));
+<dation>.dationWrite(&<expression>, sizeof(<expression>));
 %>
 
 take_send_rst_position(dation,id) ::= <%
