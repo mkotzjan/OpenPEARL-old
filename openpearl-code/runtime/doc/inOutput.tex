@@ -447,20 +447,27 @@ A(w) & toA(x,w) & \\
 F(w) & toF(x,w) & \\
 F(w,d) & toF(x,w,d) & \\
 F(w,d,s) & toF(x,w,d,s) & \\
-F(w) & toF(x,w) & \\
-D(w) & toD(x,w) & {\em not implemented yet} \\
-T(w) & toT(x,w) & {\em not implemented yet} \\
-B(w) & toB1(x,w) & {\em not implemented yet} \\
-B1(w) & toB1(x,w) & {\em not implemented yet} \\
+E(w) & toE(x,w,0,1,2) & \\
+E(w,d) & toE(x,w,d,1,2) & \\
+E(w,d,s) & toE(x,w,d,s,2) & \\
+E(w) & toE(x,w,0,1,2) & \\
+E3(w) & toE(x,w,0,1,3) & \\
+E(w,d) & toE(x,w,d,1,3) & \\
+E(w,d,s) & toE(x,w,d,s,3) & \\
+D(w) & toD(x,w) &  \\
+D(w,d) & toD(x,w,d) &  \\
+T(w) & toT(x,w) &  \\
+T(w,d) & toT(x,w,d) &  \\
+B(w) & toB1(x,w) &  \\
+B1(w) & toB1(x,w) &  \\
 B3(w) & toB3(x,w) & {\em not implemented yet} \\
-B4(w) & toB4(x,w) & {\em not implemented yet} \\
-LIST &  & {\em not implemented yet} \\
+B4(w) & toB4(x,w) &  \\
+LIST &  & {\em should be treated by the compiler} \\
 \end{methodMapping}
 
-Note:
-\begin{itemize}
-\item float is not supported yet
-\end{itemize}
+\paragraph{Note:} The corresponding method for input is named with 'from' 
+instead of 'to' (e.g. fromF(..) instead of toF(...)).
+
 
 \section{READ/WRITE Operations}
 READ and WRITE are allowed on user dations with a specifig type or of type ALL.

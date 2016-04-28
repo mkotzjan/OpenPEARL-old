@@ -1,8 +1,8 @@
 #ifndef PUTHELPER_H_INCLUDED
 #define PUTHELPER_H_INCLUDED
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
 
 #include "Sink.h"
 #include "RefChar.h"
+#include "Float.h"
 
 /**
 \file
@@ -68,7 +69,14 @@ namespace pearlrt {
       */
       static void doPutChar(int length, RefCharacter* rc, Sink * s);
 
+   /** the values of the exponents with only one bit set
+   */
+   const static Float<53> binExpValues[];
+   const static int nbrBinExpValues;
+
    };
+
+
 }
 #endif
 

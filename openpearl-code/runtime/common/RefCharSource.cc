@@ -54,6 +54,7 @@ namespace pearlrt {
 
    void RefCharSource::rewind() {
       readPtr = 0;
+      forgetUnGetChar();
    }
 }
 
