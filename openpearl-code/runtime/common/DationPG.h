@@ -44,6 +44,7 @@
 #include "PutFixed.h"
 #include "GetFixed.h"
 #include "GetFloat.h"
+#include "PutFloat.h"
 #include "PutCharacter.h"
 #include "GetCharacter.h"
 
