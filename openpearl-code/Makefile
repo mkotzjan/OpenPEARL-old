@@ -41,12 +41,13 @@ endif
 # create rule to run menuconfig, if no configuration/include/autoconf.h exists
 #ifeq ($(wildcard "configuration/include/autoconf.h")),)
 
+configuration/.config:
+	(cd configuration; make menuconfig; cd ..)
 
 .PHONY: configuration/include/autoconf.h
-configuration/include/autoconf.h: 
+configuration/include/autoconf.h:  configuration/.config
 ifneq ($(wildcard ./configuration/include/autoconf.*),./configuration/include/autoconf.h)
 	(cd configuration; make include/autoconf.h; cd ..)
-	make menuconfig
 endif
 
 clean:
@@ -59,3 +60,11 @@ clean:
 
 menuconfig:
 	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
+
+.PHONY: jenkins_prepare
+jenkins_prepare:
+	cp configuration/jenkins.config configuration/.config
+	(cd configuration; make include/autoconf.h; cd ..)
+
+jenkins: jenkins_prepare
+	make install
