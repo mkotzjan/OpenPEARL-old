@@ -61,7 +61,6 @@ clean:
 menuconfig:
 	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
 
-<<<<<<< HEAD
 .PHONY: jenkins_prepare
 jenkins_prepare:
 	cp configuration/jenkins.config configuration/.config
@@ -69,7 +68,7 @@ jenkins_prepare:
 
 jenkins: jenkins_prepare
 	make install
-=======
+
 flashinterface.inc: ./configuration/include/auto.conf
 	@awk -F"=" 							\
 	   'BEGIN { found = "CONFIG_INSTALL_FLASHINTERFACE_is_not_set" }\
@@ -82,4 +81,3 @@ flashinterface.inc: ./configuration/include/auto.conf
 
 
 
->>>>>>> c73db926b3ec8a4b50bbe3ffe5eb211f28d8c264
