@@ -71,6 +71,7 @@ namespace pearlrt {
       int delimiter;
 
    public:
+      static double pow10(int exp);  // returns pow(10,exp), with exp >= 0 
 
       /**
       create a Helper object
@@ -104,6 +105,8 @@ namespace pearlrt {
       /**
       read integral value with maximum digits
 
+      The reading stops if the value is larger than the MAX_INT
+
       \param x pointer to int value for the data element
       \param digits number of digits allowed
 
@@ -115,12 +118,28 @@ namespace pearlrt {
       /**
       read integral value with exact number of digits
 
+      The reading stops if the value is larger than the MAX_INT
+
       \param x pointer to int value for the data element
       \param digits number of digits required
 
       \returns number of processed digits (>0 on normal execution)
       */
       int readFixedInteger(int * x, const int digits);
+
+      /**
+      read mantissa of a floating point number with maximum digits
+
+      The function expects nether sign nor leading spaces.
+      The function stops at the fisr not fitting character.
+
+      \param x pointer to int value for the data element
+      \param digits number of digits allowed
+
+      \returns number of processed digits (> 0 on normal execution)
+      */
+      int readMantissa(double * x, const int digits, const int decimals);
+
 
       /**
        reads a  value for the seconds part ##.####
@@ -228,6 +247,32 @@ namespace pearlrt {
       \throws FixedFormatSignal if parameters were wrong
       */
       void readFixedByF(Fixed63 * value, int d);
+
+      /**
+      read float variable
+
+      reading stops at EndOfLine or after w characters.
+
+      \param value pointer to the input value
+      \param d number of decimals to simulate if no decimal point
+               is in the field
+
+      \throws FixedValueSignal if illegal characters were found
+      \throws FixedFormatSignal if parameters were wrong
+      */
+      void readFloatByF(Float<53> * value, int d);
+
+      /**
+      read float variable
+
+      reading stops at EndOfLine or after w characters.
+
+      \param value pointer to the input value
+
+      \throws FixedValueSignal if illegal characters were found
+      \throws FixedFormatSignal if parameters were wrong
+      */
+      void readFloatByE(Float<53> * value);
    };
 }
 #endif

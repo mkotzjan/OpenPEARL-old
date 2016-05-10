@@ -1,0 +1,20 @@
+MODULE(tasking);
+
+PROBLEM;
+
+T1: TASK MAIN;
+
+   DCL d DURATION(12.0);
+   DCL c CLOCK(12:00:00.0);
+
+   AT c ALL d DURING 4*d ACTIVATE T1;
+   AFTER d ALL 5*d UNTIL c+d ACTIVATE T1;
+   AFTER d RESUME T1;
+
+   AT c AFTER d CONTINUE;
+   
+
+
+END;
+
+MODEND;

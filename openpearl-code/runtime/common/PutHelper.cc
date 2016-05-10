@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -70,4 +70,11 @@ namespace pearlrt {
 
       return;
    }
+   
+   const Float<53> PutHelper::binExpValues[] = {
+          (Float<53>) (1e256), (Float<53>) (1e128), (Float<53>) (1e64),
+          (Float<53>) (1e32), (Float<53>) (1e16), (Float<53>) (1e8),
+          (Float<53>) (1e4), (Float<53>) (1e2), (Float<53>) (1e1)};
+   const int PutHelper::nbrBinExpValues = sizeof(PutHelper::binExpValues)/
+                               sizeof(PutHelper::binExpValues[0]);
 }

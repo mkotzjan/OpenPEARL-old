@@ -1,0 +1,17 @@
+\section{Technical Data}
+
+\subsection{Execution Speed on digital Output}
+\label{sec_lpc1768_bitflip}
+A task, which sets and resets a bit on the Lpc17xxDigitalOut runs with
+a speed of $650 \mu s$ per loop cycle.
+
+\subsection{ALL .. ACTIVATE}
+A task which will be started cyclic with the ALL statement my be scheduled 
+with a timing resolution of $10 \mu s$. In the test case, the task 
+flips a bit of the Lpc17xxDigitalOut. The minimum rate for the activation is 
+$1,1 ms$ due the task setup operations and task execution.
+In consideration of the timing in section \ref{sec_lpc1768_bitflip}
+the task setup needs $650 \mu s$.
+
+
+  

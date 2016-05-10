@@ -56,6 +56,8 @@ Only this file mus be included.
 #include "Fixed.h"
 #include "PutFixed.h"
 #include "GetFixed.h"
+#include "PutFloat.h"
+#include "GetFloat.h"
 
 #include "Fixed63.h"
 #include "Character.h"

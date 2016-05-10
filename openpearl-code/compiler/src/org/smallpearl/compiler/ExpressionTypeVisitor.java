@@ -202,14 +202,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#5");
         }
         else if ( op1 instanceof TypeDuration && op2 instanceof TypeClock) {
-            res = new TypeClock(0);
+            res = new TypeClock();
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#6");
         }
         else if ( op1 instanceof  TypeClock&& op2 instanceof TypeDuration) {
-            res = new TypeClock(0);
+            res = new TypeClock();
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -299,14 +299,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#5");
         }
         else if ( op1 instanceof TypeDuration && op2 instanceof TypeClock) {
-            res = new TypeClock(0);
+            res = new TypeClock();
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#6");
         }
         else if ( op1 instanceof  TypeClock&& op2 instanceof TypeDuration) {
-            res = new TypeClock(0);
+            res = new TypeClock();
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -1534,11 +1534,28 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             }
 
         } else if (ctx.timeConstant() != null) {
-            // TODO:
+            m_properties.put(ctx, new TypeClock(getTime(ctx.timeConstant())));
+
         } else if (ctx.durationConstant() != null) {
-            // TODO:
+            m_properties.put(ctx, new TypeDuration());
         }
 
         return null;
+    }
+
+    private Double getTime(SmallPearlParser.TimeConstantContext ctx) {
+        Integer hours = 0;
+        Integer minutes = 0;
+        Double seconds = 0.0;
+
+        hours = (Integer.valueOf(ctx.getChild(0).toString()) % 24);
+        minutes = Integer.valueOf(ctx.getChild(2).toString());
+        seconds = Double.valueOf(ctx.getChild(4).toString());
+
+        if (hours < 0 || minutes < 0 || minutes > 59) {
+            throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return hours * 3600 + minutes * 60 + seconds;
     }
 }

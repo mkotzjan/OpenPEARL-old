@@ -37,8 +37,11 @@
 */
 
 #include <stdint.h>
+#include <limits.h>   //  INT_MAX
 #include <stdio.h>
 #include <ctype.h>
+#include <math.h>
+#include <cfloat>  // DBL_MAX_10_EXP
 
 #include "GetHelper.h"
 #include "RefChar.h"
@@ -123,9 +126,18 @@ namespace pearlrt {
             return digitsProcessed;
          }
 
-         *x *= 10;
-         *x += ch - '0';
-         digitsProcessed ++;
+         // stop reading at MAX_INT
+         ch -= '0';
+
+         if ((INT_MAX - ch) / 10 >= *x) {
+            *x *= 10;
+            *x += ch;
+            digitsProcessed ++;
+         } else {
+            source->unGetChar(ch + '0');
+            width ++;
+            return digitsProcessed;
+         }
       }
 
       return digitsProcessed;
@@ -148,11 +160,120 @@ namespace pearlrt {
             return digitsProcessed;
          }
 
-         *x *= 10;
-         *x += ch - '0';
-         digitsProcessed ++;
+         // stop reading at MAX_INT
+         ch -= '0';
+
+         if ((INT_MAX - ch) / 10 >= *x) {
+            *x *= 10;
+            *x += ch;
+            digitsProcessed ++;
+         } else {
+            source->unGetChar(ch + '0');
+            width ++;
+            return digitsProcessed;
+         }
       }
 
+      return digitsProcessed;
+   }
+
+   int GetHelper::readMantissa(double * x, const int w, const int decimals)  {
+      /* we read 18 significant digits and skip remaining digits
+         since they do not contribute to the precission at all.
+         18 digits fit easily into two 32-bit integers.
+         the location of the decimal point is used at the calculation
+         of the result
+      */
+      int32_t high = 0; 	   // first 9 digits
+      int32_t low = 0;             // last 9 digits
+      int decimalPointPosition = -1; // no decimal point detected yet
+      int ch;
+      int digitsProcessed = 0;
+      bool hasLeadingZeros = false;
+
+      while (digitsProcessed < 9 && width > 0) {
+         ch = readChar();
+
+         if (ch == '0' && high == 0) {
+            hasLeadingZeros = true;
+         } else if (isdigit(ch)) {
+            high = high * 10 + ch - '0';
+            digitsProcessed ++;
+         } else if (ch == '.' && decimalPointPosition < 0) {
+            decimalPointPosition = digitsProcessed;
+         } else {
+            if (ch > 0) { // end field markers are not returned to the input
+               source->unGetChar(ch);
+               width ++;
+            }
+
+            goto endSampling;
+         }
+
+      }
+
+      if (digitsProcessed == 9 && width > 0) {
+         while (digitsProcessed < 18) {
+            ch = readChar();
+
+            if (isdigit(ch)) {
+               low = low * 10 + ch - '0';
+               digitsProcessed ++;
+            } else if (ch == '.' && decimalPointPosition < 0) {
+               decimalPointPosition = digitsProcessed;
+            } else {
+               if (ch > 0) { // end field markers are not returned to the input
+                  source->unGetChar(ch);
+                  width ++;
+               }
+
+               goto endSampling;
+            }
+
+         }
+      }
+
+      if (digitsProcessed == 18 && width > 0) {
+         // discard remaining digits
+         do {
+            ch = readChar();
+
+            if (isdigit(ch)) {
+               digitsProcessed ++;
+            } else if (ch == '.' && decimalPointPosition < 0) {
+               decimalPointPosition = digitsProcessed;
+            } else {
+               if (ch > 0) { // end field markers are not returned to the input
+                  source->unGetChar(ch);
+                  width ++;
+               }
+
+               goto endSampling;
+            }
+         } while (ch > 0); // until end of field or goto endSampling
+      }
+
+endSampling:
+/*
+      if (skipSpaces() == 0) {
+         discardRemaining();
+         Log::info("F: illegal character in field");
+         throw theFixedValueSignal;
+      }
+*/
+      if (decimalPointPosition < 0) {
+         decimalPointPosition = digitsProcessed - decimals;
+      }
+
+      if (digitsProcessed <= 9) {
+         *x = high;
+      } else if (digitsProcessed <= 18) {
+         *x = high * pow10(digitsProcessed - 9) + low;
+      } else {
+         * x = (high * 1e9 + low)*pow10(digitsProcessed-18);
+      }
+
+      *x *= pow10(decimalPointPosition - digitsProcessed);
       return digitsProcessed;
    }
 
@@ -432,7 +553,7 @@ namespace pearlrt {
       throw theNoDataInFieldSignal;
    }
 
-   void GetHelper::readFixedByF(Fixed63 *f, int d) {
+   void GetHelper::readFixedByF(Fixed63 * f, int d) {
       bool goOn = true;
       bool decimalPointFound = false;
       int digitsProcessed  = 0;
@@ -514,4 +635,134 @@ namespace pearlrt {
 
       return;
    }
+
+   void GetHelper::readFloatByF(Float<53> * value, int d) {
+      int sign = 1;
+      double x;
+
+      if (skipSpaces() == 0) {
+        if (readString("-") == 0) {
+          sign = -1;
+        }
+        if (readMantissa(&x, width, d) > 0) {
+           if (skipSpaces() == 0) {
+              discardRemaining();
+              Log::info("F: illegal character in field");
+              throw theFixedValueSignal;
+           }
+           value->x = x * sign;
+           return;
+        } else if (skipSpaces() == 0) {
+           discardRemaining();
+           Log::info("F: illegal character in field");
+           throw theFixedValueSignal;
+        } 
+     }
+
+     // no data in field --> this is 0 be specification
+     value->x = 0.0;
+   }
+
+   double GetHelper::pow10(int exp) {
+      // we regard the binary representation of exp
+      // each bit corresponts to 10^(2*i) = (10^2)^i
+      // let the compiler create the possible base factors
+      static double powersOf10[] = {10, 100, 1.e4, 1.e8, 1.e16, 1.e32,
+                                    1.e64, 1.e128, 1.e256
+                                   };
+      double result = 1.0;
+      bool invert=false;
+      double * expFactor;
+      if (exp < 0) {
+         exp = -exp;
+         invert = true;
+      }
+      if (exp > DBL_MAX_10_EXP) {
+         result = INFINITY;
+      } else {
+         for (expFactor = powersOf10; exp != 0; expFactor += 1, exp >>= 1) {
+            if (exp & 0x01) {
+               result *= *expFactor;
+            }
+         }
+      }
+      if (invert) {
+         result = 1.0/result;
+      }
+      return result;
+   }
+
+   void GetHelper::readFloatByE(Float<53> * value) {
+      int sign = 1;
+      int expSign = 0;
+      int expValue;
+      int ch; 
+      double x;
+
+      if (skipSpaces() == 0) {
+        if (readString("-") == 0) {
+          sign = -1;
+        }
+        if (readMantissa(&x, width, 0) > 0) {
+           if (readString("E") == 0) {
+              // treat exponent
+              ch = readChar();
+              if (ch > 0) {
+                switch (ch) {
+                   case '+': expSign = 1;
+                             ch = readChar();
+                             break;
+                   case '-': expSign = -1;
+                             ch = readChar();
+                             break;
+                }
+                if (isdigit(ch)) {
+                  source->unGetChar(ch);
+                  width ++;
+                }
+                if (ch < 0) {
+                   discardRemaining();
+                   Log::error("E-format: no exponent found");
+                   throw theExpValueSignal;
+                }                   
+                if (readInteger(&expValue, width) == 0) {
+                   if (expSign != 0) {
+                      source->unGetChar(ch);
+                      width ++;
+                   }
+                   discardRemaining();
+                   Log::error("E-format: no exponent found");
+                   throw theExpValueSignal;
+                }
+                if (skipSpaces() == 0) {
+                   discardRemaining();
+                   Log::info("E: illegal character in field");
+                   throw theExpValueSignal;
+                }
+                if (expSign < 0) {
+                   value->x = x * sign / pow10(expValue);
+                } else {
+                   value->x = x * sign * pow10(expValue);
+                }
+                return; 
+              } 
+           } else {
+              if (skipSpaces() != 0) {
+                 value->x = x * sign;
+                 return;
+              }
+           }
+        }
+        discardRemaining();
+        Log::info("E: illegal character in field");
+        throw theExpValueSignal;
+     }
+
+     // no data in field 
+     Log::error("E-format: no data in field");
+     throw theNoDataInFieldSignal;
+   }
+
 }
+
+

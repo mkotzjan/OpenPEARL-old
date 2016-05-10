@@ -54,26 +54,6 @@ namespace pearlrt {
    Class containing the output formatting of fixed variables
    all methods are defined as static.
 
-
-   Sample usage in PEARL:
-   \verbatim
-   DCL x FIXED(15) INIT(2);
-   ...
-   PUT x TO console BY F(3);
-   \endverbatim
-
-   Should compile in C++ to:
-   \verbatim
-   //DCL x FIXED(15) INIT(2);
-   pearlrt:Fixed<15> x(2);
-   ...
-   //PUT x TO console BY F(3);
-   // the console object should provide access to the data sink object
-   // width=3, decimals=0, scale=0
-   pearlrt::PutFixed<15>:toF(x, (pearlrt::Fixed<31>)3, 
-                                (pearlrt::Fixed<31>)0, 
-                                console.getSink());
-   \endverbatim
    */
    template<int S> class PutFixed {
    private:
@@ -92,9 +72,6 @@ namespace pearlrt {
 
       width denoting the total width of the output field<br>
       decimals denoting the dogits after the decimal point<br>
-      scale giving a 'virtual' number of decimals to enable the user
-      to avoid floating point
-             variables<br>
       The value will be set right adjusted into the output field.
 
       \note in difference to the language report, a signal is throw

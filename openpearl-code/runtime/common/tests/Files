@@ -19,12 +19,14 @@ CXX_COMMON_TESTS2 := \
 	GetClockTests.cc \
 	GetDurationTests.cc \
 	GetFixedTests.cc \
+	GetFloatTests.cc \
 	GetUtils.cc \
 	PutBitStringTests.cc\
 	PutCharacterTests.cc\
 	PutClockTests.cc\
 	PutDurationTests.cc\
 	PutFixedTests.cc\
+	PutFloatTests.cc\
 	RefCharSinkTests.cc\
 	RefCharSourceTests.cc \
 	RefCharTests.cc

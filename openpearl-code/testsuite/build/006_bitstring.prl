@@ -34,7 +34,7 @@ T1: TASK MAIN;
    !__cpp__('pearlrt::BitString<1> b4i11(0);			');
     DCL b4i2 BIT(2)      INIT('8'B4);
    !__cpp__('pearlrt::BitString<2> b4i2(2); // only 2 bits !		');
-    DCL b4i64 BIT(64)    INIT('F0F0F0F0F0F0F0F0' B4);
+    DCL b4i64 BIT(64)    INIT('F0F0F0F0F0F0F0F0'B4);
    ! __cpp__('pearlrt::BitString<64> b4i64(0xf0f0f0f0f0f0f0f0LL);	');
 
    ! deklarations with init as B3

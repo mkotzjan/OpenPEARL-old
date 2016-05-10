@@ -390,7 +390,7 @@ variable_init :
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO: SemaDeclaration ::=
+//  SemaDeclaration ::=
 //   { DECLARE | DCL } Identifier or IdentifierList [ DimensionAttribute ] SEMA [ GlobalAttribute ]
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1389,40 +1389,40 @@ type_realtime_object
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO:  DationSpecification ::=
-//  { SPECIFY | SPC } IdentifierDenotation TypeDation [ GlobalAttribute ] ;
+//  DationSpecification ::=
+//    { SPECIFY | SPC } IdentifierDenotation TypeDation [ GlobalAttribute ] ;
 ////////////////////////////////////////////////////////////////////////////////
 
 dationSpecification
-    : ( 'SPECIFY' | 'SPC' ) identifierDenotation typeDation globalAttribute? ';'
+    : ( 'SPECIFY' | 'SPC' ) identifierDenotation specifyTypeDation globalAttribute? ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO:  DationDeclaration ::=
+
+specifyTypeDation
+    : 'DATION' sourceSinkAttribute classAttribute
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// DationDeclaration ::=
 //    {DECLARE | DCL} IdentifierDenotation TypeDation [GlobalAttribute] CREATED (Name§SystemDefDation);
 ////////////////////////////////////////////////////////////////////////////////
 
 dationDeclaration
-    : ( 'DECLARE' | 'DCL' ) identifierDenotation typeDation typology accessAttribute? globalAttribute? 'CREATED' '(' ID  ')' ';'
+    : ( 'DECLARE' | 'DCL' ) identifierDenotation typeDation typology? accessAttribute? globalAttribute? 'CREATED' '(' ID  ')' ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
-// TODO:  TypeDation ::=
+//  TypeDation ::=
 //    DATION SourceSinkAttribute ClassAttribute [ Structure ] [ AccessAttribute ]
 ////////////////////////////////////////////////////////////////////////////////
 
 typeDation
-    : 'DATION' sourceSinkAttribute  systemDation?  classAttribute
+    : 'DATION' sourceSinkAttribute classAttribute
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-systemDation
-    : 'SYSTEM'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-// TODO:  SourceSinkAttribute ::=
+//  SourceSinkAttribute ::=
 //    IN | OUT | INOUT
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1433,14 +1433,32 @@ sourceSinkAttribute
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+systemDation
+    : 'SYSTEM'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 //  ClassAttribute ::=
-//    ALPHIC | BASIC | TypeOfTransmissionData
+//    [ SYSTEM ]                       /* system dation */
+//    ALPHIC                       |   /* PUT/GET */
+//    BASIC TypeOfTransmissionData |   /* TAKE/SEND */
+//    TypeOfTransmissionData           /* READ/WRITE */
 ////////////////////////////////////////////////////////////////////////////////
 
 classAttribute
-    : 'ALPHIC'                  # classAttributeALPHIC
-    | 'BASIC'                   # classAttributeBASIC
-    | typeOfTransmissionData    # classAttributeTypeOfTransmissionData
+    : systemDation? ( alphicDation | basicDation typeOfTransmissionData| typeOfTransmissionData)
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+alphicDation
+    : 'ALPHIC'
+    ;
+////////////////////////////////////////////////////////////////////////////////
+
+basicDation
+    : 'BASIC'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

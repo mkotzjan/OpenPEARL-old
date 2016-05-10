@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -134,12 +134,13 @@ TEST(GetFixed, conversions) {
    }
    // internal overflow
    {
+      pearlrt::Fixed<63> f63;
       //                        123456789012345678901234567890
       pearlrt::Character<30> d("99999999999999999999999999999");
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(
-         pearlrt::GetFixed<15>::fromF(f15, 30, 0, source),
+         pearlrt::GetFixed<63>::fromF(f63, 30, 0, source),
          pearlrt::FixedRangeSignal);
    }
    // skip wrong field

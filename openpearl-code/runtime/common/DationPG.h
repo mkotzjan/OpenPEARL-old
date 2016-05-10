@@ -43,6 +43,8 @@
 #include "SystemDationNBSource.h"
 #include "PutFixed.h"
 #include "GetFixed.h"
+#include "GetFloat.h"
+#include "PutFloat.h"
 #include "PutCharacter.h"
 #include "GetCharacter.h"
 
@@ -258,7 +260,7 @@ namespace pearlrt {
 
 
       /**
-       output format F
+       output format F with Fixed
 
        \param f value to be printed
        \param w width of the output field
@@ -273,7 +275,7 @@ namespace pearlrt {
       };
 
       /**
-      input format F
+      input format F with FIXED
 
       \param f value to be read
       \param w width of the input field
@@ -287,6 +289,74 @@ namespace pearlrt {
          GetFixed<S>::fromF(f, w, d, source);
       };
 
+      /**
+       output format F with FLOAT
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the float value type
+       */
+      template<int S>
+      void toF(Float<S> & f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0) {
+         PutFloat<S>::toF(f, w, d, sink);
+      };
+
+      /**
+      input format F with FLOAT
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      \tparam  S width of the float value type
+      */
+      template<int S>
+      void fromF(Float<S> & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0) {
+         GetFloat<S>::fromF(f, w, d, source);
+      };
+
+
+      /**
+       output format E with FLOAT
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       \param s number of significant digits 
+       \param e number of digits in exponent field
+       \tparam  S width of the float value type
+       */
+      template<int S>
+      void toE(Float<S> & f,
+               const Fixed<31> w,
+               const Fixed<31> d,
+               const Fixed<31> s,
+               const Fixed<31> e) {
+         PutFloat<S>::toE(f, w, d, s, e, sink);
+      };
+
+      /**
+      input format E with FLOAT
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      \param s number of significant digits 
+      \param e number of digits in exponent field
+      \tparam  S width of the fixed value type
+      */
+      template<int S>
+      void fromF(Float<S> & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d,
+                 const Fixed<31> s,
+               const Fixed<31> e) {
+         GetFloat<S>::fromE(f, w, d, s, e, source);
+      };
 
 
       /**
