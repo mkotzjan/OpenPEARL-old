@@ -30,7 +30,6 @@ silentoldconfig: $(obj)/conf
 	$(Q)mkdir -p include/generated
 	$< -s $(Kconfig)
 
-createconf: $(obj)/conf
 
 # if no path is given, then use src directory to find file
 ifdef LSMOD
@@ -332,3 +331,6 @@ lex.%.c: %.l
 	cp $@ $@_shipped
 
 endif
+
+createconf: $(obj)/conf
+

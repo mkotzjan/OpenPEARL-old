@@ -80,7 +80,7 @@ clean:
 scripts/kconfig/conf:
 	$(Q)$(MAKE) $(build)=scripts/kconfig createconf
 	
-include/autoconf.h: scripts/kconfig/conf  .config 
+include/autoconf.h: scripts_basic scripts/kconfig/conf  .config 
 	./scripts/kconfig/conf -s fm/main.fm
 	
 
