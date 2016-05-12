@@ -58,6 +58,16 @@ INSTALL_PEARLINCLUDES = $(CONFIG_INSTALL_Target)/include/PearlIncludes.h
 
 all: $(targets)
 
+prepare:
+	touch $(INSTALL_PEARLINCLUDES)
+	chmod 777 $(INSTALL_PEARLINCLUDES)
+ifeq ($(CONFIG_LINUX),y) 
+	@(cd linux; make prepare;)
+endif
+ifeq ($(CONFIG_LPC1768),y) 
+	@(cd lpc1768; make prepare;)
+endif
+
 linux:
 	(cd linux; make -B;)
 
@@ -68,7 +78,9 @@ help:
 	@echo "-----------------"
 	@echo "make all         : build the pearl libraries for all selected targets"
 	@echo "make clean       : remove all generated files"
-	@echo "make install     : install to /usr/local/lib and /usr/local/include"
+	@echo "make prepare     : create dummy target installation files with public"
+	@echo "                   public write premissions"
+	@echo "make install     : install to the installation target"
 	@echo "-----------------"
 	@echo
 

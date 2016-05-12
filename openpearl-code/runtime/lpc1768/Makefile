@@ -183,6 +183,15 @@ doc:
 	doxygen doc_stuff/Doxyfile
 #	(cd latex; make pdf; cd ..)
 
+phony += prepare
+prepare:
+	@touch $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a
+	@touch $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.a
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.a
+	@touch $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
+
 phony += install
 install: all cc_bin run_bin
 	rm -f pearl2.h

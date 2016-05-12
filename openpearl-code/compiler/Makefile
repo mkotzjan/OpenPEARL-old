@@ -34,6 +34,10 @@ DIRS	= src
 all : force_look
 	@$(ECHO) looking into src : $(MAKE) 
 	cd src; $(MAKE) all
+
+.PHONY: prepare
+prepare:
+	cd src; $(MAKE) prepare
 	
 clean :
 	@$(ECHO) cleaning up in .

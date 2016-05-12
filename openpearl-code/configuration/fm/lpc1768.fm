@@ -25,14 +25,14 @@ config LPC1768_CHECK_STACK_OVERFLOW
 config LPC1768_tests
 	depends on LPC1768
 	boolean "build low level test applications"
-	default y
+	default n
 	help
 	This will create the low level test application of the runtime
         system for the LPC1768 microcontroller. 
         These tests should be run at least once to make shure that
 	the runtime system interacts properly with your configuration
         with hardware and toolchain.
-	Usually select this.
+	Usually deselect this.
 
 #choice
 #depends on LPC1768
@@ -76,17 +76,18 @@ config LPC1768_USB_Disc
      help
      This option provides mass storage access via the usb interface.
      1 common usb flash disc device may be attached.
+     Only 1 usb device may be attached.
 
 config LPC1768_UART
      bool "UART support"
-     default n
+     default y
      help
      This option enables the system dation and driver for the two uart
      channels
 
 config LPC1768_HY32A
      bool "HY32A support display support"
-     default n
+     default y
      help
      This option enables the system dation and driver for the onboard
      color grafic module

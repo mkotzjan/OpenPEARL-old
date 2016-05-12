@@ -82,6 +82,10 @@ test:
     
 ###############################################################################
 
+prepare:
+	touch $(CONFIG_INSTALL_Target)/bin/smallpearl_compiler.jar 
+	chmod 777 $(CONFIG_INSTALL_Target)/bin/smallpearl_compiler.jar 
+
 install: gen javac prl_cc.inc
 #	cp prl_c $(INSTALL_DIR)
 #	cp smallpearl_compiler.jar $(INSTALL_DIR)

@@ -1,5 +1,7 @@
 # super makefile for OpenPEARL
 # 
+USERID=$(shell id -u)
+
 -include configuration/.config
 
 .PHONY: install runtime compiler help build all menuconfig
@@ -8,9 +10,21 @@ help:
 	@echo "*************************************"
 	@echo "master make for OpenPEARL"
 	@echo "make build:   build compiler and runtime"
-	@echo "make install: copy build stuff to /usr/local/... (must be root)"
-	@echo "make all:     build+install"
-	@echo "make clean:   clean all parts"
+	@echo "make prepare: create installation targets with public write access"
+	@echo "              should be executed once for developers"
+	@echo "              (must be root)"
+	@echo "make install: build and install to the configured installation target"
+	@echo "              if target is /usr/local/  you must be root"
+	@echo "              after make prepare, this may be done as normal user"
+	@echo "make defconfig: create default configuration setting"
+	@echo "make menuconfig: edit configuration setting"
+	@echo "make all:     install"
+	@echo "make clean:   clean in all project parts"
+	@echo
+	@echo "Usual sequence for developer"
+	@echo "+ initially as root:        make prepare"
+	@echo "+ initially as normal user: make menuconfig"
+	@echo "+ cyclic as normal user:    make install (this includes build)"
 	@echo "*************************************"
 
 all:	build install
@@ -22,6 +36,16 @@ runtime:
 
 compiler:
 	(cd compiler/src; make all; )
+
+prepare:
+ifeq ($(USERID),0)
+	   (cd runtime; make prepare; )
+	   (cd compiler; make prepare; )
+	   touch $(CONFIG_INSTALL_Target)/bin/prl
+	   chmod 777 $(CONFIG_INSTALL_Target)/bin/prl
+else
+	   $(error You must be root to execute this command)
+endif
 
 install: configuration/include/autoconf.h  flashinterface.inc
 	(cd runtime; make clean; )
@@ -36,7 +60,6 @@ endif
 	# is created by includeComposer but not needed here
 	@rm -f sysincs.h
 	@cp prl $(CONFIG_INSTALL_Target)/bin
-	@chmod a+x $(CONFIG_INSTALL_Target)/bin/prl
 
 # create rule to run menuconfig, if no configuration/include/autoconf.h exists
 #ifeq ($(wildcard "configuration/include/autoconf.h")),)
@@ -61,13 +84,13 @@ clean:
 menuconfig:
 	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
 
-.PHONY: jenkins_prepare
-jenkins_prepare:
-	cp configuration/jenkins.config configuration/.config
-	(cd configuration; make include/autoconf.h; cd ..)
-
-jenkins: jenkins_prepare
-	make install
+#.PHONY: jenkins_prepare
+#jenkins_prepare:
+#	cp configuration/jenkins.config configuration/.config
+#	(cd configuration; make include/autoconf.h; cd ..)
+#
+#jenkins: jenkins_prepare
+#	make install
 
 flashinterface.inc: ./configuration/include/auto.conf
 	@awk -F"=" 							\

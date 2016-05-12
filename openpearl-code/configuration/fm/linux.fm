@@ -9,12 +9,12 @@ config LINUX
 config LINUX_tests
 	depends on LINUX
 	boolean "build low level test applications"
-	default y
+	default n
 	help
 	This will create the low level test application of the linux runtime
         system. These tests should be run at least once to make shure that
 	the runtime system interacts properly with your linux installation.
-	Usually select this.
+	Usually deselect this.
 
 
 menu Drivers

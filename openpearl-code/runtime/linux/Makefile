@@ -141,8 +141,14 @@ help:
 	@echo "make doc         : generate Doxygen documentation in HTML"
 	@echo "make install     : install to $(CONFIG_INSTALL_Target) in lib"
 	@echo "                 : and prepare include file" 
+	@echo "make prepare     : create dummy installation files with public access"
 	@echo "-----------------"
 	@echo
+
+phony += prepare
+prepare:
+	@touch $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a
 
 phony += install
 install: all
