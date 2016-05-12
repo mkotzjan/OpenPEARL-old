@@ -77,8 +77,10 @@ clean:
 	rm -f scripts/kconfig/*.o
 
 # rebuild includes for build process after altered configuration
-include/autoconf.h: .config 
-	(cd scripts/kconfig; cc conf.c zconf.tab.c -o conf)
+scripts/kconfig/conf:
+	$(Q)$(MAKE) $(build)=scripts/kconfig createconf
+	
+include/autoconf.h: scripts/kconfig/conf  .config 
 	./scripts/kconfig/conf -s fm/main.fm
 	
 
