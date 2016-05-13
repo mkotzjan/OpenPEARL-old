@@ -2,15 +2,10 @@ MODULE(taskdata);
 
 PROBLEM;
 T1: TASK MAIN;
-!   DCL x FIXED(15);
-!   DCL y FIXED(15);
-!   DCL z FIXED(15);
-!   DCL null FIXED(15);
-  __cpp__ ( 'pearlrt::Fixed<15>  _x;');
-  __cpp__ ( 'pearlrt::Fixed<15>  _y;');
-  __cpp__ ( 'pearlrt::Fixed<15>  _z;');
-  __cpp__ ( 'pearlrt::Fixed<15>  _null;');
-  __cpp__ ('me->setLocation(5,filename);');
+   DCL x FIXED(15);
+   DCL y FIXED(15);
+   DCL z FIXED(15);
+   DCL null FIXED(15);
 
    x := 1;
    y := 0;

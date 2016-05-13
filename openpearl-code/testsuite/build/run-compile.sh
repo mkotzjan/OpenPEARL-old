@@ -1,4 +1,6 @@
 #!/bin/bash
+PARAM=$1
+shift
 TESTS=$*
 
 nooftests=0
@@ -35,4 +37,24 @@ do
 done
 
 printf "Result:  no of tests/passed/failed: %d/%d/%d\n" "$nooftests" "$passed" "$failed"
+
+if [ $PARAM -eq 0 ]; then
+   exit 0
+fi
+if [ $PARAM -eq 1 ]; then
+   if [ $failed -ne 0 ]; then
+      echo "at least 1 program did not compile"
+      exit 1
+   fi
+   exit 0
+fi
+if [ $PARAM -eq 2 ]; then
+   if [ $passed -ne 0 ]; then
+      echo "at least 1 program did compile"
+      exit 1
+   fi
+   exit 0
+fi
+echo "how did you reach this line?"
+exit 3
 

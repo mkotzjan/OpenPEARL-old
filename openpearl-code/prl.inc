@@ -83,6 +83,9 @@ fn=${INPUT%.*}
 if [ "$RUN" == "1" ] ; then
    if [ "$fn" != "$ext" ] ; then
 #include "runtime/run_bin.inc"
+      if [ $rc -ne 0 ]; then
+          echo "*** program terminated with error ($rc) ***"
+      fi
    else
       echo "specify executable file to perform run "
       exit 1
@@ -115,7 +118,6 @@ fi
 if [ "$COMPILEONLY" != "1" ] ; then
   #   echo "C++->BIN"
 #include "runtime/cc_bin.inc"
-  rc=$?
   if [ $rc -ne 0 ]
   then
      echo "compilation stage 2 terminated with errors"

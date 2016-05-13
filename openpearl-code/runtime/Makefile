@@ -117,11 +117,13 @@ cc_bin.inc:
 ifeq ($(CONFIG_LINUX),y) 
 	@echo 'if [ "$$PLATTFORM" == "linux" ] ; then' >> cc_bin.inc
 	@echo '#include  "runtime/linux/cc_bin.inc"' >>cc_bin.inc
+	@echo 'rc=$$?' >>cc_bin.inc
 	@echo 'fi' >>cc_bin.inc
 endif
 ifeq ($(CONFIG_LPC1768),y) 
 	@echo 'if [ "$$PLATTFORM" == "lpc1768" ] ; then' >>cc_bin.inc
 	@echo '#include  "runtime/lpc1768/cc_bin.inc" ' >>cc_bin.inc
+	@echo 'rc=$$?' >>cc_bin.inc
 	@echo 'fi' >>cc_bin.inc
 endif
 
@@ -132,11 +134,13 @@ run_bin.inc:
 ifeq ($(CONFIG_LINUX),y) 
 	@echo 'if [ "$$PLATTFORM" == "linux" ] ; then' >> run_bin.inc
 	@echo '#include  "runtime/linux/run_bin.inc"' >>run_bin.inc
+	@echo 'rc=$$?' >>run_bin.inc
 	@echo 'fi' >>run_bin.inc
 endif
 ifeq ($(CONFIG_LPC1768),y) 
 	@echo 'if [ "$$PLATTFORM" == "lpc1768" ] ; then' >>run_bin.inc
 	@echo '#include  "runtime/lpc1768/run_bin.inc" ' >>run_bin.inc
+	@echo 'rc=$$?' >>run_bin.inc
 	@echo 'fi' >>run_bin.inc
 endif
 
