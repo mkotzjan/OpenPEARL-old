@@ -6,11 +6,20 @@
 # perform regression tests
 #  remove tests from build: DONOTBUILD
 #  remove tests from run: DONOTRUN
-
-DONOTBUILD=006_bitstring 030_signals 031_signalsInduce 010_cpp_trycatch \
+#
+# --------------------------
+# for the usage in jenkins the policy is:
+# add all test cases to DONOTBUILD which are recorded in an open ticket
+# add all test cases to DONOTRUN which are known that they are intended
+#     as build only test cases
+# the result of make build is ok, if all test cases work
+# the result of make doesnotbuild is ok, if no test cases work
+ 
+DONOTBUILD=006_bitstring 030_signals 031_signalsInduce  \
 	201_bit_init \
-	400_char_dcl 401_char_expr1 \
-	700_dation_rw 701_dation_pg 702_dation_ts 
+	050_interrupt 090_tasking  \
+	700_dation_rw 703_userdation_dcl
+
 DONOTRUN=000_empty 006_bitstring \
 	703_userdation_dcl 704_dation_open 705_dation_close
 
@@ -43,24 +52,34 @@ redo:	build run
 allbuild:
 	@echo "try to build test programs"
 	@echo "--------------------------"
-	@./run-compile.sh $(BINS)
+	@./run-compile.sh 0 $(BINS)
 
 build:
 	@echo "try to build test programs"
 	@echo "--------------------------"
-	@./run-compile.sh $(BUILD)
+	@./run-compile.sh 1 $(BUILD)
 	@echo "excluded (NOT build): " $(DONOTBUILD)
+
+doesnotbuild:
+	@echo "none of the programs should build"
+	@echo "--------------------------"
+	@./run-compile.sh 2 $(DONOTBUILD)
 
 allrun:
 	@echo "run simple test programs"
 	@echo "------------------------"
-	@$(foreach f,$(BINS), ./runtest.sh $(f);)
+	@./runtest.sh 0 $(BINS)
 
 run: 
 	@echo "run simple test programs"
 	@echo "------------------------"
-	@$(foreach f,$(RUN), ./runtest.sh $(f);)
+	@./runtest.sh 1 $(RUN)
 	@echo "excluded (NOT run): " $(DONOTRUN)
+
+doesnotrun: 
+	@echo "cross check: none of the test cases should run"
+	@echo "------------------------"
+	@./runtest.sh 2 $(DONOTRUN)
 
 clean:
 	rm -f $(BINS)
