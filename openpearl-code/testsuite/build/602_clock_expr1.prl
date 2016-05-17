@@ -11,5 +11,6 @@ T1: TASK MAIN;
    diff := x1 - x;
    x2 := 25:00:00;
    x := 12:30:45.25 + 1 HRS 15 MIN 45 SEC;
+   x := NOW;
 END;
 MODEND;
