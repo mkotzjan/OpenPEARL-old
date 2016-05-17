@@ -28,7 +28,7 @@ do
   fi
 done
 	
-printf "Result:  no of tests/passed/failed: %d/%d/%d\n" "$nooftests" "$passed" "$failed"
+printf "Result:  number of tests/passed/failed: %d/%d/%d\n" "$nooftests" "$passed" "$failed"
 
 if [ $PARAM -eq 0 ] ; then
    exit 0
