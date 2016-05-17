@@ -893,7 +893,7 @@ priority
 ////////////////////////////////////////////////////////////////////////////////
 
 frequency
-    : 'ALL' expression ( 'UNTIL' expression |  'DURING' expression )?
+    : 'ALL' durationConstant ( 'UNTIL' timeConstant |  'DURING' durationConstant )?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -909,9 +909,9 @@ frequency
 
 startCondition
     :
-      'AFTER'   expression                                # startConditionAFTER
-    | 'AT'      expression                                # startConditionAT
-    | 'WHEN'    ID  ( 'AFTER' expression)?  frequency?    # startConditionWHEN
+      'AFTER'   durationConstant                                # startConditionAFTER
+    | 'AT'      timeConstant                                    # startConditionAT
+    | 'WHEN'    ID  ( 'AFTER' durationConstant)?  frequency?    # startConditionWHEN
     ;
 
 
