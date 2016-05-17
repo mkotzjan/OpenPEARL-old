@@ -121,7 +121,6 @@
    :END:
 
 
-
 ** Software Development (not planned yet)
    :PROPERTIES:
    :ORDERED:  t
@@ -222,14 +221,12 @@
    :allocate: dev
    :END:
 
-
 ** Bug Fixing
    :PROPERTIES:
    :ORDERED:  t
    :priority: 900
    :allocate: dev
    :END:      
-
 *** Ticket#56	TAKE/​SEND does not compile
   :PROPERTIES:
   :Effort:   3d
@@ -296,7 +293,7 @@
    :allocate: dev
    :END:
     
-*** Ticket#137	integrate new DATION Grammer
+*** Ticket#137	integrate new DATION Grammar
   :PROPERTIES:
   :Effort:   1d
   :allocate: dev

@@ -1,4 +1,4 @@
-project nil "OpenPEARL Compiler" "1.0" 2015-06-05 +280d {
+project nil "OpenPEARL Compiler" "1.0" 2016-04-29 +280d {
 }
 shift s40 "Part time shift" {
   workinghours wed, thu, fri off
@@ -11,9 +11,11 @@ resource dev_semanticanalysis "Students" {
 }
 task openpearl "OpenPEARL Compiler" {
   task software "Software Development" {
+    depends !start
     purge allocate
     allocate dev
     task feature_block "Block (Keyword: BEGIN and END)" {
+      depends !!start
       purge allocate
       allocate dev
       effort 40.0h
@@ -116,61 +118,61 @@ task openpearl "OpenPEARL Compiler" {
       effort 8.0h
     }
     task feature_ref_proc "References to procedures (REF PROC)" {
-      depends !statement
+      depends !statement, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_references "References (Keywords: REF and CONT)" {
-      depends !feature_ref_proc
+      depends !feature_ref_proc, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_struct "Structures (Keyword: STRUCT)" {
-      depends !feature_references
+      depends !feature_references, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_array "Datatype Array" {
-      depends !feature_struct
+      depends !feature_struct, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_by_type "\"BY TYPE\" Operator" {
-      depends !feature_array
+      depends !feature_array, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_convert "CONVERT Statement" {
-      depends !feature_by_type
+      depends !feature_by_type, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_bolt "BOLT" {
-      depends !feature_convert
+      depends !feature_convert, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task feature_global "GLOBAL" {
-      depends !feature_bolt
+      depends !feature_bolt, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task renaming "Renaming of Java package" {
-      depends !feature_global
+      depends !feature_global, !!start
       purge allocate
       allocate dev
       effort 8.0h
     }
     task handling "Handling of generated constants" {
-      depends !renaming
+      depends !renaming, !!start
       purge allocate
       allocate dev
       effort 8.0h
@@ -261,13 +263,13 @@ task openpearl "OpenPEARL Compiler" {
       milestone
     }
   }
-  task project "Project start" {
+  task start "Project start" {
     milestone
   }
 }
 textreport report "Plan" {
   formats html
-  header '== openpearl-compiler-roadmap =='
+  header '== OpenPEARL Compiler =='
 
   center -8<-
     [#Plan Plan] | [#Resource_Allocation Resource Allocation]
