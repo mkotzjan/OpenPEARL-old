@@ -14,14 +14,6 @@ __cpp__(
 PROBLEM;
 
    SPC disc DATION INOUT SYSTEM  ALL;
-/* expected C++ code keyword SYSTEM ALL -> 
-   static_cast<pearlrt::SystemDationNB*>
-
-__cpp__('extern pearlrt::Decice* d_disc;'
-        'pearlrt::SystemDationNB* _disc = '
-        '    static_cast<pearlrt::SystemDationNB*>(d_disc);');
-
- */
 
    DCL table DATION INOUT ALPHIC DIM(*,80)
              FORWARD NOCYCL  NOSTREAM 
@@ -32,7 +24,6 @@ FileTest1: TASK MAIN;
      DCL f1 FIXED(15);
      DCL text CHAR(5) INIT(' f = ');
      DCL text1 CHAR(5);
-!__cpp__('pearlrt::Character<5> _text1;');
  
      OPEN table BY ANY, IDF('file1.txt');
      PUT text, f TO table BY  X(3), A,F(3), SKIP;
@@ -42,57 +33,57 @@ FileTest1: TASK MAIN;
      OPEN table BY OLD, IDF('file1.txt');
      GET text1, f1 FROM table BY  X(3), A,F(3), SKIP;
      CLOSE table;
-/*
 
-__cpp__ (
-	'pearlrt::Character<9> tmp_name("file1.txt");'
-	'_table.dationOpen(pearlrt::Dation::IDF | pearlrt::Dation::ANY, &tmp_name);'
-	'');
+        
+     OPEN table BY ANY, IDF('file1.txt');
+     FOR i TO 10 REPEAT
+        PUT text1, i TO table BY  X(3), A,F(3), SKIP;
+     END;
+     CLOSE table;
 
-        DCL i FIXED(31);
-        i := 1;
+     OPEN table BY OLD, IDF('file1.txt');
+     FOR i TO 10 REPEAT
+        GET f1 FROM table BY  X(8),F(3), SKIP;
+     END;
+     CLOSE table;
 
-__cpp__(
-        ' static Character<5> text1(" f = ");'
-	'while (_i <= pearlrt::Fixed<15>(10)) {'
-	'    _f = _i;'
-	'    try {'
-	'      _table.beginSequence(me);'
-	'      _table.toA(text1);'
-	'      _table.toF(_f, 3);'
-	'      _table.toSkip(1);'
-	'      _table.endSequence();'
-	'    } catch (pearlrt::Signal & s) {'
-	'       if (!_table.updateRst(&s) ) {'
-	'         _table.endSequence();'
-	'         throw;'
-	'       }'
-	'      _table.endSequence();'
-	'    }'
-);
-        i := i + 1;
-__cpp__(
-	'}'
-	'_table.dationClose();'
-);
-__cpp__ ('// tmp_name defined in upper section'
-	'_table.dationOpen(pearlrt::Dation::IDF | pearlrt::Dation::OLD, &tmp_name);'
-	'    try {'
-	'      _table.beginSequence(me);'
-	'      _table.fromA(text1);'
-	'      _table.fromF(_f, 3);'
-	'      _table.fromSkip(1);'
-	'      _table.endSequence();'
-	'    } catch (pearlrt::Signal & s) {'
-	'       if (!_table.updateRst(&s) ) {'
-	'         _table.endSequence();'
-	'         throw;'
-	'       }'
-	'      _table.endSequence();'
-	'    }'
-	'_table.dationClose();'
-);
-*/
+END;
+
+testFormats: PROC;
+   DCL c1 CHAR(20) INIT('123');
+   DCL dur DURATION INIT(12.3SEC);
+   DCL clk CLOCK INIT(1HRS 30MIN 2.3SEC);
+   DCL float FLOAT INIT(12.3); 
+   DCL fixed FIXED INIT(12); 
+   DCL bit BIT(1) INIT('1'B1);
+
+   PUT c1 TO table BY A,SKIP;
+   PUT dur TO table BY D(13,6),SKIP;
+   PUT clk TO table BY T(13,6),SKIP;
+   PUT float TO table BY F(13),SKIP;
+   PUT float TO table BY F(13,6),SKIP;
+   PUT float TO table BY E(19,6),SKIP;
+   PUT float TO table BY E3(19,6),SKIP;
+   PUT fixed TO table BY F(13,6),SKIP;
+   PUT fixed TO table BY F(13),SKIP;
+   PUT bit TO table BY B1(1),SKIP;
+   PUT bit TO table BY B2(1),SKIP;
+   PUT bit TO table BY B3(1),SKIP;
+   PUT bit TO table BY B4(1),SKIP;
+
+   GET c1 FROM table BY A,SKIP;
+   GET dur FROM table BY D(13,6),SKIP;
+   GET clk FROM table BY T(13,6),SKIP;
+   GET float FROM table BY F(13),SKIP;
+   GET float FROM table BY F(13,6),SKIP;
+   GET float FROM table BY E(19,6),SKIP;
+   GET float FROM table BY E3(19,6),SKIP;
+   GET fixed FROM table BY F(13,6),SKIP;
+   GET fixed FROM table BY F(13),SKIP;
+   GET bit FROM table BY B1(1),SKIP;
+   GET bit FROM table BY B2(1),SKIP;
+   GET bit FROM table BY B3(1),SKIP;
+   GET bit FROM table BY B4(1),SKIP;
 
 END;
 MODEND;

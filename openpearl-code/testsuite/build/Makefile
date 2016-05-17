@@ -20,6 +20,7 @@ DONOTBUILD=006_bitstring 030_signals 031_signalsInduce  \
 	401_char_expr1 \
 	050_interrupt 090_tasking  \
 	602_clock_expr1	\
+	701_dation_pg \
 	700_dation_rw 703_userdation_dcl
 
 DONOTRUN=000_empty 006_bitstring \

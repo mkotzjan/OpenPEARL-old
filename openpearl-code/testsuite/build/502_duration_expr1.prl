@@ -21,5 +21,6 @@ T1: TASK MAIN;
    x := x  * f12;
    f := x4 / x2; 
    x2 := 1HRS 2MIN 3.6SEC;
+   ! x := x2 + 1HRS 2MIN 10SEC;
 END;
 MODEND;
