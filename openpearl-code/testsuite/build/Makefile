@@ -17,7 +17,9 @@
  
 DONOTBUILD=006_bitstring 030_signals 031_signalsInduce  \
 	201_bit_init \
+	401_char_expr1 \
 	050_interrupt 090_tasking  \
+	602_clock_expr1	\
 	700_dation_rw 703_userdation_dcl
 
 DONOTRUN=000_empty 006_bitstring \
@@ -52,34 +54,34 @@ redo:	build run
 allbuild:
 	@echo "try to build test programs"
 	@echo "--------------------------"
-	@./run-compile.sh 0 $(BINS)
+	@../run-compile.sh 0 $(BINS)
 
 build:
 	@echo "try to build test programs"
 	@echo "--------------------------"
-	@./run-compile.sh 1 $(BUILD)
+	@../run-compile.sh 1 $(BUILD)
 	@echo "excluded (NOT build): " $(DONOTBUILD)
 
 doesnotbuild:
 	@echo "none of the programs should build"
 	@echo "--------------------------"
-	@./run-compile.sh 2 $(DONOTBUILD)
+	@../run-compile.sh 2 $(DONOTBUILD)
 
 allrun:
 	@echo "run simple test programs"
 	@echo "------------------------"
-	@./runtest.sh 0 $(BINS)
+	@../runtest.sh 0 $(BINS)
 
 run: 
 	@echo "run simple test programs"
 	@echo "------------------------"
-	@./runtest.sh 1 $(RUN)
+	@../runtest.sh 1 $(RUN)
 	@echo "excluded (NOT run): " $(DONOTRUN)
 
 doesnotrun: 
 	@echo "cross check: none of the test cases should run"
 	@echo "------------------------"
-	@./runtest.sh 2 $(DONOTRUN)
+	@../runtest.sh 2 $(DONOTRUN)
 
 clean:
 	rm -f $(BINS)
