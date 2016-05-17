@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -31,23 +31,13 @@ MODULE(sched_demo);
 ! SYSTEM;
 ! termout: StdStream(1);
 __cpp__('pearlrt::StdStream ___termout(1);');
-__cpp__('pearlrt::Device*  __termout = &___termout;');
+__cpp__('pearlrt::Device*  d_termout = &___termout;');
 
-!__cpp__('SPCTASK(_TASK1);');
-!__cpp__('SPCTASK(_TASK2);');
-!__cpp__('SPCTASK(_TASK3);');
 
 PROBLEM;
-!SPC termout DATION OUT SYSTEM ALPHIC;
-__cpp__('extern pearlrt::Device * __termout;');
-__cpp__('pearlrt::SystemDationNB* _termout = static_cast<pearlrt::SystemDationNB*>(__termout); ');
+SPC termout DATION OUT SYSTEM ALPHIC;
 
-! DCL console DATION OUT ALPHIC DIM(*,80) FORWARD GLOBAL CREATED(termout);
-__cpp__(
-   'static pearlrt::DationDim2 dim_termout(80);' 
-   'pearlrt::DationPG _console(_termout, pearlrt::Dation::OUT|pearlrt::Dation::FORWARD, &dim_termout); '
-);
-
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD /* GLOBAL */ CREATED(termout);
 
 !SPC rr_test PROC GLOBAL;
 
@@ -59,16 +49,14 @@ TASK1: TASK PRIO 2 MAIN;
      __cpp__ (' pearlrt::Character<30> tc_4("Task1: preventing Task3"); ');
      __cpp__ (' pearlrt::Character<30> tc_5("Task1: terminate  Task2"); ');
 
-     !DCL end CLOCK;
-     __cpp__ (' pearlrt::Clock _end; ');
-     !OPEN console;
-     __cpp__('_console.dationOpen(0,(pearlrt::Character<1>*)NULL,(pearlrt::Fixed<31>*) NULL);	');
+     DCL end CLOCK;
+     DCL d DURATION INIT (10SEC);
 
+     OPEN console;
 
      ACTIVATE TASK2 PRIO 10;
-!     __cpp__('_TASK2.activate(me, pearlrt::Task::PRIO, pearlrt::Prio(10)); ');
 
-     !PUT "Task1..." BY A, SKIP;
+     !PUT 'Task1...' TO console BY A, SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
@@ -83,13 +71,13 @@ TASK1: TASK PRIO 2 MAIN;
              '   _console.endSequence();'
              '}'); 
 
-     !end = NOW() + 10 SEC;
-     __cpp__('_end = pearlrt::Clock::now() + pearlrt::Duration(10);	');
+     end := NOW;
+     end := end + d;   ! d = 10SEC 
 
-     !WHILE NOW() < end REPEAT
-     __cpp__('while( pearlrt::Clock::now().compare(_end) < 0) {');
+     WHILE NOW < end REPEAT
 
-         ! PUT NOW(), "Task 1 works" TO TERM BY T(15,6),X(3),A,SKIP;
+      !    PUT NOW, 'Task 1 works' TO console BY T(15,6),X(3),A,SKIP;
+      ! PUT NOW, tc_2 TO console BY T(15,6),X(3),A,SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
@@ -108,10 +96,9 @@ TASK1: TASK PRIO 2 MAIN;
 
          AFTER 2 SEC RESUME;
 
-     ! END;
-     __cpp__('}');
+      END;
 
-     ! PUT 'Task1: preventing Task3' TO TERM BY A,SKIP;
+     ! PUT 'Task1: preventing Task3' TO console BY A,SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
@@ -129,7 +116,7 @@ TASK1: TASK PRIO 2 MAIN;
      PREVENT TASK3;
      !__cpp__ ('_TASK3.prevent(); ');
 
-     !PUT 'Task1: terminating Task2' TO TERM BY A,SKIP;
+     !PUT 'Task1: terminating Task2' TO console BY A,SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
@@ -150,7 +137,7 @@ TASK1: TASK PRIO 2 MAIN;
     ! CALL rr_test;
 
 
-     ! PUT 'Task1 finished' TO TERM BY A,SKIP;
+     ! PUT 'Task1 finished' TO console BY A,SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
@@ -164,6 +151,8 @@ TASK1: TASK PRIO 2 MAIN;
              '   } '
              '   _console.endSequence();'
              '}'); 
+
+      CLOSE console;
 
 END;
 
@@ -181,9 +170,8 @@ TASK2: TASK PRIO 4;
             '           pearlrt::Clock(0.0),             // until'
             '           pearlrt::Duration(0.0));         // during' );
 
-   !REPEAT
-    __cpp__ (' while(1) {');
-     !  PUT NOW(),'Task2 works' TO TERM BY T(15,6),X(15),A,SKIP;
+   REPEAT
+     !  PUT NOW(),'Task2 works' TO console BY T(15,6),X(15),A,SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
@@ -203,8 +191,7 @@ TASK2: TASK PRIO 4;
 
       AFTER 5 SEC RESUME;
 
-   !END; ! of REPEAT
-   __cpp__('}');
+   END; ! of REPEAT
 END;
 
 TASK3: TASK PRIO 6;
@@ -212,7 +199,7 @@ TASK3: TASK PRIO 6;
      __cpp__ (' pearlrt::Character<11> tc_1("Task3 works"); ');
 
 
-   ! PUT NOW(),'3 works' TO TERM BY T(15,6),X(25),A,SKIP;
+   ! PUT NOW(),'Task 3 works' TO console BY T(15,6),X(25),A,SKIP;
      __cpp__(
              'try {'
              '   _console.beginSequence(me);'
