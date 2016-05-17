@@ -872,6 +872,40 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitGtRelationalExpression((SmallPearlParser.GtRelationalExpressionContext) ctx));
             } else if (ctx instanceof SmallPearlParser.LeRelationalExpressionContext) {
                 st.add("code", visitLeRelationalExpression((SmallPearlParser.LeRelationalExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.AtanExpressionContext) {
+                st.add("code", visitAtanExpression((SmallPearlParser.AtanExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.CosExpressionContext) {
+                st.add("code", visitCosExpression((SmallPearlParser.CosExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.ExpExpressionContext) {
+                st.add("code", visitExpExpression((SmallPearlParser.ExpExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.LnExpressionContext) {
+                st.add("code", visitLnExpression((SmallPearlParser.LnExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.SinExpressionContext) {
+                st.add("code", visitSinExpression((SmallPearlParser.SinExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.SqrtExpressionContext) {
+                st.add("code", visitSqrtExpression((SmallPearlParser.SqrtExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.TanExpressionContext) {
+                st.add("code", visitTanExpression((SmallPearlParser.TanExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.TanhExpressionContext) {
+                st.add("code", visitTanhExpression((SmallPearlParser.TanhExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.FitExpressionContext) {
+                st.add("code", visitFitExpression((SmallPearlParser.FitExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.ExponentiationExpressionContext) {
+                st.add("code", visitExponentiationExpression((SmallPearlParser.ExponentiationExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.AbsExpressionContext) {
+                st.add("code", visitAbsExpression((SmallPearlParser.AbsExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.SizeofExpressionContext) {
+                st.add("code", visitSizeofExpression((SmallPearlParser.SizeofExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.EntierExpressionContext) {
+                st.add("code", visitEntierExpression((SmallPearlParser.EntierExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.RoundExpressionContext) {
+                st.add("code", visitRoundExpression((SmallPearlParser.RoundExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.SignExpressionContext) {
+                st.add("code", visitSignExpression((SmallPearlParser.SignExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.RemainderExpressionContext) {
+                st.add("code", visitRemainderExpression((SmallPearlParser.RemainderExpressionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.NowFunctionContext) {
+                st.add("code", visitNowFunction((SmallPearlParser.NowFunctionContext) ctx));
             }
         }
         return st;
@@ -1012,63 +1046,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitIf_statement(SmallPearlParser.If_statementContext ctx) {
         ST stmt = group.getInstanceOf("if_statement");
 
-        if (ctx.expression() instanceof SmallPearlParser.BaseExpressionContext) {
-            stmt.add("rhs", visitBaseExpression(((SmallPearlParser.BaseExpressionContext) ctx.expression())));
-        } else if (ctx.expression() instanceof SmallPearlParser.AdditiveExpressionContext) {
-            stmt.add("rhs", visitAdditiveExpression(((SmallPearlParser.AdditiveExpressionContext) ctx.expression())));
-        } else if (ctx.expression() instanceof SmallPearlParser.MultiplicativeExpressionContext) {
-            stmt.add("rhs", visitMultiplicativeExpression((SmallPearlParser.MultiplicativeExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.UnaryAdditiveExpressionContext) {
-            stmt.add("rhs", visitUnaryAdditiveExpression((SmallPearlParser.UnaryAdditiveExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.UnarySubtractiveExpressionContext) {
-            stmt.add("rhs", visitUnarySubtractiveExpression((SmallPearlParser.UnarySubtractiveExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.AtanExpressionContext) {
-            stmt.add("rhs", visitAtanExpression((SmallPearlParser.AtanExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.CosExpressionContext) {
-            stmt.add("rhs", visitCosExpression((SmallPearlParser.CosExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.ExpExpressionContext) {
-            stmt.add("rhs", visitExpExpression((SmallPearlParser.ExpExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.LnExpressionContext) {
-            stmt.add("rhs", visitLnExpression((SmallPearlParser.LnExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SinExpressionContext) {
-            stmt.add("rhs", visitSinExpression((SmallPearlParser.SinExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SqrtExpressionContext) {
-            stmt.add("rhs", visitSqrtExpression((SmallPearlParser.SqrtExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.TanExpressionContext) {
-            stmt.add("rhs", visitTanExpression((SmallPearlParser.TanExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.TanhExpressionContext) {
-            stmt.add("rhs", visitTanhExpression((SmallPearlParser.TanhExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.EqRelationalExpressionContext) {
-            stmt.add("rhs", visitEqRelationalExpression((SmallPearlParser.EqRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.NeRelationalExpressionContext) {
-            stmt.add("rhs", visitNeRelationalExpression((SmallPearlParser.NeRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.LtRelationalExpressionContext) {
-            stmt.add("rhs", visitLtRelationalExpression((SmallPearlParser.LtRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.LeRelationalExpressionContext) {
-            stmt.add("rhs", visitLeRelationalExpression((SmallPearlParser.LeRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.GtRelationalExpressionContext) {
-            stmt.add("rhs", visitGtRelationalExpression((SmallPearlParser.GtRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.GeRelationalExpressionContext) {
-            stmt.add("rhs", visitGeRelationalExpression((SmallPearlParser.GeRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.FitExpressionContext) {
-            stmt.add("rhs", visitFitExpression((SmallPearlParser.FitExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.ExponentiationExpressionContext) {
-            stmt.add("rhs", visitExponentiationExpression((SmallPearlParser.ExponentiationExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.AbsExpressionContext) {
-            stmt.add("rhs", visitAbsExpression((SmallPearlParser.AbsExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SizeofExpressionContext) {
-            stmt.add("rhs", visitSizeofExpression((SmallPearlParser.SizeofExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.EntierExpressionContext) {
-            stmt.add("rhs", visitEntierExpression((SmallPearlParser.EntierExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.RoundExpressionContext) {
-            stmt.add("rhs", visitRoundExpression((SmallPearlParser.RoundExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SignExpressionContext) {
-            stmt.add("rhs", visitSignExpression((SmallPearlParser.SignExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.RemainderExpressionContext) {
-            stmt.add("rhs", visitRemainderExpression((SmallPearlParser.RemainderExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.NowFunctionContext) {
-            stmt.add("rhs", visitNowFunction((SmallPearlParser.NowFunctionContext) ctx.expression()));
-        }
+        stmt.add("rhs", getExpression(ctx.expression()));
 
         if (ctx.then_block() != null) {
             stmt.add("then_block", visitThen_block(ctx.then_block()));
@@ -1242,71 +1220,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST stmt = group.getInstanceOf("assignment_statement");
 
         stmt.add("lhs", ctx.ID());
-
-        if (ctx.expression() instanceof SmallPearlParser.BaseExpressionContext) {
-            stmt.add("rhs", visitBaseExpression(((SmallPearlParser.BaseExpressionContext) ctx.expression())));
-        } else if (ctx.expression() instanceof SmallPearlParser.AdditiveExpressionContext) {
-            stmt.add("rhs", visitAdditiveExpression(((SmallPearlParser.AdditiveExpressionContext) ctx.expression())));
-        } else if (ctx.expression() instanceof SmallPearlParser.SubtractiveExpressionContext) {
-            stmt.add("rhs", visitSubtractiveExpression(((SmallPearlParser.SubtractiveExpressionContext) ctx.expression())));
-        } else if (ctx.expression() instanceof SmallPearlParser.MultiplicativeExpressionContext) {
-            stmt.add("rhs", visitMultiplicativeExpression((SmallPearlParser.MultiplicativeExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.DivideExpressionContext) {
-            stmt.add("rhs", visitDivideExpression((SmallPearlParser.DivideExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.DivideIntegerExpressionContext) {
-            stmt.add("rhs", visitDivideIntegerExpression((SmallPearlParser.DivideIntegerExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.UnaryAdditiveExpressionContext) {
-            stmt.add("rhs", visitUnaryAdditiveExpression((SmallPearlParser.UnaryAdditiveExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.UnarySubtractiveExpressionContext) {
-            stmt.add("rhs", visitUnarySubtractiveExpression((SmallPearlParser.UnarySubtractiveExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.AtanExpressionContext) {
-            stmt.add("rhs", visitAtanExpression((SmallPearlParser.AtanExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.CosExpressionContext) {
-            stmt.add("rhs", visitCosExpression((SmallPearlParser.CosExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.ExpExpressionContext) {
-            stmt.add("rhs", visitExpExpression((SmallPearlParser.ExpExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.LnExpressionContext) {
-            stmt.add("rhs", visitLnExpression((SmallPearlParser.LnExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SinExpressionContext) {
-            stmt.add("rhs", visitSinExpression((SmallPearlParser.SinExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SqrtExpressionContext) {
-            stmt.add("rhs", visitSqrtExpression((SmallPearlParser.SqrtExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.TanExpressionContext) {
-            stmt.add("rhs", visitTanExpression((SmallPearlParser.TanExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.TanhExpressionContext) {
-            stmt.add("rhs", visitTanhExpression((SmallPearlParser.TanhExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.EqRelationalExpressionContext) {
-            stmt.add("rhs", visitEqRelationalExpression((SmallPearlParser.EqRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.NeRelationalExpressionContext) {
-            stmt.add("rhs", visitNeRelationalExpression((SmallPearlParser.NeRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.LtRelationalExpressionContext) {
-            stmt.add("rhs", visitLtRelationalExpression((SmallPearlParser.LtRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.LeRelationalExpressionContext) {
-            stmt.add("rhs", visitLeRelationalExpression((SmallPearlParser.LeRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.GtRelationalExpressionContext) {
-            stmt.add("rhs", visitGtRelationalExpression((SmallPearlParser.GtRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.GeRelationalExpressionContext) {
-            stmt.add("rhs", visitGeRelationalExpression((SmallPearlParser.GeRelationalExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.FitExpressionContext) {
-            stmt.add("rhs", visitFitExpression((SmallPearlParser.FitExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.ExponentiationExpressionContext) {
-            stmt.add("rhs", visitExponentiationExpression((SmallPearlParser.ExponentiationExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.AbsExpressionContext) {
-            stmt.add("rhs", visitAbsExpression((SmallPearlParser.AbsExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SizeofExpressionContext) {
-            stmt.add("rhs", visitSizeofExpression((SmallPearlParser.SizeofExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.EntierExpressionContext) {
-            stmt.add("rhs", visitEntierExpression((SmallPearlParser.EntierExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.RoundExpressionContext) {
-            stmt.add("rhs", visitRoundExpression((SmallPearlParser.RoundExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.SignExpressionContext) {
-            stmt.add("rhs", visitSignExpression((SmallPearlParser.SignExpressionContext) ctx.expression()));
-        } else if (ctx.expression() instanceof SmallPearlParser.RemainderExpressionContext) {
-            stmt.add("rhs", visitRemainderExpression((SmallPearlParser.RemainderExpressionContext) ctx.expression()));
-        }
-
+        stmt.add("rhs",getExpression(ctx.expression()));
         return stmt;
     }
+
 
     @Override
     public ST visitRealtime_statement(SmallPearlParser.Realtime_statementContext ctx) {
