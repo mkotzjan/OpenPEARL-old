@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,8 @@ In case that all tests pass the return value is 0.
 #include "Clock.h"
 #include "Signals.h"
 #include "compare.h"
+#include "Fixed.h"
+#include "Float.h"
 
 using namespace std;
 
@@ -125,9 +127,19 @@ TEST(Duration, Operations) {
 
    {
       pearlrt::Duration d(5.0);
-      d = d * pearlrt::Float<24>(2.5);
-      ASSERT_TRUE((d == pearlrt::Duration(12.5)).getBoolean());
+      d = d * pearlrt::Fixed<31>(2);
+      ASSERT_TRUE((d == pearlrt::Duration(10.0)).getBoolean());
+      d = d / pearlrt::Fixed<31>(2);
+      ASSERT_TRUE((d == pearlrt::Duration(5)).getBoolean());
    }
+
+   {
+      pearlrt::Duration d(5.0);
+      d = pearlrt::Fixed<31>(2) * d;
+      ASSERT_TRUE((d == pearlrt::Duration(10.0)).getBoolean());
+   }
+
+
    {
       pearlrt::Duration d(5.0);
       d = pearlrt::Float<24>(2.5) * d;

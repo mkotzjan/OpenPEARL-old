@@ -177,6 +177,67 @@ namespace pearlrt {
       */
       const Duration operator-() const;
 
+      /**
+      multiply with Fixed
+
+      \param rhs the multiplicator
+      \returns reference to the multiplied duration
+
+      \throws DurationRangeSignal
+      */
+      template <int S>Duration& operator*=(const Fixed<S>& rhs) {
+         intval = intval.get() * rhs.x;
+         return *this;
+      }
+
+      /**
+      multiply with Fixed
+
+      \param rhs the multiplicator
+      \returns new object containg the product
+
+      \throws DurationRangeSignal
+      */
+      template<int S>const Duration  operator*(const Fixed<S>& rhs) const {
+         return Duration(*this) *= rhs;
+      }
+
+      /**
+      divide by Fixed
+
+      \param rhs the denominator
+      \returns reference to the divided duration
+
+      \throws DurationRangeSignal
+      */
+      template <int S>Duration& operator/=(const Fixed<S>& rhs) {
+         if ((rhs == Fixed<S>(0.0)).getBoolean()) {
+            throw theDurationDivideByZeroSignal;
+         }
+
+         Fixed63 help;
+
+         try {
+            help = intval.get() / rhs.x;
+         } catch (FloatIsINFSignal &s) {
+            throw theDurationRangeSignal;
+         }
+
+         intval = help;
+         return (*this);
+      }
+
+      /**
+      divide by Fixed
+
+      \param rhs the denominator
+      \returns the rhs'th part of the duration
+
+      \throws DurationRangeSignal
+      */
+      template <int S>Duration operator/(const Fixed<S>& rhs) {
+         return Duration(*this) /= rhs;
+      }
 
       /**
       multiply with Float
@@ -202,6 +263,7 @@ namespace pearlrt {
       template<int S>const Duration  operator*(const Float<S>& rhs) const {
          return Duration(*this) *= rhs;
       }
+
       /**
       divide by Float
 
@@ -238,6 +300,7 @@ namespace pearlrt {
       template <int S>Duration operator/(const Float<S>& rhs) {
          return Duration(*this) /= rhs;
       }
+
       /**
       divide by durations
 
@@ -350,6 +413,23 @@ namespace pearlrt {
 
 
    };
+
+   /**
+   multiply with fixed*dur
+
+   \param lhs the multiplicand
+   \param rhs the multiplicator
+   \returns new object containg the product
+
+   \throws DurationRangeSignal
+   */
+   template<int S>const Duration  operator*(const Fixed<S>& lhs,
+         const Duration &rhs) {
+      Duration result(rhs);
+      result *= lhs;
+      return result;
+   }
+
 
    /**
    multiply with float*dur
