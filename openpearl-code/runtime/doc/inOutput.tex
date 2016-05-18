@@ -109,6 +109,52 @@ The user objects are prependend with an underscore (\verb|_|).
    user dation
 \end{description}
 
+\section{Bus Device Associations}
+The update of the language definition introduced {\em BusDeviceAssociations},
+which allows to interconnect system part elements.
+
+E.g.
+\begin{PEARLCode}
+MODULE (m1);
+SYSTEM;
+   i2c: I2CBus('/dev/i2c-0',100000);  ! access to i2-c
+                                      ! interface with 
+                                      ! 100kHz bus speed
+   temp: LM75('48'B4) --- i2c;        ! one temperatur
+                                      ! sensor at
+                                      ! the bus i2c
+PROBLEM;
+   SPC LM75 DATION SYSTEM BASIC FIXED(15);
+MODEND;
+\end{PEARLCode}
+
+\begin{CppCode}
+static pearlrt::I2CBus s_i2cbus("/dev/i2c-0",100000);
+static pearlrt::Device * d_i2cbus = &s_i2cbus;
+
+static pearlrt::LM75 s_temp(&s_i2cbus,0x48);
+       pearlrt::Device * d_temp = &s_temp;
+\end{CppCode}
+
+Depending to the characteristics of the bus there may be only one client,
+or multiple clients. This is specified in the XML-description of the 
+device.
+
+The implementation provides two roles:
+\begin{itemize}
+\item ConnectionProvider, which represents the bus device
+\item ConnectionClient, which represents the component on the bus.
+\end{itemize}
+
+The classes for provider and client are derived from \texttt{SystemDationB}
+and a connection specific pair of provider and client classes - e.g. 
+\texttt{I2CBusProvider} and \texttt{I2CBusClient}. These classes
+provide the communication between provider and client, if required.
+
+\paragraph{Note:} The client has access to the provider by default, since
+the provider is passed as first argument in the ctor of the client.
+ 
+
 \section{Specifications in Problem Part}
 The system device is specified in the problem part.
 Depending on the class specifier in the {\em SPC}-statement the concete 
