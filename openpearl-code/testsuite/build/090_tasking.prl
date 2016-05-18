@@ -9,9 +9,9 @@ T1: TASK MAIN;
 
    AT c ALL d DURING 4*d ACTIVATE T1;
    AFTER d ALL 5*d UNTIL c+d ACTIVATE T1;
-   AFTER d RESUME /*T1*/;
+   AFTER d RESUME T1;
 
-   /*AT c AFTER d CONTINUE;*/
+   AT c AFTER d CONTINUE;
    
 
 
