@@ -44,8 +44,8 @@ These tests must be done interactive.
 */
 #include "Task.h"
 #include "Signals.h"
+#include "StdOut.h"
 #include "Pipe.h"
-#include "StdStream.h"
 #include "Log.h"
 #include "Fixed.h"
 #include "Character.h"
@@ -56,7 +56,7 @@ These tests must be done interactive.
 using namespace std;
 
 pearlrt::Pipe myPipe("/tmp/pipe1", 10, "CAN OPEN1");
-pearlrt::StdStream stdOut(1);
+pearlrt::StdOut stdOut;
 pearlrt::Fixed<31>  x(42);
 
 SPCTASK(READER);

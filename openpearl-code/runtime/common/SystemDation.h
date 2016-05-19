@@ -32,8 +32,6 @@
 #define SYSTEMDATION_INCLUDED
 
 #include "Dation.h"
-#include "Character.h"
-#include "Log.h"
 #include <stdio.h>
 
 /**

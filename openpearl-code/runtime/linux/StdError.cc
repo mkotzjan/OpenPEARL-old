@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2013-2014 Holger Koelle
- Copyright (c) 2014 Rainer Mueller
+ Copyright (c) 2014-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@
 
 */
 
-#include "StdStream.h"
+#include "StdError.h"
 #include "Character.h"
 #include "RefChar.h"
 #include "Dation.h"
@@ -46,48 +46,28 @@
 #include <sys/stat.h>
 
 namespace pearlrt {
-   int StdStream::declaredDations = 0;
+//   int StdError::declaredDations = 0;
 
-   StdStream::StdStream(const int numberOfStream) :
+   StdError::StdError() :
       SystemDationNB() {
       /* ctor is called before multitasking starts --> no mutex required */
-      mutex.name("StdStream");
+      mutex.name("StdError");
       inUse = false;
       cap = FORWARD;
       cap |= PRM;
       cap |= ANY;
 
-      declaredDations |= 1<< numberOfStream;
-
-      switch (numberOfStream) {
-      case 0 : // stdin
-         cap |= IN;
-         fp = stdin;
-         break;
-
-      case 1: // stdout
-         cap |= OUT;
-         fp = stdout;
-         break;
-
-      case 2: // stderr
-         cap |= OUT;
-         fp = stderr;
-         break;
-
-      default:
-         Log::error("StdStream: unknown stream (%d)", numberOfStream);
-         throw theIllegalParamSignal;
-      }
+      cap |= OUT;
+      fp = stderr;
    }
 
-   int StdStream::capabilities() {
+   int StdError::capabilities() {
       return cap;
    }
 
-   StdStream* StdStream::dationOpen(const char * idf, int openParams) {
+   StdError* StdError::dationOpen(const char * idf, int openParams) {
       if (openParams & (Dation::IDF | Dation::CAN)) {
-         Log::error("StdStream: does not support IDF and CAN");
+         Log::error("StdError: does not support IDF and CAN");
          throw theIllegalParamSignal;
       }
 
@@ -97,7 +77,7 @@ namespace pearlrt {
       return this;
    }
 
-   void StdStream::dationClose(int closeParams) {
+   void StdError::dationClose(int closeParams) {
       int ret;
 
       //
@@ -106,13 +86,13 @@ namespace pearlrt {
       ret = fflush(fp);
 
       if (ret != 0) {
-         Log::error("StdStream: error at close (%s)", strerror(ferror(fp)));
+         Log::error("StdError: error at close (%s)", strerror(ferror(fp)));
          mutex.unlock();
          throw theCloseFailedSignal;
       }
 
       if (closeParams & Dation::CAN) {
-         Log::error("StdStream: CAN not supported");
+         Log::error("StdError: CAN not supported");
          mutex.unlock();
          throw theIllegalParamSignal;
       }
@@ -120,38 +100,20 @@ namespace pearlrt {
       mutex.unlock();
    }
 
-   void StdStream::dationRead(void * destination, size_t size) {
-      int ret;
-      mutex.lock();
-      clearerr(fp);
-      errno = 0;
-      ret = fread(destination, size, 1, fp);
-
-      if (ret < 1) {
-         if (feof(fp)) {
-            Log::error("StdStream: error across EOF");
-            mutex.unlock();
-            throw theDationEOFSignal;
-         }
-
-         Log::error("StdStream: error at read (%s)", strerror(errno));
-         mutex.unlock();
-         throw theReadingFailedSignal;
-      }
-
-      mutex.unlock();
+   void StdError::dationRead(void * destination, size_t size) {
+      Log::error("StdError: does not support read");
+      throw theDationNotSupportedSignal;
    }
 
 
-   void StdStream::dationWrite(void * source, size_t size) {
+   void StdError::dationWrite(void * source, size_t size) {
       int ret;
       mutex.lock();
-      fseek(fp, 0, SEEK_CUR);      // allow write after read
       errno = 0;
       ret = fwrite(source, size, 1, fp);
 
       if (ret < 1) {
-         Log::error("StdStream: error at write (%s)", strerror(errno));
+         Log::error("StdError: error at write (%s)", strerror(errno));
          mutex.unlock();
          throw theWritingFailedSignal;
       }
@@ -159,13 +121,14 @@ namespace pearlrt {
       mutex.unlock();
    }
 
-   void StdStream::dationUnGetChar(const char x) {
-      mutex.lock();
-      ungetc(x, fp);
-      mutex.unlock();
+   void StdError::dationUnGetChar(const char x) {
+      Log::error("StdError: does not support unget");
+      throw theDationNotSupportedSignal;
    }
 
-   bool StdStream::isDefined(const int streamNumber) {
+/*
+   bool StdError::isDefined(const int streamNumber) {
       return (!! (declaredDations & (1<<streamNumber)));
    }
+*/
 }

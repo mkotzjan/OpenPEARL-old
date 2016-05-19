@@ -1,5 +1,6 @@
 /*
  [A "BSD license"]
+ Copyright (c) 2012-2013 Holger Koelle
  Copyright (c) 2016 Rainer Mueller
  All rights reserved.
 
@@ -27,21 +28,23 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "Log.h"
-#include "Signals.h"
-#include "StdError.h"
-/*
-#include "LogFile.h"
-#include "Disc.h"
+/**
+\file
+
+\brief dation default implementation of virtual method
+
 */
 
+
+#include "Signals.h"
+#include "Dation.h"
+#include "Log.h"
+
 namespace pearlrt {
-   Log::Log() {
-      ctorIsActive = true;
-      static StdError stdError;
-      provider = &stdError;
-      provider->dationOpen(NULL,0);
-      ctorIsActive = false;
+
+   void Dation::dationSeek(const Fixed<31> & p, const int dationParam) {
+      Log::error("Dation: no seek implemented");
+      throw theDationSeekNotRealizedSignal;
    }
 
 }

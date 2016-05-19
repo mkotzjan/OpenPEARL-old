@@ -2,7 +2,7 @@
 PROGRAM
 The Main Task increments a variable (varTask1)  and activate Task 2 with a 
 higher Prio. The Task2 repressed the main task and increment the variable
-varTask2 and go to the end. After this the main task activate task2 agian,
+varTask2 and go to the end. After this the main task activate task2 again,
 but this time with a lower priority. The task2 starts until the main task
 go sleep for 1 sec. Task2 increments teh variable 2 varTask2 again.
 The main task come back and check the varibales and set the ExitCode.

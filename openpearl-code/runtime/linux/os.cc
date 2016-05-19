@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -249,7 +249,10 @@ List of commands:
 #include "Signals.h"
 #include "Control.h"
 #include "UnixSignal.h"
-#include "StdStream.h"   // for intermediate disablingh of system console
+#include "StdIn.h"   // for intermediate disabling of system console
+
+#include "LogFile.h"
+#include "Disc.h"
 
 /**
 The namespace pearlrt is introduced to collect all symbols of the
@@ -452,7 +455,15 @@ int main() {
    int numberOfCpus;
 
    scanPearlRc();
+
+   // setup default log file as ./pearl_log.txt
+   Disc * disc = new Disc("./",1);
+   LogFile * logfile = new LogFile(disc, "pearl_log.txt");
+   new Log(logfile,(char*)"EWDI"); // all levels enabled
+
+   // set desired log level
    Log::setLevel(entries[LOGLEVEL].value);
+
    numberOfCpus = sysconf(_SC_NPROCESSORS_ONLN);
    Log::info("PEARL system startup");
    sprintf(line, "number of CPUs: %d", numberOfCpus);
@@ -531,7 +542,7 @@ int main() {
 
    while (1) {
       char* ret = 0;
-      if (StdStream::isDefined(0)) {
+      if (StdIn::isDefined()) {
          //sleep all the time. if a timer expire, he will be awaked
          sleep(20);
       } else {

@@ -69,12 +69,16 @@ SRCANDH = \
 	Task.cc \
 	Mutex.cc PrioMapper.cc \
 	CSema.cc \
-	Pipe.cc Disc.cc StdStream.cc \
-	UnixSignal.cc \
-	Log.cc
+	Pipe.cc Disc.cc \
+	StdIn.cc StdOut.cc StdError.cc \
+	UnixSignal.cc 
+
+#StdStream.cc \
+#	Log.cc
 
 SRCONLY =os.cc \
-	TaskMonitor.cc 
+	TaskMonitor.cc \
+	Log.cc
 
 # ---------------------------------------
 # import lists of common files for all implementations

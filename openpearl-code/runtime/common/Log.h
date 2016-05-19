@@ -1,6 +1,6 @@
 /*
  [A "BSD license"]
- Copyright (c) 2016 Rainer Mueller
+ Copyright (c) 2012-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef LOGCOMMON_INCLUDED
-#define LOGCOMMON_INCLUDED
+#ifndef LOG_INCLUDED
+#define LOG_INCLUDED
 
 /**
 \file
@@ -37,8 +37,8 @@
 
 This module realizes a simple log facility the the PEARL runtime system.
 Depending on a statically set log-level, all incoming messages will
-be written to a plattform specific logging output, if the current
-log-level matches the given log request
+be written to a log file, if the current log-level matches the given
+log request
 
 Each log-request corresponds with a bit in log-level. If the bit
 is set, the message will be formatted and sent to the log file.
@@ -55,8 +55,10 @@ The following formats are supported - all without width specification:
 */
 
 #include <cstdarg>    // va_list
+#include "SystemDationNB.h"
 #include "Character.h"
-#include "Mutex.h"  // write is not thread safe -- mutex required
+#include "RefChar.h"
+#include "Mutex.h"
 
 namespace pearlrt {
 
@@ -68,20 +70,32 @@ namespace pearlrt {
       \todo realize configurable file name using
             a configuration file
    */
-   class LogCommon {
-   public:
-      /**
-        constants for log level setting
-      */
-      enum LogLevel {DEBUG = 1, INFO = 2, WARN = 4, ERROR = 8};
+   class Log {
+   private:
+      Log();
+      static int logFileHandle;
+      static bool initialized;
+      static Mutex mutex;
+      static Log* instance;
+      static bool ctorIsActive;
 
-   protected:
       /**
         The current log level. This is a bitwise or'd value from
         the enum LogLevel.
       */
       static int logLevel;
 
+      static SystemDationNB * provider;
+
+      /**
+      write a log message
+
+      \param type type of the message
+      \param format the output format like in printf
+      \param args an arvg variable parameter list
+      */
+      void doit(const Character<7>& type, const char * format,
+                       va_list args);
       /**
       format a log message
 
@@ -95,26 +109,79 @@ namespace pearlrt {
                            RefCharacter &rc,
                            const char * format,
                            va_list args);
-      /**
-      write a log message
-
-      \param type type of the message
-      \param format the output format like in printf
-      \param args an arvg variable parameter list
-
-      */
-      virtual void doit(const Character<7>& type, 
-                        const char * format,
-                        va_list args)=0;
-
    public:
+      /**
+        constants for log level setting
+      */
+      enum LogLevel {DEBUG = 1, INFO = 2, WARN = 4, ERROR = 8};
 
       /**
        set log level
 
       \param level a binary coded value from the enumeration LogLevels
       */
+
       static void setLevel(int level);
+      /**
+      configuration constructor
+
+      \param _provider a pointer to the transport layer for log messages
+      \param level a C-string with desired log levels (E,W,D,I)
+
+      \note: the default ctor set the default path of the log message,
+      which is plattform dependent - thus the implementation of this 
+      method is in the plattform specific part.
+      The configuration ctor replaces the plattform specific default setting
+
+      */
+
+      Log(SystemDationNB * _provider, char* level);
+
+      /**
+         singleton pattern resolve static initialize problem
+      */
+      static Log* getInstance();
+
+
+      /**
+      write an info log message with parameters
+
+      \param format the message format (like in printf) to be written
+      \param ... as required in format
+      */
+      static void info(const char * format, ...)
+      __attribute__((format(printf, 1, 2)));
+      /**
+      write an error log message
+
+      \param format the message format (like in printf) to be written
+      \param ... as required in format
+      */
+      static void error(const char * format, ...)
+      __attribute__((format(printf, 1, 2)));
+
+      /**
+      write a warning log message
+
+      \param format the message format (like in printf) to be written
+      \param ... as required in format
+      */
+      static void warn(const char * format, ...)
+      __attribute__((format(printf, 1, 2)));
+
+      /**
+      write a debugging log message
+
+      \param format the message format (like in printf) to be written
+      \param ... as required in format
+      */
+      static void debug(const char * format, ...)
+      __attribute__((format(printf, 1, 2)));
+
+      /**
+      close the logging system
+      */
+      static void exit();
    };
 
 }

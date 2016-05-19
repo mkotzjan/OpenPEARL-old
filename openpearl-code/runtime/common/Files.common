@@ -36,7 +36,9 @@
 
 CXX_COMMON = \
 	Array.cc \
-	LogCommon.cc \
+	LogFile.cc\
+	Dation.cc \
+	Log.cc \
 	Clock.cc  \
 	Duration.cc  \
 	PutDuration.cc GetDuration.cc \
@@ -72,7 +74,7 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	PutBitString.h GetBitString.h \
 	Sink.h RefCharSink.h \
 	Fixed.h PutFixed.h GetFixed.h \
-	Device.h Dation.h UserDation.h \
+	Device.h UserDation.h \
 	PutCharacter.h \
 	Float.h \
 	TaskTimerCommon.h \

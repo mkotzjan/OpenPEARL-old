@@ -1,7 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -28,92 +27,51 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef STDSTREAM_INCLUDED
-#define STDSTREAM_INCLUDED
+#ifndef LOGFILE_INCLUDED
+#define LOGFILE_INCLUDED
 
+#include "SystemDationNB.h"
 
 /**
 \file
 
-\brief generic non-basic systemdation class for reading and writing
-       file from/to stanadrd streams (stdin, stdout, stderr)
-*/
+\brief configuration element for a log file
 
-#include "SystemDationNB.h"
-#include "Mutex.h"
-#include "Character.h"
-#include "RefChar.h"
-#include <unistd.h>
+*/
 
 namespace pearlrt {
 
    /**
-   \brief generic non-basic systemdation class
-
-   With this class it is possible to generate linux stream
-   devices.
-
-   The parameter of the Ctor defines which stream should be used.
-
-   Usage:
-   \verbatim
-   SYSTEM;
-      stdOut : StdStream(1); ! 0=stdin, 1=stdout, 2=stderr
-   PROBLEM;
-      SPC stdOut DATION OUT ALL;
-
-      anyTask: TASK;
-         DCL console DATION OUT FORWARD DIM(*,80) STREAM CREATED(stdOut);
-         OPEN console; ! only RST allowed on StdStream
-         PUT 'PEARL' TO console BY A,SKIP;
-         CLOSE console;
-      END;
-   \endverbatim
-
+      This class provides a connection to a file , which is used
+      by the logging facility.
    */
+   class LogFile : public SystemDationNB {
+      public:
+        /**
+        Constructor of the LogFile element
 
-   class StdStream: public SystemDationNB {
+        \param provider, pointer to the connection provider
+        \param filename name of the log file
 
-   private:
-      /**
-      mutex for  class data
-      */
-      Mutex mutex;
+       \throws IllegalParamSignal, if the file name is invalid, or
+             provider is null
+        */
+ 	 LogFile(SystemDationNB * provider, char const* filename);
+
+
+      private:
+	char const * logFileName;  // just a pointer to the given filename
+        SystemDationNB * provider;
 
       /** access capabilities */
       int cap;
-
-      /** flag, whether deviceis in use */
-      bool inUse;
-
-      /**
-       number of files which may be simultaneously opened on this
-       dation
-      */
-      int capacity;
 
       /**
       File* to use
       */
       FILE* fp;
-      
-      static int declaredDations;
-
-   public:
-
-      /**
-       Constructor to setup the system device
-
-       PEARL attributes: FORWARD IN or OUT ALPHIC or type
-
-       \param streamNumber number  of the system stream
-                        (0=stdin, 1=stdout, 2=stderr)
-
-       \throws IllegalParamSignal, if the required stream
-                   is invalid
-      */
-      StdStream(const int streamNumber);
-
+     
+public: 
       /**
          return capabilities of the folder objects
 
@@ -141,7 +99,7 @@ namespace pearlrt {
       \throws OpenFailedSignal in case of errors
       \throws IllegalParamsSignal in case of errors
       */
-      StdStream* dationOpen(const char * fileName, int openParams);
+      LogFile* dationOpen(const char * fileName, int openParams);
 
       /**
        close method.
@@ -159,12 +117,12 @@ namespace pearlrt {
       read method
 
        This method is empty.
-       All operations are in the DiscFile::dationClose() method.
+       This kind of element does not support reading
 
       \param destination target area for the read bytes
       \param size number of bytes to read
 
-      \throws ReadingFailedSignal in case of read errors
+      \throws InternalDationSignal if called 
 
       */
       void dationRead(void * destination, size_t size);
@@ -172,14 +130,9 @@ namespace pearlrt {
       /**
       write method
 
-       This method is empty.
-       All operations are in the DiscFile::dationClose() method.
+       delegate send data to the provider
 
-      \param destination source area for the bytes to be written
-      \param size number of bytes to write
-
-      \throws WritingFailedSignal in case of write errors
-
+      \throws depending on the connectiopn provider
       */
       void dationWrite(void * destination, size_t size);
 
@@ -192,10 +145,7 @@ namespace pearlrt {
       */
       void dationUnGetChar(const char c);
 
-     /** check if at least one dation of the given type is defined 
-     */
-     static bool isDefined(const int streamNumber);
-
-   };
+};
 }
 #endif
+

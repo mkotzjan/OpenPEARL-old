@@ -40,7 +40,6 @@
 
 #include "Device.h"
 #include "Fixed.h"
-#include "Log.h"
 
 namespace pearlrt {
 
@@ -202,10 +201,7 @@ namespace pearlrt {
       \param dationParam specified the dation type (DIRECT,FORWARD,..)
       \throws may throw different exceptions - not defined yet
       */
-      virtual void dationSeek(const Fixed<31> & p, const int dationParam) {
-         Log::error("Dation: no seek implemented");
-         throw theDationSeekNotRealizedSignal;
-      }
+      virtual void dationSeek(const Fixed<31> & p, const int dationParam) ;
 
    };
 }

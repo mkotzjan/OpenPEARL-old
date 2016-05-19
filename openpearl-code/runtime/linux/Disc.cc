@@ -282,6 +282,7 @@ namespace pearlrt {
       //  NEW       !!       w        r+    file must not exist
       //  ANY       like OLD, if file exists
       //            like NEW, if file does not exist
+
       rcFn.setWork(completeFileName);
       rcFn.clear();
       rcFn.add(fn);
@@ -342,7 +343,7 @@ namespace pearlrt {
 
       if (fp == 0) {
          Log::error("Disc: error opening file %s (%s)",
-                    fn, strerror(ferror(fp)));
+                    fn, strerror(errno));
          myDisc->mutex.unlock();
          throw theOpenFailedSignal;
       }

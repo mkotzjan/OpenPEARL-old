@@ -91,7 +91,10 @@ Only this file mus be included.
 
 #include "Control.h"
 
-#include "StdStream.h"
+//#include "StdStream.h"
+#include "StdIn.h"
+#include "StdOut.h"
+#include "StdError.h"
 #include "Pipe.h"
 #include "Disc.h"
 #include "UnixSignal.h"

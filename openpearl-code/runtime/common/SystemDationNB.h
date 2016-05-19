@@ -32,9 +32,6 @@
 #define SYSTEMDATIONNB_INCLUDED
 
 #include "SystemDation.h"
-#include "Character.h"
-#include "Log.h"
-#include <stdio.h>
 
 /**
 \file

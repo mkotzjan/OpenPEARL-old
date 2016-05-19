@@ -1,4 +1,12 @@
 /*
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
  1. Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
  2. Redistributions in binary form must reproduce the above copyright
@@ -20,18 +28,140 @@
 */
 
 #include <cstdarg>   // for va_start,..
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "Clock.h"
 #include "PutClock.h"
 #include "Character.h"
 #include "RefChar.h"
 #include "RefCharSink.h"
-#include "LogCommon.h"
+#include "Log.h"
 
 namespace pearlrt {
+#define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
-   int LogCommon::logLevel = Log::WARN | Log::ERROR;
-   //int LogCommon::logLevel = Log::WARN | Log::ERROR | Log::INFO | Log::DEBUG;
+   bool Log::initialized = false;
+   bool Log::ctorIsActive = false;
+   int Log::logLevel = Log::WARN | Log::ERROR;
+   SystemDationNB* Log::provider = NULL;
+   Log* Log::instance = NULL;
+   Mutex Log::mutex;
+
+   Log* Log::getInstance() {
+      if (!instance) {
+        try {
+         instance = new Log();
+        } catch ( ... ) {
+          printf("failed to create logger\n");
+        }
+      }
+      return instance;
+   }
+
+   Log::Log(SystemDationNB * _provider, char * level) {
+      int newLogLevel = 0;
+
+      if (ctorIsActive) {
+         printf("RECURSION!\n");
+      }
+      ctorIsActive = true;
+      if (initialized) {
+          provider->dationClose(0);
+      }
+      provider = _provider;
+    
+      while (*level) {
+          switch(*level) {
+             case 'E': newLogLevel |= ERROR;
+                       break;
+             case 'W': newLogLevel |= WARN;
+                       break;
+             case 'D': newLogLevel |= DEBUG;
+                       break;
+             case 'I': newLogLevel |= INFO;
+                       break;
+             /* no error handling here ! */
+             /* ignore other characters  */
+          }
+          level ++;
+      }
+      setLevel(newLogLevel);
+
+      provider = provider->dationOpen(NULL,0);
+      ctorIsActive = false;
+
+      instance=this;
+   }
+
+   void Log::exit(void) {
+      if (initialized) {
+         provider->dationClose(0);
+         initialized = false;
+      }
+   }
+
+   void Log::doit(const Character<7>& type,
+                  const char * format,
+                  va_list args) {
+      Character<128> line;
+      RefCharacter rc(line);
+
+      try {
+         doFormat(type, rc, format, args);
+
+         mutex.lock();
+         provider->dationWrite(rc.getCstring(), rc.getCurrent());
+         mutex.unlock();
+      } catch (CharacterTooLongSignal s) {
+         mutex.lock();
+         provider->dationWrite(line.get(), (size_t)(line.upb().x));
+         provider->dationWrite((void*)ERRORMESSAGE, strlen(ERRORMESSAGE));
+         mutex.unlock();
+      }
+
+   }
+
+
+   void Log::info(const char * format, ...) {
+      if (logLevel & Log::INFO) {
+         Character<7> type("INFO:");
+         va_list args;
+         va_start(args, format);
+         Log::getInstance()->doit(type, format, args);
+         va_end(args);
+      }
+   }
+
+   void Log::error(const char * format, ...) {
+      if (logLevel & Log::ERROR) {
+         Character<7> type("ERROR:");
+         va_list args;
+         va_start(args, format);
+         Log::getInstance()->doit(type, format, args);
+         va_end(args);
+      }
+   }
+
+   void Log::warn(const char * format, ...) {
+      if (logLevel & Log::WARN) {
+         Character<7> type("WARN:");
+         va_list args;
+         va_start(args, format);
+         Log::getInstance()->doit(type, format, args);
+         va_end(args);
+      }
+   }
+
+   void Log::debug(const char * format, ...) {
+      if (logLevel & Log::DEBUG) {
+         Character<7> type("DEBUG:");
+         va_list args;
+         va_start(args, format);
+         Log::getInstance()->doit(type, format, args);
+         va_end(args);
+      }
+   }
 
    static void addInt(int value, RefCharacter & rc) {
       int l;  // nbr of digits
@@ -156,7 +286,7 @@ namespace pearlrt {
       }
    }
 
-   void LogCommon::doFormat(const Character<7>& type,
+   void Log::doFormat(const Character<7>& type,
                             RefCharacter & rc,
                             const char * format,
                             va_list args) {
@@ -267,8 +397,9 @@ namespace pearlrt {
       rc.add('\n');
    }
 
-   void LogCommon::setLevel(int level) {
+   void Log::setLevel(int level) {
       logLevel = level;
    }
 
 }
+

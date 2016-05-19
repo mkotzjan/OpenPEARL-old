@@ -6,15 +6,32 @@
 # perform regression tests
 #  remove tests from run: DONOTRUN
 
-DONOTRUN=#609_suspend_terminate 610_continue_terminate
+# ---
+# these programs are known to 'do not work'
+DONOTRUN=
+
+# ----
+# these programs are known to deliver 'false' if run as normal user
+DO_NOT_RUN_IF_NOT_ROOT = 600_two_tasks       611_prio_range_linux \
+	617_activatePrio_activate 700_oneSemaphore_samePrio \
+	701_twoSemaphore_samePrio 702_semaphore_blocked_after_request \
+	704_counting_semaphore    705_Continue_Semaphore           \
+	707_two_counting_semaphore      
+
 
 ####################################################
 ##### do not change beyond this line  ##############
 
+USERID=$(shell id -u)
+
+ifneq ($(USERID),0)
+DONOTRUN += $(DO_NOT_RUN_IF_NOT_ROOT)
+endif
+
 .SUFFIXES: .prl
 
 .prl:
-	prl_bin $<
+	prl -b linux $<
 
 FILES=$(shell ls *.prl)
 
@@ -36,19 +53,19 @@ all:    build allrun
 build: 
 	@echo "try to build test programs"
 	@echo "--------------------------"
-	@./run-compile.sh
+	@../run-compile.sh 1 $(TARGETS)
 
 
 allrun:	
 	@echo "run test programs"
 	@echo "-----------------" 
-	@$(foreach f,$(TARGETS), ./startScript.sh $(f);)
+	@../runtest.sh 1 $(TARGETS)
 
 clean:
 	rm -f $(TARGETS)
 	rm -f *.cc
 	rm -f *.o
-	rm -f *.prl.out
+	rm -f *.out
 	rm -f *.log
 	./clean_m4.sh
 	
@@ -56,7 +73,12 @@ clean:
 run: 
 	@echo "run simple test programs"
 	@echo "------------------------"
-	@$(foreach f,$(RUN), ./startScript.sh $(f);)
+	@../runtest.sh 1 $(RUN)
 	@echo "excluded (NOT run): " $(DONOTRUN)
+
+doesnotrun: 
+	@echo "verify that none of these programs work"
+	@echo "------------------------"
+	@../runtest.sh 2 $(DONOTRUN)
 
  

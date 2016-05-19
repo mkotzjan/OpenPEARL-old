@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2014-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,9 @@ There are some tests to enshure proper operation of the StdStream system dation
 */
 #include <gtest/gtest.h>
 #include "Signals.h"
-#include "StdStream.h"
+#include "StdIn.h"
+#include "StdOut.h"
+#include "StdError.h"
 #include "Log.h"
 #include "Fixed.h"
 #include "Character.h"
@@ -55,16 +57,10 @@ Test ctor parameters for StdStream device
 TEST(StdStream, path) {
    pearlrt::Log::info("**** StdStream stream select tests ***");
    {
-      ASSERT_NO_THROW(pearlrt::StdStream stdIn(0));
-      ASSERT_NO_THROW(pearlrt::StdStream stdOut(1));
-      ASSERT_NO_THROW(pearlrt::StdStream stdErr(2));
+      ASSERT_NO_THROW(pearlrt::StdIn stdIn);
+      ASSERT_NO_THROW(pearlrt::StdOut stdOut);
+      ASSERT_NO_THROW(pearlrt::StdError stdErr);
 
-      ASSERT_THROW(
-         pearlrt::StdStream str1(3),
-         pearlrt::IllegalParamSignal);
-      ASSERT_THROW(
-         pearlrt::StdStream str2(-1),
-         pearlrt::IllegalParamSignal);
    }
 }
 
@@ -76,19 +72,19 @@ TEST(StdStream, openClose) {
    //---------------------------------------------------
    // tests legal operations
    pearlrt::SystemDationNB* work;
-   pearlrt::StdStream stdIn(0);
+   pearlrt::StdIn stdIn;
    work = stdIn.dationOpen(NULL,
                           pearlrt::Dation::OLD |
                           pearlrt::Dation::IN);
    work->dationClose(pearlrt::Dation::PRM);
 
-   pearlrt::StdStream stdOut(1);
+   pearlrt::StdOut stdOut;
    work = stdOut.dationOpen(NULL,
                           pearlrt::Dation::OLD |
                           pearlrt::Dation::OUT);
    work->dationClose(pearlrt::Dation::PRM);
 
-   pearlrt::StdStream stdErr(2);
+   pearlrt::StdError stdErr;
    work = stdErr.dationOpen(NULL,
                           pearlrt::Dation::OLD |
                           pearlrt::Dation::OUT);
@@ -108,7 +104,7 @@ UserDations tests on stdOut
 TEST(StdStream, userDationStdOut) {
    pearlrt::Log::info("**** StdStream UserDations  start (StdOut) ***");
 
-   pearlrt::StdStream stdOut(1);
+   pearlrt::StdOut stdOut;
    pearlrt::DationDim2 dim(80);
    pearlrt::Character<1> fn;
    ASSERT_THROW(
@@ -172,7 +168,7 @@ UserDations tests on stdIn
 TEST(StdStream, userDationStdIn) {
    pearlrt::Log::info("**** StdStream UserDations  start (StdIn) ***");
 
-   pearlrt::StdStream stdIn(0);
+   pearlrt::StdIn stdIn;
    pearlrt::DationDim2 dim(80);
    pearlrt::Character<1> fn;
    ASSERT_THROW(
@@ -236,7 +232,7 @@ TEST(StdStream, putGet) {
    pearlrt::Log::info("**** StdStream put get  start ***");
    pearlrt::Character<37> prompt1("give String A(8)-format and enter    ");
    pearlrt::Character<37> prompt2("and give Fixed F(3)-format and enter ");
-   pearlrt::StdStream stdOut(1);
+   pearlrt::StdOut stdOut;
    pearlrt::DationDim2 dim(80);
    pearlrt::Character<1> fn;
    pearlrt::DationPG console(&stdOut,
@@ -261,7 +257,7 @@ TEST(StdStream, putGet) {
    console.toF(x, (pearlrt::Fixed<31>)5, (pearlrt::Fixed<31>)2);
    console.toSkip(1);
 
-   pearlrt::StdStream stdIn(0);
+   pearlrt::StdIn stdIn;
    pearlrt::DationPG keyboard(&stdIn,
                              pearlrt::Dation::IN |
                              pearlrt::Dation::FORWARD |
