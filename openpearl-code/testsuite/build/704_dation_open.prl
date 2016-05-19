@@ -4,14 +4,14 @@ MODULE(userdation_open);
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
 !disc: Disc('/tmp/' ,10);
-! output: StdStream(1);
+! output: StdOut;
 
 /* expected C++ code from system part  */
 __cpp__(
      ' // system decl'
      'static pearlrt::Disc s_disc("/tmp/", 10);'
      'pearlrt::Device * d_disc = & s_disc;'
-     'static pearlrt::StdStream s_output(1);'
+     'static pearlrt::StdOut s_output;'
      'pearlrt::Device * d_output = &s_output;'
 );
 /* expected C++ code from SPC in problem part
