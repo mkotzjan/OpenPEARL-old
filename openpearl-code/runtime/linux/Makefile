@@ -109,6 +109,8 @@ ifeq ($(CONFIG_LINUX_Octopus),y)
 endif
 
 ifeq ($(CONFIG_LINUX_Raspberry),y) 
+   INCLUDES += -I ./raspberry 
+   INCLUDES += -I ../raspberry 
 ifeq ($(CONFIG_LINUX_RPI_DigIO),y) 
    SRCANDH += raspberry/RPiGpio.cc
    SRCANDH += raspberry/RPiDigitalOut.cc
@@ -116,8 +118,6 @@ ifeq ($(CONFIG_LINUX_RPI_DigIO),y)
    CHECK_FILES += raspberry/RPiGpio.cc raspberry/RPiGpio.h
    CHECK_FILES += raspberry/RPiDigitalOut.cc raspberry/RPiDigitalOut.h
    CHECK_FILES += raspberry/RPiDigitalIn.cc raspberry/RPiDigitalIn.h
-   INCLUDES += -I ./raspberry 
-   INCLUDES += -I ../raspberry 
 endif
 endif
 
