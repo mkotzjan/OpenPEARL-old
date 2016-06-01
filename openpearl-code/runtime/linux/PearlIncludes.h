@@ -109,4 +109,6 @@ Only this file mus be included.
 //#include "Octopus.h"
 //#include "OctopusDigitalIn.h"
 //#include "OctopusDigitalOut.h"
-
+#ifdef CONFIG_LINUX_Raspberry
+#include "RPiDigitalOut.h"
+#endif

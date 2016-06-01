@@ -1,0 +1,30 @@
+MODULE(RPiGpio);
+
+SYSTEM;
+__cpp__(
+	'pearlrt::RPiDigitalOut s_bit(10,1);'
+	'pearlrt::Device* d_bit = & s_bit;'
+       ); 
+
+PROBLEM;
+   SPC bit DATION OUT SYSTEM BASIC BIT(1);
+
+   DCL led DATION OUT BASIC BIT(1) CREATED(bit);
+
+T1: TASK MAIN;
+!   DCL on BIT(1) INIT ('1'B1);
+!   DCL off BIT(1) INIT ('0'B1);
+   __cpp__( 'pearlrt::BitString<1> _on(1);');
+   __cpp__( 'pearlrt::BitString<1> _off(0);');
+   OPEN led;
+   REPEAT
+      SEND  on TO led;
+      AFTER 1 SEC RESUME;
+      SEND  off TO led;
+      AFTER 1 SEC RESUME;
+   END;
+END;
+
+MODEND;
+
+

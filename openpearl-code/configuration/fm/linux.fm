@@ -6,6 +6,14 @@ config LINUX
         systems.
 	Usually select this.
 
+config LINUX_Raspberry
+	depends on LINUX
+	boolean "Select the RPi specific drivers"
+	default n
+	help
+	This will enable the parameters for raspberry pi specific drivers
+	Usually deselect this.
+
 config LINUX_tests
 	depends on LINUX
 	boolean "build low level test applications"
@@ -42,6 +50,20 @@ config LINUX_Octopus
         This feature requires that the octopus-library is already
         installed on the system an the libusb-devel
         package is installed.
+
+
+menu LINUX_RPiDrivers
+	depends on LINUX_Raspberry
+
+config LINUX_RPI_DigIO
+	boolean "gpio i/o as digital in and out"
+	default n
+	help
+	the raspberry pi board provides some gpio i/o pins.
+        Some of them may be used as general purpose i/o-pins.
+	This option provides RPiDigIn, RPiDigOut system dations.
+
+endmenu
 
 #source fm/linux_i2c.fm
 

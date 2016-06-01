@@ -108,6 +108,19 @@ ifeq ($(CONFIG_LINUX_Octopus),y)
    LDFLAGS +=  -lusb -loctopus
 endif
 
+ifeq ($(CONFIG_LINUX_Raspberry),y) 
+ifeq ($(CONFIG_LINUX_RPI_DigIO),y) 
+   SRCANDH += raspberry/RPiGpio.cc
+   SRCANDH += raspberry/RPiDigitalOut.cc
+   SRCANDH += raspberry/RPiDigitalIn.cc
+   CHECK_FILES += raspberry/RPiGpio.cc raspberry/RPiGpio.h
+   CHECK_FILES += raspberry/RPiDigitalOut.cc raspberry/RPiDigitalOut.h
+   CHECK_FILES += raspberry/RPiDigitalIn.cc raspberry/RPiDigitalIn.h
+   INCLUDES += -I ./raspberry 
+   INCLUDES += -I ../raspberry 
+endif
+endif
+
 targets := libOpenPEARLlinux.a
 
 ifeq ($(CONFIG_LINUX_tests),y)

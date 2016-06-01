@@ -1,0 +1,12 @@
+make prepare
+wget http://www.antlr.org/download/antlr-4.5-complete.jar
+mv antlr-4.5-complete.jar /usr/local/lib/
+apt-get install openjdk-7-jdk
+apt-get install flex
+apt-get install libncurses5-dev
+apt-get install expat
+apt-get install libexpat1-dev
+cpan App::cpanminus
+cpanm Spreadsheet::Read
+cpanm Spreadsheet::ReadSXC
+
