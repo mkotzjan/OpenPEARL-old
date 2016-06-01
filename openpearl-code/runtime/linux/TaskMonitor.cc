@@ -45,24 +45,12 @@ stops the system when no more activity may occur
 
 namespace pearlrt {
 
-   TaskMonitor& TaskMonitor::Instance() {
-      // static objects are initialized at first call of the function
-      // see eg: www.devarticles-com/c/a/Cplusplus/
-      //        C-plus-plus-In-Theory-The-Singleton-Pattern-Part-I/4/
-      static TaskMonitor tm;
-      return tm;
-   }
+static pid_t pid;
 
    TaskMonitor::TaskMonitor() {
       nbrPendingTasks = 0;
       pid = getpid();  // get current pid; necessary to send signal at the end
       mutex.name("TaskMonitor");
-   }
-
-   void TaskMonitor::incPendingTasks() {
-      mutex.lock();
-      nbrPendingTasks ++;
-      mutex.unlock();
    }
 
    void TaskMonitor::decPendingTasks() {
@@ -73,10 +61,6 @@ namespace pearlrt {
       if (nbrPendingTasks == 0) {
          kill(pid, SIGRTMIN + 4); // indicate that last task exited
       }
-   }
-
-   int TaskMonitor::getPendingTasks() {
-      return nbrPendingTasks;
    }
 
 }

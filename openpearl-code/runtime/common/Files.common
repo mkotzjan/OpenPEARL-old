@@ -56,6 +56,7 @@ CXX_COMMON = \
 	TaskWhenLinks.cc \
 	TaskCommon.cc \
 	TaskList.cc \
+	TaskMonitor.cc \
 	MutexCommon.cc CSemaCommon.cc \
 	Semaphore.cc PriorityQueue.cc \
 	DationRW.cc \
@@ -78,7 +79,6 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	PutCharacter.h \
 	Float.h \
 	TaskTimerCommon.h \
-	TaskMonitor.h \
 	compare.h \
 	SystemDation.h \
 	SystemDationNB.h

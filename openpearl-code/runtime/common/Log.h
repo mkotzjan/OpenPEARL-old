@@ -58,9 +58,10 @@ The following formats are supported - all without width specification:
 #include "SystemDationNB.h"
 #include "Character.h"
 #include "RefChar.h"
-#include "Mutex.h"
 
 namespace pearlrt {
+
+#define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
    /**
       This class provides some methods to write messages to a log file.
@@ -75,7 +76,6 @@ namespace pearlrt {
       Log();
       static int logFileHandle;
       static bool initialized;
-      static Mutex mutex;
       static Log* instance;
       static bool ctorIsActive;
 
@@ -96,6 +96,7 @@ namespace pearlrt {
       */
       void doit(const Character<7>& type, const char * format,
                        va_list args);
+   public:
       /**
       format a log message
 
@@ -109,7 +110,6 @@ namespace pearlrt {
                            RefCharacter &rc,
                            const char * format,
                            va_list args);
-   public:
       /**
         constants for log level setting
       */

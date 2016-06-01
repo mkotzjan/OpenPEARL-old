@@ -53,7 +53,6 @@ namespace pearlrt {
    class TaskMonitor {
    private:
       volatile int nbrPendingTasks;
-      pid_t pid;
       Mutex mutex;
       TaskMonitor();					// hidden!!
       TaskMonitor(TaskMonitor const&);			// hidden!!

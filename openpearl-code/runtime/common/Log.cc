@@ -39,14 +39,12 @@
 #include "Log.h"
 
 namespace pearlrt {
-#define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
    bool Log::initialized = false;
    bool Log::ctorIsActive = false;
    int Log::logLevel = Log::WARN | Log::ERROR;
    SystemDationNB* Log::provider = NULL;
    Log* Log::instance = NULL;
-   Mutex Log::mutex;
 
    Log* Log::getInstance() {
       if (!instance) {
@@ -99,27 +97,6 @@ namespace pearlrt {
          provider->dationClose(0);
          initialized = false;
       }
-   }
-
-   void Log::doit(const Character<7>& type,
-                  const char * format,
-                  va_list args) {
-      Character<128> line;
-      RefCharacter rc(line);
-
-      try {
-         doFormat(type, rc, format, args);
-
-         mutex.lock();
-         provider->dationWrite(rc.getCstring(), rc.getCurrent());
-         mutex.unlock();
-      } catch (CharacterTooLongSignal s) {
-         mutex.lock();
-         provider->dationWrite(line.get(), (size_t)(line.upb().x));
-         provider->dationWrite((void*)ERRORMESSAGE, strlen(ERRORMESSAGE));
-         mutex.unlock();
-      }
-
    }
 
 

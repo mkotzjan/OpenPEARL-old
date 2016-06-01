@@ -28,6 +28,7 @@
 */
 
 #include "Log.h"
+#include "Mutex.h"
 #include "Signals.h"
 #include "StdError.h"
 /*
@@ -36,6 +37,8 @@
 */
 
 namespace pearlrt {
+   static Mutex mutex;
+
    Log::Log() {
       ctorIsActive = true;
       static StdError stdError;
@@ -43,5 +46,27 @@ namespace pearlrt {
       provider->dationOpen(NULL,0);
       ctorIsActive = false;
    }
+
+   void Log::doit(const Character<7>& type,
+                  const char * format,
+                  va_list args) {
+      Character<128> line;
+      RefCharacter rc(line);
+
+      try {
+         doFormat(type, rc, format, args);
+
+         mutex.lock();
+         provider->dationWrite(rc.getCstring(), rc.getCurrent());
+         mutex.unlock();
+      } catch (CharacterTooLongSignal s) {
+         mutex.lock();
+         provider->dationWrite(line.get(), (size_t)(line.upb().x));
+         provider->dationWrite((void*)ERRORMESSAGE, strlen(ERRORMESSAGE));
+         mutex.unlock();
+      }
+
+   }
+
 
 }
