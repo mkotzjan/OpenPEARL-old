@@ -124,11 +124,12 @@ SYSTEM;
                                       ! sensor at
                                       ! the bus i2c
 PROBLEM;
-   SPC LM75 DATION SYSTEM BASIC FIXED(15);
+   SPC temp DATION SYSTEM BASIC FIXED(15);
 MODEND;
 \end{PEARLCode}
 
 \begin{CppCode}
+// system part only
 static pearlrt::I2CBus s_i2cbus("/dev/i2c-0",100000);
 static pearlrt::Device * d_i2cbus = &s_i2cbus;
 
