@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #/*
-# [The "BSD license"]
-# Copyright (c) 2012-2013 Rainer Mueller
+# [A "BSD license"]
+# Copyright (c) 2012-2016 Rainer Mueller
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,9 @@
    if [ -e $1 ]
    then
       astyle --options=$BASEDIR/astyle.opt <$1 >$1.new
+# some versions of astyle add an emptly line at the end of the file
+# sed removes theempty line at the end of the new file
+      sed -i '${/^$/d;}' $1.new
       diff --ifdef=NEWFORMAT $1 $1.new >$1.diff
       d=$?
       if [ "$d" != "0" ]
