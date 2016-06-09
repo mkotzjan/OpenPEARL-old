@@ -43,44 +43,48 @@ namespace pearlrt {
    RPiDigitalOut::RPiDigitalOut(int start, int width) :
       start(start), width(width) {
       dationStatus = CLOSED;
-      RPiGpio::instance()->useBits(start, width, RPiGpio::DIGOUT,RPiGpio::NONE);
+      RPiGpio::instance()->useBits(start, width,
+                                   RPiGpio::DIGOUT, RPiGpio::NONE);
    }
 
    RPiDigitalOut::~RPiDigitalOut() {
    }
 
-  SystemDationB* RPiDigitalOut::dationOpen(const char * idf, int openParam) {
-    if (idf != 0) {
+   SystemDationB* RPiDigitalOut::dationOpen(const char * idf, int openParam) {
+      if (idf != 0) {
          Log::error("IDF not allowed for RPi digital out device");
          throw theNotAllowedSignal;
-    }
-    if ( (openParam & (~OUT))  != 0) {
-        Log::error("No open parameters allowed for RPi digital out device (%x)",
-        openParam);
-        throw theNotAllowedSignal;
-    }
+      }
+
+      if ((openParam & (~OUT))  != 0) {
+         Log::error("No open parameters allowed for RPi digital"
+                    " out device (%x)", openParam);
+         throw theNotAllowedSignal;
+      }
+
       if (dationStatus != CLOSED) {
          Log::error("RPiDigitalOut: Dation already open");
          throw theNotAllowedSignal;
       }
 
       dationStatus = OPENED;
-   
-   return this;
-  }
-  
-  void RPiDigitalOut::dationClose(int closeParam) {
-           if (closeParam != 0) {
-              Log::error("No close parameters allowed for RPiDigitalOut device");
-              throw theNotAllowedSignal;
-           }
+
+      return this;
+   }
+
+   void RPiDigitalOut::dationClose(int closeParam) {
+      if (closeParam != 0) {
+         Log::error("No close parameters allowed for RPiDigitalOut device");
+         throw theNotAllowedSignal;
+      }
+
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalOut: Dation not open");
          throw theNotAllowedSignal;
       }
 
       dationStatus = CLOSED;
-     }
+   }
 
 
    void RPiDigitalOut::dationRead(void* data, size_t size) {
@@ -94,7 +98,7 @@ namespace pearlrt {
       // it is expected that a BitString<width> object is passed
       // with a maximum of 32 bits. This fits into 4 byte.
       // Therefore size must be less than 4
-      if (size >4) {
+      if (size > 4) {
          Log::error("RPiDigitalOut: max 32 bits expected");
          throw theIllegalParamSignal;
       }
@@ -105,18 +109,24 @@ namespace pearlrt {
       }
 
       // expect BitString<width> as data
-      // bits are left adjusted in data, thus casting the pointerto 32 bit pointer
-      // the bits are also left adujsted if less than 4 byte were passed
+      // bits are left adjusted in data, thus the data must be
+      // shifted according the concrete size of data
       switch (size) {
-          case 1: d = (*(char*)data) << 24;
-                  break;
-          case 2: d = (*(int16_t*)data) << 16;
-                  break;
-          case 4: d = (*(int32_t*)data);
-                  break;
-         default:
- 		Log::error("RPiDigitalOut: illegal size (%d)", size);
-                throw theInternalDationSignal;
+      case 1:
+         d = (*(char*)data) << 24;
+         break;
+
+      case 2:
+         d = (*(int16_t*)data) << 16;
+         break;
+
+      case 4:
+         d = (*(int32_t*)data);
+         break;
+
+      default:
+         Log::error("RPiDigitalOut: illegal size (%d)", size);
+         throw theInternalDationSignal;
       }
 
       // shifting the data to the correct position occurs in writeBits
@@ -129,4 +139,3 @@ namespace pearlrt {
    }
 
 }
-

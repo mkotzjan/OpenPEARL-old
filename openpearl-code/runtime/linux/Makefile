@@ -109,6 +109,31 @@ ifeq ($(CONFIG_LINUX_Octopus),y)
 endif
 
 ifeq ($(CONFIG_LINUX_Raspberry),y) 
+   ifeq ($(CONFIG_LINUX_Raspberry_Version_Auto),y) 
+   # set CONFIG_LINUX_Raspberry_Version_V1, ..V3 depending of /proc/cpuinfo
+   # raspberry revision numbers are taken from http://www.gtkdb.de/index_36_1831.html
+   # and http://www.raspberrypi-spy.co.uk/2012/09/checking-your-raspberry-pi-board-version/
+   ver := $(shell awk '$$1 == "Revision" {print $$3}' /proc/cpuinfo)
+   ifeq ($(ver),000d)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V1B
+   else ifeq ($(ver),000e)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V1B
+   else ifeq ($(ver),000f)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V1B
+   else ifeq ($(ver),a01041)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V2B
+   else ifeq ($(ver),a21041)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V2B
+   else ifeq ($(ver),a02082)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V3B
+   else ifeq ($(ver),a22082)
+      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V3B
+   else
+      $(error raspberry revision $(ver) not known by auto detection)
+   endif 
+$(warning $(CXXFLAGS))
+
+endif
    INCLUDES += -I ./raspberry 
    INCLUDES += -I ../raspberry 
 ifeq ($(CONFIG_LINUX_RPI_DigIO),y) 
@@ -237,7 +262,7 @@ doc:
 phony += depend
 depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
 	@echo update dependencies ...
-	@$(CC) -MM  $(INCLUDES) $(ALL_SRCS) > $(DEPENDFILE)
+	@$(CXX) -MM  $(CXXFLAGS) $(INCLUDES) $(ALL_SRCS) > $(DEPENDFILE)
 
 -include .depend
 

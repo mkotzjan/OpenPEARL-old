@@ -454,7 +454,6 @@ int main() {
    char line[80];
    int numberOfCpus;
 
-   scanPearlRc();
 
    // setup default log file as ./pearl_log.txt
    Disc * disc = new Disc("./",1);
@@ -463,6 +462,9 @@ int main() {
 
    // set desired log level
    Log::setLevel(entries[LOGLEVEL].value);
+   // --- log setup complete ---
+
+   scanPearlRc();
 
    numberOfCpus = sysconf(_SC_NPROCESSORS_ONLN);
    Log::info("PEARL system startup");

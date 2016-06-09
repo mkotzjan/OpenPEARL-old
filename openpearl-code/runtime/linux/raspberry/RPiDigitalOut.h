@@ -79,11 +79,11 @@ namespace pearlrt {
 
       /**
       Open the DigitalOut
-     \param openParam open parameters if given
+      \param openParam open parameters if given
       \param idf pointer to IDF-value if given
       \throws NotAllowedSignal, if  dation is not closed and rst is not given
       */
-      SystemDationB* dationOpen(const char * idf = 0, int openParam=0);
+      SystemDationB* dationOpen(const char * idf = 0, int openParam = 0);
 
       /**
       Close the DigitalOut
@@ -93,7 +93,7 @@ namespace pearlrt {
 
       \throws NotAllowedSignal, if  dation is not opened and rst is not given
       */
-      void dationClose(int closeParam=0);
+      void dationClose(int closeParam = 0);
 
       /**
       read  a Bit<width> value from the device
@@ -118,19 +118,18 @@ namespace pearlrt {
       */
       void dationWrite(void * data, size_t size);
 
-    /**
-    obtain the capabilities of the device
+      /**
+      obtain the capabilities of the device
 
-    This method returns :
-          OUT ANY
+      This method returns :
+            OUT ANY
 
-    \returns available commands of the device
-    */
-    int capabilities();
+      \returns available commands of the device
+      */
+      int capabilities();
 
    };
 
 
 }
 #endif
-

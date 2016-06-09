@@ -60,8 +60,6 @@ namespace pearlrt {
    }
    void DationTS::internalDationOpen(int p,
                                      RefCharacter * rc) {
-      Log::error("DationTS: internalDationOpen empty");
-
       // open system dation
       if (p & IDF) {
          // pass filename if specified by IDF

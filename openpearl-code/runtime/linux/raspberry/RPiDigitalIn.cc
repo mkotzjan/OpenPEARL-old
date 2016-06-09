@@ -43,53 +43,60 @@ namespace pearlrt {
    RPiDigitalIn::RPiDigitalIn(int start, int width, char*pud) :
       start(start), width(width) {
       dationStatus = CLOSED;
-      if (strcmp(pud,"u") == 0) { 
-         RPiGpio::instance()->useBits(start, width, RPiGpio::DIGIN, RPiGpio::UP);
-      } else if (strcmp(pud,"d") == 0) {
-         RPiGpio::instance()->useBits(start, width, RPiGpio::DIGIN, RPiGpio::DOWN);
-      } else if (strcmp(pud,"") == 0) {
-         RPiGpio::instance()->useBits(start, width, RPiGpio::DIGIN, RPiGpio::NONE);
+
+      if (strcmp(pud, "u") == 0) {
+         RPiGpio::instance()->useBits(start, width,
+                                      RPiGpio::DIGIN, RPiGpio::UP);
+      } else if (strcmp(pud, "d") == 0) {
+         RPiGpio::instance()->useBits(start, width,
+                                      RPiGpio::DIGIN, RPiGpio::DOWN);
+      } else if (strcmp(pud, "") == 0) {
+         RPiGpio::instance()->useBits(start, width,
+                                      RPiGpio::DIGIN, RPiGpio::NONE);
       } else {
-        Log::error("RPiDigitalIn: illegal pub value (%s)", pud);
-        throw theIllegalParamSignal;
+         Log::error("RPiDigitalIn: illegal pub value (%s)", pud);
+         throw theIllegalParamSignal;
       }
    }
 
    RPiDigitalIn::~RPiDigitalIn() {
    }
 
-  SystemDationB* RPiDigitalIn::dationOpen(const char * idf, int openParam) {
-    if (idf != 0) {
+   SystemDationB* RPiDigitalIn::dationOpen(const char * idf, int openParam) {
+      if (idf != 0) {
          Log::error("IDF not allowed for RPi digital out device");
          throw theNotAllowedSignal;
-    }
-    if ( (openParam & (~OUT))  != 0) {
-        Log::error("No open parameters allowed for RPi digital out device (%x)",
-        openParam);
-        throw theNotAllowedSignal;
-    }
+      }
+
+      if ((openParam & (~IN))  != 0) {
+         Log::error("No open parameters allowed for RPi digital "
+                    "in device (%x)", openParam);
+         throw theNotAllowedSignal;
+      }
+
       if (dationStatus != CLOSED) {
          Log::error("RPiDigitalIn: Dation already open");
          throw theNotAllowedSignal;
       }
 
       dationStatus = OPENED;
-   
-   return this;
-  }
-  
-  void RPiDigitalIn::dationClose(int closeParam) {
-           if (closeParam != 0) {
-              Log::error("No close parameters allowed for RPiDigitalIn device");
-              throw theNotAllowedSignal;
-           }
+
+      return this;
+   }
+
+   void RPiDigitalIn::dationClose(int closeParam) {
+      if (closeParam != 0) {
+         Log::error("No close parameters allowed for RPiDigitalIn device");
+         throw theNotAllowedSignal;
+      }
+
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalIn: Dation not open");
          throw theNotAllowedSignal;
       }
 
       dationStatus = CLOSED;
-     }
+   }
 
 
    void RPiDigitalIn::dationWrite(void* data, size_t size) {
@@ -103,7 +110,7 @@ namespace pearlrt {
       // it is expected that a BitString<width> object is passed
       // with a maximum of 32 bits. This fits into 4 byte.
       // Therefore size must be less than 4
-      if (size >4) {
+      if (size > 4) {
          Log::error("RPiDigitalIn: max 32 bits expected");
          throw theIllegalParamSignal;
       }
@@ -117,15 +124,21 @@ namespace pearlrt {
       d = RPiGpio::instance()->readBits(start, width);
 
       switch (size) {
-          case 1: *(char*)data = d>>24;
-                  break;
-          case 2: *(int16_t*)data = d >> 16;
-                  break;
-          case 4: *(int32_t*)data = d;
-                  break;
-         default:
- 		Log::error("RPiDigitalIn: illegal size (%d)", size);
-                throw theInternalDationSignal;
+      case 1:
+         *(char*)data = d >> 24;
+         break;
+
+      case 2:
+         *(int16_t*)data = d >> 16;
+         break;
+
+      case 4:
+         *(int32_t*)data = d;
+         break;
+
+      default:
+         Log::error("RPiDigitalIn: illegal size (%d)", size);
+         throw theInternalDationSignal;
       }
 
    }
@@ -136,4 +149,3 @@ namespace pearlrt {
    }
 
 }
-
