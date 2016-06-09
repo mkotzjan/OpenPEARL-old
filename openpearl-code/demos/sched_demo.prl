@@ -31,8 +31,8 @@ MODULE(sched_demo);
 ! SYSTEM;
 ! termout: StdStream(1);
 __cpp__(
-	'pearlrt::StdStream sys_termout(1);'
-	'pearlrt::Device*  d_termout = &sys_termout;'
+	'pearlrt::StdOut s_termout;'
+	'pearlrt::Device*  d_termout = &s_termout;'
 );
 
 
