@@ -71,10 +71,8 @@ SRCANDH = \
 	CSema.cc \
 	Pipe.cc Disc.cc \
 	StdIn.cc StdOut.cc StdError.cc \
-	UnixSignal.cc 
-
-#StdStream.cc \
-#	Log.cc
+	UnixSignal.cc  \
+	I2CBus.cc
 
 SRCONLY =os.cc \
 	TaskMonitor.cc \
@@ -87,11 +85,6 @@ include ../common/Files.common
 CXX_COMMON := $(addprefix ../common/,$(CXX_COMMON))
 HDR_COMMON := $(addprefix ../common/,$(HDR_COMMON))
 
-# ---------------------------------------
-# list of file for checkformat
-CHECK_FILES = $(sort $(SRC) $(SRCONLY) $(SRC_H) \
-		     $(CXX_COMMON) $(HDR_COMMON) ) 
-
 
 # -----------------------------------
 # add driver specific stuff to file lists
@@ -100,9 +93,6 @@ ifeq ($(CONFIG_LINUX_Octopus),y)
    SRCANDH += drivers/Octopus.cc
    SRCANDH += drivers/OctopusDigitalOut.cc
    SRCANDH += drivers/OctopusDigitalIn.cc
-   CHECK_FILES += drivers/Octopus.cc drivers/Octopus.h
-   CHECK_FILES += drivers/OctopusDigitalOut.cc drivers/OctopusDigitalOut.h
-   CHECK_FILES += drivers/OctopusDigitalIn.cc drivers/OctopusDigitalIn.h
    INCLUDES += -I ./drivers 
    INCLUDES += -I ../drivers 
    LDFLAGS +=  -lusb -loctopus
@@ -140,9 +130,6 @@ ifeq ($(CONFIG_LINUX_RPI_DigIO),y)
    SRCANDH += raspberry/RPiGpio.cc
    SRCANDH += raspberry/RPiDigitalOut.cc
    SRCANDH += raspberry/RPiDigitalIn.cc
-   CHECK_FILES += raspberry/RPiGpio.cc raspberry/RPiGpio.h
-   CHECK_FILES += raspberry/RPiDigitalOut.cc raspberry/RPiDigitalOut.h
-   CHECK_FILES += raspberry/RPiDigitalIn.cc raspberry/RPiDigitalIn.h
 endif
 endif
 
@@ -154,8 +141,15 @@ ifeq ($(CONFIG_LINUX_tests),y)
 endif
 
 # ------------------------------------
-CHECK_FILES := $(sort $(CHECK_FILES))
 SRC = $(SRCANDH) $(SRCONLY) $(CXX_COMMON)
+SRC_H = $(SRCANDH:%.cc=%.h) PearlIncludes.h  $(HDR_COMMON)
+
+# ------------------------------------
+# list of file for checkformat
+CHECK_FILES = $(sort $(SRC)  $(SRC_H) \
+		     $(CXX_COMMON) $(HDR_COMMON) ) 
+
+CHECK_FILES := $(sort $(CHECK_FILES))
 #$(warning src = $(SRC))
 
 PLIB_OBJ = $(SRC:%.cc=%.o)
@@ -165,7 +159,6 @@ ALL_SRCS = $(SRC) $(TEST_SRCS) $(TEST_DATION_SRCS) $(GTEST_SRCS)
 #$(warning allsrc = $(ALL_SRCS))
 
 
-SRC_H = $(SRCANDH:%.cc=%.h) PearlIncludes.h  $(HDR_COMMON)
 
 OBJS = $(ALL_SRCS:%.cc=%.o)
 

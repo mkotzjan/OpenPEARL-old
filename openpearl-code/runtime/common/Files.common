@@ -68,7 +68,8 @@ CXX_COMMON = \
 	FloatHelper.cc \
 	SoftInt.cc \
 	Control.cc \
-	SampleBasicDation.cc
+	SampleBasicDation.cc \
+	LM75.cc
 
 HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \
@@ -81,6 +82,7 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	TaskTimerCommon.h \
 	compare.h \
 	SystemDation.h \
-	SystemDationNB.h
+	SystemDationNB.h \
+	I2CProvider.h
 
 

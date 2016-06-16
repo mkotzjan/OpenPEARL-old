@@ -115,3 +115,6 @@ Only this file mus be included.
 #include "RPiDigitalIn.h"
 #endif
 #endif
+#include "I2CBus.h"
+#include "LM75.h"
+
