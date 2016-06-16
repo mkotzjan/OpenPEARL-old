@@ -90,7 +90,7 @@ menu "Raspberry Pi specific drivers"
 
 config LINUX_RPI_DigIO
 	boolean "gpio i/o as digital in and out"
-	default n
+	default y
 	help
 	The raspberry pi board provides some gpio i/o pins.
         Some of them may be used as general purpose i/o-pins.
@@ -100,6 +100,17 @@ config LINUX_RPI_DigIO
 
 endmenu
 
-#source fm/linux_i2c.fm
+config LINUX_I2C
+	depends on LINUX
+	boolean "I2C support"
+	default n
+	select HAS_I2C
+	help
+	The i2c subsystem needs an i2c device driver and some header files.
+	These are not installed on all linux systems as default.
+	Set this option to yes, if you need i2c support. Make shure that
+	/dev/i2c-x and the i2c-header files are available and accessible.
+	
+	Check the documentation of your distribution how to enable i2c.
 
 endmenu

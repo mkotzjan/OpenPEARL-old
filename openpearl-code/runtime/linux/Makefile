@@ -71,8 +71,8 @@ SRCANDH = \
 	CSema.cc \
 	Pipe.cc Disc.cc \
 	StdIn.cc StdOut.cc StdError.cc \
-	UnixSignal.cc  \
-	I2CBus.cc
+	UnixSignal.cc
+
 
 SRCONLY =os.cc \
 	TaskMonitor.cc \
@@ -131,6 +131,10 @@ ifeq ($(CONFIG_LINUX_RPI_DigIO),y)
    SRCANDH += raspberry/RPiDigitalOut.cc
    SRCANDH += raspberry/RPiDigitalIn.cc
 endif
+endif
+
+ifeq ($(CONFIG_LINUX_I2C),y) 
+   SRCANDH += I2CBus.cc
 endif
 
 targets := libOpenPEARLlinux.a

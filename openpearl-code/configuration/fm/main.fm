@@ -3,3 +3,9 @@ source fm/runtime.fm
 source fm/doc.fm
 source fm/install.fm
 
+# HAS_I2C ist set if at least one target plattform has i2c support
+# selected
+config HAS_I2C
+	bool
+	default n
+
