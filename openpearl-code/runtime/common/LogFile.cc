@@ -68,8 +68,13 @@ printf("logfile op=%d  provider=%p\n", openParams, provider);
       }
 
 printf(" delegate open \n");
+      // remove file if it exists
       provider = provider->dationOpen(logFileName,
-                                      Dation::OUT | Dation::IDF | Dation::ANY);
+                            Dation::INOUT | Dation::IDF | Dation::ANY);
+      provider->dationClose(Dation::CAN); // delete file
+
+      provider = provider->dationOpen(logFileName,
+                           Dation::OUT | Dation::IDF | Dation::NEW);
 printf("logfile .... provider=%p\n",provider);
 
       return this;
