@@ -105,20 +105,26 @@ PEARL example for the system part:
 \begin{added}
 \input{SystemPart.bnf}
 \input{UserNameDeclaration.bnf}
+\input{Association.bnf}
 \input{ListOfConstants.bnf}
 \input{ConstantParameter.bnf}
  
+\end{added}
+\begin{added}
 For details about interrupts see chapter \ref{interrupts} and 
 signals see chapter \ref{signals}.
 
-Thus, a system part consists of a number of device associations of the
-following form:
 
 Devices may be connected directly to the computer or they are connected 
 via a bus like I2C to the computer. In this case, the bus is represented
 by a separate user name declaration. The identifier of the bus may
 be used in conjuntion with the connection symbol (-\,-\,-) to
-a bus component.
+a bus component. If the bus component is only used once in the system part,
+it may be specified directly. In other cases, a user supplied name
+must be introduced and used.
+
+Thus, a system part consists of a number of device associations of the
+following form:
 
 Especially for standalone running microcontrollers the system part
 may configure the behavior of the PEARL environment, like the
@@ -126,26 +132,28 @@ definition of an error output channel.
 
 \input{ConfigurationElement.bnf}
 
+\begin{removed}
 Example:
 \begin{tabbing}
 \x dateout: \= \kill
 {\bf Module} (example); \> \\
 {\bf SYSTEM}; \> \\
-\x tty0:    \> Lpc17xxUart(0, 9600, 8, 1, 'E', 0);\\
-\x  \> ErrorLog(tty0, 'WE'); ! send errors and warnings to uart 0\\
+\x tty0:    \> Lpc17xxUart(0, 9600, 8, 1, 'E');\\
+\x  \> Log('WE') -\,-\,- tty0; ! send errors and warnings to uart 0\\
 \x ...
 \end{tabbing}
+\end{removed}
 
 \end{added}
-\begin{accepted}
+\begin{added}
 
 For the example of a system part as given below, a typical linux computer
 system is considered, with the following provided system names in OpenPEARL:
 
 \begin{tabular}{ll@{\x}p{6cm}}
 SystemName & Parameter & Device \\ \hline
-StdStream  &  0 & standard input \\
-StdStream  &  1 & standard output \\
+StdIn  &  - & standard input \\
+StdOut  &  - & standard output \\
 Disc       & '/home', 10 & files for reading and writing are located in the given folder. The maximum of concurrent open files also specified. \\
 OctopusDigIn & ... & Digital input: Details are described in 
 		the plattform users guide \\
@@ -161,18 +169,25 @@ PEARL example for the system part:
 {\bf SYSTEM}; \> \\
 \x termin:  \> StdStream(0); \\
 \x termout: \> StdStream(1);\\
-\x file:    \> Disc('/tmp' ,10) ;  \\
+\x folder:  \> Disc('/tmp' ,10) ;  \\
 \x counter: \> OctopusDigitalIn('A',3,1); \\
 \x switch:  \> OctopusDigitalOut('B',3,1); \\
 \x motor:   \> OctopusDigitalOut('B',7,4); \\
 \x ic2bus1: \> I2CBus('/dev/i2c-0', 100000);\\
-\x temp:    \> i2cbus1 -\,-\.- LM75('48'B4); \\
+\x temp:    \> LM75('48'B4); -\,-\,- i2cbus1;\\
+\x \> Log('EW') -\,-\,- LogFile('pearl\_log.txt') -\,-\,- folder; \\
 \x ... \> \\
 {\bf PROBLEM};\> \\
 \x ... \>
 \end{tabbing}
 
-\end{accepted}
+\end{added}
+
+\begin{added}
+The configuration item for logging denotes that errors and warnings ('EW')
+should be gathered in the file 'pearl\_log.txt' in the dic folder specified
+by the previous defined folder on the disc drive.
+\end{added}
 
 The available devices and the associated system names must be taken from
 the corresponding user manual of a PEARL implementation.
@@ -211,7 +226,7 @@ For the declarations from the above example, this can take place as:
 \begin{tabular}{llll}
 {\bf SPC} & termin  & {\bf DATION IN}    & {\bf SYSTEM ALL},\\
    & termout & {\bf DATION OUT}   & {\bf SYSTEM ALL},\\
-   & file    & {\bf DATION INOUT} & {\bf SYSTEM ALL},   \\
+   & Folder  & {\bf DATION INOUT} & {\bf SYSTEM ALL},   \\
    & tty\_1  & {\bf DATION IN}    & {\bf SYSTEM ALL},\\
    & tty\_4  & {\bf DATION INOUT} & {\bf SYSTEM ALL},   \\
    & counter & {\bf DATION IN}    & {\bf SYSTEM BIT(1)}, \\
@@ -276,14 +291,7 @@ TypeDation ::= \\
 Each data station is source and/or sink of a data transmission. The
 corresponding feature must be given upon declaration:
 
-\begin{front}
-SourceSinkAttribute ::= \\
-\x {\bf IN $\mid$ OUT $\mid$ INOUT}
-\end{front}
-\begin{grammar}
-%\input{DationAttribute.bnf}
 \input{SourceSinkAttribute.bnf}
-\end{grammar}
 
 IN means that this data station is a source for data, i.e., it may only
 appear in such data transmission statements which transmit these data
@@ -560,7 +568,9 @@ transmission statement, it must be opened by the open statement:
 
 When executing the open statement, a data station with typology is
 positioned at its beginning.
-
+\begin{discuss}
+typology?? 
+\end{discuss}
 The open parameters serve to handle data stations containing
 identifyable files. E.g., a system defined data station Disk can possess
 a file TAB1, which is also maintained after terminating the program
@@ -579,7 +589,9 @@ OpenParameter ::=\\
 \begin{grammar}
 \input{OpenParameter.bnf}
 \end{grammar}
-
+\begin{discuss}
+forbid CAN, PRM  as OpenParam
+\end{discuss}
 The open parameters of the open statement must belong to different
 subsets.
 
@@ -602,6 +614,10 @@ A file with IDF name is created and identified with the notated data
 station. If there is already a file with this name, or if IDF is
 lacking, an error message is given, or the RST variable is set with the
 error number.
+\begin{added}
+If the dation has a fixed topology like DIM(10,10)), the content is
+filled with spaces or null bytes for ALPHIC or typed dations, respectively.
+\end{added}
 \item ANY\\
 If there is already a file with IDF name, it is identified with the
 notated data station. Otherwise, a new file is created for it. If IDF
@@ -613,6 +629,15 @@ statement (see below).
 \item PRM (from ``permanent'')\\
 The file is still there after executing the close statement, and again
 accessible with the same name after re-executing an open statement.
+\begin{discuss}
+\item EXCLUSIVE \\
+The dation (not file) may be opened only once.
+Subsequent attempts to open the already
+opened  dation produce an error message, or the RST variable is set with the
+error number.
+
+Muss noch in die Liste der OpenParameter
+\end{discuss}
 \end{itemize}
 
 If open parameters are lacking, ANY and PRM are assumed.
@@ -624,6 +649,10 @@ usable again not before the execution of an open statement.
 
 The settings for closing a data station made in the open statement can
 be overwritten by a close statement:
+\begin{discuss}
+das nur, wenn Close-Parameter bei OPEN weiterhin zulaessig bleiben.
+Sonst die beiden Attribute hier erklaeren.
+\end{discuss}
 
 \begin{front}
 CloseParameter ::=\\
@@ -645,6 +674,18 @@ be executed to close the data station.
 the same task.
 \item Upon lacking parameters, ANY and PRM are assumed, unless earlier
 executed close or open statements have made explicit settings.
+\begin{added}
+\item executing an OPEN statement on an already opened dation ignores the
+IDF attribute. The attributes CAN or PRM must be identical 
+in all concurrent OPEN statements. Otherwise an error message is produced
+or the RST variable is set with the error number.
+
+Frage: wieso nicht auch IDF identisch?
+executing the OPEN statement on an already opened dation need identical 
+open parameters IDF, CAN and PRM. Otherwise an error message is produced
+or the RST variable is set with the error number.
+
+\end{added}
 \end{itemize}
 
 Example:
@@ -764,6 +805,9 @@ RelativePosition ::=\\
 \x \{ {\bf X $\mid$ SKIP $\mid$ PAGE} \} [ (Expression) ] $\mid$ \\
 \x {\bf ADV} ( [ [ Expression , ] Expression , ] Expression )
 \end{front}
+\begin{discuss}
+EOF bei RealtivePosition  ergaenzen?
+\end{discuss}
 \begin{grammar}
 \input{ReadStatement.bnf}
 \input{WriteStatement.bnf}
@@ -962,6 +1006,13 @@ gives the distance of the data element to be transmitted from the
 current data element. Missing expressions are replaced by the value
 zero. If the data station has the attribute FORWARD, the value for the
 expression furthest to the left must be positive or zero.
+\begin{discuss}
+\item EOF\\
+refers to the end of the dation. If used in conjunction with fixed topology
+and CYCLIC attribute the
+compiler will emit a warning that the effective position will be the
+beginning of the dation.
+\end{discuss}
 \end{itemize}
 
 Examples:
@@ -1470,6 +1521,9 @@ value  & format    & output \\ \hline
 
 \item The floating point number is stored right-justified in a field of length
 w. Otherwise, 1(a) in \ref{sec_dation_f_format} holds.
+\begin{discuss}
+passt dieser Bezug wirklich?
+\end{discuss}
 
 \item In case w $>$ d $>$ s, the mantissa is chosen so that it holds:
 
@@ -1489,6 +1543,9 @@ mantissa does not equal zero, if the number is different from zero.
 \item the exponent field used two digits in E-format and 
       three digit in E3-format
 
+\begin{discuss}
+\item If s $<$ d +1 the ExpFormatSignal is induced.
+\end{discuss}
 \end{enumerate}
  
 \item {\bf Input}\\
@@ -1499,10 +1556,13 @@ mantissa does not equal zero, if the number is different from zero.
 
 %\item The statements 2(b) to 2(f) in \ref{sec_dation_f_format}
 %     hold analogously.
-\item If w $<=$ 0, or d $<$ 0, or s $<$ 0, no assignment happens and  
+\item If w $<=$ 0, or d $<$ 0, or s $<$ \removedtext{0}\addedtext{1}, no assignment happens and  
          the FloatFormatSignal is induced
 \item If the data in the field does not match a valid number, 
- no data is assigned and the FloatValueSignal is induced.
+ no data is assigned and the ExpValueSignal is induced.
+\begin{discuss}
+\item If the field is empty the NoDataInFieldSignal is induced.
+\end{discuss}
 \end{enumerate}
 \end{enumerate}
 
@@ -1513,6 +1573,9 @@ value  & format    & output \\ \hline
 2721   & E(8)      & \_\_\_2E+03 \\
 2721   & E3(8)      & \_\_2E+003
 \end{tabular}
+\begin{discuss}
+wieso keine Rundung bei 27.13E+2 ? muesste m.E 27.14E+02 heissen
+\end{discuss}
 \end{accepted}
 
 %\subsection{The Character String Formats (A) and (S)}  % 10.5.3
@@ -1754,7 +1817,7 @@ If the input field does not match a valid clock constant, the
 
 \begin{discuss}
 The current implementation accepts automatic decimals if no decimal point is given and $d > 0$. This behavior is defined in the F-format. It was removed 
-wheen the D-format was relaxed.
+when the D-format was relaxed.
 
 Should this behavior be removed here and from the F format?
 \end{discuss}
@@ -1823,7 +1886,7 @@ The character \_ means a space.
 The rules from \ref{sec_dation_t_format} (1) are valid.
 \end{removed}
 \item {\bf Input}\\
-If w $<=$ 0 or d $<$ 0, no data is read and the DurationFormatSignal
+If w $<=$ 0 \removedtext{or d $<$ 0}, no data is read and the DurationFormatSignal
    is induced.
 
 \begin{accepted}
@@ -1853,6 +1916,7 @@ input               & format  & value \\ \hline
 \end{tabular}
 
 \end{added}
+The character \_ means a space.
 
 \end{enumerate}
 
@@ -2144,3 +2208,6 @@ to which the PEARL programmer himself can connect drivers. This
 interface is described in the respective user manual (in the chapter
 ``Open Driver Interfaces'').
 
+\begin{discuss}
+das lassen wir doch auch lieber in einem separaten Dokument, oder?
+\end{discuss}

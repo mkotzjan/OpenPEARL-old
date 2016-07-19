@@ -8,10 +8,9 @@ UserNameDeclaration ::=\\
 
 \begin{added}
 \htgt{UserNameDeclaration} ::=\\
-\x \hlink{Identifier}$\S $UserName: [ \hlink{Identifier}$\S $Username -\,-\,- ]\\
-\x \x \hlink{Identifier}$\S $DATION-SystemName [ ( \hlink{ListOfConstants} ) ];\\
-\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $SIGNAL-SystemName;\\
-\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $Interrupt-SystemName
+\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $DationSystemName [ ( \hlink{ListOfConstants} ) ] [\hlink{Association}] ;\\
+\x $\mid$ \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $SignalSystemName;\\
+\x $\mid$ \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $InterruptSystemName
 		 [ ( \hlink{ListOfConstants} ) ];\\
 
 \end{added}
