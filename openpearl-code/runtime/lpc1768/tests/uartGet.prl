@@ -5,7 +5,7 @@ SYSTEM;
 !        'pearlrt::Device * d_terminal = &com2;');
 !__cpp__('pearlrt::Lpc17xxUart com2(2,115200,8,1,\'N\', 0x010080);'
 !        'pearlrt::Device * d_terminal = &com2;');
-__cpp__('pearlrt::Lpc17xxUart com2(0,115200,8,1,\'N\', 0x010080);'
+__cpp__('pearlrt::Lpc17xxUart com2(0,115200,8,1,\'N\', 0);'
         'pearlrt::Device * d_terminal = &com2;');
 __cpp__('pearlrt::Post ppp(0);');
 

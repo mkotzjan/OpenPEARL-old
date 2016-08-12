@@ -1,11 +1,13 @@
-
 #include <chip.h>
 
+#if 0
 #define UART_SELECTION  LPC_UART0
+
 static const PINMUX_GRP_T pinmuxing[] = {
    {0,  2,   IOCON_MODE_INACT | IOCON_FUNC1},	/* TXD0 */
    {0,  3,   IOCON_MODE_INACT | IOCON_FUNC1}	/* RXD0 */
 };
+
 
 static const char hello[] = "retarget initiated\n";
 static const char cr = '\r';
@@ -21,6 +23,7 @@ static void sendChar(char cc) {
 }
 
 int  __attribute__((used)) _write(int fd, char *ptr, int len) {
+
    int i;
 
    /* Write "len" of char from "ptr" to file id "fd"
@@ -38,6 +41,7 @@ int  __attribute__((used)) _write(int fd, char *ptr, int len) {
       sendChar(*(ptr + i));
    }
 
+
    return len;
 }
 
@@ -46,6 +50,7 @@ int __attribute__((used)) _read(int fd, char *ptr, int len) {
     * Return number of char read.
     * Need implementing with UART here. */
    int received = 0;
+
 
    if (!initiated) {
       retarget_init();
@@ -82,14 +87,19 @@ int __attribute__((used)) _read(int fd, char *ptr, int len) {
       }
    }
 
+
    return received;
 }
 
 void _ttywrch(int ch) {
    /* Write one char "ch" to the default console
     * Need implementing with UART here. */
+
    char c = ch;
+
+
    sendChar(c);
+
 
 }
 
@@ -99,7 +109,7 @@ static void retarget_init() {
    Chip_IOCON_SetPinMuxing(LPC_IOCON,
                            pinmuxing,
                            sizeof(pinmuxing) / sizeof(pinmuxing[0]));
-   Chip_UART_Init(LPC_UART0); //UART_SELECTION);
+   Chip_UART_Init(UART_SELECTION);
    Chip_UART_SetBaud(UART_SELECTION, 115200);
    Chip_UART_ConfigData(UART_SELECTION, (UART_LCR_WLEN8 | UART_LCR_SBS_1BIT));
 
@@ -108,6 +118,7 @@ static void retarget_init() {
    _write(1, (char*)hello, sizeof(hello));
 }
 
+#endif
 
 void _exit(int x) {
    _write(1, (char*)"*** end. ***\n", 13);

@@ -6,7 +6,8 @@ PEARL_FREERTOS_SRC += \
 	PrioMapper.cc \
 	Task.cc \
 	TaskMonitor.cc  \
-	TaskTimer.cc
+	TaskTimer.cc \
+	GenericUart.cc
 
 
 PEARL_FREERTOS_INC = .

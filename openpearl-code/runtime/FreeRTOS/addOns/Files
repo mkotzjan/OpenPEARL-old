@@ -8,6 +8,7 @@ ADDONCSRC = assert.c	 \
 	heap_1_2.c
 
 #####
+ADDONCSRC += Retarget.cc
 #ADDONCSRC += testStackOverflow.cc
 # testStackOverFlow is added to BOARDSUPPORT to enforce the linkage
 # of the required functions in tasks.c

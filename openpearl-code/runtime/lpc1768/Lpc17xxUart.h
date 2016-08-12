@@ -31,9 +31,13 @@
 #define LPC17XXUART_INCLUDED
 
 #include "SystemDationNB.h"
+#include "Lpc17xxUartInternal.h"
+#include "GenericUartDation.h"
+
 //#include "chip.h"
-#include "RingBuffer.h"
+//#include "RingBuffer.h"
 #include "CSema.h"
+#include "Mutex.h"
 
 namespace pearlrt {
    /**
@@ -45,38 +49,32 @@ namespace pearlrt {
    /**
    This class provides uart support for the LPC17xx
 
-   The dation initializes the uart device to the required
-   line characteristic. If an input buffer is required, it
-   is allocated on the FreeRTOS-heap.
-
    The interrupt is only enabled if the device is opened.
 
-   There is no check if more than one userdateion is opened
+   There is no check if more than one userdation is opened
    on the device. It should no problem, since the operations
    are secured by a mutex.
 
 
-   The UART may me used with different policies:
-   <ul>
-   <li>
    As connection to a terminal with line edit functions.
-   This means, that BS will remove the last entered character and CR
-   will abort the input before  all requested data is received.
-   On output \n is translated into CR + LF
-   In this mode, the connection may be used in half duplex only.
-   This means that ether an input or an output action may be active
-   at one time.
-   <li>In raw mode, all data are transfered as specified. No early
-   termination on input is possible. The line may be used in full duplex
+
+   console: LineEdit(80) --- Lpc17xxUart(....)
+
+   The LineEdit class uses a different interface as the pur dation
+   operation, which supplies a raw mode. All data are transfered as specified.
+   No early termination on input is possible.
+   The line may be used in full duplex
    mode.
-   </ul>
-   Besides theese modes of operation, the communication protocel xon/xoff
+
+   Besides these modes of operation, the communication protocol xon/xoff
    may be selected. This operates in both directions.
    On output, the reception of an XOFF will stop the transmission of more
    characters until an XON is received.
    On input, an XOFF is emitted in case of the reception of a data byte
    with no active input request. The next input action (dationRead()) will
    take the buffered input character and sends an XON.
+   The implementation of XonXoff is provided plattform indepoendent in
+   GenericUart
 
    To achieve mutual exclusion between interrupt service routine and
    API function calls, the specific NVI interrupt is cleared and
@@ -87,22 +85,16 @@ namespace pearlrt {
    interface as well as the logging output.
 
    */
-   class Lpc17xxUart : public SystemDationNB {
+   class Lpc17xxUart : public GenericUartDation, public SystemDationNB {
    private:
-      void* lpc_uart;	// pointer to port (in LPCOpen)
-      int rxBufferSize; // size of the receive buffer in line edit mode
-      int rxBytes;	// number of bytes in receive buffer in line edit mode
-      char * rxBuffer;  // receive buffer in line edit mode
-      RingBuffer<char> rxRingBuffer;
-      bool lineEdit;    // line edit (BS) desired
-      bool xonProtocol; // operate with xon/xoff toe remore system
       Mutex mutex; 	// mutex for objects data
       CSema writeSema;  // semaphore to resume operation from interrupt
       CSema readSema;  	// semaphore to resume operation from interrupt
       int nbrOpenUserDations; // multiple dations counter
       int status;  	// status of the current operation
       // for details see enum Lpc17xxUartStatus
-      static Lpc17xxUart * uartObject[2];
+
+      Lpc17xxUartInternal * internalUart;
       struct Job4Isr {
          char * data;
          int nbr;
@@ -110,8 +102,6 @@ namespace pearlrt {
          SemaphoreHandle_t blockSema;
       } sendCommand, recvCommand;
 
-      char echoBuffer[10];
-      RingBuffer<char> lineEditEcho;
       char bufferedInputChar;	// one char may be buffered even if no
       // input is active to run xon/xoff protocol
       // this stores the last received character
@@ -127,28 +117,12 @@ namespace pearlrt {
       \param bitsPerCharacter  5-8  is allowed
       \param stopBits number of stop bits
       \param parity the desired type of parity ('O', 'E', 'N')
-      \param mode multiplex parameter
-                  <ul>
-        <li>Bit 0-15: rx buffer size;
-      	 (must be > 0) if line edit is selected
-                  <li>Bit 16: 1= line edit on
-                  <li>Bit 17: 1=xon/xoff protocol enabled
-                  </ul>
-      If lineEdit is selected, dationRead and dationWrite may only
-      be used exclusive. Simultaneous calls for read and write are
-      sequenced internally.
-
-      In lineEdit mode, the received characters are stored until a CR is
-      received.
-
-      If no lineEdit is selected, the dation works in full duplex mode.
-      Note that xoff-sending has higher priority than data sending.
 
       \throws theIllegalParamSignal in case of illegal parameter values
                                or if the rxbuffer could not be allocated
       */
       Lpc17xxUart(int port, int baudRate, int bitsPerCharacter,
-                  int stopBits, char parity, int mode);
+                  int stopBits, char parity, bool xon);
 
       /**
        open the system dation
@@ -173,10 +147,10 @@ namespace pearlrt {
       void dationUnGetChar(const char c);
 
       /**
-       interrupt handler for both uart channels. 
+       interrupt handler for both uart channels.
        This method is called from the real interrupt service routines
        and delegates the operation to the concrete uart objects
-      
+
       \param uartIndex numbe of the uart.
       */
       static void irqHandler(int uartIndex);
@@ -186,7 +160,9 @@ namespace pearlrt {
       bool sendNextChar();
       void interruptEnable(bool on);
       void logError();
-      void copyRxRingBuffer();
+
+      bool getNextTransmitChar(char * ch);
+      bool addReceivedChar(char ch);
 
    };
 }
