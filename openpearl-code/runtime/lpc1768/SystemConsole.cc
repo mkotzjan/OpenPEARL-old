@@ -7,7 +7,7 @@ namespace pearlrt {
    GenericUart* SystemConsole::getInstance() {
       if (! console) {
          console =
-            Lpc17xxUartInternal::getInstance(0, 115200, 7, 1 , 'E', true);
+            Lpc17xxUartInternal::getInstance(0, 115200, 8, 1 , 'N', false);
       }
 
       return console;

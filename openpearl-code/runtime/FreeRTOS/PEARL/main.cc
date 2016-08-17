@@ -86,7 +86,7 @@ __attribute__((weak)) int main(void) {
    char line[40];
    uint32_t resetReason;
 
-   printf("OpenPEARL started\n");
+   printf("OpenPEARL started \n");
 
 
    // obtain the reset reason

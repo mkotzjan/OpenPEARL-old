@@ -357,5 +357,9 @@ namespace pearlrt {
       // do nothing, sice get is not supported --> unget is not
       // needed
    }
+
+   void Hy32::translateNewLine(bool doNewLineTranslation) {
+      // do nothing - Hy32 does support only ALPHIC access
+   }
 }
 

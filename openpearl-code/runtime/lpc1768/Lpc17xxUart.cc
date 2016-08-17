@@ -59,6 +59,7 @@ namespace pearlrt {
       internalUart->setup(_port, baudRate,
                           bitsPerCharacter, stopBits, parity);
 
+      internalUart->registerUartDation(this);
 
       status = 0;  // not busy
       sendCommand.blockSema = xSemaphoreCreateBinary();
@@ -79,16 +80,16 @@ namespace pearlrt {
 
    }
 
-   void Lpc17xxUart::logError() {
+   void Lpc17xxUart::logError(int errorStatus) {
       // echo only one error reason, eg. BREAK will often
       // come together with PARITY_ERROR
-      if (status & GenericUart::BREAK_INDICATOR) {
+      if (errorStatus & GenericUart::BREAK_INDICATOR) {
          Log::error("Lpc17xxUart: break received");
-      } else if (status & GenericUart::FRAME_ERROR) {
+      } else if (errorStatus & GenericUart::FRAME_ERROR) {
          Log::error("Lpc17xxUart: frame error");
-      } else if (status & GenericUart::PARITY_ERROR) {
+      } else if (errorStatus & GenericUart::PARITY_ERROR) {
          Log::error("Lpc17xxUart: parity error");
-      } else  if (status & GenericUart::RECEIVE_OVERRUN) {
+      } else  if (errorStatus & GenericUart::RECEIVE_OVERRUN) {
          Log::error("Lpc17xxUart: receive overrun");
       }
    }
@@ -168,6 +169,7 @@ namespace pearlrt {
 
    void Lpc17xxUart::dationRead(void * destination, size_t size) {
       bool errorExit = false;
+      int errorStatus;
 
       if (nbrOpenUserDations == 0) {
          Log::error("Lpc17xxUart: not opened");
@@ -208,10 +210,10 @@ namespace pearlrt {
          internalUart->interruptEnable(false);
       }
 
-
-      if ((status & READ_ERRORMASK) != 0) {
+      errorStatus = internalUart->getErrorStatus();
+      if ((errorStatus & READ_ERRORMASK) != 0) {
          errorExit = true;
-         logError();
+         logError(errorStatus);
       }
 
       status &= ~READ_ERRORMASK;
@@ -230,6 +232,7 @@ namespace pearlrt {
 
    void Lpc17xxUart::dationWrite(void * destination, size_t size) {
       bool errorExit = false;
+      int errorStatus;
 
       if (nbrOpenUserDations == 0) {
          Log::error("Lpc17xxUart: not opened");
@@ -254,9 +257,10 @@ namespace pearlrt {
       xSemaphoreTake(sendCommand.blockSema, portMAX_DELAY);
       internalUart->interruptEnable(false);
 
-      if ((status & READ_ERRORMASK) != 0) {
+      errorStatus = internalUart->getErrorStatus();
+      if ((errorStatus & READ_ERRORMASK) != 0) {
          errorExit = true;
-         logError();
+         logError(errorStatus);
       }
 
       status &= ~READ_ERRORMASK;
@@ -293,6 +297,11 @@ namespace pearlrt {
       unGetChar = c;
       status |= GenericUart::HAS_UNGETCHAR;
       mutex.unlock();
+   }
+
+   void Lpc17xxUart::translateNewLine(bool doNewLineTranslation) {
+      // just delegate to the generic uart driver
+      internalUart->translateNewLine(doNewLineTranslation);
    }
 
 #if 0

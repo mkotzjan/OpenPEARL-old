@@ -65,10 +65,11 @@ namespace pearlrt {
    private:
       GenericUartDation * systemDation;
       bool isConsole;
-       
-   protected:
-      int status;
       bool xonProtocol;
+      bool doNewLineTranslation;
+
+   protected:
+      int status;  // same attribut in low level part
 
    public:
       /** 
@@ -89,7 +90,7 @@ namespace pearlrt {
       PARITY_ERROR = (1 << 1), // return code parity error
       FRAME_ERROR = (1 << 2),  // return code frame error
       RECEIVE_OVERRUN = (1 << 3), // return code receive overrun
-      SEND_CR_LF = (1 << 4), // internal marker for CR/LF transmission
+      LF_MUST_SEND = (1 << 4), // internal marker for CR/LF transmission
       WRITE_IS_ACTIVE  = (1 << 5), // internal marker that a write is active
       READ_IS_ACTIVE  = (1 << 6), // internal marker that a read is active
       XOFF_MUST_SEND  = (1 << 7), // internal marker for xon/xoff protocol
@@ -127,6 +128,15 @@ namespace pearlrt {
    */ 
    void sendNextChar();
 
+   /**
+   translate NewLine
+
+   on input: translate CR into \n
+   on output: translate \n ito CR+LF
+   
+   \param doNewLineTranslation enables/disables the translation
+   */
+   void translateNewLine(bool doNewLineTranslation);
 
    /**
    treat the received character as input or xon/xoff-flow control
@@ -135,12 +145,39 @@ namespace pearlrt {
    */
    void doReceiveChar(char ch);
 
+   /**
+   Send the given character to the otput data register
+
+   \param ch the character to send
+   */
    virtual void sendChar(char ch) = 0;
 
+   /**
+   send the next character to the output data register if no
+   transmit interrupt will occur automatically. This function
+   restarts the output loop via the interrupt service routine.
+   */
    virtual void triggerOutput() = 0;
 
+   /**
+   Send the given character in polling mode
+
+   \param ch the character to send
+   */
    virtual void sendCharPolling(char data) = 0;
+
+   /**
+   read the next character in polling mode
+
+   \param ch the character to send
+   */
    virtual char readCharPolling() = 0; 
+
+   /**
+   return the error status to the superior layer of the 
+   uart driver
+   */
+   virtual int getErrorStatus() = 0;
 };
 }
 #endif

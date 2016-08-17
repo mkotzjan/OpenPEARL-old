@@ -9,7 +9,7 @@ pearlrt::Lpc17xxDigitalOut led7(2,7,1);
 pearlrt::Interrupt * _key1 = &key1;
 pearlrt::Interrupt * _int0 = &int0;
 
-pearlrt::Lpc17xxUart u2(2,9600,7,1,'E',0x03);
+pearlrt::Lpc17xxUart u2(0,115200,7,1,'E',true);
 
 SPCTASK(ut);
 

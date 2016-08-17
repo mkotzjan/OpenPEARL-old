@@ -45,7 +45,6 @@ namespace pearlrt {
 
    private:
       static Lpc17xxUartInternal* uartObject[2];
-      int status;
       void * lpcUart;    // use void pointer to remove chip specific stuff
       // from generated PearlIncludes.h
 
@@ -108,6 +107,12 @@ namespace pearlrt {
       restart output, if necessary
       */
       void triggerOutput();
+
+      /**
+      return the error status to the superior uart layer
+      \returns the error status as bit array of type GenericUartStatus
+      */
+      int getErrorStatus();
 
    private:
       void treatInterrupt();

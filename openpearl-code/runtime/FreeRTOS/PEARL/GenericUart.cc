@@ -41,10 +41,15 @@ namespace pearlrt {
       xonProtocol = xon;
       isConsole = _isConsole;
       systemDation = NULL;
+      status = 0;
    }
 
    void GenericUart::registerUartDation(GenericUartDation * u) {
       systemDation = u;
+   }
+
+   void GenericUart::translateNewLine(bool _doNewLineTranslation) {
+       doNewLineTranslation = _doNewLineTranslation;
    }
 
    void GenericUart::sendNextChar() {
@@ -61,14 +66,32 @@ namespace pearlrt {
          sendChar(XOFF);
          status &= ~XOFF_MUST_SEND;
          status |= XOFF_SENT | TX_INTERRUPT_PENDING;;
+      } else if (status & LF_MUST_SEND) {
+         sendChar('\n');
+         status &= ~LF_MUST_SEND;
+         status |= TX_INTERRUPT_PENDING;
       } else if (isConsole &&
                  Retarget::getNextStdOutChar(&ch) == true) {
+
+         if (doNewLineTranslation && ch == '\n') {
+             status |= LF_MUST_SEND;
+             ch = '\r';
+         }
+
          sendChar(ch);
          status |= TX_INTERRUPT_PENDING;;
       } else if (systemDation &&
                  (systemDation->getNextTransmitChar(&ch) == true)) {
+
+         if (doNewLineTranslation && ch == '\n') {
+             status |= LF_MUST_SEND;
+             ch = '\r';
+         }
+
          sendChar(ch);
          status |= TX_INTERRUPT_PENDING;;
+      } else {
+    	  status &= ~TX_INTERRUPT_PENDING;
       }
    }
 
@@ -99,7 +122,12 @@ namespace pearlrt {
             }
          }
       } else {
-         // test if scanf is active on stdin
+         if (doNewLineTranslation && ch == '\r') {
+            ch = '\n';
+         }
+
+         // test if scanf is active on stdin or a system dation wants
+         // data. If none, then send Xoff.
          if (isConsole && Retarget::addNextStdInChar(ch) == false) {
             // if not -> delegate to superior layer
             // the superior layer is responsible to buffer at least one

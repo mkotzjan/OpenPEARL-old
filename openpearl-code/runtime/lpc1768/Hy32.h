@@ -87,6 +87,7 @@ namespace pearlrt {
       void dationRead(void * destination, size_t size);
       void dationWrite(void * destination, size_t size);
       void dationUnGetChar(const char c);
+      void translateNewLine(bool doNewLineTranslation);
 
    };
 };

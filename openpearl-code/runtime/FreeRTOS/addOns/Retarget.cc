@@ -91,7 +91,8 @@ extern "C" {
       }
    }
 
-#if 0     void _ttywrch(int ch) {
+#if 0
+     void _ttywrch(int ch) {
          /* Write one char "ch" to the default console
           * Need implementing with UART here. */
 

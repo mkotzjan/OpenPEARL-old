@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2014 Rainer Mueller
+ Copyright (c) 2014-2016 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -91,6 +91,20 @@ namespace pearlrt {
       \param c the character with should be returned to the input stream
       */
       virtual void dationUnGetChar(const char c) = 0;
+
+      /**
+      set newline translation mode
+
+      The system dation is responsible to perform newline translations in
+      a plattform specific manner, if the user dation is in ALPHIC mode.
+      In case of usage in "Typed" mode (READ/WRITE) no translation must
+      be performed. The class UserDationNB knowns this difference and 
+      invokes this method accordingly.
+     
+      \param doNewLineTranslation must be true to enable the translation
+      */
+      virtual void translateNewLine(bool doNewLineTranslation) = 0; 
+
    };
 }
 #endif

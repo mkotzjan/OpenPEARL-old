@@ -147,19 +147,20 @@ namespace pearlrt {
       void dationUnGetChar(const char c);
 
       /**
-       interrupt handler for both uart channels.
-       This method is called from the real interrupt service routines
-       and delegates the operation to the concrete uart objects
+      translate newline<br>
+      in input: CR -> \n<br>
+      in output: \n -> CR+LF
 
-      \param uartIndex numbe of the uart.
+      \param doNewLineTranslation true enables the translation, <br>
+              false disables the translation
       */
-      static void irqHandler(int uartIndex);
+      void translateNewLine(bool doNewLineTranslation); 
    private:
       void treatInterrupt();
       void doRecvChar();
       bool sendNextChar();
       void interruptEnable(bool on);
-      void logError();
+      void logError(int status);
 
       bool getNextTransmitChar(char * ch);
       bool addReceivedChar(char ch);

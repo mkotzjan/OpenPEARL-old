@@ -207,16 +207,16 @@ namespace pearlrt {
                            UART_FCR_TRG_LEV0);  // int on each rx char
 
       Chip_UART_TXEnable((LPC_USART_T*)lpcUart);
+      Chip_UART_IntEnable((LPC_USART_T*)lpcUart,
+                                UART_IER_RBRINT |
+                                UART_IER_RLSINT |
+                                UART_IER_THREINT);
+
 
    }
 
    void Lpc17xxUartInternal::interruptEnable(bool on) {
       if (on) {
-         Chip_UART_IntEnable((LPC_USART_T*)lpcUart,
-                             UART_IER_RBRINT |
-                             UART_IER_RLSINT |
-                             UART_IER_THREINT);
-
          if ((LPC_USART_T*)lpcUart == LPC_UART0) {
             NVIC_SetPriority(UART0_IRQn, 10);
             NVIC_EnableIRQ(UART0_IRQn);
@@ -297,15 +297,10 @@ namespace pearlrt {
 
       // transmitter empty interrupt
       if (intIdReg == UART_IIR_INTID_THRE) {
-
-         if (status & GenericUart::XOFF_RECEIVED) {
-            // do nothing and wait for reception of xon
-            // the receiver part of the isr must retrigger the
-            // transmission when xon is received
-            status &= ~GenericUart::TX_INTERRUPT_PENDING;
-         } else {
-            sendNextChar();
-         }
+         // just try to send next char.
+         // if there is nothing to send, the routine
+         // updates the status variable and returns
+         sendNextChar();
       }
    }
 
@@ -315,6 +310,8 @@ namespace pearlrt {
    }
 
    void Lpc17xxUartInternal::triggerOutput() {
+      // test, whether an TX-interrupt is pending. If not,
+      // retrigger the output by sending of the next character
       if (!(status & GenericUart::TX_INTERRUPT_PENDING)) {
          sendNextChar();
       }
@@ -335,6 +332,10 @@ namespace pearlrt {
 
       ch = Chip_UART_ReadByte((LPC_USART_T*)lpcUart);
       return (ch);
+   }
+
+   int Lpc17xxUartInternal::getErrorStatus() {
+      return status;
    }
 }
 
