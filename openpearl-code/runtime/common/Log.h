@@ -122,6 +122,7 @@ namespace pearlrt {
       */
 
       static void setLevel(int level);
+
       /**
       configuration constructor
 
@@ -132,7 +133,6 @@ namespace pearlrt {
       which is plattform dependent - thus the implementation of this 
       method is in the plattform specific part.
       The configuration ctor replaces the plattform specific default setting
-
       */
 
       Log(SystemDationNB * _provider, char* level);

@@ -135,8 +135,14 @@ namespace pearlrt {
    }
 
 
+
    bool StdIn::isDefined() {
       return (_isDefined);
+   }
+
+
+   void StdIn::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
    }
 
 }

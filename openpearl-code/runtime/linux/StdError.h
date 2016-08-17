@@ -173,9 +173,16 @@ namespace pearlrt {
       */
       void dationUnGetChar(const char c);
 
-     /** check if at least one dation of the given type is defined 
-     */
-//     static bool isDefined(const int streamNumber);
+
+      /**
+      translate newline
+  
+      this is empty since linux uses \n for newline
+      
+      \param doNewLineTranslation enbale/disable the translation
+             (has no effect)
+      */
+      void translateNewLine(bool doNewLineTranslation);
 
    };
 }
