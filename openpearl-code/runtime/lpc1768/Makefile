@@ -78,7 +78,7 @@ CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.ca \
 	Hy32.h Hy32LowLevel.h
 # ------- add board specific stuff to project
 BOARDSUPPORT := 
-BOARDSUPPORT += lpc17_uart_retarget.c
+#BOARDSUPPORT += lpc17_uart_retarget.c
 BOARDSUPPORT += lpc17_oscillators.c
 BOARDSUPPORT += lpc17_SystemInit.c
 BOARDSUPPORT += Lpc17xxRTC.cc

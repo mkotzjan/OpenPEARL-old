@@ -77,7 +77,7 @@ public:
    during system startup, retarget uses the polling mode.
    The invocation of this method switches to interrupt mode.
    */
-   static void useInterrupts();
+   static void useInterrupts(bool use=true);
 };
 }
 
