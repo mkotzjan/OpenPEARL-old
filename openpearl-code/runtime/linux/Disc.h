@@ -170,7 +170,18 @@ namespace pearlrt {
          \throws * depends an the implementation of the SystemDationNB device
          */
          void dationUnGetChar(const char c);
+
+      /**
+      translate newline
+  
+      this is empty since linux uses \n for newline
+      
+      \param doNewLineTranslation enbale/disable the translation
+             (has no effect)
+      */
+      void translateNewLine(bool doNewLineTranslation);
       };
+
    private:
       /**
       mutex for  class data
@@ -295,6 +306,17 @@ namespace pearlrt {
       \throws * depends an the implementation of the SystemDationNB device
       */
       void dationUnGetChar(const char c);
+
+      /**
+      translate newline
+  
+      this is empty since linux uses \n for newline
+      
+      \param doNewLineTranslation enbale/disable the translation
+             (has no effect)
+      */
+      void translateNewLine(bool doNewLineTranslation);
+
    };
 }
 #endif

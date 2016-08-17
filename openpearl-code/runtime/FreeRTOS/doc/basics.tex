@@ -16,7 +16,7 @@ The FreeRTOS system has the following disadvantages:
 \item ... and more ?? ... 
 \end{enumerate}
 
-Item 1 is trated by a modification of FreeRTOS with static TCB and stack
+Item 1 is treated by a modification of FreeRTOS with static TCB and stack
 and an user supplied heap manager, with implements a pool allocation pattern.
 
 \section{System Architecture}
@@ -91,7 +91,55 @@ This service task is used by the
 \item[interrupt devices] to trigger the internal treatment
 \end{description}
 
+\section{System Console}
+Each plattform needs a system console for emergency error logging.
+The retarget mechanismn of the glibc needs access to stdin and stdout
+to realize printf and scanf. These functions are nice to use during 
+system debugging.
+An uart is the first choice for this purpose. It is desired to multiplex
+the system console with a normal dation. 
+
+The  architecture consists a GenericUart class, which defines the low 
+level interface 
+of a concrete uart (e.q. Lpc17xxUartInternal). This class is
+realized as singleton to make shure that only 1 instance for a 
+concrete uart is instantiated.
+The GenericUart class performs the multiplexing of retargeting,
+user dation and actions for the xon/xoff-protocol.
+
+The GenericUartDation class defines the additional interface of a
+SystemDationNB call, which realizes a serial system dation. 
+
+The interface for the retarget job is realized in the Retarget class.
+This class implements the basic C functions  \verb|_read| and \verb|_write|,
+which delegates to a plattform specific class SystemConsole, which
+is a singleton. 
+The implementation of \verb|_read| and \verb|_write| starts in polling mode
+and is switch over to interrupt mode, when FreeRTOS is started.
+
+The class SystemConsole contains just the singleton and instantiates 
+the system consol uart with plattform specific parameters.
+
+The concrete SystemDationNB class for the uart with a system console
+must use the low level implementation  of the uart. It must implement
+the interfaces from SystemDationNB and GenericUartDation. 
+
+\paragraph{Summary:}\ \\
+GenericUart, GenericUartDation and Retarget are common to all micro
+ controllers.
+
+The plattform specific classes are very small:
+
+\begin{itemize}
+\item SystemDation
+\item the low level uart interface
+\item the complete uart interface
+\end{itemize}
+
+By this architecture the port to other controllers should be very simple.
+
 \section{Time Base}
+
 The presence of a real time clock (RTC) is not guaranteed on a
 microprocessor system.
 This is no big problem for most PEARL applications, since they works 

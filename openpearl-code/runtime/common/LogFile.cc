@@ -102,4 +102,10 @@ printf("LogFile: delegate write to %p\n", provider);
       throw theInternalDationSignal;
    }
 
+
+   void LogFile::translateNewLine(bool doNewLineTranslation) {
+      // just delegate
+      provider->translateNewLine(doNewLineTranslation);
+   }
+
 }

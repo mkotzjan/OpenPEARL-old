@@ -403,6 +403,10 @@ namespace pearlrt {
    void Pipe::dationUnGetChar(const char x) {
    }
 
+   void Pipe::Pipe::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
+   }
+
    void Pipe::PipeFile::dationRead(void * destination, size_t size) {
       int ret;
 //   allow read after write does not apply at pipes; they are unidirectional
@@ -443,5 +447,9 @@ namespace pearlrt {
 
    void Pipe::PipeFile::dationUnGetChar(const char x) {
       ungetc(x, fp);
+   }
+
+   void Pipe::PipeFile::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
    }
 }

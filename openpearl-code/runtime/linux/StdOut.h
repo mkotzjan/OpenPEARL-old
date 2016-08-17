@@ -179,6 +179,16 @@ namespace pearlrt {
      */
 //     static bool isDefined(const int streamNumber);
 
+      /**
+      translate newline
+  
+      this is empty since linux uses \n for newline
+      
+      \param doNewLineTranslation enbale/disable the translation
+             (has no effect)
+      */
+      void translateNewLine(bool doNewLineTranslation);
+
    };
 }
 #endif

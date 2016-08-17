@@ -145,6 +145,13 @@ public:
       */
       void dationUnGetChar(const char c);
 
+      /**
+      translate newline
+  
+      \param doNewLineTranslation enbale/disable the translation
+      */
+      void translateNewLine(bool doNewLineTranslation);
+
 };
 }
 #endif
