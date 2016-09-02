@@ -1,7 +1,10 @@
-\begin{added}
+\begin{discuss}
+reduktionstregel noch mal scharf anschauen
+
+
 \htgt{Association} ::=\\
 \x  [ Association ]  -\ -\ - \\
 \x        \{ \hlink{Identifier}$\S $UsernameOfConnectionProvider \\
 \x \x   $\mid$ \hlink{Identifier}$\S $ConnectionProviderSystemName
          [ ( \hlink{ListOfConstants}) ] \} ;\\
-\end{added}
+\end{discuss}

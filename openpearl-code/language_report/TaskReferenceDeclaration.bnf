@@ -1,0 +1,5 @@
+\htgt{TaskReferenceDeclaration} ::= \\
+\x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{OneIdentifierOrList}
+	 [ \hlink{DimensionAttribute} ] [ {\bf INV} ]\\
+\x {\bf REF TASK} [ \hlink{GlobalAttribute} ] [ \hlink{InitialisationAttribute} ] ;
+

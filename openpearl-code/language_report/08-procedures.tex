@@ -13,7 +13,7 @@ part instead of it, in PEARL this program part is declared and called
 as a procedure. Otherwise --- namely, if the statements following the
 call are to be executed simultaneously with the called program part ---
 the program part is declared and started as task. Tasks are treated in
-Chapter 9, Parallel Activities.
+chapter \ref{sec_parallel_activities}, Parallel Activities.
 
 Procedures returning a result to their call position are called function
 procedures, all other ones are called subprogram procedures.
@@ -76,13 +76,17 @@ Since the variable Occ\_Plan is declared at module level, it can be used
 and, if needed, changed by all procedures and tasks of the module.
 
 \section{Declaration and Specification of Procedures (PROC)}  % 8.1
+\label{sec_proc_dcl}
 
 The statement sequence to be executed when calling a procedure is
 prescribed in a procedure declaration, defining a procedure identifier.
 The statements of the procedure can use data
 \begin{itemize}
-\item which are declared at module level or in a higher level relativ to the procedure
-(see 4.1),
+\item which are declared at module level
+%%%\begin{removed}
+%%% or in a higher level relativ to the procedure
+%%%\end{removed}
+(see \ref{sec_modules}),
 \item which are specified as formal parameters, i.e., as representatives
 for those expressions or variables, which, upon calling, are passed
 to the procedure as actual parameters, or
@@ -92,80 +96,43 @@ to the procedure as actual parameters, or
 The local declarations and the statements of the procedure form the
 procedure body.
 
-\begin{front}
-ProcedureDeclaration ::= \\
-\x Identifier: \{ {\bf PROCEDURE $\mid$ PROC} \} [ ListOfFormalParameters ]\\
-\x [ ResultAttribute ]\\
-\x [ GlobalAttribute ] ;\\
-\x ProcedureBody\\
-\x {\bf END};
-
-ProcedureBody ::= \\
-\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
-
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%ProcedureDeclaration ::= \\
+%%%\x Identifier: \{ {\bf PROCEDURE $\mid$ PROC} \} [ ListOfFormalParameters ]\\
+%%%\x [ ResultAttribute ]\\
+%%%\x [ GlobalAttribute ] ;\\
+%%%\x ProcedureBody\\
+%%%\x {\bf END};
+%%%
+%%%ProcedureBody ::= \\
+%%%\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
+%%%\end{front}
 \input{ProcedureDeclaration.bnf}
 \input{ProcedureBody.bnf}
-\end{grammar}
-
 \input{ListOfFormalParameters.bnf}
 
-\begin{front}
-FormalParameter ::=\\
-\x Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ AssignmentProtection ]\\
-\x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%FormalParameter ::=\\
+%%%\x Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ AssignmentProtection ]\\
+%%%\x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
+%%%\end{front}
 \input{FormalParameter.bnf}
-\end{grammar}
 
 \input{VirtualDimensionList.bnf}
-
-\begin{front}
-
-ParameterType ::= \\
-\x SimpleType $\mid$ TypeReference $\mid$ TypeStructure\\
-\x $\mid$ Identifier\S ForType $\mid$ TypeDation $\mid$ TypeRealTimeObject
-\end{front}
-\begin{grammar}
 \input{ParameterType.bnf}
-\end{grammar}
-
 \input{ResultAttribute.bnf}
 
-\begin{front}
-TypeRealTimeObject ::=\\
-\x {\bf SEMA $\mid$ BOLT $\mid$ IRPT $\mid$ INTERRUPT $\mid$ SIGNAL}
-
-ResultType ::= \\
-\x SimpleType $\mid$ TypeReference $\mid$ TypeStructure $\mid$ Identifier\S ForType
-\end{front}
-\begin{grammar}
 \input{TypeRealTimeObject.bnf}
 \input{ResultType.bnf}
-\end{grammar}
 
 The general form of the specification of a procedure reads as follows:
 
-\begin{front}
-ProcedureSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\S Procedure \{ {\bf ENTRY $\mid$ [ : ] PROC} \} \\
-\x [ ListOfParametersFor-SPC ] [ResultAttribute ] GlobalAttribute ;
+\input{ProcedureSpecification.bnf}
+\input{ListOfParametersForSPC.bnf}
+\input{ParameterSpecification.bnf}
 
-ListOfParametersFor-SPC ::=\\
-\x (ParameterSpecification [ , ParameterSpecification ]$^{...}$)
-
-ParameterSpecification ::=\\
-\x [ Identifier ] [ VirtualDimensionList ] [ AssignmentProtection ] \\
-\x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
-
-In the procedure specification, the (optionally) definable list of
-parameters is only of documentary importance; however, it is thus
+In the procedure specification, the (optionally) definable identifiers of
+parameters are only of documentary importance; however, it is thus
 possible to copy the head of a procedure declaration into another module
 and to generate a correct specification of the procedure by adding the
 keyword SPECIFY.
@@ -192,17 +159,23 @@ Execution of a subprogram procedure is terminated by
 \end{itemize}
 
 The procedure body can contain declarations, e.g., declarations of local
-variables which are only known within the procedure body. However,
-further procedures, so-called nested procedures, may also be declared; the
-occurring aspects of unambiguity of names, also occurring when declaring
-procedures in task bodies, are described in 4.3 within the context of
-blocks.
+variables which are only known within the procedure body. 
+%%%\begin{removed}
+%%%However,
+%%%further procedures, so-called nested procedures, may also be declared; the
+%%%occurring aspects of unambiguity of names, also occurring when declaring
+%%%procedures in task bodies, are described in \ref{sec_block} within the context of
+%%%blocks.
+%%%\end{removed}
+%%%\begin{added}
+Procedures may only be declared at module level.
+%%%\end{added}
 
 Due to the call, variables or expressions are associated with the
 specified formal parameters of the procedure as actual parameters. How
 this association takes place (two possibilities), is determined by the
 fact whether the attribute IDENTICAL is given or not. Both ways are
-explained in 8.2, Call of Procedures.
+explained in chapter \ref{sec_call}, Call of Procedures.
 
 The number n of commas in the virtual dimension list indicates that the
 parameter is an (n+1) dimensional array. Formal array parameters
@@ -214,7 +187,7 @@ FIXED IDENTICAL''.
 
 Procedures declared at module level, are translated by the compiler with
 the {\em re-entrancy} capability, so that they can be used
-simultaneously by several tasks (see 9). The recursive call of
+simultaneously by several tasks (see \ref{sec_parallel_activities}). The recursive call of
 procedures is allowed for all --- even for nested --- procedures.
 However, since for each task only limited memory space for the local
 data of the called procedures (stack) is provided, the programmer
@@ -222,17 +195,13 @@ should avoid (or suitably restrict) recursion in the sense of safe
 programs.
 
 \section{Calls of Procedures (CALL)}   % 8.2
+\label{sec_call}
 
 Subprogram procedures are called with the help of the keyword CALL or
 only with their identifiers:
 
-\begin{front}
-CallStatement ::=\\
-\x [ {\bf CALL} ] Name\S SubprogramProcedure [ ListOfActualParameters ] ;
-\end{front}
-\begin{grammar}
+ 
 \input{ProcedureCall.bnf}
-\end{grammar}
 
 \input{ListOfActualParameters.bnf}
 
@@ -253,13 +222,8 @@ The call of a function procedure does not take place as an independent
 statement, but within expressions upon stating the identifier and the
 actual parameters:
 
-\begin{front}
-FunctionCall ::= \\
-\x Name\S FunctionProcedure [ ListOfActualParameters ]
-\end{front}
-\begin{grammar}
 \input{FunctionCall.bnf}
-\end{grammar}
+
 Example:
 
 The function procedure Ari shall calculate the arithmetic average of an
@@ -287,7 +251,10 @@ Ari: {\bf PROC} (Array() {\bf FLOAT IDENTICAL}) {\bf RETURNS} ({\bf FLOAT});\\
 
 When evaluating a function call, the given actual parameters are
 associated with the formal parameters of the indicated function
-procedure in the order of writing down them; then the procedure body is
+procedure 
+%%%in the order of writing down them;
+from left to right;
+ then the procedure body is
 executed. Subsequently, the evaluation of the expression where the
 function call took place is continued --- in the above example the
 evaluation of the expression 'Arith.Average' in the put statement.
@@ -346,7 +313,7 @@ After the call of P1 in P2 i (still) has the value 2, but a(i) has the
 value 5.0.
 
 As the language form of the procedure declaration already shows (see
-8.1), the values of the actual parameters may be of type
+\ref{sec_proc_dcl}), the values of the actual parameters may be of type
 \begin{itemize}
 \item Integer or FloatingPointNumber, or
 \item BitString or CharacterString, or
@@ -362,6 +329,7 @@ Such objects may only be passed to a procedure via identification, i.e.,
 the formal parameter may only be defined with the IDENTICAL attribute.
 
 \section{References to Procedures (REF PROC)}  % 8.3
+\label{sec_ref_proc}
 
 The opportunity to use procedure reference variables is a first step
 towards object oriented programming. With the help of it, e.g., data
@@ -371,42 +339,20 @@ these structures can be combined into new, abstract data structures.
 A declaration of reference variables for procedures contains the
 description of all parameter types, as well as the type of the result.
 
-\begin{front}
-ProcedureReferenceDeclaration ::= \\
-\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ] [ {\bf INV} ]\\
-\x {\bf REF} TypeProcedure [ GlobalAttribute ] [ InitialisationAttribute ] ;
-
-TypeProcedure ::=\\
-\x {\bf PROC} [ ListOfParametersFor-SPC ] [ ResultAttribute ]
-\end{front}
-\begin{grammar}
+\input{ProcedureReferenceDeclaration.bnf}
 \input{TypeProcedure.bnf} 
-\end{grammar}
 
 The general form of the specification of procedure reference variables
 reads:
 
-\begin{front}
-ProcedureReferenceSpecification ::= \\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ {\bf INV} ]\\
-\x {\bf REF} TypeProcedure GlobalAttribute;
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+\input{ProcedureReferenceSpecification.bnf} 
 
 The value assignment to a procedure reference variable takes place with
 the assignment:
 
-\begin{front}
-Assignment ::=\\
-\x Name\S RefProcVariable \{ := $\mid$ = \} Identifier\S Procedure;
-\end{front}
-\begin{grammar}
-\input{Assignment.bnf}
-\end{grammar}
+\input{RefProcAssignment.bnf}
 
-Only procedures declared at module level may be assigned here.
+%%%Only procedures declared at module level may be assigned here.
 
 The required matching of types means in this case, that the number of
 parameters, all parameter types and also the type of the result
@@ -433,7 +379,7 @@ Examples:
 
       {\bf DCL}(A, B) {\bf CLOCK};\\
       FuncPointer := time;\\
-      A := FuncPointer;\\
-      B := {\bf CONT} FuncPointer;
+      A := FuncPointer; ~~~~~~~~~~~ ! both statements\\
+      B := {\bf CONT} FuncPointer;~ ! invoke the same function
 \end{enumerate}
 

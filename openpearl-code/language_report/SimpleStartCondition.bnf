@@ -1,0 +1,10 @@
+\begin{discuss}
+Name von Interrupt  -- wie darf ein Interrupt genutzt werden? --- ggf. Identifier
+
+\htgt{SimpleStartCondition} ::= \\
+\x {\bf AT} \hlink{Expression}$\S $Time $\mid$ 
+	{\bf AFTER} \hlink{Expression}$\S $Duration $\mid$
+	 {\bf WHEN} \hlink{Name}$\S $Interrupt
+
+\end{discuss}
+

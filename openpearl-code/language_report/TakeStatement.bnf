@@ -1,4 +1,4 @@
 \htgt{TakeStatement} ::=\\
-\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} \hlink{RST-Format} ] ;\\
+\x {\bf TAKE} [ \hlink{Name}$\S $Variable ] {\bf FROM} \hlink{Name}$\S $Dation\\
+\x [ {\bf BY} \hlink{RSTFormat} ] ;\\
 

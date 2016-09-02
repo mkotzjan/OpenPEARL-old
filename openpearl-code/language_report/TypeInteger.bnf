@@ -1,0 +1,3 @@
+\htgt{TypeInteger} ::=\\
+\x {\bf FIXED} [ (\hlink{Precision}) ]
+

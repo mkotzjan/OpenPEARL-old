@@ -1,6 +1,7 @@
 \htgt{StringSelection} ::=\\
-\x \hlink{Name}$\S $String . \{ {\bf BIT $\mid$ CHAR $\mid$ CHARACTER} \}\\ 
-\x ( \{ \hlink{Constant-FIXED-Expression} [ : \hlink{Constant-FIXED-Expression} ]\\
-\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} + \hlink{Constant-FIXED-Expression} ]\\
-\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} ] \} )\\
+\x \hlink{Name}$\S $String . \{ {\bf BIT $\mid$ CHAR $\mid$ CHARACTER} \}\\
+%%%\x ( \{ \hlink{Constant-FIXED-Expression} [ : \hlink{Constant-FIXED-Expression} ]\\
+%%%\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} + \hlink{Constant-FIXED-Expression} ]\\
+%%%\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} ] \} )\\
+\x \x (\hlink{Expression}\S Start [ : \hlink{Expression}\S End ] )
 

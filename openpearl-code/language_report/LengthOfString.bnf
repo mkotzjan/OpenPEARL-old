@@ -1,0 +1,3 @@
+\htgt{LengthOfString} ::=\\
+\x \hlink{IntegerWithoutPrecision}\S GreaterZero
+

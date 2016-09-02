@@ -1,0 +1,3 @@
+\htgt{BitFormat} ::=\\
+\x \{ {\bf B $\mid$ B1 $\mid$ B2 $\mid$ B3 $\mid$ B4} \} [ ( \hlink{Expression}$\S $NumberCharacters) ]
+

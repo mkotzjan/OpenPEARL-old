@@ -1,0 +1,5 @@
+\htgt{TypeDationSystem} ::=\\
+\x {\bf DATION} \hlink{SourceSinkAttribute} {\bf SYSTEM}
+  \hlink{ClassAttribute}\\
+\x [ \hlink{Typology} ] [ \hlink{AccessAttribute} ]\\
+

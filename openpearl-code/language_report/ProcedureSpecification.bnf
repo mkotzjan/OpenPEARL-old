@@ -1,0 +1,7 @@
+\htgt{ProcedureSpecification} ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{Identifier}\S Procedure 
+%%%\{ {\bf ENTRY $\mid$ [ : ] PROC} \} \\
+\{ {\bf PROC $\mid$  PROCEDURE} \} \\
+\x [ \hlink{ListOfParametersForSPC} ] [\hlink{ResultAttribute} ] 
+   \hlink{GlobalAttribute} ;
+

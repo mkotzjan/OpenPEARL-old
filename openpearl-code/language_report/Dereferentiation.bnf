@@ -1,2 +1,3 @@
 \htgt{Dereferentiation} ::=\\
-\x {\bf CONT} \{ \hlink{Name}$\S $Reference $\mid$ \hlink{FunctionCall} \}\\
+\x {\bf CONT} \{ \hlink{Name}$\S $Reference $\mid$ \hlink{FunctionCall} \}
+

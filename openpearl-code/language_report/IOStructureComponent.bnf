@@ -1,0 +1,8 @@
+\begin{discuss}
+IdentifierDenotaiopn sollte wohl OneIndentifierOrList sein, oder?
+
+\htgt{IOStructureComponent} := \\
+\x \hlink{IdentifierDenotation}\\
+\x \{ \hlink{SimpleType} $\mid$ \hlink{IOStructure} $\mid$ \hlink{Identifier}$\S $ForNewTypeFromSimpleTypes \}
+
+\end{discuss}

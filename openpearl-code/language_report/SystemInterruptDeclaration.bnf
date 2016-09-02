@@ -1,0 +1,4 @@
+\htgt{SystemInterruptDeclaration} ::=\\
+\x \hlink{Identifier}$\S $InterruptSystemName
+		 [ ( \hlink{ListOfConstants} ) ];\\
+

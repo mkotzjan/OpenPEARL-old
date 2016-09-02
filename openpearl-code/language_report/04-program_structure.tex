@@ -1,6 +1,7 @@
 \chapter{Program Structure}   % 4
 
 \section{Modules}  % 4.1
+\label{sec_modules}
 
 A PEARL program is constructed of one or several parts, so-called
 modules, which are translated independently. Each module consists of a
@@ -8,29 +9,26 @@ system part and/or a problem part.
 
 The general form of a PEARL program reads as follows:
 
-\begin{front}
-PEARL program ::=\\
-\x Module $^{...}$
-\end{front}
+%%%\begin{front}
+%%%PEARL program ::=\\
+%%%\x Module $^{...}$
+%%%\end{front}
 
-\begin{grammar}
-\input{PEARL-Program.bnf}
-\end{grammar}
+\input{Program.bnf}
 
-\begin{front}
-Module ::=\\
-\x {\bf MODULE} [ (Identifier\S  OfTheModule) ];\\
-\x \x \{ SystemPart [ ProblemPart ] \} $\mid$ ProblemPart\\
-\x {\bf MODEND};
+%%%\begin{front}
+%%%Module ::=\\
+%%%\x {\bf MODULE} [ (Identifier\S  OfTheModule) ];\\
+%%%\x \x \{ SystemPart [ ProblemPart ] \} $\mid$ ProblemPart\\
+%%%\x {\bf MODEND};
 
-SystemPart ::=\\
-\x {\bf SYSTEM}; [ UserNameDeclaration $^{...}$ ]
-\end{front}
-
-\begin{grammar}
 \input{Module.bnf}
+
+%%%SystemPart ::=\\
+%%%\x {\bf SYSTEM}; [ UserNameDeclaration $^{...}$ ]
+%%%\end{front}
+
 \input{SystemPart.bnf}
-\end{grammar}
 
 \input{ProblemPart.bnf}
 
@@ -99,6 +97,7 @@ respective task or procedure and can only be used or, if needed,
 changed there.
 
 \section{Declarations and Specifications} %  4.2
+\label{sec_dcl_and_spc}
 
 Objects are introduced by {\it declaration} or {\it specification}.
 
@@ -114,7 +113,7 @@ only once. If an identifier X is declared as object both at module level
 and in a procedure or task, two objects are introduced: In the
 respective procedure or task, identifier X refers to the object
 (locally) declared there, outside the procedure or task it refers to the
-object declared at module level (cf. section 4.3, Block Structure).
+object declared at module level (cf. section \ref{sec_block}, Block Structure).
 
 Example:
 
@@ -180,7 +179,8 @@ type                   & x            & x    & x         & x \\
 
 With a specification, an already declared object is
 referred to.  This is meaningful for objects which are declared in a
-module, and which shall be used in other modules (cf. 4.4, References
+module, and which shall be used in other modules (cf. \ref{sec_references},
+ References
 between Modules), but also for introducing additional names for already
 declared objects in general.
 \newpage
@@ -200,21 +200,19 @@ in a different way: Object x shall be {\it identified} with name xx:
 
 In general, the form of identification reads as follows:
 
-\begin{front}
-Identification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier [ AllocationProtection ] Type IdentificationAttribute ;
+%%%\begin{front}
+%%%Identification ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier [ AllocationProtection ] Type IdentificationAttribute ;
 
-IdentificationAttribute ::=\\
-\x {\bf IDENT} (Name\S  Object)
-\end{front}
-\begin{grammar}
-Missing in grammar
-\end{grammar}
+\input{Identification.bnf}
+
+\input{IdentificationAttribute.bnf}
 
 The given type has to correspond to the type of the named object. More
 details are defined when presenting the various objects.
 
 \section{Block Structure, Validity of Objects}   % 4.3
+\label{sec_block}
 
 Blocks are used to structure task or procedure bodies and to influence
 the scope and the life-span of PEARL objects. A block is a summary of
@@ -245,35 +243,36 @@ evaluation of its declaration and the execution of the end of the block
 takes place.
 
 % Klammern einfuegen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-\begin{discuss}
-Das Systemgeraet PRINTER macht heutzutage wohl keinen Sinn mehr.
-Was soll damit dann passieren? Wie sollte so etwas in Linux aussehen?
-Wie soll so etwas bei Linux gehen? Drcukjob bei Programmende - aber das 
-endet ja nicht unbedingt ...
-\end{discuss}
-
-{\bf MODULE};\\
-\x {\bf SYSTEM};\\
-\x \x printer: STDPRINT;\\
-\x {\bf PROBLEM};\\
-\x \x {\bf SPC} printer {\bf DATION} ... ;\\
-\x \x T: {\bf TASK};\\
-\x \x \x {\bf DCL} a {\bf FIXED};\\
-\x \x \x {\bf BEGIN}\\
-\x \x \x \x ...\\
-\x \x \x \x {\bf DCL} x {\bf FLOAT};\\
-\x \x \x \x ...\\
-\x \x \x {\bf END};\\
-\x \x \x ...\\
-\x \x \x {\bf END}; ! T\\
-\x \x ...\\
-{\bf MODEND};
+%%%\begin{discuss}
+%%%Das Systemgeraet PRINTER macht heutzutage wohl keinen Sinn mehr.
+%%%Was soll damit dann passieren? Wie sollte so etwas in Linux aussehen?
+%%%Wie soll so etwas bei Linux gehen? Drcukjob bei Programmende - aber das 
+%%%endet ja nicht unbedingt ...
+%%%\end{discuss}
+%%%
+%%%{\bf MODULE};\\
+%%%\x {\bf SYSTEM};\\
+%%%\x \x printer: STDPRINT;\\
+%%%\x {\bf PROBLEM};\\
+%%%\x \x {\bf SPC} printer {\bf DATION} ... ;\\
+%%%\x \x T: {\bf TASK};\\
+%%%\x \x \x {\bf DCL} a {\bf FIXED};\\
+%%%\x \x \x {\bf BEGIN}\\
+%%%\x \x \x \x ...\\
+%%%\x \x \x \x {\bf DCL} x {\bf FLOAT};\\
+%%%\x \x \x \x ...\\
+%%%\x \x \x {\bf END};\\
+%%%\x \x \x ...\\
+%%%\x \x \x {\bf END}; ! T\\
+%%%\x \x ...\\
+%%%{\bf MODEND};
 
 The scope of an object are all parts of the program where the object can
 be used. The following rules are to be obeyed:
 \begin{itemize}
 \item An object declared at module level is usable at the module level
-and in all tasks and procedures of this module (however, see 4.4), even
+and in all tasks and procedures of this module (however, see 
+\ref{sec_references}), even
 in all encapsulated procedures, blocks and repetitions with the
 following exception: The scope range is restricted, if in one of the
 tasks or procedures another object is declared under the same name.
@@ -320,6 +319,7 @@ blocks can be left deliberately with the help of the exit statement
 (cf. 7.5).
 
 \section{References between Modules}  % 4.4
+\label{sec_references}
 
 If a PEARL program consists of several modules, it can be necessary to
 use objects declared in a module and occupying memory space there (data,
@@ -352,13 +352,7 @@ the same module, in all other modules it must be defined.
 
 The general form of the global attribute reads:
 
-\begin{front}
-GlobalAttribute ::=\\
-\x {\bf GLOBAL} [ (Identifier\S OfaModule) ]
-\end{front}
-\begin{grammar}
 \input{GlobalAttribute.bnf}
-\end{grammar}
 
 When specifying an object, all attributes have to be taken over from its
 declaration, except for a given priority, precision or length. In the
@@ -392,19 +386,16 @@ The different forms of specifying global objects are defined when
 presenting the objects.
 
 \section{Execution of a Program}   % 4.5
+\label{sec_program_execution}
 
 After the loading of a PEARL program, the PEARL run time system
 automatically starts all tasks marked by the attribute MAIN according
 to their priority.  
-All tasks provided with MAIN have to be declared in
-the same module.
-\begin{discuss}
-streichen? 
-All tasks provided with MAIN have to be declared in
-the same module.
-
-Ist bei Kompatibilitaetspruefung auch pruefbar, aber macht das Sinn?
-\end{discuss}
+%%%begin difference
+%%%All tasks provided with MAIN have to be declared in
+%%%the same module.
+OpenPEARL supports tasks with attribute MAIN in multiple modules.
+%%%end difference
 
 Example:
 

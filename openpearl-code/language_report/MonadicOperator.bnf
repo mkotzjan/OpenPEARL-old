@@ -1,3 +1,5 @@
 \htgt{MonadicOperator} ::=\\
-\x + $\mid$ - $\mid$ \hlink{Identifier}$\S $MonadicOperator\\
+\x + $\mid$ - {\bf $\mid$ NOT $\mid$ ABS $\mid$ SIGN $\mid$ LWB $\mid$ UPB $\mid$ SIZEOF $\mid$ CONT \\
+\x $\mid$ TOFIXED $\mid$ TOFLOAT $\mid$ TOBIT $\mid$ TOCHAR $\mid$ ENTIER $\mid$ ROUND} 
+%%%\x $\mid$ Identifier\S UserDefinedMonadicOperator
 

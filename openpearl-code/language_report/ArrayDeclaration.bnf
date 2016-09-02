@@ -1,0 +1,3 @@
+\htgt{ArrayDeclaration} ::=\\
+\x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{ArrayDenotation} [ , \hlink{ArrayDenotation} ] $^{...}$ ;
+

@@ -1,4 +1,4 @@
 \htgt{FunctionCall} ::=\\
-\x \hlink{Identifier}$\S $FunctionProcedure
+\x \hlink{Name}$\S $FunctionProcedure
 	 [ \hlink{ListOfActualParameters} ]\\
 

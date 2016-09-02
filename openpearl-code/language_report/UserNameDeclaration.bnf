@@ -1,16 +1,5 @@
-\begin{removed}
-UserNameDeclaration ::=\\
-\x Identifier$\S $UserName: Identifier$\S $SystemName [ ( nngz$\S $Index ) ]\\
-\x \x [ $^*$ nngz$\S $Channel [ $^*$ nngz$\S $Position [ , nngz$\S $Width ] ] ];\\
-\x $\mid$ Identifier$\S $UserName: Identifier$\S $SIGNAL-SystemName\\
-\x \x [ ( Identifier$\S $ErrorNumber [ , Identifier$\S $ErrorNumber ] $^{...}$ ) ] ;\\
-\end{removed}
-
-\begin{added}
 \htgt{UserNameDeclaration} ::=\\
-\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $DationSystemName [ ( \hlink{ListOfConstants} ) ] [\hlink{Association}] ;\\
-\x $\mid$ \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $SignalSystemName;\\
-\x $\mid$ \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $InterruptSystemName
-		 [ ( \hlink{ListOfConstants} ) ];\\
+\x \{ \hlink{SystemDationDeclaration}
+ $\mid$ \hlink{SystemSignalDeclaration} 
+ $\mid$ \hlink{SystemInterruptDeclaration} \} \\
 
-\end{added}

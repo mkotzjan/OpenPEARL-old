@@ -1,0 +1,3 @@
+\htgt{ArraySpecification} ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{ArrayDenotationS} [ , \hlink{ArrayDenotationS} ] $^{...}$;
+

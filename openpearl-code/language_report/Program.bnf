@@ -1,2 +1,2 @@
-PEARL-Program ::=\\
+Program ::=\\
 \x \hlink{Module} $^{...}$\\

@@ -1,0 +1,3 @@
+\htgt{TimeFormat} ::= \\
+\x {\bf T} ( \hlink{FieldWidth} [ , \hlink{DecimalPositions} ] )
+

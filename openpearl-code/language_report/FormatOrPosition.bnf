@@ -1,4 +1,9 @@
+\begin{discuss}
+ist das korrekt? welche Formate gehen??
+
 \htgt{FormatOrPosition} ::=\\
 \x [ \hlink{FormatFactor} ] \{ \hlink{Format} $\mid$ \hlink{Position} \}\\
 \x $\mid$ \hlink{FormatFactor} ( \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ )\\
-      
+     
+\end{discuss}
+ 

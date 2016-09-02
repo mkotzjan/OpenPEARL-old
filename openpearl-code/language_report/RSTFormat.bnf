@@ -1,3 +1,3 @@
-\htgt{RST-Format} ::=\\
+\htgt{RSTFormat} ::=\\
 \x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
 

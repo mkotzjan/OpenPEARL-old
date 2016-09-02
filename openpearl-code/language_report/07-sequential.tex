@@ -17,12 +17,17 @@ Such control statements are
 \item the exit statement
 \end{itemize}
 
-\begin{grammar}
 \input{SequentialControlStatement.bnf}
-\end{grammar}
-\begin{discuss}
-emptyStatement is missing
-\end{discuss}
+
+%%%\begin{added}
+\section{Empty Statement}
+The empty statement  consists of one semicolon only and has no effects.
+
+The general form of the empty statement reads:
+
+\input{EmptyStatement.bnf}
+
+%%%\end{added}
 
 \section{Conditional Statement (IF)}   % 7.1
 
@@ -30,13 +35,7 @@ With the help of the conditional statement, it is determined depending
 on the result of an expression with which statement the program
 execution is to continued.
 
-\begin{front}
-ConditionalStatement ::=\\
-\x {\bf IF} Expression {\bf THEN} Statement$^{...}$ {\bf [ ELSE} Statement$^{...}$ {\bf ] FIN};
-\end{front}
-\begin{grammar}
 \input{IfStatement.bnf}
-\end{grammar}
 The result of the expression must be of type BIT(1). If the expression
 provides value '1'B (true), the statements following THEN are evaluated;
 otherwise the statements following ELSE are evaluated.
@@ -55,7 +54,7 @@ Example:
 {\bf FIN};\\
 ...
 
-\section{Statement Selection (CASE) and Empty Statement}  % 7.2
+\section{Statement Selection (CASE)}  % 7.2
 
 Let us assume that a (function) procedure control shall be used for
 controlling several devices of the same kind, after each call returning
@@ -74,24 +73,15 @@ provided in two (historically caused) forms is suitable: The older form
 allows only integers as distinction criteria; the newer one permits also
 characters. At first, the older form is described:
 
-\begin{front}
-StatementSelection1 ::=\\
-\x {\bf CASE} Expression\\
-\x \x \{ {\bf ALT} Statement$^{...} \}^{...}$\\
-\x \x [ {\bf OUT} Statement$^{...}$ ]\\
-\x {\bf FIN};
-\end{front}
-\begin{grammar}
 \input{CaseStatement.bnf}
 \input{CaseStatement1.bnf}
-\end{grammar}
 
 The number 1 is assigned to the statement sequence following the first
 ALT (alternative 1), the number 2 to the statement sequence following
 the second ALT (alternative 2), etc.
 
-Upon execution of the statement selection, the given expression is
-evaluated; it must result in a value of type FIXED. If the integer value
+Upon execution of the case statement, the given expression is
+evaluated; it must result in a value of type {\bf FIXED}. If the integer value
 is between 1 and the number of given alternatives, the associated
 statement sequence is executed; otherwise the statement sequence
 following OUT (if given) is executed.
@@ -135,8 +125,9 @@ again:   \> {\bf CASE} \> control (no, order) \> \\
 end:     \> {\bf END}; \> ! supply \>
 \end{tabbing}
 
-In this example, the empty statement is used. It consists of one
-semicolon only and has no effects. The keyword ALT must be followed by
+%%%In this example, the empty statement is used. It consists of one
+%%%semicolon only and has no effects.
+The keyword ALT must be followed by
 one statement at least; this may also be an empty statement. It has no
 effects and is only of interest in conditional statements and statement
 selections.
@@ -145,36 +136,22 @@ In the example, the empty statement results in the immediate execution
 of the statement following FIN in the case of success (``request carried
 out'').
 
-The general form of the empty statement reads:
-
-\input{EmptyStatement.bnf}
 
 The second form of the statement selection has the following form:
 
-\begin{front}
-StatementSelection2 ::= \\
-\x {\bf CASE} CaseIndex\\
-\x \{ {\bf ALT} (CaseList) Statement$^{...} \}^{...}$ \\
-\x [ {\bf OUT} Statement$^{...}$ ] \\
-\x {\bf FIN};
-\end{front}
-\begin{grammar}
 \input{CaseStatement2.bnf}
-\end{grammar}
-
 \input{CaseIndex.bnf}
 
-\begin{front}
-CaseList ::= \\
-\x IndexRange [ , Index-Range ]$^{...}$
+%%%\begin{front}
+%%%CaseList ::= \\
+%%%\x IndexRange [ , Index-Range ]$^{...}$
+%%%
+%%%IndexRange ::= \\
+%%%\x Constant [ : Constant ]
+%%%\end{front}
 
-IndexRange ::= \\
-\x Constant [ : Constant ]
-\end{front}
-\begin{grammar}
 \input{CaseList.bnf}
-\input{IndexSection.bnf}
-\end{grammar}
+\input{IndexRange.bnf}
 
 All given constants must be of type CaseIndex expression; CHAR(1) or
 FIXED are allowed.
@@ -231,7 +208,7 @@ e.g., the following is not correct:
 
 The selection must be deterministic.
 
-Jumps into a statement selection are forbidden.
+Jumps into a case statement are forbidden (refer chapter \ref{sec_goto}).
 
 \section{Repetition (FOR -- REPEAT)}   % 7.3
 
@@ -246,25 +223,25 @@ num\_devices be the number of devices:
 
 In general, such ``program loops'' are constructed like this:
 
-\begin{front}
-repetition ::= \\
-\x [ {\bf FOR} Identifier\S ControlVariable ] \\
-\x [ {\bf FROM} Expression\S InitialValue ] \\
-\x [ {\bf BY} Expression\S Increment ] \\
-\x [ {\bf TO} Expression\S FinalValue ] \\
-\x [ {\bf WHILE} Expression\S Condition ] \\
-\x {\bf REPEAT} \\
-\x [ Declaration ]$^{...}$ [ Statement ]$^{...}$ \\
-\x {\bf END} [ Identifier\S Loop ] ;
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%repetition ::= \\
+%%%\x [ {\bf FOR} Identifier\S ControlVariable ] \\
+%%%\x [ {\bf FROM} Expression\S InitialValue ] \\
+%%%\x [ {\bf BY} Expression\S Increment ] \\
+%%%\x [ {\bf TO} Expression\S FinalValue ] \\
+%%%\x [ {\bf WHILE} Expression\S Condition ] \\
+%%%\x {\bf REPEAT} \\
+%%%\x [ Declaration ]$^{...}$ [ Statement ]$^{...}$ \\
+%%%\x {\bf END} [ Identifier\S Loop ] ;
+%%%\end{front}
+%%%\begin{grammar}
 \input{LoopStatement.bnf}
-\end{grammar}
+%%%\end{grammar}
 The declarations and statements following REPEAT, i.e., the loop body,
 are run so often as specified by the clauses given in front of them; the
 statement following END is carried out subsequently. However, it is also
-possible to leave the loop body prematurely by a jump statement or the
-exit statement (cf. 7.5). Jumps into the loop body are not permitted.
+possible to leave the loop body prematurely by a jump statement (cf. \ref{sec_goto})
+or the exit statement (cf. \ref{sec_exit}). Jumps into the loop body are not permitted.
 
 In the loop body, all statements are permitted; thus, particularly
 repetitions can be nested:
@@ -287,14 +264,14 @@ expression for the Condition must be of type BIT(1).
 The ControlVariable may not be used in the given expressions, except
 for Expression\S Condition, but in the statements to be repeated.
 
-Besides, all rules for blocks are valid for the loop body (cf. 4.4).
+Besides, all rules for blocks are valid for the loop body (cf. \ref{sec_block}).
 
-\begin{added}
+%%%\begin{added}
 The precision of the control variable is derived from the
 required precision defined by the initial and final expression if both are
 specifed.
 The default precision is 31.
-\end{added}
+%%%\end{added}
 
 The flow chart depicted in Figure~\ref{schleife} is an equivalent representation of the
 statement
@@ -308,14 +285,14 @@ statement
 \x LoopBody \\
 {\bf END};
 
-\begin{added}
+%%%\begin{added}
 Regard that the expression for the increment and the final
 value are calculated once. Modifications of these expressions
 in the loop body does not effect the loop behavior.
 
 The increment of the control variable does not cause
 a range exception.
-\end{added}
+%%%\end{added}
 
 \begin{figure}[htb]
 \centering
@@ -429,13 +406,17 @@ a range exception.
 \end{figure}
 
 \section{GoTo Statement (GOTO)}   % 7.4
+\label{sec_goto}
 
 \input{GoToStatement.bnf}
 
 This statement has the result that program processing is continued at
-the program position determined by the label identifier. This program
-position must be a statement and may not be outside the body of the
-task or procedure executing the GoTo statement.
+the program position determined by the label identifier.
+%%% This program
+%%%position must be a statement and may not be outside the body of the
+%%%task or procedure executing the GoTo statement.
+The label for a goto statement must be defined in the same block or in a outer block 
+in the same procedure or task.
 
 Example:
 
@@ -451,12 +432,9 @@ In general, statements can (several times) be marked with lables; i.e.,
 the label is given immediately before the (possibly already marked)
 statement, separated by a colon.
 
-\begin{added}
-The label for a {\bf GOTO} statement must be defined in the same block or in a superior block 
-in the same {\bf PROC} or {\bf TASK}.
-\end{added}
 
 \section{Exit Statement (EXIT)}    % 7.5
+\label{sec_exit}
 
 The exit statement serves to exit blocks and loops deliberately. With
 EXIT, also blocks and loops nested several times can be exited
@@ -473,7 +451,7 @@ If the identifier is given, program processing is continued with the
 statement following the end of the indicated block or loop, the exit
 statement being in an internal block or loop.
 
-The exit statement may not serve for exiting procedures or tasks.
+%%%The exit statement may not serve for exiting procedures or tasks.
 
 Example:
 

@@ -1,0 +1,13 @@
+\begin{discuss}
+CREATED(Identifier) oder CREATED(NAME) ; Name kann auch Feldelement sein.
+Felder von Systemteilnamen haben wir nicht mehr
+
+
+\htgt{DationDeclaration} ::= \\
+\x \{{\bf DECLARE $\mid$ DCL}\} \hlink{OneIdentifierOrList} 
+   \hlink{TypeDation} [\hlink{GlobalAttribute}]\\
+\x {\bf CREATED} (\hlink{Identifier}$\S $UserNameOfSystemDation);
+
+\end{discuss}
+
+

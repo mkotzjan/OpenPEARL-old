@@ -1,0 +1,3 @@
+\htgt{SystemSignalDeclaration} ::=\\
+\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $SignalSystemName;\\
+

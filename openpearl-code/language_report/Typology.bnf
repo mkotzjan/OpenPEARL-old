@@ -1,0 +1,15 @@
+\begin{discuss}
+TFU als E/A-Puffergroesse definieren?
+
+\htgt{Typology} ::=\\
+\x {\bf DIM} ( \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \}\\
+\x \x [ , \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \}\\
+\x \x \x [ , \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \} ] ] ) 
+\removedtext{[ {\bf TFU} [ {\bf MAX} ] ]}\\
+\x $\mid$ 
+	{\bf DIM} ( [ , [ , ] ] )
+	 $/^*$ Virtual dimension declaration 
+	only permitted for SPC $*/$\\
+
+\end{discuss}
+

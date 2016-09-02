@@ -1,0 +1,3 @@
+\htgt{ListOfParametersForSPC} ::=\\
+\x (\hlink{ParameterSpecification} [ , \hlink{ParameterSpecification} ]$^{...}$)
+

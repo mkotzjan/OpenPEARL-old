@@ -1,0 +1,5 @@
+\htgt{FixedFormat} ::=\\
+\x {\bf F} (\hlink{FieldWidth} [ , \hlink{DecimalPositions}
+	%%% \removedtext{[ , ScaleFactor ]}
+	 ] )
+

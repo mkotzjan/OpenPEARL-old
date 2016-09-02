@@ -1,0 +1,4 @@
+\htgt{FloatFormat} ::=\\
+\x {\bf E}[3] (\hlink{FieldWidth} [ , \hlink{DecimalPositions}
+	 [ , \hlink{Significance} ] ] )
+

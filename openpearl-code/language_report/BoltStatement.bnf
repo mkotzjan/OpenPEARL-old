@@ -1,0 +1,4 @@
+\htgt{BoltStatement} ::= \\
+\x \{ {\bf RESERVE} $\mid$ {\bf FREE} $\mid$ {\bf ENTER}  $\mid$ {\bf LEAVE} \}
+  \hlink{OneIdentifierOrList}\S Bolt {\bf ;}
+

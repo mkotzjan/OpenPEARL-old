@@ -1,6 +1,6 @@
 \htgt{CaseStatement1} ::=\\
 \x {\bf CASE} \hlink{Expression}$\S $WithIntegerAsValue\\
-\x \x \{ {\bf ALT} [ \hlink{Statement} $^{...}$ ] \} $^{...}$\\
-\x \x [ {\bf OUT} [ \hlink{Statement} $^{...}$ ] ]\\
+\x \x \{ {\bf ALT}  \hlink{Statement} $^{...}$  \} $^{...}$\\
+\x \x [ {\bf OUT}  \hlink{Statement} $^{...}$  ]\\
 \x {\bf FIN} ;\\
 

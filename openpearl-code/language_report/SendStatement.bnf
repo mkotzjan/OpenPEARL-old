@@ -1,4 +1,4 @@
 \htgt{SendStatement} ::=\\
 \x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} \hlink{RST-Format} ] ;\\
+\x [ {\bf BY} \hlink{RSTFormat} ] ;\\
 
