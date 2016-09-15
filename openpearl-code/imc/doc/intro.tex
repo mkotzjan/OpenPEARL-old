@@ -1,0 +1,41 @@
+\chapter{Introduction}
+A PEARL program consists of several separatly compilable modules.
+The interface between the modules is defined by SPC and DCL statements with the
+attribute GLOBAL.
+The declaration of plattform dependent elements like INTERRUPTs, 
+DATIONs and SIGNALs must be done in the SYSTEM-part.
+
+For proper operation the types of the specified and declared elements must
+fit. 
+For system elements, we need a mechanism to obtain the type in an
+extensible way. This is solved by the use of an interface definition as 
+xml-file for each system element.
+
+This tool checks all global definitions and specifications and checks for
+\begin{itemize}
+\item proper types, including the types of system elements
+\item multiple declarations
+\item missing declarations
+\item unused declarations
+\end{itemize}
+
+\section{Structure}
+As shown in \cite{mueller2016} the structure of operation of the \OpenPEARL{}
+compilation system is like:
+\input{structure_system_build.tex}
+
+The first stage compiler creates an C++-representation of the PEARL-module
+together with an xml-representation of the export and import interface.
+
+The definition of system names may be done by the user to order to supply 
+additional system devices.
+Each system name must be accompanied by the developer with a xml-representation
+of the system element. The imc tool extracts the required information
+from these xml-files and verifies a proper system configuration.
+
+\section{Credits}
+This tool  was influenced by the master thesis of 
+Stephan Hertig \cite{msc_hertwig} and the semester project of
+M.Bauer, T-Schaz, J.Weber, T.Welte and J.Wirth \cite{openpearlss16}.
+
+

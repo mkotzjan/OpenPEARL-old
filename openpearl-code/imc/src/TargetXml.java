@@ -1,0 +1,300 @@
+/*
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+/**
+ * read xml definition for target system resources and provide specific
+ * operations, like search for names as well as required and valid parameters
+ * 
+ * 
+ * @author mueller
+ * 
+ */
+
+public class TargetXml {
+	String indent = "";
+	Document targetXML;
+	boolean verbose;
+
+	/**
+	 * create an object for the query operations for the target plattform
+	 * elements, like SIGNAL, DATION and INTERRUPT
+	 * 
+	 * @param fileName
+	 *            plattform definition file name
+	 * @param verbose
+	 *            flag for verbose output; if true lot of messages are sent to
+	 *            System.out
+	 */
+	TargetXml(String fileName, boolean verbose) {
+		this.verbose = verbose;
+		ReadXml tgt = new ReadXml(fileName, verbose);
+
+		targetXML = tgt.getDocument(); // readXMLDocumentFromFile(fileName);
+		if (targetXML == null) {
+			System.err.println("error reading target definition file ("
+					+ fileName);
+			System.exit(1);
+			return;
+		}
+
+		if (verbose) {
+			tgt.dumpDomTree();
+		}
+	}
+
+	/**
+	 * check if a system signal name exists
+	 * 
+	 * @param signalName
+	 *            the expected system name of a signal
+	 * @return Node, of the signal entry, if the signal exists on this target
+	 *         plattform null, if the signal name does not exist
+	 */
+	public Node hasSystemName(String systemName) {
+
+		// get entry point in tree for signals
+		NodeList nl = targetXML.getElementsByTagName("plattform");
+		nl = nl.item(0).getChildNodes();
+		if (nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				Node n = nl.item(i); // .getChildNodes();
+				String sName;
+				sName = null;
+				if (n.getNodeType() == Node.ELEMENT_NODE
+						&& n.getAttributes() != null) {
+					if (n.getAttributes() != null) {
+						if (n.getAttributes().getNamedItem("name") != null) {
+							sName = n.getAttributes().getNamedItem("name")
+									.getTextContent();
+						}
+					}
+
+					if (sName != null && sName.equals(systemName)) {
+						Error.info(systemName + " is available and has type "
+								+ getNodeType(n));
+						return n;
+					}
+				}
+			}
+		}
+		Error.info(systemName + " is NOT available");
+
+		return null;
+	}
+
+	public String getNodeType(Node n) {
+		String type = n.getNodeName();
+		return type;
+	}
+
+	public Node provides(Node n, String associationName) {
+		Node association = ModuleXml.getChildByName(n, "associationProvider");
+		if (association != null) {
+			NodeList cl = association.getChildNodes();
+			for (int i = 0; i < cl.getLength(); i++) {
+				if (cl.item(i).getNodeType() == Node.ELEMENT_NODE
+						&& cl.item(i).getNodeName().trim()
+								.equals("associationType")) {
+					// System.out.println(cl.item(i).getNodeName());
+					String cName = cl.item(i).getAttributes()
+							.getNamedItem("name").getTextContent();
+					if (cName.equals(associationName)) {
+						Error.info("association type " + associationName
+								+ " found");
+						return cl.item(i);
+					}
+				}
+			}
+		}
+		Error.error("association " + associationName + " not provided");
+		return null;
+	}
+
+	int getAssociationClients(Node associationProvider) {
+		Node a = associationProvider.getAttributes().getNamedItem("clients");
+		int n = -1;
+
+		if (a != null) {
+			String nbr = a.getTextContent().trim();
+
+			try {
+				n = Integer.parseInt(nbr);
+			} catch (NumberFormatException e) {
+				n = -1;
+			}
+		}
+		return (n);
+	}
+
+	boolean checkParameterTypeAndValue(Node n, Parameter p) {
+		String type;
+		int length;
+
+		type = n.getNodeName();
+		length = Integer.parseInt(n.getAttributes().getNamedItem("length")
+				.getTextContent());
+		if (type != p.getType()) {
+			Error.error("parameter type mismatch (" + type + " -- "
+					+ p.getType());
+			return false;
+		}
+		if (length < p.length()) {
+			Error.error("parameter of type " + type + "(" + length
+					+ ") does not fit into expected type" + p.getType() + "("
+					+ p.length() + ")");
+			return false;
+		}
+
+		// test value
+		NodeList childs = n.getChildNodes();
+		for (int i = 0; i < childs.getLength(); i++) {
+			if (childs.item(i).getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			// rule found
+			String rule = childs.item(i).getNodeName();
+			String ruleContent = childs.item(i).getTextContent();
+			Error.info("Rule " + rule + "  content " + ruleContent);
+			if (rule.equals("VALUES")) {
+				String[] items = ruleContent.split(",");
+				for (int j = 0; j < items.length; j++) {
+					if (items[j].trim().equals(p.getValue())) {
+						return true;
+					}
+				}
+				Error.error("illegal value: " + p.getValue()
+						+ " not in supported list");
+				return false;
+			} else if (rule.equals("FIXEDRANGE")) {
+				String[] items = ruleContent.split(",");
+				int low = Integer.parseInt(items[0]);
+				int high = Integer.parseInt(items[1]);
+				int val = Integer.parseInt(p.getValue());
+				if (val >= low && val <= high) {
+					return true;
+				} else {
+					Error.error("value \"" + val + "\" out of range [" + low
+							+ "," + high + "]");
+					return false;
+				}
+			} else if (rule.equals("FIXEDGT")) {
+				int low = Integer.parseInt(ruleContent);
+				int val = Integer.parseInt(p.getValue());
+				if (val > low) {
+					return true;
+				} else {
+					Error.error("value out of range (val=" + val
+							+ ") not > as " + low + ")");
+					return false;
+				}
+			} else if (rule.equals("NotEmpty")) {
+				if (p.length() > 0) {
+					return true;
+				} else {
+					Error.error("value must not be empty");
+					return false;
+				}
+
+			} else if (rule.equals("ALL")) {
+				return true;
+			} else {
+				Error.info("no rule found -- accept everything");
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * test, whether the current element need an association provider
+	 * 
+	 * @param node the node of the system element
+	 * @return null, if no association provider is needed, or  
+	 * 	           the name of the association provider, if there is one specified
+	 */
+	String associationRequiredProvider(Node node) {
+		// get all defined interrupts
+		NodeList nl = node.getChildNodes();
+
+		if (nl.getLength() > 0) {
+			for (int i = 0; i < nl.getLength(); i++) {
+				Node n = nl.item(i);
+				if (n.getNodeType() == Node.ELEMENT_NODE
+						&& n.getNodeName().equals("needAssociation")) {
+					// get name and remove all surrounding whitespaces
+					String provider = n.getAttributes()
+							.getNamedItem("provider").getTextContent();
+					return provider;
+				}
+			}
+
+		}
+		return null;
+	}
+
+	public void incrementInstances(Node targetNode) {
+		Node instances = targetNode.getAttributes().getNamedItem("instances");
+		// Node instances = ModuleXml.getChildByName(targetNode, "instances");
+		if (instances != null) {
+			int maxInstances = Integer.parseInt(instances.getNodeValue());
+//			System.out.println(targetNode.getAttributes().getNamedItem("name")
+//					.getTextContent()
+//					+ " provides instances: " + maxInstances);
+
+			String currentValue = ((Element) targetNode)
+					.getAttribute("instanceCount");
+			if (currentValue != null && currentValue.length() > 0) {
+				// System.out.println("current: "+ currentValue);
+				int newCount = Integer.parseInt(currentValue) + 1;
+				if (newCount > maxInstances) {
+					Error.error("too many instances for element "
+							+ ((Element) targetNode).getAttribute("name"));
+					return;
+				}
+				
+				// set new instance count into dom tree
+				((Element) targetNode).setAttribute("instanceCount", Integer.toString(newCount));
+				// System.out.println(targetNode.getAttributes().getNamedItem("name").getTextContent()
+				// + " now instances: "+ newCount );
+
+			} else {
+				// attribute for counting not set yet --> set initial value as 1
+				((Element) targetNode).setAttribute("instanceCount", "1");
+
+			}
+		}
+	}
+}

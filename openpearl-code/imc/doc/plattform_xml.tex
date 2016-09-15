@@ -1,0 +1,68 @@
+\chapter{Plattform Specific Names}
+
+\section{Introduction}
+Each specific plattform may support a different set of system names.
+Thus each target plattform is characterized by a separate xml-file.
+These files are created during the build phase of the runtime system
+for each target plattform.
+
+\section{Structure of the XML-File}
+All possible system elements are located as unordered separate 
+elements under the root tag \verb|plattform|.
+For the individual types of system elements, the following tags are
+provided:
+\begin{itemize}
+\item \verb|<signal ...>| defines a system signal
+\item \verb|<interrupt ...>| defines a system interupt
+\item \verb|<dation ...>| defines a system dation
+\item \verb|<configuration ...>| defines a configuration item
+\item \verb|<connection ...>| defines a association provider, if 
+   non of the above fit
+\end{itemize}
+
+These elements have attributes 
+\begin{description}
+\item [name] is the system name
+\item [instances] the number of instances, if specified. If this attribute 
+   is not specified, there is no instance limit.
+\end{description}
+
+\subsection{Signal-Tag}
+The signal tag contains only the attribute \verb|name| for the
+system signal name.
+
+\subsection{Interrupt-Tag}
+The interrupt tag contains the attribute \verb|name| for the
+system interrupt name.
+Possible Parameters are listed as subtree \verb|<parameters>|.
+
+\subsection{Dation-Tag}
+The dation tag contains the attribute \verb|name| for the
+system dation name.
+Possible parameters are listed as subtree \verb|<parameters>|.
+Possible attributes are listed as subtree \verb|<attributes>|.
+Possible associations to this element are
+ listed as subtree \verb|<associationProvider>|.
+
+
+\subsection{Configuration-Tag}
+The configuration element has the same structure as the dation tag
+except the attribute \verb|name|, which has not to be present.
+
+\subsection{Associations}
+The connection between two system elements is treated by the following
+elements:
+
+\begin{itemize}
+\item \verb|<needAssociation>| 
+\item \verb|<associationProvider>|  with elements \verb|<associationType>|.
+  Attributes for an associationType are:
+  \begin{itemize}
+   \item  \verb|<name>|,  which is an unique free selectable
+     identifier for this kind of  association.
+   \item \verb|<clients>|  if given it is the number of allowed
+      clients for this connection provider. If not given, there is no
+      limits of allowed clients.
+   \end{itemize} 
+\end{itemize}
+
