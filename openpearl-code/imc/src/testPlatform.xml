@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plattform file="testPlatform.xml">
+      <signal name="FixedRangeSignal"/>
+      <signal name="FixedDivideByZeroSignal"/>
+      <signal name="FloatIsNaNSignal"/>
+      <interrupt name="UnixSignal">
+         <parameters>
+            <FIXED length="31">
+               <VALUES>1,2,3,15,16,17</VALUES>
+            </FIXED>
+         </parameters>
+      </interrupt>
+      <dation name="Disc">
+         <parameters>
+            <CHAR length="32767"/>	<!-- beliebiger String -->
+            <FIXED length="31">
+               <FIXEDRANGE>1,9999</FIXEDRANGE>
+            </FIXED>
+         </parameters>
+         <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
+         <data>ALL</data>
+      </dation>
+      <dation name="StdIn" instances="1">
+         <parameters>
+         </parameters>
+         <attributes>
+            FORWARD, IN	, SYSTEM
+         </attributes>
+         <DATA>ALPHIC</DATA>
+      </dation>
+      <dation name="StdOut" instances="1">
+         <parameters>
+         </parameters>
+	 <attributes>
+            FORWARD, OUT, SYSTEM
+         </attributes>
+         <data>ALPHIC</data>
+         <associationProvider>
+            <associationType name="AlphicOutProvider" />
+         </associationProvider>
+      </dation>
+      <connection name="I2CBus">
+         <parameters>
+            <CHAR length="32767">
+               <NotEmpty />
+            </CHAR>
+            <FIXED length="31">	<!-- max int32_t -->
+               <FIXEDGT>0</FIXEDGT>
+            </FIXED>
+         </parameters>
+         <associationProvider>
+            <associationType name="I2CBusProvider" />
+         </associationProvider>
+      </connection>
+      <dation name="LM75">
+         <parameters>
+            <BIT length="8">
+               <VALUES>'48'B4, '49'B4, '4A'B4, '4B'B4,
+                       '4C'B4, '4D'B4 , '4E'B4, '4F'B4</VALUES>
+            </BIT>
+         </parameters>
+         <needAssociation provider="I2CBusProvider"/>
+      </dation>
+
+  <configuration name="Log" instances="1">
+    <parameters>
+      <CHAR length="4">
+         <NotEmpty/>
+      </CHAR>
+    </parameters>
+    <needAssociation provider="AlphicOutProvider"/>
+  </configuration>
+</plattform>
+

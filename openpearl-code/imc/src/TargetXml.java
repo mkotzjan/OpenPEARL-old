@@ -48,11 +48,11 @@ public class TargetXml {
 	boolean verbose;
 
 	/**
-	 * create an object for the query operations for the target plattform
+	 * create an object for the query operations for the target platform
 	 * elements, like SIGNAL, DATION and INTERRUPT
 	 * 
 	 * @param fileName
-	 *            plattform definition file name
+	 *            platform definition file name
 	 * @param verbose
 	 *            flag for verbose output; if true lot of messages are sent to
 	 *            System.out
@@ -80,12 +80,12 @@ public class TargetXml {
 	 * @param signalName
 	 *            the expected system name of a signal
 	 * @return Node, of the signal entry, if the signal exists on this target
-	 *         plattform null, if the signal name does not exist
+	 *         platform null, if the signal name does not exist
 	 */
 	public Node hasSystemName(String systemName) {
 
 		// get entry point in tree for signals
-		NodeList nl = targetXML.getElementsByTagName("plattform");
+		NodeList nl = targetXML.getElementsByTagName("platform");
 		nl = nl.item(0).getChildNodes();
 		if (nl.getLength() > 0) {
 			for (int i = 0; i < nl.getLength(); i++) {

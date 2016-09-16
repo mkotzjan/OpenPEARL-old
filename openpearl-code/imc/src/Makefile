@@ -1,7 +1,15 @@
 all: imc.jar
 
-imc.jar: InterModuleChecker.class
-	jar -cf imc.jar *.class
+SRCS = InterModuleChecker.java TargetXml.java ModuleXml.java ReadXml.java \
+	SystemEntries.java SystemEntry.java Parameter.java Error.java \
+	CodeGenerator.java
+%.class: %.java
+	javac $<
+
+CLASSES = $(SRCS:.java=.class)
+
+imc.jar:  $(CLASSES)
+	jar -cf imc.jar $(CLASSES) 
 
 InterModuleChecker.class: InterModuleChecker.java
 	javac InterModuleChecker.java

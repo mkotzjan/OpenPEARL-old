@@ -54,11 +54,11 @@ public class ModuleXml {
 	Deque<SystemEntry> associationStack = new ArrayDeque<SystemEntry>();
 
 	/**
-	 * create an object for the query operations for the target plattform
+	 * create an object for the query operations for the target platform
 	 * elements, like SIGNAL, DATION and INTERRUPT
 	 * 
 	 * @param fileName
-	 *            plattform definition file name
+	 *            platform definition file name
 	 * @param verbose
 	 *            flag for verbose output; if true lot of messages are sent to
 	 *            System.out
@@ -86,7 +86,7 @@ public class ModuleXml {
 	}
 
 	/**
-	 * check existence and type of used system names associate target plattform
+	 * check existence and type of used system names associate target platform
 	 * system node with username or configuration item
 	 */
 	public void checkSystemEntries() {
