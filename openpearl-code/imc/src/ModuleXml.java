@@ -25,12 +25,12 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -47,7 +47,7 @@ public class ModuleXml {
 	Document moduleXML;
 	boolean verbose;
 	String sourceFileName;
-	TargetXml targetXml;
+	TargetPlatformXml targetXml;
 	ReadXml wrappedDomTree;
 	int line;
 	SystemEntry un;
@@ -63,10 +63,10 @@ public class ModuleXml {
 	 *            flag for verbose output; if true lot of messages are sent to
 	 *            System.out
 	 */
-	ModuleXml(String fileName, TargetXml targetXml, boolean verbose) {
+	ModuleXml(String fileName, TargetPlatformXml targetXml, boolean verbose) {
 		this.verbose = verbose;
 		this.targetXml = targetXml;
-		wrappedDomTree = new ReadXml(fileName, verbose);
+		wrappedDomTree = new ReadXml(fileName, verbose, null);
 
 		moduleXML = wrappedDomTree.getDocument(); // readXMLDocumentFromFile(fileName);
 		if (moduleXML == null) {
@@ -119,6 +119,8 @@ public class ModuleXml {
 							// error message later
 							un = new SystemEntry(userName, sourceFileName, line);
 							SystemEntries.add(un);
+						} else {
+							un.setLocation(sourceFileName, line);
 						}
 					} else {
 						un = new SystemEntry(userName, sourceFileName, line);
@@ -133,15 +135,17 @@ public class ModuleXml {
 						// expected
 						// interface
 						// System.out.println("test "+mustProvide[p]);
-						Node assocProvider = targetXml.provides(targetNode,
-								mustProvide[p]);
+						Node assocProvider = TargetPlatformXml.provides(
+								targetNode, mustProvide[p]);
 						if (assocProvider == null) {
 							Error.error(userName
 									+ " does not provide previously required interface "
 									+ mustProvide[p]);
 						} else {
-							if (!un.setMaxClients(mustProvide[p], targetXml
-									.getAssociationClients(assocProvider))) {
+							if (!un.setMaxClients(
+									mustProvide[p],
+									TargetPlatformXml
+											.getAssociationClients(assocProvider))) {
 								Error.error("too many clients for "
 										+ un.getName());
 							}
@@ -187,7 +191,7 @@ public class ModuleXml {
 				if (targetNode != null) {
 					targetXml.incrementInstances(targetNode);
 					Error.info("System Name " + systemName + " has type "
-							+ targetXml.getNodeType(targetNode));
+							+ TargetPlatformXml.getNodeType(targetNode));
 					if (compareParameterTypes(currentChild, targetNode)) {
 						Error.info("parameter types are ok");
 					} else {
@@ -195,10 +199,12 @@ public class ModuleXml {
 								+ systemName);
 					}
 
-					String typeOfElement = targetXml.getNodeType(targetNode);
-					Node typeNode = moduleXML.createElement(typeOfElement);
-					Element e = (Element) n;
-					e.appendChild(typeNode);
+					String typeOfElement = TargetPlatformXml
+							.getNodeType(targetNode);
+					/*
+					 * Node typeNode = moduleXML.createElement(typeOfElement);
+					 * Element e = (Element) n; e.appendChild(typeNode);
+					 */
 					un.setType(typeOfElement);
 
 					checkAssociation(n, targetNode);
@@ -217,7 +223,8 @@ public class ModuleXml {
 	}
 
 	private void checkAssociation(Node moduleNode, Node systemNode) {
-		String provider = targetXml.associationRequiredProvider(systemNode);
+		String provider = TargetPlatformXml
+				.associationRequiredProvider(systemNode);
 		Node association = getChildByName(moduleNode, "association");
 		if (association != null) {
 			String associationName = association.getAttributes()
@@ -236,7 +243,7 @@ public class ModuleXml {
 					// connected with it, no code can be produced
 					u = new SystemEntry(associationName, sourceFileName, line);
 					if (!u.incrementAssociationClients(provider)) {
-						Error.error("xx1 too many associations for " + provider);
+						Error.error("too many associations for " + provider);
 					}
 					SystemEntries.add(u);
 					un.setProvider(u);
@@ -250,7 +257,8 @@ public class ModuleXml {
 					Node assoc;
 
 					if (u.getNode() != null) {
-						assoc = targetXml.provides(u.getNode(), provider);
+						assoc = TargetPlatformXml.provides(u.getNode(),
+								provider);
 						if (assoc == null) {
 							Error.error(u.getName()
 									+ " does not provide association type "
@@ -258,7 +266,7 @@ public class ModuleXml {
 							return;
 						}
 						un.setMaxClients(provider,
-								targetXml.getAssociationClients(assoc));
+								TargetPlatformXml.getAssociationClients(assoc));
 					} else {
 						Error.info("association type must be checked later -- still missing");
 						u.mustProvide(provider);
@@ -272,8 +280,8 @@ public class ModuleXml {
 					return;// safety result
 				}
 			} else {
-				Node assoc = targetXml
-						.provides(associationSystemNode, provider);
+				Node assoc = TargetPlatformXml.provides(associationSystemNode,
+						provider);
 				if (assoc == null) {
 					// the error is already emitted in provides(...)
 					return;
@@ -285,7 +293,8 @@ public class ModuleXml {
 					SystemEntries.add(u);
 					un.setProvider(u);
 
-					int maxClients = targetXml.getAssociationClients(assoc);
+					int maxClients = TargetPlatformXml
+							.getAssociationClients(assoc);
 					if (!u.setMaxClients(provider, maxClients)) {
 						Error.error("too many clients for " + provider);
 					}
@@ -301,7 +310,14 @@ public class ModuleXml {
 					if (!u.incrementAssociationClients(provider)) {
 						Error.error("too many associations for " + provider);
 					}
+					if (TargetPlatformXml
+							.associationRequiredProvider(associationSystemNode) != null) {
+						// System.out.println("need to check for required associationType: "+
+						// targetXml.associationRequiredProvider(associationSystemNode));
+						// System.out.println("in association: "+associationName);
 
+						checkAssociation(association, associationSystemNode);
+					}
 					un = associationStack.pop();
 
 					return;
@@ -337,13 +353,15 @@ public class ModuleXml {
 
 		}
 	}
-	
+
 	/**
-	 * find the child node of the given node with the given name 
+	 * find the child node of the given node with the given name
 	 * 
-	 * @param n the node which is ecpected to contain a child with the
-	 *          given name
-	 * @param name the name of the child node
+	 * @param n
+	 *            the node which is ecpected to contain a child with the given
+	 *            name
+	 * @param name
+	 *            the name of the child node
 	 * @return null, if there is non fitting child; else the detected child node
 	 */
 	public static Node getChildByName(Node n, String name) {
@@ -412,7 +430,7 @@ public class ModuleXml {
 					return false;
 				}
 
-				targetXml.checkParameterTypeAndValue(
+				TargetPlatformXml.checkParameterTypeAndValue(
 						targetParameterNodes.item(targetParameterIndex), p1);
 				targetParameterIndex++;
 				un.addParameter(p1);

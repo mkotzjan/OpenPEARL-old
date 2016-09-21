@@ -56,6 +56,7 @@ public class SystemEntry {
     private String file;
     private int line;
     private boolean isUsed = false;
+    private boolean codeIsCompleted = false;
 
 	private List<AssociationEntry> mustProvide=new ArrayList<AssociationEntry>();
     
@@ -136,20 +137,25 @@ public class SystemEntry {
 		if (type.equals("signal")) {
 			result =  "static pearlrt::"+systemName+" _"+userName+";\n";
 			result += "       pearlrt::Signal * generalized_"+userName + "= &_"+userName+";\n";
+			codeIsCompleted = true;
 		} else if (type.equals("dation")) {
 			result =  "static pearlrt::"+systemName+" s_"+userName+"(";
 			result += translateParameters()+");\n";
 			result += "       pearlrt::Device * d_"+userName+" = &s_" + userName+";\n"; 
+			codeIsCompleted = true;
 		} else if (type.equals("interrupt")) {
 			result =  "static pearlrt::"+systemName+" sys_"+userName+"(";
 			result += translateParameters()+");\n";
 			result += "       pearlrt::Interrupt * _"+userName+" = (pearlrt::Interrupt*)& sys_"+userName+";\n";
+			codeIsCompleted = true;
 		} else if (type.equals("connection")) {
 			result =  "static pearlrt::"+systemName+" sys_"+userName+"(";
 			result += translateParameters()+");\n";
+			codeIsCompleted = true;
 		} else {
 			System.out.println("could not create code for type "+type);
 		}
+		
 		
 		return result;
 	}
@@ -300,7 +306,7 @@ public class SystemEntry {
 			}
 		}
 		if (ae == null) {
-  		   ae =		new AssociationEntry(p);
+  		   ae =	new AssociationEntry(p);
 		   mustProvide.add(ae);
 		}
 	}
@@ -312,6 +318,26 @@ public class SystemEntry {
 			returnValue[i] = mustProvide.get(i).getAssociationName();
 		}
 		return returnValue;
+	}
+
+	public SystemEntry requiresOtherSystemEntry() {
+
+		if (provider != null && provider.getName() != null) {
+			if (!provider.codeIsCompleted ) {
+		     	return provider;
+			}
+		}
+		return null;
+	}
+
+	public boolean codeIsCompleted() {
+		return codeIsCompleted;
+	}
+
+	public void setLocation(String sourceFileName, int l) {
+		file=sourceFileName;
+		line=l;
+		
 	}
 	
 

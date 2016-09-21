@@ -25,26 +25,26 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
+ */
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
  * read xml definition for target system resources and provide specific
- * operations, like search for names as well as required and valid parameters
+ * operations, like search for names as well as required and valid parameters.
  * 
  * 
  * @author mueller
  * 
  */
 
-public class TargetXml {
+public class TargetPlatformXml {
 	String indent = "";
-	Document targetXML;
+	Document targetPlatform;
 	boolean verbose;
 
 	/**
@@ -57,14 +57,14 @@ public class TargetXml {
 	 *            flag for verbose output; if true lot of messages are sent to
 	 *            System.out
 	 */
-	TargetXml(String fileName, boolean verbose) {
+	TargetPlatformXml(String fileName, boolean verbose) {
 		this.verbose = verbose;
-		ReadXml tgt = new ReadXml(fileName, verbose);
+		ReadXml tgt = new ReadXml(fileName, verbose,  InstallationLocation.path);
 
-		targetXML = tgt.getDocument(); // readXMLDocumentFromFile(fileName);
-		if (targetXML == null) {
+		targetPlatform = tgt.getDocument(); // readXMLDocumentFromFile(fileName);
+		if (targetPlatform == null) {
 			System.err.println("error reading target definition file ("
-					+ fileName);
+					+ fileName + ")");
 			System.exit(1);
 			return;
 		}
@@ -85,7 +85,7 @@ public class TargetXml {
 	public Node hasSystemName(String systemName) {
 
 		// get entry point in tree for signals
-		NodeList nl = targetXML.getElementsByTagName("platform");
+		NodeList nl = targetPlatform.getElementsByTagName("platform");
 		nl = nl.item(0).getChildNodes();
 		if (nl.getLength() > 0) {
 			for (int i = 0; i < nl.getLength(); i++) {
@@ -114,12 +114,28 @@ public class TargetXml {
 		return null;
 	}
 
-	public String getNodeType(Node n) {
+	/**
+	 * return the type of the given node as string
+	 * 
+	 * @param n
+	 *            the node to be queried
+	 * @return the type ofthe queried nod --> "dation", "interrupt", ...
+	 */
+	static public String getNodeType(Node n) {
 		String type = n.getNodeName();
 		return type;
 	}
 
-	public Node provides(Node n, String associationName) {
+	/**
+	 * check, whether the given node provides the given kind of association
+	 * 
+	 * @param n
+	 *            thenode to be queried
+	 * @param associationName
+	 *            the name of the association
+	 * @return true, if supported, else false
+	 */
+	static public Node provides(Node n, String associationName) {
 		Node association = ModuleXml.getChildByName(n, "associationProvider");
 		if (association != null) {
 			NodeList cl = association.getChildNodes();
@@ -142,7 +158,17 @@ public class TargetXml {
 		return null;
 	}
 
-	int getAssociationClients(Node associationProvider) {
+	/**
+	 * read the number of registerd clients for an associytion provider
+	 * 
+	 * The number of registerd clients is stored as attribute of the node in the
+	 * dom tree
+	 * 
+	 * @param associationProvider
+	 *            the node of the associatiojn provider
+	 * @return the number of registered clients
+	 */
+	static int getAssociationClients(Node associationProvider) {
 		Node a = associationProvider.getAttributes().getNamedItem("clients");
 		int n = -1;
 
@@ -158,7 +184,20 @@ public class TargetXml {
 		return (n);
 	}
 
-	boolean checkParameterTypeAndValue(Node n, Parameter p) {
+	/**
+	 * check the type and value for the given system device node parameter
+	 * 
+	 * The rule are specified in the system devive parameter description, like
+	 * FIXEDGT, FIXEDRANGE, ... This list is expected to be extended when
+	 * needed.
+	 * 
+	 * @param n
+	 *            the formal parameter to be checked
+	 * @param p
+	 *            the actual parameter from the user module
+	 * @return true, if type and value are ok; false else
+	 */
+	static boolean checkParameterTypeAndValue(Node n, Parameter p) {
 		String type;
 		int length;
 
@@ -241,11 +280,12 @@ public class TargetXml {
 	/**
 	 * test, whether the current element need an association provider
 	 * 
-	 * @param node the node of the system element
-	 * @return null, if no association provider is needed, or  
-	 * 	           the name of the association provider, if there is one specified
+	 * @param node
+	 *            the node of the system element
+	 * @return null, if no association provider is needed, or the name of the
+	 *         association provider, if there is one specified
 	 */
-	String associationRequiredProvider(Node node) {
+	static String associationRequiredProvider(Node node) {
 		// get all defined interrupts
 		NodeList nl = node.getChildNodes();
 
@@ -255,8 +295,9 @@ public class TargetXml {
 				if (n.getNodeType() == Node.ELEMENT_NODE
 						&& n.getNodeName().equals("needAssociation")) {
 					// get name and remove all surrounding whitespaces
-					String provider = n.getAttributes()
-							.getNamedItem("provider").getTextContent();
+					NamedNodeMap nm = n.getAttributes();
+					Node n1 = nm.getNamedItem("provider");
+					String provider = n1.getTextContent();
 					return provider;
 				}
 			}
@@ -265,14 +306,22 @@ public class TargetXml {
 		return null;
 	}
 
+	/**
+	 * increment to INSTANCE counter, when a new client for an association was
+	 * detected. The counter is located in the DOM tree.
+	 * 
+	 * 
+	 * @param targetNode
+	 *            the node of the system element
+	 */
 	public void incrementInstances(Node targetNode) {
 		Node instances = targetNode.getAttributes().getNamedItem("instances");
 		// Node instances = ModuleXml.getChildByName(targetNode, "instances");
 		if (instances != null) {
 			int maxInstances = Integer.parseInt(instances.getNodeValue());
-//			System.out.println(targetNode.getAttributes().getNamedItem("name")
-//					.getTextContent()
-//					+ " provides instances: " + maxInstances);
+			// System.out.println(targetNode.getAttributes().getNamedItem("name")
+			// .getTextContent()
+			// + " provides instances: " + maxInstances);
 
 			String currentValue = ((Element) targetNode)
 					.getAttribute("instanceCount");
@@ -284,9 +333,10 @@ public class TargetXml {
 							+ ((Element) targetNode).getAttribute("name"));
 					return;
 				}
-				
+
 				// set new instance count into dom tree
-				((Element) targetNode).setAttribute("instanceCount", Integer.toString(newCount));
+				((Element) targetNode).setAttribute("instanceCount",
+						Integer.toString(newCount));
 				// System.out.println(targetNode.getAttributes().getNamedItem("name").getTextContent()
 				// + " now instances: "+ newCount );
 

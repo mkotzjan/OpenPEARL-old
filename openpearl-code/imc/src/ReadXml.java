@@ -49,6 +49,7 @@ public class ReadXml {
 	String indent = "";
 	Document document;
 	boolean verbose;
+	String searchPath;
 	
 	
 	/**
@@ -57,17 +58,14 @@ public class ReadXml {
 	 * @param fileName plattform definition file name
 	 * @param verbose  flag for verbose output; if true lot of messages are sent to System.out
 	 */
-	 ReadXml(String fileName, boolean verbose) {
+	 ReadXml(String fileName, boolean verbose, String searchPrefix) {
 		this.verbose=verbose;
+        searchPath = searchPrefix;
+        
 		document = readXMLDocumentFromFile(fileName);
-		if (document == null) {
-			System.err.println("error reading target definition file ("
-					+ fileName);
-			System.exit(1);
-			return;
-		}
+
 		
-		if (verbose) {
+		if (document != null & verbose) {
 			traverseDOMTree(document);
 		}
 	}
@@ -81,19 +79,31 @@ public class ReadXml {
     }
     
 	private  Document readXMLDocumentFromFile(String file) {
-		File inputFile = new File(file);
+		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		Document xmlDoc=null;
-
+		String prefix = "";
+		
+       while (xmlDoc == null) {
+    	   
+       
 		try {
+			File inputFile = new File(file);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			xmlDoc = builder.parse(inputFile);
 			xmlDoc.getDocumentElement().normalize();
+		} catch (java.io.FileNotFoundException e) {
+			if (prefix.isEmpty() && searchPath!= null) {
+			   prefix= searchPath;
+			} else {
+				return null;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("error reading XML file: " + file);
+			return null;
 		}
-
+       }
 		return xmlDoc;
 	}
 

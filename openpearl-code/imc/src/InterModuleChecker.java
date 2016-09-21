@@ -32,19 +32,28 @@ import java.util.List;
 
 /**
  * utility to check the compatibility of system part and problem part resources.
+ * 
  * @author mueller
  *
  */
 public class InterModuleChecker {
 	static String target;
 	static String outputFile;
-	static TargetXml targetXml;
+	static TargetPlatformXml targetXml;
 
 	static List<String> inputFiles = new ArrayList<String>();
 	static List<ModuleXml> moduleXml = new ArrayList<ModuleXml>();
 
 	static boolean verbose = false;
 
+	/**
+	 * the main entry
+	 * 
+	 * command line arguments are documented by the option --help
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 
 		if (args.length < 1) {
@@ -80,7 +89,7 @@ public class InterModuleChecker {
 		}
 
 		// read target-xml
-		targetXml = new TargetXml(target + ".xml", false);
+		targetXml = new TargetPlatformXml(target + ".xml", false);
 
 
 		// read all input files
@@ -142,7 +151,7 @@ public class InterModuleChecker {
 	private static void printHelp() {
 
 		System.err
-				.println("java IntzerModuleChecker                           \n"
+				.println("java InterModuleChecker                           \n"
 						+ " Options:                                                     \n"
 						+ "  --help                      Print this help message         \n"
 						+ "  --verbose                   Print lot of information        \n"

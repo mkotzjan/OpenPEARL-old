@@ -1,7 +1,8 @@
 TEXFILES = imc.tex \
 	intro.tex structure_system_build.tex\
 	structure_import_export.tex \
-	plattform_xml.tex \
+	plattform_xml.tex usage.tex  \
+	documentation.tex \
 	literature.tex
 
 all: imc.pdf  $(TEXFILES)

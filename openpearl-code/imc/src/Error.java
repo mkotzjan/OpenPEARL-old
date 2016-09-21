@@ -25,41 +25,104 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
+/**
+ * provide static methods to print error messages and count the created error
+ * messages. The error message coungter is used to stop compilation after each
+ * step of check.
+ * 
+ * @author mueller
+ * 
+ */
 public class Error {
-	static int numberOfErrors = 0;
-	static String file;
-	static int lineNbr;
-	static boolean showInfo = true;
-	
+	private static int numberOfErrors = 0;
+	private static String file;
+	private static int lineNbr;
+	private static boolean showInfo = true;
+
+	/**
+	 * set the location of the error (sourceFile:line)
+	 * 
+	 * @param fileName
+	 *            the source file name
+	 * @param line
+	 *            the line number of the error producing element
+	 */
 	static void setLocation(String fileName, int line) {
 		file = fileName;
 		lineNbr = line;
 	}
+
+	/**
+	 * print an error meaage in the proper format with location and text
+	 * 
+	 * The error counter is automatically incremented.
+	 * 
+	 * @param message
+	 *            the error message
+	 */
 	static void error(String message) {
-		numberOfErrors ++;
-		System.err.println(file+":" + lineNbr + ": error: "+message);
+		numberOfErrors++;
+		System.err.println(file + ":" + lineNbr + ": error: " + message);
 	}
+
+	/**
+	 * print info message, which is only printed in verbose mode. The verbose
+	 * mode is set in the module by showInfo()
+	 * 
+	 * @param message
+	 *            the info message
+	 */
 	static void info(String message) {
 		if (showInfo) {
-		System.err.println(file+":" + lineNbr + ": info: "+message);
+			System.err.println(file + ":" + lineNbr + ": info: " + message);
 		}
 	}
-	
+
+	/**
+	 * test if the error counter is non zero and exit in this case
+	 */
 	static void exitIfErrors() {
 		if (numberOfErrors > 0) {
 			System.err.println("*** check aborted due to errors");
 			System.exit(1);
 		}
 	}
+
+	/**
+	 * set verbose mode to enbale the info-messages
+	 * 
+	 * @param v
+	 *            must be true for verbode mode; if false: no info messages are
+	 *            printed
+	 */
 	public static void setShowInfo(boolean v) {
 		showInfo = v;
-		
+
 	}
+
+	/**
+	 * print warning
+	 * 
+	 * The error counter isNOT incremented!
+	 * 
+	 * @param message
+	 */
 	public static void warn(String message) {
-		System.err.println(file+":" + lineNbr + ": warning: "+message);
-		
+		System.err.println(file + ":" + lineNbr + ": warning: " + message);
+
 	}
-	
+
+	/**
+	 * print further lines for errors, info and warnings
+	 * 
+	 * @param string
+	 *            the next line
+	 */
+	public static void append(String string) {
+		System.err.println("\t" + string);
+
+	}
+
 }

@@ -6,7 +6,12 @@ The inter module checker is invoked with
 imc -b <target> -o <output> pearlModules...
 \end{verbatim}
 
-The option -b is  recommended, the option -o defaults to system.cc.
+The option -b is  recommended. The given parameter defines the
+platform definition XML file, which is expected ether in the current 
+working directory (first)
+or in installation directory of OpenPEARL.
+
+The option -o defaults to system.cc in the current working directory.
 
 The list of pearl modules is passed without extension. Pathnames are 
 possible.
@@ -44,7 +49,8 @@ Not supported up to now:
 \end{itemize}I
 
 \section{Output}
-The tool created a C++ file for the system part. 
+The tool creates a C++ file for the system part if no errors are
+detected. 
 This file must be passed to the g++ compiler and linked with all 
 other object modules.
 

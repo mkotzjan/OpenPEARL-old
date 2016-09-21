@@ -159,6 +159,8 @@ if ( "LaTeX" ~~ @type) {
    # create output files
    open(my $header, ">Signals.hh");
    open(my $src, ">Signals.hcc");
+   open(my $xml, ">Signals.xml");
+
    $target = "classImpl";
    $firstOutput = 1;
    $fileHandle = $header;
@@ -181,21 +183,33 @@ if ( "LaTeX" ~~ @type) {
    $fileHandle = $src;
    &printEntries;
 
+   $firstOutput = 1;
+   $nbrOfSignals = 0;
+   $target = "Signals.xml";
+   $fileHandle = $xml;
+   &printEntries;
+
    close($header);
    close($src);
+   close($xml)
 }
 
 #####################################################################
 sub printEntries
 {
-   print $fileHandle "/* ".$target." : auto generated (".localtime().") */\n";
 
    # print header
    if ($target eq "objDCL" ) {
+      print $fileHandle "/* ".$target." : auto generated (".localtime().") */\n";
    } elsif ($target eq "objArray" ) {
+      print $fileHandle "/* ".$target." : auto generated (".localtime().") */\n";
       printf $fileHandle "Signal *sv[] = {\n"; 
    } elsif ($target eq "classImpl") {
+      print $fileHandle "/* ".$target." : auto generated (".localtime().") */\n";
    } elsif ($target eq "extList") {
+      print $fileHandle "/* ".$target." : auto generated (".localtime().") */\n";
+   } elsif ($target eq "Signals.xml") {
+      print $fileHandle "<!-- ".$target." : auto generated (".localtime().") -->\n";
    } else {
       die "*** header: illegal parameter (".$target.")\n";
    }
@@ -253,6 +267,9 @@ sub printEntries
                 $string = "extern ".$xls->[$cur_sheet_nr]{cell}[2][$i].
                           " the".$xls->[$cur_sheet_nr]{cell}[2][$i];  
 	         print $fileHandle "$string;\n";
+              } elsif ($target eq "Signals.xml") {
+                $string = "   <signal name=\"".$xls->[$cur_sheet_nr]{cell}[2][$i]."\"/>";  
+	         print $fileHandle "$string\n";
               } else {
 		die "*** body: illegal parameter (".$target.")\n";
 	      }
@@ -269,6 +286,7 @@ sub printEntries
       print $fileHandle "Signal** Signal::signalVector = sv;\n";
    } elsif ($target eq "classImpl") {
    } elsif ($target eq "extList") {
+   } elsif ($target eq "Signals.xml") {
    } else {
       die "*** footer: illegal parameter (".$_[0].")\n";
    }

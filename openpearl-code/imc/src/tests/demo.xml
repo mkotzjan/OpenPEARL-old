@@ -76,7 +76,12 @@
      <CHAR>'EW'</CHAR>
     </parameters>
   </sysname>
-  <association name="StdOut">
+  <association name="LogFile">
+     <parameters>
+       <CHAR>'prl_log.log'</CHAR>
+     </parameters>
+     <association name="disc">
+     </association>
   </association>
 </configuration>
 </system>

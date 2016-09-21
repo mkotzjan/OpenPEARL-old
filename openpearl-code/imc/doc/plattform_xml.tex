@@ -34,7 +34,7 @@ system signal name.
 \subsection{Interrupt-Tag}
 The interrupt tag contains the attribute \verb|name| for the
 system interrupt name.
-Possible Parameters are listed as subtree \verb|<parameters>|.
+Possible parameters are listed as subtree \verb|<parameters>|.
 
 \subsection{Dation-Tag}
 The dation tag contains the attribute \verb|name| for the
@@ -54,7 +54,9 @@ The connection between two system elements is treated by the following
 elements:
 
 \begin{itemize}
-\item \verb|<needAssociation>| 
+\item \verb|<needAssociation>| with the attribute 
+ \verb|name| and the identifier of the expected interface. The 
+  interface names are described in the runtime documentation. 
 \item \verb|<associationProvider>|  with elements \verb|<associationType>|.
   Attributes for an associationType are:
   \begin{itemize}
@@ -65,6 +67,49 @@ elements:
       limits of allowed clients.
    \end{itemize} 
 \end{itemize}
+
+\subsection{Parameters}
+Only parameters of system elements of types bit, fixed and char are supported.
+The actual value may be restricted to definite values and ranges.
+
+Tags are defined for each of them:
+\begin{itemize}
+\item \verb|BIT| with the attribute \verb|length|, which specifies the 
+   allowed length of an actual parameter. \verb|<BIT length="8">...</BIT>|
+   specifies a BIT(8) parameter. Shorter actual parameters are extended --- 
+   longer parameters induce an error message.
+\item \verb|FIXED| with the attribute \verb|length|, which specifies the 
+   allowed length of an actual parameter. \verb|<FIXED length="15">...</FIXED>|
+   specifies a FIXED(15) parameter. Shorter actual parameters are extended --- 
+   longer parameters induce an error message.
+\item \verb|CHAR| with the attribute \verb|length|, which specifies the 
+   allowed length of an actual parameter. \verb|<CHAR length="15">...</CHAR>|
+   specifies a CHAR(15) parameter. Shorter actual parameters are allowed --- 
+   longer parameters induce an error message.
+\end{itemize}
+
+Supported rules:
+
+\begin{tabular}{|l|c|p{8cm}|}
+\hline
+rule & type & description \\
+\hline
+VALUES & BIT,FIXED, CHAR &
+   a comma separated list of allowed values
+   is given. Other values produce an error message. \\
+\hline
+NotEmpty & CHAR & 
+   at least one character is required \\   
+\hline
+FIXEDRANGE & FIXED &
+   two comma separated integers limits the allowed range
+   of actual values --- borders included \\ 
+\hline
+FIXEDGT & FIXED &
+   one integer which limits the allowed range at the low side
+   of actual value --- border NOT included \\ 
+\hline
+\end{tabular}
 
 \section{Sample Platform File}
 \begin{XMLCode}
@@ -89,6 +134,9 @@ elements:
          </parameters>
          <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
          <data>ALL</data>
+         <associationProvider>
+            <associationType name="NamedAlphicOutProvider" />
+         </associationProvider>
       </dation>
       <dation name="StdIn" instances="1">
          <parameters>
