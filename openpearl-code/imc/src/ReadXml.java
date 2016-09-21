@@ -88,7 +88,7 @@ public class ReadXml {
     	   
        
 		try {
-			File inputFile = new File(file);
+			File inputFile = new File(prefix+file);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			xmlDoc = builder.parse(inputFile);
 			xmlDoc.getDocumentElement().normalize();

@@ -59,7 +59,7 @@ public class TargetPlatformXml {
 	 */
 	TargetPlatformXml(String fileName, boolean verbose) {
 		this.verbose = verbose;
-		ReadXml tgt = new ReadXml(fileName, verbose,  InstallationLocation.path);
+		ReadXml tgt = new ReadXml(fileName, verbose,  InstallationLocation.path+"/lib/");
 
 		targetPlatform = tgt.getDocument(); // readXMLDocumentFromFile(fileName);
 		if (targetPlatform == null) {

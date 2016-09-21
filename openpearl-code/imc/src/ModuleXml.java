@@ -70,8 +70,8 @@ public class ModuleXml {
 
 		moduleXML = wrappedDomTree.getDocument(); // readXMLDocumentFromFile(fileName);
 		if (moduleXML == null) {
-			System.err.println("error reading target definition file ("
-					+ fileName);
+			System.err.println("error reading module definition file ("
+					+ fileName+")");
 			System.exit(1);
 			return;
 		}

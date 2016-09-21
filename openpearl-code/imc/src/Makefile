@@ -1,13 +1,15 @@
 include ../../configuration/include/auto.conf
 
+
 .PHONY: all clean tests
 
 all: imc.jar
 
-SRCS = InterModuleChecker.java TargetPlatformXml.java ModuleXml.java\
+SRCS = InstallationLocation.java \
+	InterModuleChecker.java TargetPlatformXml.java ModuleXml.java\
 	ReadXml.java \
 	SystemEntries.java SystemEntry.java Parameter.java Error.java \
-	CodeGenerator.java AssociationEntry.java InstallationLocation.java
+	CodeGenerator.java AssociationEntry.java
 
 %.class: %.java
 	javac $<
@@ -30,6 +32,14 @@ clean:
 	rm -f InstallationLocation.java
 	rm -f $(CLASSES)
 	rm -f imc.jar 
+
+install: imc.jar
+	cp imc.jar $(CONFIG_INSTALL_Target)/bin/imc.jar
+	echo 'java -cp $(CONFIG_INSTALL_Target)/bin/imc.jar InterModuleChecker -b $$PLATTFORM  -o system.cc $$fn' > ../imc.inc
+
+prepare:
+	touch $(CONFIG_INSTALL_Target)/bin/imc.jar
+	chmod 777  $(CONFIG_INSTALL_Target)/bin/imc.jar
 
 tests:
 	(cd tests; make;)

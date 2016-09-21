@@ -198,6 +198,8 @@ phony += prepare
 prepare:
 	@touch $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a
+	@touch $(CONFIG_INSTALL_Target)/lib/linux.xml
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/linux.xml
 
 phony += install
 install: all
@@ -212,6 +214,8 @@ install: all
 	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a -pthread -lrt' > cc_bin.inc
 	# ##########
 	@echo './$$fn' >run_bin.inc
+	# #########
+	@cp linux.xml $(CONFIG_INSTALL_Target)/lib/linux.xml
 
 libOpenPEARLlinux.a: $(PLIB_OBJ)
 	@rm -f $@

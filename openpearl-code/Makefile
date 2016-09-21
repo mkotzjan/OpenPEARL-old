@@ -40,6 +40,7 @@ compiler:
 prepare:
 ifeq ($(USERID),0)
 	   (cd runtime; make prepare; )
+	   (cd imc; make prepare; )
 	   (cd compiler; make prepare; )
 	   touch $(CONFIG_INSTALL_Target)/bin/prl
 	   chmod 777 $(CONFIG_INSTALL_Target)/bin/prl
@@ -50,6 +51,8 @@ endif
 install: configuration/include/autoconf.h  flashinterface.inc
 	(cd runtime; make clean; )
 	(cd compiler/src; make clean; )
+	(cd imc; make clean; )
+	(cd imc; make install; )
 	(cd runtime; make install; )
 	(cd compiler/src; make install; )
 ifeq ($(CONFIG_DOC_PREPORT),y)

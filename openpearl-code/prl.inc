@@ -109,6 +109,13 @@ then
  echo "terminate due to errors in stage 1"
  exit $rc
 fi
+#include "imc/imc.inc"
+rc=$?
+if [ $rc -ne 0 ]
+then
+ echo "terminate due to errors in stage 1 (imc)"
+ exit $rc
+fi
 
 else  if [ "$COMPILEONLY" == "1" ] ; then
    echo " C++ input conflicts with option -c"
