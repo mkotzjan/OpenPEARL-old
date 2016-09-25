@@ -1,4 +1,4 @@
-# /bin/sh
+#!/bin/sh
 # Name: prl
 #echo "called with :" $@
 #
@@ -80,7 +80,7 @@ fn=${INPUT%.*}
 #echo ext: $inp_ext
 #echo fn: $fn 
 
-if [ "$RUN" == "1" ] ; then
+if [ "$RUN" = "1" ] ; then
    if [ "$fn" != "$ext" ] ; then
 #include "runtime/run_bin.inc"
       if [ $rc -ne 0 ]; then
@@ -91,7 +91,7 @@ if [ "$RUN" == "1" ] ; then
       exit 1
    fi
 else
-if [ "$inp_ext" == "prl" ] ; then
+if [ "$inp_ext" = "prl" ] ; then
    prlcc=1;
 else if [ "$inp_ext" != "cc" ] ; then
    echo "cannot treat extension " $inp_ext;
@@ -100,7 +100,7 @@ else if [ "$inp_ext" != "cc" ] ; then
 fi
 
 #echo "prlcc=" $prlcc
-if [ "$prlcc" == "1" ] ; then 
+if [ "$prlcc" = "1" ] ; then 
 #   echo "PRL-> C++"
 #include "compiler/prl_cc.inc"
 rc=$?
@@ -109,15 +109,15 @@ then
  echo "terminate due to errors in stage 1"
  exit $rc
 fi
-#include "imc/imc.inc"
-rc=$?
-if [ $rc -ne 0 ]
-then
- echo "terminate due to errors in stage 1 (imc)"
- exit $rc
-fi
-
-else  if [ "$COMPILEONLY" == "1" ] ; then
+# imc invokation removed untilmodule.xml is available
+# #include "imc/imc.inc"
+#rc=$?
+#if [ $rc -ne 0 ]
+#then
+# echo "terminate due to errors in stage 1b (imc)"
+# exit $rc
+#fi
+else  if [ "$COMPILEONLY" = "1" ] ; then
    echo " C++ input conflicts with option -c"
    exit 1
    fi
