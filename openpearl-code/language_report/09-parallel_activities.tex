@@ -515,6 +515,7 @@ Example:
 {\bf AT} 22:00:00 {\bf ALL} 2 HRS {\bf UNTIL} 2:00:00  {\bf ACTIVATE} t1;
 will produce the activation of the task t1 at the following time, 
 depending on the time of the execution of the scheduled activation statement.
+
 \begin{tabular}{l|l}
 current time & activation times \\
 \hline
@@ -529,6 +530,29 @@ noch eingefuegt ...
 
 To avoid problems from jitter, it is recommended that the 
 activation freqency and border expression have a sufficient clearance.
+\end{discuss}
+
+\begin{discuss}
+ist das die richtige Stelle? Gilt auch bei CONTINUE!
+
+
+A problem may arise if the absolute time changes due to daylight saving setting
+or other influences.
+An element in the system part is provided in OpenPEARL
+to induce an interrupt, when a difference between to time of the system and
+the OpenPEARL specific time is detected. In application which are sensitive
+to the absolute time, this  interrupt should be treated and the task scheduling
+statements executed again.
+
+Example:
+
+SYSTEM;\\
+\x clockChangeInterrupt: ClockDifference(3600, -20.5, +300.0) -\ -\ - Lpc17xxRTC;
+
+If the difference of the hardware clock in Lpc17xxRTC is detected to be 
+mor than 20.5 seconds in the past, or more than 300 seconds in the future,
+the OpenPEARL clock base is changed and the interrupt triggered.
+The check is repeated all 3600 seconds.
 \end{discuss}
 
 

@@ -1,5 +1,8 @@
 \begin{discuss}
 TFU als E/A-Puffergroesse definieren?
+Gehoert dann TFU zu Typology oder als separater Eintrag in die 
+Dation Grammatik? 
+Sollte Typology aufgeteilt werden in eine Fassung fuer DCL und eine Fassung fuer SPC? --- bei SPC kein TFU(Puffergroesse)
 
 \htgt{Typology} ::=\\
 \x {\bf DIM} ( \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \}\\

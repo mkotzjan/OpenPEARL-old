@@ -1,5 +1,5 @@
 \begin{discuss}
-ist das korrekt? welche Formate gehen??
+ist das korrekt? 
 
 \htgt{FormatOrPosition} ::=\\
 \x [ \hlink{FormatFactor} ] \{ \hlink{Format} $\mid$ \hlink{Position} \}\\

@@ -159,6 +159,9 @@ specified.
 \caption{Permissibility of declarations\label{objekte}}
 \vspace{5mm}
 
+\begin{discuss}
+in der Tabelle darf kein Kreuz bei PROC and TASK und 
+PROC-Level sein
 \begin{tabular}{|l|c|c|c|c|}
 \hline
                        & \multicolumn{4}{|c|}{declaration possible on} \\
@@ -173,6 +176,7 @@ data station, format   & x            & --   & --        & -- \\
 type                   & x            & x    & x         & x \\
 \hline
 \end{tabular}
+\end{discuss}
 \end{table}
 
 \subsection{Specification (SPC) and Identification (SPC IDENT)}  % 4.2.2
@@ -346,37 +350,75 @@ Example:
 
 All data stations, interrupts and signals given in the system part of a
 certain module are regarded as declared (implicitly) with the global
-attribute. Thus, they are only specified in the problem parts of the
+attribute.
+\begin{discuss}
+Diese Sonderbehandlung passt nicht zu unserer Compilerstruktur.
+Mir ist diese Sonderbehandlung auch nicht eingängig.
+
+\begin{removed}
+Thus, they are only specified in the problem parts of the
 program; here the global attribute can be omitted in the problem part of
 the same module, in all other modules it must be defined.
+\end{removed}
+\end{discuss}
 
 The general form of the global attribute reads:
 
 \input{GlobalAttribute.bnf}
+\begin{discuss}
+in der deutschen Fassung des Sprachreports von 1995 ist noch dargelegt,
+dass Identifier(Module) nur dokumentatorischen Character hat.
+In dieser Fassung ist diese Anmerkung entfallen.
 
+Klaerungsmoeglichkeit 1:\\
+Identifer(Module) entfällt in der Sprachdefinition
+
+Klaerungsmoeglichkeit 2: Modulangabe ist notwendig\\
+The identifer$\S $Module denotes the module name of the corresponding
+declaration. Multiple declarations of the same identifier in different modules
+are distinct.  
+\end{discuss}
+
+\begin{discuss}
+Laengenangabe nicht verst"andlich!
+
+\begin{removed}
 When specifying an object, all attributes have to be taken over from its
 declaration, except for a given priority, precision or length. In the
 latter exceptional case, the precision or length defined in the
 corresponding length declaration is applied for the range of the program
 where the specification is valid.
+\end{removed}
+
+Vorschlag:\\
+\begin{added}
+When specifying an object, all attributes have to be taken over from its
+declaration, except for a given priority. The effective precission or length 
+must fit exactly. Maybe the literal specification and declaration differ 
+due to different length declaration in the range of the program.
+\end{added} 
+
+\end{discuss}
 
 Example:
 
 % ??? Einrueckungen im Original unuebersichtlich und unklar
+
+%%%%% SPC in rechter Spalte mit , statt ;
 
 \begin{tabbing}
 \x P: {\bf PROC} (A(,) {\bf FIXED IDENT})\=  \kill
 
 {\bf MODULE};                     \> {\bf MODULE};\\
 {\bf PROBLEM};                    \> {\bf PROBLEM};\\
-\x T: {\bf TASK PRIO 3 GLOBAL};   \> \x {\bf SPC} T {\bf TASK GLOBAL};\\
+\x T: {\bf TASK PRIO 3 GLOBAL};   \> \x {\bf SPC} T {\bf TASK GLOBAL},\\
 \x \x \x ! task body              \> \x \x P {\bf ENTRY} ((,) {\bf FIXED IDENT}) {\bf GLOBAL};\\
-\x \x {\bf END}; ! T              \> \x INIT: {\bf TASK};\\
+\x {\bf END}; ! T              \> \x INIT: {\bf TASK};\\
                                   \> \x \x {\bf DCL} TAB (10,20) {\bf FIXED;}\\
 \x P: {\bf PROC} (A(,) {\bf FIXED IDENT}) \> \x \x ...\\
 \x \x \x \x {\bf GLOBAL};         \> \x \x {\bf CALL} P (TAB);\\
 \x \x \x ! procedure body         \> \x \x ... \\
-\x \x {\bf END}; ! P              \> \x \x {\bf ACTIVATE} T;\\
+\x {\bf END}; ! P              \> \x \x {\bf ACTIVATE} T;\\
 \x ...                            \> \x {\bf END}; ! INIT\\
 {\bf MODEND};                     \> \x ...\\
                                   \> {\bf MODEND};

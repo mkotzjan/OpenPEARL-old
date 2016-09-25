@@ -140,8 +140,8 @@ Es koennen auch noch ueberzaehlige Elemente vorhanden sein!
 
 ParameterListForSPC, Indicator fehlen
 
-Ist IdentifierDenotation das gleiuche wie OneIdentifierOrList?
-war in Kapitel 5 so deklariert --- wird noch einige male referenziert:
+Ist IdentifierDenotation das gleiche wie OneIdentifierOrList?
+war in Kapitel 5 so deklariert --- wird noch einige Male referenziert:
 
 IdentifierDenotation ::=\\
 \x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
@@ -291,10 +291,10 @@ nngz ::= \\
 \x $\mid$ \hlink{FormatDeclaration}\\
 \x $\mid$ \hlink{ProcedureDeclaration}\\
 \x $\mid$ \hlink{TaskDeclaration}\\
-\begin{removed}
-\x $\mid$ OperatorDefinition\\
-\x $\mid$ PredenceDefinition\\
-\end{removed}
+%%%%%\begin{removed}
+%%%%%\x $\mid$ OperatorDefinition\\
+%%%%%\x $\mid$ PredenceDefinition\\
+%%%%%\end{removed}
 
 
 \input{LengthDefinition.bnf} 
@@ -407,15 +407,14 @@ Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
 
 \input{SourceSinkAttribute.bnf}
 
-\begin{removed}
-ClassAttribute ::= \\
-\x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData\\
-\end{removed}
+%%%%%\begin{removed}
+%%%%%ClassAttribute ::= \\
+%%%%%\x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData\\
+%%%%%\end{removed}
 
-\begin{added}
+%%%%%\begin{added}
 \input{ClassAttribute.bnf}
-
-\end{added}
+%%%%%\end{added}
 
 \input{TypeOfTransmissionData.bnf}
 \input{IOCompoundType.bnf}
@@ -625,26 +624,26 @@ Auswirkung auf alte Teile pruefen
 
 \input{InterruptStatement.bnf}
 
-\begin{removed}
-SchedulingSignalReaction ::=\\
-\x {\bf ON} Name$\S $Signal \{ [ 
-	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
-\x \x SignalReaction $\mid$ 
-	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
+%%%%%\begin{removed}
+%%%%%SchedulingSignalReaction ::=\\
+%%%%%\x {\bf ON} Name$\S $Signal \{ [ 
+%%%%%	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
+%%%%%\x \x SignalReaction $\mid$ 
+%%%%%	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
+%%%%%
+%%%%%SignalReaction::= UnlabeledStatement\\
+%%%%%
+%%%%%InduceStatement ::=\\
+%%%%%\x {\bf INDUCE} Name$\S $Signal 
+%%%%%	[ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
+%%%%%\end{removed}
 
-SignalReaction::= UnlabeledStatement\\
-
-InduceStatement ::=\\
-\x {\bf INDUCE} Name$\S $Signal 
-	[ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
-\end{removed}
-
-\begin{added}
+%%%%%\begin{added}
 \input{SignalStatement.bnf}
 \input{SignalReaction.bnf}
 \input{SignalFinalStatement.bnf}
 \input{InduceStatement.bnf} 
-\end{added}
+%%%%%\end{added}
 
 \htgt{ConvertStatement} ::=\\
 \x \hlink{ConvertToStatement} $\mid$ \hlink{ConvertFromStatement}\\
@@ -680,44 +679,44 @@ InduceStatement ::=\\
         
 \input{ReadStatement.bnf}
         
-\begin{removed}
-SendStatement ::=\\
-\x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%\begin{removed}
+%%%%%SendStatement ::=\\
+%%%%%\x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
+%%%%%\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%
+%%%%%TakeStatement ::=\\
+%%%%%\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
+%%%%%\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%
+%%%%%RST-S-CTRL-Format ::=\\
+%%%%%\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+%%%%%\x $\mid$ {\bf S} ( \hlink{Name}$\S $Variable-FIXED )\\
+%%%%%\x $\mid$ {\bf CONTROL} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
+%%%%%\end{removed}
 
-TakeStatement ::=\\
-\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
-
-RST-S-CTRL-Format ::=\\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-\x $\mid$ {\bf S} ( \hlink{Name}$\S $Variable-FIXED )\\
-\x $\mid$ {\bf CONTROL} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
-\end{removed}
-
-\begin{added}
+%%%%%\begin{added}
 \input{SendStatement.bnf} 
 
 \input{TakeStatement.bnf}
 
 \input{RSTFormat.bnf}
 
-\end{added}
+%%%%%\end{added}
 
 \input{Slice.bnf}
 
 \input{FormatOrPosition.bnf}
       
-\begin{removed}  
-Factor ::=\\
-\x ( \hlink{Expression}$\S $IntegerGreaterZero ) $\mid$ \hlink{IntegerWithoutPrecision}$\S $GreaterZero\\
-
-.. and sustituted Factor by FormatFactor in Convert and Put/GET statements
-\end{removed}  
-\begin{added}  
+%%%%%\begin{removed}  
+%%%%%Factor ::=\\
+%%%%%\x ( \hlink{Expression}$\S $IntegerGreaterZero ) $\mid$ \hlink{IntegerWithoutPrecision}$\S $GreaterZero\\
+%%%%%
+%%%%%.. and sustituted Factor by FormatFactor in Convert and Put/GET statements
+%%%%%\end{removed}  
+%%%%%\begin{added}  
 \input{FormatFactor.bnf}
 
-\end{added}  
+%%%%%\end{added}  
 
 \input{Format.bnf}
 \input{FixedFormat.bnf}

@@ -1,8 +1,6 @@
 \begin{discuss}
 REF INTERRUPT/IRPT, REF SIGNAL ok?
 
-Klammer nach BOLT sollte nach CHAR() verschoben werden?
-
 \htgt{TypeReference} ::=\\
 \x {\bf REF} \\
 \x \{ [ \hlink{VirtualDimensionList} ] [ {\bf INV} ] 

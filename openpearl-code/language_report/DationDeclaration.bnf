@@ -1,6 +1,7 @@
 \begin{discuss}
 CREATED(Identifier) oder CREATED(NAME) ; Name kann auch Feldelement sein.
-Felder von Systemteilnamen haben wir nicht mehr
+Felder von Systemteilnamen haben wir nicht mehr, also ist
+Identifier die engere Beschreibung.
 
 
 \htgt{DationDeclaration} ::= \\

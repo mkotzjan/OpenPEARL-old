@@ -12,25 +12,21 @@ handling upon the occurrence of a signal.
 \section{System Part Entries}
 The signals needed for a program are declared in the system part, where
 freely selectable user names can be assigned to them.
-\begin{removed} Additionally, an
-error list can be defined to limit the signal scheduling to one or
-several particular error numbers.
-
-UserNameDeclaration$\S $For-SIGNAL ::= \\
-\x Identifier$\S $UserName : Identifier$\S $SIGNAL-SystemName\\
-\x \x [ ( Identifier$\S $ErrorNumber [ , Identifier$\S $ErrorNumber ] $^{...}$ ) ]
-\end{removed}
+%%%%%\begin{removed} Additionally, an
+%%%%%error list can be defined to limit the signal scheduling to one or
+%%%%%several particular error numbers.
+%%%%%
+%%%%%UserNameDeclaration$\S $For-SIGNAL ::= \\
+%%%%%\x Identifier$\S $UserName : Identifier$\S $SIGNAL-SystemName\\
+%%%%%\x \x [ ( Identifier$\S $ErrorNumber [ , Identifier$\S $ErrorNumber ] $^{...}$ ) ]
+%%%%%\end{removed}
 
 \input{SystemSignalDeclaration.bnf}
 
-\begin{discuss}
-System Names sicherlich im plattform manual -- aber sind Nummern noch
-wichtig?
 
 The signals and their associated error numbers possible on a certain
 computer are described in the respective user manual, giving their
 system names and meanings.
-\end{discuss}
 
 \section{Declaration and Specification of Signals} 
 
@@ -94,14 +90,14 @@ UserSignalDeclaration :==\\
 The reaction planned for the occurrence of a signal is scheduled with
 the following statement:
 
-\begin{removed}
-SchedulingSignalReaction ::=\\
-\x {\bf ON} Name$\S $Signal \{ [ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
-\x \x SignalReaction $\mid$ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};
-
-SignalReaction ::=\\
-\x UnlabeledStatement
-\end{removed}
+%%%%%\begin{removed}
+%%%%%SchedulingSignalReaction ::=\\
+%%%%%\x {\bf ON} Name$\S $Signal \{ [ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
+%%%%%\x \x SignalReaction $\mid$ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};
+%%%%%
+%%%%%SignalReaction ::=\\
+%%%%%\x UnlabeledStatement
+%%%%%\end{removed}
 
 \begin{discuss}
 SchedulingSignalReaction ::=\\
@@ -109,7 +105,7 @@ SchedulingSignalReaction ::=\\
 \x \x SignalReaction ;
 
 
-\input{SignalStatement.bnf}
+%%%%\input{SignalStatement.bnf}
 \input{SignalFinalStatement.bnf}
 \input{SignalReaction.bnf}
 \input{InduceStatement.bnf}

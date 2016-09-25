@@ -1,5 +1,6 @@
 \begin{discuss}
-[] bei exclusive korrekt? ich denke nicht
+[] bei exclusive korrekt? ich denke sie sind ueberfluessig, 
+da schon der OpenParameter selbst optional ist. Daher streichen?
 
 \htgt{OpenParameter} ::=\\
 \x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\

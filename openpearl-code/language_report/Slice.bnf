@@ -1,5 +1,6 @@
 \begin{discuss}
 was bedeutet der Kommentar?
+Was bedeutet hier bottom-up order?
 
 \htgt{Slice} ::=\\
 \x \hlink{Name}$\S $Array ( [ \hlink{Index} , ] $^{...}$ \hlink{Index} : \hlink{Index} )\\

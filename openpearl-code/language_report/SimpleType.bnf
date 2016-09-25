@@ -6,8 +6,14 @@
 %%% \x $\mid$ {\bf CLOCK}\\
 %%% \x $\mid$ \{ {\bf DUR $\mid$ DURATION} \}\\
 %%%\end{removed}
+\begin{discuss}
+sollte TypeInteger in TypeFixed umbenannt werden, damit diese 
+Definition homogener wird?
+
 \htgt{SimpleType} ::=\\
 \x \hlink{TypeInteger} $\mid$ \hlink{TypeFloat} $\mid$\\
 \x \hlink{TypeBitString} $\mid$ \hlink{TypeCharacterString} $\mid$\\
 \x \hlink{TypeClock} $\mid$ \hlink{TypeDuration}
+
+\end{discuss}
 

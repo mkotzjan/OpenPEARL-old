@@ -1,5 +1,5 @@
 \begin{discuss}
-IdentifierDenotaiopn sollte wohl OneIndentifierOrList sein, oder?
+IdentifierDenotation sollte wohl OneIndentifierOrList sein, oder?
 
 \htgt{IOStructureComponent} := \\
 \x \hlink{IdentifierDenotation}\\
