@@ -270,10 +270,11 @@ clean:
 	@rm -f drivers/*.diff
 	@rm -f core
 	@rm -f ../common/Signals.hh ../common/Signals.hcc
+	@rm -f ../common/Signals.xml
 	@rm -f ../common/signallist.tex 
 	@rm -f ../common/signals.log
 	@rm -f sysincs.h  pearl2.h pearl.h
-	rm -f cc_bin.inc run_bin.inc
+	@rm -f cc_bin.inc run_bin.inc
 
 phony += checkformat
 checkformat: 
