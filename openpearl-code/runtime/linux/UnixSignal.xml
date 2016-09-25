@@ -1,0 +1,7 @@
+   <interrupt name="UnixSignal">
+      <parameters>
+         <FIXED length="31">
+            <VALUES>1,2,3,15,16,17</VALUES>
+         </FIXED>
+      </parameters>
+   </interrupt>
