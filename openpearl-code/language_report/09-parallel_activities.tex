@@ -230,7 +230,56 @@ CurrPrio := {\bf PRIO};\\
 PrioTaskA := {\bf PRIO} (TaskA);\\
 {\bf CONTINUE} TaskA {\bf PRIO} CurrPrio + 1;
 
+\section{Timing}
+
+\begin{discuss}
+Dieser Abschnitt ist neu eingefuegt worden.
+Passt die Kapitelueberschrift?
+
+Verhalten bei Zeitdrifts waere nun klar definiert.
+
+Inhaltlich wird die bei der AK-Sitzung im November 2016 besprochen.
+
+\begin{added}
+The internal clock is usually realized upon a realtime clock and 
+periodic ticks, which defines the clock resolution. 
+
+One problem may arise if the absolute time changes due to 
+daylight saving setting or other influences or e.g. temperature  drift.
+An automatic reexecution of the task scheduling statements
+ (see \ref{sec_tasking_statements})
+may be wrong in some cases. 
+
+To adress this problem, 
+an element in the system part is provided in OpenPEARL
+to induce an interrupt, when a difference between a reference clock and
+the OpenPEARL specific time is detected. In application, which are sensitive
+to the absolute time, this  interrupt should be treated and the task scheduling
+statements reexecuted fitting to the requirements of the application.
+
+Example:
+
+SYSTEM;\\
+\x clockChangeInterrupt: ClockDifference(3600, -20.5, +300.0) -\ -\ - Lpc17xxRTC;
+
+If the difference of the hardware clock in Lpc17xxRTC is detected to be 
+mor than 20.5 seconds in the past, or more than 300 seconds in the future,
+the OpenPEARL clock base is changed and the interrupt triggered.
+The check is repeated all 3600 seconds.
+
+Another problem arises, if an usually small processor system provides no
+realtime clock. Thus no scheduling condition based on absolute times 
+ can be satisfied. In this case the build process rejects the creation
+of the PEARL application, if AT or UNTIL
+ (see \ref{sec_tasking_statements})
+ is used.
+
+\end{added}
+\end{discuss}
+
+
 \section{Statements for Controlling Tasks}    % 9.2
+\label{sec_tasking_statements}
 
 A task can be started, terminated, suspended, continued, resumed and
 descheduled.
@@ -405,14 +454,14 @@ statement.
 %%%\begin{discuss}
 %%%TaskStarting already inserted in sec start condition
 %%%\end{discuss}
-\begin{discuss}
-Executing such a start statement causes that the indicated task...
+%%%%%\begin{discuss}
+%%%%%Executing such a start statement causes that the indicated task...
+%%%%%
+%%%%%such streichen?
+%%%%%\end{discuss}
 
-such streichen?
-
-\end{discuss}
-
-Executing such a start statement causes that the indicated task
+Executing %%%%%such
+ a start statement causes that the indicated task
 applies for the allocation of a processor immediately (form without
 start condition) or at the instant determined by the start condition ---
 competing with all other tasks being runable at the moment
@@ -423,8 +472,8 @@ one processor is provided.
 Possibly, the indicated task has already been started and not been
 terminated when executing the start statement. If in this case no
 StartCondition is denoted, an error message occurs.
-\begin{discuss}
-so ok? 
+%%%%%\begin{discuss}
+%%%%%so ok? 
 
 However, if the start statement contains a StartCondition,
  the indicated task is
@@ -442,8 +491,7 @@ This buffering is limited to 1 re-start action.
 This behavior is shown in figure~\ref{task-sched} and \ref{task-sched1}. The rectangles denote the time period, where the tasks are active. The arrows mark
 the time of interaction.
 
-evtl. ein Flussdiagramm hierzu einfuegen?
-\end{discuss}
+%%%%%\end{discuss}
 
 \begin{figure}
 \setlength{\unitlength}{1.00mm}
@@ -505,11 +553,6 @@ for this activation. Subsequent activations will use the priority, which
 is specified in the task declaration.
 %%%\end{added}
 
-%%%\begin{added}
-%%%\OpenPEARL{} uses relative times for the startCondition. This becomes apparent,
-%%%if the time-scale is re-adjusted. The re-start will occur according the
-%%%time-base which was valid while setting the task schedule condition.
-
 Example:
 
 {\bf AT} 22:00:00 {\bf ALL} 2 HRS {\bf UNTIL} 2:00:00  {\bf ACTIVATE} t1;
@@ -525,37 +568,37 @@ current time & activation times \\
 \end{tabular}
 
 Note that \OpenPEARL{} treats time intervals inclusive the borders.
-\begin{discuss}
-noch eingefuegt ...
+%%%%%\begin{added}
+%%%%%noch eingefuegt ...
 
 To avoid problems from jitter, it is recommended that the 
-activation freqency and border expression have a sufficient clearance.
-\end{discuss}
+activation freqency and border expression have a sufficient spacing.
+%%%%%\end{added}
 
-\begin{discuss}
-ist das die richtige Stelle? Gilt auch bei CONTINUE!
-
-
-A problem may arise if the absolute time changes due to daylight saving setting
-or other influences.
-An element in the system part is provided in OpenPEARL
-to induce an interrupt, when a difference between to time of the system and
-the OpenPEARL specific time is detected. In application which are sensitive
-to the absolute time, this  interrupt should be treated and the task scheduling
-statements executed again.
-
-Example:
-
-SYSTEM;\\
-\x clockChangeInterrupt: ClockDifference(3600, -20.5, +300.0) -\ -\ - Lpc17xxRTC;
-
-If the difference of the hardware clock in Lpc17xxRTC is detected to be 
-mor than 20.5 seconds in the past, or more than 300 seconds in the future,
-the OpenPEARL clock base is changed and the interrupt triggered.
-The check is repeated all 3600 seconds.
-\end{discuss}
-
-
+%%%%%\begin{discuss}
+%%%%%ist das die richtige Stelle? Gilt auch bei CONTINUE!
+%%%%%
+%%%%%
+%%%%%A problem may arise if the absolute time changes due to daylight saving setting
+%%%%%or other influences.
+%%%%%An element in the system part is provided in OpenPEARL
+%%%%%to induce an interrupt, when a difference between to time of the system and
+%%%%%the OpenPEARL specific time is detected. In application which are sensitive
+%%%%%to the absolute time, this  interrupt should be treated and the task scheduling
+%%%%%statements executed again.
+%%%%%
+%%%%%Example:
+%%%%%
+%%%%%SYSTEM;\\
+%%%%%\x clockChangeInterrupt: ClockDifference(3600, -20.5, +300.0) -\ -\ - Lpc17xxRTC;
+%%%%%
+%%%%%If the difference of the hardware clock in Lpc17xxRTC is detected to be 
+%%%%%mor than 20.5 seconds in the past, or more than 300 seconds in the future,
+%%%%%the OpenPEARL clock base is changed and the interrupt triggered.
+%%%%%The check is repeated all 3600 seconds.
+%%%%%\end{discuss}
+%%%%%
+%%%%%
 Figure \ref{sched_act} illustrates the possibilities to start a task
 immediately or under various start conditions.
 %%%\end{added}
@@ -804,8 +847,8 @@ time, after a certain duration or after the occurrence of an interrupt by
 the following statement:
 
 %%%\begin{front}
-TaskContinuation ::=\\
-\x [ SimpleStartCondition ] {\bf CONTINUE} [ Name$\S $Task ] [ Priority ]\
+%%%TaskContinuation ::=\\
+%%%\x [ SimpleStartCondition ] {\bf CONTINUE} [ Name$\S $Task ] [ Priority ]\
 
 \input{TaskContinuing.bnf}
 \input{SimpleStartCondition.bnf}
@@ -1755,7 +1798,9 @@ Supply:         \> {\bf TASK PRIORITY} 2;\\
 ...             \>
 \end{tabbing}
 
-The general form of an interrupt specification reads:
+The general form of an interrupt declaration and specification reads:
+
+\input{SystemInterruptDeclaration.bnf}
 
 %%%\begin{front}
 %%%InterruptSpecification ::=\\

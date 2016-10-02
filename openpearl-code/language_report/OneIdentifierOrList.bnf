@@ -1,0 +1,3 @@
+\htgt{OneIdentifierOrList} ::= \\
+\x \hlink{Identifier} $\mid$ ( \hlink{Identifier} [ , \hlink{Identifier} ] $^{...}$ ) \\
+

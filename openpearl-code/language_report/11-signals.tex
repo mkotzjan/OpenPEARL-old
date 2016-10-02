@@ -54,7 +54,7 @@ FixedOverflowSignal and DationEOFSignal are system names.
 
 {\bf MODULE};\\
 \x {\bf SYSTEM};\\
-\x \x overflow : FixedOverfowSignal;\\
+\x \x overflow : FixedOverflowSignal;\\
 \x \x eof : DationEOFSignal;
 \x \x ...\\
 \x {\bf PROBLEM};\\
@@ -74,15 +74,20 @@ The general form of the specification of signals reads:
 
 \begin{discuss}
 
-proposal fuer UserSignals
+Proposal fuer UserSignals
+
+Dies ist Thema auf der AK-Sitzung im November 2016
+
 
 In larger software systems it may be useful to define own signals, e.g.
 for wrong usage of functions. 
 
 UserSignalDeclaration :==\\
 \x \{ {\bf DCL $\mid$ DECLARE \} } \hlink{Identifier} SIGNAL\\
-\x \x  [ {\bf RST (} \hlink{ConstantFIXEDExpression}$\S $ErrorNumber ] \\
+\x \x  {\bf RST (} \hlink{ConstantFIXEDExpression}$\S $ErrorNumber \\
 \x \x [ \hlink{GlobalAttribute} ] ;
+
+Valid ranges for the error number are listed in the plattform specific manual.
 
 \end{discuss}
 
@@ -99,18 +104,14 @@ the following statement:
 %%%%%\x UnlabeledStatement
 %%%%%\end{removed}
 
-\begin{discuss}
-SchedulingSignalReaction ::=\\
-\x {\bf ON} Name$\S $Signal [ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
-\x \x SignalReaction ;
-
-
+%%%%%\begin{discuss}
+\input{SchedulingSignalReaction.bnf}
 %%%%\input{SignalStatement.bnf}
-\input{SignalFinalStatement.bnf}
 \input{SignalReaction.bnf}
+\input{SignalFinalStatement.bnf}
 \input{InduceStatement.bnf}
 
-\end{discuss}
+%%%%%\end{discuss}
 
 Instead of UnlabeledStatement, all statements besides the
 statement SchedulingSignalReaction are permitted, particularly
@@ -212,16 +213,34 @@ For testing, the statement
 
 could be executed sporadically instead of the read statement.
 
+
+%%%\begin{modified}
+%%%fixiert, dass die Systemreaktion zur Terminierung des ausfuehrenden Task
+%%%fuehrt.
+
 If a signal is induced, whether by an error state or an induce
 statement, and no signal reaction is scheduled for it, the system
 reaction is triggered (i.e., generally an error message of the run time
-system and termination of the causing task).
+system), which terminates the causing task.
+%%%\end{modified}
 
 By stating a variable after RST in the signal scheduling, the programmer
 gets access to the error number (error cause). In this case, the signal
 SignalName can be induced for the error with the number ErrorNumber by
 
 {\bf INDUCE} SignalName {\bf RST} ( ErrorNumber ) ;
+
+\begin{discuss}
+Im letzten Satz des vorherigen Abschnitts muss "'In this case"' gestrichen 
+werden, oder?
+
+\begin{added}
+In case of inducing a signal with an error number, the predefined number
+is superseeded for this action with the given value. This does not change
+the identify of a signal, when setting the actual number to the
+system number of another signal. 
+\end{added}
+\end{discuss}
 
 Example:
 

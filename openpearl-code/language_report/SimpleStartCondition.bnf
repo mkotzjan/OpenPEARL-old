@@ -1,5 +1,8 @@
 \begin{discuss}
-Name von Interrupt  -- wie darf ein Interrupt genutzt werden? --- ggf. Identifier
+Name von Interrupt  -- wie darf ein Interrupt genutzt werden? --- ggf. Identifier.
+
+Dies ist Thema auf der AK-Sitzung im Novembner 2016
+
 
 \htgt{SimpleStartCondition} ::= \\
 \x {\bf AT} \hlink{Expression}$\S $Time $\mid$ 

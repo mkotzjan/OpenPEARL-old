@@ -1,12 +1,5 @@
-\begin{discuss}
-was bedeutet der Kommentar?
-Was bedeutet hier bottom-up order?
 
 \htgt{Slice} ::=\\
 \x \hlink{Name}$\S $Array ( [ \hlink{Index} , ] $^{...}$ \hlink{Index} : \hlink{Index} )\\
-\x $/^*$ Instead of the last array-index an index-slice is given to address 
-the respective one-dimensional array-slice which is processed by the I/O 
-in bottom-up order. $*/$\\
 
-\end{discuss}
 

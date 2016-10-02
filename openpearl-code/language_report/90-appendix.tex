@@ -27,7 +27,11 @@ IRPT als Parameter oder REF value zulaessig?
 
 bei SIGNALs geht nur GLOBAL; die restlichen 'x' raus?
 
-REF STRUCT[] entfernen!
+REF STRUCT[] entfernt
+
+Dies ist Thema auf der AK-Sitzung im November 2016.
+
+
 \end{discuss}
 \begin{table}[htb]
 \begin{tabular}{lccccccccc}
@@ -55,7 +59,7 @@ FORMAT         & --    &  --     & --    &  --    &  --   &   --   &  -- &    --
 REF CHAR ( )   & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
 REF PROC       & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
 REF TASK       & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
-REF STRUCT [ ] & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+%%% REF STRUCT [ ] & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
 \end{tabular}
 \end{table}
                                                                                  
@@ -65,7 +69,9 @@ passed on by means of identification (IDENT) as procedure parameters.
 \newpage
 \section{Predefined Functions}   % A 2
 
-This appendix describes the functions known to the PEARL compiler. They
+This appendix describes the functions known to the PEARL
+% compiler
+System. They
 can be used in the single modules 
 %%%without
 by
@@ -82,7 +88,7 @@ the predefined function in the whole program.
 \subsection{The Function NOW}    % A 2.1
 
 The function procedure NOW passes back the actual time or system time, resp., 
-as value of type CLOCK. A specification of the function looks like this:\\
+as value of type CLOCK. The specification of the function looks like this:\\
 
 {\bf SPC} NOW {\bf PROC RETURNS ( CLOCK ) GLOBAL} ; 
 
@@ -92,7 +98,7 @@ as value of type CLOCK. A specification of the function looks like this:\\
 The actual date can be received by invoking the function procedure DATE.
 The function result is a character string constant of length 10, containing
 the date in the form ``year--month--day''. Here an example for December 5,
-1991: ``1991--12-05''. The function can be specified like this:\\
+1991: ``1991--12-05''. The function must  be specified like this:\\
 
 {\bf SPC} DATE {\bf PROC RETURNS ( CHAR(10) ) GLOBAL} ;
 
@@ -109,9 +115,9 @@ code. The position of the insertion is
 \item in system part: {\em not defined yet}
 \item on module level in the problem part 
    it is not clearly defined, since the first compilation
-   steps adds some information for administration is between.
+   steps adds some information for administration in between.
 \item in tasks and procedures just between the output of the surrounding
-generated output
+statements.
 \end{itemize}
 \end{discuss}
 
@@ -138,14 +144,16 @@ C & PEARL \\
 die Syntaxelemente sind ggf. noch besser zu ordnen.
 Es koennen auch noch ueberzaehlige Elemente vorhanden sein!
 
-ParameterListForSPC, Indicator fehlen
+ParameterListForSPC kann vermutlich durcgListOfFormalParameters ersetzt 
+werden.
 
-Ist IdentifierDenotation das gleiche wie OneIdentifierOrList?
-war in Kapitel 5 so deklariert --- wird noch einige Male referenziert:
-
-IdentifierDenotation ::=\\
-\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
-
+%%%Ist IdentifierDenotation das gleiche wie OneIdentifierOrList?
+%%% ja --> wurde komplett ersetzt
+%%% war so definiert:
+%%%IdentifierDenotation ::=\\
+%%%\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
+%%%
+%%% Indicator wurde durch Identifier ersetzt
 
 \end{discuss}
 
@@ -198,10 +206,10 @@ description.
 \input{ConstantParameter.bnf}
 \input{Association.bnf}
 
-\begin{removed}
-nngz ::= \\
-\x IntegerWithoutPrecision$\S $NonNegative
-\end{removed}
+%%%\begin{removed}
+%%%nngz ::= \\
+%%%\x IntegerWithoutPrecision$\S $NonNegative
+%%%\end{removed}
 
 
 \subsection{Basic Elements}    % A 3.3 
@@ -301,7 +309,7 @@ nngz ::= \\
 
 \input{TypeDefinition.bnf}
 \input{Type.bnf}
-\input{TypeInteger.bnf}
+\input{TypeFixed.bnf}
 \input{TypeFloat.bnf}
 \input{TypeBitString.bnf}
 \input{TypeCharacterString.bnf}
@@ -327,16 +335,20 @@ Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
 \htgt{DeclareSentence} ::=\\
 \x \hlink{OneIdentifierOrList} [ \hlink{DimensionAttribute} ]\\
 \x \{ \hlink{ProblemDataAttribute} $\mid$ \hlink{SemaAttribute} $\mid$ \hlink{BoltAttribute} $\mid$ \hlink{DationAttribute} \}\\ 
+\end{discuss}
+
+
+\begin{discuss}
+Doppelte Regel mit DationDeclaration
 
 \htgt{DationAttribute} ::=\\
 \x \hlink{TypeDation}\\
 \x [ \hlink{GlobalAttribute} ]\\
-\x {\bf CREATED} ( \hlink{Indicator}$\S $UserNameForSytemDation )\\
+\x {\bf CREATED} ( \hlink{Identifier}$\S $UserNameForSytemDation )\\
 \end{discuss}
 
 
-\htgt{OneIdentifierOrList} ::= \\
-\x \hlink{Identifier} $\mid$ ( \hlink{Identifier} [ , \hlink{Identifier} ] $^{...}$ ) \\
+\input{OneIdentifierOrList.bnf}
 
 \input{DimensionAttribute.bnf}
 
@@ -352,7 +364,7 @@ Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
 \htgt{StructuredType} ::=\\
 \x \hlink{TypeStructure} $\mid$ \hlink{Identifier}$\S $ForNewDefinedType\\
 
-\input{TypeStructure.bnf}
+% war schon mal da \input{TypeStructure.bnf}
 
 \input{StructureComponent.bnf}
 
@@ -369,8 +381,8 @@ Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
 \input{ArrayDeclaration.bnf}
 \input{ArrayDenotation.bnf}
 \input{TypeAttributeForArray.bnf}
-\input{DimensionAttribute.bnf}
-\input{DimensionBoundaries.bnf}
+% war schon mal da \input{DimensionAttribute.bnf}
+% war schon mal da \input{DimensionBoundaries.bnf}
 
 \input{ArraySpecification.bnf}
 \input{ArrayDenotationS.bnf}
@@ -378,8 +390,8 @@ Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
 \input{StructureDeclaration.bnf}
 \input{StructureDenotation.bnf}
 \input{TypeStructure.bnf}
-\input{StructureComponent.bnf}
-\input{TypeAttributeInStructureComponent.bnf}
+% ist schon mal da  \input{StructureComponent.bnf}
+% ist schon mal da \input{TypeAttributeInStructureComponent.bnf}
 \input{StructureSpecification.bnf}
 \input{StructureDenotationS.bnf}
 
@@ -721,6 +733,12 @@ Auswirkung auf alte Teile pruefen
 \input{Format.bnf}
 \input{FixedFormat.bnf}
 \input{FloatFormat.bnf}
+\input{CharacterStringFormat.bnf}
+\input{BitFormat.bnf}
+\input{TimeFormat.bnf}
+\input{DurationFormat.bnf}
+\input{ListFormat.bnf}
+\input{RFormat.bnf}
 \input{FieldWidth.bnf}
 \input{DecimalPositions.bnf}
 \input{Significance.bnf}

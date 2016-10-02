@@ -104,9 +104,6 @@ I/O statements of the problem part via these user names.
 
 \input{SystemPart.bnf}
 %%%\begin{added}
-For details about interrupts see chapter \ref{interrupts} and 
-signals see chapter \ref{signals}.
-
 
 Devices may be connected directly to the computer or they are connected 
 via a bus like I2C to the computer. In this case, the bus is represented
@@ -116,11 +113,6 @@ a bus component. If the bus component is only used once in the system part,
 it may be specified directly. In other cases, a user supplied name
 must be introduced and used.
 
-\begin{discuss}
-hier nur datiopns behandeln -- nur die Grammatik von SytemDations 
-bringen? Interrupts und Signals in die entsprechenden Kapitel
- verschieben?
-\end{discuss}
 
 Thus, a system part consists of a number of device associations of the
 following form:
@@ -128,9 +120,15 @@ following form:
 
 
 \input{UserNameDeclaration.bnf}
+
+The declaration of interrupts and signals are defined in
+ chapter \ref{sec_interrupts} and \ref{signals}.
+
 \input{SystemDationDeclaration.bnf}
-\input{SystemSignalDeclaration.bnf}
-\input{SystemInterruptDeclaration.bnf}
+
+
+%\input{SystemSignalDeclaration.bnf}
+%\input{SystemInterruptDeclaration.bnf}
 
 \input{Association.bnf}
 \input{ListOfConstants.bnf}
@@ -427,11 +425,11 @@ pages must be denoted in the structure attribute:
 
 \input{Typology.bnf}
 
-\begin{discuss}
-Formulierung so ok?
+%%%\begin{added}
 
 The Constant-FIXED-Expressions of each dimension size
  must have a positive value.
+%%%\end{added}
 
 %%%pi must be substituded in next paragraph
 %%%The pi denotation furthest to the right always denotes the number of
@@ -443,7 +441,8 @@ elements per line,
  the next (possibly lacking) value denotes
 the number of lines per page, and the next (possiby lacking)
 value denotes the number of pages.
-\end{discuss}
+%%%\end{discuss}
+
 The denotation $^*$ means that
 the corresponding number is not limited. E.g., a data station Printer
 with 120 characters per line, 60 lines per page, and any number of pages
@@ -463,7 +462,13 @@ DIM ($^*$)
 \end{itemize}
 
 \begin{discuss}
-soll TFU genutzt werden?  
+Soll  TFU genutzt werden? --- Wenn ja, welche Semantik steckt dahinter?
+Wie wird zwischen nur Zeilen und nur Seiten unterschieden?
+Gibt es hierzu noch konkrete Anwendungen und Geräte?
+Mit den Formatangaben SKIP und PAGE laesst sich das doch auch erreichen!
+
+Dies ist Thema auf der AK-Sitzung im November 2016.
+
 
 
 Furthermore, the typology indicates, how many data elements are
@@ -591,13 +596,12 @@ The open parameters may not conflict --- e.g. OLD and NEW are not allowed
 in the same statement.
 
 %%%\end{added}
-\begin{discuss}
-subsets nicht definiert!
+%%%\begin{removed}
+%%%subsets nicht definiert!
 
-
-The open parameters of the open statement must belong to different
-subsets.
-\end{discuss}
+%%%The open parameters of the open statement must belong to different
+%%%subsets.
+%%%\end{removed}
 
 Meaning of the parameters:
 \begin{itemize}
@@ -642,16 +646,17 @@ error number.
 %%%\end{discuss}
 \end{itemize}
 
-\begin{discuss}
-Formulierung ok?
-
+\begin{removed}
 If open parameters are lacking, ANY and PRM are assumed.
+\end{removed}
 
-neu:
+\begin{added}
+If the open parameter about the previous state of the file (e.g. OLD, NEW, ANY)
+is missing ANY is assumed.
+If the parameter about the state of the file after closing (e.g. CAN, PRM)
+is missing in OPEN and CLOSE statements PRM is assumed.
+\end{added}
 
-If open parameters about the pre/post state of the file  are missing ANY/PRM 
-is assumed.
-\end{discuss}
 When executing the close statement, a file is closed; i.e., it is
 usable again not before the execution of an open statement.
 
@@ -792,7 +797,10 @@ The general forms of the read and write statements read:
 
 \input{ReadStatement.bnf}
 \input{WriteStatement.bnf}
+
+A slice may be defined as range of the last index of an array.
 \input{Slice.bnf}
+
 \input{Position.bnf}
 \input{AbsolutePosition.bnf}
 \input{RelativePosition.bnf}
@@ -1541,9 +1549,6 @@ d+1 , no assignment happens and
     Otherwise the ExpValueSignal is induced.
 %\item The statements 2(b) to 2(f) in \ref{sec_dation_f_format}
 %     hold analogously.
-%%%\begin{discuss}
-\item If the field is empty the NoDataInFieldSignal is induced.
-%%%\end{discuss}
 \end{enumerate}
 \end{enumerate}
 
@@ -1707,10 +1712,6 @@ If w $<=$ 0, no data is assigned and the BitFormatSignal is induced.
 If the data field does not match a valid bit representation, the
 BitValueSignal is induced.
 
-\begin{discuss}
-NoDataInFieldSIgnal wenn nicht drin steht?
-
-\end{discuss}
 %%%\end{accepted}
 \end{enumerate}
 
@@ -1779,10 +1780,7 @@ If w $<=$ 0 or d $<$ 0, no data is read and the ClockFormatSignal
 
 If the input field does not match a valid clock constant, the 
    ClockValueSignal is induced.
-\begin{discuss}
-NoDataInField wenn Bereich leer ist?
 
-\end{discuss}
 %%%\end{accepted}
 
 %%%\begin{discuss}
@@ -1958,8 +1956,7 @@ Ftab : {\bf FORMAT} ( {\bf X}(2), {\bf F}(8,3), (3) ( {\bf X}(2), {\bf E}(10,3) 
 A format declared in such a way can be used in a get or put statement,
 stating its identifier:
 
-R-Format ::=\\
-\x {\bf R} ( Identifier$\S $Format )
+\input{RFormat.bnf}
 
 When transmitting data, the R format is replaced by the format position
 list contained in the indicated format declaration.
