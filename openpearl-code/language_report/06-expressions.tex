@@ -67,8 +67,44 @@ operands.
 %%%eigene Operatoren
 %%%\end{removed}
 \input{MonadicOperator.bnf}
+\index{NOT@\textbf{NOT}}
+\index{ABS@\textbf{ABS}}
+\index{SIGN@\textbf{SIGN}}
+\index{LWB@\textbf{LWB}}
+\index{UPB@\textbf{UPB}}
+\index{SIZEOF@\textbf{SIZEOF}}
+\index{CONT@\textbf{CONT}}
+\index{TOFIXED@\textbf{TOFIXED}}
+\index{TOFLOAT@\textbf{TOFLOAT}}
+\index{TOBIT@\textbf{TOBIT}}
+\index{TOCHAR@\textbf{TOCHAR}}
+\index{ENTIER@\textbf{ENTIER}}
+\index{ROUND@\textbf{ROUND}}
+
 \input{DyadicOperator.bnf}
+\index{REM@\textbf{REM}}
+\index{LT@\textbf{LT}}
+\index{GT@\textbf{GT}}
+\index{LE@\textbf{LE}}
+\index{GE@\textbf{GE}}
+\index{EQ@\textbf{EQ}}
+\index{NE@\textbf{NE}}
+\index{AND@\textbf{AND}}
+\index{OR@\textbf{OR}}
+\index{EXOR@\textbf{EXOR}}
+\index{CAT@\textbf{CAT}}
+\index{SHIFT@\textbf{SHIFT}}
+\index{CSHIFT@\textbf{CSHIFT}}
+\index{LWB@\textbf{LWB}}
+\index{UPB@\textbf{UPB}}
+\index{IS@\textbf{IS}}
+\index{ISNT@\textbf{ISNT}}
+\index{FIT@\textbf{FIT}}
+
 \input{Operand.bnf}
+\index{PRIO@\textbf{PRIO}}
+\index{TASK@\textbf{TASK}!Operand}
+\index{TRY@\textbf{TRY}}
 
 
 
@@ -152,6 +188,9 @@ bits or characters can be addresses analogously; the general form of
 addressing is:
 
 \input{StringSelection.bnf}
+\index{BIT@\textbf{BIT}!String Selection}
+\index{CHAR@\textbf{CHAR}!String Selection}
+\index{CHARACTER@\textbf{CHARACTER}!String Selection}
 
 
 The expressions Start and End must have integer values. End must be
@@ -284,13 +323,17 @@ the length of the operand.
                  & FLOAT(g)          & FLOAT(g)         & \\
                  & DURATION          & DURATION         & \\ \hline
 
-NOT a            & BIT(lg)           & BIT(lg)          & inverting all bit positions of a\\ \hline
+NOT a\index{NOT@\textbf{NOT}|textbf}
+                 & BIT(lg)           & BIT(lg)          & inverting all bit positions of a\\ \hline
 
-ABS a            & FIXED(g)          & FIXED(g)         & absolute value of a\\
+ABS a\index{ABS@\textbf{ABS}|textbf}
+                 & FIXED(g)          & FIXED(g)         & absolute value of a\\
                  & FLOAT(g)          & FLOAT(g)         & \\
                  & DURATION          & DURATION         & \\ \hline
 
-SIGN a           & FIXED(g)          & FIXED(1)         & determining the sign of a\\ 
+SIGN a
+\index{SIGN@\textbf{SIGN}|textbf}
+                 & FIXED(g)          & FIXED(1)         & determining the sign of a\\ 
                  & FLOAT(g)          &                  & 1 for a $>$ 0\\
                  & DURATION          &                  & 0 for a = 0\\   
                  &                   &                  & -1 for a $<$ 0\\
@@ -329,27 +372,41 @@ conversion of the type of objects.
 \hline
 {\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operator}\\ \hline
 
-TOFIXED a        & CHARACTER(1)      & FIXED(7)         & internal representation\\
+TOFIXED a
+\index{TOFIXED@\textbf{TOFIXED}|textbf}
+        & CHARACTER(1)      & FIXED(7)         & internal representation\\
                 &                   &                   & for operand character\\ \cline{2-4}
                      
                  & BIT(lg)           & FIXED(g)         & interpreting the bit pattern of the\\
                  &                   &                  & operand as an integer, with g = lg-1\\ \hline
 
-TOFLOAT a        & FIXED(g)          & FLOAT(g)         & converting the operand into a\\
+TOFLOAT a
+\index{TOFLOAT@\textbf{TOFLOAT}|textbf}
+        & FIXED(g)          & FLOAT(g)         & converting the operand into a\\
                  &                   &                  & floating point number\\ \hline
     
-TOBIT a          & FIXED(g)          & BIT(lg)          & interpreting the operand as bit\\
+TOBIT a
+\index{TOBIT@\textbf{TOBIT}|textbf}
+          & FIXED(g)          & BIT(lg)          & interpreting the operand as bit\\
                  &                   &                  & pattern, with lg = g+1\\ \hline
 
-TOCHAR a         & FIXED             & CHARACTER(1)     & character for the internal code\\
+TOCHAR a
+\index{TOCHAR@\textbf{TOCHAR}|textbf}
+         & FIXED             & CHARACTER(1)     & character for the internal code\\
                  &                   &                  & of the operand\\ \hline
 
-ENTIER a         & FLOAT(g)          & FIXED(g)         & greatest integer less or equal than\\
+ENTIER a
+\index{ENTIER@\textbf{ENTIER}|textbf}
+         & FLOAT(g)          & FIXED(g)         & greatest integer less or equal than\\
                  &                   &                  & the operand\\ \hline
  
-ROUND a          & FLOAT(g)          & FIXED(g)         & next integer \\ \hline
+ROUND a
+\index{ROUND@\textbf{ROUND}|textbf}
+          & FLOAT(g)          & FIXED(g)         & next integer \\ \hline
 
-CONT a           & REF type          & type             & explicit de-referentiation\\
+CONT a
+\index{CONT@\textbf{CONT}|textbf}
+           & REF type          & type             & explicit de-referentiation\\
 \hline
 \end{tabular}  
 \end{center} 
@@ -386,14 +443,30 @@ A := {\bf ROUND} X + {\bf TOFIXED} B;
 \begin{tabular}{|l|l|l|l|}
 \hline 
 {\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operator}\\ \hline
-SQRT a           & FIXED(g) or        & FLOAT(g)          & square root of operand \\ \cline{1-1} \cline{4-4}
-SIN a            & FLOAT(g)           &                   & sine of operand \\ \cline{1-1} \cline{4-4}
-COS a            &                    &                   & cosine of operand \\ \cline{1-1} \cline{4-4}
-EXP a            &                    &                   & $e^{a}$, with e=Euler's number\\ \cline{1-1} \cline{4-4}
-LN a             &                    &                   & natural logarithm of operand\\ \cline{1-1} \cline{4-4}
-TAN a            &                    &                   & tangent of operand \\ \cline{1-1} \cline{4-4}
-ATAN a           &                    &                   & arcus tangent of operand\\ \cline{1-1} \cline{4-4}
-TANH a           &                    &                   & tangent hyperbolicus of operand\\
+SQRT a
+\index{SQRT@\textbf{SQRT}|textbf}
+           & FIXED(g) or        & FLOAT(g)          & square root of operand \\ \cline{1-1} \cline{4-4}
+SIN a
+\index{SIN@\textbf{SIN}|textbf}
+            & FLOAT(g)           &                   & sine of operand \\ \cline{1-1} \cline{4-4}
+COS a
+\index{COS@\textbf{COS}|textbf}
+            &                    &                   & cosine of operand \\ \cline{1-1} \cline{4-4}
+EXP a
+\index{EXP@\textbf{EXP}|textbf}
+            &                    &                   & $e^{a}$, with e=Euler's number\\ \cline{1-1} \cline{4-4}
+LN a
+\index{LN@\textbf{LN}|textbf}
+             &                    &                   & natural logarithm of operand\\ \cline{1-1} \cline{4-4}
+TAN a
+\index{TAN@\textbf{TAN}|textbf}
+            &                    &                   & tangent of operand \\ \cline{1-1} \cline{4-4}
+ATAN a
+\index{ATAN@\textbf{ATAN}|textbf}
+           &                    &                   & arcus tangent of operand\\ \cline{1-1} \cline{4-4}
+TANH a
+\index{TANH@\textbf{TANH}|textbf}
+           &                    &                   & tangent hyperbolicus of operand\\
 \hline
 \end{tabular}
 \end{center}
@@ -408,26 +481,40 @@ TANH a           &                    &                   & tangent hyperbolicus
 \hline
 {\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operand}\\ \hline
 
-LWB a            & array              & FIXED(31)        & lower boundary of the first\\
+LWB a
+\index{LWB@\textbf{LWB}|textbf}
+            & array              & FIXED(31)        & lower boundary of the first\\
                  &                    &                  & dimension of the operand array\\ \hline
 
-UPB a            & array              & FIXED(31)        & upper boundary of the first\\
+UPB a
+\index{UPB@\textbf{UPB}|textbf}
+            & array              & FIXED(31)        & upper boundary of the first\\
                  &                    &                  & dimension of the operand array\\ \cline{2-2} \cline{4-4}
                  & CHARACTER(lg)      & FIXED(15)        & result := Lg \\ \hline
  
-SIZEOF a         & \hlink{Identifier} & FIXED(31)        & memory size of the identified\\
+SIZEOF a
+\index{SIZEOF@\textbf{SIZEOF}|textbf}
+         & \hlink{Identifier} & FIXED(31)        & memory size of the identified\\
                  &                    &                  & object at run time in bytes\\ \cline{2-2} \cline{4-4}
                  & \hlink{SimpleType}  &                  & memory size of an object\\ 
                  & \hlink{TypeStructure}  &                  & of the given type in bytes\\ 
                  & \hlink{Identifier}\S ForType  &                  & \\ \hline
 
-SIZEOF a MAX     & REF CHAR( )        & FIXED(31)        & maximum length of the referenced\\
+SIZEOF a MAX
+\index{SIZEOF@\textbf{SIZEOF}!MAX}
+\index{MAX@\textbf{MAX}!SIZEOF}
+     & REF CHAR( )        & FIXED(31)        & maximum length of the referenced\\
                  &                    &                  & character string variable\\ \hline
 
-SIZEOF a LENGTH  & REF CHAR( )        & FIXED(31)        & actual length of the referenced\\
+SIZEOF a LENGTH
+\index{SIZEOF@\textbf{SIZEOF}!LENGTH}
+\index{LENGTH@\textbf{LENGTH}!SIZEOF}
+  & REF CHAR( )        & FIXED(31)        & actual length of the referenced\\
                  &                    &                  & character string variable\\ \hline
 
-TRY a            & SEMA               & BIT(1)           & try of a REQUEST, '1'B\\
+TRY a
+\index{TRY@\textbf{TRY}|textbf}
+            & SEMA               & BIT(1)           & try of a REQUEST, '1'B\\
                  &                    &                  & if successful\\
 \hline
 \end{tabular}
@@ -505,14 +592,18 @@ op1 // op2       & FIXED(g1)       & FIXED(g2)       & FIXED(g3)         & integ
                  &                 &                 &                   & \\
                  &                 &                 &                   & g3 = max (g1, g2)\\ \hline
 
-op1 REM op2      & FIXED(g1)       & FIXED(g2)       & FIXED(g3)         & remainder of the integer division\\
+op1 REM op2
+\index{REM@\textbf{REM}|textbf}
+      & FIXED(g1)       & FIXED(g2)       & FIXED(g3)         & remainder of the integer division\\
                  &                 &                 &                   & of the values of the operands op1\\
                  &                 &                 &                   & and op2\\ \hline
 
 op1 ** op2       & FIXED(g1)       & FIXED(g2)       & FIXED(g1)         & exponentiation of the values\\
                  & FLOAT(g1)       & FIXED(g2)       & FLOAT(g1)         & of the operands op1 and op2\\ \hline
 
-op1 FIT op2      & FIXED(g1)       & FIXED(g2)       & FIXED(g2)         & changing the precision of\\
+op1 FIT op2
+\index{FIT@\textbf{FIT}|textbf}
+      & FIXED(g1)       & FIXED(g2)       & FIXED(g2)         & changing the precision of\\
                  & FLOAT(g1)       & FLOAT(g2)       & FLOAT(g2)         & operand op1 into the precision\\
                  &                 &                 &                   & of operand op2\\  
 \hline
@@ -568,7 +659,9 @@ D:={\bf TOBIT} A;    \> /* ok */
 
 op1 $<$ op2      & FIXED(g1)       & FIXED(g2)       &   BIT(1)             & ``less than''\\
 or               & FIXED(g1)       & FLOAT(g2)       &                      & If op1 is less than op2,\\
-op1 LT op2       & FLOAT(g1)       & FIXED(g2)       &                      & the result has value '1'B,\\
+op1 LT op2
+\index{LT@\textbf{LT}|textbf}
+       & FLOAT(g1)       & FIXED(g2)       &                      & the result has value '1'B,\\
                  & FLOAT(g1)       & FLOAT(g2)       &                      & otherwise '0'B.\\
                  & CLOCK           & CLOCK           &                      & \\
                  & DURATION        & DURATION        &                      & \\ \cline{2-3} \cline{5-5}
@@ -584,22 +677,30 @@ op1 LT op2       & FLOAT(g1)       & FIXED(g2)       &                      & th
                  &                 &                 &                      & from left to right \\ \hline
 op1 $>$ op2      & refer         & refer         & BIT(1)               & ``greater than'':\\
 or               & op1 $<$ op2     & op1 $<$ op      &                      & If op1 is greater than op2,\\
-op1 GT op2       &                 &                 &                      & the result has value '1'B,\\
+op1 GT op2
+\index{GT@\textbf{GT}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
                  &                 &                 &                      & otherwise '0'B.\\ \hline
 
 op1 $<$= op2     & refer         & refer         & BIT(1)               & ``less or equal''\\
 or               & op1 $<$ op2     & op1 $<$ op2     &                      & If op1 is less or equal op2,\\
-op1 LE op2       &                 &                 &                      & the result has value '1'B,\\
+op1 LE op2
+\index{LE@\textbf{LE}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
                  &                 &                 &                      & otherwise '0'B.\\ \hline
 
 op1 $>$= op2     & refer         & refer         & BIT(1)               & ``greater or equal''\\
 or               & op1 $<$ op2     & op1 $<$ op2     &                      & If op1 is greater or equal op2,\\
-op1 GE op2       &                 &                 &                      & the result has value '1'B,\\
+op1 GE op2
+\index{GE@\textbf{GE}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
                  &                 &                 &                      & otherwise '0'B.\\ \hline
 
 op1 == op2       & FIXED(g1)       & FIXED(g2)       & BIT(1)               & ``equal''\\
 or               & FIXED(g1)       & FLOAT(g2)       &                      & If op1 is equal op2,\\
-op1 EQ op2       & FLOAT(g1)       & FIXED(g2)       &                      & the result has value '1'B,\\
+op1 EQ op2
+\index{EQ@\textbf{EQ}|textbf}
+       & FLOAT(g1)       & FIXED(g2)       &                      & the result has value '1'B,\\
                  & FLOAT(g1)       & FLOAT(g2)       &                      & otherwise '0'B.\\
                  & CLOCK           & CLOCK           &                      & If lg2 $\neq$ lg1, the shorter\\
                  & DURATION        & DURATION        &                      & character or bit string, resp.,\\
@@ -609,15 +710,21 @@ op1 EQ op2       & FLOAT(g1)       & FIXED(g2)       &                      & th
 
 op1 /= op2       & refer         & refer         & BIT(1)               & ``not equal''\\
 or               & op1 == op2     & op1 == op2     &                      & If op1 is not equal op2,\\
-op1 NE op2       &                 &                 &                      & the result has value '1'B,\\
+op1 NE op2
+\index{NE@\textbf{NE}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
                  &                 &                 &                      & otherwise '0'B.\\
                  &                 &                 &                      & If lg2 $\neq$ lg1, refer ``equal''\\ \hline
 
-op1 IS op2       & REF type        & REF type        & BIT(1)               & Comparison for equality of the\\
+op1 IS op2
+\index{IS@\textbf{IS}|textbf}
+       & REF type        & REF type        & BIT(1)               & Comparison for equality of the\\
                  &                 &                 &                      & objects of references variables.\\
                  &                 &                 &                      & The result upon equality is '1'B.\\ \hline
 
-op1 ISNT op2     & REF type        & REF type        & BIT(1)               & Comparison for equality of the\\
+op1 ISNT op2
+\index{ISNT@\textbf{ISNT}|textbf}
+     & REF type        & REF type        & BIT(1)               & Comparison for equality of the\\
                  &                 &                 &                      & objects of references variables.\\
                  &                 &                 &                      & The result upon non-equality\\
                  &                 &                 &                      & is '1'B.\\
@@ -636,7 +743,9 @@ op1 ISNT op2     & REF type        & REF type        & BIT(1)               & Co
 {\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
                  & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
 
-op1 AND op2      & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & Boolean bitwise conjunction,\\  
+op1 AND op2
+\index{AND@\textbf{AND}|textbf}
+      & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & Boolean bitwise conjunction,\\  
                  &                 &                 &                   & disjunction, or antivalence,\\
                  &                 &                 &                   & resp., of the operands\\
                  &                 &                 &                   & lg3 = max (lg1, lg2).\\
@@ -644,17 +753,25 @@ op1 AND op2      & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & Boole
                  &                 &                 &                   & with zeros on the right side to\\
                  &                 &                 &                   & match the length of the longer\\
                  &                 &                 &                   & operand.\\ \cline{1-4}
-op1 OR op2       & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & \\ \cline{1-4}
-op1 EXOR op2     & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & \\ \hline
+op1 OR op2
+\index{OR@\textbf{OR}|textbf}
+       & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & \\ \cline{1-4}
+op1 EXOR op2
+\index{EXOR@\textbf{EXOR}|textbf}
+     & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & \\ \hline
 
 op1 $<>$ op2     & BIT(lg)         & FIXED(g)        & BIT(lg)           & Cyclic shift of operand op1 for the\\
 or               &                 &                 &                   & number of positions determined\\
-op1 CSHIFT op2   &                 &                 &                   & by operand op2.\\
+op1 CSHIFT op2
+\index{CSHIFT@\textbf{CSHIFT}|textbf}
+   &                 &                 &                   & by operand op2.\\
                  &                 &                 &                   & If operand op2 $>$ 0,\\
                  &                 &                 &                   & op1 is shifted to the left,\\
                  &                 &                 &                   & otherwise to the right.\\ \hline
 
-op1 SHIFT op2    & BIT(lg)         & FIXED(g)        & BIT(lg)           & Shifting of operand op1 for the\\
+op1 SHIFT op2
+\index{SHIFT@\textbf{SHIFT}|textbf}
+    & BIT(lg)         & FIXED(g)        & BIT(lg)           & Shifting of operand op1 for the\\
                  &                 &                 &                   & number of positions determined\\
                  &                 &                 &                   & operand op2. If operand op2 $>$ 0,\\
                  &                 &                 &                   & op1 is shifted to the left,\\
@@ -678,7 +795,9 @@ op1 SHIFT op2    & BIT(lg)         & FIXED(g)        & BIT(lg)           & Shift
 op1 $><$ op2     & CHAR(lg1)       & CHAR(lg2)       & CHAR(lg3)         & Concatenation of the strings\\ 
 or               & BIT(lg1)        & BIT(lg2)        & BIT(lg3)          & op1 and op2. Op2 is linked \\
                  &                 &                 &                   & to op1 on the right side.\\
-op1 CAT op2      &                 &                 &                   & lg3 = lg1 + lg2.\\
+op1 CAT op2 
+\index{CAT@\textbf{CAT}|textbf}
+     &                 &                 &                   & lg3 = lg1 + lg2.\\
 \hline
 \end{tabular}
 \end{center}
@@ -722,11 +841,15 @@ Two further dyadic standard operators relating to array bounds are defined in Ta
 {\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
                  & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
 
-op1 LWB op2      & FIXED(g)        & array           & FIXED(31)         & lower boundary of the dimension\\
+op1 LWB op2
+\index{LWB@\textbf{LWB}|textbf}
+      & FIXED(g)        & array           & FIXED(31)         & lower boundary of the dimension\\
                  &                 &                 &                   & (given by op1) of the array\\
                  &                 &                 &                   & (determined by op2), if existing\\ \hline
 
-op1 UPB op2      & FIXED(g)        & array           & FIXED(31)         & upper boundary of the dimension\\
+op1 UPB op2
+\index{UPB@\textbf{UPB}|textbf}
+      & FIXED(g)        & array           & FIXED(31)         & upper boundary of the dimension\\
                  &                 &                 &                   & (given by op1) of the array\\
                  &                 &                 &                   & (determined by op2), if existing\\ 
 \hline
@@ -788,6 +911,24 @@ rank & dyadic operators       & evaluation order \\ \hline
 6    & AND                    & from the left to the right\\
 7    & OR, EXOR               & from the left to the right\\
 \hline
+\index{Operator!Rank}
+\index{FIT@\textbf{FIT}!Rank}
+\index{LWB@\textbf{LWB}!Rank}
+\index{UPB@\textbf{UPB}!Rank}
+\index{CAT@\textbf{CAT}!Rank}
+\index{REM@\textbf{REM}!Rank}
+\index{SHIFT@\textbf{SHIFT}!Rank}
+\index{CSHIFT@\textbf{CSHIFT}!Rank}
+\index{IS@\textbf{IS}!Rank}
+\index{ISNT@\textbf{ISNT}!Rank}
+\index{AND@\textbf{AND}!Rank}
+\index{OR@\textbf{OR}!Rank}
+\index{LT@\textbf{LT}!Rank}
+\index{LE@\textbf{LE}!Rank}
+\index{GE@\textbf{GE}!Rank}
+\index{EQ@\textbf{EQ}!Rank}
+\index{NE@\textbf{NE}!Rank}
+\index{GT@\textbf{XOR}!Rank}
 \end{tabular}
 \end{center}
 \end{table}
@@ -907,12 +1048,14 @@ Assignments are implemented for scalar variables and for structures, but
 not for arrays.
 
 \input{Assignment.bnf}
+\index{Assignment}
 
 \subsection{Assignments for Scalar Variables}   % 6.3.1
 
 Assignments for scalar variables are defined as follows:
 
 \input{ScalarAssignment.bnf}
+\index{Assignment!Scalar Variable}
 
 The statement causes that the value of the expression on the right side
 is assigned to the variable given on the left of the assignment sign
@@ -987,6 +1130,7 @@ The values of all components of a structure can be assigned to another
 structure in one single assignment:
 
 \input{StructureAssignment.bnf}
+\index{Assignment!Structure}
 
 The values of the components of Structure\_2 are assigned to the
 corresponding components of Structure\_1. Both structures must have the same

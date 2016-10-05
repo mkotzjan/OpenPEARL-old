@@ -21,6 +21,8 @@ Such control statements are
 
 %%%\begin{added}
 \section{Empty Statement}
+\index{Statement!Empty}
+
 The empty statement  consists of one semicolon only and has no effects.
 
 The general form of the empty statement reads:
@@ -30,12 +32,18 @@ The general form of the empty statement reads:
 %%%\end{added}
 
 \section{Conditional Statement (IF)}   % 7.1
+\index{Statement!Conditional (IF)}
 
 With the help of the conditional statement, it is determined depending
 on the result of an expression with which statement the program
 execution is to continued.
 
 \input{IfStatement.bnf}
+\index{IF@\textbf{IF}}
+\index{THEN@\textbf{THEN}}
+\index{ELSE@\textbf{ELSE}}
+\index{FIN@\textbf{FIN}}
+
 The result of the expression must be of type BIT(1). If the expression
 provides value '1'B (true), the statements following THEN are evaluated;
 otherwise the statements following ELSE are evaluated.
@@ -55,6 +63,7 @@ Example:
 ...
 
 \section{Statement Selection (CASE)}  % 7.2
+\index{Statement!Selection (CASE)}
 
 Let us assume that a (function) procedure control shall be used for
 controlling several devices of the same kind, after each call returning
@@ -75,6 +84,9 @@ characters. At first, the older form is described:
 
 \input{CaseStatement.bnf}
 \input{CaseStatement1.bnf}
+\index{CASE@\textbf{CASE}}
+\index{CASE@\textbf{OUT}}
+\index{CASE@\textbf{FIN}}
 
 The number 1 is assigned to the statement sequence following the first
 ALT (alternative 1), the number 2 to the statement sequence following
@@ -140,6 +152,10 @@ out'').
 The second form of the statement selection has the following form:
 
 \input{CaseStatement2.bnf}
+\index{CASE@\textbf{CASE}}
+\index{CASE@\textbf{OUT}}
+\index{CASE@\textbf{FIN}}
+
 \input{CaseIndex.bnf}
 
 %%%\begin{front}
@@ -211,6 +227,7 @@ The selection must be deterministic.
 Jumps into a case statement are forbidden (refer chapter \ref{sec_goto}).
 
 \section{Repetition (FOR -- REPEAT)}   % 7.3
+\index{Statement!Repetition (FOR)}
 
 Often, a statement sequence must be executed repeatedly, with only one
 parameter changing. E.g., various devices are to be checked; let
@@ -236,6 +253,14 @@ In general, such ``program loops'' are constructed like this:
 %%%\end{front}
 %%%\begin{grammar}
 \input{LoopStatement.bnf}
+\index{FOR@\textbf{FOR}!Repetition}
+\index{FROM@\textbf{FROM}!Repetition}
+\index{TO@\textbf{TO}!Repetition}
+\index{BY@\textbf{BY}!Repetition}
+\index{WHILE@\textbf{WHILE}!Repetition}
+\index{REPEAT@\textbf{REPEAT}}
+\index{END@\textbf{END}!Repetition}
+
 %%%\end{grammar}
 The declarations and statements following REPEAT, i.e., the loop body,
 are run so often as specified by the clauses given in front of them; the
@@ -407,8 +432,11 @@ a range exception.
 
 \section{GoTo Statement (GOTO)}   % 7.4
 \label{sec_goto}
+\index{Statement!GOTO}
+
 
 \input{GoToStatement.bnf}
+\index{GOTO\textbf{GOTO}}
 
 This statement has the result that program processing is continued at
 the program position determined by the label identifier.
@@ -435,6 +463,7 @@ statement, separated by a colon.
 
 \section{Exit Statement (EXIT)}    % 7.5
 \label{sec_exit}
+\index{Statement!Leave block (EXIT)}
 
 The exit statement serves to exit blocks and loops deliberately. With
 EXIT, also blocks and loops nested several times can be exited
@@ -442,6 +471,7 @@ deliberately, which must have an identifier (the jump target) at the
 corresponding end.
 
 \input{ExitStatement.bnf}
+\index{EXIT@\textbf{EXIT}}
 
 If the identifier is missing, program processing is continued with the
 statement following the end of the block or the loop containing the exit

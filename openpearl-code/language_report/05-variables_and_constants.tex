@@ -53,8 +53,9 @@ in a declaration by separating them by commas:
 Summarised, scalar variables can be declared as follows:
 
 \input{ScalarVariableDeclaration.bnf}
-\input{ScalarDeclareDataSentence.bnf}
+\index{DCL@\textbf{DCL}!Scalar Variable}
 
+\input{ScalarDeclareDataSentence.bnf}
 
 %%%IdentifierDenotation ::=\\
 %%%\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
@@ -66,6 +67,7 @@ Summarised, scalar variables can be declared as follows:
 The general form of specifying scalar variables reads as follows:
 
 \input{ScalarVariableSpecification.bnf}
+\index{SPC@\textbf{SPC}!Scalar Variable}
 
 \input{VariableDenotationS.bnf}
 
@@ -80,6 +82,7 @@ of type Sema, Bolt, Interrupt or Signal are considered in
 \ref{sec_input_output}.
 
 \section{Integers (FIXED)}   % 5.2
+\index{FIXED@\textbf{FIXED}}
 
 Integers can be written in decimal or dual representation. The decimal
 representation of an integer consists of a sequence of decimal digits. The dual
@@ -131,6 +134,7 @@ Example:
 i := 2;
 
 \section{Floating Point Numbers (FLOAT)}  % 5.3
+\index{FLOAT@\textbf{FLOAT}}
 
 Constants for floating point numbers can be represented as a sequence of
 \begin{enumerate}
@@ -198,7 +202,7 @@ x:=3.5; y:=1; Koeff:=3.14E-10;
 
 \section{Bit Strings (BIT)}  % 5.4
 \label{sec_bit_strings}
-
+\index{BIT@\textbf{BIT}}
 
 A bit string constant can be given in binary form (B1), in form of
 tetrades (B2), octades (B3), or in hexadecimal form (B4).
@@ -275,6 +279,8 @@ signal BitIndexOutOfRangeSignal is induced.
 %%%\end{added}
 
 \section{Character Strings (CHARACTER)}  % 5.5
+\index{CHAR@\textbf{CHAR}}
+\index{CHARACTER@\textbf{CHARACTER}|see {CHAR}}
 
 A character string constant consists of an apostrophe, a sequence of any
 characters (besides of apostrophe) and an apostrophe.
@@ -332,6 +338,7 @@ CharacterIndexOutOfRangeSignal is induced.
 
 \section{The Length Definition}   % 5.6
 \label{sec_length}
+\index{LENGTH@\textbf{LENGTH}}
 
 With the length definition, the precisions and lengths for such
 number and string objects are defined, whose precisions and lengths are
@@ -357,6 +364,7 @@ variable declarations (see 4.3, Block Structure).
 
 \section{Times (CLOCK)}   % 5.7
 \label{sec_type_clock}
+\index{CLOCK@\textbf{CLOCK}}
 
 A time constant consists of a positive integer to state the hour, an
 integer between 0 and 59 for the minute, and a floating point number
@@ -383,10 +391,13 @@ time:=12:30:00;
 
 %%%\begin{added}
 \OpenPEARL{} provides a resolution for CLOCK values of $1\mu s$
+\index{CLOCK@\textbf{CLOCK}!Resolution}
 %%%\end{added}
 
 \section{Durations (DURATION)}   % 5.8
 \label{sec_type_duration}
+\index{DURATION@\textbf{DURATION}|see {DUR}}
+\index{DUR@\textbf{DUR}}
 
 A duration constant is composed of stating an hour, a minute, and a
 second, however, single pieces of specifications may be lacking. An hour
@@ -417,8 +428,10 @@ Example:
 delay:=0.1 {\bf SEC};
 
 %%%\begin{added}
-\OpenPEARL{} provides a resolution for DURATION values of $1\mu s$ and
-a range of $\approx \pm 100 days$.
+\OpenPEARL{} provides a resolution for DURATION values of $1\mu s$ 
+\index{DUR@\textbf{DUR}!Resolution}
+and
+a range of $\approx \pm 100 days$ \index{DUR@\textbf{DUR}!Range}.
 In case of an arithmetic overflow in calculations with durations, the
 DurationValueSignal is induced.
 In case of division by a duration or numeric value of zero, 
@@ -427,6 +440,7 @@ the DurationDivideByZeroSignal is induced.
 
 \section{References (REF)}  % 5.9
 \label{sec_references}
+\index{REF@\textbf{REF}}
 
 For the indirect addressing, so-called reference variables (pointer
 variables, pointers) are provided in PEARL. Reference variables have the
@@ -486,6 +500,7 @@ In general, it holds:
 \input{TypeReference.bnf}
 \input{VirtualDimensionList.bnf}
 \input{Dereferentiation.bnf}
+\index{CONT@\textbf{CONT}}
 %%%\begin{added}
 The lifetime of the referenced object must be longer or equal as
 the lifetime of the reference object.
@@ -552,7 +567,7 @@ Example:
 
 \subsection{Variable Character String Pointers (REF CHAR())}  % 5.9.1
 \label{sec_ref_char}
-
+\index{REF CHAR@\textbf{REF CHAR}}
 
 Variably long character strings can easily be processed with special
 pointer objects, so-called variable character string pointers.
@@ -723,6 +738,7 @@ Koeff(2.0) \x  Koeff(2,1) \x  Koeff(2,2) \x  Koeff(2,3)
 The general form of a array declaration reads as follows:
 
 \input{ArrayDeclaration.bnf} 
+\index{DCL@\textbf{DCL}!Array}
 \input{ArrayDenotation.bnf}
 \input{TypeAttributeForArray.bnf}
 %%%DimensionAttribute ::=\\
@@ -773,6 +789,7 @@ e.g.:
 The general specification form of an array reads:
 
 \input{ArraySpecification.bnf}
+\index{SPC@\textbf{SPC}!Array}
 \input{ArrayDenotationS.bnf}
 \input{VirtualDimensionList.bnf}
 
@@ -784,6 +801,7 @@ objects may be combined to arrays.
 
 \section{Structures}   % 5.11
 \label{sec_struct}
+\index{STRUCT@\textbf{STRUCT}}
 
 Arrays allow to combine scalar variables of the {\it same} type under
 one identifier; the various variables are addressed by this identifier
@@ -939,6 +957,7 @@ Person.Name.FirstName := 'OTTO';\\
 The general form of the structure declaration reads:
 
 \input{StructureDeclaration.bnf}
+\index{DCL@\textbf{DCL}!Structure}
 \input{StructureDenotation.bnf}
 
 \input{TypeStructure.bnf}
@@ -955,10 +974,12 @@ The general form of the structure declaration reads:
 The general form of the structure specification reads:
 
 \input{StructureSpecification.bnf}
+\index{SPC@\textbf{SPC}!Structure}
 \input{StructureDenotationS.bnf}
 
 \section{Type Definition (TYPE)} % 5.12
 \label{sec_type}
+\index{TYPE@\textbf{TYPE}}
 
 A certain structure, e.g., can occur as parameter, as substructure in other
 structures, or as type of the transmission data of a data station.  Each
@@ -1129,6 +1150,8 @@ Example:
 
 
 \section{The Initialisation Attribute (INITIAL)}   % 5.13
+\index{INIT@\textbf{INIT}}
+\index{INITIAL@\textbf{INITIAL}|see {INIT}}
 
 The initialisation attribute allows to assign initial values to
 variables upon their declaration. For variables with assignment
@@ -1195,6 +1218,7 @@ of named constants as well as expressions calculable by the compiler
 
 \section{Assignment Protection (INV)}    % 5.14
 \label{sec_inv}
+\index{INV@\textbf{INV}}
 
 Variables can be declared with an assignment protection,i.e. the attribute
 INV (from ``invariant''), in order to forbid --- apart from
@@ -1255,6 +1279,7 @@ of the tabular element via CONT is not possible.
 
 \subsection{Named Constants (INV Constants)}   % 5.14.1
 \label{sec_named_const}
+\index{INV@\textbf{INV}!Named Constant}
 
 The compiler treats objects of type FIXED, BIT, CHAR(1), CLOCK and
 DURATION declared with attribute INV as (named) constants. The names of

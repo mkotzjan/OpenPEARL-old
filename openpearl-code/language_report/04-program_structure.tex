@@ -15,6 +15,7 @@ The general form of a PEARL program reads as follows:
 %%%\end{front}
 
 \input{Program.bnf}
+\index{Program}
 
 %%%\begin{front}
 %%%Module ::=\\
@@ -23,14 +24,18 @@ The general form of a PEARL program reads as follows:
 %%%\x {\bf MODEND};
 
 \input{Module.bnf}
+\index{MODULE@\textbf{MODULE}}
+\index{MODEND@\textbf{MODEND}}
 
 %%%SystemPart ::=\\
 %%%\x {\bf SYSTEM}; [ UserNameDeclaration $^{...}$ ]
 %%%\end{front}
 
 \input{SystemPart.bnf}
+\index{SYSTEM@\textbf{SYSTEM}!System Part}
 
 \input{ProblemPart.bnf}
+\index{PROBLEM@\textbf{PROBLEM}}
 
 In the system part, the connections of the projected computer are
 described with the elements of the technical process (sensors,
@@ -102,6 +107,8 @@ changed there.
 Objects are introduced by {\it declaration} or {\it specification}.
 
 \subsection{Declaration (DCL)}  % 4.2.1
+\index{DCL@\textbf{DCL}}
+\index{DECLARATION@\textbf{DECLARATION}|see {DCL}}
 
 The declaration serves to introduce an object and its name, i.e., when
 evaluating the declaration, memory space for the object is allocated, and
@@ -177,6 +184,8 @@ type                   & x            & x    & x         & x \\
 \end{table}
 
 \subsection{Specification (SPC) and Identification (SPC IDENT)}  % 4.2.2
+\index{SPC@\textbf{SPC}}
+\index{SPECIFY@\textbf{SPECIFY}|see {SPC}}
 
 With a specification, an already declared object is
 referred to.  This is meaningful for objects which are declared in a
@@ -184,7 +193,6 @@ module, and which shall be used in other modules (cf. \ref{sec_references_module
  References
 between Modules), but also for introducing additional names for already
 declared objects in general.
-\newpage
 
 Example:
 
@@ -206,8 +214,11 @@ In general, the form of identification reads as follows:
 %%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier [ AllocationProtection ] Type IdentificationAttribute ;
 
 \input{Identification.bnf}
+\index{Identification}
+\index{SPC@\textbf{SPC}!Identification}
 
 \input{IdentificationAttribute.bnf}
+\index{IDENT@\textbf{IDENT}!Identification}
 
 The given type has to correspond to the type of the named object. More
 details are defined when presenting the various objects.
@@ -220,6 +231,8 @@ the scope and the life-span of PEARL objects. A block is a summary of
 declarations and statements:
 
 \input{Block.bnf}
+\index{BEGIN@\textbf{BEGIN}}
+\index{END@\textbf{END}}
 
 Blocks are regarded as statements and may thus only occur in tasks and
 procedures, but there even nested. The entry into a block takes
@@ -365,6 +378,8 @@ the same module, in all other modules it must be defined.
 The general form of the global attribute reads:
 
 \input{GlobalAttribute.bnf}
+\index{GLOBAL@\textbf{GLOBAL}}
+
 \begin{discuss}
 in der deutschen Fassung des Sprachreports von 1995 ist noch dargelegt,
 dass Identifier(Module) nur dokumentatorischen Character hat.

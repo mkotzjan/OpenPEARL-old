@@ -1,4 +1,5 @@
 \chapter{Procedures}   % 8
+\index{Procedure}
 
 When solving an automation problem, in the sense of structured
 programming an independent program part is formulated and named for a
@@ -77,6 +78,7 @@ and, if needed, changed by all procedures and tasks of the module.
 
 \section{Declaration and Specification of Procedures (PROC)}  % 8.1
 \label{sec_proc_dcl}
+\index{Procedure!Declaration}
 
 The statement sequence to be executed when calling a procedure is
 prescribed in a procedure declaration, defining a procedure identifier.
@@ -108,6 +110,10 @@ procedure body.
 %%%\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
 %%%\end{front}
 \input{ProcedureDeclaration.bnf}
+\index{PROC@\textbf{PROC}}
+\index{END@\textbf{END}!Procedure}
+\index{PROCEDURE@\textbf{PROCEDURE}|see {PROC}}
+
 \input{ProcedureBody.bnf}
 \input{ListOfFormalParameters.bnf}
 
@@ -121,15 +127,25 @@ procedure body.
 \input{VirtualDimensionList.bnf}
 \input{ParameterType.bnf}
 \input{ResultAttribute.bnf}
+\index{RETURNS@\textbf{RETURNS}}
 
 \input{TypeRealTimeObject.bnf}
+\index{SEMA@\textbf{SEMA}}
+\index{BOLT@\textbf{BOLT}}
+\index{INTERRUPT@\textbf{INTERRUPT}}
+\index{IRPT@\textbf{IRPT}}
+\index{SIGNAL@\textbf{SIGNAL}}
+
 \input{ResultType.bnf}
 
 The general form of the specification of a procedure reads as follows:
 
 \input{ProcedureSpecification.bnf}
+\index{SPC@\textbf{SPC}!Procedure}
 \input{ListOfParametersForSPC.bnf}
 \input{ParameterSpecification.bnf}
+\index{IDENT@\textbf{IDENT}!Procedure}
+\index{IDENTICAL@\textbf{IDENTICAL}|see {IDENT}}
 
 In the procedure specification, the (optionally) definable identifiers of
 parameters are only of documentary importance; however, it is thus
@@ -142,7 +158,8 @@ result attribute. The result type determines the type of the calculated
 result which is returned to the call position. With the help of the
 return statement, this return takes place in the form
 
-{\bf RETURN} (Expression);
+\input{ReturnStatement.bnf}
+\index{RETURN@\textbf{RETURN}}
 
 Thus, the value of the expression must have the type specified by the
 result attribute.
@@ -196,12 +213,14 @@ programs.
 
 \section{Calls of Procedures (CALL)}   % 8.2
 \label{sec_call}
+\index{Procedure!CALL}
 
 Subprogram procedures are called with the help of the keyword CALL or
 only with their identifiers:
 
  
 \input{ProcedureCall.bnf}
+\index{CALL@\textbf{CALL}}
 
 \input{ListOfActualParameters.bnf}
 
@@ -340,17 +359,22 @@ A declaration of reference variables for procedures contains the
 description of all parameter types, as well as the type of the result.
 
 \input{ProcedureReferenceDeclaration.bnf}
+\index{DCL@\textbf{DCL}!Reference Procedure}
+\index{REF@\textbf{REF}!Procedure}
 \input{TypeProcedure.bnf} 
+\index{Procedure!Reference}
 
 The general form of the specification of procedure reference variables
 reads:
 
 \input{ProcedureReferenceSpecification.bnf} 
+\index{SPC@\textbf{SPC}!Reference Procedure}
 
 The value assignment to a procedure reference variable takes place with
 the assignment:
 
 \input{RefProcAssignment.bnf}
+\index{Assignment!Reference Procedure}
 
 %%%Only procedures declared at module level may be assigned here.
 
