@@ -27,8 +27,8 @@ t1: TASK MAIN;
   REPEAT
      TAKE t FROM thermometer;
      temp := t / 10.0;
-     PUT text1,temp TO terminal BY A,F(5,1), SKIP;
-     AFTER 0.1 SEC RESUME;
+!     PUT text1,temp TO terminal BY A,F(5,1), SKIP;
+!     AFTER 0.1 SEC RESUME;
   END;
 END;
 MODEND;

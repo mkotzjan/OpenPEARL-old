@@ -2,7 +2,7 @@ MODULE(RPiGpio);
 
 SYSTEM;
 __cpp__(
-	'pearlrt::RPiDigitalOut s_bito(25,4);'
+	'pearlrt::RPiDigitalOut s_bito(25,5);'
 	'pearlrt::Device* d_bito = & s_bito;'
 	'pearlrt::RPiDigitalIn s_biti(27,1,"u");'
 	'pearlrt::Device* d_biti = & s_biti;'
@@ -20,7 +20,7 @@ T1: TASK MAIN;
 !   DCL off BIT(1) INIT ('0'B1);
    __cpp__( 'pearlrt::BitString<1> _on(1);');
    __cpp__( 'pearlrt::BitString<1> _off(0);');
-   __cpp__( 'pearlrt::BitString<4> _work(1);');
+   __cpp__( 'pearlrt::BitString<5> _work(1);');
    OPEN taste;
    OPEN led;
    REPEAT

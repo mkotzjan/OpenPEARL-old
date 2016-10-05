@@ -90,14 +90,14 @@ namespace pearlrt {
 #if defined(CONFIG_LINUX_Raspberry_Version_V1B)
       // version 1 model B
       // available GPIO bits on RPi
-      // Rev 2 P1 : 2,3,4,7,8,9,10,11,14,15,17,18,22,23,24,25,27
+      // Rev 2 P1 : 2,3,4,7,8,9,10,11,14,15,17,18,21,22,23,24,25,27
       //       bit31-+                                     +-bit0
-      //     mask:   0000 1011 1100 0110 1100 1111 1001 1100
+      //     mask:   0000 1011 1110 0110 1100 1111 1001 1100
       // Rev 2 P5:  28,29,30,31
       //     mask:   1111 0000 0000 0000 0000 0000 0000 0000
       // used by: serial port: 14,15
       //             0000 0000 0000 0000 1100 0000 0000 0000
-      availableBits = 0x0fBc60F9c;
+      availableBits = 0x0fBE60F9c;
 #elif defined(CONFIG_LINUX_Raspberry_Version_V2B)
       // version 2 model b
       // bit 2-27 are available
