@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module file="demo.prl">
 <system>
+<username name="pcf8574" line="14">
+   <sysname name="Pcf8574">
+   <parameters>
+   <BIT>'20'B4</BIT>
+   <FIXED>7</FIXED>
+   <FIXED>4</FIXED>
+   </parameters>
+   </sysname>
+   <association name="I2CBus">
+      <parameters>
+        <CHAR>'/dev/i2c-0'</CHAR>
+        <FIXED>100000</FIXED>
+      </parameters>
+   </association>
+</username>
 <username name="lm75" line="4">
    <sysname name="LM75">
    <parameters>
@@ -89,6 +104,10 @@
 <problem>
    <spc type="signal" name="sig1" line="19"/>
    <spc type="interrupt" name="int1" line="20" />
+   <spc type="dation" name="pcf8574" line="21">
+      <attributes> OUT,SYSTEM </attributes>
+      <data>BIT(4)</data>
+   </spc>
    <spc type="dation" name="disc" line="21">
       <attributes> OUT,SYSTEM </attributes>
       <data>ALL</data>

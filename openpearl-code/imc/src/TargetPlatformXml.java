@@ -47,6 +47,7 @@ public class TargetPlatformXml {
 	Document targetPlatform;
 	boolean verbose;
 
+    
 	/**
 	 * create an object for the query operations for the target platform
 	 * elements, like SIGNAL, DATION and INTERRUPT
@@ -59,6 +60,7 @@ public class TargetPlatformXml {
 	 */
 	TargetPlatformXml(String fileName, boolean verbose) {
 		this.verbose = verbose;
+	
 		ReadXml tgt = new ReadXml(fileName, verbose,  InstallationLocation.path+"/lib/");
 
 		targetPlatform = tgt.getDocument(); // readXMLDocumentFromFile(fileName);
@@ -77,10 +79,9 @@ public class TargetPlatformXml {
 	/**
 	 * check if a system signal name exists
 	 * 
-	 * @param signalName
-	 *            the expected system name of a signal
-	 * @return Node, of the signal entry, if the signal exists on this target
-	 *         platform null, if the signal name does not exist
+	 * @param systemName 	 *            the expected system name 
+	 * @return Node, of the entry, if the name exists on this target
+	 *         platform <br>null, if the system name does not exist
 	 */
 	public Node hasSystemName(String systemName) {
 
@@ -109,7 +110,7 @@ public class TargetPlatformXml {
 				}
 			}
 		}
-		Error.info(systemName + " is NOT available");
+		Error.info(systemName + " is NOT available - maybe it is a user defined name");
 
 		return null;
 	}
@@ -119,7 +120,7 @@ public class TargetPlatformXml {
 	 * 
 	 * @param n
 	 *            the node to be queried
-	 * @return the type ofthe queried nod --> "dation", "interrupt", ...
+	 * @return the type of the queried node --> "dation", "interrupt", ...
 	 */
 	static public String getNodeType(Node n) {
 		String type = n.getNodeName();
@@ -159,13 +160,13 @@ public class TargetPlatformXml {
 	}
 
 	/**
-	 * read the number of registerd clients for an associytion provider
+	 * read the number of registered clients for an association provider
 	 * 
-	 * The number of registerd clients is stored as attribute of the node in the
-	 * dom tree
+	 * The number of registered clients is stored as attribute of the node in the
+	 * DOM tree
 	 * 
 	 * @param associationProvider
-	 *            the node of the associatiojn provider
+	 *            the node of the association provider
 	 * @return the number of registered clients
 	 */
 	static int getAssociationClients(Node associationProvider) {
@@ -197,13 +198,19 @@ public class TargetPlatformXml {
 	 *            the actual parameter from the user module
 	 * @return true, if type and value are ok; false else
 	 */
-	static boolean checkParameterTypeAndValue(Node n, Parameter p) {
+	static boolean checkParameterTypeAndValue(Node n, Parameter p, SystemEntry systemEntry) {
 		String type;
 		int length;
 
 		type = n.getNodeName();
-		length = Integer.parseInt(n.getAttributes().getNamedItem("length")
-				.getTextContent());
+		String lengthIsNumericalOrNickname = n.getAttributes().getNamedItem("length").getTextContent();
+		if (lengthIsNumericalOrNickname.contains("$")) {
+		   System.out.println("lookup in nicknames missing");	
+		   length = -1; // should produce an error 
+		} else {
+		   length = Integer.parseInt(lengthIsNumericalOrNickname);
+		}
+		
 		if (type != p.getType()) {
 			Error.error("parameter type mismatch (" + type + " -- "
 					+ p.getType());
@@ -216,6 +223,12 @@ public class TargetPlatformXml {
 			return false;
 		}
 
+		// look for a nickname of this parameter
+		Node nickName = n.getAttributes().getNamedItem("nick");
+		if (nickName!= null) {
+			p.setNickName(nickName.getTextContent());
+		}
+		
 		// test value
 		NodeList childs = n.getChildNodes();
 		for (int i = 0; i < childs.getLength(); i++) {
@@ -236,10 +249,31 @@ public class TargetPlatformXml {
 				Error.error("illegal value: " + p.getValue()
 						+ " not in supported list");
 				return false;
+			} else if (rule.equals("ConsistsOf")) {
+				// only the elements of the comma separated list are allowed in the parameter
+				boolean found=false;
+				boolean ok=true;
+				String[] ruleItems = ruleContent.split(",");
+				String[] paramItems = p.getValue().split(" ");
+				for (int pi =0; pi < paramItems.length; pi++) {
+					found = false;
+					for (int ri=0; ri < ruleItems.length && found == false; ri++) {
+						if (paramItems[i].trim().equals(ruleItems[ri].trim())) {
+							found = true;
+						}
+					}
+					if (!found) {
+						Error.error("parameter value "+paramItems[i]+" not supported");
+						ok = false;
+					}
+				}
+				return ok;
 			} else if (rule.equals("FIXEDRANGE")) {
 				String[] items = ruleContent.split(",");
-				int low = Integer.parseInt(items[0]);
-				int high = Integer.parseInt(items[1]);
+				String evaluated = systemEntry.evaluateExpression(items[0]);
+				int low = Integer.parseInt(evaluated);
+				evaluated = systemEntry.evaluateExpression(items[1]);
+				int high = Integer.parseInt(evaluated);
 				int val = Integer.parseInt(p.getValue());
 				if (val >= low && val <= high) {
 					return true;
@@ -249,7 +283,8 @@ public class TargetPlatformXml {
 					return false;
 				}
 			} else if (rule.equals("FIXEDGT")) {
-				int low = Integer.parseInt(ruleContent);
+				int low = Integer.parseInt(systemEntry.evaluateExpression(ruleContent));
+
 				int val = Integer.parseInt(p.getValue());
 				if (val > low) {
 					return true;
@@ -294,7 +329,7 @@ public class TargetPlatformXml {
 				Node n = nl.item(i);
 				if (n.getNodeType() == Node.ELEMENT_NODE
 						&& n.getNodeName().equals("needAssociation")) {
-					// get name and remove all surrounding whitespaces
+					// get name and remove all surrounding white space characters
 					NamedNodeMap nm = n.getAttributes();
 					Node n1 = nm.getNamedItem("provider");
 					String provider = n1.getTextContent();
@@ -307,9 +342,12 @@ public class TargetPlatformXml {
 	}
 
 	/**
-	 * increment to INSTANCE counter, when a new client for an association was
+	 * increment the instanceCount counter, when a new client for an association was
 	 * detected. The counter is located in the DOM tree.
 	 * 
+	 * The counting of instances is only done, if the the attribute 'instances'
+	 * is specified, which defines the maximum of allowed instances to this
+	 * kink of system element in one PEARL application.
 	 * 
 	 * @param targetNode
 	 *            the node of the system element
@@ -325,26 +363,21 @@ public class TargetPlatformXml {
 
 			String currentValue = ((Element) targetNode)
 					.getAttribute("instanceCount");
+			int newCount = 1;
 			if (currentValue != null && currentValue.length() > 0) {
 				// System.out.println("current: "+ currentValue);
-				int newCount = Integer.parseInt(currentValue) + 1;
+				newCount = Integer.parseInt(currentValue) + 1;
 				if (newCount > maxInstances) {
 					Error.error("too many instances for element "
 							+ ((Element) targetNode).getAttribute("name"));
 					return;
 				}
-
-				// set new instance count into dom tree
-				((Element) targetNode).setAttribute("instanceCount",
-						Integer.toString(newCount));
-				// System.out.println(targetNode.getAttributes().getNamedItem("name").getTextContent()
-				// + " now instances: "+ newCount );
-
-			} else {
-				// attribute for counting not set yet --> set initial value as 1
-				((Element) targetNode).setAttribute("instanceCount", "1");
-
 			}
+			
+			// set new instance count into dom tree
+			// or write the count as 1, if the counter did not exist
+			((Element) targetNode).setAttribute("instanceCount",
+						Integer.toString(newCount));
 		}
 	}
 }

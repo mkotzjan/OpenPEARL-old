@@ -30,6 +30,7 @@ InstallationLocation.java: ../../configuration/include/auto.conf
 
 clean:
 	rm -f InstallationLocation.java
+	rm -f ../imc.inc
 	rm -f $(CLASSES)
 	rm -f imc.jar 
 

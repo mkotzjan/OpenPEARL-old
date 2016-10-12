@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 public class Parameter {
    private String value=null;
    private String type=null;
+   private String nickName=null;
    
    Parameter(Node node) {
 	 //  NodeList childs = node.getChildNodes();
@@ -58,8 +59,16 @@ public class Parameter {
    String getValue() {
 	   return value;
    }
+   
    boolean hasType(String type) {
 	   return this.type.equals(type);
+   }
+   
+   void setNickName(String n) {
+	   nickName=n;
+   }
+   String getNickName() {
+	   return nickName;
    }
    
    int length() {

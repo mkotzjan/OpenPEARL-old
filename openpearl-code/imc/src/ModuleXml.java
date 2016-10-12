@@ -71,7 +71,7 @@ public class ModuleXml {
 		moduleXML = wrappedDomTree.getDocument(); // readXMLDocumentFromFile(fileName);
 		if (moduleXML == null) {
 			System.err.println("error reading module definition file ("
-					+ fileName+")");
+					+ fileName + ")");
 			System.exit(1);
 			return;
 		}
@@ -86,8 +86,12 @@ public class ModuleXml {
 	}
 
 	/**
-	 * check existence and type of used system names associate target platform
-	 * system node with username or configuration item
+	 * check existence and type of used system names, associations and
+	 * configuration elements on the target platform *
+	 * <p>
+	 * <b>Note:</b> the methode emits error messages in case of problems. The
+	 * check is aborted by the main program, if errors are detected in one stage
+	 * of translation
 	 */
 	public void checkSystemEntries() {
 		NodeList systemElements = moduleXML.getElementsByTagName("system");
@@ -268,7 +272,8 @@ public class ModuleXml {
 						un.setMaxClients(provider,
 								TargetPlatformXml.getAssociationClients(assoc));
 					} else {
-						Error.info("association type must be checked later -- still missing");
+						// mark that this system element must provide an
+						// association of type provider
 						u.mustProvide(provider);
 					}
 
@@ -277,13 +282,13 @@ public class ModuleXml {
 					}
 
 					un.setProvider(u);
-					return;// safety result
+					return;
 				}
 			} else {
 				Node assoc = TargetPlatformXml.provides(associationSystemNode,
 						provider);
 				if (assoc == null) {
-					// the error is already emitted in provides(...)
+					// the error message is already emitted in provides(...)
 					return;
 				} else {
 					// System.out.println("connection type is ok -- lets check the parameters...");
@@ -358,7 +363,7 @@ public class ModuleXml {
 	 * find the child node of the given node with the given name
 	 * 
 	 * @param n
-	 *            the node which is ecpected to contain a child with the given
+	 *            the node, which is expected to contain a child with the given
 	 *            name
 	 * @param name
 	 *            the name of the child node
@@ -430,8 +435,10 @@ public class ModuleXml {
 					return false;
 				}
 
-				TargetPlatformXml.checkParameterTypeAndValue(
-						targetParameterNodes.item(targetParameterIndex), p1);
+				TargetPlatformXml
+						.checkParameterTypeAndValue(
+								targetParameterNodes.item(targetParameterIndex),
+								p1, un);
 				targetParameterIndex++;
 				un.addParameter(p1);
 			}
@@ -557,6 +564,9 @@ public class ModuleXml {
 				dataTypeMatch = true;
 			}
 		}
+		// expand nicknames
+		dataInDevice = un.evaluateExpression(dataInDevice);
+
 		if (dataInDevice.trim().equals(dataInSpc.trim())) {
 			dataTypeMatch = true;
 		}
@@ -566,4 +576,18 @@ public class ModuleXml {
 		}
 	}
 
+	/*
+	 * private String expandNicknames(String dataInDevice, SystemEntry un) {
+	 * 
+	 * int nickNameStart = dataInDevice.indexOf('$'); int nickNameEnd; if
+	 * (nickNameStart >= 0) { nickNameEnd = nickNameStart; boolean isLetter; do
+	 * { nickNameEnd ++; char currentChar = dataInDevice.charAt(nickNameEnd);
+	 * isLetter = (currentChar >= 'A' && currentChar <= 'Z') | (currentChar >=
+	 * 'a' && currentChar <= 'z'); } while (isLetter);
+	 * 
+	 * String nickName = dataInDevice.substring(nickNameStart+1, nickNameEnd);
+	 * String nickValue = un.getNickNameValue(nickName); dataInDevice =
+	 * dataInDevice.substring(0,nickNameStart) + nickValue +
+	 * dataInDevice.substring(nickNameEnd); } return dataInDevice; }
+	 */
 }
