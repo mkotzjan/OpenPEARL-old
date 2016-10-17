@@ -74,6 +74,7 @@ gen ./check_cmds.sh $(ANTLR_GENERATED_FILES) : SmallPearl.g4
 ###############################################################################
 
 javac:
+	test -d $(OUTPUT_DIR) || mkdir $(OUTPUT_DIR)
 	javac -cp .:$(CONFIG_COMPILER_ANTLR) -d $(OUTPUT_DIR) $(JAVAC_FLAGS) org/smallpearl/compiler/Compiler.java
 	rm -f smallpearl_compiler.jar
 	cp SmallPearlCpp.stg $(OUTPUT_DIR)
