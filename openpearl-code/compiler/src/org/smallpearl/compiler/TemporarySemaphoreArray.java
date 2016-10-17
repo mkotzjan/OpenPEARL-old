@@ -33,7 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class TemporarySemaphoreArray {
-    private LinkedList<String> semaphores = new LinkedList();
+    private LinkedList<String> semaphores = new LinkedList<String>();
 
 
     public Void add(String name) {

@@ -86,7 +86,7 @@ module:
 
 system_part:
     'SYSTEM' ';'
-    ( username_declaration | cpp_inline )*
+    ( username_declaration | user_configuration | cpp_inline )*
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,39 +163,25 @@ problem_part:
 
 username_declaration:
     ID ':' (username_declaration_without_data_flow_direction |
-			username_declaration_with_data_flow_direction) ';'
+			username_declaration_with_data_flow_direction ) ';'
 	;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 username_declaration_without_data_flow_direction:
-	peripheral_name username_parameters?
+	ID username_parameters?
 	;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 username_declaration_with_data_flow_direction:
-    data_flow_direction ':' connection_name '---' peripheral_name username_parameters?
+    ID username_parameters '---' ID username_parameters?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-data_flow_direction:
-	  'IN'
-	| 'OUT'
-    | 'INOUT'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-connection_name:
-    ID
-    ; 
-
-////////////////////////////////////////////////////////////////////////////////
-
-peripheral_name:
-    ID
+user_configuration:
+    ID username_parameters '---' ID ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +195,7 @@ username_parameters:
 //           { SPECIFY | SPC } Identifier [ AllocationProtection ] Type IdentificationAttribute ;
 
 identification:
-    ( 'SPECIFY' | 'SPC' ) ID  allocation_protection? type? identification_attribute? ';'
+    ( 'SPECIFY' | 'SPC' ) ID  allocation_protection? type? identification_attribute? globalAttribute? ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,7 +210,7 @@ allocation_protection:
 ////////////////////////////////////////////////////////////////////////////////
 
 identification_attribute:
-    ID '(' ID ')'
+    'IDENT' '(' ID ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,7 +284,7 @@ globalAttribute :
 ////////////////////////////////////////////////////////////////////////////////
 
 typeAttribute :
-      simpleType 
+     simpleType
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1689,7 +1675,8 @@ monadicExplicitTypeConversionOperators
 literal
     : IntegerConstant
     | FloatingPointConstant
-    | ( StringLiteral | BitStringLiteral )
+    | StringLiteral
+    | BitStringLiteral
     | timeConstant
     | durationConstant
     ;

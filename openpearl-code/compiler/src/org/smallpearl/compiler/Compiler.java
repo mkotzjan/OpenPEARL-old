@@ -41,7 +41,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.6.4";
+    static String version = "v0.8";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -65,7 +65,7 @@ public class Compiler {
     static boolean debug = false;
     static boolean debugSTG = false;
     static boolean stacktrace = false;
-    static boolean exportSystemPart = false;
+    static boolean imc = true;
     static int     noOfErrors = 0;
     static int     noOfWarnings = 0;
     static int     warninglevel = 255;
@@ -152,7 +152,7 @@ public class Compiler {
                     semanticCheckVisitor.visit(tree);
                 }
 
-                if (exportSystemPart) {
+                if (imc) {
                     SystemPartExport(lexer.getSourceName(),tree);
                 }
 
@@ -223,7 +223,7 @@ public class Compiler {
                 "  --warninglevel <level>      Set the warning level                 \n" +
                 "                              Level   0: no warning                 \n" +
                 "                              Level 255: all warnings (default)     \n" +
-                " --export-systempart          Export the System part into a xml     \n" +
+                " --imc                        Enable Inter Module Checker           \n" +
                 "                              file                                  \n" +
                 "  --output <filename>         Filename of the generated code        \n" +
                 "  infile ...                                                        \n");
@@ -273,8 +273,8 @@ public class Compiler {
                 debugSTG = true;
             } else if (arg.equals("--stacktrace")) {
                 stacktrace = true;
-            } else if (arg.equals("--export-systempart")) {
-                exportSystemPart = true;
+            } else if (arg.equals("--imc")) {
+                imc = true;
             } else if (arg.equals("--output")) {
                 if (i >= args.length) {
                     System.err.println("missing filename on --output");
@@ -298,7 +298,7 @@ public class Compiler {
                 psFile = args[i];
                 i++;
             } else if (arg.equals("--version")) {
-                    System.out.println("OpenPEARL90 compiler version "+version);
+                    System.out.println("OpenPEARL compiler version "+version);
                 i++;
             } else if (arg.equals("--warninglevel")) {
                 if (i >= args.length) {
@@ -376,14 +376,14 @@ public class Compiler {
         try {
 
             if (verbose>0) {
-                System.out.println("Generating export file "+outputFileName);
+                System.out.println("Generating IMC file "+outputFileName);
             }
 
             PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
             writer.println(systemPart.render(lineWidth));
             writer.close();
         } catch (IOException e) {
-            System.err.println("Problem writing to the export file " + outputFileName);
+            System.err.println("Problem writing to the IMC file " + outputFileName);
         }
 
         return null;

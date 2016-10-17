@@ -43,6 +43,10 @@ ANTLR_GENERATED_FILES = SmallPearl.tokens          \
 ## ANTLR_FLAGS = -XdbgST
 ANTLR_FLAGS = 
 
+OUTPUT_DIR = ../out
+##JAVAC_FLAGS = -Xlint:unchecked
+JAVAC_FLAGS =
+
 ###############################################################################
 
 .PHONY: gen javac 
@@ -70,10 +74,12 @@ gen ./check_cmds.sh $(ANTLR_GENERATED_FILES) : SmallPearl.g4
 ###############################################################################
 
 javac:
-	javac -cp .:$(CONFIG_COMPILER_ANTLR)  org/smallpearl/compiler/Compiler.java
+	javac -cp .:$(CONFIG_COMPILER_ANTLR) -d $(OUTPUT_DIR) $(JAVAC_FLAGS) org/smallpearl/compiler/Compiler.java
 	rm -f smallpearl_compiler.jar
-	jar cf smallpearl_compiler.jar org/smallpearl/compiler/*.class \
-		SmallPearlCpp.stg SystemPartExport.stg
+	cp SmallPearlCpp.stg $(OUTPUT_DIR)
+	cp IMC.stg $(OUTPUT_DIR)
+	cd $(OUTPUT_DIR) && jar cvf smallpearl_compiler.jar org/smallpearl/compiler/*.class \
+	SmallPearlCpp.stg IMC.stg
 
 ##############################################################################
 
@@ -89,7 +95,7 @@ prepare:
 install: gen javac prl_cc.inc
 #	cp prl_c $(INSTALL_DIR)
 #	cp smallpearl_compiler.jar $(INSTALL_DIR)
-	cp smallpearl_compiler.jar $(CONFIG_INSTALL_Target)/bin
+	cp $(OUTPUT_DIR)/smallpearl_compiler.jar $(CONFIG_INSTALL_Target)/bin
 
 .PHONY: prl_cc.inc
 prl_cc.inc:
@@ -104,7 +110,9 @@ clean:
 	$(RM) org/smallpearl/compiler/SmallPearlLexer.tokens
 	$(RM) org/smallpearl/compiler/SmallPearlParser.java
 	$(RM) org/smallpearl/compiler/SmallPearlVisitor.java
-	$(RM) org/smallpearl/compiler/*.class
+	$(RM) $(OUTPUT_DIR)/org/smallpearl/compiler/*.class
+	$(RM) $(OUTPUT_DIR)/*.jar
+	$(RM) $(OUTPUT_DIR)/*.stg
 	$(RM) ../prl_cc.inc
 
 ###############################################################################

@@ -44,13 +44,12 @@ import org.w3c.dom.*;
 
 public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements SmallPearlVisitor<ST> {
 
-    private static final String SYSTEMPART_EXPORT_STG = "SystemPartExport.stg";
+    private static final String IMC_EXPORT_STG = "IMC.stg";
 
     private STGroup group;
     private int m_verbose;
     private boolean m_debug;
     private String m_sourceFileName;
-
 
     public SystemPartExporter(String sourceFileName, int verbose, boolean debug) {
 
@@ -59,10 +58,10 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
         m_sourceFileName = sourceFileName;
 
         if (m_verbose > 1) {
-            System.out.println("Generating SystemPart definitions");
+            System.out.println("Generating InterModuleChecker definitions");
         }
 
-        this.ReadTemplate(SYSTEMPART_EXPORT_STG);
+        this.ReadTemplate(IMC_EXPORT_STG);
     }
 
     private Void ReadTemplate(String filename) {
@@ -79,17 +78,20 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
     public ST visitModule(SmallPearlParser.ModuleContext ctx) {
         ST module = group.getInstanceOf("Module");
 
-        module.add( "sourcefile", m_sourceFileName);
-        module.add( "name", ctx.ID().getText());
-        System.out.println( "SystemPartExporter: visitModule");
+        module.add("sourcefile", m_sourceFileName);
+        module.add("name", ctx.ID().getText());
+
         if (ctx != null) {
             for (ParseTree c : ctx.children) {
                 if (c instanceof SmallPearlParser.System_partContext) {
                     module.add("SystemPart", visitSystem_part((SmallPearlParser.System_partContext) c));
+                } else if (c instanceof SmallPearlParser.Problem_partContext) {
+                    module.add("ProblemPart", visitProblem_part((SmallPearlParser.Problem_partContext) c));
                 }
             }
         }
 
+/*
         SymbolTable symtab = SymbolTable.getSymbolTable();
         LinkedList<TaskDef> tasks = symtab.getTasks();
         ST tasklist = group.getInstanceOf("TaskList");
@@ -102,6 +104,7 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
         }
 
         module.add("TaskList", tasklist);
+*/
 
         return module;
     }
@@ -110,12 +113,12 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
     public ST visitSystem_part(SmallPearlParser.System_partContext ctx) {
         ST st = group.getInstanceOf("SystemPart");
 
-        System.out.println( "SystemPartExporter: visitSystem_part");
-
         if (ctx != null) {
             for (ParseTree c : ctx.children) {
                 if (c instanceof SmallPearlParser.Username_declarationContext) {
                     st.add("decls", visitUsername_declaration((SmallPearlParser.Username_declarationContext) c));
+                } else if (c instanceof SmallPearlParser.User_configurationContext) {
+                    st.add("decls", visitUser_configuration((SmallPearlParser.User_configurationContext) c));
                 }
             }
         }
@@ -127,53 +130,48 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
     public ST visitUsername_declaration(SmallPearlParser.Username_declarationContext ctx) {
         ST decl = group.getInstanceOf("Username_Declaration");
 
-        System.out.println("SystemPartExporter: visitUsername_declaration");
+        decl.add("username", ctx.ID().getText());
+        decl.add("lineno", ctx.start.getLine());
 
-        decl.add("var", ctx.ID().getText());
-
-        if ( ctx.username_declaration_with_data_flow_direction() != null )
-        {
-           decl.add("type", visitUsername_declaration_with_data_flow_direction(ctx.username_declaration_with_data_flow_direction()));
-        }
-        else if ( ctx.username_declaration_without_data_flow_direction() != null )
-        {
-            decl.add("type", visitUsername_declaration_without_data_flow_direction(ctx.username_declaration_without_data_flow_direction()));
+        if (ctx.username_declaration_with_data_flow_direction() != null) {
+            decl.add("decl", visitUsername_declaration_with_data_flow_direction(ctx.username_declaration_with_data_flow_direction()));
+        } else if (ctx.username_declaration_without_data_flow_direction() != null) {
+            decl.add("decl", visitUsername_declaration_without_data_flow_direction(ctx.username_declaration_without_data_flow_direction()));
         }
 
         return decl;
     }
 
     @Override
-    public ST visitUsername_declaration_without_data_flow_direction(SmallPearlParser.Username_declaration_without_data_flow_directionContext  ctx) {
+    public ST visitUsername_declaration_without_data_flow_direction(SmallPearlParser.Username_declaration_without_data_flow_directionContext ctx) {
         ST decl = group.getInstanceOf("Username_Declaration_Without_Dataflow_Direction");
 
-        System.out.println("SystemPartExporter: visitUsername_declaration_without_data_flow_direction");
-
-        decl.add("peripheral_name", ctx.peripheral_name().ID().getText());
+        decl.add("lineno", ctx.start.getLine());
+        decl.add("sysname", ctx.ID().toString());
 
         if (ctx.username_parameters() != null) {
-            decl.add("username_parameters", visitUsername_parameters(ctx.username_parameters()));
+            decl.add("parameters", visitUsername_parameters(ctx.username_parameters()));
         }
+
         return decl;
     }
 
-
-    // username_declaration_with_data_flow_direction:
-    // data_flow_direction ':' connection_name '---' peripheral_name username_parameters?
-
-
     @Override
-    public ST visitUsername_declaration_with_data_flow_direction(SmallPearlParser.Username_declaration_with_data_flow_directionContext  ctx) {
+    public ST visitUsername_declaration_with_data_flow_direction(SmallPearlParser.Username_declaration_with_data_flow_directionContext ctx) {
         ST decl = group.getInstanceOf("Username_Declaration_With_Dataflow_Direction");
 
-        System.out.println("SystemPartExporter: visitUsername_declaration_with_data_flow_direction");
-
-        decl.add("data_flow_direction", ctx.data_flow_direction().getText());
-        decl.add("connection", ctx.connection_name().getText());
-        decl.add("peripheral_name", ctx.peripheral_name().ID().getText());
+        decl.add("sysname", ctx.ID(0).toString());
 
         if (ctx.username_parameters() != null) {
-            decl.add("username_parameters", visitUsername_parameters(ctx.username_parameters()));
+            decl.add("parameters", visitUsername_parameters(ctx.username_parameters(0)));
+
+            ST association = group.getInstanceOf("Association");
+            association.add("name", ctx.ID(1).toString());
+            if (ctx.username_parameters().size() > 1) {
+                association.add("parameters", visitUsername_parameters(ctx.username_parameters(1)));
+            }
+
+            decl.add("association", association);
         }
 
         return decl;
@@ -181,21 +179,203 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
 
 
     @Override
-    public ST visitUsername_parameters(SmallPearlParser.Username_parametersContext  ctx) {
-        ST params = group.getInstanceOf("Username_Parameters");
-
-        System.out.println("SystemPartExporter: visitUsername_parameters");
+    public ST visitUsername_parameters(SmallPearlParser.Username_parametersContext ctx) {
+        ST parameters = group.getInstanceOf("Username_Parameters");
 
         for (int i = 0; i < ctx.literal().size(); i++) {
-            String p = ctx.literal(i).getText();
-            p = p.replaceAll("^'","");
-            p = p.replaceAll("'$","");
-            params.add("params",p);
+            ST parameter = group.getInstanceOf("Parameter");
+            String param = ctx.literal(i).getText();
+//            param = param.replaceAll("^'","");
+//            param = param.replaceAll("'$","");
+
+            if (ctx.literal(i).StringLiteral() != null) {
+                ST type = group.getInstanceOf("Type_Char");
+                type.add("name", param);
+                parameter.add("type", type);
+            } else if (ctx.literal(i).BitStringLiteral() != null) {
+                ST type = group.getInstanceOf("Type_Bit");
+                type.add("name", param);
+                parameter.add("type", type);
+            } else if (ctx.literal(i).IntegerConstant() != null) {
+                ST type = group.getInstanceOf("Type_Fixed");
+                type.add("name", param);
+                parameter.add("type", type);
+            }
+
+            parameters.add("params", parameter);
         }
 
-        return params;
+        return parameters;
     }
 
 
-}
+    @Override
+    public ST visitUser_configuration(SmallPearlParser.User_configurationContext ctx) {
+        ST user_configuration = group.getInstanceOf("User_Configuration");
 
+        user_configuration.add("lineno", ctx.start.getLine());
+        user_configuration.add("sysname", ctx.ID(0).toString());
+
+        if (ctx.username_parameters() != null) {
+            user_configuration.add("parameters", visitUsername_parameters(ctx.username_parameters()));
+        }
+
+        ST association = group.getInstanceOf("Association");
+        association.add("name", ctx.ID(1).toString());
+        user_configuration.add("association", association);
+
+        return user_configuration;
+    }
+
+    @Override
+    public ST visitProblem_part(SmallPearlParser.Problem_partContext ctx) {
+        ST st = group.getInstanceOf("ProblemPart");
+
+        if (ctx != null) {
+            for (ParseTree c : ctx.children) {
+                if (c instanceof SmallPearlParser.IdentificationContext) {
+                    st.add("decls", visitIdentification((SmallPearlParser.IdentificationContext) c));
+                } else if (c instanceof SmallPearlParser.DationSpecificationContext) {
+                    st.add("decls", visitDationSpecification((SmallPearlParser.DationSpecificationContext) c));
+                }
+            }
+        }
+
+        return st;
+    }
+
+    @Override
+    public ST visitIdentification(SmallPearlParser.IdentificationContext ctx) {
+        ST st = group.getInstanceOf("Specification");
+
+        st.add("lineno", ctx.start.getLine());
+        st.add("name", ctx.ID().toString());
+        if (ctx.type() != null) {
+            st.add("type", visitType(ctx.type()));
+        }
+        return st;
+    }
+
+    @Override
+    public ST visitDationSpecification(SmallPearlParser.DationSpecificationContext ctx) {
+        ST dationSpecification = group.getInstanceOf("DationSpecification");
+
+        dationSpecification.add("lineno", ctx.start.getLine());
+
+        boolean hasGlobalAttribute = false;
+
+        ArrayList<String> identifierDenotationList = null;
+        if (ctx != null) {
+            if (ctx.identifierDenotation() != null ){
+                identifierDenotationList = getIdentifierDenotation(ctx.identifierDenotation());
+            }
+
+            if ( ctx.globalAttribute() != null ) {
+                hasGlobalAttribute = true;
+            }
+
+
+            for (int i = 0; i < identifierDenotationList.size(); i++) {
+                dationSpecification.add( "name", identifierDenotationList.get(i));
+            }
+
+            if ( ctx.specifyTypeDation() != null ) {
+                ST datalist = group.getInstanceOf("DataList");
+                ST attributes = group.getInstanceOf("Attributes");
+
+                if (ctx.specifyTypeDation().classAttribute() != null) {
+                    if (ctx.specifyTypeDation().classAttribute().alphicDation() != null) {
+                        ST data = group.getInstanceOf("Data");
+                        data.add("name", "ALPHIC");
+                        datalist.add("data",data);
+                    }
+
+                    if (ctx.specifyTypeDation().classAttribute().basicDation() != null) {
+                        ST data = group.getInstanceOf("Data");
+                        data.add("name", "BASIC");
+                        datalist.add("data",data);
+                    }
+
+                    if (ctx.specifyTypeDation().classAttribute().systemDation() != null) {
+                        ST attribute = group.getInstanceOf("Attribute");
+                        attribute.add("name", "SYSTEM");
+                        attributes.add("attributes", attribute);
+                    }
+
+                    if ( ctx.specifyTypeDation().classAttribute() != null ) {
+                        if ( ctx.specifyTypeDation().classAttribute().typeOfTransmissionData() != null) {
+                            ST data = group.getInstanceOf("Data");
+                            data.add("name", ctx.specifyTypeDation().classAttribute().typeOfTransmissionData().getText());
+                            datalist.add("data",data);
+                        }
+                    }
+                }
+
+                if ( ctx.specifyTypeDation().sourceSinkAttribute() != null) {
+                    ST attribute = group.getInstanceOf("Attribute");
+                    attribute.add("name", ctx.specifyTypeDation().sourceSinkAttribute().getText());
+                    attributes.add("attributes",attribute);
+                }
+
+                dationSpecification.add("datalist", datalist);
+                dationSpecification.add("attributes", attributes);
+
+            }
+
+        }
+
+        return dationSpecification;
+    }
+
+    @Override
+    public ST visitType(SmallPearlParser.TypeContext ctx) {
+        ST type = group.getInstanceOf("Type");
+
+        if ( ctx.simple_type() != null) {
+            if ( ctx.simple_type().type_bit() != null ) {
+                type.add("name", "BIT");
+            }
+            else if ( ctx.simple_type().type_char() != null ) {
+                type.add("name", "CHAR");
+            }
+            else if ( ctx.simple_type().type_fixed() != null ) {
+                type.add("name", "FIXED");
+            }
+            else if ( ctx.simple_type().type_float() != null ) {
+                type.add("name", "FLOAT");
+            }
+            else {
+                throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+        else if ( ctx.type_realtime_object() != null) {
+                type.add("name", ctx.type_realtime_object().getText());
+        }
+        else if ( ctx.typeTime() != null) {
+            if ( ctx.typeTime().type_clock() != null ) {
+                type.add("name", "CLOCK");
+            }
+            else if ( ctx.typeTime().type_duration() != null ) {
+                type.add("name", "DURATION");
+            }
+            else {
+                throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        return type;
+    }
+
+
+    private ArrayList<String> getIdentifierDenotation(SmallPearlParser.IdentifierDenotationContext ctx) {
+        ArrayList<String> identifierDenotationList = new ArrayList<String>();
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.ID().size(); i++) {
+                identifierDenotationList.add(ctx.ID().get(i).toString());
+            }
+        }
+
+        return identifierDenotationList;
+    }
+}

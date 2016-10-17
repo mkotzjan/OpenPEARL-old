@@ -41,7 +41,7 @@ T1: TASK MAIN;
    DCL b3i1 BIT         INIT('4'B3);
    DCL b3i11 BIT(1)     INIT('0'B3);
    DCL b3i2 BIT(2)      INIT('4'B3);
-   DCL b3i64 BIT(64)    INIT('7817036074170360741700'B3);
+   DCL b3i64 BIT(64)    INIT('7717036074170360741700'B3);
 
    ! helper variables
    DCL fixed31 FIXED(31);
@@ -86,13 +86,13 @@ T1: TASK MAIN;
    __cpp__('b64 = b64.bitShift(_fixed15);			');
 
    ! slice-operations
-    b1 := b64.BIT(1);
+!TODO    b1 := b64.BIT(1);
    !__cpp__('b1 = b64.getSlice(1,b1);   // parameter b1 is required for return size			');
-    b2 := b64.BIT(13:14);
+!TODO    b2 := b64.BIT(13:14);
    !__cpp__('b2 = b64.getSlice(13,b2);   // parameter b2 is required for return size			');
-    b64.BIT(1) := b1;
+!TODO    b64.BIT(1) := b1;
    !__cpp__('b64.setSlice(13,b1);			');
-    b64.BIT(1:2) := b2;
+!TODO    b64.BIT(1:2) := b2;
    !__cpp__('b64.setSlice(1,b2);			');
 
    ! comparison
@@ -108,7 +108,7 @@ T1: TASK MAIN;
    ! type conversions
     fixed31 := TOFIXED(b1);
    !__cpp__('_fixed31 = b1.toFixed();			');
-   b2 := TOBIT(1(2));
+!TODO   b2 := TOBIT(1(2));
    !__cpp__('b2 = pearlrt::BitString<2>(1);			');
 
 END;
