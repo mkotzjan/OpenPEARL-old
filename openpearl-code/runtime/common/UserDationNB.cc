@@ -118,6 +118,10 @@ namespace pearlrt {
 
       dationParams = params;
       dim->setDationParams(dationParams);
+
+     // perform NewLine translation only for ALPHIC dations
+     system->translateNewLine(dationType == ALPHIC);
+        
    }
 
    void UserDationNB::closeSystemDation(int dationParams) {

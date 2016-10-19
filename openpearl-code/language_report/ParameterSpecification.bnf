@@ -1,0 +1,4 @@
+\htgt{ParameterSpecification} ::=\\
+\x [ \hlink{Identifier} ] [ \hlink{VirtualDimensionList} ] [ {\bf INV} ] \\
+\x \hlink{ParameterType} [ {\bf IDENTICAL $\mid$ IDENT} ]
+

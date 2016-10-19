@@ -3,4 +3,5 @@
 	 \hlink{LoopStatement} $\mid$ \hlink{ExitStatement}\\
 \x $\mid$ \hlink{ProcedureCall} $\mid$ \hlink{ReturnStatement}
 	 $\mid$ \hlink{GoToStatement}\\
+\x $\mid$ \hlink{EmptyStatement}
 

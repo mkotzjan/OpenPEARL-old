@@ -70,6 +70,8 @@ independent parts.
 // read options from menuconfig
 #include "../../../../configuration/include/autoconf.h"
 
+ extern "C" {  extern int _write(int fd, char * ptr, int len);};
+
 using namespace pearlrt;
 /*-----------------------------------------------------------*/
 /**
@@ -83,6 +85,9 @@ and start FreeRTOS-scheduler
 __attribute__((weak)) int main(void) {
    char line[40];
    uint32_t resetReason;
+
+   printf("OpenPEARL started \n");
+
 
    // obtain the reset reason
    resetReason = Chip_SYSCTL_GetSystemRSTStatus();
@@ -161,6 +166,7 @@ __attribute__((weak)) int main(void) {
    Log::info("system startup complete");
 
    /* Start the scheduler. */
+
    vTaskStartScheduler();
    Log::error("main.c: could not create idle task");
    exit(1);

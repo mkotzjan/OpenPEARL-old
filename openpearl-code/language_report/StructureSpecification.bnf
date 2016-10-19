@@ -1,0 +1,3 @@
+\htgt{StructureSpecification} ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{StructureDenotationS} [ , \hlink{StructureDenotationS} ] $^{...}$ ;
+

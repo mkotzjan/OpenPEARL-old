@@ -1,0 +1,24 @@
+MODULE(demo);
+
+SYSTEM;
+  lm75: LM75('48'B4) --- I2CBus('/dev/i2c-0', 100000);
+
+  lm75a : LM75('49'B4) --- i2cbus1;
+  i2cbus1: I2CBus('/dev/i2c-1', 100000);
+
+  sig1: FixedRangeSignal;
+  int1: UnixSignal(15);
+
+  disc: Disc('/tmp/folder1', 10);
+  
+  stdOut: StdOut;
+
+  Log('EW') --- StdOut;
+
+PROBLEM,
+  SPC sig1 SIGNAL GLOBAL;
+  SPC int1 INTERRUPT GLOBAL;
+  SPC disc DATION OUT SYSTEM ALL GLOBAL;
+  SPC stdOut DATION OUT SYSTEM ALPHIC GLOBAL;
+
+MODEND;

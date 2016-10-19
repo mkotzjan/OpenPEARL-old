@@ -1,3 +1,4 @@
+\appendix
 \chapter{Appendix}
 
 % --------
@@ -5,6 +6,7 @@
 \renewcommand{\htgt}{\htgtOn}
 
 \section{Data Types and their usability}    % A1
+\label{sec_data_types_usability}
 
 The following overview shows for each of the available data types, whether
 objects of this type may
@@ -21,6 +23,17 @@ objects of this type may
 \item be provided with the initialisation attribute.
 \end{itemize}
 
+\begin{discuss}
+IRPT als Parameter oder REF value zulaessig?
+
+bei SIGNALs geht nur GLOBAL; die restlichen 'x' raus?
+
+REF STRUCT[] entfernt
+
+Dies ist Thema auf der AK-Sitzung im November 2016.
+
+
+\end{discuss}
 \begin{table}[htb]
 \begin{tabular}{lccccccccc}
 {\bf type}     & \multicolumn{9}{c}{{\bf usage}} \\ 
@@ -47,7 +60,7 @@ FORMAT         & --    &  --     & --    &  --    &  --   &   --   &  -- &    --
 REF CHAR ( )   & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
 REF PROC       & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
 REF TASK       & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
-REF STRUCT [ ] & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+%%% REF STRUCT [ ] & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
 \end{tabular}
 \end{table}
                                                                                  
@@ -57,16 +70,26 @@ passed on by means of identification (IDENT) as procedure parameters.
 \newpage
 \section{Predefined Functions}   % A 2
 
-This appendix describes the functions known to the PEARL compiler. They
-can be used in the single modules without specifying them before. If one
-of the functions is specified in a module, no object may exist with the
-functions' name at module level.
+This appendix describes the functions known to the PEARL
+% compiler
+System. They
+can be used in the single modules 
+%%%without
+by
+%%% ^^added
+ specifying them before. 
+%%%If one 
+%%%of the functions is specified in a module, no object may exist with the 
+%%%functions' name at module level.
+%%%\begin{added}
+A user supplied global function with the same signature substitutes
+the predefined function in the whole program.
+%%%\end{added}
 
-\begin{tobedone}
 \subsection{The Function NOW}    % A 2.1
 
 The function procedure NOW passes back the actual time or system time, resp., 
-as value of type CLOCK. A specification of the function looks like this:\\
+as value of type CLOCK. The specification of the function looks like this:\\
 
 {\bf SPC} NOW {\bf PROC RETURNS ( CLOCK ) GLOBAL} ; 
 
@@ -76,31 +99,32 @@ as value of type CLOCK. A specification of the function looks like this:\\
 The actual date can be received by invoking the function procedure DATE.
 The function result is a character string constant of length 10, containing
 the date in the form ``year--month--day''. Here an example for December 5,
-1991: ``1991--12-05''. The function can be specified like this:\\
+1991: ``1991--12-05''. The function must  be specified like this:\\
 
 {\bf SPC} DATE {\bf PROC RETURNS ( CHAR(10) ) GLOBAL} ;
-\end{tobedone}
 
-\begin{added}
+%%%\begin{added}
 \section{CPP-Insertions}
 The language translation is done in two steps.
-Step 1 translates PEARL into C++.
+Step 1 translates \OpenPEARL{} into C++.
 Step 2 translates C++ into the plattform specific machine code.
 
 It is possible to insert C++ statements into the generated C++ 
 code. The position of the insertion is
+\begin{discuss}
 \begin{itemize}
 \item in system part: {\em not defined yet}
 \item on module level in the problem part 
    it is not clearly defined, since the first compilation
-   steps adds some information for administration is between.
+   steps adds some information for administration in between.
 \item in tasks and procedures just between the output of the surrounding
-generated output
+statements.
 \end{itemize}
+\end{discuss}
 
 The syntax is.
 
-CPP\_insertion ::=\\
+CPPInsertion ::=\\
 \x {\bf \_\_cpp\_\_} ( CharacterStringConstant ... );
 
 The CharacterStringConstants are expected in PEARL notation.
@@ -113,14 +137,27 @@ C & PEARL \\
 \verb|\| & \verb|\\| \\
 \verb|'| & \verb|\'|  \\
 \end{tabular}
-\end{added}
+%%%\end{added}
 
 \newpage
 \section{Syntax}    % A 3
 \begin{discuss}
-this section is duplicate with chapter  3
+die Syntaxelemente sind ggf. noch besser zu ordnen.
+Es koennen auch noch ueberzaehlige Elemente vorhanden sein!
+
+ParameterListForSPC kann vermutlich durcgListOfFormalParameters ersetzt 
+werden.
+
+%%%Ist IdentifierDenotation das gleiche wie OneIdentifierOrList?
+%%% ja --> wurde komplett ersetzt
+%%% war so definiert:
+%%%IdentifierDenotation ::=\\
+%%%\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
+%%%
+%%% Indicator wurde durch Identifier ersetzt
 
 \end{discuss}
+
 Following meta characters are used in the syntax description:\\ 
 
 \begin{tabular}{ll}
@@ -152,7 +189,7 @@ description.
 
 \subsection{Program}    % A 3.1
 
-\input{PEARL-Program.bnf}
+\input{Program.bnf}
 
 \input{Module.bnf}
 
@@ -161,14 +198,19 @@ description.
 \input{SystemPart.bnf}
 
 \input{UserNameDeclaration.bnf}
+\input{SystemDationDeclaration.bnf}
+\input{SystemSignalDeclaration.bnf}
+\input{SystemInterruptDeclaration.bnf}
+
 \input{ConfigurationElement.bnf}
 \input{ListOfConstants.bnf}
 \input{ConstantParameter.bnf}
+\input{Association.bnf}
 
-\begin{removed}
-nngz ::= \\
-\x IntegerWithoutPrecision$\S $NonNegative
-\end{removed}
+%%%\begin{removed}
+%%%nngz ::= \\
+%%%\x IntegerWithoutPrecision$\S $NonNegative
+%%%\end{removed}
 
 
 \subsection{Basic Elements}    % A 3.3 
@@ -185,9 +227,7 @@ nngz ::= \\
 \input{Constant.bnf}
 
 \input{Integer.bnf} 
-
 \input{IntegerWithoutPrecision.bnf}
-
 \input{Precision.bnf}
 
 \htgt{FloatingPointNumber} ::=\\
@@ -241,7 +281,7 @@ nngz ::= \\
 
 \input{ConstantExpression.bnf}
 
-\input{Constant-FIXED-Expression.bnf} 
+\input{ConstantFIXEDExpression.bnf} 
         
 \input{Term.bnf}
 
@@ -260,15 +300,34 @@ nngz ::= \\
 \x $\mid$ \hlink{FormatDeclaration}\\
 \x $\mid$ \hlink{ProcedureDeclaration}\\
 \x $\mid$ \hlink{TaskDeclaration}\\
-\begin{removed}
-\x $\mid$ OperatorDefinition\\
-\x $\mid$ PredenceDefinition\\
-\end{removed}
+%%%%%\begin{removed}
+%%%%%\x $\mid$ OperatorDefinition\\
+%%%%%\x $\mid$ PredenceDefinition\\
+%%%%%\end{removed}
 
 
 \input{LengthDefinition.bnf} 
 
 \input{TypeDefinition.bnf}
+\input{Type.bnf}
+\input{TypeFixed.bnf}
+\input{TypeFloat.bnf}
+\input{TypeBitString.bnf}
+\input{TypeCharacterString.bnf}
+\input{TypeClock.bnf}
+\input{TypeDuration.bnf}
+
+\input{LengthOfString.bnf}
+
+\input{ScalarVariableDeclaration.bnf}
+%%%\input{VariableDenotation.bnf}
+\input{ScalarDeclareDataSentence.bnf}
+\input{TypeAttribute.bnf}
+
+\begin{discuss}
+sind DeclareSentence und DationAttribute noch notwendig?
+
+Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
 
 \htgt{VariableDeclaration} ::=\\
 \x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{DeclareSentence} [ , \hlink{DeclareSentence} ] $^{...}$ ;\\
@@ -277,9 +336,20 @@ nngz ::= \\
 \htgt{DeclareSentence} ::=\\
 \x \hlink{OneIdentifierOrList} [ \hlink{DimensionAttribute} ]\\
 \x \{ \hlink{ProblemDataAttribute} $\mid$ \hlink{SemaAttribute} $\mid$ \hlink{BoltAttribute} $\mid$ \hlink{DationAttribute} \}\\ 
+\end{discuss}
 
-\htgt{OneIdentifierOrList} ::= \\
-\x \hlink{Identifier} $\mid$ ( \hlink{Identifier} [ , \hlink{Identifier} ] $^{...}$ ) \\
+
+\begin{discuss}
+Doppelte Regel mit DationDeclaration
+
+\htgt{DationAttribute} ::=\\
+\x \hlink{TypeDation}\\
+\x [ \hlink{GlobalAttribute} ]\\
+\x {\bf CREATED} ( \hlink{Identifier}$\S $UserNameForSytemDation )\\
+\end{discuss}
+
+
+\input{OneIdentifierOrList.bnf}
 
 \input{DimensionAttribute.bnf}
 
@@ -295,7 +365,7 @@ nngz ::= \\
 \htgt{StructuredType} ::=\\
 \x \hlink{TypeStructure} $\mid$ \hlink{Identifier}$\S $ForNewDefinedType\\
 
-\input{TypeStructure.bnf}
+% war schon mal da \input{TypeStructure.bnf}
 
 \input{StructureComponent.bnf}
 
@@ -305,12 +375,31 @@ nngz ::= \\
 
 \input{VirtualDimensionList.bnf}
 
-\input{Type-VOID.bnf}
+%%%\begin{removed}
+%%%\input{Type-VOID.bnf}
+%%%\end{removed}
+
+\input{ArrayDeclaration.bnf}
+\input{ArrayDenotation.bnf}
+\input{TypeAttributeForArray.bnf}
+% war schon mal da \input{DimensionAttribute.bnf}
+% war schon mal da \input{DimensionBoundaries.bnf}
+
+\input{ArraySpecification.bnf}
+\input{ArrayDenotationS.bnf}
+
+\input{StructureDeclaration.bnf}
+\input{StructureDenotation.bnf}
+\input{TypeStructure.bnf}
+% ist schon mal da  \input{StructureComponent.bnf}
+% ist schon mal da \input{TypeAttributeInStructureComponent.bnf}
+\input{StructureSpecification.bnf}
+\input{StructureDenotationS.bnf}
 
 \htgt{SemaAttribute} ::=\\
 \x {\bf SEMA} [ \hlink{GlobalAttribute} ]\\
-\x [ {\bf PRESET} ( \hlink{Constant-FIXED-Expression}
-	[ , \hlink{Constant-FIXED-Expression} ] $^{...}$ ) ]\\
+\x [ {\bf PRESET} ( \hlink{ConstantFIXEDExpression}
+	[ , \hlink{ConstantFIXEDExpression} ] $^{...}$ ) ]\\
 
 \htgt{BoltAttribute} ::=\\
 \x {\bf BOLT} [ \hlink{GlobalAttribute} ]\\
@@ -321,25 +410,31 @@ nngz ::= \\
 
 \input{InitElement.bnf}
 
-\input{DationAttribute.bnf}
 
+\input{DationDeclaration.bnf}
+
+%%%\input{DationAttribute.bnf}
+
+\input{TypeDationSystem.bnf}
 \input{TypeDation.bnf}
 
 \input{SourceSinkAttribute.bnf}
 
-\begin{removed}
-ClassAttribute ::= \\
-\x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData\\
-\end{removed}
+%%%%%\begin{removed}
+%%%%%ClassAttribute ::= \\
+%%%%%\x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData\\
+%%%%%\end{removed}
 
-\begin{added}
+%%%%%\begin{added}
 \input{ClassAttribute.bnf}
-
-\end{added}
+%%%%%\end{added}
 
 \input{TypeOfTransmissionData.bnf}
+\input{IOCompoundType.bnf}
+\input{IOStructure.bnf}
+\input{IOStructureComponent.bnf}
 
-\input{Topology.bnf}
+\input{Typology.bnf}
 
 \input{AccessAttribute.bnf}
 
@@ -380,6 +475,13 @@ ClassAttribute ::= \\
 \end{removed}
 
 \subsection{Specification and Identification}    % A 3.4.2
+\begin{discuss}
+Auswirkung auf alte Teile pruefen
+
+\input{ScalarVariableSpecification.bnf}
+\input{VariableDenotationS.bnf}
+\end{discuss}
+
 
 \htgt{Specification} ::=\\
 \x \{ {\bf SPC $\mid$ SPECIFY} \} \hlink{SpecificationDefinition} [ , \hlink{SpecificationDefinition} ] $^{...}$ ;\\
@@ -401,33 +503,31 @@ ClassAttribute ::= \\
 
 \htgt{ProcedureUsageAttribute} ::=\\
 \x \{ {\bf ENTRY} $\mid$ [ : ] {\bf PROC} \} [ 
-	\hlink{ParameterListFor-SPC} ] [ \hlink{ResultAttribute} ] \\
+	\hlink{ParameterListForSPC} ] [ \hlink{ResultAttribute} ] \\
 \x \x \hlink{GlobalAttribute}\\
 
-\htgt{ParameterListFor-SPC} ::=\\
-\x ( \hlink{FormalParameterFor-SPC} 
-	[ , \hlink{FormalParameterFor-SPC} ] $^{...}$ )\\
-        
-\htgt{FormalParameterFor-SPC} ::=\\
-\x [ \hlink{Identifier}$\S $OnlyForDocumentation ] 
-	[ \hlink{VirtualDimensionList} ]\\
-\x \hlink{ParameterType} [ {\bf IDENTICAL $\mid$ IDENT} ]\\
-
+%%%\begin{removed}
+%%%\htgt{ParameterListFor-SPC} ::=\\
+%%%\x ( \hlink{FormalParameterFor-SPC} 
+%%%	[ , \hlink{FormalParameterFor-SPC} ] $^{...}$ )\\
+%%%      
+%%%\htgt{FormalParameterFor-SPC} ::=\\
+%%%\x [ \hlink{Identifier}$\S $OnlyForDocumentation ] 
+%%%	[ \hlink{VirtualDimensionList} ]\\
+%%%\x \hlink{ParameterType} [ {\bf IDENTICAL $\mid$ IDENT} ]\\
+%%%\end{removed}
+\input{ProcedureSpecification.bnf}
+\input{ListOfParametersForSPC.bnf}
+\input{ParameterSpecification.bnf}
 \input{TypeProcedure.bnf}
 
 \htgt{TaskUsageAttribute} ::=\\
 \x {\bf TASK} \hlink{GlobalAttribute}\\
 
-\htgt{Identification} ::=\\
-\x \{ {\bf SPC $\mid$ SPECIFY}\} \hlink{Identifier} 
-	[ {\bf INV} ] \hlink{Type} \hlink{IdentificationAttribute} ;\\
+\input{Identification.bnf}
 
-\begin{tobedone}
-Type must become defined 
-\end{tobedone}
 
-\htgt{IdentificationAttribute} ::= \\
-\x {\bf IDENT} ( \hlink{Name}$\S $Object )\\
+\input{IdentificationAttribute.bnf}
 
 \subsection{Expressions}    % A 3.4.3
 
@@ -447,11 +547,11 @@ Type must become defined
 
 \input{ListOfActualParameters.bnf}
 
-\begin{discuss}
-das wird nirgends genutzt!
-
-\input{ConditionalExpression.bnf}  %%% noch nicht in front genutzt!
-\end{discuss}
+%%%\begin{discuss}
+%%%aus Sprache gestrichen
+%%%
+%%%\input{ConditionalExpression.bnf}  %%% noch nicht in front genutzt!
+%%%\end{discuss}
 
 \input{Dereferentiation.bnf}
 
@@ -469,6 +569,9 @@ das wird nirgends genutzt!
 \input{EmptyStatement.bnf}
 
 \input{Assignment.bnf}
+\input{ScalarAssignment.bnf}
+\input{StructureAssignment.bnf}
+\input{RefProcAssignment.bnf}
 
 \input{Block.bnf}
 
@@ -486,7 +589,7 @@ das wird nirgends genutzt!
 
 \input{CaseList.bnf}
 
-\input{IndexSection.bnf}
+\input{IndexRange.bnf}
 
 \input{LoopStatement.bnf}
         
@@ -494,8 +597,7 @@ das wird nirgends genutzt!
 
 \input{ProcedureCall.bnf}
 
-\htgt{ReturnStatement} ::= \\
-\x {\bf RETURN} [ ( \hlink{Expression} ) ] ;\\
+\input{ReturnStatement.bnf}
 
 \input{GoToStatement.bnf}
 
@@ -509,6 +611,8 @@ das wird nirgends genutzt!
 \x $\mid$ \hlink{TaskResuming} $\mid$ \hlink{TaskPreventing}\\
 
 \input{TaskStarting.bnf}
+
+\input{SimpleStartCondition.bnf}
 
 \input{PriorityExpression.bnf}
 
@@ -527,33 +631,31 @@ das wird nirgends genutzt!
 \input{TaskPreventing.bnf}
 
 \input{TaskCoordinationStatement.bnf}
+\input{SemaStatement.bnf}
+\input{BoltStatement.bnf}
 
 \input{InterruptStatement.bnf}
 
-\begin{removed}
-SchedulingSignalReaction ::=\\
-\x {\bf ON} Name$\S $Signal \{ [ 
-	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
-\x \x SignalReaction $\mid$ 
-	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
+%%%%%\begin{removed}
+%%%%%SchedulingSignalReaction ::=\\
+%%%%%\x {\bf ON} Name$\S $Signal \{ [ 
+%%%%%	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
+%%%%%\x \x SignalReaction $\mid$ 
+%%%%%	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
+%%%%%
+%%%%%SignalReaction::= UnlabeledStatement\\
+%%%%%
+%%%%%InduceStatement ::=\\
+%%%%%\x {\bf INDUCE} Name$\S $Signal 
+%%%%%	[ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
+%%%%%\end{removed}
 
-SignalReaction::= UnlabeledStatement\\
-
-InduceStatement ::=\\
-\x {\bf INDUCE} Name$\S $Signal 
-	[ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
-\end{removed}
-
-\begin{added}
+%%%%%\begin{added}
 \input{SignalStatement.bnf}
-
-\input{SignalFinalStatement.bnf}
-
 \input{SignalReaction.bnf}
-
+\input{SignalFinalStatement.bnf}
 \input{InduceStatement.bnf} 
-
-\end{added}
+%%%%%\end{added}
 
 \htgt{ConvertStatement} ::=\\
 \x \hlink{ConvertToStatement} $\mid$ \hlink{ConvertFromStatement}\\
@@ -584,55 +686,75 @@ InduceStatement ::=\\
 
 \input{GetStatement.bnf}
 
+
 \input{WriteStatement.bnf}
         
 \input{ReadStatement.bnf}
         
-\begin{removed}
-SendStatement ::=\\
-\x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%\begin{removed}
+%%%%%SendStatement ::=\\
+%%%%%\x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
+%%%%%\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%
+%%%%%TakeStatement ::=\\
+%%%%%\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
+%%%%%\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%
+%%%%%RST-S-CTRL-Format ::=\\
+%%%%%\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+%%%%%\x $\mid$ {\bf S} ( \hlink{Name}$\S $Variable-FIXED )\\
+%%%%%\x $\mid$ {\bf CONTROL} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
+%%%%%\end{removed}
 
-TakeStatement ::=\\
-\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
-\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
-
-RST-S-CTRL-Format ::=\\
-\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-\x $\mid$ {\bf S} ( \hlink{Name}$\S $Variable-FIXED )\\
-\x $\mid$ {\bf CONTROL} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
-\end{removed}
-
-\begin{added}
+%%%%%\begin{added}
 \input{SendStatement.bnf} 
 
 \input{TakeStatement.bnf}
 
-\input{RST-Format.bnf}
+\input{RSTFormat.bnf}
 
-\end{added}
+%%%%%\end{added}
 
 \input{Slice.bnf}
 
 \input{FormatOrPosition.bnf}
       
-\begin{removed}  
-Factor ::=\\
-\x ( \hlink{Expression}$\S $IntegerGreaterZero ) $\mid$ \hlink{IntegerWithoutPrecision}$\S $GreaterZero\\
-
-.. and sustituted Factor by FormatFactor in Convert and Put/GET statements
-\end{removed}  
-\begin{added}  
+%%%%%\begin{removed}  
+%%%%%Factor ::=\\
+%%%%%\x ( \hlink{Expression}$\S $IntegerGreaterZero ) $\mid$ \hlink{IntegerWithoutPrecision}$\S $GreaterZero\\
+%%%%%
+%%%%%.. and sustituted Factor by FormatFactor in Convert and Put/GET statements
+%%%%%\end{removed}  
+%%%%%\begin{added}  
 \input{FormatFactor.bnf}
 
-\end{added}  
+%%%%%\end{added}  
 
 \input{Format.bnf}
+\input{FixedFormat.bnf}
+\input{FloatFormat.bnf}
+\input{CharacterStringFormat.bnf}
+\input{BitFormat.bnf}
+\input{TimeFormat.bnf}
+\input{DurationFormat.bnf}
+\input{ListFormat.bnf}
+\input{RFormat.bnf}
+\input{FieldWidth.bnf}
+\input{DecimalPositions.bnf}
+\input{Significance.bnf}
 
 \input{Position.bnf}
+\input{AbsolutePosition.bnf}
+\input{RelativePosition.bnf}
 
 \twocolumn[\section{List of Keywords with Shortforms}   % A 4
+\begin{discuss}
+das muss noch auf index, makeindex und printindex 
+mit Seitennummer
+umgestellt werden.
+13.5 und 13.6 fallen dann zusammen.
 
+\end{discuss}
 The denotation behind the keyword refers to the paragraph where it
 is introduced.\\]
 
@@ -858,3 +980,11 @@ is introduced.\\]
 {\bf X} \ref{sec_dation_read_write}
 }
 
+%\twocolumn[\section{Index}    % A 5
+%
+%???? The denotation behind the word symbol refers to the paragraph where it
+%is introduced.\\]
+%
+
+
+\printindex

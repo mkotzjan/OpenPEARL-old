@@ -384,6 +384,9 @@ namespace pearlrt {
    }
    void Disc::dationUnGetChar(const char x) {
    }
+   void Disc::Disc::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
+   }
 
    void Disc::DiscFile::dationRead(void * destination, size_t size) {
       int ret;
@@ -434,4 +437,9 @@ namespace pearlrt {
    void Disc::DiscFile::dationUnGetChar(const char x) {
       ungetc(x, fp);
    }
+
+   void Disc::DiscFile::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
+   }
+
 }

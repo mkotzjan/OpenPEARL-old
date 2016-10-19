@@ -126,11 +126,11 @@ namespace pearlrt {
        Log::error("StdOut: unget not supported");
        throw theDationNotSupportedSignal;
    }
-/*
-   bool StdOut::isDefined(const int streamNumber) {
-      return (!! (declaredDations & (1<<streamNumber)));
+
+
+   void StdOut::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
    }
-*/
 
 
 }

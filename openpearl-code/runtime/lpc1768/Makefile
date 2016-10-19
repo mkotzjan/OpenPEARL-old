@@ -78,16 +78,18 @@ CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.ca \
 	Hy32.h Hy32LowLevel.h
 # ------- add board specific stuff to project
 BOARDSUPPORT := 
-BOARDSUPPORT += lpc17_uart_retarget.c
+#BOARDSUPPORT += lpc17_uart_retarget.c
 BOARDSUPPORT += lpc17_oscillators.c
 BOARDSUPPORT += lpc17_SystemInit.c
 BOARDSUPPORT += Lpc17xxRTC.cc
 BOARDSUPPORT += Post.cc
+BOARDSUPPORT += SystemConsole.cc
 BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
 BOARDSUPPORT += Lpc17xxDigitalIn.cc
 BOARDSUPPORT += Lpc17xxDigitalOut.cc
 BOARDSUPPORT += Lpc17xxInterrupt.cc
+BOARDSUPPORT += Lpc17xxUartInternal.cc
 BOARDSUPPORT += Lpc17xxUart.cc
 CHECK_FILES += $(BOARDSUPPORT)
 CHECK_FILES += $(addsuffix .h,$(basename $(BOARDSUPPORT)))

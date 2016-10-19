@@ -1,0 +1,6 @@
+   <dation name="SampleBasicDation">
+      <parameters>
+      </parameters>
+      <attributes> SYSTEM, IN, OUT, INOUT</attributes>
+      <DATA>FIXED</DATA>
+   </dation>

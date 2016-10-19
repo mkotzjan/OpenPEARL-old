@@ -1,0 +1,18 @@
+\begin{discuss}
+REF INTERRUPT/IRPT und SIGNAL erlaubt???
+
+vgl. TypeReference
+
+\htgt{TypeAttributeForArray} ::=\\
+\x \htgt{TypeInteger} $\mid$ \hlink{TypeFloat} \\
+\x $\mid$ \hlink{TypeDuration} $\mid$ \hlink{TypeClock} \\
+\x $\mid$ \hlink{TypeBitString} $\mid$ \hlink{TypeCharacterString} \\
+\x $\mid$ \hlink{TypeDefinition} 
+%%% added
+\\$\x \mid$ REF \{ \hlink{TypeDation} $\mid$ {\bf SEMA} $\mid$ {\bf BOLT} \\
+\x \x $\mid$ \hlink{TypeProcedure} $\mid$ {\bf TASK} $\mid$ {\bf CHAR()} \\
+\x \x ??? INTERRUPT, IPRT,SIGNAL \\
+\x \x \}
+
+\end{discuss}
+

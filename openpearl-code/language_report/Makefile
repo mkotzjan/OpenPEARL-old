@@ -9,6 +9,7 @@ TEXFILES = 01-introduction.tex 		\
 	09-parallel_activities.tex	\
 	10-input_and_output.tex		\
 	11-signals.tex			\
+	12-macros.tex			\
 	90-appendix.tex			\
 	macrosShowChanges.tex		\
 	macrosShowResult.tex		\
@@ -24,11 +25,15 @@ ifeq ($(CONFIG_DOC_PREPORT),y)
 
 p-report.pdf:	p-report.tex $(TEXFILES) $(BNFFILES)
 	pdflatex p-report.tex
+	makeindex p-report.idx
 
 final:
 	pdflatex p-report.tex
+	makeindex p-report.idx
 	pdflatex p-report.tex
+	makeindex p-report.idx
 	pdflatex p-report.tex
+	makeindex p-report.idx
 endif
 
 clean:
@@ -38,4 +43,5 @@ clean:
 	rm -rf p-report.out
 	rm -rf p-report.toc
 	rm -rf p-report.aux
+	rm -rf p-report.idx p-report.ilg p-report.ind
 

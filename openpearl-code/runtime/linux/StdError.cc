@@ -126,9 +126,9 @@ namespace pearlrt {
       throw theDationNotSupportedSignal;
    }
 
-/*
-   bool StdError::isDefined(const int streamNumber) {
-      return (!! (declaredDations & (1<<streamNumber)));
+
+   void StdError::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
    }
-*/
+
 }

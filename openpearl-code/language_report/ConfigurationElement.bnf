@@ -1,4 +1,6 @@
-\begin{added}
+%%%\begin{added}
 \htgt{ConfigurationElement} ::=\\
-\x \hlink{Identifier}$\S $ConfigurationItem [ ( \hlink{ListOfConstants} ) ];\\
-\end{added}
+\x \hlink{Identifier}$\S $ConfigurationItem [ ( \hlink{ListOfConstants} ) ]
+   [ \hlink{Association} ] ;\\
+%%%\end{added}
+

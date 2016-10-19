@@ -72,8 +72,10 @@ CXX_COMMON = \
 
 ifeq ($(CONFIG_HAS_I2C),y)
    CXX_COMMON += LM75.cc
+   XML_COMMON += LM75.xml
 endif
 
+XML_COMMON += Log.xml LogFile.xml SampleBasicDation.xml
 
 HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \

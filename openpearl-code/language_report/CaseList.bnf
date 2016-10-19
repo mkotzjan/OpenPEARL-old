@@ -1,3 +1,4 @@
 \htgt{CaseList} ::=\\
-\x \hlink{IndexSection} [ , \hlink{IndexSection} ] $^{...}$\\
+%%%\x \hlink{IndexSection} [ , \hlink{IndexSection} ] $^{...}$\\
+\x \hlink{IndexRange} [ , \hlink{IndexRange} ] $^{...}$\\
 

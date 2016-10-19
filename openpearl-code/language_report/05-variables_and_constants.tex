@@ -33,7 +33,7 @@ SPECIFY Status BIT (16) GLOBAL; xx \= \kill
 A variable denotes {\it one} data element, e.g. {\it one} integer, {\it
 one} bit string, etc.; in the following, such scalar variables are
 treated. The possibilities to summarise scalar variables to arrays and
-structures are described in 5.10 and 5.11.
+structures are described in \ref{sec_array} and \ref{sec_struct}.
 
 When declaring a variable, its type has to be given in a type attribute;
 if different variables with the same type attribute are to be declared,
@@ -52,52 +52,37 @@ in a declaration by separating them by commas:
 
 Summarised, scalar variables can be declared as follows:
 
-\begin{front}
-ScalarVariableDeclaration ::=\\
-\x \{ {\bf DECLARE $\mid$ DCL} \} VariableDenotation [ , VariableDenotation ] $^{...}$ ;
+\input{ScalarVariableDeclaration.bnf}
+\index{DCL@\textbf{DCL}!Scalar Variable}
 
-VariableDenotation ::=\\
-\x IdentifierDecnotation [ AllocationProtection ] TypeAttribute [ GlobalAttribute ]\\
-\x [ InitialisationAttribute ]
+\input{ScalarDeclareDataSentence.bnf}
 
-IdentifierDenotation ::=\\
-\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
+%%%IdentifierDenotation ::=\\
+%%%\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
 
-TypeAttribute ::=\\
-\x SimpleType $\mid$ TypeReference $\mid$ Identifier\S ForType
+\input{TypeAttribute.bnf}
 
-SimpleType ::=\\
-\x TypeInteger $\mid$ TypeFloatingPointNumber $\mid$\\
-\x TypeBitString $\mid$ TypeCharacterString $\mid$\\
-\x TypeTime $\mid$ TypeDuration
-\end{front}
-\begin{grammar}
 \input{SimpleType.bnf}
-\end{grammar}
 
 The general form of specifying scalar variables reads as follows:
 
-\begin{front}
-ScalarVariableSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} VariableDenotationS [ , VariableDenotationS ] $^{...}$;
+\input{ScalarVariableSpecification.bnf}
+\index{SPC@\textbf{SPC}!Scalar Variable}
 
-VariableDenotationS ::=\\
-\x IdentifierDenotation [ AllocationProtection ] TypeAttribute\\
-\x \{ GlobalAttribute $\mid$ IdentificationAttribute \}
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+\input{VariableDenotationS.bnf}
 
-Allocation protection and initialisation attribute are described in 5.14,
-identification and global attributes were already defined in 4.2 and
-4.4.
+Allocation protection and initialisation attribute are described in 
+\ref{sec_inv},
+identification and global attributes were already defined
+in \ref{sec_dcl_and_spc} and \ref{sec_references_module}.
 
 Subsequently, the different type possibilities are presented; variables
-of type Sema, Bolt, Interrupt or Signal are considered in 9.3, 9.4 and
-10.
+of type Sema, Bolt, Interrupt or Signal are considered in 
+\ref{sec_task_sync}, \ref{sec_interrupts} and
+\ref{sec_input_output}.
 
 \section{Integers (FIXED)}   % 5.2
+\index{FIXED@\textbf{FIXED}}
 
 Integers can be written in decimal or dual representation. The decimal
 representation of an integer consists of a sequence of decimal digits. The dual
@@ -123,34 +108,23 @@ If no precision is given, the precision is derived from the constants.
 
 Variables for integers are declared with the type attribute FIXED.
 
-\begin{front}
-TypeInteger ::=\\
-\x {\bf FIXED} [ (Precision) ]
-
-Precision ::=\\
-\x IntegerWithoutPrecision\S GreaterZero
-\end{front}
-\begin{grammar}
-\input{Integer.bnf}
-
-\input{IntegerWithoutPrecision.bnf}
-
+\input{TypeFixed.bnf}
 \input{Precision.bnf}
-\end{grammar}
 
 The precision gives the number of bit positions in which the
 corresponding value of the variable (without signs) is represented. If
 the precision declaration is lacking, the precision defined in a length
-specification (see 5.6) is inserted. 
-\removedtext{Usual precisions are 15 or 31.}
+specification (see \ref{sec_length}) is inserted. 
+%%% \removedtext{Usual precisions are 15 or 31.}
 
-\begin{added}
-\OpenPEARL{} supports all lengths from 1 to 63.
+%%%\begin{added}
+\OpenPEARL{} assumes that {\bf FIXED} values are stored in the two's-complement
+representation.  The lengths from 0 to 63 are supported.
 All operations are monitored for successful operation.
 In case of a range violations the signal FixedRangeSignal is induced.
 In case of divide by zero or reminder by zero the signal FixedDivideByZeroSignal
 is induced.
-\end{added}
+%%%\end{added}
 
 Example:
 
@@ -160,6 +134,7 @@ Example:
 i := 2;
 
 \section{Floating Point Numbers (FLOAT)}  % 5.3
+\index{FLOAT@\textbf{FLOAT}}
 
 Constants for floating point numbers can be represented as a sequence of
 \begin{enumerate}
@@ -193,18 +168,14 @@ be defined with precision.
 Variables of type floating point number (with integers or floating point
 numbers as values) are declared with type attribute FLOAT.
 
-\begin{front}
-TypeFloatingPointNumber ::=\\
-\x {\bf FLOAT} [ (Precision) ]
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+%%% TypeFloatingPointNumber renamed into TypeFloat
+\input{TypeFloat.bnf}
 
-The statements of 5.2 are valid; 
-\removedtext{usual precisions are here 23 and 53, respectively.}
-\begin{added}
-\OpenPEARL{} uses the supports the lengths 24 and 53.
+%%%The statements of 5.2 are valid; 
+
+%%%\removedtext{usual precisions are here 23 and 53, respectively.}
+%%%\begin{added}
+\OpenPEARL{} supports the lengths 24 and 53.
 All operations are monitored for successful operation.
 In case of range violations or
 divide by zero the result is set to INF (infinity) and
@@ -220,7 +191,7 @@ The precision for float literals is derived in the priority from:
 \item the {\bf LENGTH} statement
 \item is set to 24 as default value in \OpenPEARL
 \end{enumerate}
-\end{added}
+%%%\end{added}
 
 Example:
 
@@ -230,6 +201,8 @@ Example:
 x:=3.5; y:=1; Koeff:=3.14E-10;
 
 \section{Bit Strings (BIT)}  % 5.4
+\label{sec_bit_strings}
+\index{BIT@\textbf{BIT}}
 
 A bit string constant can be given in binary form (B1), in form of
 tetrades (B2), octades (B3), or in hexadecimal form (B4).
@@ -279,20 +252,14 @@ B2 & B1 & B3 & B1  & B4 & B1 \\
 
 Variables for bit strings are to be declared with type attribute BIT.
 
-\begin{front}
-TypeBitString ::=\\
-\x {\bf BIT} [ (Length) ]
+\input{TypeBitString.bnf}
 
-Length ::=\\
-\x IntegerWithoutPrecision\S GreaterZero
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+%%% rename length --> LengthOfString
+\input{LengthOfString.bnf}
 
 Length gives the number of elements of the bit string. If the length
 option is lacking, it had either to be defined in a length
-definition (see 5.6), or 1 is assumed as length.
+definition (see \ref{sec_length}), or 1 is assumed as length.
 
 Example:
 
@@ -302,15 +269,18 @@ Example:
 X\_coord:='01'B;\\
 Y\_coord:= 'A9'B4;
 
-The addressing of parts of bit strings is treated in 6.1, Expressions.
+The addressing of parts of bit strings is treated in 
+\ref{sec_expressions}, Expressions.
 
-\begin{added}
+%%%\begin{added}
 \OpenPEARL{} supports all lengths from 1 to 64.
 In case of selecting a slice which is not part of the bit string, the
 signal BitIndexOutOfRangeSignal is induced.
-\end{added}
+%%%\end{added}
 
 \section{Character Strings (CHARACTER)}  % 5.5
+\index{CHAR@\textbf{CHAR}}
+\index{CHARACTER@\textbf{CHARACTER}|see {CHAR}}
 
 A character string constant consists of an apostrophe, a sequence of any
 characters (besides of apostrophe) and an apostrophe.
@@ -342,16 +312,10 @@ $\backslash$' can be created (independently from the used editor).'
 Variables for character strings are declared by the type attribute
 CHARACTER.
 
-\begin{front}
-TypeCharacterString ::=\\
-\x \{ {\bf CHARACTER $\mid$ CHAR} \} [ (Length) ]
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+\input{TypeCharacterString.bnf}
 
 Length gives the number of characters. If no length is indicated, it had
-either to be defined in a length specification (see 5.6) or length 1 is
+either to be defined in a length specification (see \ref{sec_length}) or length 1 is
 assumed.
 
 Examples:
@@ -360,37 +324,28 @@ Examples:
 ...\\
 ArticleIdentificator:='BCD/27';
 
-The addressing of parts of character strings is treated in 6.1,
-Expressions.
+The addressing of parts of character strings is treated in
+ \ref{sec_expressions}, Expressions.
 
-\begin{added}
+%%%\begin{added}
 \OpenPEARL{} supports all lengths from 1 to 32767.
 All operations are monitored:
 In case defining a {\bf CHAR} variable with more than 32767 elements the
 CharacterTooLongSignal is induced.
 In case of selecting a slice which is not part of the {\bf CHAR} variable the 
 CharacterIndexOutOfRangeSignal is induced.
-\end{added}
+%%%\end{added}
 
-\begin{tobedone}
 \section{The Length Definition}   % 5.6
+\label{sec_length}
+\index{LENGTH@\textbf{LENGTH}}
 
 With the length definition, the precisions and lengths for such
 number and string objects are defined, whose precisions and lengths are
 not determined by notation (for constants) or declaration (for
 variables).
 
-\begin{front}
-\begin{tabbing}
-\x {\bf LENGTH} \= \kill
-LengthDefinition::=\\
-\x {\bf LENGTH} \{ \{ {\bf FIXED $\mid$ FLOAT} \} (precision)\\
-              \x \> $\mid$ \{ {\bf BIT $\mid$ CHARACTER $\mid$ CHAR} \} (length) \};
-\end{tabbing}
-\end{front}
-\begin{grammar}
 \input{LengthDefinition.bnf}
-\end{grammar}
 Example:
 
 \begin{tabbing}
@@ -406,9 +361,10 @@ Example:
 
 For a length definition, the same validity rules are valid as for
 variable declarations (see 4.3, Block Structure).
-\end{tobedone}
 
 \section{Times (CLOCK)}   % 5.7
+\label{sec_type_clock}
+\index{CLOCK@\textbf{CLOCK}}
 
 A time constant consists of a positive integer to state the hour, an
 integer between 0 and 59 for the minute, and a floating point number
@@ -425,13 +381,7 @@ Example:
 
 Variables for times are declared with type attribute CLOCK.
 
-\begin{front}
-TypeClock ::=\\
-\x {\bf CLOCK}
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+\input{TypeClock.bnf}
 
 Example:
 
@@ -439,12 +389,15 @@ Example:
 ...\\
 time:=12:30:00;
 
-\begin{added}
+%%%\begin{added}
 \OpenPEARL{} provides a resolution for CLOCK values of $1\mu s$
-\end{added}
+\index{CLOCK@\textbf{CLOCK}!Resolution}
+%%%\end{added}
 
 \section{Durations (DURATION)}   % 5.8
 \label{sec_type_duration}
+\index{DURATION@\textbf{DURATION}|see {DUR}}
+\index{DUR@\textbf{DUR}}
 
 A duration constant is composed of stating an hour, a minute, and a
 second, however, single pieces of specifications may be lacking. An hour
@@ -466,13 +419,7 @@ contain precision specifications.
 Variables for durations have to be declared with the type attribute
 DURATION.
 
-\begin{front}
-TypeDuration ::=\\
-\x {\bf DURATION $\mid$ DUR}
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+\input{TypeDuration.bnf}
 
 Example:
 
@@ -480,17 +427,20 @@ Example:
 ...\\
 delay:=0.1 {\bf SEC};
 
-\begin{added}
-\OpenPEARL{} provides a resolution for DURATION values of $1\mu s$ and
-a range of $\approx 100 days$.
+%%%\begin{added}
+\OpenPEARL{} provides a resolution for DURATION values of $1\mu s$ 
+\index{DUR@\textbf{DUR}!Resolution}
+and
+a range of $\approx \pm 100 days$ \index{DUR@\textbf{DUR}!Range}.
 In case of an arithmetic overflow in calculations with durations, the
 DurationValueSignal is induced.
-In case of division by a zero duration or 0 FLOAT, 
+In case of division by a duration or numeric value of zero, 
 the DurationDivideByZeroSignal is induced.
-\end{added}
+%%%\end{added}
 
-\begin{tobedone}
 \section{References (REF)}  % 5.9
+\label{sec_references}
+\index{REF@\textbf{REF}}
 
 For the indirect addressing, so-called reference variables (pointer
 variables, pointers) are provided in PEARL. Reference variables have the
@@ -532,41 +482,50 @@ operator CONT may be omitted on the right side of an assignment
 
 In general, it holds:
 
-\begin{front}
-TypeReference ::=\\
-\x {\bf REF} [ VirtDimensionList ] [ AssignmentProtection ]\\
-\x \{ SimpleType $\mid$ Identifier\S ForType $\mid$ TypeStructure $\mid$\\
-\x \x TypeDation $\mid$ {\bf SEMA $\mid$ BOLT $\mid$ INTERRUPT $\mid$ IRPT $\mid$ SIGNAL $\mid$} \\
-\x \x TypeProcedure $\mid$ {\bf TASK} $\mid$ TypeVOID $\mid$ {\bf CHAR}()\\
-\x \}
-
-VirtDimensionList ::=\\
-\x ( [ , $^{...}$ ] )
-
-Dereferentiation ::=\\
-\x {\bf CONT} Name\S ReferenceVariable
-
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%TypeReference ::=\\
+%%%\x {\bf REF} [ VirtDimensionList ] [ AssignmentProtection ]\\
+%%%\x \{ SimpleType $\mid$ Identifier\S ForType $\mid$ TypeStructure $\mid$\\
+%%%\x \x TypeDation $\mid$ {\bf SEMA $\mid$ BOLT $\mid$ INTERRUPT $\mid$ IRPT $\mid$ SIGNAL $\mid$} \\
+%%%\x \x TypeProcedure $\mid$ {\bf TASK} $\mid$ TypeVOID $\mid$ {\bf CHAR}()\\
+%%%\x \}
+%%%
+%%%VirtDimensionList ::=\\
+%%%\x ( [ , $^{...}$ ] )
+%%%
+%%%Dereferentiation ::=\\
+%%%\x {\bf CONT} Name\S ReferenceVariable
+%%%
+%%%\end{front}
 \input{TypeReference.bnf}
 \input{VirtualDimensionList.bnf}
 \input{Dereferentiation.bnf}
-\end{grammar}
+\index{CONT@\textbf{CONT}}
+%%%\begin{added}
+The lifetime of the referenced object must be longer or equal as
+the lifetime of the reference object.
+%%%\end{added}
 
 The definition of the language form TypeReference shows, which type a
 variable may have, at which a reference variable shall point.
 Particularly, reference variables may also point at arrays and
-structures (cf. 5.10 and 5.11). The number n of commas in the virtual
+structures (cf. \ref{sec_array} and \ref{sec_struct}).
+ The number n of commas in the virtual
 dimension list states that the referenced variable is an (n + 1)
 dimensional array. On the other hand, reference variables must not point
 at reference variables; referenced arrays and structures, however, may
 possess reference variables as elements and components. This can be
 used, e.g., to interlink structures, or to build up lists in general.
-Section 5.12, Type Definition, gives an example for that.
+Section \ref{sec_type}, Type Definition, gives an example for that.
 
-TypeStructure and TypeDation are defined in 5.11 and 10.2, TypeProcedure and 
-TASK in 8.3 and 9.11, TypeVOID and REF CHAR() in 6.4.2
-and 5.9.1
+TypeStructure and TypeDation are defined in \ref{sec_type} and 
+\ref{sec_dation_problem_part}, TypeProcedure and 
+TASK in \ref{sec_ref_proc} and \ref{sec_ref_task},
+%%% TypeVOID
+ and REF CHAR() in 
+%%%\ref{sec_type_void} and
+ \ref{sec_ref_char}.
+
 
 If a reference variable R points at an array F with elements F
 (i,j,k,...) or at a structure S with components S.Ki, the elements of F
@@ -595,7 +554,7 @@ pointer) is provided, possessing a certain, constant value.
 
 To compare the values of reference variables, the dyadic operators IS or
 ISNT can be used; IS (ISNT) provides the result '1'B ('0'B), if both the
-given reference variables possess the same (different) value(s),
+given reference variables points to the same (different) object(s),
 otherwise it provides the result '0'B ('1'B).
 
 Example:
@@ -607,6 +566,8 @@ Example:
 {\bf FIN;}
 
 \subsection{Variable Character String Pointers (REF CHAR())}  % 5.9.1
+\label{sec_ref_char}
+\index{REF CHAR@\textbf{REF CHAR}}
 
 Variably long character strings can easily be processed with special
 pointer objects, so-called variable character string pointers.
@@ -647,12 +608,12 @@ maximum length is omitted.
 Example: Assignment to the referenced variable
 
 \begin{tabbing}
-{\bf CONT} str\_ptr:='Werum GmbH'; \= \kill
+{\bf CONT} str\_ptr:='HS Furtwangen'; \= \kill
 str\_ptr:=s1; \> /* adr=s1, length=20, max=20 */ \\
-{\bf CONT} str\_ptr:='PEARL 90'; \> /* adr=s1, length=8, max=20 */ \\
+{\bf CONT} str\_ptr:='OpenPEARL'; \> /* adr=s1, length=9, max=20 */ \\
  \> \\
 str\_ptr:=s2; \> /* adr=s2, length=100, max=100 */ \\
-{\bf CONT} str\_ptr:='Werum GmbH'; \> /* adr=s2, length=10, max=100 */
+{\bf CONT} str\_ptr:='HS Furtwangen'; \> /* adr=s2, length=13, max=100 */
 \end{tabbing}
 
 For the subsequent accesses to the character string via this pointer,
@@ -667,19 +628,19 @@ Example:
 {\bf DCL} str\_ptr \> {\bf REF CHAR}(); \> /* variable pointer */       \\
  \> \> \\
 str\_ptr:=s2: \> \> /* adr=s2, length=100, max=100 */ \\
-{\bf CONT} str\_ptr:='D21337 ' {\bf CAT} 'Lueneburg'; \> \> /* adr=s2, length=16, max=100 */
+{\bf CONT} str\_ptr:='D78120 ' {\bf CAT} 'Furtwangen'; \> \> /* adr=s2, length=17, max=100 */
 \end{tabbing}
 
 After this assignment, the variable ``s2'' contains the characters
-``D21337 Lueneburg'' in the first 16 positions, the other characters
+``D78120 Furtwangen'' in the first 17 positions, the other characters
 were not changed by the assignment. The length index of ``str\_ptr'' was
-set to the actual length 16.
+set to the actual length 17.
 
 s1 := {\bf CONT} str\_ptr;
 
 For this assignment, ``CONT str\_ptr'' generates the character string
-value 'D21337 Lueneburg' (with type ``CHAR(16)''). Due to the assignment
-rules of PEARL, the character string is extended by four blanks, before
+value 'D78120 Furtwangen' (with type ``CHAR(17)''). Due to the assignment
+rules of PEARL, the character string is extended by three blanks, before
 this value is assigned to variable ``s1'' (with type ``CHAR(20)'').
 
 Variable character string pointers turn out particularly useful as
@@ -715,21 +676,19 @@ belonging to the type check takes first place at run time.
 
 A variable character string pointer is not allowed as result value of a
 function. Type ``CHAR()'' may only be used in combination with ``REF'',
-i.e., parameter type ``CHAR()IDENT'' is not allowed.
-\end{tobedone}
+i.e., parameter type ``CHAR() IDENT'' is not allowed.
 
 \section{Arrays}   % 5.10
+\label{sec_array}
 
 If possible, objects of the same kind are summarised in
 one identifier, and the various objects are addressed with indices.
 
-\begin{added}
-The value of the index must be within the range.
-If the value of any index is out of the defined index range
-an \verb|IndexOutOfRangeSignal| is induced.
-Each index value must fit into \verb|FIXED(31)|. 
-
-\end{added}
+%%%\begin{added}
+The value of all indices must be within the range, otherwise
+an IndexOutOfRangeSignal is induced.
+Each index value must fit into FIXED(31). 
+%%%\end{added}
 
 Example:
 
@@ -739,19 +698,25 @@ switched on, device G(2) for '0010'B, and device G(3) for '0100'B. Here it
 suggests itself to summarise the three switch-on signals under one
 identifier, e.g., switch\_on, and to address them with indices:
 
-{\bf DCL} switch\_on(1:3) {\bf BIT}(4),\\
-\x i {\bf FIXED};\\
+{\bf DCL} switch\_on(1:3) {\bf BIT}(4);\\
+%%%,\\ \x i {\bf FIXED};\\
 switch\_on(1):='0001'B;\\
 switch\_on(2):='0010'B;\\
 switch\_on(3):='0100'B;\\
 ...
 
-/* taking over value of i (index of the device to be switched on)
-from another program part\\
-output of switch\_on (i) to the embedded controller */\\
+%%%\begin{removed}
+%%%/* taking over value of i (index of the device to be switched on)
+%%%from another program part\\
+%%%output of switch\_on (i) to the embedded controller */\\
+%%%\end{removed}
 
-In general, scalar variables of the same type can be combined into
-n-dimensional arrays (n=1,2,3,4).
+In general, scalar variables
+%%%\begin{added}
+ or structs
+%%%\end{added}
+of the same type can be combined into
+n-dimensional arrays (n=1,2,3,...).
 
 When declaring the array, an identifier is assigned to it; the various
 array elements (scalar variables) are addressed under this identifier
@@ -772,36 +737,34 @@ Koeff(2.0) \x  Koeff(2,1) \x  Koeff(2,2) \x  Koeff(2,3)
 
 The general form of a array declaration reads as follows:
 
-\begin{front}
-ArrayDeclaration ::=\\
-\x \{ {\bf DECLARE $\mid$ DCL} \} ArrayDenotation [ , ArrayDenotation ] $^{...}$ ;
-
-ArrayDeclaration ::=\\
-\x IdentifierDenotation DimensionAttribute [ AssignmentProtection ] TypeAttribute\\
-\x [ GlobalAttribute ] [ InitialisationAttribute ]
-
-DimensionAttribute ::=\\
-\x (BoundaryDenotation\S FirstDimension [ , BoundaryDenotation\S FurtherDimension ] $^{...}$)
-
-BoundaryDenotation ::=\\
-\x [ Boundary\S Lower: ] Boundary\S Upper
-
-Boundary ::=\\
-\x [ - ] IntegerWithoutPrecision $\mid$ Identifier\S NamedConstant $\mid$ \\
-\x ConstantExpression
-\end{front}
-\begin{grammar}
+\input{ArrayDeclaration.bnf} 
+\index{DCL@\textbf{DCL}!Array}
+\input{ArrayDenotation.bnf}
+\input{TypeAttributeForArray.bnf}
+%%%DimensionAttribute ::=\\
+%%%\x (BoundaryDenotation\S FirstDimension [ , BoundaryDenotation\S FurtherDimension ] $^{...}$)
+%%%
+%%%BoundaryDenotation ::=\\
+%%%\x [ Boundary\S Lower: ] Boundary\S Upper
+%%%
+%%%Boundary ::=\\
+%%%\x [ - ] IntegerWithoutPrecision $\mid$ Identifier\S NamedConstant $\mid$ \\
+%%%\x ConstantExpression
 \input{DimensionAttribute.bnf}
 \input{DimensionBoundaries.bnf}
-\end{grammar}
 
 Thus, even negative integers are allowed as dimension boundary. The
 upper boundary of a dimension, however, has always to be greater or
 equal its lower boundary.
 
-If the lower boundary is not given, value 1 is assumed for it. By a
-named constant, a variable of type FIXED(15) is understood, declared
-with assignment protection (INV) and initial value (INIT).
+If the lower boundary is not given, value 1 is assumed for it.
+%%%\begin{removed}
+%%% By a n amed constant, a variable of type FIXED(15)
+%%% is understood, declared with assignment protection (INV)
+%%% and initial value (INIT).
+%%%\end{removed}
+%%%For details about named constants see chapter \ref{sec_named_constants}.
+
 
 Examples:
 
@@ -825,29 +788,20 @@ e.g.:
 
 The general specification form of an array reads:
 
-\begin{front}
-ArraySpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} ArrayDenotationS [ , ArrayDenotationS ] $^{...}$;
-
-ArrayDenotationS ::=\\
-\x IdentifierDenotation VirtualDimensionAttribute [ AssignmentProtection ] \\
-\x TypeAttribute \{ GlobalAttribute $\mid$ IdentificationAttribute \}
-
-VirtualDimensionAttribute ::=\\
-\x ( [ , $^{...}$ ] )
-\end{front}
-\begin{grammar}
-not in grammar
-\end{grammar}
+\input{ArraySpecification.bnf}
+\index{SPC@\textbf{SPC}!Array}
+\input{ArrayDenotationS.bnf}
+\input{VirtualDimensionList.bnf}
 
 The number n of commas in the virtual dimension attribute informs that
 the specified array has n+1 dimensions.
 
-In Section 1 of the Appendix it is described in tabular form, which
+In section \ref{sec_data_types_usability} of the appendix it is described in tabular form, which
 objects may be combined to arrays.
 
-
 \section{Structures}   % 5.11
+\label{sec_struct}
+\index{STRUCT@\textbf{STRUCT}}
 
 Arrays allow to combine scalar variables of the {\it same} type under
 one identifier; the various variables are addressed by this identifier
@@ -892,10 +846,12 @@ follows:
           \>         \> Text {\bf CHAR}(200) {\bf ]};
 \end{tabbing}
 
-(A structure is encapsulated in square brackets; they are printed boldly in
-the text to distinguish them from the meta-linguistic characters ``[''
-and ``]''. When writing down the program, only square brackets or their
-substitutional symbols ``(/'' and ``/)'' are used.)
+%%%\begin{removed}
+%%%(A structure is encapsulated in square brackets; they are printed boldly in
+%%%the text to distinguish them from the meta-linguistic characters ``[''
+%%%and ``]''. When writing down the program, only square brackets or their
+%%%substitutional symbols ``(/'' and ``/)'' are used.)
+%%%\end{removed}
 
 In contrast to array elements, the components of a structure are not
 addressed via the joint identifier and an index, but via the joint
@@ -1000,48 +956,30 @@ Person.Name.FirstName := 'OTTO';\\
 
 The general form of the structure declaration reads:
 
-\begin{front}
-StructureDeclaration ::=\\
-\x \{ {\bf DECLARE $\mid$ DCL} \} StructureDenotation [ , StructurDenotation ] $^{...}$ ;
+\input{StructureDeclaration.bnf}
+\index{DCL@\textbf{DCL}!Structure}
+\input{StructureDenotation.bnf}
 
-StructureDenotation ::=\\
-\x IdentifierDenotation\S MainStructure [ DimensionAttribute ][ AllocationProtection ]\\
-\x TypeStructure [ GlobalAttribute ][ InitialisationAttribute ]
-
-TypeStructure ::=\\
-\x {\bf STRUCT [} StructureComponent [ , StructureComponent ] $^{...}$ {\bf ]}
-
-StructureComponent ::=\\
-\x IdentifierDenotation TypeAttributeInStructureDeclaration
-
-TypeAttributeInStructureDeclaration ::=\\
-\x [ DimensionAttribute ] \\
-\x \{ SimpleType $\mid$ TypeReference $\mid$ Identifier\S ForType $\mid$ TypeStructure \}
-\end{front}
-\begin{grammar}
 \input{TypeStructure.bnf}
 
+%%%StructureComponent ::=\\
+%%%\x IdentifierDenotation TypeAttributeInStructureDeclaration
 \input{StructureComponent.bnf}
 
 \input{TypeAttributeInStructureComponent.bnf}
-
-\end{grammar}
+%%%TypeAttributeInStructureDeclaration ::=\\
+%%%\x [ DimensionAttribute ] \\
+%%%\x \{ SimpleType $\mid$ TypeReference $\mid$ Identifier\S ForType $\mid$ TypeStructure \}
 
 The general form of the structure specification reads:
 
-\begin{front}
-StructureSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} StructureDenotationS [ , StructureDenotationS] $^{...}$ ;
-
-StructureDenotationS ::=\\
-\x IdentifierDenotation\S MainRecord [ VirtualDimensionAttribute ]\\
-\x [ AllocationProtection ] TypeRecord \{ GlobalAttribute $\mid$ IdentificationAttribute\}
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+\input{StructureSpecification.bnf}
+\index{SPC@\textbf{SPC}!Structure}
+\input{StructureDenotationS.bnf}
 
 \section{Type Definition (TYPE)} % 5.12
+\label{sec_type}
+\index{TYPE@\textbf{TYPE}}
 
 A certain structure, e.g., can occur as parameter, as substructure in other
 structures, or as type of the transmission data of a data station.  Each
@@ -1051,9 +989,9 @@ increase the readability of the program, the type of a structure can be
 defined as new data type under a freely selectable identifier, and used
 under this identifier, e.g., to declare variables of this data type.
 
-Examples:
-\begin{enumerate}
-\item
+Example:
+%%%\begin{enumerate}
+%%%\item
 \begin{tabbing}
 \x \= {\bf TYPE} \= {\bf [} \= \kill
 {\bf PROBLEM}; \> \> \> \\
@@ -1076,112 +1014,112 @@ Examples:
   \>            \>         \> {\bf END}; ! Coord\\
   \> ...        \>         \>
 \end{tabbing}
-\item A task controls certain devices; it receives the control orders
-from another task. Since occasionally more than one order can be
-existing and the orders can be of different urgency, they are buffered
-in form of a queue. Let the structure of the orders be of the (re-defined)
-type OrderType; let this even contain the urgency criteria for
-arranging new orders. The reference variables Next\_Order and Free,
-respectively, as shown in Figure~\ref{kette}, point at the order to be treated next or the next free position
-in the queue order string, respectively; starting with Free, let the free
-positions be interlinked as well. Let the queue be not longer than 10
-elements.
-
-
-\begin{figure}
-\setlength{\unitlength}{0.0007500in}%
-\begin{picture}(7539,2889)(124,-2110)
-\thicklines
-\put(451,-1411){\framebox(1035,1350){}}
-\put(2071,-1411){\framebox(1035,1350){}}
-\put(3646,-1411){\framebox(1035,1350){}}
-\put(6121,-1411){\framebox(1035,1350){}}
-\thinlines
-\put(451,-961){\line( 1, 0){1035}}
-\put(946,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
-\put(901,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
-\put(901,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots}}}
-\put(2071,-961){\line( 1, 0){1035}}
-\put(2566,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
-\put(2521,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
-\put(2521,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
-\put(3646,-961){\line( 1, 0){1035}}
-\put(4141,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
-\put(4096,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
-\put(4096,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
-\put(6121,-961){\line( 1, 0){1035}}
-\put(6616,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
-\put(6571,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
-\put(6571,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
-\put(4681,-1186){\line( 1, 0){270}}
-\put(4951,-1186){\line( 0,-1){450}}
-\put(4951,-1636){\line(-1, 0){4815}}
-\put(136,-1636){\line( 0, 1){1260}}
-\put(136,-376){\vector( 1, 0){315}}
-\put(3106,-1186){\line( 1, 0){270}}
-\put(3376,-1186){\line( 0, 1){1575}}
-\put(3376,389){\line( 1, 0){2250}}
-\put(5626,389){\line( 0,-1){765}}
-\put(5626,-376){\line( 1, 0){495}}
-\put(1486,-1186){\line( 1, 0){315}}
-\put(1801,-1186){\line( 0,-1){675}}
-\put(1801,-1861){\vector( 1, 0){450}}
-\put(2566,614){\vector( 0,-1){675}}
-\put(4186,614){\line( 0,-1){180}}
-\put(4186,344){\vector( 0,-1){405}}
-\put(7156,-1186){\line( 1, 0){495}}
-\put(7651,-1186){\line( 0, 1){1575}}
-\put(7651,389){\vector(-1, 0){450}}
-\put(2566,659){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Next\_Order}}}
-\put(4186,659){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Free}}}
-\put(2476,-1861){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
-\put(5401,-736){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
-\put(7021,389){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
-\put(946,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}1}}}
-\put(2521,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}2}}}
-\put(4141,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}3}}}
-\put(6616,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}10}}}
-\end{picture}
-\caption{}
-\label{kette}
-\end{figure}
-
-
-The order string can be declared as follows:
-
-\begin{tabbing}
-{\bf TYPE} \= \x \= \x \= \kill
-... \> \> \> \\
-{\bf TYPE} \> StringElement {\bf STRUCT} \> \> \\
-           \>   \> {\bf [} \> Order  OrderType,\\
-           \>   \>         \> ...,\\
-           \>   \> {\bf ]};\\
-{\bf DCL}  \> OrderString (10) StringElement, \> \> \\
-           \> (Next\_Order, Free) {\bf REF} StringElement;\\
-... \> \> \>
-\end{tabbing}
-
-After initialising and arranging various orders, a finished order can be
-removed from the queue as follows (let Help be a variable of type REF
-string element):
-
-...\\
-Help := Next\_Order;
-Next\_Order := Next\_Order.Succ;\\
-Help.Succ := Free\\
-Free := Help\\
-...
-
-These statements are also further examples for implicit
-dereferentiation. The order string can be initialised as follows:
-
-{\bf FOR} i {\bf TO} 9\\
-\x {\bf REPEAT} \\
-\x \x OrderString(i).Succ:=OrderString(i+1);\\
-\x {\bf END};\\
-OrderString(10).Succ:={\bf NIL};
-\end{enumerate}
-
+%%%\item A task controls certain devices; it receives the control orders
+%%%from another task. Since occasionally more than one order can be
+%%%existing and the orders can be of different urgency, they are buffered
+%%%in form of a queue. Let the structure of the orders be of the (re-defined)
+%%%type OrderType; let this even contain the urgency criteria for
+%%%arranging new orders. The reference variables Next\_Order and Free,
+%%%respectively, as shown in Figure~\ref{kette}, point at the order to be treated next or the next free position
+%%%in the queue order string, respectively; starting with Free, let the free
+%%%positions be interlinked as well. Let the queue be not longer than 10
+%%%elements.
+%%%
+%%%
+%%%\begin{figure}
+%%%\setlength{\unitlength}{0.0007500in}%
+%%%\begin{picture}(7539,2889)(124,-2110)
+%%%\thicklines
+%%%\put(451,-1411){\framebox(1035,1350){}}
+%%%\put(2071,-1411){\framebox(1035,1350){}}
+%%%\put(3646,-1411){\framebox(1035,1350){}}
+%%%\put(6121,-1411){\framebox(1035,1350){}}
+%%%\thinlines
+%%%\put(451,-961){\line( 1, 0){1035}}
+%%%\put(946,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
+%%%\put(901,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
+%%%\put(901,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots}}}
+%%%\put(2071,-961){\line( 1, 0){1035}}
+%%%\put(2566,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
+%%%\put(2521,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
+%%%\put(2521,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
+%%%\put(3646,-961){\line( 1, 0){1035}}
+%%%\put(4141,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
+%%%\put(4096,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
+%%%\put(4096,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
+%%%\put(6121,-961){\line( 1, 0){1035}}
+%%%\put(6616,-1276){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Succ}}}
+%%%\put(6571,-421){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Order}}}
+%%%\put(6571,-781){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
+%%%\put(4681,-1186){\line( 1, 0){270}}
+%%%\put(4951,-1186){\line( 0,-1){450}}
+%%%\put(4951,-1636){\line(-1, 0){4815}}
+%%%\put(136,-1636){\line( 0, 1){1260}}
+%%%\put(136,-376){\vector( 1, 0){315}}
+%%%\put(3106,-1186){\line( 1, 0){270}}
+%%%\put(3376,-1186){\line( 0, 1){1575}}
+%%%\put(3376,389){\line( 1, 0){2250}}
+%%%\put(5626,389){\line( 0,-1){765}}
+%%%\put(5626,-376){\line( 1, 0){495}}
+%%%\put(1486,-1186){\line( 1, 0){315}}
+%%%\put(1801,-1186){\line( 0,-1){675}}
+%%%\put(1801,-1861){\vector( 1, 0){450}}
+%%%\put(2566,614){\vector( 0,-1){675}}
+%%%\put(4186,614){\line( 0,-1){180}}
+%%%\put(4186,344){\vector( 0,-1){405}}
+%%%\put(7156,-1186){\line( 1, 0){495}}
+%%%\put(7651,-1186){\line( 0, 1){1575}}
+%%%\put(7651,389){\vector(-1, 0){450}}
+%%%\put(2566,659){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Next\_Order}}}
+%%%\put(4186,659){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}Free}}}
+%%%\put(2476,-1861){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
+%%%\put(5401,-736){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
+%%%\put(7021,389){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}\ldots }}}
+%%%\put(946,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}1}}}
+%%%\put(2521,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}2}}}
+%%%\put(4141,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}3}}}
+%%%\put(6616,-2086){\makebox(0,0)[b]{\smash{\SetFigFont{10}{12.0}{rm}10}}}
+%%%\end{picture}
+%%%\caption{}
+%%%\label{kette}
+%%%\end{figure}
+%%%
+%%%
+%%%The order string can be declared as follows:
+%%%
+%%%\begin{tabbing}
+%%%{\bf TYPE} \= \x \= \x \= \kill
+%%%... \> \> \> \\
+%%%{\bf TYPE} \> StringElement {\bf STRUCT} \> \> \\
+%%%           \>   \> {\bf [} \> Order  OrderType,\\
+%%%           \>   \>         \> ...,\\
+%%%           \>   \> {\bf ]};\\
+%%%{\bf DCL}  \> OrderString (10) StringElement, \> \> \\
+%%%           \> (Next\_Order, Free) {\bf REF} StringElement;\\
+%%%... \> \> \>
+%%%\end{tabbing}
+%%%
+%%%After initialising and arranging various orders, a finished order can be
+%%%removed from the queue as follows (let Help be a variable of type REF
+%%%string element):
+%%%
+%%%...\\
+%%%Help := Next\_Order;
+%%%Next\_Order := Next\_Order.Succ;\\
+%%%Help.Succ := Free\\
+%%%Free := Help\\
+%%%...
+%%%
+%%%These statements are also further examples for implicit
+%%%dereferentiation. The order string can be initialised as follows:
+%%%
+%%%{\bf FOR} i {\bf TO} 9\\
+%%%\x {\bf REPEAT} \\
+%%%\x \x OrderString(i).Succ:=OrderString(i+1);\\
+%%%\x {\bf END};\\
+%%%OrderString(10).Succ:={\bf NIL};
+%%%\end{enumerate}
+%%%
 Generally, a new data type is defined as follows:
 
 \input{TypeDefinition.bnf}
@@ -1212,10 +1150,12 @@ Example:
 
 
 \section{The Initialisation Attribute (INITIAL)}   % 5.13
+\index{INIT@\textbf{INIT}}
+\index{INITIAL@\textbf{INITIAL}|see {INIT}}
 
 The initialisation attribute allows to assign initial values to
 variables upon their declaration. For variables with assignment
-protection (see 5.15), this is the only possibility of allocating
+protection (see \ref{sec_inv}), this is the only possibility of allocating
 values. The initialisation attribute is given as last attribute of the
 respective declaration:
 
@@ -1223,22 +1163,20 @@ respective declaration:
 
 \input{InitElement.bnf}
 
-\begin{front}
-Constant ::=\\
-\x Integer\\
-\x $\mid$ FloatingPointNumber\\
-\x $\mid$ BitStringConstant\\
-\x $\mid$ TimeConstant\\
-\x $\mid$ DurationConstant\\
-\x $\mid$ {\bf NIL}
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%Constant ::=\\
+%%%\x Integer\\
+%%%\x $\mid$ FloatingPointNumber\\
+%%%\x $\mid$ BitStringConstant\\
+%%%\x $\mid$ TimeConstant\\
+%%%\x $\mid$ DurationConstant\\
+%%%\x $\mid$ {\bf NIL}
+%%%\end{front}
 \input{Constant.bnf}
-\end{grammar}
 
 The type of the given init element has to be compatible with the type of
 the declared variable in accordance with the rules for assignment (cf.
-6.3):
+\ref{sec_assignments}):
 
 Example:
 
@@ -1268,7 +1206,7 @@ Example:
           \>         \>               \> Town        \> {\bf CHAR}(20),\\
           \>         \>               \> Street      \> {\bf CHAR}(20),\\
           \>         \>               \> HouseNumber \> {\bf FIXED \hspace{1cm} ]}\\
-          \>         \> {\bf INIT}(21337, 'Lueneburg', 'Erbstorfer Landstr.', 14); \> \> \\
+          \>         \> {\bf INIT}(78120, 'Furtwangen', 'Robert Gerwig Platz', 1); \> \> \\
 {\bf DCL} \> colours \> (3)           \> {\bf CHAR}(7) \> {\bf INIT} ('black\ \ ', 'white\ \ ', 'red\ \ \ \ ');\\
 {\bf DCL} \> all\_sixes \> (6)        \> {\bf FIXED}  \> {\bf INIT} (6);\\
 ... \> \> \> \>
@@ -1276,10 +1214,11 @@ Example:
 
 The initialisation list can, besides constants, even contain identifiers
 of named constants as well as expressions calculable by the compiler
-(cf. 5.15.1 and 5.15.2).
+(cf. \ref{sec_named_const} and \ref{sec_const_expression}).
 
-\begin{tobedone}
 \section{Assignment Protection (INV)}    % 5.14
+\label{sec_inv}
+\index{INV@\textbf{INV}}
 
 Variables can be declared with an assignment protection,i.e. the attribute
 INV (from ``invariant''), in order to forbid --- apart from
@@ -1339,6 +1278,8 @@ The assignment R2:=Tab(5,7), however, is permitted; a value modification
 of the tabular element via CONT is not possible.
 
 \subsection{Named Constants (INV Constants)}   % 5.14.1
+\label{sec_named_const}
+\index{INV@\textbf{INV}!Named Constant}
 
 The compiler treats objects of type FIXED, BIT, CHAR(1), CLOCK and
 DURATION declared with attribute INV as (named) constants. The names of
@@ -1369,34 +1310,34 @@ Since the compiler does not generate any run time objects for named
 objects, they may not be assigned to a reference variable. Likewise,
 they cannot be used as actual parameters of a procedure, if the formal
 parameter was specified with the IDENTICAL attribute or as reference
-variable (cf. 8.2).
+variable (cf. \ref{sec_proc_dcl}).
 
 \subsection{Constant Expressions (of Type FIXED)}   % 5.14.2
+\label{sec_const_expression}
 
 In all positions where the compiler expects constants, also constant
 expressions may occur. These expressions may only contain constants
 (also named constants) as operands. They are evaluated by the compiler,
 and the results are inserted in the respective positions.
 
+
 \input{ConstantExpression.bnf}
 
-\input{Constant-FIXED-Expression.bnf}
+\input{ConstantFIXEDExpression.bnf}
 
 \input{Term.bnf}
 
-\begin{front}
-Factor ::=\\
-\x [ + $\mid$ - ] \\
-\x \{ integer \\
-\x \x $\mid$ (Constant-FIXED-Expression)\\
-\x \x $\mid$ {\bf TOFIXED} \{ CharacterStringConstant\S OfLength1 $\mid$ BitStringConstant \}\\
-\x \x $\mid$ Identifier\S NamedConstant\\
-\x \} \\
-\x [ {\bf FIT} constant-FIXED-Expression ]
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%Factor ::=\\
+%%%\x [ + $\mid$ - ] \\
+%%%\x \{ integer \\
+%%%\x \x $\mid$ (Constant-FIXED-Expression)\\
+%%%\x \x $\mid$ {\bf TOFIXED} \{ CharacterStringConstant\S OfLength1 $\mid$ BitStringConstant \}\\
+%%%\x \x $\mid$ Identifier\S NamedConstant\\
+%%%\x \} \\
+%%%\x [ {\bf FIT} constant-FIXED-Expression ]
+%%%\end{front}
 \input{Factor.bnf}
-\end{grammar}
 
 
 
@@ -1436,5 +1377,3 @@ ActualBufferIndex := ActualBufferIndex+1;\\
 {\bf THEN} /* output of warning */ \\
 {\bf FIN};\\
 ...
-\end{tobedone}
-

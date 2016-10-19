@@ -130,10 +130,9 @@ MODEND;
 
 \begin{CppCode}
 // system part only
-static pearlrt::I2CBus s_i2cbus("/dev/i2c-0",100000);
-static pearlrt::Device * d_i2cbus = &s_i2cbus;
+static pearlrt::I2CBus s_i2c("/dev/i2c-0",100000);
 
-static pearlrt::LM75 s_temp(&s_i2cbus,0x48);
+static pearlrt::LM75 s_temp(&s_i2c,0x48);
        pearlrt::Device * d_temp = &s_temp;
 \end{CppCode}
 
@@ -147,14 +146,59 @@ The implementation provides two roles:
 \item ConnectionClient, which represents the component on the bus.
 \end{itemize}
 
-The classes for provider and client are derived from \texttt{SystemDationB}
-and a connection specific pair of provider and client classes - e.g. 
-\texttt{I2CBusProvider} and \texttt{I2CBusClient}. These classes
-provide the communication between provider and client, if required.
+The classes for clients are derived from \texttt{SystemDationB}.
+The classes for providers are be derived from a class which
+defines the interface for the connection. 
+
+E.g.:
+\begin{description} 
+\item[ \texttt{I2CProvider} ] is common to all plattforms
+   and defines the communication interface between provider and client
+\item[ \texttt{I2CBus}] implements the access to the i2c-bus on a 
+   specific plattform
+\item[ \texttt{LM75} ] defines a system dation, which is attached to an i2c-bus.
+    This element is plattform independent.
+\end{description}
 
 \paragraph{Note:} The client has access to the provider by default, since
 the provider is passed as first argument in the ctor of the client.
- 
+
+\paragraph{Note:} The second parameter in I2CBus is used in microcontroller
+   environmants. The linux systems define the transmission speed at
+   another location.
+
+\section{Common Elements and Devices for all Plattforms}
+\subsection{I2C-Bus}
+The class \texttt{I2CProvider} defines the interface for all i2c-bus 
+implementations. Each implementation open the i2c hardware interface 
+when the ctor is called. The implementation must provide aside of a
+convenient ctor the following methiods:
+
+\begin{description}
+\item[readData] read the given number of bytes from the specified 
+   i2c-addres
+\item[writeData] send the given number of bytes to the specified
+    i2c-addres
+\item[rdwr] perform several subsequent read and write operations 
+   without intermediate stop condition. If the concrete controller
+   does not support this method, it must throw the InternalDationSignal.
+\end{description}
+
+\subsection{I2c-Device LM75}
+The sensor delivers the current temperature.
+
+\begin{tabular}{|l|p{10cm}|}
+\hline
+Direction & IN \\
+\hline
+Type & FIXED(15) \\
+\hline
+Remarks& The temperature is returned in tenth of degree centigrade\\
+& The chip updates the temperature value after end of data transmission. 
+  In full speed polling mode, the gap between two read operations is too 
+  short ($\approx 40 \mu s$) to update the value.\\
+\hline
+\end{tabular}
 
 \section{Specifications in Problem Part}
 The system device is specified in the problem part.

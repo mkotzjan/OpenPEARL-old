@@ -27,6 +27,7 @@
 #include "RefChar.h"
 #include "RefCharSink.h"
 #include "Log.h"
+#include "Mutex.h"
 
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
@@ -37,12 +38,11 @@ extern "C" {
 };
 
 #define LOGTASK
-#define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
 namespace pearlrt {
 
-   bool Log::initialized = false;
-   Mutex Log::mutex;
+   static Mutex mutex;
+
 #ifdef LOGTASK
 // formatting an output is done during in separate task if scheduler
 // is running. This safes a lot of tasks stack
@@ -57,9 +57,11 @@ namespace pearlrt {
    static bool schedulerWasStarted = false;
 #endif
 
-#define ERRORMESSAGE "\n                     **** above line truncated ****\n"
+   static void doitSync(const Character<7>& type,
+                      const char * format,
+                      va_list args) ;
 
-   void Log::logTask(void * p) {
+   static void logTask(void * p) {
 #ifdef LOGTASK
       schedulerWasStarted = true;
 
@@ -69,7 +71,7 @@ namespace pearlrt {
          xSemaphoreTake(logGo, portMAX_DELAY);
 
          // new job arrived
-         Log::doitSync(*commonType, commonFormat, commonArgs);
+         doitSync(*commonType, commonFormat, commonArgs);
 
          // and tell application task that the log job was done
          xSemaphoreGive(logDone);
@@ -80,7 +82,6 @@ namespace pearlrt {
 
    Log::Log() {
       StructParameters_t createParameters; // for task creation
-      initialized = true;
       mutex.name("Log");
 
 #ifdef LOGTASK
@@ -97,11 +98,6 @@ namespace pearlrt {
       logDone  = xSemaphoreCreateBinary();
       logGo    = xSemaphoreCreateBinary();
 #endif
-   }
-
-   Log* Log::getInstance() {
-      static Log * instance = new Log();
-      return (Log*) instance;
    }
 
    void Log::doit(const Character<7>& type,
@@ -138,14 +134,14 @@ namespace pearlrt {
 #endif
    }
 
-   void Log::doitSync(const Character<7>& type,
+   static void doitSync(const Character<7>& type,
                       const char * format,
                       va_list args) {
       Character<128> line;
       RefCharacter rc(line);
 
       try {
-         doFormat(type, rc, format, args);
+         Log::doFormat(type, rc, format, args);
 
          mutex.lock();
          _write(1, rc.getCstring(), rc.getCurrent());
@@ -161,51 +157,5 @@ namespace pearlrt {
       }
    }
 
-   void Log::exit(void) {
-      if (initialized) {
-         initialized = false;
-      }
-   }
-
-
-   void Log::info(const char * format, ...) {
-      if (logLevel & Log::INFO) {
-         static const Character<7> type("INFO:");
-         va_list args;
-         va_start(args, format);
-         Log::getInstance()->doit(type, format, args);
-         va_end(args);
-      }
-   }
-
-   void Log::error(const char * format, ...) {
-      if (logLevel & Log::ERROR) {
-         static const Character<7> type("ERROR:");
-         va_list args;
-         va_start(args, format);
-         Log::getInstance()->doit(type, format, args);
-         va_end(args);
-      }
-   }
-
-   void Log::warn(const char * format, ...) {
-      if (logLevel & Log::WARN) {
-         static const Character<7> type("WARN:");
-         va_list args;
-         va_start(args, format);
-         Log::getInstance()->doit(type, format, args);
-         va_end(args);
-      }
-   }
-
-   void Log::debug(const char * format, ...) {
-      if (logLevel & Log::DEBUG) {
-         static const Character<7> type("DEBUG:");
-         va_list args;
-         va_start(args, format);
-         Log::getInstance()->doit(type, format, args);
-         va_end(args);
-      }
-   }
 
 }

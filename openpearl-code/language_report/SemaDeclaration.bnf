@@ -1,0 +1,7 @@
+\htgt{SemaDeclaration} ::= \\
+\x \{ {\bf DECLARE} $\mid$ {\bf DCL} \} \hlink{OneIdentifierOrList}
+   [ \hlink{DimensionAttribute} ] {\bf SEMA} \\
+\x   [ \hlink{GlobalAttribute} ]\\
+\x [ {\bf PRESET (} \hlink{IntegerWithoutPrecision} [ , \hlink{IntegerWithoutPrecision} ] $^{...}$ {\bf )} ]{\bf ;}
+
+

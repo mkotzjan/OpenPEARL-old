@@ -1,0 +1,4 @@
+\htgt{ScalarVariableSpecification} ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{VariableDenotationS} [ , \hlink{VariableDenotationS} ] $^{...}$;
+
+

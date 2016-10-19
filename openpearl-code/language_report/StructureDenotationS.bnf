@@ -1,0 +1,5 @@
+\htgt{StructureDenotationS} ::=\\
+\x \hlink{OneIdentifierOrList}\S MainRecord [ \hlink{VirtualDimensionList} ]\\
+\x [ {\bf INV} ] \hlink{TypeStructure} \{ \hlink{GlobalAttribute} $\mid$ 
+  \hlink{IdentificationAttribute}\}
+

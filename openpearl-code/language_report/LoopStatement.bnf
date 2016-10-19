@@ -1,5 +1,5 @@
 \htgt{LoopStatement} ::=\\
-\x [ {\bf FOR} \hlink{Indicator}$\S $ControlVariable ]\\
+\x [ {\bf FOR} \hlink{Identifier}$\S $ControlVariable ]\\
 \x [ {\bf FROM} \hlink{Expression}$\S $InitialValue ]\\
 \x [ {\bf BY} \hlink{Expression}$\S $StepLength ]\\
 \x [ {\bf TO} \hlink{Expression}$\S $EndValue ]\\

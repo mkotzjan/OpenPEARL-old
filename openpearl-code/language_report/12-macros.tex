@@ -1,0 +1,80 @@
+\chapter{Macros}
+\begin{discuss}
+dieses ganze kapitel steht noch zur Diskussion!
+\end{discuss}
+
+\OpenPEARL{} requires the specification of the global interface 
+of other modules in each module which wants to use other modules.
+In some cases conditional compilation is needed. 
+
+
+\section{Import Statement}
+
+The import of a different source file is triggered with:
+\#INCLUDE FileNameWithPathAndExtension
+
+The content of the specified source file is inserted at this 
+place. Error messages from compiler and runtime system will  be given 
+relative to the included file.
+
+Wirklich??? setLocation(,) muesste entsprechend umgesetzt werden.
+
+The base location for relative path names is the directory containing 
+the file, doing the INCLUDE  
+If an included file contains further \#INCLUDE statements with relative
+path names, they included relative to the location of the including file.
+(geht sicher noch besser)
+
+There is a limit of 7 levels of nested INCLUDE-statements.
+
+\section{Conditional Compilation}
+
+\subsection{Definition of Macros Constants}
+\#DEFINE ConstantIdentifier {\bf = } ConstantIntegerExpression ;
+
+ConstantIntegerExpression :== \\
+\x [ ConstantMonadicOperator ] ConstantOperand  [ 
+ ConstantDyadicOperator ConstantIntegerExpression  ] $^{...}$\\
+
+ConstantMonadicOperator:== \\
+\x {\bf +} $\mid$ {\bf -}
+
+ConstantDyadicOperator:== \\
+\x {\bf +} $\mid$ {\bf -} $\mid$ {\bf *} $\mid$ {\bf // }
+
+ConstantOperand :== \\
+\x Integer $\mid$ Identifier$\S $Constant $\mid$ 
+{\bf (} ConstantIntegerExpression {\bf )}
+
+Example:\\
+\#DEFINE lines = 10;			\\
+\#DEFINE lineLength = 80;		\\
+\#DEFINE size = 2*(lines*lineLength);	\\
+
+Example usage:
+
+MODULE(condCompile);\\
+\\
+SYSTEM:\\
+\ \\
+PROBLEM;\\
+\#INCLUDE config.inc    ! defines target\\
+\ \\
+\#IFUDEF target;\\
+\x \#ERROR 'target is not set';\\
+\#ENDIF;\\
+\\
+\#IF target == 2;\\
+\x  \#INCLUDE 'module2.inc' ;\\
+\#ELSE IF target == 3 ;\\
+\x   \#INCLUDE 'module3.inc' ;\\
+\#ELSE ;\\
+\x   \#ERROR 'unknown target';\\
+\#ENDIF;\\
+
+Zulaessige Vergleiche: $<, <= >, >=, ==, /= $
+
+Macros: DEFINE, INCLUDE, IF, IFUDEF, IFDEF, (?? auch UNDEF?? )
+
+'\#' und Makroname muessen zusammen stehen. Vor einem Makro ist nur Whitespace erlaubt. Makroanweisungen enden mit ';'.
+Nach dem ';' sinf normal PEARL-Anweisungen zulaessig.

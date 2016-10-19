@@ -1,0 +1,4 @@
+\htgt{InterruptSpecification} ::=\\
+\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{OneIdentifierOrList} \{ {\bf INTERRUPT $\mid$ IRPT} \}\\
+\x [ \hlink{GlobalAttribute} ];
+

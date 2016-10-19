@@ -1,4 +1,4 @@
 \htgt{TypeDation} ::=\\
 \x {\bf DATION} \hlink{SourceSinkAttribute}  \hlink{ClassAttribute}\\
-\x [ \hlink{Topology} ] [ \hlink{AccessAttribute} ]\\
+\x [ \hlink{Typology} ] [ \hlink{AccessAttribute} ]\\
 

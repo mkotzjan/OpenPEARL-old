@@ -1,0 +1,3 @@
+\htgt{DurationFormat} ::=\\
+\x {\bf D} ( \hlink{FieldWidth} [ , \hlink{DecimalPositions} ] )
+

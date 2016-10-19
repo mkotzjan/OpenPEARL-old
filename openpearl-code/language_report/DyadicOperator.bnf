@@ -1,6 +1,7 @@
 \htgt{DyadicOperator} ::=\\
-\x $ + \mid - \mid ^* \mid / \mid // \mid ^{**} \mid 
-	< \mid > \mid <= \mid >= \mid == \mid /= \mid
-	 >< \mid <> \mid$\\
-\x \hlink{Identifier}$\S $DyadicOperator\\
+\x + $\mid$ - $\mid$ * $\mid$ / $\mid$ // $\mid$ {\bf REM} $\mid$ ** \\
+\x $\mid$ $<$ $\mid$ {\bf LT} $\mid$ $>$ $\mid$ {\bf GT} $\mid$ $<$= $\mid$ {\bf LE} $\mid$ $>$= $\mid$ {\bf GE} $\mid$ == $\mid$ {\bf EQ} $\mid$ /= $\mid$ {\bf NE} \\
+\x $\mid$ {\bf AND $\mid$ OR $\mid$ EXOR} $\mid$ $><$ $\mid$ {\bf CAT} $\mid$ $<>$ $\mid$ {\bf CSHIFT $\mid$ SHIFT $\mid$ LWB $\mid$ UPB \\
+\x $\mid$ IS $\mid$ ISNT $\mid$ FIT}
+%%% \x $\mid$ Identifier\S UserDefinedDyadicOperator
 

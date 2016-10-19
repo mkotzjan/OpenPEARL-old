@@ -1,0 +1,3 @@
+\htgt{RFormat} ::=\\
+\x {\bf R} ( \hlink{Identifier}$\S $Format )
+

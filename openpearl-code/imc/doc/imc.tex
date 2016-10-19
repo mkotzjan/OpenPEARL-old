@@ -1,0 +1,80 @@
+\documentclass[12pt]{scrbook}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,shapes.geometric}
+
+\geometry{a4paper}
+\setlength{\parindent}{0pt}
+
+\DeclareCaptionFormat{listing}{\colorbox{black!15}
+  {\parbox{5cm}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,
+%labelfont=white,textfont=white,
+singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+\newcommand{\OpenPEARL}{\textit{OpenPEARL}}
+
+\begin{document}
+\title{\OpenPEARL{} - Inter Module Checker (imc)}
+
+\author{R. M\"uller}
+
+\lstnewenvironment{XMLCode} {
+    \lstset{numbers=left,
+            title={XML},
+            frame=tlrb,
+            breaklines = true,
+            belowcaptionskip=4pt
+    }
+}%
+{}%
+
+\lstnewenvironment{CppCode} {
+    \lstset{numbers=left,
+            title={C++},
+            frame=tlrb,
+            breaklines = true,
+            belowcaptionskip=4pt
+    }
+}%
+{}%
+
+\lstnewenvironment{PEARLCode} {
+    \lstset{numbers=left,
+            title={PEARL},
+            frame=tlrb,
+            breaklines = true,
+            belowcaptionskip=4pt
+    }
+}%
+{}%
+\pagestyle{myheadings}
+\markboth {\OpenPEARL{} imc \today} {\OpenPEARL{} imc \today}
+
+\date{
+ToDo:
+\begin{itemize}
+\item check, whether array of dations, signals or interrupts are possible
+\item investigate about parameters in REF DATION
+\item how to enshure proper mapping of REF DATIONS in STRUCTs
+\end{itemize}
+}
+
+\maketitle
+
+\tableofcontents
+
+\input{intro.tex}
+\input{structure_import_export.tex}
+\input{plattform_xml.tex}
+\input{usage.tex}
+\input{documentation.tex}
+\input{literature.tex}
+
+\end{document}

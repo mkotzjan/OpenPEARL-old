@@ -120,11 +120,11 @@ Synopsis: & \verb|RPiDigitalOut(start, width)| \\
      depend on the model of the raspberry pi. The starting number if
      the leftmost gpio bit number (large value)
 \item [width] specifies the number of bits which are grouped together.
-     Valid numbers depend on the mpodel of the raspberry pi.
+     Valid numbers depend on the model of the raspberry pi.
 \item [pud] Pull-up / pull-down configuration.
     Valid values are 'u' for pull up, 'd' for pull down and 
     '' for no pull-up/pull-down resistor. This option is only
-    availaböle for digital inputs.
+    available for digital inputs.
 \end{description}
 
 The access to the dation is done by writing a BIT(width)-value to the
@@ -165,7 +165,21 @@ is set afterwards leading to '01'.
 \item the current user needs priviledges to access the system device 
   \verb|/dev/gpiomem|.
 \end{itemize}
-  
+ 
+\subsection{I2CBus}
+Linux supports normal access to an i2c bus if i2c is available. 
+The corresponding device file are named like \texttt{/dev/i2c-0}.
+The i2c subsystem of linux provides test features for the availability
+to the so called {\em repeated start} feature (see I2C\_FUNCS\_I2C)
+
+\begin{tabular}{ll}
+Synopsis: & \verb|I2CBus(deviceName)|\\ 
+\end{tabular}
+
+\begin{description}
+\item[deviceName] specifies the name to the device file (e.g. "/dev/i2c-0")
+\end{description}
+
 \subsection{Creating a new Device for User Dations}
 The creation of a new device is very simple:
 \begin{enumerate}

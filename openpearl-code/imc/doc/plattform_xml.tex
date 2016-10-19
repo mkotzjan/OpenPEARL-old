@@ -1,0 +1,233 @@
+\chapter{Platform Specific Names}
+
+\section{Introduction}
+Each specific platform may support a different set of system names.
+Thus each target platform is characterized by a separate xml-file.
+These files are created during the build phase of the runtime system
+for each target platform.
+
+\section{Structure of the XML-File}
+All possible system elements are located as unordered separate 
+elements under the root tag \verb|platform|.
+For the individual types of system elements, the following tags are
+provided:
+\begin{itemize}
+\item \verb|<signal ...>| defines a system signal
+\item \verb|<interrupt ...>| defines a system interupt
+\item \verb|<dation ...>| defines a system dation
+\item \verb|<configuration ...>| defines a configuration item
+\item \verb|<connection ...>| defines a association provider, if 
+   non of the above fit
+\end{itemize}
+
+These elements have attributes 
+\begin{description}
+\item [name] is the system name
+\item [instances] the number of instances, if specified. If this attribute 
+   is not specified, there is no instance limit.
+\end{description}
+
+\subsection{Signal-Tag}
+The signal tag contains only the attribute \verb|name| for the
+system signal name.
+
+\subsection{Interrupt-Tag}
+The interrupt tag contains the attribute \verb|name| for the
+system interrupt name.
+Possible parameters are listed as subtree \verb|<parameters>|.
+
+\subsection{Dation-Tag}
+The dation tag contains the attribute \verb|name| for the
+system dation name.
+Possible parameters are listed as subtree \verb|<parameters>|.
+Possible attributes are listed as subtree \verb|<attributes>|.
+Possible associations to this element are
+ listed as subtree \verb|<associationProvider>|.
+
+
+\subsection{Configuration-Tag}
+The configuration element has the same structure as the dation tag
+except the attribute \verb|name|, which has not to be present.
+
+\subsection{Associations}
+The connection between two system elements is treated by the following
+elements:
+
+\begin{itemize}
+\item \verb|<needAssociation>| with the attribute 
+ \verb|name| and the identifier of the expected interface. The 
+  interface names are described in the runtime documentation. 
+\item \verb|<associationProvider>|  with elements \verb|<associationType>|.
+  Attributes for an associationType are:
+  \begin{itemize}
+   \item  \verb|<name>|,  which is an unique free selectable
+     identifier for this kind of  association.
+   \item \verb|<clients>|  if given it is the number of allowed
+      clients for this connection provider. If not given, there is no
+      limits of allowed clients.
+   \end{itemize} 
+\end{itemize}
+
+\subsection{Parameters}
+Only parameters of system elements of types bit, fixed and char are supported.
+The actual value may be restricted to definite values and ranges.
+
+Tags are defined for each of them:
+\begin{itemize}
+\item \verb|BIT| with the attribute \verb|length|, which specifies the 
+   allowed length of an actual parameter. \verb|<BIT length="8">...</BIT>|
+   specifies a BIT(8) parameter. Shorter actual parameters are extended --- 
+   longer parameters induce an error message.
+\item \verb|FIXED| with the attribute \verb|length|, which specifies the 
+   allowed length of an actual parameter. \verb|<FIXED length="15">...</FIXED>|
+   specifies a FIXED(15) parameter. Shorter actual parameters are extended --- 
+   longer parameters induce an error message.
+\item \verb|CHAR| with the attribute \verb|length|, which specifies the 
+   allowed length of an actual parameter. \verb|<CHAR length="15">...</CHAR>|
+   specifies a CHAR(15) parameter. Shorter actual parameters are allowed --- 
+   longer parameters induce an error message.
+\end{itemize}
+
+Each parameter may have an attribute 'nick' which allows to access 
+the concrete value of the parameter in expressions of subsequent parameters
+or in the 'data'-attribute. The nicknames consist of letters ('A'-'Z', 
+'a'-'z') only. To access a nickname, ar '\$' must be used as prefix.
+Expressions are supported for integer results. The Java Script machine,
+which is used to evaluate the expressions, operates on double values ---
+thus the division must be used with care.
+Expressions must be placed in square brackets.
+e.g. \verb|anyText[$start+3]anyOtherText|.
+
+Parameters may be checked against rules. The list of rules may be extended
+in the class TargetPlattformXml, if other rules are required.
+
+Supported rules:
+
+\begin{tabular}{|l|c|p{8cm}|}
+\hline
+rule & type & description \\
+\hline
+VALUES & BIT,FIXED, CHAR &
+   a comma separated list of allowed values
+   is given. Other values produce an error message. 
+No nicknames or expressions are allowed.\\
+\hline
+ConsistsOf & CHAR &
+a comma separeted list of allowed values is given. 
+The actual parameter must consist of only one or more of these
+elements.
+No nicknames or expressions are allowed.\\
+\hline
+NotEmpty & CHAR & 
+   at least one character is required \\   
+\hline
+FIXEDRANGE & FIXED &
+   two comma separated integers or expressions with nicknames
+ limits the allowed range
+   of actual values --- borders included \\ 
+\hline
+FIXEDGT & FIXED &
+   one integer or expression with nicknames
+ limits the allowed range at the low side
+   of actual value --- border NOT included \\ 
+\hline
+\end{tabular}
+
+\section{Sample Platform File}
+\begin{XMLCode}
+<?xml version="1.0" encoding="UTF-8"?>
+<platform file="testPlatform.xml">
+   <signal name="FixedRangeSignal"/>
+   <signal name="FixedDivideByZeroSignal"/>
+   <signal name="FloatIsNaNSignal"/>
+   <interrupt name="UnixSignal">
+      <parameters>
+         <FIXED length="31">
+            <VALUES>1,2,3,15,16,17</VALUES>
+         </FIXED>
+      </parameters>
+   </interrupt>
+   <dation name="Disc">
+      <parameters>
+         <CHAR length="32767"/>	<!-- beliebiger String -->
+         <FIXED length="31">
+            <FIXEDRANGE>1,9999</FIXEDRANGE>
+         </FIXED>
+      </parameters>
+      <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALL</data>
+      <associationProvider>
+         <associationType name="NamedAlphicOutProvider" />
+      </associationProvider>
+   </dation>
+   <dation name="StdIn" instances="1">
+      <parameters>
+      </parameters>
+      <attributes>
+         FORWARD, IN, SYSTEM
+      </attributes>
+      <DATA>ALPHIC</DATA>
+   </dation>
+   <dation name="StdOut" instances="1">
+      <parameters>
+      </parameters>
+      <attributes> FORWARD, OUT, SYSTEM</attributes>
+      <data>ALPHIC</data>
+      <associationProvider>
+         <associationType name="AlphicOutProvider" />
+      </associationProvider>
+   </dation>
+   <connection name="I2CBus">
+      <parameters>
+         <CHAR length="32767">
+            <NotEmpty />
+         </CHAR>
+         <FIXED length="31">	<!-- max int32_t -->
+            <FIXEDGT>0</FIXEDGT>
+         </FIXED>
+      </parameters>
+      <associationProvider>
+         <associationType name="I2CBusProvider" />
+      </associationProvider>
+   </connection>
+   <dation name="LM75">
+      <parameters>
+         <BIT length="8">
+            <VALUES>'48'B4, '49'B4, '4A'B4, '4B'B4,
+                    '4C'B4, '4D'B4 , '4E'B4, '4F'B4</VALUES>
+         </BIT>
+      </parameters>
+      <needAssociation provider="I2CBusProvider"/>
+   </dation>
+   <dation name="Pcf8574">
+      <parameters>
+         <BIT length="8">
+            <VALUES>'20'B4, '21'B4, '22'B4, '23'B4,
+                    '24'B4, '25'B4 , '26'B4, '27'B4,
+                    '38'B4, '39'B4 , '3A'B4, '3B'B4,
+                    '3C'B4, '3D'B4 , '3E'B4, '3F'B4
+            </VALUES>
+         </BIT>
+         <FIXED length="7" nick="start">
+            <FIXEDRANGE>0,7</FIXEDRANGE>
+         </FIXED>
+         <FIXED length="7" nick="width">
+            <FIXEDRANGE>1,[$start+1]</FIXEDRANGE>
+         </FIXED>
+      </parameters>
+      <attributes>
+         BASIC, SYSTEM, IN, OUT
+      </attributes>
+      <data>BIT($width)</data>
+      <needAssociation provider="I2CBusProvider"/>
+   </dation>
+  <configuration name="Log" instances="1">
+    <parameters>
+      <CHAR length="4">
+         <NotEmpty/>
+      </CHAR>
+    </parameters>
+    <needAssociation provider="AlphicOutProvider"/>
+  </configuration>
+</plattform>
+\end{XMLCode}

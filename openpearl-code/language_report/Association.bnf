@@ -1,0 +1,11 @@
+
+\htgt{Association} ::=\\
+\x  -\ -\ - 
+       \{ \hlink{Identifier}$\S $UsernameOfConnectionProvider \\
+\x \x   $\mid$ \hlink{Identifier}$\S $ConnectionProviderSystemName
+         [ ( \hlink{ListOfConstants}) ] \} \\
+\x \x       [ -\ -\ -
+     \{ \hlink{Identifier}$\S $UsernameOfConnectionProvider \\
+\x \x \x   $\mid$ \hlink{Identifier}$\S $ConnectionProviderSystemName
+         [ ( \hlink{ListOfConstants}) ] \}  ] $^{...}$ ;\\
+

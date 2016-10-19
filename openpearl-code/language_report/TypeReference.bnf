@@ -1,3 +1,6 @@
+\begin{discuss}
+REF INTERRUPT/IRPT, REF SIGNAL ok?
+
 \htgt{TypeReference} ::=\\
 \x {\bf REF} \\
 \x \{ [ \hlink{VirtualDimensionList} ] [ {\bf INV} ] 
@@ -6,5 +9,10 @@
 	\{ \hlink{TypeDation} $\mid$ {\bf SEMA $\mid$ BOLT} \}\\
 \x \x $\mid$ \hlink{TypeProcedure} $\mid$ 
 	{\bf TASK $\mid$ INTERRUPT $\mid$ IRPT $\mid$ SIGNAL}\\
-\x \x $\mid$ \hlink{Type-VOID} $\mid$ {\bf CHAR}( )\\
-\x \}\\
+\x \x 
+%%%$\mid$ \hlink{Type-VOID}
+ $\mid$ {\bf CHAR}( )\\
+\x \}
+
+\end{discuss}
+

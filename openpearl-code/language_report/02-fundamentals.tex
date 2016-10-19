@@ -62,25 +62,25 @@ work faster than the consumer. More complex synchronisation problems
 occur, if e.g. a task has to access to a file exclusively (because
 writing), whereas others can access simultaneously (because reading). In
 order to solve these synchronisation problems, PEARL contains the data
-\removedtext{types SEMA and BOLT} \addedtext{type SEMA} 
+types SEMA and BOLT 
 with corresponding statements, such as
 
 \begin{itemize}
-\item {\bf REQUEST} conveyor-belt;
-\item {\bf RELEASE} communication-buffer;
+\item {\bf REQUEST} conveyor\_belt;        %%%conveyor-belt;
+\item {\bf RELEASE} comminication\_buffer; %%%communication-buffer;
 \end{itemize}
 
-\begin{removed}
-It is fundamental that these multitasking statements are {\it computer
-independent}, i.e. PEARL programs can run on iRMX, OS/2, UNIX or VAX/VMS
-systems without any changes.
-\end{removed}
+%\begin{removed}
+%It is fundamental that these multitasking statements are {\it computer
+%independent}, i.e. PEARL programs can run on iRMX, OS/2, UNIX or VAX/VMS
+%systems without any changes.
+%\end{removed}
 
-\begin{added}
+%\begin{added}
 It is fundamental that these multitasking statements are {\it computer 
 plattform independent}, i.e. \OpenPEARL{} programs can run on Linux and 
 Microcontrollers enhanced with FreeRTOS without any changes.
-\end{added}
+%\end{added}
 
 In addition to this, there is the great advantage that the PEARL
 programmer can program his multitasking statements in a {\it problem
@@ -156,34 +156,36 @@ In the system part, the used hardware configuration is described.
 Particularly freely chosen names can here be assigned to the devices and
 their connections, the interrupts and signals. 
 
-\begin{removed}
+%\begin{removed}
+%Thus, the following
+%example means that a valve is connected to the connector 3 of a digital
+%output unit called by the computer specific system name DIGOUT (1). The
+%valve, i.e. connector 3, is to be called by the freely selectable
+%computer independent user name ``valve'':
+%
+%valve: DIGOUT (1) * 3;
+%\end{removed}
+
+%%%\begin{discuss}
+%%%wir nutzen Userdations auf fuer die ProzessE/A. Das wäre aber hier 
+%%%zu frueh... daher nun ein Interrupt
+
 Thus, the following
-example means that a valve is connected to the connector 3 of a digital
-output unit called by the computer specific system name DIGOUT (1). The
-valve, i.e. connector 3, is to be called by the freely selectable
-computer independent user name ``valve'':
+example means that a button may emit an interrupt when pressed.
+The button is connected to the computer at location specified
+by the system name GpioInterrupt(2).
 
-valve: DIGOUT (1) * 3;
-\end{removed}
+The button, i.e. GpioInterrupt 2, is to be called by the freely selectable
+computer independent user name ``start'':
 
-\begin{added}
-Thus, the following
-example means that a valve is connected to the connector 3
- of a digital
-output unit called by the computer specific system name DIGOUT.
-The valve needs only 1 bit, other devices need more bits to be controlled
-efficiently.
-The valve, i.e. connector 3, is to be called by the freely selectable
-computer independent user name ``valve'':
-
-valve: DIGOUT(3,1);
-\end{added}
+start: GpioInterrupt(2);
 
 Using the user name introduced in the system part, the actual algorithm
 for the solution of the automation task is programmed computer
 independently in the problem part, e.g.:
 
-{\bf SEND} on {\bf TO} valve;
+{\bf WHEN} start {\bf ACTIVATE} measurement\_task;
+%%%\end{discuss}
 
 In order to structure the algorithms, (named) blocks, procedures and
 tasks (parallel activities) are available.
@@ -199,9 +201,9 @@ The following data types are available in PEARL:
 \item references {\bf (REF)} for indirect addressing
 \item devices and files {\bf (DATION)} for standard and process input and
       output
-\item \removedtext{interrupts {\bf (INTERRUPT)} for external interrupts}
-\item \removedtext{signals {\bf (SIGNAL)} for internal exceptional situations}
-\item semaphores {\bf (SEMA)} \removedtext{and bolt variables {\bf (BOLT)}} for
+\item interrupts {\bf (INTERRUPT)} for external interrupts
+\item signals {\bf (SIGNAL)} for internal exceptional situations
+\item semaphores {\bf (SEMA)} and bolt variables {\bf (BOLT)} for
       coordinating the access of tasks to shared object
 \end{itemize}
 
@@ -212,7 +214,6 @@ data types as well. Furthermore, PEARL allows the introduction of new,
 problem oriented operators for any data structures with the help of the
 OPERATOR definition.
 
-\begin{tobedone}
 \section{Control Structures}   % 2.5
 
 The following control structures are available:
@@ -259,5 +260,4 @@ The following control structures are available:
 
       {\bf EXIT} block;
 \end{itemize}
-\end{tobedone}
 

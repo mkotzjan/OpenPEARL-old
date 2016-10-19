@@ -1,0 +1,3 @@
+\htgt{DecimalPositions} ::=\\
+\x \hlink{Expression}$\S $WithNonNegativeIntegerAsValue
+

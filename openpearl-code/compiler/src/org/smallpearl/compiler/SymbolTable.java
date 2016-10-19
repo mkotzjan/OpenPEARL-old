@@ -36,8 +36,8 @@ import java.util.LinkedList;
 public class SymbolTable {
     private ScopeStack scopeStack = new ScopeStack();
     private LinkedList unknowns = new LinkedList();
-    private LinkedList<TaskDef> tasks = new LinkedList();
-    private LinkedList<TemporarySemaphoreArray>  temporarySemaphoreArrays = new LinkedList();
+    private LinkedList<TaskDef> tasks = new LinkedList<TaskDef>();
+    private LinkedList<TemporarySemaphoreArray>  temporarySemaphoreArrays = new LinkedList<TemporarySemaphoreArray>();
 
     private ScopeDef baseScope;
     private static int scopeCounter = 0;

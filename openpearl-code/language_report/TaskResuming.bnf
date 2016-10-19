@@ -1,6 +1,3 @@
 \htgt{TaskResuming} ::=\\
-\x \{ {\bf AT} \hlink{Expression}$\S $Time $\mid$
-	 {\bf AFTER} \hlink{Expression}$\S $Duration $\mid$
-	 {\bf WHEN} \hlink{Name}$\S $Interrupt \}\\
-\x {\bf RESUME;}\\        
+\x  \hlink{SimpleStartCondition} {\bf RESUME;}
 

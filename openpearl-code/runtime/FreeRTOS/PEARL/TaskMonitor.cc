@@ -38,33 +38,15 @@ stops the system when no more activity may occur
 */
 
 #include <stdio.h>
-//#include <signal.h>
-//#include <unistd.h>
 
 #include "TaskMonitor.h"
 #include "Log.h"
-#include "task.h"   // vTaskEndScheduler()
 
 namespace pearlrt {
-
-   TaskMonitor& TaskMonitor::Instance() {
-      // static objects are initialized at first call of the function
-      // see eg: www.devarticles-com/c/a/Cplusplus/
-      //        C-plus-plus-In-Theory-The-Singleton-Pattern-Part-I/4/
-      static TaskMonitor tm;
-      return tm;
-   }
 
    TaskMonitor::TaskMonitor() {
       nbrPendingTasks = 0;
       mutex.name("TaskMonitor");
-   }
-
-   void TaskMonitor::incPendingTasks() {
-      mutex.lock();
-      nbrPendingTasks ++;
-      Log::debug("TaskMonitor: inc: %d task active/pending", nbrPendingTasks);
-      mutex.unlock();
    }
 
    void TaskMonitor::decPendingTasks() {
@@ -82,10 +64,6 @@ namespace pearlrt {
          printf("last task exited -- end.\n");
          exit(0);
       }
-   }
-
-   int TaskMonitor::getPendingTasks() {
-      return nbrPendingTasks;
    }
 
 }

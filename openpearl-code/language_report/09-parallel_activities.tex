@@ -1,4 +1,6 @@
 \chapter{Parallel Activities}  % 9
+\label{sec_parallel_activities}
+\index{Task}
 
 Typical for a program to control a technical process are
 \begin{itemize}
@@ -38,9 +40,14 @@ the occurrence of an interrupt or upon executing statements for task
 control, for synchronisation and for input and output.
 
 \section{Declaration and Specification of Tasks (TASK)}   % 9.1
+\index{TASK@\textbf{TASK}|textbf}
+\index{Task!Declaration}
+\index{Task!Specification}
 
 The declaration of tasks takes place analogously to the declaration of
-procedures. In contrast to procedures, tasks may only be declared at
+procedures.
+%%% In contrast to 
+Like procedures, tasks may only be declared at
 module level --- i.e., not within procedure or task bodies. Furthermore,
 parameters are not permitted. However, since in a task body all PEARL
 objects declared at module level may be used and --- as far as it is
@@ -77,68 +84,64 @@ statements are explained in 9.3.)
 The general form of a task declaration reads:
 
 \input{TaskDeclaration.bnf}
-\begin{front}
-PriorityAttribute ::= \\
-\x \{ {\bf PRIORITY $\mid$ PRIO} \} IntegerWithoutPrecision$\S $GreaterZero
+\index{TASK@\textbf{TASK}}
+\index{MAIN@\textbf{MAIN}}
 
-TaskBody ::= \\
-\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%PriorityAttribute ::= \\
+%%%\x \{ {\bf PRIORITY $\mid$ PRIO} \} IntegerWithoutPrecision$\S $GreaterZero
+%%%
+%%%TaskBody ::= \\
+%%%\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
+%%%\end{front}
 \input{PriorityAttribute.bnf}
+\index{PRIO@\textbf{PRIO}}
+\index{PRIORITY@\textbf{PRIORITY}|see {PRIO}}
 \input{TaskBody.bnf}
-\end{grammar}
 
 If no priority is given in a task declaration, priority 255 is assumed.
-\begin{added}
+%%%\begin{added}
 The priority value must be in the range from 1 to 255. 
 In case the priority value is not inside this range the PrioOutOfRangeSignal
-is induced. Each target plattform must support at least the priorities 1 and 255. In case a requested priority is not avaliable on the current plattform
+is induced.
+Each target plattform must support at least the priorities 1 and 255.
+In case a requested priority is not avaliable on the current plattform
 the PrioNotMappableSignal is induced.
-\end{added}
+%%%\end{added}
 
 
 The general form of a task specification reads:
 
-\begin{front}
-TaskSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier$\S $Task {\bf TASK} GlobalAttribute;
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+\input{TaskSpecification.bnf}
+\index{SPC@\textbf{SPC}!Task}
+
 
 Upon program or system start, the tasks marked with MAIN are started
-according to their priority. All MAIN tasks must be declared in the same
-module.
+according to their priority. 
+%%%All MAIN tasks must be declared in the same module.
+%%%\begin{added}
+As mentioned in section \ref{sec_program_execution}, \OpenPEARL{} 
+accepts tasks with MAIN attribute in different modules.
+%%%\end{added}
 
-The global attribute is explained in 4.4.
+The global attribute is explained in \ref{sec_references}.
 
 \subsection{References to Tasks (REF TASK)}   % 9.1.1
+\label{sec_ref_task}
+\index{Task!Reference}
 
 The control of all task activities is also possible via references to
 objects of type TASK. The declaration of corresponding reference
 variables can take place like this:
 
-\begin{front}
-TaskReferenceDeclaration ::= \\
-\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ]\\
-\x [ AllocationProtection ] {\bf REF TASK} [ GlobalAttribute ] [ InitialisationAttribute ];
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+\input{TaskReferenceDeclaration.bnf}
+\index{DCL@\textbf{DCL}!Task Reference}
+\index{REF@\textbf{REF}!Task Reference}
 
 The general form of the specification of task reference variables reads:
 
-\begin{front}
-TaskReferenceSpecification ::= \\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList [ VirtualDimensionList ] \\
-\x [ AllocationProtection ] {\bf REF TASK} GlobalAttribute;
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+\input{TaskReferenceSpecification.bnf}
+\index{SPC@\textbf{SPC}!Task Reference}
 
 The following short example shows an application possibility for task
 reference variables:
@@ -208,6 +211,11 @@ PtrTask := {\bf TASK}; \x ! provides address of the task containing
 this statement.\\
 ...\\
 
+The general form of tak reference assignment reads:
+
+\input{RefTaskAssignment.bnf}
+\index{Assignement!Task Reference}
+
 Besides using task reference variables in task statements, they can
 also be used for identifying tasks (cf. IS and ISNT operators).
 
@@ -224,7 +232,8 @@ Example:
 \subsection{Determining Task Priorities}   % 9.1.3
 
 The (current) priority of a task can be obtained by the predefined
-function PRIO. Without stating a parameter, it provides the priority of
+function PRIO\index{PRIO@\textbf{PRIO}!Prefinied Function}.
+ Without stating a parameter, it provides the priority of
 the running task, and with a task name as parameter, it returns the
 priority of that task.
 
@@ -238,73 +247,133 @@ CurrPrio := {\bf PRIO};\\
 PrioTaskA := {\bf PRIO} (TaskA);\\
 {\bf CONTINUE} TaskA {\bf PRIO} CurrPrio + 1;
 
+\section{Timing}
+
+\begin{discuss}
+Dieser Abschnitt ist neu eingefuegt worden.
+Passt die Kapitelueberschrift?
+
+Verhalten bei Zeitdrifts waere nun klar definiert.
+
+Inhaltlich wird die bei der AK-Sitzung im November 2016 besprochen.
+
+\begin{added}
+The internal clock is usually realized upon a realtime clock and 
+periodic ticks, which defines the clock resolution. 
+
+One problem may arise if the absolute time changes due to 
+daylight saving setting or other influences or e.g. temperature  drift.
+An automatic reexecution of the task scheduling statements
+ (see \ref{sec_tasking_statements})
+may be wrong in some cases. 
+
+To adress this problem, 
+an element in the system part is provided in OpenPEARL
+to induce an interrupt, when a difference between a reference clock and
+the OpenPEARL specific time is detected. In application, which are sensitive
+to the absolute time, this  interrupt should be treated and the task scheduling
+statements reexecuted fitting to the requirements of the application.
+
+Example:
+
+SYSTEM;\\
+\x clockChangeInterrupt: ClockDifference(3600, -20.5, +300.0) -\ -\ - Lpc17xxRTC;
+
+If the difference of the hardware clock in Lpc17xxRTC is detected to be 
+mor than 20.5 seconds in the past, or more than 300 seconds in the future,
+the OpenPEARL clock base is changed and the interrupt triggered.
+The check is repeated all 3600 seconds.
+
+Another problem arises, if an usually small processor system provides no
+realtime clock. Thus no scheduling condition based on absolute times 
+ can be satisfied. In this case the build process rejects the creation
+of the PEARL application, if AT or UNTIL
+ (see \ref{sec_tasking_statements})
+ is used.
+
+\end{added}
+\end{discuss}
+
+
 \section{Statements for Controlling Tasks}    % 9.2
+\label{sec_tasking_statements}
 
 A task can be started, terminated, suspended, continued, resumed and
 descheduled.
 
-\subsection{Start Condition}   % 9.2.1
+%%%\subsection{Start Condition}   % 9.2.1
+\subsection{Starting a Task (ACTIVATE)}   % 9.2.1
+\index{ACTIVATE@\textbf{ACTIVATE}}
+\index{TASK@\textbf{TASK}!Activation}
 
 Unlike procedures, tasks are not executed immediately by calls, but in
 dependence of time instants and interrupts. Thus, a task must first be
 {\bf scheduled} for the start by a task control statement of the
 syntax
 
-\begin{front}
-Task\_Start ::= \\
-\x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task;
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%Task\_Start ::= \\
+%%%\x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task;
+%%%\end{front}
 \input{TaskStarting.bnf}
-\end{grammar}
 
 The start itself is managed by a real time operating system. If
 the StartCondition defined in the control statement is fulfilled,
 the task first becomes ``runnable''; but it is not started, i.e.,
 transferred into the state ``running'', until it has become the runnable
-task of highest priority (cf. also 9.2.2).
+task of highest priority. %%% (cf. also 9.2.2).
 
 Examples:
 
 {\bf AT} 20:0:0 {\bf ACTIVATE} Statistics;\\
-\x means that the task ``statistics'' is not to be started until the
+The task ``statistics'' is not to be started until the
 future time ``8 o'clock p.m.''.
 
 {\bf ACTIVATE} statistics;\\
-\x in contrast, means that the task ``statistics'' is to be started
-immediately.
+the task ``statistics'' is to be started immediately.
 
 With the start condition, tasks can be scheduled for cyclic (repeated)
 start, in accordance with the syntax definition
 
 \input{StartCondition.bnf}
-\input{Frequency.bnf}
+\index{AT@\textbf{AT}}
+\index{AFTER@\textbf{AFTER}}
+\index{WHEN@\textbf{WHEN}}
 
-% Zeile zu lang; Umbruch vor ]
+\input{Frequency.bnf}
+\index{ALL@\textbf{ALL}}
+\index{UNTIL@\textbf{UNTIL}}
+\index{DURING@\textbf{DURING}}
 
 Examples:
 
 {\bf ALL} T {\bf ACTIVATE} Regulator;\\
-\x means that task Regulator becomes runnable at each integer
+The task Regulator becomes runnable at each integer
 multiple of the time interval T.
 
 {\bf WHEN} Alarm {\bf ACTIVATE} ShutDown;\\
-\x means that the task ShutDown becomes runnable each time when the
+The task ShutDown becomes runnable each time when the
 interrupt Alarm occurs.
 
-AT Expression$\S $Time determines, at which time the task shall be
-executed for the first time, AFTER Expression$\S $Duration determines,
+AT \index{AT@\textbf{AT}} 
+ Expression$\S $Time determines, at which time the task shall be
+executed for the first time, AFTER
+\index{AFTER@\textbf{AFTER}} Expression$\S $Duration determines,
 from when on this is to happen relative to the execution of the task
-control statement, and WHEN Name$\S $Interrupt determines that this is
+control statement, and WHEN \index{WHEN@\textbf{WHEN}}
+ Name$\S $Interrupt determines that this is
 to happen when the denoted interrupt occurs, possibly delayed by the
 duration denoted in AFTER Expression$\S $Duration. If AT, AFTER and WHEN
 are lacking, the task becomes runnable immediately after the execution
 of the task control statement.
 
 If the task is to be repeated after equal time intervals, the time between
-two executions is to be determined by ALL Expression$\S $Duration. To
-limit the repeated executions, a time can be determined by UNTIL
-Expression$\S $Time, or a duration with DURING Expression$\S $Duration,
+two executions is to be determined by ALL\index{ALL@\textbf{ALL}}
+ Expression$\S $Duration. To
+limit the repeated executions, a time can be determined by 
+UNTIL\index{UNTIL@\textbf{UNTIL}}
+Expression$\S $Time, or a duration with DURING\index{DURING@\textbf{DURING}}
+ Expression$\S $Duration,
 respectively, after which no more task starts are repeated.
 
 If the start condition commences with WHEN, the task becomes runnable
@@ -313,11 +382,12 @@ of the start condition. A schedule determined by ALL becomes
 re-effective, relative to the occurrence of the interrupt, whereas the
 previous schedule becomes ineffective.
 
-\begin{added}
+%%%\begin{added}
 In combinations of WHEN and AFTER each interrupt occurance restarts
 the delay period for the tasks activation.
 This is shown in figure  \ref{whenAfter}.
-\end{added}
+The restart of the timer is also true for the frequency.
+%%%\end{added}
 
 \begin{figure}
 \setlength{\unitlength}{1.00mm}
@@ -365,26 +435,24 @@ task's termination (c).}
 \end{figure}
 
 The start condition becomes ineffective 
-\removedtext{(i.e., the task associated with
-it is not executed any longer)} % verwirrende Formulierung
+%%%\removedtext{(i.e., the task associated with
+%%%it is not executed any longer)} % verwirrende Formulierung
 ,
 \begin{itemize}
 \item if it commences with AFTER or ALL and an end condition determined
 by UNTIL or DURING is reached, or if it has the form AFTER
 Expression$\S $Duration and the denoted Duration reckoning from the
 execution of the task control statement has passed,
-\item because a statement to deschedule a task is executed (see 9.2.7),
-\item \removedtext{
- upon execution of a new task control statement of the same type.
+\item because a statement to deschedule a task is executed 
+(see \ref{sec_prevent}),
+\item 
+ upon execution of a new task control statement of the same type 
+%%%\addedtext{
+({\bf ACTIVATE}).
+%%%}.
 The previous start condition is replaced by the new one
 , or, if no new
-condition is denoted, deleted.}
-\item \addedtext{
- upon execution of a new task control statement of the same type ({\bf ACTIVATE}
-or {\bf CONTINUE}).
-The previous start condition is replaced by the new one
-, or, if no new
-condition is denoted, deleted.}
+condition is denoted, deleted.
 \end{itemize}
 
 Example:
@@ -399,27 +467,33 @@ start condition ALL 2 HRS replaces start condition AT 12:0:0, unless
 time ``12 o'clock'' does not occur before executing the second
 statement.
 
-\subsection{Starting a Task (ACTIVATE)}   % 9.2.2
+%%%\subsection{Starting a Task (ACTIVATE)}   % 9.2.2
+%%%
+%%%The general form of the statement to start a task (i.e., to schedule a
+%%%task to be started) reads:
+%%%
+%%%\begin{front}
+%%%TaskStart ::=\\
+%%%\x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task [ Priority ];
+%%%
+%%%Priority ::=\\
+%%%\x \{ {\bf PRIORITY $\mid$ PRIO} \} Expression$\S $WithPositiveIntegerAsValue
+%%%\end{front}
+%%%\begin{grammar}
+%%%\input{TaskStarting.bnf}
+%%%\input{PriorityExpression.bnf}
+%%%\end{grammar}
+%%%\begin{discuss}
+%%%TaskStarting already inserted in sec start condition
+%%%\end{discuss}
+%%%%%\begin{discuss}
+%%%%%Executing such a start statement causes that the indicated task...
+%%%%%
+%%%%%such streichen?
+%%%%%\end{discuss}
 
-The general form of the statement to start a task (i.e., to schedule a
-task to be started) reads:
-
-\begin{front}
-TaskStart ::=\\
-\x [ StartCondition ] {\bf ACTIVATE} Name$\S $Task [ Priority ];
-
-Priority ::=\\
-\x \{ {\bf PRIORITY $\mid$ PRIO} \} Expression$\S $WithPositiveIntegerAsValue
-\end{front}
-\begin{grammar}
-\input{TaskStarting.bnf}
-\input{PriorityExpression.bnf}
-\end{grammar}
-\begin{discuss}
-TaskStarting already inserted in sec start condition
-\end{discuss}
-
-Executing such a start statement causes that the indicated task
+Executing %%%%%such
+ a start statement causes that the indicated task
 applies for the allocation of a processor immediately (form without
 start condition) or at the instant determined by the start condition ---
 competing with all other tasks being runable at the moment
@@ -430,19 +504,26 @@ one processor is provided.
 Possibly, the indicated task has already been started and not been
 terminated when executing the start statement. If in this case no
 StartCondition is denoted, an error message occurs.
-However, if the
-start statement contains a StartCondition, the indicated task is
-continued, and its re-start is scheduled (buffered) according to the
+%%%%%\begin{discuss}
+%%%%%so ok? 
+
+However, if the start statement contains a StartCondition,
+ the indicated task is
+%%%continued
+not changed, and its re-start is scheduled (buffered) according to the
 StartCondition, replacing a possibly existing scheduling by the new
 one.
-\begin{added}
-The the task will be re-started as soon as the task terminates.
+
+Possibly the task is still active when the StartCondition should activate
+ the task.
+ In this case the task will be re-started as soon as the task terminates.
 This buffering is limited to 1 re-start action.
 % as described in FullPEARL(1977)
 
 This behavior is shown in figure~\ref{task-sched} and \ref{task-sched1}. The rectangles denote the time period, where the tasks are active. The arrows mark
 the time of interaction.
-\end{added}
+
+%%%%%\end{discuss}
 
 \begin{figure}
 \setlength{\unitlength}{1.00mm}
@@ -498,22 +579,18 @@ task's termination.}
 
 A possibly stated priority overwrites the priority stated in the
 declaration of the indicated task. 
-\begin{added}
+%%%\begin{added}
 The new priority is valid only 
 for this activation. Subsequent activations will use the priority, which
 is specified in the task declaration.
-\end{added}
-
-\begin{added}
-\OpenPEARL{} uses relative times for the startCondition. This becomes apparent,
-if the time-scale is re-adjusted. The re-start will occur according the
-time-base which was valid while setting the task schedule condition.
+%%%\end{added}
 
 Example:
 
 {\bf AT} 22:00:00 {\bf ALL} 2 HRS {\bf UNTIL} 2:00:00  {\bf ACTIVATE} t1;
 will produce the activation of the task t1 at the following time, 
 depending on the time of the execution of the scheduled activation statement.
+
 \begin{tabular}{l|l}
 current time & activation times \\
 \hline
@@ -523,10 +600,40 @@ current time & activation times \\
 \end{tabular}
 
 Note that \OpenPEARL{} treats time intervals inclusive the borders.
+%%%%%\begin{added}
+%%%%%noch eingefuegt ...
 
+To avoid problems from jitter, it is recommended that the 
+activation freqency and border expression have a sufficient spacing.
+%%%%%\end{added}
+
+%%%%%\begin{discuss}
+%%%%%ist das die richtige Stelle? Gilt auch bei CONTINUE!
+%%%%%
+%%%%%
+%%%%%A problem may arise if the absolute time changes due to daylight saving setting
+%%%%%or other influences.
+%%%%%An element in the system part is provided in OpenPEARL
+%%%%%to induce an interrupt, when a difference between to time of the system and
+%%%%%the OpenPEARL specific time is detected. In application which are sensitive
+%%%%%to the absolute time, this  interrupt should be treated and the task scheduling
+%%%%%statements executed again.
+%%%%%
+%%%%%Example:
+%%%%%
+%%%%%SYSTEM;\\
+%%%%%\x clockChangeInterrupt: ClockDifference(3600, -20.5, +300.0) -\ -\ - Lpc17xxRTC;
+%%%%%
+%%%%%If the difference of the hardware clock in Lpc17xxRTC is detected to be 
+%%%%%mor than 20.5 seconds in the past, or more than 300 seconds in the future,
+%%%%%the OpenPEARL clock base is changed and the interrupt triggered.
+%%%%%The check is repeated all 3600 seconds.
+%%%%%\end{discuss}
+%%%%%
+%%%%%
 Figure \ref{sched_act} illustrates the possibilities to start a task
 immediately or under various start conditions.
-\end{added}
+%%%\end{added}
 
 \setlength{\unitlength}{1.00mm}
 \begin{figure}
@@ -649,7 +756,7 @@ various conditions}
 % Fussnote (im Bild): After occurrence of the interrupt, the task is
 % re-scheduled under the related start condition. The old scheduling becomes
 % ineffective.
-\begin{added}
+%%%\begin{added}
 Possible problem situations:
 \begin{description}
 \item[TaskRunningSignal] is induced, if the task is still active when 
@@ -659,16 +766,16 @@ an {\bf ACTIVATE} statement without start-condition is executed.
 \end{description}
 The first activation will be on the next day, if the current time is larger 
 than the value of the {\bf AT} parameter.
-If the time specified by {\bf UNTIL} is less than the time of {\bf bf} the 
+If the time specified by {\bf UNTIL} is less than the time of {\bf AT}, the 
 period will end the day after the first scheduled activation. This is true
 independent of the way of specifying the first activation.
-\end{added}
+%%%\end{added}
 
 A task is terminated
 \begin{itemize}
 \item when it reaches the terminating END statement of its body, or
 \item by executing a statement to terminate tasks related to the task
-(see 9.2.3).
+(see \ref{sec_terminate}).
 \end{itemize}
 
 Example:
@@ -702,17 +809,18 @@ The task Pressure\_measurement shall measure all 5 seconds the pressure in a tan
 
 
 \subsection{Terminating a Task (TERMINATE)}    % 9.2.3
+\label{sec_terminate}
 
 The premature termination of a task is achieved by following
 statement:
 
-\begin{front}
-TaskTermination ::= \\
-\x {\bf TERMINATE} [ Name$\S $Task ] ;
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%TaskTermination ::= \\
+%%%\x {\bf TERMINATE} [ Name$\S $Task ] ;
+%%%\end{front}
 \input{TaskTerminating.bnf}
-\end{grammar}
+\index{TERMINATE@\textbf{TERMINATE}}
+\index{TASK@\textbf{TASK}!Termination}
 
 If the denotation Name$\S $Task is lacking, the statement refers to
 the task in whose body it is contained.
@@ -721,7 +829,7 @@ All resources occupied by the terminated task (including processor) are
 withdrawn from it. Synchronisation variables blocked by the task,
 however, are not released automatically.
 
-\begin{added}
+%%%\begin{added}
 Possible problem situations:
 \begin{description}
 \item[TaskTerminatedSignal] is induced, if the task is in terminated state
@@ -730,19 +838,20 @@ Possible problem situations:
 is delayed until the i/o-statement is completed, or a record mark ({\bf SKIP}) 
 is encountered.  This is done to enshure the integrity of the i/o-behavior.
 \end{description}
-\end{added}
+%%%\end{added}
 
 \subsection{Suspending a Task (SUSPEND)}   % 9.2.4
+\label{sec_suspend}
 
 By executing the statement
 
-\begin{front}
-TaskSuspension ::=\\
-\x {\bf SUSPEND} [ Name$\S $Task ] ;
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%TaskSuspension ::=\\
+%%%\x {\bf SUSPEND} [ Name$\S $Task ] ;
+%%%\end{front}
 \input{TaskSuspending.bnf}
-\end{grammar}
+\index{SUSPEND@\textbf{SUSPEND}}
+\index{TASK@\textbf{TASK}!Suspending}
 
 the indicated task --- or the executing task, respectively, if
 Name$\S $Task is lacking --- is suspended, i.e., its execution is
@@ -750,9 +859,9 @@ postponed. The processor allocated to it is withdrawn from it --- but
 not all the other resources occupied by it.
 
 A suspended task can only be continued by executing a continue
-statement (see 9.2.5).
+statement (see \ref{sec_continue}).
 
-\begin{added}
+%%%\begin{added}
 Possible problem situations:
 \begin{description}
 \item[TaskTerminatedSignal] is induced, if the task is not activated when 
@@ -763,28 +872,28 @@ a {\bf SUSPEND} statement is executed.
 is delayed until the i/o-statement is completed, or a record mark ({\bf SKIP}) 
 is encountered. This is done to enshure the integrity of the i/o-behavior.
 \end{description}
-\end{added}
+%%%\end{added}
 
 
 \subsection{Continuing a Task (CONTINUE)}    % 9.2.5
+\label{sec_continue}
 
 A suspended task can be continued immediately, at a certain point in
 time, after a certain duration or after the occurrence of an interrupt by
 the following statement:
 
-\begin{front}
-TaskContinuation ::=\\
-\x [ SimpleStartCondition ] {\bf CONTINUE} [ Name$\S $Task ] [ Priority ]\
+%%%\begin{front}
+%%%TaskContinuation ::=\\
+%%%\x [ SimpleStartCondition ] {\bf CONTINUE} [ Name$\S $Task ] [ Priority ]\
 
-SimpleStartCondition ::= \\
-\x {\bf AT} Expression$\S $Time $\mid$ {\bf AFTER} Expression$\S $Duration $\mid$ {\bf WHEN} Name$\S $Interrupt
-\end{front}
-\begin{grammar}
 \input{TaskContinuing.bnf}
-\end{grammar}
-\begin{discuss}
-simpleSTartCondition should be  in grammar
-\end{discuss}
+\index{CONTINUE@\textbf{CONTINUE}}
+\index{TASK@\textbf{TASK}!Continuation}
+
+\input{SimpleStartCondition.bnf}
+\index{AT@\textbf{AT}}
+\index{AFTER@\textbf{AFTER}}
+\index{WHEN@\textbf{WHEN}}
 
 
 If Name$\S $Task is stated, the statement causes that the indicated task
@@ -817,23 +926,23 @@ the state transitions of a task possible by executing CONTINUE
 instructions are illustrated graphically. For the case of
 ``scheduled continuations'', the state transitions for SUSPEND statements are
 given additionally.
-\begin{added}
+%%%\begin{added}
 Note that fulfilling the continuation condition annihilates the
-continuation condition.
-\end{added}
+SimpleStartCondition.
+%%%\end{added}
 
-\begin{added}
+%%%\begin{added}
 Possible problem situations:
 \begin{description}
 \item[TaskTerminatedSignal] is induced, if the task is not activated when 
-a {\bf CONTINUE} statement is executed, without a schedule condition.
+a {\bf CONTINUE} statement is executed, without a SimpleStartCondition.
 \item[Priority update] occurs at any {\bf CONTINUE PRIO xxx} statement,
  except if the tasks state is terminated.
 \item[executing a scheduled CONTINUE] never induces a signal. The action will
    be discarded, if the tasks state is not suspended. The priority will be 
    updated, if the tasks state is not terminated.
 \end{description}
-\end{added}
+%%%\end{added}
 
 
 \begin{figure}
@@ -1139,22 +1248,20 @@ CONTINUE}
 
 
 \subsection{Delaying a Task (RESUME)}    % 9.2.6
+\label{sec_resume}
 
 If the running task shall release the processor allocated to it for a
 certain duration or until the occurrence of a certain point in time or an
 interrupt, respectively, (if it is to be delayed), the following
 statement is to be executed:
 
-\begin{front}
-TaskDelay ::= \\
-\x SimpleStartCondition {\bf RESUME};
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%TaskDelay ::= \\
+%%%\x SimpleStartCondition {\bf RESUME};
+%%%\end{front}
 \input{TaskResuming.bnf}
-\end{grammar}
-\begin{discuss}
-fehlt hier nicht eine [..] um die simpleStartCondition?
-\end{discuss}
+\index{RESUME@\textbf{RESUME}}
+\index{Task!Delay}
 
 This statement if equivalent to the non-devisable combination of
 the statements
@@ -1162,14 +1269,15 @@ the statements
 SimpleStartCondition {\bf CONTINUE};\\
 {\bf SUSPEND};
 
-After having executed the statement TaskDelay, the start condition is
+After having executed the statement 
+%%%TaskDelay
+{\bf RESUME}, the start condition is
 ineffective, i.e., the execution is once.
 
-\begin{added}
-Note that {\bf RESUME} annihilates a continuation condition
-for the current task, due to the implicit {\bf CONTINUE} in the {\bf RESUME}-
-statement.
-\end{added}
+%%%\begin{added}
+Note that {\bf RESUME} annihilates a SimpleStartCondition
+for the current task, due to the implicit {\bf CONTINUE}-statement.
+%%%\end{added}
 
 Example:
 
@@ -1186,18 +1294,19 @@ Control: \= {\bf TASK};\\
 \end{tabbing}
 
 \subsection{De-scheduling a Task (PREVENT)}    % 9.2.7
+\label{sec_prevent}
 
 Sometimes it is necessary to cancel the schedules existing for a task,
 i.e., to take care that the start conditions related to this task become
 ineffective. This can be achieved with the following statement:
 
-\begin{front}
-TaskPrevent ::= \\
-\x {\bf PREVENT} [ Name$\S $Task ] ;
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%TaskPrevent ::= \\
+%%%\x {\bf PREVENT} [ Name$\S $Task ] ;
+%%%\end{front}
 \input{TaskPreventing.bnf}
-\end{grammar}
+\index{PREVENT@\textbf{PREVENT}}
+\index{Task!De-schedule}
 
 This statement does not terminate the corresponding task; if
 Name$\S $Task is not given, the statement effects the running task.
@@ -1239,6 +1348,8 @@ de-scheduled. In the normal case --- Ready arrives within 30 seconds
 \end{tabbing}
 
 \section{Synchronising Tasks}    % 9.3
+\label{sec_task_sync}
+\index{Task!Synchronisation}
 
 Generally, tasks are run independently from one another. However, it may
 happen that several tasks work on parts of a more complex, overall
@@ -1309,6 +1420,7 @@ continued.
 \subsection{Semaphore Variables (SEMA) and Statements (REQUEST,
 RELEASE, TRY)} % 9.3.1
 % Zeilenumbruch mitten im Wort RELEASE
+\index{Task!Semaphore}
 
 Semaphore variables can have non-negative integers as values. These
 numbers represent the states ``free'' or ``locked'': Zero means state
@@ -1330,6 +1442,7 @@ If a semaphore variable explicitly is to assume the state ``locked'',
 the following locking statement is to be executed:
 
 {\bf REQUEST} Name$\S $Sema;
+\index{REQUEST@\textbf{REQUEST}|textbf}
 
 The effect of this statement depends on the actual value of the
 indicated semaphore variable:
@@ -1343,6 +1456,7 @@ associated to the semaphore variable (the task is blocked).
 The execution of the release statement
 
 {\bf RELEASE} Name$\S $Sema;
+\index{RELEASE@\textbf{RELEASE}|textbf}
 
 causes that the value of the indicated semaphore variable is incremented
 by 1. Furthermore, the tasks in the queue of the semaphore variable are
@@ -1410,6 +1524,7 @@ The state of a semaphore variable can be obtained with the monadic
 operator
 
 {\bf TRY} Name$\S $Sema;
+\index{TRY@\textbf{TRY}|textbf}
 
 As result, the operator provides a BIT(1) value to be used in all
 logical expressions. If the semaphore variable is ``free'', the operator
@@ -1472,6 +1587,7 @@ locking statements.
 By executing the statement
 
 {\bf REQUEST} Name$\S $Sema [ , Name$\S $Sema ]$^{...}$ ;
+\index{REQUEST@\textbf{REQUEST}!Multiple Semaphores}
 
 the running task is suspended, if at least one of the indicated semaphore
 variables is in state ``locked''; the task is not continued until none
@@ -1483,6 +1599,7 @@ continued after decrementing the values of each of these semaphore variables by
 The statement
 
 {\bf RELEASE} Name$\S $Sema [ , Name$\S $Sema ]$^{...}$;
+\index{RELEASE@\textbf{RELEASE}!Multiple Semaphores}
 
 has the effect, as if a release statement were executed for each of
 the indicated semaphore variables without any interruption.
@@ -1508,28 +1625,23 @@ given, a list of semaphore variables is not allowed.
 The general forms for the declaration of semaphore variables as well as
 locking and release statements read:
 
-\begin{front}
-SemaDeclaration ::= \\
-\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList [ DimensionAttribute ] {\bf SEMA} [ GlobalAttribute ]\\
-\x [ {\bf PRESET} (IntegerWithoutPrecision [ , IntegerWithoutPrecision ] $^{...}$ ) ];
+\input{SemaDeclaration.bnf}
+\index{DCL@\textbf{DCL}!Semaphore}
+\index{SEMA@\textbf{SEMA}}
+\index{PRESET@\textbf{PRESET}}
 
-RequestStatement ::=\\
-\x {\bf REQUEST} Name$\S $Sema [ , Name$\S $Sema ] $^{...}$;
+%%%\begin{front}
+%%%RequestStatement ::=\\
+%%%\x {\bf REQUEST} Name$\S $Sema [ , Name$\S $Sema ] $^{...}$;
+%%%
+%%%ReleaseStatement ::=\\
+%%%\x {\bf RELEASE} Name$\S $Sema [ , Name$\S $Sema ] $^{...}$;
+\input{SemaStatement.bnf}
 
-ReleaseStatement ::=\\
-\x {\bf RELEASE} Name$\S $Sema [ , Name$\S $Sema ] $^{...}$;
+%%%TRY-Operator ::= \\
+\input{TRYOperator.bnf}
 
-TRY-Operator ::= \\
-\x {\bf TRY} Name$\S $Sema
-\end{front}
-\begin{grammar}
-semadecl is missing
 
-\input{TaskCoordinationStatement.bnf}
-
-TRY is missing
-
-\end{grammar}
 
 Thus, also arrays of semaphore variables are possible; the various
 elements are addressed by indices in the request and release
@@ -1549,18 +1661,15 @@ variables S1 and S2, respectively.
 
 The general form for the specification of semaphore variables reads:
 
-\begin{front}
-SemaSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList\\
-\x \x [ VirtualDimensionAttribute ] {\bf SEMA} \\
-\x \x \{ GlobalAttribute $\mid$ IdentificationAttribute \};
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+%%%\begin{front}
+%%%SemaSpecification ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList\\
+%%%\x \x [ VirtualDimensionAttribute ] {\bf SEMA} \\
+%%%\x \x \{ GlobalAttribute $\mid$ IdentificationAttribute \};
+%%%\end{front}
+\input{SemaSpecification.bnf}
 
-
-\begin{added}
+%%%\begin{added}
 Possible problem situations:
 
 \begin{description}
@@ -1568,10 +1677,10 @@ Possible problem situations:
    are executed and the range of a FIXED(32) would exceed.
 \end{description}
 
-\end{added}
-\begin{tobedone}
+%%%\end{added}
 \subsection{Bolt Variables (BOLT) and Statements (ENTER, LEAVE,
 RESERVE, FREE)} % 9.3.2
+\index{Task!Bolt}
 
 We assume that in different tasks the same data are used for
 calculation, but not modified (e.g., comparison quantities for
@@ -1616,9 +1725,11 @@ The exact description of the effect of theses statements considers the
 state and the modification of the bolt variables:
 \begin{description}
 \item[Effect of RESERVE B;]
+\index{RESERVE@\textbf{RESERVE}|textbf}
 If B has state ``lock possible'', B assumes state ``locked''; otherwise,
 the executing task is suspended and placed in a queue associated with B.
 \item[Effect of FREE B;]
+\index{FREE@\textbf{FREE}|textbf}
 B assumes state ``lock possible''. Furthermore, all tasks waiting in the
 queue of B due to a RESERVE statement are released; the tasks repeat
 their locking statements in the order of their priorities. If no task
@@ -1626,6 +1737,7 @@ is waiting due to a RESERVE statement, all other waiting tasks, due to
 their ENTER-instruction, are released, in turn repeating the ENTER 
 statement in the order of their priorities.
 \item[Effect of ENTER B;]
+\index{ENTER@\textbf{ENTER}|textbf}
 If B has state ``locked'', or if a task is in the queue of B due to a
 RESERVE statement, the executing task is suspended and placed in the
 queue of B. Otherwise, B assumes state ``lock not possible'', to prohibit
@@ -1634,6 +1746,7 @@ exclusive access; furthermore, the (internally noted) number Z of
 (I.e., tasks executing ``ENTER B'' are continued not before the tasks
 requiring exclusive access to the resource.)
 \item[Effect of LEAVE B;]
+\index{LEAVE@\textbf{LEAVE}|textbf}
 If Z = 1, this statement has the same effect as ``FREE B;''.
 Otherwise, Z is decremented by 1, and B keeps the state ``lock not
 possible''.
@@ -1675,38 +1788,49 @@ semaphore variables.
 
 Generally, bolt variables can be declared and used as follows:
 
-\begin{front}
-BoltDeclaration ::=\\
-\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList 
-[ DimensionAttribute ] {\bf BOLT}\\
-\x [ GlobalAttribute ] ;
+%%%\begin{front}
+%%%BoltDeclaration ::=\\
+%%%\x \{ {\bf DECLARE $\mid$ DCL} \} Identifier\_or\_IdentifierList 
+%%%[ DimensionAttribute ] {\bf BOLT}\\
+%%%\x [ GlobalAttribute ] ;
+%%%
+%%%BoltSpecification ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList 
+%%%[ VirtualDimensionAttribute ]\\
+%%%\x \x {\bf BOLT} \{ GlobalAttribute $\mid$ IdentificationAttribute \} ;
+%%%
+%%%\begin{tabbing}
+%%%\x $\mid$ \= {\bf RESERVE} \= \kill
+%%%BoltStatement ::= \> \> \\
+%%%   \> {\bf RESERVE} \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
+%%%\x $\mid$ \> {\bf FREE}    \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
+%%%\x $\mid$ \> {\bf ENTER}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
+%%%\x $\mid$ \> {\bf LEAVE}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;
+%%%\end{tabbing}
+%%%\end{front}
+\input{BoltDeclaration.bnf}
+\index{BOLT@\textbf{BOLT}}
+\index{DCL@\textbf{DCL}!Bolt}
 
-BoltSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList 
-[ VirtualDimensionAttribute ]\\
-\x \x {\bf BOLT} \{ GlobalAttribute $\mid$ IdentificationAttribute \} ;
-
-\begin{tabbing}
-\x $\mid$ \= {\bf RESERVE} \= \kill
-BoltStatement ::= \> \> \\
-   \> {\bf RESERVE} \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
-\x $\mid$ \> {\bf FREE}    \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
-\x $\mid$ \> {\bf ENTER}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;\\
-\x $\mid$ \> {\bf LEAVE}   \> Name$\S $Bolt [ , Name$\S $Bolt ] $^{...}$ ;
-\end{tabbing}
-\end{front}
-\begin{grammar}
-integrated with sema 
-\end{grammar}
+\input{BoltSpecification.bnf}
+\index{SPC@\textbf{SPC}!Bolt}
+\input{BoltStatement.bnf}
+\index{ENTER@\textbf{ENTER}}
+\index{LEAVE@\textbf{LEAVE}}
+\index{RESERVE@\textbf{RESERVE}}
+\index{FREE@\textbf{FREE}}
 
 Therefore, also arrays of bolt variables can be declared.
 
 Bolt declarations must take place at module level.
-\end{tobedone}
 
 
 \section{Interrupts and Interrupt Statements}   % 9.4
-\label{interrupts}
+\label{sec_interrupts}
+\index{Task!Interrupt}
+\index{INTERRUPT@\textbf{INTERRUPT}}
+\index{IRPT@\textbf{IRPT}|see {INTERRUPT}}
+
 \subsection{Declarations of Interrupts and Software Interrupts}    % 9.4.1
 
 An interrupt is a message of the controlled process via an interrupt
@@ -1747,16 +1871,19 @@ Supply:         \> {\bf TASK PRIORITY} 2;\\
 ...             \>
 \end{tabbing}
 
-The general form of an interrupt specification reads:
+The general form of an interrupt declaration and specification reads:
 
-\begin{front}
-InterruptSpecification ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList \{ {\bf INTERRUPT $\mid$ IRPT} \}\\
-\x [ GlobalAttribute ];
-\end{front}
-\begin{grammar}
-missing in grammar
-\end{grammar}
+\input{SystemInterruptDeclaration.bnf}
+\index{INTERRUPT@\textbf{INTERRUPT}!System Part}
+
+%%%\begin{front}
+%%%InterruptSpecification ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier\_or\_IdentifierList \{ {\bf INTERRUPT $\mid$ IRPT} \}\\
+%%%\x [ GlobalAttribute ];
+%%%\end{front}
+\input{InterruptSpecification.bnf}
+\index{INTERRUPT@\textbf{INTERRUPT}!Specification}
+\index{SPC@\textbf{SPC}!Interrupt}
 
 Most modern computers and operating systems, however, do not provide the
 possibility to address interrupt channels anymore, because hardware
@@ -1777,16 +1904,17 @@ statements related to it shall stay ineffective although the interrupt
 occurs, a disable statement is to be executed for this purpose, which
 in turn can be revoked again by executing an enable statement.
 
-\begin{front}
-DisableStatement ::= \\
-\x {\bf DISABLE} Name$\S $Interrupt;
-
-EnableStatement ::=  \\
-\x {\bf ENABLE} Name$\S $Interrupt;
-\end{front}
-\begin{grammar}
+%%%\begin{front}
+%%%DisableStatement ::= \\
+%%%\x {\bf DISABLE} Name$\S $Interrupt;
+%%%
+%%%EnableStatement ::=  \\
+%%%\x {\bf ENABLE} Name$\S $Interrupt;
+%%%\end{front}
 \input{InterruptStatement.bnf}
-\end{grammar}
+\index{ENABLE@\textbf{ENABLE}}
+\index{DISABLE@\textbf{DISABLE}}
+\index{TRIGGER@\textbf{TRIGGER}}
 
 The validity range of the disable statement starts with its
 execution and ends upon execution of an enable statement.
@@ -1819,21 +1947,13 @@ Example:
 The test of real time programs requires sometimes to simulate the effect
 of interrupts, particularly if the technical process has not been
 connected to the computer, yet. For such simulations, the trigger
-statement is provided:
+statement is provided.
 
-\begin{front}
-TriggerStatement := \\
-{\bf TRIGGER} Name$\S $Interrupt;
-\end{front}
-\begin{grammar}
-included in InterruptStatement
-\end{grammar}
-\begin{discuss}
-InterruptStatement := \{ EnaleStatement $\mid$ DisableStatement $\mid$ TriggerStatement \}
+%%%\begin{front}
+%%%TriggerStatement := \\
+%%%{\bf TRIGGER} Name$\S $Interrupt;
+%%%\end{front}
 
- would be better 
-
-\end{discuss}
 Example:
 
 \begin{tabbing}

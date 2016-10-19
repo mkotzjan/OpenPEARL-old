@@ -290,7 +290,7 @@ public class BuildSymbolTableVisitor extends SmallPearlBaseVisitor<Void> impleme
      * @see
      */
     private ArrayList<String> getIdentifierDenotation(SmallPearlParser.IdentifierDenotationContext ctx) {
-        ArrayList<String> identifierDenotationList = new ArrayList();
+        ArrayList<String> identifierDenotationList = new ArrayList<String>();
 
         if (ctx != null) {
             for (int i = 0; i < ctx.ID().size(); i++) {

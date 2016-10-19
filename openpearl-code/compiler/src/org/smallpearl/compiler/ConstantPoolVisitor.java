@@ -71,7 +71,10 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
         for (i = 0; i < constantPool.size(); i++) {
             if ( value instanceof ConstantFixedValue) {
                 if (constantPool.get(i) instanceof ConstantFixedValue) {
-                    if ( ((ConstantFixedValue)(value)).getValue() == ((ConstantFixedValue)(constantPool.get(i))).getValue()) {
+                    Long a = ((ConstantFixedValue)(value)).getValue();
+                    Long b = ((ConstantFixedValue)(constantPool.get(i))).getValue();
+
+                    if ( a.equals(b) ) {
                         found = true;
                         break;
                     }

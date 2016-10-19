@@ -1,4 +1,13 @@
-\htgt{LengthDefinition} ::=\\
-\x {\bf LENGTH} \{ {\bf FIXED $\mid$ FLOAT
-                    $\mid$ BIT $\mid$ CHARACTER $\mid$ CHAR} \}
-                ( \hlink{Precision} ) ;\\
+%%%\begin{removed}
+%%%\htgt{LengthDefinition} ::=\\
+%%%\x {\bf LENGTH} \{ {\bf FIXED $\mid$ FLOAT
+%%%                    $\mid$ BIT $\mid$ CHARACTER $\mid$ CHAR} \}
+%%%                ( \hlink{Precision} ) ;\\
+%%%\end{removed}
+\begin{tabbing}
+\x {\bf LENGTH} \= \kill
+\htgt{LengthDefinition}::=\\
+\x {\bf LENGTH} \{ \{ {\bf FIXED $\mid$ FLOAT} \} (\hlink{Precision})\\
+              \x \> $\mid$ \{ {\bf BIT $\mid$ CHARACTER $\mid$ CHAR} \} (\hlink{LengthOfString}) \};
+\end{tabbing}
+

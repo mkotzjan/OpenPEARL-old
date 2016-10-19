@@ -1,0 +1,4 @@
+\htgt{FormatDeclaration} ::=\\
+\x \hlink{Identifier} : {\bf FORMAT} ( \hlink{FormatOrPosition} 
+	[ , \hlink{FormatOrPosition} ] $^{...}$ ) ;
+

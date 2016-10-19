@@ -1,0 +1,3 @@
+\htgt{TypeCharacterString} ::=\\
+\x \{ {\bf CHARACTER $\mid$ CHAR} \} [ \hlink{LengthOfString}) ]
+
