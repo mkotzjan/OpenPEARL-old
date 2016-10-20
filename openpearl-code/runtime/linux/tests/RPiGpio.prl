@@ -1,13 +1,17 @@
 MODULE(RPiGpio);
 
 SYSTEM;
+bito: RPiDigitalOut(25,4);
+biti: RPiDigitalIn(27,1,'u');
+
+/*
 __cpp__(
 	'pearlrt::RPiDigitalOut s_bito(25,5);'
 	'pearlrt::Device* d_bito = & s_bito;'
 	'pearlrt::RPiDigitalIn s_biti(27,1,"u");'
 	'pearlrt::Device* d_biti = & s_biti;'
        ); 
-
+*/
 PROBLEM;
    SPC biti DATION IN SYSTEM BASIC BIT(1);
    SPC bito DATION OUT SYSTEM BASIC BIT(4);
