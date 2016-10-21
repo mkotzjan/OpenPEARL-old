@@ -95,10 +95,19 @@ public class ModuleXml {
 	 */
 	public void checkSystemEntries() {
 		NodeList systemElements = moduleXML.getElementsByTagName("system");
+		if (systemElements == null) {
+			// no system part present
+			return;
+		}
 		Node targetNode = null;
 
 		// get all defined system elements
-		systemElements = systemElements.item(0).getChildNodes();
+		try {
+		   systemElements = systemElements.item(0).getChildNodes();
+		} catch (NullPointerException e) {
+			// no system part
+			return;
+		}
 
 		if (systemElements.getLength() > 0) {
 			// search desired signal in the text section of concrete
@@ -453,9 +462,17 @@ public class ModuleXml {
 	public void checkProblemPart() {
 		NodeList problemElements = moduleXML.getElementsByTagName("problem");
 
+		if (problemElements == null) {
+			// no problem part
+			return;
+		}
 		// get all defined system elements
-		problemElements = problemElements.item(0).getChildNodes();
-
+		try {
+		  problemElements = problemElements.item(0).getChildNodes();
+		} catch (NullPointerException e) {
+			// no problem part
+			return;
+		}
 		if (problemElements.getLength() > 0) {
 			// search desired signal in the text section of concrete
 			// signal-entry
