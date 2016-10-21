@@ -90,22 +90,7 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
                 }
             }
         }
-
-/*
-        SymbolTable symtab = SymbolTable.getSymbolTable();
-        LinkedList<TaskDef> tasks = symtab.getTasks();
-        ST tasklist = group.getInstanceOf("TaskList");
-
-        for (int i = 0; i < tasks.size(); i++) {
-            TaskDef task = tasks.get(i);
-            ST curTask = group.getInstanceOf("Task");
-            curTask.add("name", task.getName());
-            tasklist.add( "tasks", curTask);
-        }
-
-        module.add("TaskList", tasklist);
-*/
-
+        
         return module;
     }
 
@@ -274,7 +259,6 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
                 hasGlobalAttribute = true;
             }
 
-
             for (int i = 0; i < identifierDenotationList.size(); i++) {
                 dationSpecification.add( "name", identifierDenotationList.get(i));
             }
@@ -291,9 +275,9 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
                     }
 
                     if (ctx.specifyTypeDation().classAttribute().basicDation() != null) {
-                        ST data = group.getInstanceOf("Data");
-                        data.add("name", "BASIC");
-                        datalist.add("data",data);
+                        ST attribute = group.getInstanceOf("Attribute");
+                        attribute.add("name", "BASIC");
+                        attributes.add("attributes", attribute);
                     }
 
                     if (ctx.specifyTypeDation().classAttribute().systemDation() != null) {
@@ -319,9 +303,7 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
 
                 dationSpecification.add("datalist", datalist);
                 dationSpecification.add("attributes", attributes);
-
             }
-
         }
 
         return dationSpecification;
