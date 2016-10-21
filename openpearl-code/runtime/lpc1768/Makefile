@@ -97,6 +97,10 @@ BOARDSUPPORT += startup_lpc1768.S
 ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
 BOARDSUPPORT += ../FreeRTOS/addOns/testStackOverflow.cc
 endif
+ifeq ($(CONFIG_LPC1768_CAN),y)
+LPCOpen_CSRC += $(LPCOpen)/can_17xx_40xx.c
+BOARDSUPPORT += Lpc17xxCan.cc
+endif
 
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
 
@@ -208,7 +212,7 @@ install: all cc_bin run_bin
 phony += cc_bin
 cc_bin:
 	# create cc_bin.inc
-	echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' > cc_bin.inc 
+	echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include system.cc $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' > cc_bin.inc 
 
 phony += run_bin
 run_bin:

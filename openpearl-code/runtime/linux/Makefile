@@ -211,7 +211,7 @@ install: all
 	@cp libOpenPEARLlinux.a $(CONFIG_INSTALL_Target)/lib
 	@rm -f pearl2.h sysincs.h
 	# ########
-	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) -I $(CONFIG_INSTALL_Target)/include $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a -pthread -lrt' > cc_bin.inc
+	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) -I $(CONFIG_INSTALL_Target)/include $$fn.cc system.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a -pthread -lrt' > cc_bin.inc
 	# ##########
 	@echo './$$fn' >run_bin.inc
 	# #########

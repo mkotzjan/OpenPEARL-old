@@ -110,13 +110,13 @@ then
  exit $rc
 fi
 # imc invokation removed untilmodule.xml is available
-# #include "imc/imc.inc"
-#rc=$?
-#if [ $rc -ne 0 ]
-#then
-# echo "terminate due to errors in stage 1b (imc)"
-# exit $rc
-#fi
+#include "imc/imc.inc"
+rc=$?
+if [ $rc -ne 0 ]
+then
+ echo "terminate due to errors in stage 1b (imc)"
+ exit $rc
+fi
 else  if [ "$COMPILEONLY" = "1" ] ; then
    echo " C++ input conflicts with option -c"
    exit 1
