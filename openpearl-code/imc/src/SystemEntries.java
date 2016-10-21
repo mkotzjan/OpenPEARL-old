@@ -69,12 +69,12 @@ public class SystemEntries {
 		   SystemEntry u = userNames.get(i);
 		   if (u.getNode() == null) {
 			   Error.setLocation(u.getFileName(), u.getLine());
-			   Error.error("identifier "+u.getName()+" is not defined");
+			   Error.error("systemname '"+u.getSystemName()+ "' not available.");
 		   }
 		   SystemEntry p = u.getProvider();
 		   if (p != null && p.getNode() == null) {
 			   Error.setLocation(u.getFileName(), u.getLine());
-			   Error.error("association provider "+p.getName()+" is not defined");
+			   Error.error("association provider '"+p.getName()+"' is not defined");
 		   }
 		   
 	   }
@@ -88,7 +88,7 @@ public class SystemEntries {
 				   SystemEntry v = userNames.get(j);
 				   if (i != j && u.getName().equals(v.getName())) {
 					   Error.setLocation(u.getFileName(), u.getLine());
-					   Error.error("identifier "+u.getName()+" is duplicated defined\n\tother declaration was "+
+					   Error.error("identifier '"+u.getName()+"' is duplicated defined\n\tother declaration was "+
 					   v.getFileName()+":"+v.getLine()  );
 				   }
 			   }

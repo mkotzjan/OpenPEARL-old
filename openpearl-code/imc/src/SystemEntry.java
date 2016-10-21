@@ -212,7 +212,7 @@ public class SystemEntry {
 		return p;
 	}
 
-	private Object getSystemName() {
+	public String getSystemName() {
 		return systemName;
 	}
 
