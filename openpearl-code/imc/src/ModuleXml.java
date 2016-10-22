@@ -121,7 +121,7 @@ public class ModuleXml {
 					line = Integer.parseInt(n.getAttributes()
 							.getNamedItem("line").getTextContent());
 					Error.setLocation(sourceFileName, line);
-					Error.info("username definition " + userName + " found");
+					Error.info("username definition '" + userName + "' found");
 
 					un = SystemEntries.contains(userName);
 					if (un != null) {
@@ -152,15 +152,15 @@ public class ModuleXml {
 								targetNode, mustProvide[p]);
 						if (assocProvider == null) {
 							Error.error(userName
-									+ " does not provide previously required interface "
-									+ mustProvide[p]);
+									+ " does not provide previously required interface '"
+									+ mustProvide[p] + "'");
 						} else {
 							if (!un.setMaxClients(
 									mustProvide[p],
 									TargetPlatformXml
 											.getAssociationClients(assocProvider))) {
-								Error.error("too many clients for "
-										+ un.getName());
+								Error.error("too many clients for '"
+										+ un.getName() + "'");
 							}
 						}
 					}
@@ -203,13 +203,13 @@ public class ModuleXml {
 				targetNode = targetXml.hasSystemName(systemName);
 				if (targetNode != null) {
 					targetXml.incrementInstances(targetNode);
-					Error.info("System Name " + systemName + " has type "
+					Error.info("System Name '" + systemName + "' has type '"
 							+ TargetPlatformXml.getNodeType(targetNode));
 					if (compareParameterTypes(currentChild, targetNode)) {
 						Error.info("parameter types are ok");
 					} else {
-						Error.error("parameter mismatch for system name "
-								+ systemName);
+						Error.error("parameter mismatch for system name '"
+								+ systemName+"'");
 					}
 
 					String typeOfElement = TargetPlatformXml
@@ -287,7 +287,7 @@ public class ModuleXml {
 					}
 
 					if (!u.incrementAssociationClients(provider)) {
-						Error.error("too many associations for " + provider);
+						Error.error("too many associations for '" + provider+"'");
 					}
 
 					un.setProvider(u);
@@ -310,7 +310,7 @@ public class ModuleXml {
 					int maxClients = TargetPlatformXml
 							.getAssociationClients(assoc);
 					if (!u.setMaxClients(provider, maxClients)) {
-						Error.error("too many clients for " + provider);
+						Error.error("too many clients for '" + provider+"'");
 					}
 
 					un = u;
@@ -322,7 +322,7 @@ public class ModuleXml {
 					}
 
 					if (!u.incrementAssociationClients(provider)) {
-						Error.error("too many associations for " + provider);
+						Error.error("too many associations for '" + provider+"'");
 					}
 					if (TargetPlatformXml
 							.associationRequiredProvider(associationSystemNode) != null) {
@@ -341,8 +341,8 @@ public class ModuleXml {
 			// no association in system part, let's check if system device needs
 			// an association
 			if (provider != null) {
-				Error.error("system unit needs association of type " + provider
-						+ ", but no provider is specified");
+				Error.error("system unit needs association of type '" + provider
+						+ "', but no provider is specified");
 				return;
 			}
 			return;
@@ -488,19 +488,20 @@ public class ModuleXml {
 							.getTextContent();
 
 					Error.setLocation(sourceFileName, line);
-					Error.info("SPC found type= " + type + " " + userName
-							+ " found");
+					Error.info("SPC found type= '" + type + "' '" + userName
+							+ "' found");
 					un = SystemEntries.contains(userName);
 					if (un == null) {
-						Error.error("no system definition for \"" + userName
-								+ "\" defined.");
+						Error.error("no system definition for '" + userName
+								+ "' defined.");
 						continue; // next element in loop
 					}
 					un.markAsUsed();
-					if (!un.getType().equals(type)) {
-						Error.error(userName + " is expected as type" + type
-								+ " but is defined as " + un.getType()
-								+ "\nprevious declaraion is here: "
+					// ignore case since the compiler sets the type for signals and interrupts in capital letters
+					if (!un.getType().equalsIgnoreCase(type)) {
+						Error.error(userName + " is expected as type '" + type
+								+ "' but is defined as '" + un.getType()
+								+ "'\nprevious declaraion is here: "
 								+ un.getFileName() + ":" + un.getLine());
 						continue;
 					}
@@ -553,8 +554,8 @@ public class ModuleXml {
 				}
 			}
 			if (!found) {
-				Error.error("dation attribute " + attrListInSpc[i]
-						+ " not supported by system device");
+				Error.error("dation attribute '" + attrListInSpc[i]
+						+ "' not supported by system device");
 			}
 		}
 
@@ -588,8 +589,8 @@ public class ModuleXml {
 			dataTypeMatch = true;
 		}
 		if (!dataTypeMatch) {
-			Error.error("system device does not support data type "
-					+ dataInSpc.trim());
+			Error.error("system device does not support data type '"
+					+ dataInSpc.trim() + "'");
 		}
 	}
 
