@@ -15,13 +15,15 @@
 # the result of make build is ok, if all test cases work
 # the result of make doesnotbuild is ok, if no test cases work
  
-DONOTBUILD=006_bitstring 030_signals 031_signalsInduce  \
+DONOTBUILD=006_bitstring \
 	201_bit_init \
+	030_signals 031_signalsInduce  \
 	401_char_expr1 \
-	050_interrupt 090_tasking  \
+	090_tasking  \
 	602_clock_expr1	\
 	701_dation_pg \
-	700_dation_rw 703_userdation_dcl
+	700_dation_rw \
+	703_userdation_dcl \
 
 DONOTRUN=000_empty 006_bitstring \
 	703_userdation_dcl 704_dation_open 705_dation_close
@@ -44,7 +46,9 @@ help:
 	@echo "make redo     : perform regression tests: make build; make run  "
 	@echo "make allbuild : tests for compile pass1 and pass2 (all targets)"
 	@echo "make build    : tests for compile pass1 and pass2 (except known problems)"
+	@echo "make doesnotbuild    : tests non of the known problems does build"
 	@echo "make run      : tests for primitive run results (except known problems)"
+	@echo "make doesnotrun  : test that non on known problems work"
 	@echo "make allrun   : tests for primitive run results (all targets)"
 	@echo "make clean    : remove all output files"
 	@echo "make help     : this output"

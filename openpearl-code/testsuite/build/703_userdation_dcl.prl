@@ -1,17 +1,18 @@
 MODULE(userdation_dcl);
 ! declare several user-dations on a disc file
 !  Note: ALPHIC supports currently no CYCLIC option
-!SYSTEM;
+SYSTEM;
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
-!disc: Disc('/tmp/' ,10);
+disc: Disc('/tmp/' ,10);
 
-/* expected C++ code  */
+/* expected C++ code  
 __cpp__(
      ' // system decl'
      'static pearlrt::Disc s_disc("/tmp/", 10);'
      'pearlrt::Device * d_disc = & s_disc;'
 );
+*/
 
 /* expected c++ code from SPC in problem part
 __cpp__(

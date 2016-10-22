@@ -28,11 +28,12 @@
 */
 
 MODULE(sched_demo);
-! SYSTEM;
-! termout: StdOut;
+SYSTEM;
+ termout: StdOut;
+/*
 __cpp__('pearlrt::StdOut ___termout;');
 __cpp__('pearlrt::Device*  d_termout = &___termout;');
-
+*/
 
 PROBLEM;
 SPC termout DATION OUT SYSTEM ALPHIC;

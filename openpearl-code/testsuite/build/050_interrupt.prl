@@ -1,5 +1,9 @@
 MODULE(irupt);
 
+SYSTEM;
+ctrlc: UnixSignal(3);
+int1: SoftInt(1);
+
 PROBLEM;
 
 SPC ctrlc INTERRUPT;
@@ -26,7 +30,7 @@ T1: TASK MAIN;
                   _ctrlc);
 
 */
-    WHEN ctrlc ACTIVATE T3 AFTER 10 SEC ALL 5 SEC DURING 20 SEC PRIO 30;
+    WHEN ctrlc AFTER 10 SEC ALL 5 SEC DURING 20 SEC ACTIVATE T3 PRIO 30;
 /*
 	T3.activate(me, pearlrt::Task::PRIO | 
        pearlrt::Task::AFTER | pearlrt::TASK::ALL | pearlrt::TASK::DURING |
