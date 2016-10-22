@@ -1,0 +1,7 @@
+   <interrupt name="SoftInt">
+      <parameters>
+         <FIXED length="31">
+            <FIXEDRANGE>1,31</FIXEDRANGE>
+         </FIXED>
+      </parameters>
+   </interrupt>

@@ -75,7 +75,7 @@ ifeq ($(CONFIG_HAS_I2C),y)
    XML_COMMON += LM75.xml
 endif
 
-XML_COMMON += Log.xml LogFile.xml SampleBasicDation.xml
+XML_COMMON += Log.xml LogFile.xml SampleBasicDation.xml SoftInt.xml
 
 HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \
@@ -93,4 +93,9 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 ifeq ($(CONFIG_HAS_I2C),y)
    HDR_COMMON += I2CProvider.h
 endif
+
+ifeq ($(CONFIG_HAS_CAN),y)
+   HDR_COMMON += Can2AMessage.h
+endif
+
 
