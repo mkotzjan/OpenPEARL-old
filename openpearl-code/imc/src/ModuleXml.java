@@ -563,8 +563,12 @@ public class ModuleXml {
 		String dataInSpc = getChildByName(n, "data").getTextContent();
 		// System.out.println("SPC data:" + dataInSpc);
 
-		String dataInDevice = getChildByName(un.getNode(), "data")
-				.getTextContent();
+		Node nDev = getChildByName(un.getNode(), "data");
+		if (nDev == null) {
+			Error.error("System Entry '" + un.getSystemName()+"' contains no <data>-tag");
+			return;
+		}
+		String dataInDevice = nDev.getTextContent();
 		// System.out.println("DCL data:" + dataInDevice);
 
 		// a system dation with type ALL accepts all data types
