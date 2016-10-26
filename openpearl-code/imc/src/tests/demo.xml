@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module file="demo.prl">
-<!--
 <system>
 <username name="pcf8574" line="14">
    <sysname name="Pcf8574">
@@ -101,8 +100,6 @@
   </association>
 </configuration>
 </system>
--->
-<!--
 <problem>
    <spc type="signal" name="sig1" line="19"/>
    <spc type="interrupt" name="int1" line="20" />
@@ -119,5 +116,4 @@
       <data>ALPHIC</data>
    </spc>
 </problem>
--->
 </module>

@@ -3,9 +3,9 @@ MODULE(dationpg);
 SYSTEM;
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
-!disc: Disc('/tmp/' ,10);
+disc: Disc('/tmp/' ,10);
 
-/* expected C++ code  */
+/* expected C++ code  
 __cpp__(
      'static pearlrt::Disc s_disc("/tmp/", 10);'
      'pearlrt::Device * d_disc = & s_disc;'

@@ -155,26 +155,39 @@ public class SystemEntry {
 	 */
 	public String getCompleteCode() {
 		String result = "";
+		String params;
 		if (type.equals("signal")) {
 			result = "static pearlrt::" + systemName + " _" + userName + ";\n";
 			result += "       pearlrt::Signal * generalized_" + userName
 					+ "= &_" + userName + ";\n";
 			codeIsCompleted = true;
 		} else if (type.equals("dation")) {
-			result = "static pearlrt::" + systemName + " s_" + userName + "(";
-			result += translateParameters() + ");\n";
+			params = translateParameters();
+			result = "static pearlrt::" + systemName + " s_" + userName;
+			if (!params.isEmpty()) {
+				result += "(" + params + ")";
+			}
+			result += ";\n";
 			result += "       pearlrt::Device * d_" + userName + " = &s_"
 					+ userName + ";\n";
 			codeIsCompleted = true;
 		} else if (type.equals("interrupt")) {
-			result = "static pearlrt::" + systemName + " sys_" + userName + "(";
-			result += translateParameters() + ");\n";
+			params = translateParameters();
+			result = "static pearlrt::" + systemName + " sys_" + userName;
+			if (!params.isEmpty()) {
+				result += "(" + params + ")";
+			}
+			result += ";\n";
 			result += "       pearlrt::Interrupt * _" + userName
 					+ " = (pearlrt::Interrupt*)& sys_" + userName + ";\n";
 			codeIsCompleted = true;
 		} else if (type.equals("connection")) {
-			result = "static pearlrt::" + systemName + " sys_" + userName + "(";
-			result += translateParameters() + ");\n";
+			params = translateParameters();
+			result = "static pearlrt::" + systemName + " sys_" + userName;
+			if (!params.isEmpty()) {
+				result += "(" + params + ")";
+			}
+			result += ";\n";
 			codeIsCompleted = true;
 		} else {
 			System.out.println("could not create code for type " + type);

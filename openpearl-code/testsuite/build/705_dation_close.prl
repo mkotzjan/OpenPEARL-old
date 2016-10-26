@@ -1,11 +1,11 @@
 MODULE(userdation_close);
 ! use close with all possible attributes
-!SYSTEM;
+SYSTEM;
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
-!disc: Disc('/tmp/' ,10);
+disc: Disc('/tmp/' ,10);
 
-/* expected C++ code  */
+/* expected C++ code  
 __cpp__(
      ' // system decl'
      'static pearlrt::Disc s_disc("/tmp/", 10);'

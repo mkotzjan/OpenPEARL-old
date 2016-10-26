@@ -107,7 +107,7 @@ public class Parameter {
 	   if (hasType("FIXED")) {
 		   return value;
 	   } else if (hasType("CHAR")) {
-		   String result="\"";
+		   String result="(char*)\"";
 		   for (int i=1; i<value.length()-1; i++) {
 			   if (value.charAt(i) == '\'' && value.charAt(i+1) == '\\') {
 				   Error.error("control caharacters are not supported ");	   

@@ -3,15 +3,9 @@
 !
 MODULE(dationts);
 ! declare a TS-dation on an SampleBasicDation and do some operations
-!SYSTEM;
-!inout4: SampleBasicDation();
+SYSTEM;
+inout: SampleBasicDation;
 
-/* expected C++ code  */
-__cpp__(
-     'static pearlrt::SampleBasicDation s_inout;'
-     'pearlrt::Device * d_inout = & s_inout;'
-);
-/*  */
 
 PROBLEM;
    SPC inout DATION INOUT SYSTEM BASIC FIXED(15) GLOBAL;
