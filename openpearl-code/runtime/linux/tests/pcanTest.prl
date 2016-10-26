@@ -12,12 +12,21 @@ PROBLEM;
    DCL candev DATION INOUT BASIC ALL CREATED(pcan);
 
 main: TASK MAIN;
+    __cpp__(
+	' struct _CanMessage {'
+        '   pearlrt::Fixed<11>    identifier;'
+        '   pearlrt::BitString<1> rtrRequest; '
+        '   pearlrt::Fixed<4>     dataLength; '
+        '   pearlrt::BitString<8> data[8];    '
+        ' } _canMessage; '
+    );
     DCL hello CHAR(18) INIT('PCan Test started');
     OPEN stdout;
 
     PUT hello TO stdout BY A, SKIP;
 
     OPEN candev;
+    TAKE canMessage FROM candev;
     CLOSE candev;
     CLOSE stdout;    
 

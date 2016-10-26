@@ -182,11 +182,14 @@ namespace pearlrt {
       }
 
       // CAN_Reade blocks until data is available
-      ret = CAN_Read(h, &m);
-      if (ret) {
-          Log::error("PCan: read error (%04x)", ret);
-          throw theReadingFailedSignal;
-      }
+      // and discard status messages
+      do {
+         ret = CAN_Read(h, &m);
+         if (ret) {
+             Log::error("PCan: read error (%04x)", ret);
+             throw theReadingFailedSignal;
+         }
+      } while (m.MSGTYPE == MSGTYPE_STATUS); 
 
       d->identifier.x = m.ID;
       if (m.MSGTYPE == MSGTYPE_RTR) {
@@ -194,7 +197,7 @@ namespace pearlrt {
       } else if (m.MSGTYPE == MSGTYPE_STANDARD) {
         d->rtrRequest.x = 0x00; // set to false
       } else {
-          Log::error("PCan: unexpected message type received");
+          Log::error("PCan: unexpected message type received (%d)", m.MSGTYPE);
           throw theReadingFailedSignal;
       }
 

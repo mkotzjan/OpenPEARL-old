@@ -85,7 +85,7 @@ namespace pearlrt {
       /* destructor 
          cleanup of the device setting
       */
-      ~PCan();
+      //~PCan();
 
       /**
       Open the dation
