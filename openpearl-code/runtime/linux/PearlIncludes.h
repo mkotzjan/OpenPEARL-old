@@ -118,3 +118,9 @@ Only this file mus be included.
 #include "I2CBus.h"
 #include "LM75.h"
 
+#ifdef CONFIG_CANSUPPORT
+#ifdef CONFIG_LINUX_PCAN
+#include "PCan.h"
+#endif
+#endif
+

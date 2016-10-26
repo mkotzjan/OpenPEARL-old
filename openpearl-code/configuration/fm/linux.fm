@@ -113,4 +113,17 @@ config LINUX_I2C
 	
 	Check the documentation of your distribution how to enable i2c.
 
+config LINUX_PCAN
+	depends on LINUX && CANSUPPORT
+	boolean "PCAN support (PEAK Can device adapter)"
+	default n
+	help
+	The PEAK CAN driver needs the header files and libraries from PEAK
+	to be properly installed. 
+	Set this option to ye, if you nees support for CAN-bus via a PCan
+	adapter. 
+	
+	Check the documentation from PEAK how to get, install and verify
+	installation of your device.
+
 endmenu

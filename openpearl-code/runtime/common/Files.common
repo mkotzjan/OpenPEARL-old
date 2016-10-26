@@ -94,3 +94,7 @@ ifeq ($(CONFIG_HAS_I2C),y)
    HDR_COMMON += I2CProvider.h
 endif
 
+ifeq ($(CONFIG_CANSUPPORT),y)
+   HDR_COMMON += Can2AMessage.h
+endif
+

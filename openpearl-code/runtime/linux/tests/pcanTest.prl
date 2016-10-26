@@ -1,0 +1,27 @@
+MODULE(pcanTest);
+
+SYSTEM;
+pcan: PCan('/dev/pcan32', 1000000);
+termout: StdOut;
+
+PROBLEM;
+   SPC termout DATION OUT SYSTEM ALPHIC GLOBAL;
+   SPC pcan    DATION INOUT SYSTEM BASIC ALL GLOBAL;
+
+   DCL stdout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(termout);
+   DCL candev DATION INOUT BASIC ALL CREATED(pcan);
+
+main: TASK MAIN;
+    DCL hello CHAR(18) INIT('PCan Test started');
+    OPEN stdout;
+
+    PUT hello TO stdout BY A, SKIP;
+
+    OPEN candev;
+    CLOSE candev;
+    CLOSE stdout;    
+
+END;
+
+
+MODEND;

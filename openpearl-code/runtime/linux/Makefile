@@ -147,6 +147,13 @@ ifeq ($(CONFIG_LINUX_I2C),y)
    XML_FILES += I2CBus.xml
 endif
 
+ifeq ($(CONFIG_CANSUPPORT),y) 
+ifeq ($(CONFIG_LINUX_PCAN),y) 
+   SRCANDH += PCan.cc
+   XML_FILES += PCan.xml
+endif
+endif
+
 targets := libOpenPEARLlinux.a linux.xml
 
 ifeq ($(CONFIG_LINUX_tests),y)
@@ -263,11 +270,16 @@ clean:
 	@rm -f ../common/tests/*.diff
 	@rm -f ../common/*.new
 	@rm -f ../common/*.diff
+	@rm -f ../common/*.o
 	@rm -f *.new
 	@rm -f *.diff
 	@rm -f *.log
+	@rm -f raspberry/*.new
+	@rm -f raspberry/*.diff
+	@rm -f raspberry/*.o
 	@rm -f drivers/*.new
 	@rm -f drivers/*.diff
+	@rm -f drivers/*.o
 	@rm -f core
 	@rm -f ../common/Signals.hh ../common/Signals.hcc
 	@rm -f ../common/Signals.xml

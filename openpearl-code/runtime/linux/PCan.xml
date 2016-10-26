@@ -1,0 +1,10 @@
+   <dation name="PCan">
+      <parameters>
+          <CHAR length="32767"><NotEmpty/></CHAR>
+          <FIXED length="31">
+	     <VALUES>125000, 250000, 500000, 1000000</VALUES>
+          </FIXED>
+      </parameters>
+      <attributes> SYSTEM, BASIC, IN, OUT, INOUT</attributes>
+      <data>ALL</data>
+   </dation>

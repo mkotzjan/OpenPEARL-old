@@ -1,0 +1,9 @@
+config CANSUPPORT
+	boolean "CAN support"
+	default n
+	help
+	This option enables CAN supportat all in the OpenPEARL runtime system.
+	Check the plattform specific driver sections to select the CAN drivers.
+	Experimelta!!! ---> Usually deselect this.
+
+
