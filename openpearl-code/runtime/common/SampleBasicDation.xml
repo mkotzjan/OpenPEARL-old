@@ -1,11 +1,6 @@
    <dation name="SampleBasicDation">
       <parameters>
       </parameters>
-<<<<<<< HEAD
-      <attributes> SYSTEM, IN, OUT, INOUT</attributes>
-      <data>FIXED</data>
-=======
       <attributes> BASIC, SYSTEM, IN, OUT, INOUT</attributes>
       <data>FIXED(15)</data>
->>>>>>> 2c4898e9ae4cc22b860186c969b9c97312bce953
    </dation>
