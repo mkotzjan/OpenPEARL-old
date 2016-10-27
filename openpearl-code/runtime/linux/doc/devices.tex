@@ -167,7 +167,7 @@ is set afterwards leading to '01'.
 \end{itemize}
  
 \subsection{I2CBus}
-Linux supports normal access to an i2c bus if i2c is available. 
+Linux supports normal access to an i2c bus via a device node, if i2c is available. 
 The corresponding device file are named like \texttt{/dev/i2c-0}.
 The i2c subsystem of linux provides test features for the availability
 to the so called {\em repeated start} feature (see I2C\_FUNCS\_I2C)
@@ -180,7 +180,14 @@ Synopsis: & \verb|I2CBus(deviceName)|\\
 \item[deviceName] specifies the name to the device file (e.g. "/dev/i2c-0")
 \end{description}
 
-\subsection{Creating a new Device for User Dations}
+\subsection{PEAK CAN Bus Interface}
+The CAN bus interface from the company PEAK provides the access via a character 
+device node (e.q. \texttt{/dev/pcan32} and via SocketCAN.
+The socket CAN infrastructure allows no change of the communicatipon setting
+like bitrate for normal users --- the character device from PEAK provides
+such features.
+
+\subsection{Creating a new Device}
 The creation of a new device is very simple:
 \begin{enumerate}
 \item find a suitable device name
@@ -205,11 +212,15 @@ The creation of a new device is very simple:
       of bad parameters.
       Note that dationSeek is not required, if only FORWARD dations
       may be created.
-\item if the C++ class needs non standard libraries like libusb-devel
-      add a configuration element in the system configuration menu
+\item create a suitable XML description file.
+\item insert a configuration item  
+      in the system configuration menu
       and set the default to {\em not available} ('n').
+\item modify the corresponding Makefile toi add the device depending on
+      the configuration item. If additional libraries are needed,
+      add them to \texttt{LDPATH}. 
 \item create unit tests for google tests framework in tests/ and add the
       tests in tests/Makefile
-\item run tests/DationTests and check for proper operation of the new device
+\item run the tests and check for proper operation of the new device
 \end{enumerate}
 
