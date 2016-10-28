@@ -71,8 +71,15 @@ CXX_COMMON = \
 	SampleBasicDation.cc 
 
 ifeq ($(CONFIG_HAS_I2C),y)
-   CXX_COMMON += LM75.cc
-   XML_COMMON += LM75.xml
+   HDR_COMMON += I2CProvider.h
+   ifeq ($(CONFIG_I2C_LM75),y)
+      CXX_COMMON += LM75.cc
+      XML_COMMON += LM75.xml
+   endif
+   ifeq ($(CONFIG_I2C_PCF8574),y)
+      CXX_COMMON += PCF8574Pool.cc PCF8574In.cc PCF8574Out.cc
+      XML_COMMON += PCF8574In.xml PCF8574Out.xml
+   endif
 endif
 
 XML_COMMON += Log.xml LogFile.xml SampleBasicDation.xml SoftInt.xml
@@ -90,9 +97,6 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	SystemDation.h \
 	SystemDationNB.h 
 
-ifeq ($(CONFIG_HAS_I2C),y)
-   HDR_COMMON += I2CProvider.h
-endif
 
 ifeq ($(CONFIG_CANSUPPORT),y)
    HDR_COMMON += Can2AMessage.h

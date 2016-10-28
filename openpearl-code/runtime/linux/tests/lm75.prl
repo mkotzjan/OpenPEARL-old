@@ -1,12 +1,16 @@
 MODULE(LM75);
 
 SYSTEM;
-__cpp__( 
+i2cbus: I2CBus('/dev/i2c-1',100000);
+lm75: LM75('4F'B4) --- i2cbus;
+stdout: StdOut;
+/*__cpp__( 
    'pearlrt::I2CBus s_i2c("/dev/i2c-1");'
    'pearlrt::LM75   s_lm75(&s_i2c, 0x4f);'
    'pearlrt::Device  * d_lm75 = &s_lm75;'
    'pearlrt::StdOut s_stdout;'
    'pearlrt::Device *d_stdout = &s_stdout;');
+*/
 PROBLEM;
 
 SPC lm75 DATION IN SYSTEM BASIC FIXED(15) GLOBAL;

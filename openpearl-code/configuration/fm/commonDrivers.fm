@@ -2,8 +2,32 @@ config CANSUPPORT
 	boolean "CAN support"
 	default n
 	help
-	This option enables CAN supportat all in the OpenPEARL runtime system.
+	This option enables CAN support at all in the OpenPEARL runtime system.
 	Check the plattform specific driver sections to select the CAN drivers.
-	Experimelta!!! ---> Usually deselect this.
+	Experimental!!! ---> Usually deselect this.
 
+
+config HAS_I2C
+	boolean "I2C support"
+	default n
+	help
+	This option enables I2C support at all in the OpenPEARL runtime system.
+	Check the plattform specific driver sections to select the CAN drivers.
+	Experimental!! ---> Usually deselect this.
+
+menu I2C-Components
+	depends on HAS_I2C
+config I2C_LM75
+	boolean "LM75 temperatur sensor"
+        default n
+	help
+	This option enable the LM75 system dation for temperatur measurements.
+
+config I2C_PCF8574
+	boolean "PCF8574 port expander"
+        default n
+	help
+	This option enable the PCF8574In and PCF8574Out system dation
+        as port expanders.
+endmenu
 
