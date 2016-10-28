@@ -24,7 +24,7 @@ DONOTBUILD=006_bitstring \
 	701_dation_pg \
 	700_dation_rw \
 	703_userdation_dcl \
-	706_putString.prl
+	706_putString
 
 DONOTRUN=000_empty 006_bitstring \
 	703_userdation_dcl 704_dation_open 705_dation_close
