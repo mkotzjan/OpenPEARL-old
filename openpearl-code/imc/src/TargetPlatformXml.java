@@ -131,7 +131,7 @@ public class TargetPlatformXml {
 	 * check, whether the given node provides the given kind of association
 	 * 
 	 * @param n
-	 *            thenode to be queried
+	 *            the node to be queried
 	 * @param associationName
 	 *            the name of the association
 	 * @return true, if supported, else false

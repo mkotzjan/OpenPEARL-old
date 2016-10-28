@@ -200,6 +200,18 @@ Remarks& The temperature is returned in tenth of degree centigrade\\
 \hline
 \end{tabular}
 
+\subsection{CAN Bus Interfaces}
+In order to enshure platform indepences in OpenPEARL, all CAN drivers expect 
+a CAN2A message struct as input and output data.
+\begin{PEARLCode}
+STRUCT [
+   id         FIXED(11),
+   rtrRequest BIT(1),
+   dataLength FIXED(4),
+   data[8]    BIT(8)
+];
+\end{PEARLCode}
+
 \section{Specifications in Problem Part}
 The system device is specified in the problem part.
 Depending on the class specifier in the {\em SPC}-statement the concete 
