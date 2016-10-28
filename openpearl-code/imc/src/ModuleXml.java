@@ -142,11 +142,11 @@ public class ModuleXml {
 					}
 					targetNode = treatSysName(n);
 					un.setTargetNode(targetNode);
+					
 					String mustProvide[] = un.getMustProvide();
 					for (int p = 0; p < mustProvide.length; p++) {
 						// check if the new detected system element provides the
-						// expected
-						// interface
+						// expected interface
 						// System.out.println("test "+mustProvide[p]);
 						Node assocProvider = TargetPlatformXml.provides(
 								targetNode, mustProvide[p]);
@@ -264,8 +264,7 @@ public class ModuleXml {
 				} else {
 					// System.out.println("user name " + associationName
 					// + " is defined");
-					// System.out
-					// .println("test for connection provider is missing");
+					// System.out.println("test for connection provider is missing");
 					// test if username provides interface is missing
 					Node assoc;
 
@@ -278,7 +277,7 @@ public class ModuleXml {
 									+ provider);
 							return;
 						}
-						un.setMaxClients(provider,
+						u.setMaxClients(provider,
 								TargetPlatformXml.getAssociationClients(assoc));
 					} else {
 						// mark that this system element must provide an
