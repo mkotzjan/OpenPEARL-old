@@ -936,6 +936,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitNowFunction((SmallPearlParser.NowFunctionContext) ctx));
             }
         }
+
         return st;
     }
 
@@ -2088,12 +2089,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
                 while ( k < ctx.formatPosition().size() && !foundFormat) {
                     if (ctx.formatPosition(j) instanceof SmallPearlParser.FactorFormatContext) {
-                        ST e = getFactorFormatForPut((SmallPearlParser.FactorFormatContext) ctx.formatPosition(j), ctx.ID().getText(), ctx.expression(i).getText());
+                        ST e = getFactorFormatForPut((SmallPearlParser.FactorFormatContext) ctx.formatPosition(j), ctx.ID().getText(), ctx.expression(i));
                         stmt.add("elements", e);
                         foundFormat = true;
                     } else if (ctx.formatPosition(j) instanceof SmallPearlParser.FactorPositionContext) {
                         // TODO: visitExpression???
-                        ST e = getFactorPositionForPut((SmallPearlParser.FactorPositionContext) ctx.formatPosition(j), ctx.ID().getText(), ctx.expression(i).getText());
+                        ST e = getFactorPositionForPut((SmallPearlParser.FactorPositionContext) ctx.formatPosition(j), ctx.ID().getText(), ctx.expression(i));
                         stmt.add("elements", e);
                     } else if (ctx.formatPosition(j) instanceof SmallPearlParser.FactorFormatPositionContext) {
                     }
@@ -2124,16 +2125,16 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return stmt;
     }
 
-    private ST getFactorFormatForPut(SmallPearlParser.FactorFormatContext ctx, String dation, String element) {
+    private ST getFactorFormatForPut(SmallPearlParser.FactorFormatContext ctx, String dation, SmallPearlParser.ExpressionContext expression) {
         ST st = group.getInstanceOf("put_statement_factor_format");
 
         st.add("dation", getUserVariable(dation));
 
         if ( ctx.format().fixedFormat() != null ) {
-            st.add("format", getFixedFormatForPut(ctx.format().fixedFormat(), element));
+            st.add("format", getFixedFormatForPut(ctx.format().fixedFormat(), expression));
         }
         else {
-            st.add("format", getCharacterStringFormatForPut(ctx.format().characterStringFormat(), element));
+            st.add("format", getCharacterStringFormatForPut(ctx.format().characterStringFormat(), expression));
         }
 
         return st;
@@ -2154,10 +2155,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return st;
     }
 
-    private ST getCharacterStringFormatForPut(SmallPearlParser.CharacterStringFormatContext ctx, String element) {
+    private ST getCharacterStringFormatForPut(SmallPearlParser.CharacterStringFormatContext ctx, SmallPearlParser.ExpressionContext expression) {
         ST st = group.getInstanceOf("put_statement_character_string_format");
 
-        st.add("element", getUserVariable(element));
+        st.add("element", getExpression(expression));
 
         if( ctx instanceof SmallPearlParser.CharacterStringFormatAContext ) {
             SmallPearlParser.CharacterStringFormatAContext c = (SmallPearlParser.CharacterStringFormatAContext) ctx;
@@ -2172,7 +2173,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     private ST getCharacterStringFormatForGet(SmallPearlParser.CharacterStringFormatContext ctx, String element) {
         ST st = group.getInstanceOf("get_statement_character_string_format");
-
         st.add("element", getUserVariable(element));
 
         if( ctx instanceof SmallPearlParser.CharacterStringFormatAContext ) {
@@ -2186,10 +2186,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return st;
     }
 
-    private ST getFixedFormatForPut(SmallPearlParser.FixedFormatContext ctx, String element) {
+    private ST getFixedFormatForPut(SmallPearlParser.FixedFormatContext ctx, SmallPearlParser.ExpressionContext expression) {
         ST st = group.getInstanceOf("put_statement_fixed_format");
 
-        st.add("element", getUserVariable(element));
+        st.add("element", getExpression(expression));
         st.add( "fieldwidth",  getExpression(ctx.fieldWidth().expression()));
 
         if ( ctx.decimalPositions() != null ) {
@@ -2220,7 +2220,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return st;
     }
 
-    private ST getFactorPositionForPut(SmallPearlParser.FactorPositionContext ctx, String dation, String element) {
+    private ST getFactorPositionForPut(SmallPearlParser.FactorPositionContext ctx, String dation, SmallPearlParser.ExpressionContext expression) {
         ST st = group.getInstanceOf("put_statement_factor_position");
         st.add("dation", getUserVariable(dation));
 
@@ -2263,7 +2263,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private ST getFactorPositionForGet(SmallPearlParser.FactorPositionContext ctx, String dation, String element) {
         ST st = group.getInstanceOf("get_statement_factor_position");
         st.add("dation", getUserVariable(dation));
-
+//TODO:
         if ( ctx.position() instanceof  SmallPearlParser.PositionRSTContext ) {
             SmallPearlParser.PositionRSTContext c = (SmallPearlParser.PositionRSTContext) ctx.position();
             ST e = group.getInstanceOf("get_statement_factor_position_rst");
