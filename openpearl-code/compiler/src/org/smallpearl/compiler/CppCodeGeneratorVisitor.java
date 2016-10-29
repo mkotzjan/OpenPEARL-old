@@ -2133,6 +2133,40 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if ( ctx.format().fixedFormat() != null ) {
             st.add("format", getFixedFormatForPut(ctx.format().fixedFormat(), expression));
         }
+        else if ( ctx.format().floatFormat() != null ) {
+            if ( ctx.format().floatFormat() instanceof SmallPearlParser.FloatFormatEContext ) {
+               st.add("format", getFloatFormatEForPut((SmallPearlParser.FloatFormatEContext)ctx.format().floatFormat(), expression));
+            }
+            else if ( ctx.format().floatFormat() instanceof SmallPearlParser.FloatFormatE3Context ) {
+                st.add("format", getFloatFormatE3ForPut((SmallPearlParser.FloatFormatE3Context)ctx.format().floatFormat(), expression));
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+        else if ( ctx.format().bitFormat() != null ) {
+            if ( ctx.format().bitFormat() instanceof SmallPearlParser.BitFormat1Context) {
+                st.add("format", getBitFormat1ForPut((SmallPearlParser.BitFormat1Context)ctx.format().bitFormat(), expression));
+            }
+            else if ( ctx.format().bitFormat() instanceof SmallPearlParser.BitFormat2Context) {
+                st.add("format", getBitFormat2ForPut((SmallPearlParser.BitFormat2Context)ctx.format().bitFormat(), expression));
+            }
+            else if ( ctx.format().bitFormat() instanceof SmallPearlParser.BitFormat3Context) {
+                st.add("format", getBitFormat3ForPut((SmallPearlParser.BitFormat3Context)ctx.format().bitFormat(), expression));
+            }
+            else if ( ctx.format().bitFormat() instanceof SmallPearlParser.BitFormat4Context) {
+                st.add("format", getBitFormat4ForPut((SmallPearlParser.BitFormat4Context)ctx.format().bitFormat(), expression));
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+        else if ( ctx.format().durationFormat() != null ) {
+            st.add("format", getDurationFormatForPut(ctx.format().durationFormat(), expression));
+        }
+        else if ( ctx.format().timeFormat() != null ) {
+            st.add("format", getTimeFormatForPut(ctx.format().timeFormat(), expression));
+        }
         else {
             st.add("format", getCharacterStringFormatForPut(ctx.format().characterStringFormat(), expression));
         }
@@ -2198,6 +2232,112 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             if ( ctx.scaleFactor() != null ) {
                 st.add( "scaleFactor", getExpression(ctx.scaleFactor().expression()));
             }
+        }
+
+        return st;
+    }
+
+    private ST getFloatFormatEForPut(SmallPearlParser.FloatFormatEContext ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_float_format_E");
+
+        st.add("element", getExpression(expression));
+        st.add( "fieldwidth",  getExpression(ctx.fieldWidth().expression()));
+
+        if ( ctx.decimalPositions() != null ) {
+            st.add( "decimalPositions", getExpression(ctx.decimalPositions().expression()));
+
+            if ( ctx.expression() != null ) {
+                st.add( "significance", getExpression(ctx.expression()));
+            }
+        }
+
+        return st;
+    }
+
+    private ST getFloatFormatE3ForPut(SmallPearlParser.FloatFormatE3Context ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_float_format_E3");
+
+        st.add("element", getExpression(expression));
+        st.add( "fieldwidth",  getExpression(ctx.fieldWidth().expression()));
+
+        if ( ctx.decimalPositions() != null ) {
+            st.add( "decimalPositions", getExpression(ctx.decimalPositions().expression()));
+
+            if ( ctx.expression() != null ) {
+                st.add( "significance", getExpression(ctx.expression()));
+            }
+        }
+
+        return st;
+    }
+
+    private ST getBitFormat1ForPut(SmallPearlParser.BitFormat1Context ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_bit_format_1");
+
+        st.add("element", getExpression(expression));
+
+        if ( ctx.numberOfCharacters() != null && ctx.numberOfCharacters().expression() != null ) {
+            st.add("numberOfCharacters", getExpression(ctx.numberOfCharacters().expression()));
+        }
+
+        return st;
+    }
+
+    private ST getBitFormat2ForPut(SmallPearlParser.BitFormat2Context ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_bit_format_2");
+
+        st.add("element", getExpression(expression));
+
+        if ( ctx.numberOfCharacters() != null && ctx.numberOfCharacters().expression() != null ) {
+            st.add("numberOfCharacters", getExpression(ctx.numberOfCharacters().expression()));
+        }
+
+        return st;
+    }
+    private ST getBitFormat3ForPut(SmallPearlParser.BitFormat3Context ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_bit_format_3");
+
+        st.add("element", getExpression(expression));
+
+        if ( ctx.numberOfCharacters() != null && ctx.numberOfCharacters().expression() != null ) {
+            st.add("numberOfCharacters", getExpression(ctx.numberOfCharacters().expression()));
+        }
+
+        return st;
+    }
+    private ST getBitFormat4ForPut(SmallPearlParser.BitFormat4Context ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_bit_format_4");
+
+        st.add("element", getExpression(expression));
+
+        if ( ctx.numberOfCharacters() != null && ctx.numberOfCharacters().expression() != null ) {
+            st.add("numberOfCharacters", getExpression(ctx.numberOfCharacters().expression()));
+        }
+
+        return st;
+    }
+
+    private ST getDurationFormatForPut(SmallPearlParser.DurationFormatContext ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_duration_format");
+
+        st.add("element", getExpression(expression));
+        st.add( "fieldwidth", getExpression(ctx.fieldWidth().expression()));
+
+        if ( ctx.decimalPositions() != null ) {
+            st.add( "decimalPositions", getExpression(ctx.decimalPositions().expression()));
+        }
+
+        return st;
+    }
+
+    private ST getTimeFormatForPut(SmallPearlParser.TimeFormatContext ctx, SmallPearlParser.ExpressionContext expression) {
+        ST st = group.getInstanceOf("put_statement_time_format");
+
+        st.add("element", getExpression(expression));
+        st.add( "fieldwidth", getExpression(ctx.fieldWidth().expression()));
+
+        if ( ctx.decimalPositions() != null ) {
+            st.add( "decimalPositions", getExpression(ctx.decimalPositions().expression()));
         }
 
         return st;

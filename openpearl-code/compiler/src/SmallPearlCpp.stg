@@ -766,9 +766,45 @@ put_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= 
     toF(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
 %>
 
+put_statement_duration_format(element,fieldwidth,decimalPositions) ::= <%
+    toD(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><endif>)
+%>
+
+put_statement_time_format(element,fieldwidth,decimalPositions) ::= <%
+    toT(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><endif>)
+%>
+
+put_statement_float_format_E(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
+    toE(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
+%>
+
+put_statement_float_format_E3(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
+    toE(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
+%>
+
 put_statement_character_string_format(element,fieldwidth) ::= <%
 toA(<element><if(fieldwidth)>,(pearlrt::Fixed\<31>)(<fieldwidth>)<endif>)
  %>
+
+
+put_statement_bit_format_1(element,numberOfCharacters) ::= <%
+    toB1(<element><if(numberOfCharacters)>,<numberOfCharacters><endif>)
+%>
+
+
+put_statement_bit_format_2(element,numberOfCharacters) ::= <%
+    toB2(<element><if(numberOfCharacters)>,<numberOfCharacters><endif>)
+%>
+
+
+put_statement_bit_format_3(element,numberOfCharacters) ::= <%
+    toB3(<element><if(numberOfCharacters)>,<numberOfCharacters><endif>)
+%>
+
+
+put_statement_bit_format_4(element,numberOfCharacters) ::= <%
+    toB4(<element><if(numberOfCharacters)>,<numberOfCharacters><endif>)
+%>
 
 /************************* GET STATEMENT *************************/
 
