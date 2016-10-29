@@ -321,7 +321,6 @@ public class TargetPlatformXml {
 	 *         association provider, if there is one specified
 	 */
 	static String associationRequiredProvider(Node node) {
-		// get all defined interrupts
 		NodeList nl = node.getChildNodes();
 
 		if (nl.getLength() > 0) {

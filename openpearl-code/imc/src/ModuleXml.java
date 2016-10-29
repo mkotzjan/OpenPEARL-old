@@ -238,7 +238,18 @@ public class ModuleXml {
 	private void checkAssociation(Node moduleNode, Node systemNode) {
 		String provider = TargetPlatformXml
 				.associationRequiredProvider(systemNode);
-		Node association = getChildByName(moduleNode, "association");
+		Node association;
+		// the first association resides in sysname 
+		// nested associations are located in moduleNode
+		// try to find 'sysname'
+		//  - if present we are in a username or configuration item
+		//  - if NOT present we are in an association, lets try to find the next level       
+		Node sysname = getChildByName(moduleNode,"sysname");
+		if (sysname != null) {
+			association = getChildByName(sysname, "association");
+		} else {
+			association = getChildByName(moduleNode, "association");
+		}
 		if (association != null) {
 			String associationName = association.getAttributes()
 					.getNamedItem("name").getTextContent();
