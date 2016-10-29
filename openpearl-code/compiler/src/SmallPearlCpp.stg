@@ -936,12 +936,13 @@ TypeBitString(length) ::= <<
 pearlrt::BitString\<<length>\>
 >>
 
-Constant(IntegerConstant,TimeConstant,DurationConstant,FloatingPointConstant,StringConstant) ::=  <%
+Constant(IntegerConstant,TimeConstant,DurationConstant,FloatingPointConstant,StringConstant,BitConstant) ::=  <%
 <if(IntegerConstant)><IntegerConstant><endif>
 <if(TimeConstant)><TimeConstant><endif>
 <if(DurationConstant)><DurationConstant><endif>
 <if(FloatingPointConstant)><FloatingPointConstant><endif>
 <if(StringConstant)><StringConstant><endif>
+<if(BitConstant)><BitConstant><endif>
 %>
 
 IntegerConstant(value) ::= <<
@@ -962,6 +963,10 @@ FloatingPointConstant(value) ::= <<
 
 StringConstant(value) ::= <<
 "<value>"
+>>
+
+BitConstant(value) ::= <<
+<value>
 >>
 
 sema_declaration(name,global,preset) ::= <<

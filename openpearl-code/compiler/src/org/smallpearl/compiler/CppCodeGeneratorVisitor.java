@@ -495,16 +495,20 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 ST stringConstant = group.getInstanceOf("StringConstant");
                 String s = ctx.StringLiteral().toString();
 
-                if(s.startsWith("'")) {
+                if (s.startsWith("'")) {
                     s = s.substring(1, s.length());
                 }
 
-                if(s.endsWith("'")) {
+                if (s.endsWith("'")) {
                     s = s.substring(0, s.length() - 1);
                 }
 
                 stringConstant.add("value", s);
                 constant.add("StringConstant", stringConstant);
+            } else if (ctx.BitStringLiteral() != null) {
+                ST bitConstant = group.getInstanceOf("BitConstant");
+                bitConstant.add("value", ctx.BitStringLiteral().getText());
+                constant.add("BitConstant", bitConstant);
             }
         }
 
