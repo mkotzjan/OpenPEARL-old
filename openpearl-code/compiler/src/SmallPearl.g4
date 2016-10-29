@@ -1167,8 +1167,12 @@ position :
 //   F (FieldWidth [ , DecimalPositions [ , ScaleFactor ] ] )
 ////////////////////////////////////////////////////////////////////////////////
 
+fragment FixedFormatSpecifier:
+    'F'
+    ;
+
 fixedFormat :
-    'F' '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
+    FixedFormatSpecifier '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1186,9 +1190,17 @@ fieldWidth :
 // Significance ::= Expression§WithIntegerAsValue
 ////////////////////////////////////////////////////////////////////////////////
 
+fragment FloatFormatSpecifier:
+    'E'
+    ;
+
+fragment FloatFormat3Specifier:
+    'E3'
+    ;
+
 floatFormat:
-      'E' '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE
-    | 'E3' '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'  # floatFormatE3
+      FloatFormatSpecifier '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE
+    | FloatFormat3Specifier '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'  # floatFormatE3
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1214,8 +1226,12 @@ numberOfCharacters :
 //      T ( FieldWidth [ , DecimalPositions ] )
 ////////////////////////////////////////////////////////////////////////////////
 
+fragment TimeFormatSpecifier:
+    'T'
+    ;
+
 timeFormat:
-    'T' '(' fieldWidth ( ',' decimalPositions )? ')'
+    TimeFormatSpecifier '(' fieldWidth ( ',' decimalPositions )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1223,8 +1239,12 @@ timeFormat:
 //      D ( FieldWidth [ , DecimalPositions ] )
 ////////////////////////////////////////////////////////////////////////////////
 
+fragment DurationFormatSpecifier:
+    'D'
+    ;
+
 durationFormat:
-    'D' '(' fieldWidth ( ',' decimalPositions )? ')'
+    DurationFormatSpecifier '(' fieldWidth ( ',' decimalPositions )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
