@@ -57,6 +57,7 @@
 
 package org.smallpearl.compiler;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
@@ -69,7 +70,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
-
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implements SmallPearlVisitor<ST> {
 
@@ -370,7 +372,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if (ctx != null) {
             for (ParseTree c : ctx.children) {
-
                 if (c instanceof SmallPearlParser.IdentifierDenotationContext) {
                     identifierDenotationList = getIdentifierDenotation((SmallPearlParser.IdentifierDenotationContext) c);
                 } else if (c instanceof SmallPearlParser.AllocationProtectionContext) {
@@ -452,7 +453,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 Integer value;
                 Integer sign = 1;
 
-
                 value = Integer.parseInt(ctx.IntegerConstant().getText());
 
                 if (ctx.getChildCount() > 1) {
@@ -460,7 +460,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                         value = -value;
                     }
                 }
-
 
                 if (Integer.toBinaryString(Math.abs(value)).length() < 31) {
                     integerConstant.add("value", value.toString());
@@ -506,14 +505,133 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 stringConstant.add("value", s);
                 constant.add("StringConstant", stringConstant);
             } else if (ctx.BitStringLiteral() != null) {
-                ST bitConstant = group.getInstanceOf("BitConstant");
-                bitConstant.add("value", ctx.BitStringLiteral().getText());
-                constant.add("BitConstant", bitConstant);
+                ST bitStringConstant = group.getInstanceOf("BitStringConstant");
+                int nb = 1;
+                Long l = convertBitStringToLong(ctx.BitStringLiteral().toString());
+
+                // walk up the AST and get VariableDenotationContext:
+                ParserRuleContext  sctx =  ctx.getParent();
+                while ( sctx != null && !(sctx instanceof SmallPearlParser.VariableDenotationContext)) {
+                    sctx = sctx.getParent();
+                }
+
+                if (sctx != null) {
+                    SmallPearlParser.TypeAttributeContext typeAttributeContext = ((SmallPearlParser.VariableDenotationContext)sctx).typeAttribute();
+                    if ( typeAttributeContext.simpleType() != null ) {
+                        SmallPearlParser.SimpleTypeContext simpleTypeContext = typeAttributeContext.simpleType();
+
+                        if( simpleTypeContext.typeBitString() != null ) {
+                            SmallPearlParser.TypeBitStringContext typeBitStringContext = simpleTypeContext.typeBitString();
+
+                            if ( typeBitStringContext.IntegerConstant() != null) {
+                                nb = Integer.valueOf(typeBitStringContext.IntegerConstant().toString());
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+
+                String b = Long.toBinaryString(l);
+                String bres = "";
+
+                int l1 = b.length();
+
+                if ( nb < b.length()) {
+                    bres = "";
+                    for ( int i = 0; i < nb; i++) {
+                        bres = bres + b.charAt(i);
+                    }
+                    Long r = Long.parseLong(bres,2);
+                    if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                        bitStringConstant.add("value", Long.toString(r));
+                    } else {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
+                    }
+                }
+                else if ( nb > b.length()) {
+                    bres = b;
+                    for ( int i = 0; i < nb - b.length() - 1; i++) {
+                        bres = bres + "0";
+                    }
+                    Long r = Long.parseLong(bres,2);
+                    if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                        bitStringConstant.add("value", Long.toString(r));
+                    } else {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
+                    }
+                }
+                else {
+                    if (Long.toBinaryString(Math.abs(l)).length() < 31) {
+                        bitStringConstant.add("value", Long.toString(l));
+                    } else {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "ULL");
+                    }
+                }
+
+                constant.add("BitStringConstant", bitStringConstant);
             }
-        }
+         }
 
         return constant;
     }
+
+    private Long convertBitStringToLong(String bitstring) {
+        int base = 0;
+        StringBuilder sb = new StringBuilder(bitstring.length());
+
+        if( bitstring.startsWith("'")) {
+            bitstring = bitstring.substring(1, bitstring.length());
+        }
+
+        if( bitstring.endsWith("'")) {
+            bitstring = bitstring.substring(0, bitstring.length() - 1);
+        }
+
+        if ( bitstring.charAt(bitstring.length() -1 ) == '1' ) {
+            base = 2;
+        }
+        else if ( bitstring.charAt(bitstring.length() -1 ) == '2' ) {
+            base = 4;
+        }
+        else if ( bitstring.charAt(bitstring.length() -1 ) == '3' ) {
+            base = 8;
+        }
+        else if ( bitstring.charAt(bitstring.length() -1 ) == '4' ) {
+            base = 16;
+        }
+
+        Long i = 0L;
+        for( int j = 0; j < bitstring.length() - 3; j++) {
+            int num = 0;
+            switch( bitstring.charAt(j) ) {
+                case '0': num =  0; break;
+                case '1': num =  1; break;
+                case '2': num =  2; break;
+                case '3': num =  3; break;
+                case '4': num =  4; break;
+                case '5': num =  5; break;
+                case '6': num =  6; break;
+                case '7': num =  7; break;
+                case '8': num =  8; break;
+                case '9': num =  9; break;
+                case 'A': num = 10; break;
+                case 'B': num = 11; break;
+                case 'C': num = 12; break;
+                case 'D': num = 13; break;
+                case 'E': num = 14; break;
+                case 'F': num = 15; break;
+            }
+
+            i *= base;
+            i += num;
+        }
+
+        return i;
+    }
+
 
     @Override
     public ST visitDurationConstant(SmallPearlParser.DurationConstantContext ctx) {
@@ -534,7 +652,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.seconds() != null) {
             seconds = getSeconds(ctx.seconds());
         }
-
 
         duration = hours * 3600 + minutes * 60 + seconds;
 
@@ -1294,6 +1411,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             expression.add("code", ")");
         } else if (ctx.literal() != null) {
             if (ctx.literal().BitStringLiteral() != null) {
+                // TODO:
+                // ! assignment
+                // b1 := '1'B1;
+                // !__cpp__('_b1 = pearlrt::BitString<1>(1);			');
+                // b4i2 := '8'B4;
+                // __cpp__('_b4i2= pearlrt::BitString<4>(8);			');
                 expression.add("bitstring", ctx.literal().BitStringLiteral().getText());
             } else {
                 expression.add("code", visitLiteral(ctx.literal()));

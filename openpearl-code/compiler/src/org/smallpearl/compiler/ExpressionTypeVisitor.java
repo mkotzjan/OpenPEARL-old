@@ -1539,7 +1539,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         } else if (ctx.durationConstant() != null) {
             m_properties.put(ctx, new TypeDuration());
         } else if (ctx.BitStringLiteral() != null) {
-//TODO:            m_properties.put(ctx, new TypeBit());
+            //TODO: BitString
+            m_properties.put(ctx, new TypeBit());
         }
 
         return null;

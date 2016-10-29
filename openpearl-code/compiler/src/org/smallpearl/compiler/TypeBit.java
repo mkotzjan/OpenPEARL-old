@@ -31,12 +31,12 @@ package org.smallpearl.compiler;
 
 
 public class TypeBit extends TypeDefinition {
-    public static final int BIT_DEFAULT_PRECISION = 15;
+    public static final int BIT_DEFAULT_PRECISION = 1;
 
     private int m_precision;
 
     TypeBit() {
-        super("FIXED");
+        super("BIT");
         this.m_precision = BIT_DEFAULT_PRECISION;
     }
 

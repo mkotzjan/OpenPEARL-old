@@ -6,111 +6,21 @@ MODULE(bitstring);
 
 PROBLEM;
 T1: TASK MAIN;
-   ! deklarations
-    DCL b1 BIT;
-   !__cpp__ ('pearlrt::BitString<1> b1;			');
-    DCL b11 BIT(1);
-   !__cpp__('pearlrt::BitString<1> b11;			');
-    DCL b2 BIT(2);
-   !__cpp__('pearlrt::BitString<2> b2;			');
-    DCL b64 BIT(64);
-   !__cpp__('pearlrt::BitString<64> b64;			');
-
-   ! deklarations with init as B1
-   DCL b1i1 BIT         INIT('1'B1);
-   !__cpp__('pearlrt::BitString<1> b1i1(1);			');
-    DCL b1i11 BIT(1)     INIT('0'B1);
-   !__cpp__('pearlrt::BitString<1> b1i11(0);			');
-    DCL b1i2 BIT(2)      INIT('10'B1);
-   !__cpp__('pearlrt::BitString<2> b1i2(2);			');
     DCL b1i64 BIT(64)    INIT(
       '1111000011110000111100001111000011110000111100001111000011110000'B1);
-   ! __cpp__('pearlrt::BitString<64> b1i64(0xf0f0f0f0f0f0f0f0ULL);	');
+    __cpp__('pearlrt::BitString<64> b1i64(0xf0f0f0f0f0f0f0f0ULL);	');
 
-   ! deklarations with init as B4
-    DCL b4i1 BIT         INIT('8'B4);
-   !__cpp__('pearlrt::BitString<1> b4i1(1); // only 1 bit !			');
-    DCL b4i11 BIT(1)     INIT('0'B4);
-   !__cpp__('pearlrt::BitString<1> b4i11(0);			');
-    DCL b4i2 BIT(2)      INIT('8'B4);
-   !__cpp__('pearlrt::BitString<2> b4i2(2); // only 2 bits !		');
     DCL b4i64 BIT(64)    INIT('F0F0F0F0F0F0F0F0'B4);
-   ! __cpp__('pearlrt::BitString<64> b4i64(0xf0f0f0f0f0f0f0f0LL);	');
-
-   ! deklarations with init as B3
-   DCL b3i1 BIT         INIT('4'B3);
-   DCL b3i11 BIT(1)     INIT('0'B3);
-   DCL b3i2 BIT(2)      INIT('4'B3);
-   DCL b3i64 BIT(64)    INIT('7717036074170360741700'B3);
-
-   ! helper variables
-   DCL fixed31 FIXED(31);
-   DCL fixed15 FIXED(15);
-
-   ! assignment
-   b1 := '1'B1;
-   !__cpp__('_b1 = pearlrt::BitString<1>(1);			');
-   b4i2 := '8'B4;
-   __cpp__('_b4i2= pearlrt::BitString<4>(8);			');
- 
-   ! operation NOT
-    b1 := NOT b1;
-   !__cpp__('b1 = b1.bitNot(); 			');
- 
-   ! operation AND / OR / EXOR
-   b1 := b1 AND b1i1;
-   !__cpp__('b1 = b1.bitAnd(b1i1);			');
-   b1 := b1 OR b1i1;
-   !__cpp__('b1 = b1.bitOr(b1i1);			');
-    b1 := b1 EXOR b1i1;
-   !__cpp__('b1 = b1.bitXor(b1i1);			');
-
-   ! cat
-   b2 := b1 >< b1;
-   !__cpp__('b2 = b1.bitCat(b1);			');
-   b2 := b1 CAT b1;
-   !__cpp__('b2 = b1.bitCat(b1);			');
-
-   ! cshift
-   fixed15 := -2;
-   !__cpp__('_fixed15 = -2;	');
-   b64 := b64 <> fixed15;
-   !__cpp__('b64 = b64.bitCshift(_fixed15);			');
-    b64 := b64 CSHIFT fixed15;
-   !__cpp__('b64 = b64.bitCshift(_fixed15);			');
-
-   ! shift
-   fixed15 := -2;
-   !__cpp__('_fixed15 = -2;	');
-    b64 := b64 SHIFT fixed15;
-   __cpp__('b64 = b64.bitShift(_fixed15);			');
-
-   ! slice-operations
-!TODO    b1 := b64.BIT(1);
-   !__cpp__('b1 = b64.getSlice(1,b1);   // parameter b1 is required for return size			');
-!TODO    b2 := b64.BIT(13:14);
-   !__cpp__('b2 = b64.getSlice(13,b2);   // parameter b2 is required for return size			');
-!TODO    b64.BIT(1) := b1;
-   !__cpp__('b64.setSlice(13,b1);			');
-!TODO    b64.BIT(1:2) := b2;
-   !__cpp__('b64.setSlice(1,b2);			');
-
-   ! comparison
-    b1 := b2 == b4i1;
-   !__cpp__('b1 = b2 == b4i1;			');
-    b1 := b2 EQ b4i1;
-   !__cpp__('b1 = b2 == b4i1;			');
-    b1 := b2i2 /= b4i1;
-   !__cpp__('b1 = b2 != b4i1;			');
-    b1 := b2 NE b4i1;
-   !__cpp__('b1 = b2 != b4i1;			');
-
-   ! type conversions
-    fixed31 := TOFIXED(b1);
-   !__cpp__('_fixed31 = b1.toFixed();			');
-!TODO   b2 := TOBIT(1(2));
-   !__cpp__('b2 = pearlrt::BitString<2>(1);			');
+    __cpp__('pearlrt::BitString<64> b4i64(0xf0f0f0f0f0f0f0f0LL);	');
 
 END;
 
 MODEND;
+
+/*
+
+0xf0f0f0f0f0f0f0f0
+  F0F0F0F0F0F0F0F0'B4);
+    __cpp__('pearlrt::BitString<64> b4i64(0xf0f0f0f0f0f0f0f0LL);	');
+
+*/

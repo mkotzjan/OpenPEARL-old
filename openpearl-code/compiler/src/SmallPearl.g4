@@ -1709,7 +1709,14 @@ primaryExpression
     | literal
     | semaTry
     | monadicExplicitTypeConversionOperators
+    | stringSelection
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+stringSelection
+	: ID '.' ( 'BIT' | 'CHAR' | 'CHARACTER' ) '(' expression ( ':' expression ) ')'
+	;
 
 ////////////////////////////////////////////////////////////////////////////////
 

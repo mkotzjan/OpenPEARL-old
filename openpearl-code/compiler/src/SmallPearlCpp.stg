@@ -936,16 +936,20 @@ TypeBitString(length) ::= <<
 pearlrt::BitString\<<length>\>
 >>
 
-Constant(IntegerConstant,TimeConstant,DurationConstant,FloatingPointConstant,StringConstant,BitConstant) ::=  <%
+Constant(IntegerConstant,TimeConstant,DurationConstant,FloatingPointConstant,StringConstant,BitStringConstant) ::=  <%
 <if(IntegerConstant)><IntegerConstant><endif>
 <if(TimeConstant)><TimeConstant><endif>
 <if(DurationConstant)><DurationConstant><endif>
 <if(FloatingPointConstant)><FloatingPointConstant><endif>
 <if(StringConstant)><StringConstant><endif>
-<if(BitConstant)><BitConstant><endif>
+<if(BitStringConstant)><BitStringConstant><endif>
 %>
 
 IntegerConstant(value) ::= <<
+<value>
+>>
+
+BitStringConstant(value) ::= <<
 <value>
 >>
 
