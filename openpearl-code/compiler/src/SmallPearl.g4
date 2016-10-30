@@ -1167,12 +1167,12 @@ position :
 //   F (FieldWidth [ , DecimalPositions [ , ScaleFactor ] ] )
 ////////////////////////////////////////////////////////////////////////////////
 
-fragment FixedFormatSpecifier:
-    'F'
-    ;
+//fragment FixedFormatSpecifier:
+//    'F'
+//    ;
 
 fixedFormat :
-    FixedFormatSpecifier '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
+    'F' '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
