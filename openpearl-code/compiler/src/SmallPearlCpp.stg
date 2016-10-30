@@ -120,6 +120,10 @@ ConstantPoolEntry(name,type,precision,value) ::= <<
 static /*const*/ pearlrt::<type>\<<precision>\>         <name>(<value>);
 >>
 
+ConstantPoolCharacterEntry(name,type,length,value) ::= <<
+static /*const*/ pearlrt::<type>\<<length>\>         <name>("<value>");
+>>
+
 /*********************** GLOBAL DECLARATIONS ***********************/
 
 globalDecl(decls) ::= <<
@@ -439,7 +443,7 @@ FunctionCall(callee,ListOfActualParameters) ::= <%
 literal(integer,float,string,time,duration) ::= <%
 <if(integer)><integer><endif>
 <if(float)><float><endif>
-<if(string)>"<string>"<endif>
+<if(string)><string><endif>
 <if(time)>pearlrt::Clock(<time>)<endif>
 <if(duration)>pearlrt::Duration(<duration>)<endif>
 %>
@@ -966,7 +970,7 @@ FloatingPointConstant(value) ::= <<
 >>
 
 StringConstant(value) ::= <<
-"<value>"
+<value>
 >>
 
 BitConstant(value) ::= <<

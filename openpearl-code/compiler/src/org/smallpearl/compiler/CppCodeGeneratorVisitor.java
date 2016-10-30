@@ -163,6 +163,18 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         }
 
+        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
+            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantCharacterValue ) {
+                ConstantCharacterValue value = (ConstantCharacterValue)ConstantPoolVisitor.constantPool.get(i);
+                ST entry = group.getInstanceOf("ConstantPoolCharacterEntry");
+                entry.add("name", value.toString());
+                entry.add("type", value.getBaseType());
+                entry.add("length", value.getLength());
+                entry.add("value", value.getValue());
+                pool.add("constants", entry);
+            }
+        }
+
         return pool;
     }
 
@@ -1620,6 +1632,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().getText();
 
+/*
             if(s.startsWith("'")) {
                 s = s.substring(1, s.length());
             }
@@ -1627,8 +1640,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             if(s.endsWith("'")) {
                 s = s.substring(0, s.length() - 1);
             }
-
-            literal.add("string", s);
+*/
+            literal.add("string", new ConstantCharacterValue(s).toString());
         } else if (ctx.FloatingPointConstant() != null) {
             // literal.add("float", Double.valueOf(ctx.FloatingPointConstant().toString()));
 
@@ -2513,7 +2526,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 e.add("element", getExpression(c.expression()));
             }
             else {
-                e.add("element", 1);
+                e.add("element", "CONSTANT_FIXED_POS_1_1");
             }
 
             st.add("format", e);

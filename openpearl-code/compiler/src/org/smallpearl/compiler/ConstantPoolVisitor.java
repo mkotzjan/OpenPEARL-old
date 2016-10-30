@@ -111,7 +111,7 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         } else if (ctx.StringLiteral() != null) {
-            System.out.println("string:(" + ctx.StringLiteral().toString() + ")");
+            add(new ConstantCharacterValue(ctx.StringLiteral().toString()));
         } else if (ctx.FloatingPointConstant() != null) {
             try {
                 Double value = Double.parseDouble(ctx.FloatingPointConstant().toString());
