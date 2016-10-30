@@ -41,7 +41,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.8.1";
+    static String version = "v0.8.2";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
