@@ -903,7 +903,9 @@ VariableDeclaration(name,TypeAttribute,InitElement,global,inv) ::= <%
 <if(inv)>const  <endif><TypeAttribute>  <variable(name)><if(InitElement)>(<InitElement>)<endif><if(global)>  (GLOBAL)<endif>; <\n>
 %>
 
-InitElement(value) ::= "<value>"
+InitElement(value) ::= <<
+"<value>"
+>>
 
 GlobalAttribute() ::= <<
 *** GlobalAttribute ***
@@ -945,7 +947,7 @@ Constant(IntegerConstant,TimeConstant,DurationConstant,FloatingPointConstant,Str
 <if(TimeConstant)><TimeConstant><endif>
 <if(DurationConstant)><DurationConstant><endif>
 <if(FloatingPointConstant)><FloatingPointConstant><endif>
-<if(StringConstant)><StringConstant><endif>
+<if(StringConstant)>"<StringConstant>"<endif>
 <if(BitStringConstant)><BitStringConstant><endif>
 %>
 
@@ -1441,4 +1443,8 @@ CaseOut(statements) ::= <%
         <statements>
         break;<\n>
     } // end default<\n>
+%>
+
+ConstantCharacterValue(name) ::= <%
+    <name>
 %>

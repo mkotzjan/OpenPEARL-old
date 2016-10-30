@@ -256,6 +256,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     ST decl = group.getInstanceOf("cpp_inline");
                     st.add("cpp_inlines", visitCpp_inline((SmallPearlParser.Cpp_inlineContext) c));
                 }
+                else if (c instanceof SmallPearlParser.Username_declarationContext) {
+                    visitUsername_declaration((SmallPearlParser.Username_declarationContext)c);
+                }
+                else if (c instanceof SmallPearlParser.User_configurationContext) {
+                    visitUser_configuration((SmallPearlParser.User_configurationContext)c);
+                }
             }
         }
 
@@ -1631,17 +1637,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().getText();
-
-/*
-            if(s.startsWith("'")) {
-                s = s.substring(1, s.length());
-            }
-
-            if(s.endsWith("'")) {
-                s = s.substring(0, s.length() - 1);
-            }
-*/
-            literal.add("string", new ConstantCharacterValue(s).toString());
+            ST constantCharacterValue = group.getInstanceOf("ConstantCharacterValue");
+            constantCharacterValue.add("name",new ConstantCharacterValue(s).toString());
+            literal.add("string", constantCharacterValue);
         } else if (ctx.FloatingPointConstant() != null) {
             // literal.add("float", Double.valueOf(ctx.FloatingPointConstant().toString()));
 
@@ -3699,6 +3697,31 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         return st;
+    }
+
+    @Override
+    public ST visitUsername_declaration(SmallPearlParser.Username_declarationContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public ST visitUsername_declaration_without_data_flow_direction(SmallPearlParser.Username_declaration_without_data_flow_directionContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public ST visitUsername_declaration_with_data_flow_direction(SmallPearlParser.Username_declaration_with_data_flow_directionContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public ST visitUser_configuration(SmallPearlParser.User_configurationContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public ST visitUsername_parameters(SmallPearlParser.Username_parametersContext ctx) {
+        return visitChildren(ctx);
     }
 
     private String unescapeString(String st) {

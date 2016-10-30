@@ -277,7 +277,7 @@ allocationProtection :
 globalAttribute :
     'GLOBAL'  ( '(' ID ')' )?
     ;
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 //  TypeAttribute ::=
 //      SimpleType | TypeReference | Identifier§ForType
@@ -293,17 +293,17 @@ typeAttribute :
 ////////////////////////////////////////////////////////////////////////////////
 
 simpleType :
-       typeInteger 
+       typeInteger
      | typeFloatingPointNumber
-     | typeBitString 
-     | typeCharacterString 
+     | typeBitString
+     | typeCharacterString
      | typeTime
      | typeDuration
     ;
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 // TypeInteger ::=
-//      FIXED [ (Precision) ] 
+//      FIXED [ (Precision) ]
 ////////////////////////////////////////////////////////////////////////////////
 
 typeInteger :
@@ -312,13 +312,13 @@ typeInteger :
 
 ////////////////////////////////////////////////////////////////////////////////
 // Precision ::=
-//      IntegerWithoutPrecision§GreaterZero    
+//      IntegerWithoutPrecision§GreaterZero
 ////////////////////////////////////////////////////////////////////////////////
 
 mprecision :
     integerWithoutPrecision
     ;
- 
+
 integerWithoutPrecision :
     IntegerConstant
     ;
@@ -333,7 +333,7 @@ typeFloatingPointNumber :
 typeBitString :
     'BIT' ( '(' IntegerConstant ')' )?
     ;
-    
+
 typeCharacterString :
     ( 'CHARACTER' | 'CHAR' ) ( '(' IntegerConstant ')' )?
     ;
@@ -1156,7 +1156,7 @@ format :
 position :
       'RST' ( '(' ID ')' )               # positionRST
     | 'SKIP' ( '(' expression ')' )?     # positionSKIP
-    | 'X' ( '(' expression ')' )?        # positionX
+    | XPositionSpecifier ( '(' expression ')' )?        # positionX
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1167,12 +1167,9 @@ position :
 //   F (FieldWidth [ , DecimalPositions [ , ScaleFactor ] ] )
 ////////////////////////////////////////////////////////////////////////////////
 
-//fragment FixedFormatSpecifier:
-//    'F'
-//    ;
 
 fixedFormat :
-    'F' '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
+    FixedFormatSpecifier '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1190,17 +1187,10 @@ fieldWidth :
 // Significance ::= Expression§WithIntegerAsValue
 ////////////////////////////////////////////////////////////////////////////////
 
-fragment FloatFormatSpecifier:
-    'E'
-    ;
-
-fragment FloatFormat3Specifier:
-    'E3'
-    ;
 
 floatFormat:
-      FloatFormatSpecifier '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE
-    | FloatFormat3Specifier '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'  # floatFormatE3
+      FloatFormatESpecifier  '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE
+    | FloatFormatE3Specifier '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'  # floatFormatE3
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1226,10 +1216,6 @@ numberOfCharacters :
 //      T ( FieldWidth [ , DecimalPositions ] )
 ////////////////////////////////////////////////////////////////////////////////
 
-fragment TimeFormatSpecifier:
-    'T'
-    ;
-
 timeFormat:
     TimeFormatSpecifier '(' fieldWidth ( ',' decimalPositions )? ')'
     ;
@@ -1239,9 +1225,6 @@ timeFormat:
 //      D ( FieldWidth [ , DecimalPositions ] )
 ////////////////////////////////////////////////////////////////////////////////
 
-fragment DurationFormatSpecifier:
-    'D'
-    ;
 
 durationFormat:
     DurationFormatSpecifier '(' fieldWidth ( ',' decimalPositions )? ')'
@@ -1346,7 +1329,7 @@ readWriteAbsolutePosition :
 ////////////////////////////////////////////////////////////////////////////////
 
 readWriteRelativePosition :
-      'X'     ( '(' expression ')' )?                         # readWriteRelativePositionX
+      XPositionSpecifier     ( '(' expression ')' )?                         # readWriteRelativePositionX
     | 'SKIP'  ( '(' expression ')' )?                         # readWriteRelativePositionSKIP
     | 'PAGE'  ( '(' expression ')' )?                         # readWriteRelativePositionPAGE
     | 'ADV' '(' ( ( expression ',' )? expression ',' )?
@@ -2025,6 +2008,48 @@ length_definition
  length
      : IntegerConstant
      ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+TimeFormatSpecifier :
+    'T'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+DurationFormatSpecifier :
+    'D'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+FixedFormatSpecifier :
+    'F'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+FloatFormatESpecifier :
+    'E'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+FloatFormatE3Specifier :
+    'E3'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+XPositionSpecifier:
+    'X'
+    ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
