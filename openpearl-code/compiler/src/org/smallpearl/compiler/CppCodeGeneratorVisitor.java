@@ -545,27 +545,35 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                         bres = bres + b.charAt(i);
                     }
                     Long r = Long.parseLong(bres,2);
-                    if (Long.toBinaryString(Math.abs(r)).length() < 31) {
-                        bitStringConstant.add("value", Long.toString(r));
+                    if (Long.toBinaryString(Math.abs(r)).length() < 15) {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString());
+                    } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                            bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "UL");
                     } else {
                         bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
                     }
                 }
                 else if ( nb > b.length()) {
                     bres = b;
+                    /*
                     for ( int i = 0; i < nb - b.length() - 1; i++) {
                         bres = bres + "0";
                     }
+                    */
                     Long r = Long.parseLong(bres,2);
-                    if (Long.toBinaryString(Math.abs(r)).length() < 31) {
-                        bitStringConstant.add("value", Long.toString(r));
+                    if (Long.toBinaryString(Math.abs(r)).length() < 15) {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString());
+                    } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "UL");
                     } else {
                         bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
                     }
                 }
                 else {
-                    if (Long.toBinaryString(Math.abs(l)).length() < 31) {
-                        bitStringConstant.add("value", Long.toString(l));
+                    if (Long.toBinaryString(Math.abs(l)).length() < 15) {
+                        bitStringConstant.add("value", "0x" + Long.toHexString(l).toString());
+                    } else if (Long.toBinaryString(Math.abs(l)).length() < 31) {
+                            bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "UL");
                     } else {
                         bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "ULL");
                     }
