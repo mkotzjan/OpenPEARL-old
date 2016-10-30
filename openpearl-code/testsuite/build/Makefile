@@ -24,8 +24,10 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	703_userdation_dcl 
 
 
-DONOTRUN=000_empty 006_bitstring \
-	703_userdation_dcl 704_dation_open 705_dation_close
+DONOTRUN=000_empty \
+	703_userdation_dcl \
+	704_dation_open \
+	705_dation_close
 
 ####################################################
 ##### do not change beyond this line  ##############
