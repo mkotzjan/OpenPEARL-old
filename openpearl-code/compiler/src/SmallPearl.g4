@@ -78,6 +78,11 @@ program:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ID :   Letter ( Letter | Digit | '_' )* ;
+//IDENTIFIER :   Letter ( Letter | Digit | '_' )* ;
+
+////////////////////////////////////////////////////////////////////////////////
+
 module:
   'MODULE' ( '(' ID ')' | ID ) ';' cpp_inline* system_part? problem_part? 'MODEND' ';'
   ;
@@ -1156,7 +1161,7 @@ format :
 position :
       'RST' ( '(' ID ')' )               # positionRST
     | 'SKIP' ( '(' expression ')' )?     # positionSKIP
-    | XPositionSpecifier ( '(' expression ')' )?        # positionX
+    | 'X' ( '(' expression ')' )?        # positionX
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1169,7 +1174,7 @@ position :
 
 
 fixedFormat :
-    FixedFormatSpecifier '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
+    'F' '(' fieldWidth ( ',' decimalPositions ( ',' scaleFactor )? )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1189,8 +1194,8 @@ fieldWidth :
 
 
 floatFormat:
-      FloatFormatESpecifier  '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE
-    | FloatFormatE3Specifier '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'  # floatFormatE3
+      'E'  '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE
+    | 'E3' '(' fieldWidth ( ',' decimalPositions ( ',' expression )? )? ')'   # floatFormatE3
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1217,7 +1222,7 @@ numberOfCharacters :
 ////////////////////////////////////////////////////////////////////////////////
 
 timeFormat:
-    TimeFormatSpecifier '(' fieldWidth ( ',' decimalPositions )? ')'
+    'T' '(' fieldWidth ( ',' decimalPositions )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1227,7 +1232,7 @@ timeFormat:
 
 
 durationFormat:
-    DurationFormatSpecifier '(' fieldWidth ( ',' decimalPositions )? ')'
+    'D' '(' fieldWidth ( ',' decimalPositions )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1329,7 +1334,7 @@ readWriteAbsolutePosition :
 ////////////////////////////////////////////////////////////////////////////////
 
 readWriteRelativePosition :
-      XPositionSpecifier     ( '(' expression ')' )?                         # readWriteRelativePositionX
+      'X'     ( '(' expression ')' )?                         # readWriteRelativePositionX
     | 'SKIP'  ( '(' expression ')' )?                         # readWriteRelativePositionSKIP
     | 'PAGE'  ( '(' expression ')' )?                         # readWriteRelativePositionPAGE
     | 'ADV' '(' ( ( expression ',' )? expression ',' )?
@@ -1378,11 +1383,6 @@ take_send_rst_s_ctrl_format :
         (',' expression)?)? ')'                         # take_send_rst_s_ctrl_format_CONTROL
     ;
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-ID :   Letter ( Letter | Digit | '_' )* ;
-IDENTIFIER :   Letter ( Letter | Digit | '_' )* ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2010,46 +2010,6 @@ length_definition
      ;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-fragment
-TimeFormatSpecifier :
-    'T'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-fragment
-DurationFormatSpecifier :
-    'D'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-fragment
-FixedFormatSpecifier :
-    'F'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-fragment
-FloatFormatESpecifier :
-    'E'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-fragment
-FloatFormatE3Specifier :
-    'E3'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-fragment
-XPositionSpecifier:
-    'X'
-    ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
