@@ -3494,6 +3494,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST sourceSinkAttributte = group.getInstanceOf("SourceSinkAttribute");
         sourceSinkAttributte.add("attribute",ctx.sourceSinkAttribute().getText());
         st.add("SourceSinkAttribute", sourceSinkAttributte);
+
+        if ( ctx.classAttribute() != null ) {
+            st.add( "ClassAttribute", getClassAttribute(ctx.classAttribute()));
+        }
+        
         return st;
     }
 
