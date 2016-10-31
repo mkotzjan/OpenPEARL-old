@@ -25,6 +25,6 @@ __cpp__(
 );
 */
 ! make automatic test happy
-T: TASK MAIN;
+t: TASK MAIN;
 END;
 MODEND;

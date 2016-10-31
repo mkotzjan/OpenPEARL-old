@@ -2,7 +2,7 @@ MODULE(cppAfterTask);
 
 PROBLEM;
 
-T: TASK MAIN;
+t : TASK MAIN;
   DCL  f  FIXED;
 END;
 
