@@ -1144,13 +1144,11 @@ DationSpecifications(decl) ::= <<
 >>
 
 DationSpecification(name,SpecifyTypeDation) ::= <<
-[** DationSpecification ***]
 extern pearlrt::Device *d_<name>;
 <SpecifyTypeDation>
 >>
 
 SpecifyTypeDation(SourceSinkAttribute,SystemDation,ClassAttribute) ::= <<
-[** SpecifyTypeDation ***]
 >>
 
 SpecificationSystemDationB(name,TypeDation,global) ::= <<

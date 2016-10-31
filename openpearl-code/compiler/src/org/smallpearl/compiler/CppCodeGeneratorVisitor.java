@@ -3434,7 +3434,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST dationDeclarations = group.getInstanceOf("DationDeclarations");
         ST typeDation = group.getInstanceOf("TypeDation");
         dationDeclarations.add("decl", visitIdentifierDenotation(ctx.identifierDenotation()));
-        typeDation = visitTypeDation(ctx.typeDation());
+        typeDation = getTypeDation(ctx.typeDation(),getDationClass(ctx.typeDation().classAttribute()));
 
         ST typology = group.getInstanceOf("Typology");
         ST accessAttributes = group.getInstanceOf("AccessAttributes");
@@ -3498,7 +3498,20 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if ( ctx.classAttribute() != null ) {
             st.add( "ClassAttribute", getClassAttribute(ctx.classAttribute()));
         }
-        
+
+        return st;
+    }
+
+    private ST getTypeDation(SmallPearlParser.TypeDationContext ctx, String dationClass) {
+        ST st = group.getInstanceOf("TypeDation");
+        ST sourceSinkAttributte = group.getInstanceOf("SourceSinkAttribute");
+        sourceSinkAttributte.add("attribute",ctx.sourceSinkAttribute().getText());
+        st.add("SourceSinkAttribute", sourceSinkAttributte);
+
+        if (dationClass.equals("DationRW") && ctx.classAttribute() != null ) {
+            st.add( "ClassAttribute", getClassAttribute(ctx.classAttribute()));
+        }
+
         return st;
     }
 
