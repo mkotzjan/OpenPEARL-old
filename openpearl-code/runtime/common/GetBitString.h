@@ -98,13 +98,15 @@ namespace pearlrt {
 
       \param bitstring the data to be read
       \param w the width of the input field.
+      \param base is 1 (B1), 2(B2) or 3(B3)-format
       \param source the origin of the character sequence
       \throws  BitFormatSignal, if w is < 0, or <br>
       \throws  BitValueSignal, if field was empty
       */
-      static void fromB1(
+      static void fromB123(
          BitString<S> &bitstring,
          const Fixed<31> w,
+         const int base,
          Source & source) {
          if (w.x < 0) {
             throw theBitFormatSignal;
@@ -117,7 +119,8 @@ namespace pearlrt {
 
          GetHelper helper(w, &source);
          uint64_t fixedValue;
-         helper.readB1(&fixedValue, S);
+        
+         helper.readB123(&fixedValue, base, S);
          BitString<S> retVal(fixedValue);
          bitstring.x = retVal.x;
          return;

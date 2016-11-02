@@ -43,9 +43,30 @@ for B1,B3 and B4-format.
 
 
 #include "Sink.h"
+#include "BitString.h"
 
 using namespace std;
 namespace pearlrt {
+
+   template<int S> class PutBits;
+   template<> class PutBits<1> {
+      public:
+         static void toBit(Bits<1>::BitType data, int len, int w, int base, Sink &sink);
+   };
+   template<> class PutBits<2> {
+      public:
+         static void toBit(Bits<2>::BitType data, int len, int w, int base, Sink &sink);
+   };
+
+   template<> class PutBits<4> {
+      public:
+         static void toBit(Bits<4>::BitType data, int len, int w, int base, Sink &sink);
+   };
+
+   template<> class PutBits<8> {
+      public:
+         static void toBit(Bits<8>::BitType data, int len, int w, int base, Sink &sink);
+   };
 
    /**
    Class containing the output formatting of bit string variables
@@ -66,7 +87,7 @@ namespace pearlrt {
    ...
    //PUT x TO console BY B4(1);
    // the console object should provide access to the data sink object
-   pearlrt::PutBitString<3>::toB4(x, 1, console.getSink());
+   pearlrt::PutBitString<3>::toB4(x, (Fixed<31>)(w), console.getSink());
    \endverbatim
 
    */
@@ -77,6 +98,12 @@ namespace pearlrt {
        are provided. They need no objects.
       */
       PutBitString() {}
+
+      /**
+      number of bytes in the data storage
+      */
+      static const int len=NumberOfBytes<S>::resultBitString;
+
    public:
 
       /**
@@ -94,124 +121,39 @@ namespace pearlrt {
       */
       static void toB4(
          BitString<S> &bitstring,
-         int w,
+         Fixed<31> w,
          Sink & sink) {
-         if (w <= 0) {
-            throw theBitFormatSignal;
-         }
 
-         typename BitString<S>::DataType h, m;
-         int i;
-         int shifts;
-         char s;
-// calculation of mask
-// mask must 1111000....0000, according the value of S
-// S=1..8: m.x = 0x0f0    0x0f << 4
-// S=9..16: m.x=0x0f000   0x0f <<12
-// S=17..31 m.x = 0x0f0000000 0x0f << 28
-// --> shift by sizeof(*bitstring) * 8 - 4
-         m = 0x0f;
-         shifts = sizeof(bitstring.x) * 8 - 4;
-         h = bitstring.x;
-         m  <<= shifts;
-// PEARL requires the FIRST 4 bits for the first hex-digit
-// --> round shift
-         shifts = (shifts / 4) * 4;
-
-         for (i = 0; i < w; i++) {
-            if (shifts >= 0) {
-               s = ((h & m) >> shifts) + '0';
-
-               if (s > '9') {
-                  s += 'A' - '9' - 1;
-               }
-
-               sink.putChar(s);
-               m >>= 4;
-               shifts -= 4;
-            } else {
-               sink.putChar('0');
-            }
-         }
+         PutBits<len>::toBit(bitstring.x,S, w.x, 4, sink);
 
          return;
       }
 
-      /**
-      convert the bit string into a character string in hex-format.
-
-      The bit string is treated in bunches of 4 bit, starting at
-      the leftmost position. The length of the output field depends on the
-      length of the bit string.
-
-      \param bitstring the data to be formatted
-      \param sink the destination for the generated character sequence
-      \throws signal in case of trouble
-      */
-      static void toB4(
-         BitString<S> &bitstring,
-         Sink & sink) {
-         int w = (S + 3) / 4;
-         toB4(bitstring, w, sink);
-      }
-
-      /**
-      convert the bit string into a character string in binary-format.
-
-      The bit string is treated in single bits, starting at
-      the leftmost position. If more digits are required
-      than the bit string contains, they are appended with 0 as
-      long as required.
-
-      \param bitstring the data to be formatted
-      \param w the width of the output field.
-      \param sink the destination for the generated character sequence
-      \throw BitFormatSignal, if w is <= 0
-      */
       static void toB1(
          BitString<S> &bitstring,
-         int w,
+         Fixed<31> w,
          Sink & sink) {
-         if (w <= 0) {
-            throw theBitFormatSignal;
-         }
-
-         typename BitString<S>::DataType h, m;
-         int i;
-         h = bitstring.x;
-         m = 0x01;
-         m <<= (sizeof(bitstring.x) * 8 - 1);
-
-         for (i = 0; i < w; i++) {
-            if (h) {
-               sink.putChar('0' + !!(h & m));
-               m >>= 1;
-            } else {
-               sink.putChar('0');
-            }
-         }
+         PutBits<len>::toBit(bitstring.x, S, w.x, 1, sink);
 
          return;
       }
-
-      /**
-      convert the bit string into a character string in binary-format.
-
-      The bit string is treated in single bits, starting at
-      the leftmost position.
-
-      The output field width is according the bit string length.
-      than the bit string contains, they are appended with 0 as
-      long as required.
-
-      \param bitstring the data to be formatted
-      \param sink the destination for the generated character sequence
-      \throws BitFormatSignal, if w is <= 0
-      */
-      static void toB1(
+      static void toB2(
          BitString<S> &bitstring,
+         Fixed<31> w,
          Sink & sink) {
-         toB1(bitstring, S, sink);
+
+         PutBits<len>::toBit(bitstring.x, S, w.x, 2, sink);
+
+         return;
+      }
+      static void toB3(
+         BitString<S> &bitstring,
+         Fixed<31> w,
+         Sink & sink) {
+
+         PutBits<len>::toBit(bitstring.x, S, w.x, 3, sink);
+
+         return;
       }
    };
 

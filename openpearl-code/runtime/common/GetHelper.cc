@@ -42,6 +42,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <cfloat>  // DBL_MAX_10_EXP
+#include <inttypes.h>  // printf uint64_t
 
 #include "GetHelper.h"
 #include "RefChar.h"
@@ -522,26 +523,38 @@ endSampling:
    }
 
 
-   void GetHelper::readB1(uint64_t * value, int nbrOfBitsToSample) {
+   void GetHelper::readB123(uint64_t * value, int nbrOfBitsToSample,
+                            const int base) {
       int sampledBits = 0;
       int c;
+      char maxDigit = '1';;
+      if (base == 1) {
+          maxDigit = '1';
+      } else if (base == 2) {
+          maxDigit = '3';
+      } else if (base == 3) {
+          maxDigit = '7';
+      } 
 
+printf("readhelper::read123: maxDigit=%x base=%d\n", maxDigit, base);
+          
       if (skipSpaces() == 0) {
          do {
             c = readChar();
 
-            if (c  == '0' || c == '1')  {
+            if (c  >= '0' && c <= maxDigit)  {
                if (sampledBits < nbrOfBitsToSample) {
-                  *value <<= 1;
+                  *value <<= base;
                   *value |= c - '0';
-                  sampledBits ++;
+                  sampledBits +=base;
+printf("   got %c: new value = 0x%" PRIx64 "\n", *value);
                }
             } else if (c < 0 || c == ' ') {
                // do nothing - is treated n´in while condition
             } else {
                throw theBitValueSignal;
             }
-         } while ((c == '0' || c == '1') && getRemainingWidth() > 0);
+         } while ((c >= '0' && c <= maxDigit) && getRemainingWidth() > 0);
 
          skipSpaces();
 

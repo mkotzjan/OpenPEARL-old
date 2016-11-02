@@ -47,6 +47,8 @@
 #include "PutFloat.h"
 #include "PutCharacter.h"
 #include "GetCharacter.h"
+#include "PutBitString.h"
+#include "GetBitString.h"
 
 namespace pearlrt {
 
@@ -260,6 +262,107 @@ namespace pearlrt {
 
 
       /**
+      output format B1(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB1(BitString<S> & s, Fixed<31> w) {
+         PutBitString<S>::toB1(s,w,sink);
+      }
+
+      /**
+      input format B1(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB1(BitString<S> & s, Fixed<31> w) {
+         GetBitString<S>::fromB123(s, w, 1, source);
+         return;
+      }
+
+      /**
+      output format B2(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB2(BitString<S> & s, Fixed<31> w) {
+         PutBitString<S>::toB2(s,w,sink);
+      }
+
+      /**
+      input format B2(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB2(BitString<S> & s, Fixed<31> w) {
+         GetBitString<S>::fromB123(s, w, 2, source);
+         return;
+      }
+
+      /**
+      output format B3(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB3(BitString<S> & s, Fixed<31> w) {
+         PutBitString<S>::toB3(s,w,sink);
+      }
+
+      /**
+      input format B3(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB3(BitString<S> & s, Fixed<31> w) {
+         GetBitString<S>::fromB123(s, w, 3, source);
+         return;
+      }
+
+      /**
+      output format B4(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB4(BitString<S> & s, Fixed<31> w) {
+         PutBitString<S>::toB4(s,w,sink);
+      }
+
+      /**
+      input format B4(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB4(BitString<S> & s, Fixed<31> w) {
+         GetBitString<S>::fromB4(s, w, source);
+         return;
+      }
+
+
+      /**
        output format F with Fixed
 
        \param f value to be printed
@@ -383,7 +486,7 @@ namespace pearlrt {
                const Fixed<31> d = 0);
 
       /**
-      output format T
+      input format T
 
       \param f value to be read
       \param w width of the input field

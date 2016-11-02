@@ -60,27 +60,27 @@ TEST(GetBitString, B1_format) {
    pearlrt::BitString<1> x;
    // test format width exceptions
    ASSERT_THROW(
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>) - 1, source),
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>) - 1, 1, source),
       pearlrt::BitFormatSignal);
    // test reading with width=0 and continue with width>0
    ASSERT_NO_THROW(
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)0, source));
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)0, 1, source));
    {
       pearlrt::BitString<1> x1(0);
       ASSERT_TRUE((x == x1).getBoolean());
       pearlrt::BitString<1> x2(0x1);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)3, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)3, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
    // test reading of 2 not separated values
    {
       source.rewind();
       pearlrt::BitString<1> x;
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)2, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)2, 1, source);
       pearlrt::BitString<1> x1(1);
       ASSERT_TRUE((x == x1).getBoolean());
       pearlrt::BitString<1> x2(0);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)1, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)1, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
    // test reading of 2 not separated values skipping appended digits at
@@ -88,11 +88,11 @@ TEST(GetBitString, B1_format) {
    {
       source.rewind();
       pearlrt::BitString<1> x;
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)2, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)2, 1, source);
       pearlrt::BitString<1> x1(1);
       ASSERT_TRUE((x == x1).getBoolean());
       pearlrt::BitString<1> x2(0);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)5, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)5, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
    // test illegal values
@@ -102,7 +102,7 @@ TEST(GetBitString, B1_format) {
       source.rewind();
       pearlrt::BitString<1> x;
       ASSERT_THROW(
-         pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)2, source),
+         pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)2, 1, source),
          pearlrt::BitValueSignal);
    }
    {
@@ -111,7 +111,7 @@ TEST(GetBitString, B1_format) {
       source.rewind();
       pearlrt::BitString<1> x;
       ASSERT_THROW(
-         pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)2, source),
+         pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)2, 1, source),
          pearlrt::BitValueSignal);
    }
    // test capture data from wide fields
@@ -123,16 +123,16 @@ TEST(GetBitString, B1_format) {
       source.rewind();
       pearlrt::BitString<1> x;
       x2 = pearlrt::BitString<1>(1);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)4, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)4, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
       x2 = pearlrt::BitString<1>(0);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)4, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)4, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
       x2 = pearlrt::BitString<1>(1);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)4, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)4, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
       x2 = pearlrt::BitString<1>(1);
-      pearlrt::GetBitString<1>::fromB1(x, (pearlrt::Fixed<31>)4, source);
+      pearlrt::GetBitString<1>::fromB123(x, (pearlrt::Fixed<31>)4, 1, source);
       ASSERT_TRUE((x == x2).getBoolean());
    }
 }

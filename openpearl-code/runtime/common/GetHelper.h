@@ -226,13 +226,15 @@ namespace pearlrt {
       void readB4(uint64_t * value, const int nbrOfBitsToSample);
 
       /**
-       read bin value
+       read bin value in format B1, B2 or B3
 
        \param value pointer to the returns value
        \param nbrOfBitsToSample length of the target bit string
+       \param base is 1(B1), 2(B2) or 3(B3)-Format
        \throws BValueSignal  if illegal characters found
       */
-      void readB1(uint64_t * value, const int nbrOfBitsToSample);
+      void readB123(uint64_t * value, const int nbrOfBitsToSample,
+                    const int base);
 
       /**
       read fixed variable

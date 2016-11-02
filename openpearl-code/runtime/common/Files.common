@@ -52,6 +52,7 @@ CXX_COMMON = \
 	RefCharSink.cc RefCharSource.cc \
 	SystemDationNBSource.cc SystemDationNBSink.cc \
 	PutClock.cc GetClock.cc \
+	PutBitString.cc \
 	GetHelper.cc PutHelper.cc \
 	TaskWhenLinks.cc \
 	TaskCommon.cc \
@@ -86,7 +87,7 @@ XML_COMMON += Log.xml LogFile.xml SampleBasicDation.xml SoftInt.xml
 
 HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \
-	PutBitString.h GetBitString.h \
+	GetBitString.h \
 	Sink.h RefCharSink.h \
 	Fixed.h PutFixed.h GetFixed.h \
 	Device.h UserDation.h \
