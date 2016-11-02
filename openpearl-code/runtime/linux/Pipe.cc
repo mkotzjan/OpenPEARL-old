@@ -144,7 +144,7 @@ namespace pearlrt {
                throw theIllegalPathSignal;
             }
 
-            cap |= (IN | OUT);
+            cap |= (IN | OUT | INOUT);
          }
       } else {
          if (mode & NEW) {
