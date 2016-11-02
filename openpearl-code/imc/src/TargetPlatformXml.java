@@ -257,8 +257,8 @@ public class TargetPlatformXml {
 				String[] paramItems = p.getValue().split(" ");
 				for (int pi =0; pi < paramItems.length; pi++) {
 					found = false;
-					for (int ri=0; ri < ruleItems.length && found == false; ri++) {
-						if (paramItems[i].trim().equals(ruleItems[ri].trim())) {
+					for (int ri=0; ri < ruleItems.length && found == false; ri++) {			
+						if (paramItems[pi].trim().equals(ruleItems[ri].trim())) {
 							found = true;
 						}
 					}
