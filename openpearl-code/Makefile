@@ -77,6 +77,7 @@ ifneq ($(wildcard ./configuration/include/autoconf.*),./configuration/include/au
 endif
 
 clean:
+	(cd imc; make clean; )
 	(cd runtime; make clean; )
 	(cd compiler/src; make clean; )
 	(cd testsuite; make clean; )
