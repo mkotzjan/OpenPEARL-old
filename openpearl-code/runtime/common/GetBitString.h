@@ -118,7 +118,7 @@ namespace pearlrt {
          }
 
          GetHelper helper(w, &source);
-         uint64_t fixedValue;
+         uint64_t fixedValue = 0;
         
          helper.readB123(&fixedValue, base, S);
          BitString<S> retVal(fixedValue);
@@ -162,7 +162,7 @@ namespace pearlrt {
          }
 
          GetHelper helper(w, &source);
-         uint64_t fixedValue;
+         uint64_t fixedValue=0;
          helper.readB4(&fixedValue, S);
          BitString<S> retVal(fixedValue);
          bitstring.x = retVal.x;

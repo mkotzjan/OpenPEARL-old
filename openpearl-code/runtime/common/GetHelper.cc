@@ -536,7 +536,7 @@ endSampling:
           maxDigit = '7';
       } 
 
-printf("readhelper::read123: maxDigit=%x base=%d\n", maxDigit, base);
+printf("GetHelper::readB123: maxDigit=%x base=%d\n", maxDigit, base);
           
       if (skipSpaces() == 0) {
          do {
