@@ -29,6 +29,59 @@
 
 package org.smallpearl.compiler;
 
-public class ConstantBitValue {
+public class ConstantBitValue extends ConstantValue {
+    private String m_value;
 
+    ConstantBitValue(String str) {
+        if( str.startsWith("'")) {
+            str = str.substring(1, str.length());
+        }
+
+        if( str.endsWith("'")) {
+            str = str.substring(0, str.length() - 1);
+        }
+
+        m_value = str;
+    }
+
+    public int getLength() { return m_value.length(); }
+
+    public String getValue() {
+        return m_value;
+    }
+
+    public String getBaseType() {
+        return "BitString";
+    }
+
+    public String toString() {
+        String name = "CONSTANT_" + getBaseType().toUpperCase();
+        name += "_" + m_value.length() + "_" + canonicalize(m_value);
+        return name;
+    }
+
+    public String canonicalize(String str) {
+        String res = "";
+
+        if( str.startsWith("'")) {
+            str = str.substring(1, str.length());
+        }
+
+        if( str.endsWith("'")) {
+            str = str.substring(0, str.length() - 1);
+        }
+
+        for ( int i = 0; i < str.length(); i++) {
+            Character ch = str.charAt(i);
+
+            if ( !(( ch >= 'a' && ch <= 'z') || ( ch >= 'A' && ch <= 'Z' ) || ( ch >= '0' && ch <= '9'))) {
+                ch = '_';
+            }
+
+            res += String.valueOf(ch);
+
+        }
+
+        return res;
+    }
 }
