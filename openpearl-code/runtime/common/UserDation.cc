@@ -67,9 +67,14 @@ namespace pearlrt {
    }
 
    void UserDation::beginSequence(TaskCommon * me) {
+      // this method is called before any dation operation starts
+      // in the application
+      // verify that the dation is really open
+      assertOpen();
+
       mutex.lock();
       currentTask = me;
-
+    
       if (me) {
          // for testing purpose it it possible to use
          // without a task object
