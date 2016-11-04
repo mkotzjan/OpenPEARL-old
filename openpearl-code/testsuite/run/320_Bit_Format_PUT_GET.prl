@@ -41,7 +41,7 @@ DCL pipe_in DATION IN ALPHIC DIM(*,80)
              FORWARD NOCYCL  STREAM 
              CREATED(pipe);
 
-     DCL (b0,b1) BIT(1) INIT('0'B1,'1'B1);
+     DCL b0 BIT(1) INIT('0'B1);
      DCL (text, expect) CHAR(10);
   
      DCL check FIXED(15) INIT(0);
@@ -55,11 +55,16 @@ DCL pipe_in DATION IN ALPHIC DIM(*,80)
      expect := '0         ';
      check_streq(text,expect);
 
+/*
+     b0 = '1'B1;
      PUT b1 TO pipe_out BY  B1(1), SKIP;
      GET text FROM pipe_in BY A, SKIP;
      expect := '1         ';
      check_streq(text,expect);
-
+*/
+     PUT '1' TO pipe_out BY A,SKIP;
+     GET b0 FROM pipe_in BY  B1(1), SKIP;
+     PUT 'got as B1: ',b0 TO termout BY  A, B1(1), SKIP;
      CLOSE pipe_in;
      CLOSE pipe_out;
 
