@@ -16,6 +16,7 @@
 # the result of make doesnotbuild is ok, if no test cases work
  
 DONOTBUILD= 030_signals 031_signalsInduce  \
+	041_if_if \
 	401_char_expr1 \
 	090_tasking  \
 	602_clock_expr1	\
@@ -23,6 +24,7 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	700_dation_rw
 
 DONOTRUN=000_empty \
+	042_switch \
 	703_userdation_dcl \
 	704_dation_open \
 	705_dation_close
@@ -42,7 +44,7 @@ all:	allbuild allrun
 help:
 	@echo "make          : --> make all    " 
 	@echo "make all      : make allbuild; make allrun  "
-	@echo "make redo     : perform regression tests: make build; make run  "
+	@echo "make redo     : perform regression tests: make build,doesnotbuild,run,doesnotrun  "
 	@echo "make allbuild : tests for compile pass1 and pass2 (all targets)"
 	@echo "make build    : tests for compile pass1 and pass2 (except known problems)"
 	@echo "make doesnotbuild    : tests non of the known problems does build"
@@ -53,7 +55,7 @@ help:
 	@echo "make help     : this output"
 	@echo
 
-redo:	build run
+redo:	build doesnotbuild run doesnotrun
 
 allbuild:
 	@echo "try to build test programs"
@@ -92,3 +94,4 @@ clean:
 	rm -f *.cc *.out *.xml *.log *.o
 	rm -f pearl_log.txt 
 	rm -f system.cc 
+	rm -f .log

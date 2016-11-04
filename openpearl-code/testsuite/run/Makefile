@@ -65,6 +65,8 @@ clean:
 	rm -f $(TARGETS)
 	rm -f *.cc *.o *.out *.log *.xml
 	rm -f system.cc
+	rm -f pearl_log.txt testLog.txt
+
 	./clean_m4.sh
 	
 

@@ -13,6 +13,10 @@ T1: TASK MAIN;
     FIN;
     f3 = 4;
   FIN;
+
+  IF f1 < f2 AND f2 < f3 THEN
+     f2 := 0;
+  FIN;
 END;
 
 MODEND;
