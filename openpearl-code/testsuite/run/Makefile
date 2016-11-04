@@ -63,10 +63,8 @@ allrun:
 
 clean:
 	rm -f $(TARGETS)
-	rm -f *.cc
-	rm -f *.o
-	rm -f *.out
-	rm -f *.log
+	rm -f *.cc *.o *.out *.log *.xml
+	rm -f system.cc
 	./clean_m4.sh
 	
 

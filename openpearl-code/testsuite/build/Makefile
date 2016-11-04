@@ -89,7 +89,6 @@ doesnotrun:
 
 clean:
 	rm -f $(BINS)
-	rm -f *.cc
-	rm -f *.out
-	rm -f *.log
-	rm -f pearl_log.txt
+	rm -f *.cc *.out *.xml *.log *.o
+	rm -f pearl_log.txt 
+	rm -f system.cc 
