@@ -62,12 +62,12 @@ namespace pearlrt {
    }
 
    LogFile* LogFile::dationOpen(const char * idf, int openParams) {
-printf("logfile op=%d  provider=%p\n", openParams, provider);
+//printf("logfile op=%d  provider=%p\n", openParams, provider);
       if (openParams) {
          Log::warn("LogFile: openParams ignored");
       }
 
-printf(" delegate open \n");
+//printf(" delegate open \n");
       // remove file if it exists
       provider = provider->dationOpen(logFileName,
                             Dation::INOUT | Dation::IDF | Dation::ANY);
@@ -75,7 +75,7 @@ printf(" delegate open \n");
 
       provider = provider->dationOpen(logFileName,
                            Dation::OUT | Dation::IDF | Dation::NEW);
-printf("logfile .... provider=%p\n",provider);
+//printf("logfile .... provider=%p\n",provider);
 
       return this;
    }
@@ -93,7 +93,7 @@ printf("logfile .... provider=%p\n",provider);
 
 
    void LogFile::dationWrite(void * source, size_t size) {
-printf("LogFile: delegate write to %p\n", provider); 
+//printf("LogFile: delegate write to %p\n", provider); 
       provider->dationWrite(source, size);
    }
 
