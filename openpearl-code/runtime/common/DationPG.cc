@@ -47,6 +47,7 @@
 #include "PutClock.h"
 #include "GetClock.h"
 #include "PutDuration.h"
+#include "GetDuration.h"
 
 namespace pearlrt {
 
@@ -140,16 +141,22 @@ namespace pearlrt {
       PutClock::toT(f, w, d, sink);
    }
 
+   void DationPG::fromT(Clock & f,
+                        const Fixed<31> w,
+                        const Fixed<31> d) {
+      GetClock::fromT(f, w, d, source);
+   }
+
    void DationPG::toD(const Duration& f,
                       const Fixed<31> w,
                       const Fixed<31> d) {
       PutDuration::toD(f, w, d, sink);
    }
 
-   void DationPG::fromT(Clock & f,
+   void DationPG::fromD(Duration & f,
                         const Fixed<31> w,
                         const Fixed<31> d) {
-      GetClock::fromT(f, w, d, source);
+      GetDuration::fromD(f, w, d, source);
    }
 
 }

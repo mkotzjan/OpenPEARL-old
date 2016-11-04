@@ -547,7 +547,7 @@ printf("GetHelper::readB123: maxDigit=%x base=%d\n", maxDigit, base);
                   *value <<= base;
                   *value |= c - '0';
                   sampledBits +=base;
-printf("   got %c: new value = 0x%" PRIx64 "\n", *value);
+printf("   got %c: new value = 0x%" PRIx64 "\n", c, *value);
                }
             } else if (c < 0 || c == ' ') {
                // do nothing - is treated n´in while condition

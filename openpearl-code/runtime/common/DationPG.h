@@ -453,12 +453,11 @@ namespace pearlrt {
       \tparam  S width of the fixed value type
       */
       template<int S>
-      void fromF(Float<S> & f,
+      void fromE(Float<S> & f,
                  const Fixed<31> w,
                  const Fixed<31> d,
-                 const Fixed<31> s,
-               const Fixed<31> e) {
-         GetFloat<S>::fromE(f, w, d, s, e, source);
+                 const Fixed<31> s) {
+         GetFloat<S>::fromE(f, w, d, s, source);
       };
 
 
@@ -475,6 +474,17 @@ namespace pearlrt {
 
 
       /**
+      input format T
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      */
+      void fromT(Clock & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0) ;
+
+      /**
        output format D
 
        \param f value to be printed
@@ -486,15 +496,15 @@ namespace pearlrt {
                const Fixed<31> d = 0);
 
       /**
-      input format T
+       input format D
 
-      \param f value to be read
-      \param w width of the input field
-      \param d number of decimals to be used
-      */
-      void fromT(Clock & f,
-                 const Fixed<31> w,
-                 const Fixed<31> d = 0) ;
+       \param f value to be read
+       \param w width of the input field
+       \param d number of decimals to be used
+       */
+      void fromD(Duration& f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0);
 
    };
 }

@@ -129,7 +129,6 @@ namespace pearlrt {
                         const Fixed<31> w,
                         const Fixed<31> d,
 			const Fixed<31> s,
-			const Fixed<31> e,
                         Source & source) {
          Float<53> value;
 

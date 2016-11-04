@@ -232,7 +232,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 12E3           X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, 2,  source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(1.2E4)).getBoolean());
    }
    {
@@ -240,7 +240,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 12             X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4,   2,source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4,source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(1.2E1)).getBoolean());
    }
    {
@@ -248,7 +248,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 12E-4             X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, 2,  source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(1.2E-3)).getBoolean());
    }
    {
@@ -256,7 +256,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d("-12E-4             X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, 2,  source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(-1.2E-3)).getBoolean());
    }
    // exotic values
@@ -265,7 +265,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d("1E-4             X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4,  2, source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(1E-4)).getBoolean());
    }
    // exotic values
@@ -274,7 +274,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(".1E-4             X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4,  2, source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(1E-5)).getBoolean());
    }
    // exotic values
@@ -283,7 +283,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d("-.1E-4             X");
       rc.setWork(d);
       source.rewind();
-      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, 2,  source));
+      EXPECT_NO_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source));
       EXPECT_TRUE((f24 == pearlrt::Float<24>(-1E-5)).getBoolean());
    }
 
@@ -294,11 +294,11 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d("                    ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 0, 1, 4,  2, source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 0, 1, 4, source),
         pearlrt::ExpFormatSignal);
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, -1, 4,  2, source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, -1, 4, source),
         pearlrt::ExpFormatSignal);
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 0, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 0, source),
         pearlrt::ExpFormatSignal);
    }
    // error: no data
@@ -307,7 +307,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d("                    ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4,  2, source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source),
         pearlrt::NoDataInFieldSignal);
    }
    // error: illegal value only -
@@ -316,7 +316,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" -                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value only no mantissa
@@ -325,7 +325,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" E10                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value only no mantissa
@@ -334,7 +334,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" +.E10                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value only no mantissa
@@ -343,7 +343,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" .E10                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value no exponent
@@ -352,7 +352,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 1E                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4,  2, source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value no exponent
@@ -361,7 +361,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 1E+                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value no exponent
@@ -370,7 +370,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 1e+3                  ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::ExpValueSignal);
    }
    // error: illegal value too large exponent
@@ -379,7 +379,7 @@ TEST(getFloat, EFormat) {
       pearlrt::Character<30> d(" 1E+333                ");
       rc.setWork(d);
       source.rewind();
-      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, 2,  source),
+      EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 16, 1, 4, source),
         pearlrt::FloatIsINFSignal);
    }
 }
