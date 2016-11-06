@@ -306,3 +306,31 @@ TEST(DationPG, signal_get) {
    ASSERT_EQ(rst.x , pearlrt::theFixedValueSignal.whichRST());
    logbuch.dationClose(0, (pearlrt::Fixed<15>*)0);
 }
+
+TEST(DationPG, notOpened) {
+   pearlrt::Log::info("*** DationPG: not opened start ***");
+   pearlrt::Character<9> filename("put_1.txt");
+   pearlrt::SystemDationNB* disc_ =
+      static_cast<pearlrt::SystemDationNB*>(_disc);
+   pearlrt::DationDim2 dim(80);
+   /* -------------------------------------------- */
+   pearlrt::Log::info("      DationPG: simple_out start   ");
+   pearlrt::DationPG logbuch(disc_,
+                             pearlrt::Dation::OUT |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::STREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim);
+/*
+   ASSERT_NO_THROW(
+      logbuch.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::ANY ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+*/
+   pearlrt::Character<8> text("PEARL");
+   pearlrt::Fixed<31>  x(42);
+   ASSERT_THROW(logbuch.beginSequence(NULL),
+      pearlrt::NotAllowedSignal);
+}
