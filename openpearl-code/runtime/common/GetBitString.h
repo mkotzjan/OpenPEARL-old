@@ -118,9 +118,10 @@ namespace pearlrt {
          }
 
          GetHelper helper(w, &source);
+         helper.setDelimiters(GetHelper::EndOfLine);
          uint64_t fixedValue = 0;
         
-         helper.readB123(&fixedValue, base, S);
+         helper.readB123(&fixedValue, S, base);
          BitString<S> retVal(fixedValue);
          bitstring.x = retVal.x;
          return;
@@ -162,6 +163,7 @@ namespace pearlrt {
          }
 
          GetHelper helper(w, &source);
+         helper.setDelimiters(GetHelper::EndOfLine);
          uint64_t fixedValue=0;
          helper.readB4(&fixedValue, S);
          BitString<S> retVal(fixedValue);

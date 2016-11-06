@@ -504,19 +504,23 @@ endSampling:
                   sampledBits += 4;
                }
             } else if (c < 0 || c == ' ') {
-               // do nothing - is treated n´in while condition
+               // do nothing - is treated in while condition
             } else {
                throw theBitValueSignal;
             }
          } while (c > 0 && isxdigit(c) && getRemainingWidth() > 0);
 
          skipSpaces();
+         
+         while (sampledBits > 0 && (sampledBits < nbrOfBitsToSample)) {
+            // delimiter detected
+            *value <<= 4;
+            sampledBits += 4;
+         } 
 
-         if (getRemainingWidth() == 0) {
-            shifts = (4 - (nbrOfBitsToSample % 4)) % 4;
-            *value >>= shifts;   // remove padding bits at right side
-            return;
-         }
+         shifts = (4 - (nbrOfBitsToSample % 4)) % 4;
+         *value >>= shifts;   // remove padding bits at right side
+         return;
       }
 
       throw theNoDataInFieldSignal;
@@ -527,6 +531,8 @@ endSampling:
                             const int base) {
       int sampledBits = 0;
       int c;
+      int shifts;
+
       char maxDigit = '1';;
       if (base == 1) {
           maxDigit = '1';
@@ -557,14 +563,22 @@ printf("   got %c: new value = 0x%" PRIx64 "\n", c, *value);
          } while ((c >= '0' && c <= maxDigit) && getRemainingWidth() > 0);
 
          skipSpaces();
+         
+         while (sampledBits > 0 && (sampledBits < nbrOfBitsToSample)) {
+            // delimiter detected
+            *value <<= base;
+            sampledBits += base;
+         } 
 
-         if (getRemainingWidth() == 0) {
-            return;
-         }
+         shifts = (base - (nbrOfBitsToSample % base)) % base;
+         *value >>= shifts;   // remove padding bits at right side
+         return;
       }
 
       throw theNoDataInFieldSignal;
    }
+
+
 
    void GetHelper::readFixedByF(Fixed63 * f, int d) {
       bool goOn = true;
