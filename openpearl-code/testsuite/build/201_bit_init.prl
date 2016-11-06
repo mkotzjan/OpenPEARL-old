@@ -10,6 +10,8 @@ PROBLEM;
     DCL b BIT INIT('0'B1);
     DCL b1 BIT(1) INIT('1'B1);
     DCL b2 BIT(2) INIT('01'B1);
+    DCL b2a BIT(2) INIT('10'B1);
+    DCL b2b BIT(2) INIT('1'B1);
     DCL b15 BIT(15) INIT('000111100001111'B1);
     DCL b32 BIT(32) INIT('12345678'B4);
     DCL b33 BIT(33) INIT('01234567012'B3);
@@ -64,6 +66,12 @@ T1: TASK MAIN;
         '       pearlrt::Control::setExitCode(1);       '
         '} '     
 	);
+        IF b2a NE b2b THEN
+        __cpp__(
+        '       printf("BIT(2) INIT (\'10\'B1) NE \'1\'B1: fail\\n");       '
+        '       pearlrt::Control::setExitCode(1);       '
+        );
+        FIN;
 END;
 
 MODEND;

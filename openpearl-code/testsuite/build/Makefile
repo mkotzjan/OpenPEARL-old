@@ -20,11 +20,11 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	401_char_expr1 \
 	090_tasking  \
 	602_clock_expr1	\
-	701_dation_pg \
-	700_dation_rw
+	701_dation_pg 
 
 DONOTRUN=000_empty \
 	042_switch \
+	201_bit_init \
 	703_userdation_dcl \
 	704_dation_open \
 	705_dation_close
