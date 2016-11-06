@@ -2,14 +2,8 @@ MODULE(dationrw);
 SYSTEM;
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
-!disc: Disc('/tmp/' ,10);
+disc: Disc('/tmp/' ,10);
 
-/* expected C++ code  */
-__cpp__(
-     'static pearlrt::Disc s_disc("/tmp/", 10);'
-     'pearlrt::Device * d_disc = & s_disc;'
-);
-/*  */
 PROBLEM;
    SPC disc DATION INOUT SYSTEM ALL;
 
@@ -21,8 +15,6 @@ FileTest1: TASK MAIN;
 
      OPEN table BY ANY,IDF('file1.txt');
 
-!        'pearlrt::Character<9> tmp_name("file1.txt");'
-!        '_table.dationOpen(pearlrt::Dation::IDF | pearlrt::Dation::ANY, &tmp_name);'
               WRITE f4 TO table;
               WRITE f4 TO table;
               WRITE f4 TO table;
