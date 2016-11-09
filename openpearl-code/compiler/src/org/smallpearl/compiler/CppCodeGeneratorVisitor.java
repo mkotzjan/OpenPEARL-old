@@ -1312,6 +1312,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitCase_statement_selection_out(SmallPearlParser.Case_statement_selection_outContext ctx) {
         ST st = group.getInstanceOf("CaseOut");
+
+        for ( int i = 0; i < ctx.statement().size(); i++) {
+            st.add("statements", visitStatement(ctx.statement(i)));
+        }
+
         return st;
     }
 

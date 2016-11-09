@@ -24,7 +24,6 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	701_dation_pg 
 
 DONOTRUN=000_empty \
-	042_switch \
 	201_bit_init \
 	703_userdation_dcl \
 	704_dation_open \

@@ -89,6 +89,29 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                     }
                 }
             }
+            else if ( value instanceof ConstantCharacterValue) {
+                if (constantPool.get(i) instanceof ConstantCharacterValue) {
+                    String s1 = ((ConstantCharacterValue)(value)).getValue();
+                    String s2 = ((ConstantCharacterValue)(constantPool.get(i))).getValue();
+
+                    if ( s1.equals(s2)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            else if ( value instanceof ConstantBitValue) {
+                if (constantPool.get(i) instanceof ConstantBitValue) {
+                    String s1 = ((ConstantBitValue)(value)).getValue();
+                    String s2 = ((ConstantBitValue)(constantPool.get(i))).getValue();
+
+                    if ( s1.equals(s2)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
         }
 
         if (!found) {
@@ -124,7 +147,10 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
             }
         } else if (ctx.timeConstant() != null) {
         } else if (ctx.durationConstant() != null) {
+        } else if (ctx.BitStringLiteral() != null) {
+            add(new ConstantBitValue(ctx.BitStringLiteral().toString()));
         }
+
         return null;
     }
 
