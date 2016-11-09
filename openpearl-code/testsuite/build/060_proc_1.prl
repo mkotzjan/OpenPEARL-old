@@ -5,6 +5,7 @@ sum1: PROC ( (a,b) FIXED(15) ) RETURNS(FIXED(15));
   DCL result FIXED(15);
 
   result := a + b;
+  result := sum2(a,b);
   RETURN (result);
 END;
  
