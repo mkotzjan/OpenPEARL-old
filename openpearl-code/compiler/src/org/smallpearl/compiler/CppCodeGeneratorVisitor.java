@@ -890,6 +890,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     problem_part.add("DationDeclarations", visitDationDeclaration((SmallPearlParser.DationDeclarationContext) c));
                 } else if (c instanceof SmallPearlParser.ProcedureDeclarationContext) {
                     problem_part.add("ProcedureDeclarations", visitProcedureDeclaration((SmallPearlParser.ProcedureDeclarationContext) c));
+                    problem_part.add("ProcedureSpecifications", getProcedureSpecification((SmallPearlParser.ProcedureDeclarationContext) c));
                 }
             }
         }
@@ -3783,6 +3784,26 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             if (c instanceof SmallPearlParser.ProcedureBodyContext) {
                 st.add("body", visitProcedureBody((SmallPearlParser.ProcedureBodyContext) c));
             } else
+            if (c instanceof SmallPearlParser.ResultAttributeContext) {
+                st.add("resultAttribute", visitResultAttribute((SmallPearlParser.ResultAttributeContext) c));
+            } else
+            if (c instanceof SmallPearlParser.GlobalAttributeContext) {
+                st.add("globalAttribute", visitGlobalAttribute((SmallPearlParser.GlobalAttributeContext) c));
+            } else
+            if (c instanceof SmallPearlParser.ListOfFormalParametersContext) {
+                st.add("listOfFormalParameters", visitListOfFormalParameters((SmallPearlParser.ListOfFormalParametersContext) c));
+            }
+        }
+
+        return st;
+    }
+
+    private ST getProcedureSpecification(SmallPearlParser.ProcedureDeclarationContext ctx) {
+        ST st = group.getInstanceOf("ProcedureSpecification");
+
+        st.add("id", ctx.ID().getText());
+
+        for (ParseTree c : ctx.children) {
             if (c instanceof SmallPearlParser.ResultAttributeContext) {
                 st.add("resultAttribute", visitResultAttribute((SmallPearlParser.ResultAttributeContext) c));
             } else

@@ -134,10 +134,18 @@ globalDecl(decls) ::= <<
 
 /*********************** PROBLEM PART ***********************/
 
-ProblemPart(ScalarVariableDeclarations,SemaDeclarations,temporarySemaphoreArrays,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureDeclarations) ::= <<
+ProblemPart(ScalarVariableDeclarations,SemaDeclarations,temporarySemaphoreArrays,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations) ::= <<
 /////////////////////////////////////////////////////////////////////////////
 // PROBLEM PART
 /////////////////////////////////////////////////////////////////////////////
+
+<if(ProcedureSpecifications)>
+/////////////////////////////////////////////////////////////////////////////
+// PROCEDURE SPECIFICATIONS
+/////////////////////////////////////////////////////////////////////////////
+<ProcedureSpecifications>
+<endif>
+
 
 <if(DationSpecifications)>
 /////////////////////////////////////////////////////////////////////////////
@@ -1366,6 +1374,12 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
 >>
 
 /* --------------------- PROCEDURES -------------------------- */
+
+ProcedureSpecification(id,listOfFormalParameters,body,resultAttribute,globalAttribute) ::= <<
+<if(resultAttribute)><resultAttribute><else>void<endif>
+<user_procedure(id)>(pearlrt::Task *me<if(listOfFormalParameters)>, <listOfFormalParameters><endif>);
+
+>>
 
 ProcedureDeclaration(id,listOfFormalParameters,body,resultAttribute,globalAttribute) ::= <<
 <if(resultAttribute)><resultAttribute><else>void<endif>
