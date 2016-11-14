@@ -40,7 +40,7 @@ in the xml-subtree \verb|problem|.
 If a system element defines a user name the \verb|<username>| tag is 
 used. Each user name is accompanied by an system name with the tag 
 \verb|<sysname>|, which may have parameters.
-Maybe there is a list of associations, thus there may by a tree
+The sysname-tag may contain a list of associations, thus there may by a tree
 of \verb|<association>| tags.
 The user name tag contains the attribute \verb|line| with the value of the 
 source code line number.
@@ -113,13 +113,13 @@ MODEND;
       <parameters>
          <BIT>'48'B4</BIT>
       </parameters>
+      <association name="I2CBus">
+         <parameters>
+            <CHAR>'/dev/i2c-0'</CHAR>
+            <FIXED>100000</FIXED>
+         </parameters>
+      </association>
    </sysname>
-   <association name="I2CBus">
-      <parameters>
-         <CHAR>'/dev/i2c-0'</CHAR>
-         <FIXED>100000</FIXED>
-      </parameters>
-   </association>
 </username>
 
 <username name="lm75a" line="6">
@@ -127,9 +127,9 @@ MODEND;
       <parameters>
          <BIT>'49'B4</BIT>
       </parameters>
+      <association name="i2cbus1">
+      </association>
    </sysname>
-   <association name="i2cbus1">
-   </association>
 </username>
 
 <username name="i2cbus1" line="7">
@@ -172,9 +172,9 @@ MODEND;
       <parameters>
          <CHAR>'EW'</CHAR>
       </parameters>
+      <association name="StdOut">
+      </association>
    </sysname>
-   <association name="StdOut">
-   </association>
 </configuration>
 </system>
 <problem>
