@@ -3,9 +3,24 @@ SYSTEM;
 ! Disc defines a folder on the file system. The second parameters
 ! denotes the maximum number of simultaneous open files
 disc: Disc('/tmp/' ,10);
+stdout: StdOut;
 
 PROBLEM;
    SPC disc DATION INOUT SYSTEM ALL;
+   SPC stdout DATION OUT SYSTEM ALPHIC;
+   DCL stdOut DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
+
+ticket126: TASK;
+     DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
+     DCL f FIXED(15) INIT(42);
+     DCL (f4,f5) FIXED(15) INIT(0,0);
+     DCL error FIXED(15);
+
+     OPEN table BY ANY,IDF('file1.txt');
+
+     WRITE f4 TO table BY POS(1), POS(2);
+     CLOSE table;
+END;
 
 FileTest1: TASK MAIN;
      DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
@@ -13,6 +28,7 @@ FileTest1: TASK MAIN;
      DCL (f4,f5) FIXED(15) INIT(0,0);
      DCL error FIXED(15);
 
+     OPEN stdOut;
      OPEN table BY ANY,IDF('file1.txt');
 
               WRITE f4 TO table;
@@ -30,24 +46,27 @@ FileTest1: TASK MAIN;
               READ f4 FROM table BY RST(error), POS(4);
      CLOSE table;
      IF (error /= 0) THEN
-__cpp__('printf(" error: RST-value should be zero( %d)\\n", _error.x);');
+        PUT 'error: RST-value should be zero (', error ,') ' TO stdOut 
+             BY A, F(3), A, SKIP;
 __cpp__('pearlrt::Control::setExitCode(1);');
      FIN;
 
      IF (f /= f5) THEN
-__cpp__('printf(" error: did not read the same value (%d, %d)\\n", _f.x, _f5.x);');
+        PUT 'error: did not read the same value (', f,',', f5,') ' TO stdOut
+         BY A,F(6),A,F(6),A, SKIP;
 __cpp__('pearlrt::Control::setExitCode(1);');
        error = 1;
      FIN;
      IF (f4 /= 0) THEN
-__cpp__('printf("error: f4 should be zero (%d)\\n",_f4.x);');
+       PUT 'error: f4 should be zero (', f4, ') ' TO stdOut 
+         BY A, F(6),A,SKIP;
 __cpp__('pearlrt::Control::setExitCode(1);');
        error = 1;
      FIN;
 
 
     IF error == 0 THEN
-      __cpp__('printf("success\\n");');
+      PUT 'success' TO stdOut BY A, SKIP;
     FIN;
 
 END;

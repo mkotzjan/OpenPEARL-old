@@ -34,6 +34,8 @@ T1: TASK MAIN;
 
 END;
 
+DCL dummy FIXED;
+
 sum2: PROC(a FIXED(15), b FIXED(15)) RETURNS(FIXED(15)); 
   DCL result FIXED(15);
 
