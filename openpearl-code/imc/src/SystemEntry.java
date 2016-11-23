@@ -183,7 +183,7 @@ public class SystemEntry {
 			codeIsCompleted = true;
 		} else if (type.equals("connection")) {
 			params = translateParameters();
-			result = "static pearlrt::" + systemName + " sys_" + userName;
+			result = "static pearlrt::" + systemName + " s_" + userName;
 			if (!params.isEmpty()) {
 				result += "(" + params + ")";
 			}
@@ -211,7 +211,7 @@ public class SystemEntry {
 						+ provider.translateParameters() + ")";
 
 			} else {
-				p += "& " + provider.getName();
+				p += "& s_" + provider.getName();
 				provider.markAsUsed();
 			}
 		}

@@ -117,6 +117,8 @@ Only this file mus be included.
 #endif
 #include "I2CBus.h"
 #include "LM75.h"
+#include "PCF8574In.h"
+#include "PCF8574Out.h"
 
 #ifdef CONFIG_CANSUPPORT
 #ifdef CONFIG_LINUX_PCAN

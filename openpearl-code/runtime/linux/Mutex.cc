@@ -55,7 +55,7 @@ namespace pearlrt {
          // was free
          ret = pthread_mutex_unlock(&mutex);
       }  else {
-         printf("\n@destroy: mutex %s is locked\n", id);
+//         printf("\n@destroy: mutex %s is locked\n", id);
          ret = pthread_mutex_unlock(&mutex);
       }
 

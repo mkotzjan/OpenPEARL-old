@@ -66,6 +66,7 @@ namespace pearlrt {
       HANDLE h;
       char * deviceNode;
       int bitRate;
+      int openCount;
       void internalDationOpen();
       void internalDationClose();
 
