@@ -1,0 +1,125 @@
+MODULE(pcf8574);
+! i/o configuration of the HFU ball sorter machine
+SYSTEM;
+   ! test with ball sorter
+  ls1_8: PCF8574In('20'B4, 7,8) --- i2cbus;
+  ls9:   PCF8574In('21'B4, 0,1) --- i2cbus;
+  esAuf: PCF8574In('21'B4, 1,1) --- i2cbus;
+  esZu:  PCF8574In('21'B4, 2,1) --- i2cbus;
+  esNotaus:  PCF8574In('21'B4, 3,1) --- i2cbus;
+  fahr: PCF8574Out('21'B4,5,2) ---  i2cbus; ! (auf, zu)
+  hm1_7: PCF8574Out('22'B4,6,7) --- i2cbus;
+  i2cbus: I2CBus('/dev/i2c-1');
+  termout: StdOut;
+
+PROBLEM;
+  SPC termout DATION OUT SYSTEM ALPHIC GLOBAL;
+  SPC ls1_8   DATION IN  SYSTEM BASIC BIT(8) GLOBAL;
+  SPC ls9     DATION IN  SYSTEM BASIC BIT(1) GLOBAL;
+  SPC esAuf   DATION IN  SYSTEM BASIC BIT(1) GLOBAL;
+  SPC esZu    DATION IN  SYSTEM BASIC BIT(1) GLOBAL;
+  SPC esNotaus DATION IN  SYSTEM BASIC BIT(1) GLOBAL;
+  SPC fahr DATION OUT  SYSTEM BASIC BIT(2) GLOBAL;
+  SPC hm1_7   DATION OUT  SYSTEM BASIC BIT(7) GLOBAL;
+
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD NOSTREAM CREATED(termout);
+DCL uls1_8 DATION IN BASIC BIT(8) CREATED(ls1_8);
+DCL uls9   DATION IN BASIC BIT(1) CREATED(ls9);
+DCL uesa   DATION IN BASIC BIT(1) CREATED(esAuf);
+DCL uesz   DATION IN BASIC BIT(1) CREATED(esZu);
+DCL uesna  DATION IN BASIC BIT(1) CREATED(esNotaus);
+DCL ufahr DATION OUT BASIC BIT(2) CREATED(fahr);
+DCL uhm1_7 DATION OUT BASIC BIT(7) CREATED(hm1_7);
+
+DCL commonData SEMA PRESET(1);
+DCL ls BIT(9);
+DCL (esa,esz,esna) BIT(1);
+DCL driveJob BIT(2);
+
+dumpInputs: TASK MAIN;
+   
+   OPEN console;
+
+   ACTIVATE readInputs;
+   ACTIVATE wobble;
+   ACTIVATE kicker;
+
+   PUT 'PCF8574 Test started' TO console BY A, SKIP;
+   REPEAT
+      PUT 'LS9-1: ', ls TO console BY A,B1(9);
+      PUT ' DMP : auf: ', esa, ' zu: ', esz, ' notaus: ', esna TO console
+         BY    A,        B1(1), A,    B1(1),   A, B1(1);
+      PUT '  Drive: ' , driveJob TO console BY A, B1(2), SKIP;
+      AFTER 0.5 SEC RESUME;
+   END;
+END; 
+
+wobble: TASK PRIO 5;
+   DCL (auf,zu,stop) BIT(2) INIT('01'B1, '10'B1, '00'B1);
+   DCL lastJob BIT(2) INIT('11'B1);
+   DCL count FIXED INIT(0);
+   OPEN ufahr;
+
+   WHILE count < 10 REPEAT
+      REQUEST commonData;
+      IF esa THEN
+         driveJob := zu; ! close
+      FIN;
+      IF esz THEN
+         driveJob := auf; ! open
+      FIN;
+      IF esna THEN
+         driveJob := auf; ! open
+      FIN;
+      RELEASE commonData; 
+      ! only this task writes the variable driveJob
+      ! thats why it is save to used it without sema
+      IF lastJob NE driveJob THEN
+         SEND driveJob TO ufahr;
+         lastJob := driveJob;
+         count := count + 1;
+      FIN;
+      AFTER 0.01 SEC RESUME;
+   END;
+   driveJob := stop;
+   SEND stop TO ufahr;
+END;
+
+kicker: TASK;
+   DCL (current, allOff) BIT(7) INIT('0000001'B1, '0000000'B1);
+
+   OPEN uhm1_7;
+   REPEAT
+      SEND current TO uhm1_7;
+      AFTER 1 SEC RESUME;
+      SEND allOff  TO uhm1_7;
+      AFTER 1 SEC RESUME;
+      __cpp__('_current = _current.bitCshift(1);');
+   END;
+END;
+
+readInputs: TASK PRIO 10;
+   DCL b8 BIT(8);
+   DCL b1 BIT(1);
+
+   OPEN uls1_8;
+   OPEN uls9;
+   OPEN uesa;
+   OPEN uesz;
+   OPEN uesna;
+   REPEAT
+      REQUEST commonData;
+      TAKE b8 FROM uls1_8;
+      TAKE b1 FROM uls9;
+      TAKE esa FROM uesa;
+      TAKE esz FROM uesz;
+      TAKE esna FROM uesna;
+      __cpp__('_ls = _b1.bitCat(_b8);');
+      RELEASE commonData;
+      AFTER 0.01 SEC RESUME;
+   END; 
+END;
+
+
+
+MODEND;
