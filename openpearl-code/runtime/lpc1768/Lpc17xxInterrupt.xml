@@ -1,0 +1,9 @@
+   <interrupt name="Lpc17xxInterrupt">
+      <parameters>
+        <FIXED length="15">
+           <VALUES>0,2</VALUES>
+        </FIXED>
+        <FIXED length="15"><FIXEDRANGE>0,30</FIXEDRANGE></FIXED>
+      </parameters>
+   </interrupt>
+

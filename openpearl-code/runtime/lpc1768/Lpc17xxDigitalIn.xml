@@ -1,0 +1,15 @@
+   <dation name="Lpc17xxDigitalIn">
+      <parameters>
+         <FIXED length="15">
+             <FIXEDRANGE>0,4</FIXEDRANGE>
+         </FIXED>
+         <FIXED length="15" nick="start">
+             <FIXEDRANGE>0,31</FIXEDRANGE>
+         </FIXED>
+         <FIXED length="15" nick="width">
+            <FIXEDRANGE>1,[$start+1]</FIXEDRANGE>
+         </FIXED>
+      </parameters>
+      <attributes> IN, SYSTEM, BASIC</attributes>
+      <data>BIT($width)</data>
+   </dation>

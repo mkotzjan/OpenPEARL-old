@@ -1,10 +1,8 @@
 MODULE(lcdTest);
 SYSTEM;
-__cpp__(
- 'pearlrt::Lpc17xxClock dummy(1);'
- ' pearlrt::Hy32  s_lcd(1);'
- ' pearlrt::Device * d_lcd = &s_lcd;'
-);
+   !Lpc17xxClock(0);
+__cpp__('pearlrt::Lpc17xxClock dummy(0);');
+   lcd: Hy32(1);
 
 PROBLEM;
 __cpp__(' pearlrt::Character<10> _text1("0123456789");');

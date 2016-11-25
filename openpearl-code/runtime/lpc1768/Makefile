@@ -29,7 +29,7 @@ INCS = .
 CXXSRCS =
 CRCS =
 
-targets := OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a
+targets := OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a lpc1768.xml
 
 # -------------------- add CMSIS support to project
 INCS += ../cortexM/CMSIS/Include
@@ -60,6 +60,7 @@ include ../common/Files.common
 CXXSRCS += $(addprefix ../common/,$(CXX_COMMON))
 CHECK_FILES += $(addprefix ../common/,$(CXX_COMMON))
 INCS += ../common
+XMLFILES  += $(addprefix ../common/,$(XML_COMMON))
 
 #---------------------------------
 # required parts of LPCopen V2.xx 
@@ -74,6 +75,7 @@ LPCOpen_CSRC += $(LPCOpen)/rtc_17xx_40xx.c
 LPCOpen_CSRC += $(LPCOpen)/iocon_17xx_40xx.c
 
 CSRC += Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.c
+XMLFILES += Hy32.xml
 CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.ca \
 	Hy32.h Hy32LowLevel.h
 # ------- add board specific stuff to project
@@ -83,14 +85,19 @@ BOARDSUPPORT += lpc17_oscillators.c
 BOARDSUPPORT += lpc17_SystemInit.c
 BOARDSUPPORT += Lpc17xxRTC.cc
 BOARDSUPPORT += Post.cc
+XMLFILES     += Post.xml
 BOARDSUPPORT += SystemConsole.cc
 BOARDSUPPORT += Lpc17xxTimer0.cc
 BOARDSUPPORT += Lpc17xxClock.cc
+XMLFILES     += Lpc17xxClock.xml
 BOARDSUPPORT += Lpc17xxDigitalIn.cc
 BOARDSUPPORT += Lpc17xxDigitalOut.cc
+XMLFILES     += Lpc17xxDigitalIn.xml Lpc17xxDigitalOut.xml
 BOARDSUPPORT += Lpc17xxInterrupt.cc
+XMLFILES     += Lpc17xxInterrupt.xml
 BOARDSUPPORT += Lpc17xxUartInternal.cc
 BOARDSUPPORT += Lpc17xxUart.cc
+XMLFILES     += Lpc17xxUart.xml
 CHECK_FILES += $(BOARDSUPPORT)
 CHECK_FILES += $(addsuffix .h,$(basename $(BOARDSUPPORT)))
 BOARDSUPPORT += startup_lpc1768.S 
@@ -100,6 +107,7 @@ endif
 ifeq ($(CONFIG_LPC1768_CAN),y)
 LPCOpen_CSRC += $(LPCOpen)/can_17xx_40xx.c
 BOARDSUPPORT += Lpc17xxCan.cc
+XMLFILES     += Lpc17xxCan.xml
 endif
 
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
@@ -144,6 +152,7 @@ PLIB_OBJS += $(addsuffix .o,$(basename $(CSRC)))
 CHECK_FILES := $(sort $(CHECK_FILES))
 
 #$(warning BOARDSUPPORT_OBJ=$(BOARDSUPPORT_OBJ))
+#$(warning XMLFILES=$(XMLFILES))
 
 all: depend $(targets)
 
@@ -162,6 +171,14 @@ libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@echo "[create] $@"
 	@rm   -f libOpenPEARLlpc1768.a
 	@$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
+
+lpc1768.xml: $(XMLFILES)
+	echo $(XMLFILES)
+	@echo "[build] $@"
+	@echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" > $@
+	@echo "<platform file=\"$@\">" >> $@
+	@cat $(XMLFILES) >> $@
+	@echo "</platform>" >> $@
 
 
 phony += depend
@@ -197,6 +214,8 @@ prepare:
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.a
 	@touch $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
+	@touch $(CONFIG_INSTALL_Target)/lib/lpc1768.xml
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/lpc1768.xml
 
 phony += install
 install: all cc_bin run_bin
@@ -208,6 +227,7 @@ install: all cc_bin run_bin
 	mkdir -p $(CONFIG_INSTALL_Target)/lib/ldscripts
 	cp OpenPEARLlpc1768.ld $(CONFIG_INSTALL_Target)/lib/ldscripts
 	cp OpenPEARLlpc1768_board.o $(CONFIG_INSTALL_Target)/lib
+	cp lpc1768.xml $(CONFIG_INSTALL_Target)/lib
 
 phony += cc_bin
 cc_bin:

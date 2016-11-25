@@ -75,7 +75,7 @@ namespace pearlrt {
 
 
       /**
-      Open the OctopusDigitalIn
+      Open the DigitalIn
 
       \param openParam open parameters if given
       \param idf pointer to IDF-value if given
@@ -86,7 +86,7 @@ namespace pearlrt {
       SystemDationB* dationOpen(const char * idf, int openParam);
 
       /**
-      Close the OctopusDigitalIn
+      Close the DigitalIn
 
       \param closeParam close parameters if given
 

@@ -1,0 +1,6 @@
+   <configuration name="Post">
+      <parameters>
+         <FIXED length="15"><VALUES>0,1</VALUES></FIXED>
+      </parameters>
+   </configuration>
+
