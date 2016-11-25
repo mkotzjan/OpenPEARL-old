@@ -2,4 +2,7 @@
       <parameters> </parameters>
       <attributes>FORWARD, OUT, SYSTEM</attributes>
       <data>ALPHIC</data>
+      <associationProvider>
+         <associationType name="AlphicOutProvider"/>
+      </associationProvider>
    </dation>
