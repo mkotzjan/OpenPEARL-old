@@ -103,7 +103,7 @@ public class ModuleXml {
 
 		// get all defined system elements
 		try {
-		   systemElements = systemElements.item(0).getChildNodes();
+			systemElements = systemElements.item(0).getChildNodes();
 		} catch (NullPointerException e) {
 			// no system part
 			return;
@@ -112,11 +112,12 @@ public class ModuleXml {
 		if (systemElements.getLength() > 0) {
 			// search desired signal in the text section of concrete
 			// signal-entry
+			String userName = "config-element";
 			for (int i = 0; i < systemElements.getLength(); i++) {
 				Node n = systemElements.item(i); // .getChildNodes();
 				if (n.getNodeType() == Node.ELEMENT_NODE
 						&& n.getNodeName().equals("username")) {
-					String userName = n.getAttributes().getNamedItem("name")
+					userName = n.getAttributes().getNamedItem("name")
 							.getTextContent();
 					line = Integer.parseInt(n.getAttributes()
 							.getNamedItem("line").getTextContent());
@@ -127,9 +128,8 @@ public class ModuleXml {
 					if (un != null) {
 						// same user name found!
 						if (un.getNode() != null) {
-							// was complete definition --> create new entry an
-							// produce
-							// error message later
+							// was complete definition --> create new entry and
+							// produce the error message later
 							un = new SystemEntry(userName, sourceFileName, line);
 							SystemEntries.add(un);
 						} else {
@@ -140,40 +140,46 @@ public class ModuleXml {
 						SystemEntries.add(un);
 
 					}
-					targetNode = treatSysName(n);
-					un.setTargetNode(targetNode);
 					
-					String mustProvide[] = un.getMustProvide();
-					for (int p = 0; p < mustProvide.length; p++) {
-						// check if the new detected system element provides the
-						// expected interface
-						// System.out.println("test "+mustProvide[p]);
-						Node assocProvider = TargetPlatformXml.provides(
-								targetNode, mustProvide[p]);
-						if (assocProvider == null) {
-							Error.error(userName
-									+ " does not provide previously required interface '"
-									+ mustProvide[p] + "'");
-						} else {
-							if (!un.setMaxClients(
-									mustProvide[p],
-									TargetPlatformXml
-											.getAssociationClients(assocProvider))) {
-								Error.error("too many clients for '"
-										+ un.getName() + "'");
-							}
-						}
-					}
 
 				} else if (n.getNodeType() == Node.ELEMENT_NODE
 						&& n.getNodeName().equals("configuration")) {
 					Error.info("configuration entry found");
 					un = new SystemEntry(sourceFileName, line);
 					SystemEntries.add(un);
-					targetNode = treatSysName(n);
-					un.setTargetNode(targetNode);
-					if (targetNode == null) {
-						System.err.println("configuration problem");
+
+				} else {
+					continue; // lets check the next element
+				}
+				
+				// treate association for username and configuration element
+				// un is the current SystemEntry
+				
+				targetNode = treatSysName(n);
+				if (targetNode == null) {
+					System.err.println("configuration problem");
+				}
+				un.setTargetNode(targetNode);
+
+				String mustProvide[] = un.getMustProvide();
+				for (int p = 0; p < mustProvide.length; p++) {
+					// check if the new detected system element provides the
+					// expected interface
+					// System.out.println("test "+mustProvide[p]);
+					Node assocProvider = TargetPlatformXml.provides(
+							targetNode, mustProvide[p]);
+					if (assocProvider == null) {
+						Error.error(userName
+								+ " does not provide previously required interface '"
+								+ mustProvide[p] + "'");
+					} else {
+						if (!un.setMaxClients(
+								mustProvide[p],
+								TargetPlatformXml
+										.getAssociationClients(assocProvider))) {
+							Error.error("too many clients for '"
+									+ un.getName() + "'");
+						}
 					}
 				}
 			}
@@ -209,7 +215,7 @@ public class ModuleXml {
 						Error.info("parameter types are ok");
 					} else {
 						Error.error("parameter mismatch for system name '"
-								+ systemName+"'");
+								+ systemName + "'");
 					}
 
 					String typeOfElement = TargetPlatformXml
@@ -238,13 +244,14 @@ public class ModuleXml {
 	private void checkAssociation(Node moduleNode, Node systemNode) {
 		String provider = TargetPlatformXml
 				.associationRequiredProvider(systemNode);
-		Node association;
-		// the first association resides in sysname 
+		Node association = null;
+		// the first association resides in sysname
 		// nested associations are located in moduleNode
 		// try to find 'sysname'
-		//  - if present we are in a username or configuration item
-		//  - if NOT present we are in an association, lets try to find the next level       
-		Node sysname = getChildByName(moduleNode,"sysname");
+		// - if present we are in a username or configuration item
+		// - if NOT present we are in an association, lets try to find the next
+		// level
+		Node sysname = getChildByName(moduleNode, "sysname");
 		if (sysname != null) {
 			association = getChildByName(sysname, "association");
 		} else {
@@ -297,7 +304,8 @@ public class ModuleXml {
 					}
 
 					if (!u.incrementAssociationClients(provider)) {
-						Error.error("too many associations for '" + provider+"'");
+						Error.error("too many associations for '" + provider
+								+ "'");
 					}
 
 					un.setProvider(u);
@@ -320,7 +328,7 @@ public class ModuleXml {
 					int maxClients = TargetPlatformXml
 							.getAssociationClients(assoc);
 					if (!u.setMaxClients(provider, maxClients)) {
-						Error.error("too many clients for '" + provider+"'");
+						Error.error("too many clients for '" + provider + "'");
 					}
 
 					un = u;
@@ -332,7 +340,8 @@ public class ModuleXml {
 					}
 
 					if (!u.incrementAssociationClients(provider)) {
-						Error.error("too many associations for '" + provider+"'");
+						Error.error("too many associations for '" + provider
+								+ "'");
 					}
 					if (TargetPlatformXml
 							.associationRequiredProvider(associationSystemNode) != null) {
@@ -351,8 +360,8 @@ public class ModuleXml {
 			// no association in system part, let's check if system device needs
 			// an association
 			if (provider != null) {
-				Error.error("system unit needs association of type '" + provider
-						+ "', but no provider is specified");
+				Error.info("system unit provides unused association of type '"
+						+ provider);
 				return;
 			}
 			return;
@@ -478,7 +487,7 @@ public class ModuleXml {
 		}
 		// get all defined system elements
 		try {
-		  problemElements = problemElements.item(0).getChildNodes();
+			problemElements = problemElements.item(0).getChildNodes();
 		} catch (NullPointerException e) {
 			// no problem part
 			return;
@@ -507,7 +516,8 @@ public class ModuleXml {
 						continue; // next element in loop
 					}
 					un.markAsUsed();
-					// ignore case since the compiler sets the type for signals and interrupts in capital letters
+					// ignore case since the compiler sets the type for signals
+					// and interrupts in capital letters
 					if (!un.getType().equalsIgnoreCase(type)) {
 						Error.error(userName + " is expected as type '" + type
 								+ "' but is defined as '" + un.getType()
@@ -575,7 +585,8 @@ public class ModuleXml {
 
 		Node nDev = getChildByName(un.getNode(), "data");
 		if (nDev == null) {
-			Error.error("System Entry '" + un.getSystemName()+"' contains no <data>-tag");
+			Error.error("System Entry '" + un.getSystemName()
+					+ "' contains no <data>-tag");
 			return;
 		}
 		String dataInDevice = nDev.getTextContent();

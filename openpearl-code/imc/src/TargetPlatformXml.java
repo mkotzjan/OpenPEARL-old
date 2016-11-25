@@ -330,7 +330,11 @@ public class TargetPlatformXml {
 						&& n.getNodeName().equals("needAssociation")) {
 					// get name and remove all surrounding white space characters
 					NamedNodeMap nm = n.getAttributes();
-					Node n1 = nm.getNamedItem("provider");
+					Node n1 = nm.getNamedItem("name");
+					if (n1 == null) {
+						Error.error("Error in platform xml file: needAssociation needs attribute 'name'");
+						return null;
+					} 
 					String provider = n1.getTextContent();
 					return provider;
 				}
