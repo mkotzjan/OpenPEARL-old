@@ -66,7 +66,7 @@
             BASIC, SYSTEM, IN
          </attributes>
          <data>FIXED(15)</data>
-         <needAssociation provider="I2CBusProvider"/>
+         <needAssociation name="I2CBusProvider"/>
       </dation>
       <dation name="Pcf8574">
          <parameters>
@@ -88,7 +88,7 @@
             BASIC, SYSTEM, IN, OUT
          </attributes>
          <data>BIT($width)</data>
-         <needAssociation provider="I2CBusProvider"/>
+         <needAssociation name="I2CBusProvider"/>
       </dation>
 
   <configuration name="Log" instances="1">
@@ -97,7 +97,7 @@
          <NotEmpty/>
       </CHAR>
     </parameters>
-    <needAssociation provider="AlphicOutProvider"/>
+    <needAssociation name="AlphicOutProvider"/>
   </configuration>
 
    <connection name="LogFile">
@@ -109,7 +109,7 @@
       <associationProvider>
          <associationType name="AlphicOutProvider"/>
       </associationProvider>
-      <needAssociation provider="NamedAlphicOutProvider"/>
+      <needAssociation name="NamedAlphicOutProvider"/>
    </connection>
 </platform>
 
