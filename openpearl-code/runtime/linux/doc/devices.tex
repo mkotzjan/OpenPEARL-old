@@ -167,7 +167,8 @@ is set afterwards leading to '01'.
 \end{itemize}
  
 \subsection{I2CBus}
-Linux supports normal access to an i2c bus via a device node, if i2c is available. 
+Linux supports normal access to an i2c bus via a device node,
+ if i2c is available. 
 The corresponding device file are named like \texttt{/dev/i2c-0}.
 The i2c subsystem of linux provides test features for the availability
 to the so called {\em repeated start} feature (see I2C\_FUNCS\_I2C)
@@ -180,12 +181,50 @@ Synopsis: & \verb|I2CBus(deviceName)|\\
 \item[deviceName] specifies the name to the device file (e.g. "/dev/i2c-0")
 \end{description}
 
+\paragraph{Note:}
+The I2C bus speed must be set at system level depending on the 
+i2c device module.
+
+
 \subsection{PEAK CAN Bus Interface}
 The CAN bus interface from the company PEAK provides the access via a character 
 device node (e.q. \texttt{/dev/pcan32} and via SocketCAN.
 The socket CAN infrastructure allows no change of the communicatipon setting
 like bitrate for normal users --- the character device from PEAK provides
 such features.
+
+After installation of the PCAN device driver on the system as character 
+device, the corresponding device nodes and libraries are installed 
+in the system (e.g. \verb|/dev/pcan32|).
+
+
+\begin{tabular}{ll}
+Synopsis: & \verb|PCan(deviceName, speed)|\\ 
+\end{tabular}
+
+\begin{description}
+\item[deviceName] specifies the name to the device file (e.g. "/dev/pcan32")
+\item[bus speed] specifies the bus speed. 
+Only the values 125k, 250k, 500k and 1M bps are supported by 
+the OpenPEARL driver.
+\end{description}
+
+The transmission data must have the following structure:
+
+\begin{verbatim}
+   class Can2AMessage {
+
+   public:
+     Fixed<11> identifier;
+     BitString<1> rtrRequest;
+     Fixed<4> dataLength;
+     BitString<8> data[8];
+
+   };
+\end{verbatim}
+
+
+
 
 \subsection{Creating a new Device}
 The creation of a new device is very simple:

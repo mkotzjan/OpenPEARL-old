@@ -41,20 +41,23 @@
 #include <unistd.h>
 
 namespace pearlrt {
-   /**
-   create the I2C-bus device on the named interface
-
-   \param deviceName is the name of the device (e.g. /dev/i2c-1)
-
-   \throws IllegalParamException if the device is not accessible
-   */
    I2CBus::I2CBus(const char * deviceName) {
+
       i2c_file = open(deviceName, O_RDWR);
 
       if (i2c_file < 0) {
          Log::error("I2CBus: %s", strerror(errno));
          throw theIllegalParamSignal;
       }
+      
+      /* there is no ioctl function to modify the transmisssion speed
+         thus we cannot modify it dynamically
+      ret=ioctl(i2c_file, I2C_SET_SPEED, speed);
+      if (ret != 0) {
+         Log::error("I2CBus: error setting transmission speed to %d  (%s)"
+              speed, strerror(errno));
+      }
+      */
    }
 
    /**

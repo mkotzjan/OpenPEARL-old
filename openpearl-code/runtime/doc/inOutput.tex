@@ -200,6 +200,58 @@ Remarks& The temperature is returned in tenth of degree centigrade\\
 \hline
 \end{tabular}
 
+\subsection{I2c-Device PCF8574}
+This device acts as port expander. 
+Individual bits may be ether as input or as output.
+Input and output are treated in different system elements.
+
+\begin{tabular}{|l|p{10cm}|}
+\hline
+Direction & IN \\
+\hline
+System name & PCF8574In \\
+\hline
+Parameters & \\
+ I2C adress & BIT(8) value \\
+  starting bit number (s) & FIXED value between 0 and 7 \\
+   number of bits (w) & FIXED value between 1 and s+1 \\
+\hline
+Type & BIT(w) \\
+\hline
+Remarks& A BIT(w) value may be read from the device.
+The selected bits are masked and shifted to match the BIT(w) value.
+The starting bit number must be specified according the PCF8575 datasheet.
+Bit 7 is the modt significant bit and bit 0 is the least signigicant bit.
+Thus PCF8574In('20'B4, 6,3) selects the device bits 6,5,4 as input.
+\\
+\hline
+\end{tabular}
+
+\ \\
+
+\begin{tabular}{|l|p{10cm}|}
+\hline
+Direction & OUT \\
+\hline
+System name & PCF8574Out \\
+\hline
+Parameters & \\
+ I2C adress & BIT(8) value \\
+  starting bit number (s) & FIXED value between 0 and 7 \\
+   number of bits (w) & FIXED value between 1 and s+1 \\
+\hline
+Type & BIT(w) \\
+\hline
+Remarks& A BIT(w) value may be read from the device.
+The selected bits are masked and shifted to match the BIT(w) value.
+The starting bit number must be specified according the PCF8575 datasheet.
+Bit 7 is the modt significant bit and bit 0 is the least signigicant bit.
+Thus PCF8574Out('20'B4, 3,2) selects the device bits 3,2 as output.
+\\
+\hline
+\end{tabular}
+
+
 \subsection{CAN Bus Interfaces}
 In order to enshure platform indepences in OpenPEARL, all CAN drivers expect 
 a CAN2A message struct as input and output data.

@@ -34,14 +34,17 @@ final:
 	makeindex p-report.idx
 	pdflatex p-report.tex
 	makeindex p-report.idx
+else
+$(warning generation of language report is deselected in 'menuconfig')
 endif
 
 clean:
-	rm -rf p-report.cb 
-	rm -rf p-report.cb2
-	rm -rf p-report.log
-	rm -rf p-report.out
-	rm -rf p-report.toc
-	rm -rf p-report.aux
-	rm -rf p-report.idx p-report.ilg p-report.ind
+	@echo "cleaning temporary files"
+	@rm -rf p-report.cb 
+	@rm -rf p-report.cb2
+	@rm -rf p-report.log
+	@rm -rf p-report.out
+	@rm -rf p-report.toc
+	@rm -rf p-report.aux
+	@rm -rf p-report.idx p-report.ilg p-report.ind
 

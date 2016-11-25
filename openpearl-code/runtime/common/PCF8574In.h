@@ -26,79 +26,63 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef PCAN_H_INCLUDED
-#define PCAN_H_INCLUDED
+#ifndef PCF8574_H_INCLUDED
+#define PCF8574_H_INCLUDED
 /**
 \file
 
-\brief CAN driver for PEAK Can adapters
+\brief Basic system device for the PCF8574 I2C basic dation
 
 */
 
 #include "SystemDationB.h"
 #include "Fixed.h"
 #include "Signals.h"
-#include "Can2AMessage.h"
+#include "I2CProvider.h"
 
 #include <stdint.h>
-#include <libpcan.h>
 
 namespace pearlrt {
 
    /**
    \file
 
-   \brief system device for the PEAK CAN device adapters.
+   \brief Basic system device for an i2c element pcf8574  basic dation
 
-      All versions of the adapet are supported. The PEAK
-      library and device nodes must be installed before 
-      compilation and the search paths for include and lib
-      must be updates.
-
-      This device provides  native access to CAN 2A messages.
-      The transfer data is defined in the Can2AMessage struct.
+      This device provides a simple input and output of an bit(x) values
 
    */
 
-   class PCan: public SystemDationB {
+   class PCF8574In: public SystemDationB {
 
    private:
-      HANDLE h;
-      char * deviceNode;
-      int bitRate;
-      int openCount;
-      void internalDationOpen();
-      void internalDationClose();
+      int16_t addr;
+      int handle;
+      uint8_t mask, start;
+//      void internalDationOpen();
+//      void internalDationClose();
 
    public:
       /**
-      constructor  of the device
-
-      \param devicePath is the path name of the corresponding linux device node
-      \param speed the transmission speed, which may be one of 125000, 250000,
-         500000 or 1000000
+      constructor to create the bit group and set the
+      bits to output direction
 
       \throws IllegalParamSignal in case of init failure
 
       */
-      PCan(char* devicePath, int speed);
-
-      /* destructor 
-         cleanup of the device setting
-      */
-      //~PCan();
+      PCF8574In(I2CProvider * provider, int _addr, int s, int w);
 
       /**
-      Open the dation
+      Open the  dation
 
       \param openParam open parameters if given
       \param idf pointer to IDF-value if given
-      \returns pointer to the PCan object itself as working
+      \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
       \throws NotAllowedSignal, if  dation is not closed and rst is not given
       */
-      SystemDationB* dationOpen(const char* idf = 0, int openParam = 0);
+      PCF8574In* dationOpen(const char* idf = 0, int openParam = 0);
 
       /**
       Close the dation
@@ -108,27 +92,26 @@ namespace pearlrt {
       void dationClose(int closeParam = 0);
 
       /**
-      read  a Can2AMessage struct from the device
+      read  a BIT(width) value from the device.
 
-      the method blocks teh calling thread until one message is available
 
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size is not equal
-                       to the length of the Can2AMessage 
+      \throws IllegalParamSignal, if size != 1, since 1 byte is
+                       expected for the Bit<width> value at maximum
       \throws NotAllowedSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
       /**
-      send  a Can2AMessage to the device
+      send  a  value to the device
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size is not equal
-                       to the length of the Can2AMessage 
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws IllegalParamSignal, if size != 1, since 1 byte is
+                       expected for the Bit<width> value at maximum
+      \throws NotAllowedSignal, in any case
       */
       void dationWrite(void * data, size_t size);
 
@@ -136,10 +119,10 @@ namespace pearlrt {
       obtain the capabilities of the device
 
       This method returns :
-            IN  OUT INOUT
+            IN OUT
 
       does not return:
-            IDF  PRM CAN NEW  OLD ANY
+            IDF  PRM CAN NEW  OLD ANY INOUT 
 
       \returns available commands of the device
       */

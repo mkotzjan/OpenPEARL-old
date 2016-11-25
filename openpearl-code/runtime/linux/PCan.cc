@@ -67,7 +67,9 @@ namespace pearlrt {
            break;
       }
 
+      openCount = 0;
       dationStatus = CLOSED;
+
    }
 
    SystemDationB* PCan::dationOpen(const char * idf, int params) {
@@ -82,25 +84,28 @@ namespace pearlrt {
          Log::error("PCan: only RST allowed");
          throw theNotAllowedSignal;
       }
-
+/*
       if (dationStatus != CLOSED) {
          Log::error("PCan: Dation already open");
          throw theNotAllowedSignal;
       }
+*/
+      if (openCount == 0) {
+         h = LINUX_CAN_Open(deviceNode, O_RDWR);
+         if (h == NULL) {
+             Log::error("PCan: can't open device %s", deviceNode);
+	     throw theIllegalParamSignal;
+         }
 
-      h = LINUX_CAN_Open(deviceNode, O_RDWR);
-      if (h == NULL) {
-          Log::error("PCan: can't open device %s", deviceNode);
-	  throw theIllegalParamSignal;
+         // use standard frames (11Bit ID)
+         ret = CAN_Init(h, bitRate, CAN_INIT_TYPE_ST);
+         if (ret) {
+            Log::error("PCan: error in CAN_Init");
+	     throw theIllegalParamSignal;
+         }
       }
 
-      // use standard frames (11Bit ID)
-      ret = CAN_Init(h, bitRate, CAN_INIT_TYPE_ST);
-      if (ret) {
-         Log::error("PCan: error in CAN_Init");
-	  throw theIllegalParamSignal;
-      }
-   
+      openCount ++;   
       dationStatus = OPENED;
       return this;
    }
@@ -117,9 +122,11 @@ namespace pearlrt {
          throw theNotAllowedSignal;
       }
 
-      CAN_Close(h);
- 
-      dationStatus = CLOSED;
+      openCount --;
+      if (openCount  == 0) {
+         CAN_Close(h);
+         dationStatus = CLOSED;
+      } 
    }
 
    void PCan::dationWrite(void* data, size_t size) {
@@ -186,7 +193,7 @@ namespace pearlrt {
       do {
          ret = CAN_Read(h, &m);
          if (ret) {
-             Log::error("PCan: read error (%04x)", ret);
+             Log::error("PCan: read error (%4x)", ret);
              throw theReadingFailedSignal;
          }
       } while (m.MSGTYPE == MSGTYPE_STATUS); 

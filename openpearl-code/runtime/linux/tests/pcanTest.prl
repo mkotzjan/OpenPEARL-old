@@ -16,14 +16,14 @@ PROBLEM;
 main: TASK MAIN;
     DCL hello CHAR(18) INIT('PCan Test started');
     OPEN stdout;
+    OPEN stdin;
 
     PUT hello TO stdout BY A, SKIP;
 
-    OPEN candev;
     ACTIVATE canRead;
+    ACTIVATE canWrite;
 
-    CLOSE candev;
-    CLOSE stdout;    
+    !CLOSE stdout;    
 
 END;
 
@@ -33,12 +33,31 @@ canWrite: TASK;
     DCL id FIXED(11);
     DCL rtr BIT(1);
     DCL len FIXED(4);
-    DCL (d1,d2,d3,d4,d5,d6,d7,d8) BIT(8);
+    DCL data BIT(8);
+    DCL rtrText CHAR;
+    __cpp__(
+	' struct _CanMessage {'
+        '   pearlrt::Fixed<11>    identifier;'
+        '   pearlrt::BitString<1> rtrRequest; '
+        '   pearlrt::Fixed<4>     dataLength; '
+        '   pearlrt::BitString<8> data[8];    '
+        ' } _canMessage; '
+    );
+
+   OPEN candev;
+
    REPEAT
-       PUT promptId TO stdout BY A;
+       PUT 'enter identifier to send:' TO stdout BY A, SKIP;
        GET id FROM stdin BY F(4), SKIP;
-       PUT 'RTR' TO stdout BY A;
-!       GET rtr FROM stdiin BY B, SKIP; 
+       PUT 'is RTR? (y/n) ' TO stdout BY A;
+       GET rtrText FROM stdin BY A, SKIP; 
+       PUT 'data size? ' TO stdout BY A, SKIP;
+       GET len FROM stdin BY F(1) , SKIP;
+       FOR i TO len REPEAT
+           PUT 'data byte #',i TO stdout BY A,F(1);
+           GET data FROM stdin BY B4(2), SKIP;
+           __cpp__('_canMessage.data[_i.x] = _data;');
+       END;
    END;
 END;
 
@@ -57,6 +76,7 @@ canRead: TASK;
         '   pearlrt::BitString<8> data[8];    '
         ' } _canMessage; '
     );
+   OPEN candev;
     REPEAT
     TAKE canMessage FROM candev;
     __cpp__ (
@@ -75,10 +95,11 @@ canRead: TASK;
     '    _id.x, !!_rtr.x, _len.x, _d1.x, _d2.x, _d3.x, _d4.x,'
     '                             _d5.x, _d6.x, _d7.x, _d8.x);' 
     );
-/*
+
     PUT id,rtr,len,d1,d2,d3,d4,d5,d6,d7,d8 TO stdout BY F(6),X(3),B4(1),X(3),F(4),
-       (8)(B4(2),X(2)),SKIP;
-*/
+       B4(2),X(2), B4(2),X(2), B4(2),X(2), B4(2),X(2),
+       B4(2),X(2), B4(2),X(2), B4(2),X(2), B4(2),X(2), SKIP;
+
     END;
 END;
 MODEND;

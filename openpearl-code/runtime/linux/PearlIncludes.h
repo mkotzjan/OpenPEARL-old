@@ -115,8 +115,18 @@ Only this file mus be included.
 #include "RPiDigitalIn.h"
 #endif
 #endif
+#ifdef CONFIG_HAS_I2C
+#ifdef CONFIG_LINUX_I2C
 #include "I2CBus.h"
+#endif
+#endif
+#ifdef CONFIG_I2C_LM75
 #include "LM75.h"
+#endif
+#ifdef CONFIG_I2C_PCF8574
+#include "PCF8574In.h"
+#include "PCF8574Out.h"
+#endif
 
 #ifdef CONFIG_CANSUPPORT
 #ifdef CONFIG_LINUX_PCAN
