@@ -1,11 +1,8 @@
-   <connection name="LogFile" >
+   <configuration name="Log" instances="1" >
       <parameters>
-         <CHAR length="32767">
+         <CHAR length="4">
            <NotEmpty/>
          </CHAR>
       </parameters>
-      <associationProvider>
-         <associationType name="AlphicOutProvider"/>
-      </associationProvider>
       <needAssociation name="AlphicOutProvider"/>
-   </connection>
+   </configuration>
