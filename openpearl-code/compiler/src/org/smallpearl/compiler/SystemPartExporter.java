@@ -102,8 +102,10 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
             for (ParseTree c : ctx.children) {
                 if (c instanceof SmallPearlParser.Username_declarationContext) {
                     st.add("decls", visitUsername_declaration((SmallPearlParser.Username_declarationContext) c));
-                } else if (c instanceof SmallPearlParser.User_configurationContext) {
-                    st.add("decls", visitUser_configuration((SmallPearlParser.User_configurationContext) c));
+                } else if (c instanceof SmallPearlParser.UserConfigurationWithoutAssociationContext) {
+                    st.add("decls", visitUserConfigurationWithoutAssociation((SmallPearlParser.UserConfigurationWithoutAssociationContext) c));
+                } else if (c instanceof SmallPearlParser.UserConfigurationWithAssociationContext) {
+                    st.add("decls", visitUserConfigurationWithAssociation((SmallPearlParser.UserConfigurationWithAssociationContext) c));
                 }
             }
         }
@@ -195,18 +197,33 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
 
 
     @Override
-    public ST visitUser_configuration(SmallPearlParser.User_configurationContext ctx) {
+    public ST visitUserConfigurationWithoutAssociation(SmallPearlParser.UserConfigurationWithoutAssociationContext ctx) {
         ST user_configuration = group.getInstanceOf("User_Configuration");
 
         user_configuration.add("lineno", ctx.start.getLine());
-        user_configuration.add("sysname", ctx.ID(0).toString());
+        user_configuration.add("sysname", ctx.user_configuration_without_association().ID().toString());
 
-        if (ctx.username_parameters() != null) {
-            user_configuration.add("parameters", visitUsername_parameters(ctx.username_parameters()));
+        if (ctx.user_configuration_without_association().username_parameters() != null) {
+            user_configuration.add("parameters", visitUsername_parameters(ctx.user_configuration_without_association().username_parameters()));
+        }
+
+
+        return user_configuration;
+    }
+
+    @Override
+    public ST visitUserConfigurationWithAssociation(SmallPearlParser.UserConfigurationWithAssociationContext ctx) {
+        ST user_configuration = group.getInstanceOf("User_Configuration");
+
+        user_configuration.add("lineno", ctx.start.getLine());
+        user_configuration.add("sysname", ctx.user_configuration_with_association().ID(0).toString());
+
+        if (ctx.user_configuration_with_association().username_parameters() != null) {
+            user_configuration.add("parameters", visitUsername_parameters(ctx.user_configuration_with_association().username_parameters()));
         }
 
         ST association = group.getInstanceOf("Association");
-        association.add("name", ctx.ID(1).toString());
+        association.add("name", ctx.user_configuration_with_association().ID(1).toString());
         user_configuration.add("association", association);
 
         return user_configuration;

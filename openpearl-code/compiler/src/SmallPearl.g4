@@ -186,6 +186,19 @@ username_declaration_with_data_flow_direction:
 ////////////////////////////////////////////////////////////////////////////////
 
 user_configuration:
+       user_configuration_without_association       #userConfigurationWithoutAssociation
+    | user_configuration_with_association           #userConfigurationWithAssociation
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+user_configuration_without_association:
+    ID username_parameters ';'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+user_configuration_with_association:
     ID username_parameters '---' ID ';'
     ;
 
@@ -1855,9 +1868,14 @@ constant :
       ('+'|'-')? ( IntegerConstant | FloatingPointConstant )
     | timeConstant
     | durationConstant
-    | BitStringLiteral
+    | bitStringConstant
     | StringLiteral
     | 'NIL'
+    ;
+
+
+bitStringConstant:
+    BitStringLiteral
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

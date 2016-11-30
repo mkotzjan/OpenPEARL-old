@@ -145,28 +145,40 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFixedValue ) {
                 ST entry = group.getInstanceOf("ConstantPoolEntry");
                 entry.add("name", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).toString());
-                entry.add("type", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getBaseType());
-                entry.add("precision", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getPrecision());
-                entry.add("value", ((ConstantFixedValue)ConstantPoolVisitor.constantPool.get(i)).getValue());
+                entry.add("type", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).getBaseType());
+                entry.add("precision", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).getPrecision());
+                entry.add("value", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).getValue());
                 pool.add("constants", entry);
             }
         }
 
         for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
-            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFloatValue ) {
+            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFloatValue) {
                 ST entry = group.getInstanceOf("ConstantPoolEntry");
                 entry.add("name", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).toString());
-                entry.add("type", ((ConstantFloatValue)ConstantPoolVisitor.constantPool.get(i)).getBaseType());
-                entry.add("precision", ((ConstantFloatValue)ConstantPoolVisitor.constantPool.get(i)).getPrecision());
-                entry.add("value", ((ConstantFloatValue)ConstantPoolVisitor.constantPool.get(i)).getValue());
+                entry.add("type", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).getBaseType());
+                entry.add("precision", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).getPrecision());
+                entry.add("value", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).getValue());
                 pool.add("constants", entry);
             }
         }
 
         for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
-            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantCharacterValue ) {
-                ConstantCharacterValue value = (ConstantCharacterValue)ConstantPoolVisitor.constantPool.get(i);
+            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantCharacterValue) {
+                ConstantCharacterValue value = (ConstantCharacterValue) ConstantPoolVisitor.constantPool.get(i);
                 ST entry = group.getInstanceOf("ConstantPoolCharacterEntry");
+                entry.add("name", value.toString());
+                entry.add("type", value.getBaseType());
+                entry.add("length", value.getLength());
+                entry.add("value", value.getValue());
+                pool.add("constants", entry);
+            }
+        }
+
+        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
+            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantBitValue) {
+                ConstantBitValue value = (ConstantBitValue) ConstantPoolVisitor.constantPool.get(i);
+                ST entry = group.getInstanceOf("ConstantPoolBitEntry");
                 entry.add("name", value.toString());
                 entry.add("type", value.getBaseType());
                 entry.add("length", value.getLength());
@@ -255,12 +267,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 if (c instanceof SmallPearlParser.Cpp_inlineContext) {
                     ST decl = group.getInstanceOf("cpp_inline");
                     st.add("cpp_inlines", visitCpp_inline((SmallPearlParser.Cpp_inlineContext) c));
-                }
-                else if (c instanceof SmallPearlParser.Username_declarationContext) {
-                    visitUsername_declaration((SmallPearlParser.Username_declarationContext)c);
-                }
-                else if (c instanceof SmallPearlParser.User_configurationContext) {
-                    visitUser_configuration((SmallPearlParser.User_configurationContext)c);
+                } else if (c instanceof SmallPearlParser.Username_declarationContext) {
+                    visitUsername_declaration((SmallPearlParser.Username_declarationContext) c);
+                } else if (c instanceof SmallPearlParser.UserConfigurationWithoutAssociationContext) {
+                    visitUserConfigurationWithoutAssociation((SmallPearlParser.UserConfigurationWithoutAssociationContext) c);
+                } else if (c instanceof SmallPearlParser.UserConfigurationWithAssociationContext) {
+                    visitUserConfigurationWithAssociation((SmallPearlParser.UserConfigurationWithAssociationContext) c);
                 }
             }
         }
@@ -522,84 +534,91 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
                 stringConstant.add("value", s);
                 constant.add("StringConstant", stringConstant);
-            } else if (ctx.BitStringLiteral() != null) {
-                ST bitStringConstant = group.getInstanceOf("BitStringConstant");
-                int nb = 1;
-                Long l = convertBitStringToLong(ctx.BitStringLiteral().toString());
-
-                // walk up the AST and get VariableDenotationContext:
-                ParserRuleContext  sctx =  ctx.getParent();
-                while ( sctx != null && !(sctx instanceof SmallPearlParser.VariableDenotationContext)) {
-                    sctx = sctx.getParent();
-                }
-
-                if (sctx != null) {
-                    SmallPearlParser.TypeAttributeContext typeAttributeContext = ((SmallPearlParser.VariableDenotationContext)sctx).typeAttribute();
-                    if ( typeAttributeContext.simpleType() != null ) {
-                        SmallPearlParser.SimpleTypeContext simpleTypeContext = typeAttributeContext.simpleType();
-
-                        if( simpleTypeContext.typeBitString() != null ) {
-                            SmallPearlParser.TypeBitStringContext typeBitStringContext = simpleTypeContext.typeBitString();
-
-                            if ( typeBitStringContext.IntegerConstant() != null) {
-                                nb = Integer.valueOf(typeBitStringContext.IntegerConstant().toString());
-                            }
-                        }
-                    }
-
-                }
-                else {
-                    throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-                }
-
-                String b = Long.toBinaryString(l);
-                String bres = "";
-
-                int l1 = b.length();
-
-                if ( nb < b.length()) {
-                    bres = "";
-                    for ( int i = 0; i < nb; i++) {
-                        bres = bres + b.charAt(i);
-                    }
-                    Long r = Long.parseLong(bres,2);
-                    if (Long.toBinaryString(Math.abs(r)).length() < 15) {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString());
-                    } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
-                            bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "UL");
-                    } else {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
-                    }
-                }
-                else if ( nb > b.length()) {
-                    bres = b;
-                    /*
-                    for ( int i = 0; i < nb - b.length() - 1; i++) {
-                        bres = bres + "0";
-                    }
-                    */
-                    Long r = Long.parseLong(bres,2);
-                    if (Long.toBinaryString(Math.abs(r)).length() < 15) {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString());
-                    } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "UL");
-                    } else {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
-                    }
-                }
-                else {
-                    if (Long.toBinaryString(Math.abs(l)).length() < 15) {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(l).toString());
-                    } else if (Long.toBinaryString(Math.abs(l)).length() < 31) {
-                            bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "UL");
-                    } else {
-                        bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "ULL");
-                    }
-                }
-
-                constant.add("BitStringConstant", bitStringConstant);
+            } else if (ctx.bitStringConstant() != null) {
+                constant.add("BitStringConstant", getBitStringConstant(ctx));
             }
-         }
+        }
+
+        return constant;
+    }
+
+    private ST getBitStringConstant(SmallPearlParser.ConstantContext ctx) {
+        int nb = 1;
+        Long l = convertBitStringToLong(ctx.bitStringConstant().BitStringLiteral().toString());
+
+        // walk up the AST and get VariableDenotationContext:
+        ParserRuleContext sctx = ctx.getParent();
+        while (sctx != null && !(sctx instanceof SmallPearlParser.VariableDenotationContext)) {
+            sctx = sctx.getParent();
+        }
+
+        if (sctx != null) {
+            SmallPearlParser.TypeAttributeContext typeAttributeContext = ((SmallPearlParser.VariableDenotationContext) sctx).typeAttribute();
+            if (typeAttributeContext.simpleType() != null) {
+                SmallPearlParser.SimpleTypeContext simpleTypeContext = typeAttributeContext.simpleType();
+
+                if (simpleTypeContext.typeBitString() != null) {
+                    SmallPearlParser.TypeBitStringContext typeBitStringContext = simpleTypeContext.typeBitString();
+
+                    if (typeBitStringContext.IntegerConstant() != null) {
+                        nb = Integer.valueOf(typeBitStringContext.IntegerConstant().toString());
+                    }
+                }
+            }
+
+        } else {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return formatBitStringConstant(l,nb);
+    }
+
+    private ST formatBitStringConstant(Long l, int numberOfBits) {
+        ST bitStringConstant = group.getInstanceOf("BitStringConstant");
+        ST constant = group.getInstanceOf("Constant");
+
+        String b = Long.toBinaryString(l);
+        String bres = "";
+
+        int l1 = b.length();
+
+        if (numberOfBits < b.length())
+
+        {
+            bres = "";
+            for (int i = 0; i < numberOfBits; i++) {
+                bres = bres + b.charAt(i);
+            }
+            Long r = Long.parseLong(bres, 2);
+            if (Long.toBinaryString(Math.abs(r)).length() < 15) {
+                bitStringConstant.add("value", "0x" + Long.toHexString(r).toString());
+            } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "UL");
+            } else {
+                bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
+            }
+        } else if (numberOfBits > b.length()) {
+            bres = b;
+            Long r = Long.parseLong(bres, 2);
+            if (Long.toBinaryString(Math.abs(r)).length() < 15) {
+                bitStringConstant.add("value", "0x" + Long.toHexString(r).toString());
+            } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "UL");
+            } else {
+                bitStringConstant.add("value", "0x" + Long.toHexString(r).toString() + "ULL");
+            }
+        } else
+        {
+            if (Long.toBinaryString(Math.abs(l)).length() < 15) {
+                bitStringConstant.add("value", "0x" + Long.toHexString(l).toString());
+            } else if (Long.toBinaryString(Math.abs(l)).length() < 31) {
+                bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "UL");
+            } else {
+                bitStringConstant.add("value", "0x" + Long.toHexString(l).toString() + "ULL");
+            }
+        }
+
+        constant.add("BitStringConstant", bitStringConstant);
 
         return constant;
     }
@@ -1082,6 +1101,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitRemainderExpression((SmallPearlParser.RemainderExpressionContext) ctx));
             } else if (ctx instanceof SmallPearlParser.NowFunctionContext) {
                 st.add("code", visitNowFunction((SmallPearlParser.NowFunctionContext) ctx));
+            } else if (ctx instanceof SmallPearlParser.AndExpressionContext) {
+                st.add("code", visitAndExpression(((SmallPearlParser.AndExpressionContext) ctx)));
+            } else if (ctx instanceof SmallPearlParser.OrExpressionContext) {
+                st.add("code", visitOrExpression(((SmallPearlParser.OrExpressionContext) ctx)));
+            } else if (ctx instanceof SmallPearlParser.ExorExpressionContext) {
+                st.add("code", visitExorExpression(((SmallPearlParser.ExorExpressionContext) ctx)));
             }
         }
 
@@ -1433,6 +1458,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     }
 
+    private String getBitStringLiteral(String literal) {
+        return null;
+    }
+
     @Override
     public ST visitPrimaryExpression(SmallPearlParser.PrimaryExpressionContext ctx) {
         ST expression = group.getInstanceOf("expression");
@@ -1443,13 +1472,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             expression.add("code", ")");
         } else if (ctx.literal() != null) {
             if (ctx.literal().BitStringLiteral() != null) {
+                ST bitstring = group.getInstanceOf("BitStringConstant");
                 // TODO:
                 // ! assignment
                 // b1 := '1'B1;
                 // !__cpp__('_b1 = pearlrt::BitString<1>(1);			');
                 // b4i2 := '8'B4;
                 // __cpp__('_b4i2= pearlrt::BitString<4>(8);			');
-                expression.add("bitstring", ctx.literal().BitStringLiteral().getText());
+                expression.add("bitstring", getBitStringLiteral(ctx.literal().BitStringLiteral().getText()));
             } else {
                 expression.add("code", visitLiteral(ctx.literal()));
             }
@@ -1617,6 +1647,36 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitExponentiationExpression(SmallPearlParser.ExponentiationExpressionContext ctx) {
         ST expr = group.getInstanceOf("Exponentiation");
+
+        expr.add("lhs", visit(ctx.expression(0)));
+        expr.add("rhs", visit(ctx.expression(1)));
+
+        return expr;
+    }
+
+    @Override
+    public ST visitAndExpression(SmallPearlParser.AndExpressionContext ctx) {
+        ST expr = group.getInstanceOf("AndExpression");
+
+        expr.add("lhs", visit(ctx.expression(0)));
+        expr.add("rhs", visit(ctx.expression(1)));
+
+        return expr;
+    }
+
+    @Override
+    public ST visitOrExpression(SmallPearlParser.OrExpressionContext ctx) {
+        ST expr = group.getInstanceOf("OrExpression");
+
+        expr.add("lhs", visit(ctx.expression(0)));
+        expr.add("rhs", visit(ctx.expression(1)));
+
+        return expr;
+    }
+
+    @Override
+    public ST visitExorExpression(SmallPearlParser.ExorExpressionContext ctx) {
+        ST expr = group.getInstanceOf("ExorExpression");
 
         expr.add("lhs", visit(ctx.expression(0)));
         expr.add("rhs", visit(ctx.expression(1)));
@@ -3933,9 +3993,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     }
 
     @Override
-    public ST visitUser_configuration(SmallPearlParser.User_configurationContext ctx) {
+    public ST visitUserConfigurationWithAssociation(SmallPearlParser.UserConfigurationWithAssociationContext ctx) {
         return visitChildren(ctx);
     }
+
+    @Override
+    public ST visitUserConfigurationWithoutAssociation(SmallPearlParser.UserConfigurationWithoutAssociationContext ctx) {
+        return visitChildren(ctx);
+    }
+
 
     @Override
     public ST visitUsername_parameters(SmallPearlParser.Username_parametersContext ctx) {

@@ -80,8 +80,8 @@ User_Configuration(lineno,sysname,parameters,association) ::= <<
 \<configuration line="<lineno>">
     \<sysname name="<sysname>" >
         <if(parameters)><parameters><endif>
+        <association>
     \</sysname>
-    <association>
 \</configuration>
 
 >>
