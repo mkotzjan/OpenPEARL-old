@@ -124,6 +124,10 @@ ConstantPoolCharacterEntry(name,type,length,value) ::= <<
 static /*const*/ pearlrt::<type>\<<length>\>         <name>("<value>");
 >>
 
+ConstantPoolBitEntry(name,type,length,value) ::= <<
+static /*const*/ pearlrt::<type>\<<length>\>         <name>("<value>");
+>>
+
 /*********************** GLOBAL DECLARATIONS ***********************/
 
 globalDecl(decls) ::= <<
@@ -286,7 +290,7 @@ _<lhs> = <rhs>;
 >>
 
 if_statement(rhs, then_block, else_block) ::= <<
-if ((<rhs>).getBoolean()) {
+if (<rhs>) {
     <then_block>
 }
 <if(else_block)>else {
@@ -442,6 +446,18 @@ expression(code,id,bitstring,operator,functionCall) ::= <%
 <if(id)><id><elseif(code)><code; wrap><elseif(bitstring)>pearlrt::BitString\<<bitstring>\><endif>
 <if(operator)><operator><endif>
 <if(functionCall)><functionCall><endif>
+%>
+
+AndExpression(lhs,rhs) ::= <%
+  ( <lhs> && <rhs> )
+%>
+
+OrExpression(lhs,rhs) ::= <%
+  ( <lhs> || <rhs> )
+%>
+
+ExorExpression(lhs,rhs) ::= <%
+  ( <lhs> ^ <rhs> )
 %>
 
 FunctionCall(callee,ListOfActualParameters) ::= <%
@@ -1072,34 +1088,40 @@ TANH(operand) ::= <%
 
 /* --------------------- Relational Operators -------------------------- */
 EQ(lhs,rhs) ::= <%
-<lhs> == <rhs>
+(<lhs> == <rhs>).getBoolean()
 %>
 
 NE(lhs,rhs) ::= <%
-<lhs> != <rhs>
+(<lhs> != <rhs>).getBoolean()
 %>
 
 LT(lhs,rhs) ::= <%
-<lhs> \< <rhs>
+(<lhs> \< <rhs>).getBoolean()
 %>
 
 LE(lhs,rhs) ::= <%
-<lhs> \<= <rhs>
+(<lhs> \<= <rhs>).getBoolean()
 %>
 
 GT(lhs,rhs) ::= <%
-<lhs> > <rhs>
+(<lhs> > <rhs>).getBoolean()
 %>
 
 GE(lhs,rhs) ::= <%
-<lhs> >= <rhs>
+(<lhs> >= <rhs>).getBoolean()
 %>
+
+/* --------------------------------------------------------------------- */
 
 FIT(lhs,rhs) ::= <%
 <lhs>.fit(<rhs>)
 %>
 
 Exponentiation(lhs,rhs) ::= <%
+<lhs>.pow(<rhs>)
+%>
+
+POW(lhs,rhs) ::= <%
 <lhs>.pow(<rhs>)
 %>
 
@@ -1331,7 +1353,7 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
             <endif>
 
             <if(while_cond)>
-            if (!(<while_cond>).getBoolean())
+            if (!(<while_cond>))
                 break;
             <endif>
 
@@ -1357,7 +1379,7 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
             <endif>
 
             <if(while_cond)>
-            if (!(<while_cond>).getBoolean())
+            if (!(<while_cond>))
                 break;
             <endif>
 
