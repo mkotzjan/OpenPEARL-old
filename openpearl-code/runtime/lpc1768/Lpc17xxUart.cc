@@ -49,15 +49,15 @@ namespace pearlrt {
 
 
    Lpc17xxUart::Lpc17xxUart(int _port, int baudRate, int bitsPerCharacter,
-                            int stopBits, char parity, bool xon) :
+                            int stopBits, char* parity, bool xon) :
       writeSema(1), readSema(1) {
 
       internalUart = Lpc17xxUartInternal::getInstance(_port, baudRate,
-                     bitsPerCharacter, stopBits, parity, xon);
+                     bitsPerCharacter, stopBits, *parity, xon);
 
       // enforces these parameters, if the default setting was used before
       internalUart->setup(_port, baudRate,
-                          bitsPerCharacter, stopBits, parity);
+                          bitsPerCharacter, stopBits, *parity);
 
       internalUart->registerUartDation(this);
 

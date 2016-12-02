@@ -1,7 +1,7 @@
    <dation name="Lpc17xxUart">
       <parameters>
          <FIXED length="15"><VALUES>0,2</VALUES></FIXED>
-         <FIXED length="15">
+         <FIXED length="31">
             <VALUES>300, 600, 1200, 2400, 4800, 9600,
                     19200, 38400, 57600, 115200</VALUES>
          </FIXED>

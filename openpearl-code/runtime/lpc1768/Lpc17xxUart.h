@@ -122,7 +122,7 @@ namespace pearlrt {
                                or if the rxbuffer could not be allocated
       */
       Lpc17xxUart(int port, int baudRate, int bitsPerCharacter,
-                  int stopBits, char parity, bool xon);
+                  int stopBits, char* parity, bool xon);
 
       /**
        open the system dation

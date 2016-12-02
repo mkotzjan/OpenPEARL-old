@@ -1,11 +1,12 @@
 MODULE(lcdTest);
 SYSTEM;
-   !Lpc17xxClock(0);
-__cpp__('pearlrt::Lpc17xxClock dummy(0);');
+!   Lpc17xxClock(0);
+!__cpp__('pearlrt::Lpc17xxClock dummy(0);');
    lcd: Hy32(1);
 
 PROBLEM;
-__cpp__(' pearlrt::Character<10> _text1("0123456789");');
+   DCL text1 CHAR(10) INIT('0123456789');
+/*
 __cpp__(' pearlrt::Character<5> _black("\\033[30m");');
 __cpp__(' pearlrt::Character<5> _red("\\033[31m");');
 __cpp__(' pearlrt::Character<5> _green("\\033[32m");');
@@ -28,9 +29,16 @@ __cpp__(' pearlrt::Character<4> _clearToBegin("\\033[1J");');
 __cpp__(' pearlrt::Character<4> _clear("\\033[2J");');
 __cpp__(' pearlrt::Character<5> _small("\\033[10m");');
 __cpp__(' pearlrt::Character<5> _big("\\033[11m");');
-
+*/
   SPC lcd DATION OUT SYSTEM ALPHIC;
-  DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(lcd);
+
+  DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(lcd);
+
+/*
+  __cpp__(' static pearlrt::DationDim2 h_dim_term(80); ');
+  __cpp__(' static pearlrt::DationPG _term(_lcd, pearlrt::Dation::OUT  | pearlrt::Dation::FORWARD, &h_dim_term);');
+
+
 
 pgoto: PROC( (line,col) FIXED);
    DCL ch CHAR(1);
@@ -175,15 +183,25 @@ fontTests: PROC;
 
   AFTER 1 SEC RESUME;
 END;
+*/
 
 TASK1: TASK PRIO 10 MAIN;
-
+__cpp__('printf("TASK1 start\\n");');
+!  DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(lcd);
   OPEN termout;
-  CALL clearTests;
+__cpp__('printf("Open Done \\n");'
+        'pearlrt::Log::error("hallo");'
+);
+
+
+  PUT text1 TO termout BY A, SKIP;
+/*  CALL clearTests;
+__cpp__('printf("clear Done \\n");');
   CALL textColors;
+__cpp__('printf("text colors Done \\n");');
   CALL gotoTests;
   CALL fontTests;
-
+*/
   CLOSE termout;
 
 END;

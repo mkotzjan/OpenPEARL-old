@@ -45,6 +45,7 @@ namespace pearlrt {
    const uint16_t Hy32::lineSpacingBig = 2;
 
    Hy32::Hy32(int orientation) {
+printf("Hy32-ctor\n");
       if (orientation < 0 || orientation > 3) {
          Log::error("Hy32: illegal orientation: %d", orientation);
          throw theIllegalParamSignal;
@@ -73,6 +74,7 @@ namespace pearlrt {
 
       line = 0;
       col = 0;
+      state = 0;
 
       mutex.name("Hy32");
       nbrOpenUserDations = 0;
