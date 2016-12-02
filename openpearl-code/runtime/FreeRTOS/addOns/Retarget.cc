@@ -171,12 +171,13 @@ extern "C" {
       pc = faultStack[6];
       psr = faultStack[7];
    }
-
+int handleControlStateReg;
    void lpc17_default_handler(void) __attribute__((naked));
    void lpc17_default_handler(void) {
    // NVIC_INT_CTRL_CONSTis 0xe000ed04		\n"
 
        exceptNumber = * (volatile uint32_t*) 0xe000ed04;
+       handleControlStateReg = * (volatile uint32_t*) 0xe000ed24;
     /*     asm volatile (
             " ldr r3, #e000ed04			\n"
             " ldr r2, [r3, #0]			\n"
@@ -197,7 +198,10 @@ extern "C" {
 */
       useInterruptFlag = false;
 
-      printf("*** Default handler (vector index = %d)\n*** halt ***.\n", exceptNumber & 0x0ff);
+//      printf("*** Default handler (vector index = %d)\n*** halt ***.\n", exceptNumber & 0x3ff);
+      printf("*** Default handler (InterruprControl State Reg = %04X)\n"
+        "   handleControlStatusReg = %04X"
+	"*** halt ***.\n", exceptNumber , handleControlStateReg);
    //   printf(" Registers: \n r0: %08x r1: %08x r2: %08x r3: %08x\n"
    //          "r12: %08x lr: %08x pc: %08x psr: %08x\n",
    //          r0, r1, r2, r3, r12, lr, pc, psr);
