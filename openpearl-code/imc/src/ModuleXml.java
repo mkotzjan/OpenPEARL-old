@@ -360,8 +360,8 @@ public class ModuleXml {
 			// no association in system part, let's check if system device needs
 			// an association
 			if (provider != null) {
-				Error.info("system unit provides unused association of type '"
-						+ provider);
+				Error.error("system unit requires association with type '"
+						+ provider +"'");
 				return;
 			}
 			return;

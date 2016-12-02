@@ -6,13 +6,13 @@
    <parameters>
    <BIT>'48'B4</BIT>
    </parameters>
-   </sysname>
    <association name="I2CBus">
       <parameters>
         <CHAR>'/dev/i2c-0'</CHAR>
         <FIXED>100000</FIXED>
       </parameters>
    </association>
+   </sysname>
 </username>
 
 <username name="lm75a" line="6">
@@ -20,9 +20,9 @@
    <parameters>
    <BIT>'49'B4</BIT>
    </parameters>
-   </sysname>
    <association name="i2cbus1">
    </association>
+   </sysname>
 </username>
 
 <username name="lm75b" line="116">
@@ -30,9 +30,9 @@
    <parameters>
    <BIT>'49'B4</BIT>
    </parameters>
-   </sysname>
    <association name="i2cbus1">
    </association>
+   </sysname>
 </username>
 
 <username name="i2cbus1" line="7">
@@ -75,18 +75,9 @@
     <parameters>
      <CHAR>'EW'</CHAR>
     </parameters>
-  </sysname>
-  <association name="LogFile">
-     <parameters>
-       <CHAR>'prl_log.log'</CHAR>
-     </parameters>
-     <association name="Disc">
-        <parameters>
-          <CHAR>'/tmp'</CHAR>
-          <FIXED>1</FIXED>
-        </parameters>
-     </association>
+  <association name="stdOut">
   </association>
+  </sysname>
 </configuration>
 </system>
 

@@ -59,6 +59,7 @@ public class SystemEntry {
 	private int line;
 	private boolean isUsed = false;
 	private boolean codeIsCompleted = false;
+	private int configItemNbr=0;
 
 	private List<AssociationEntry> mustProvide = new ArrayList<AssociationEntry>();
 
@@ -153,55 +154,69 @@ public class SystemEntry {
 	 * 
 	 * @return the code lines
 	 */
-	public String getCompleteCode() {
-		String result = "";
+	public void getCompleteCode(StringBuilder simple, StringBuilder dations) {
 		String params;
+		if (type == null) {
+			return;
+		}
 		if (type.equals("signal")) {
-			result = "static pearlrt::" + systemName + " _" + userName + ";\n";
-			result += "       pearlrt::Signal * generalized_" + userName
-					+ "= &_" + userName + ";\n";
+			simple.append("static pearlrt::" + systemName + " _" + userName + ";");
+			simple.append("\t// "+file+":"+line+"\n");
+			simple.append("       pearlrt::Signal * generalized_" + userName
+					+ "= &_" + userName + ";\n");
 			codeIsCompleted = true;
 		} else if (type.equals("dation")) {
 			params = translateParameters();
-			result = "static pearlrt::" + systemName + " s_" + userName;
+			dations.append("\n\t// "+file+":"+line+"\n");
+			dations.append("\tstatic pearlrt::" + systemName + " s_" + userName);
 			if (!params.isEmpty()) {
-				result += "(" + params + ")";
+				dations.append("(" + params + ")");
 			}
-			result += ";\n";
-			result += "       pearlrt::Device * d_" + userName + " = &s_"
-					+ userName + ";\n";
+			dations.append(";\n");
+			dations.append("\td_" + userName + " = &s_"
+					+ userName + ";\n");
+			
+			simple.append("pearlrt::Device * d_" + userName+";");
+			simple.append("\t// "+file+":"+line+"\n");
+
 			codeIsCompleted = true;
 		} else if (type.equals("interrupt")) {
 			params = translateParameters();
-			result = "static pearlrt::" + systemName + " sys_" + userName;
+			dations.append("\n\t// "+file+":"+line+"\n");
+			dations.append("\tstatic pearlrt::" + systemName + " sys_" + userName);
 			if (!params.isEmpty()) {
-				result += "(" + params + ")";
+				dations.append("(" + params + ")");
 			}
-			result += ";\n";
-			result += "       pearlrt::Interrupt * _" + userName
-					+ " = (pearlrt::Interrupt*)& sys_" + userName + ";\n";
+			dations.append(";\n");
+			dations.append("\t_" + userName	+ " = (pearlrt::Interrupt*)& sys_" + userName + ";\n");
+			simple.append("       pearlrt::Interrupt * _" + userName + ";");
+			simple.append("\t// "+file+":"+line+"\n");
 			codeIsCompleted = true;
 		} else if (type.equals("connection")) {
 			params = translateParameters();
-			result = "static pearlrt::" + systemName + " s_" + userName;
+			dations.append("\n\t// "+file+":"+line+"\n");			
+			dations.append("\tstatic pearlrt::" + systemName + " s_" + userName);
 			if (!params.isEmpty()) {
-				result += "(" + params + ")";
+				dations.append("(" + params + ")");
 			}
-			result += ";\n";
+			dations.append(";\n");
+			codeIsCompleted = true;
+		} else if (type.equals("configuration")) {
+			dations.append("\n\t// "+file+":"+line+"\n");			
+			dations.append("\tstatic pearlrt::" + systemName + " config" + configItemNbr++);
+			params = translateParameters();
+	 	    if (!params.isEmpty()) {
+	 	  	   dations.append("("+translateParameters() + ")");
+			}
+			dations.append(";\n");
 			codeIsCompleted = true;
 		} else {
 			System.out.println("could not create code for type " + type);
 		}
 
-		return result;
+		return;
 	}
 
-	public String getCompleteCode4Config(int nbr) {
-		String result = "";
-		result = "   static pearlrt::" + systemName + " config" + nbr + "(";
-		result += translateParameters() + ");\n";
-		return result;
-	}
 
 	private String translateParameters() {
 		String p = "";
@@ -296,15 +311,7 @@ public class SystemEntry {
 		return provider;
 	}
 
-	public boolean isDationSignalInterruptConnection() {
-		if (type != null
-				&& (type.equals("dation") || type.equals("signal")
-						|| type.equals("interrupt") || type
-							.equals("connection"))) {
-			return true;
-		}
-		return false;
-	}
+	
 
 	public void markAsUsed() {
 		isUsed = true;
