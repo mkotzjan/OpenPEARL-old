@@ -5,6 +5,7 @@ DCL c CHAR;
 DCL x4a CHARACTER(4);
 DCL x4 CHAR(4);
 DCL y4 CHAR(4) INIT('ABCD');
+DCL control CHAR(4) INIT('\1B\ABC'); ! should produce "\033ABC"
 DCL x8 CHAR(8);
 
 /*
