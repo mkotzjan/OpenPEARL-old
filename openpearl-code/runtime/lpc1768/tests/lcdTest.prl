@@ -1,43 +1,38 @@
 MODULE(lcdTest);
 SYSTEM;
-!   Lpc17xxClock(0);
-!__cpp__('pearlrt::Lpc17xxClock dummy(0);');
+   Lpc17xxClock(0);
    lcd: Hy32(1);
 
 PROBLEM;
    DCL text1 CHAR(10) INIT('0123456789');
-/*
-__cpp__(' pearlrt::Character<5> _black("\\033[30m");');
-__cpp__(' pearlrt::Character<5> _red("\\033[31m");');
-__cpp__(' pearlrt::Character<5> _green("\\033[32m");');
-__cpp__(' pearlrt::Character<5> _yellow("\\033[33m");');
-__cpp__(' pearlrt::Character<5> _blue("\\033[34m");');
-__cpp__(' pearlrt::Character<5> _magenta("\\033[35m");');
-__cpp__(' pearlrt::Character<5> _cyan("\\033[36m");');
-__cpp__(' pearlrt::Character<5> _white("\\033[37m");');
-__cpp__(' pearlrt::Character<5> _bgblack("\\033[40m");');
-__cpp__(' pearlrt::Character<5> _bgred("\\033[41m");');
-__cpp__(' pearlrt::Character<5> _bggreen("\\033[42m");');
-__cpp__(' pearlrt::Character<5> _bgyellow("\\033[43m");');
-__cpp__(' pearlrt::Character<5> _bgblue("\\033[44m");');
-__cpp__(' pearlrt::Character<5> _bgmagenta("\\033[45m");');
-__cpp__(' pearlrt::Character<5> _bgcyan("\\033[46m");');
-__cpp__(' pearlrt::Character<5> _bgwhite("\\033[47m");');
-__cpp__(' pearlrt::Character<8> _goto("\\033[00;00H");');
-__cpp__(' pearlrt::Character<4> _clearToEnd("\\033[0J");');
-__cpp__(' pearlrt::Character<4> _clearToBegin("\\033[1J");');
-__cpp__(' pearlrt::Character<4> _clear("\\033[2J");');
-__cpp__(' pearlrt::Character<5> _small("\\033[10m");');
-__cpp__(' pearlrt::Character<5> _big("\\033[11m");');
-*/
+!   DCL black CHAR(5) INIT('\1B\[30m');
+
+__cpp__(' pearlrt::Character<5> _black("\\033[30m");'  
+        ' pearlrt::Character<5> _red("\\033[31m");'  
+        ' pearlrt::Character<5> _green("\\033[32m");'  
+        ' pearlrt::Character<5> _yellow("\\033[33m");'  
+        ' pearlrt::Character<5> _blue("\\033[34m");'  
+        ' pearlrt::Character<5> _magenta("\\033[35m");'  
+        ' pearlrt::Character<5> _cyan("\\033[36m");'  
+        ' pearlrt::Character<5> _white("\\033[37m");'  
+        ' pearlrt::Character<5> _bgblack("\\033[40m");'  
+        ' pearlrt::Character<5> _bgred("\\033[41m");'  
+        ' pearlrt::Character<5> _bggreen("\\033[42m");'  
+        ' pearlrt::Character<5> _bgyellow("\\033[43m");'  
+        ' pearlrt::Character<5> _bgblue("\\033[44m");'  
+        ' pearlrt::Character<5> _bgmagenta("\\033[45m");'  
+        ' pearlrt::Character<5> _bgcyan("\\033[46m");'  
+        ' pearlrt::Character<5> _bgwhite("\\033[47m");'  
+        ' pearlrt::Character<8> _goto("\\033[00;00H");'  
+        ' pearlrt::Character<4> _clearToEnd("\\033[0J");'  
+        ' pearlrt::Character<4> _clearToBegin("\\033[1J");'  
+        ' pearlrt::Character<4> _clear("\\033[2J");'  
+        ' pearlrt::Character<5> _small("\\033[10m");'  
+        ' pearlrt::Character<5> _big("\\033[11m");');
+
   SPC lcd DATION OUT SYSTEM ALPHIC;
 
   DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(lcd);
-
-/*
-  __cpp__(' static pearlrt::DationDim2 h_dim_term(80); ');
-  __cpp__(' static pearlrt::DationPG _term(_lcd, pearlrt::Dation::OUT  | pearlrt::Dation::FORWARD, &h_dim_term);');
-
 
 
 pgoto: PROC( (line,col) FIXED);
@@ -183,7 +178,7 @@ fontTests: PROC;
 
   AFTER 1 SEC RESUME;
 END;
-*/
+
 
 TASK1: TASK PRIO 10 MAIN;
 __cpp__('printf("TASK1 start\\n");');
@@ -195,13 +190,13 @@ __cpp__('printf("Open Done \\n");'
 
 
   PUT text1 TO termout BY A, SKIP;
-/*  CALL clearTests;
+  CALL clearTests;
 __cpp__('printf("clear Done \\n");');
   CALL textColors;
 __cpp__('printf("text colors Done \\n");');
   CALL gotoTests;
   CALL fontTests;
-*/
+
   CLOSE termout;
 
 END;
