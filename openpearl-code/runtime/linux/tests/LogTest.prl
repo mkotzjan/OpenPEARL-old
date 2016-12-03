@@ -2,7 +2,7 @@ MODULE(logTest);
 SYSTEM;
    stdout: StdOut;
    Log('EWDI') --- stdout;
-   lm75: LM75('12'B4) --- i2cbus;
+!   lm75: LM75('12'B4) --- i2cbus;
 
 PROBLEM;
    SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;

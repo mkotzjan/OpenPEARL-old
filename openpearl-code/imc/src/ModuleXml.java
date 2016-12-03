@@ -144,6 +144,9 @@ public class ModuleXml {
 
 				} else if (n.getNodeType() == Node.ELEMENT_NODE
 						&& n.getNodeName().equals("configuration")) {
+					line = Integer.parseInt(n.getAttributes()
+							.getNamedItem("line").getTextContent());
+					Error.setLocation(sourceFileName, line);
 					Error.info("configuration entry found");
 					un = new SystemEntry(sourceFileName, line);
 					SystemEntries.add(un);

@@ -203,7 +203,13 @@ public class TargetPlatformXml {
 		int length;
 
 		type = n.getNodeName();
-		String lengthIsNumericalOrNickname = n.getAttributes().getNamedItem("length").getTextContent();
+		Node lengthNode = n.getAttributes().getNamedItem("length");
+		if (lengthNode == null) {
+			Error.error("no attribute length for parameter for '" + systemEntry.getSystemName() +
+					"' in system definition file");
+			return false;
+		}
+		String lengthIsNumericalOrNickname = lengthNode.getTextContent();
 		if (lengthIsNumericalOrNickname.contains("$")) {
 		   System.out.println("lookup in nicknames missing");	
 		   length = -1; // should produce an error 
