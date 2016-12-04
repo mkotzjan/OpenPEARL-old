@@ -1,0 +1,46 @@
+MODULE(ads1015);
+SYSTEM;
+__cpp__(
+   'pearlrt::I2CBus _i2cbus("/dev/i2c-1");'
+   'pearlrt::ADS1015SE s_channel0(&_i2cbus, 0x48,0,2);'
+   'pearlrt::Device*  d_channel0 = &s_channel0;'
+   'pearlrt::ADS1015SE s_channel1(&_i2cbus, 0x48,1,2);'
+   'pearlrt::Device*  d_channel1 = &s_channel1;'
+   );
+  termout: StdOut;
+  __cpp__(
+  'extern pearlrt::Device* d_channel0;'
+  'pearlrt::SystemDationB * _channel0 = (pearlrt::SystemDationB*) d_channel0;'
+  'extern pearlrt::Device* d_channel1;'
+  'pearlrt::SystemDationB * _channel1 = (pearlrt::SystemDationB*) d_channel1;'
+  );
+
+PROBLEM;
+  SPC termout DATION OUT SYSTEM ALPHIC GLOBAL;
+  !SPC channel0   DATION IN  SYSTEM BASIC FIXED(15) GLOBAL;
+  !SPC channel1   DATION IN  SYSTEM BASIC FIXED(15) GLOBAL;
+   
+
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD NOSTREAM CREATED(termout);
+DCL ch0 DATION IN BASIC FIXED(15) CREATED(channel0);
+DCL ch1 DATION IN BASIC FIXED(15) CREATED(channel1);
+
+dumpInputs: TASK MAIN;
+   DCL (v0,v1) FIXED(15);
+   
+   OPEN console;
+   OPEN ch0;
+   OPEN ch1;
+
+   PUT 'ADS1015 Test started' TO console BY A, SKIP;
+   REPEAT
+      TAKE v0 FROM ch0;
+      TAKE v1 FROM ch1;
+
+      PUT 'values:', v0, v1 TO console BY A,F(6),X(2),F(6), SKIP;
+      AFTER 0.5 SEC RESUME;
+   END;
+END; 
+
+
+MODEND;
