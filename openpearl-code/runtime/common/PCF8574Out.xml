@@ -13,5 +13,5 @@
       </parameters>
       <attributes>SYSTEM, BASIC, OUT</attributes>
       <data>BIT($width)</data>
-      <needAssociation provider="I2CBusProvider" />
+      <needAssociation name="I2CBusProvider" />
    </dation>

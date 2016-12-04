@@ -9,5 +9,5 @@
       </parameters>
       <attributes>SYSTEM, BASIC, IN</attributes>
       <data>FIXED(15)</data>
-      <needAssociation provider="I2CBusProvider" />
+      <needAssociation name="I2CBusProvider" />
    </dation>
