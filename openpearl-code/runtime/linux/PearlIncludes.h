@@ -122,6 +122,7 @@ Only this file mus be included.
 #endif
 #ifdef CONFIG_I2C_LM75
 #include "LM75.h"
+#include "ADS1015SE.h"
 #endif
 #ifdef CONFIG_I2C_PCF8574
 #include "PCF8574In.h"

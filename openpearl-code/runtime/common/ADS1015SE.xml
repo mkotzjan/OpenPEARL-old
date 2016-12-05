@@ -1,11 +1,12 @@
-   <dation name="LM75">
+   <dation name="ADS1015SE">
       <parameters>
          <BIT length="8">
             <VALUES>
-            '48'B4, '49'B4, '4A'B4, '4B'B4,
-            '4C'B4, '4D'B4 , '4E'B4, '4F'B4
+            '48'B4, '49'B4, '4A'B4, '4B'B4
             </VALUES>
          </BIT>
+         <FIXED length="15"><FIXEDRANGE>0,3</FIXEDRANGE></FIXED>
+         <FIXED length="15"><FIXEDRANGE>0,5</FIXEDRANGE></FIXED>
       </parameters>
       <attributes>SYSTEM, BASIC, IN</attributes>
       <data>FIXED(15)</data>

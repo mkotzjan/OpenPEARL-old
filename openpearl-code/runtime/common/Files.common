@@ -76,6 +76,8 @@ ifeq ($(CONFIG_HAS_I2C),y)
    ifeq ($(CONFIG_I2C_LM75),y)
       CXX_COMMON += LM75.cc
       XML_COMMON += LM75.xml
+      CXX_COMMON += ADS1015SE.cc
+      XML_COMMON += ADS1015SE.xml
    endif
    ifeq ($(CONFIG_I2C_PCF8574),y)
       CXX_COMMON += PCF8574Pool.cc PCF8574In.cc PCF8574Out.cc
