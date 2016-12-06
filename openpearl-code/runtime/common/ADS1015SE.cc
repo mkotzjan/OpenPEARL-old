@@ -49,6 +49,7 @@ namespace pearlrt {
       // check of adress, start and width is done by IMC
       dationStatus = CLOSED;
 
+      this->addr = addr;
       this->provider = provider;
    }
 
@@ -124,7 +125,7 @@ namespace pearlrt {
       }
 
       channelSelect[0] = 1; // select config register
-      channelSelect[1] = 0x81 | (channel << 4) | (gain << 1);
+      channelSelect[1] = 0xC1 | (channel << 4) | (gain << 1);
       channelSelect[2] = 0xe3; // 3300 sps, others are default
       readData[0] = 0;
 
@@ -150,8 +151,6 @@ namespace pearlrt {
          throw theOpenFailedSignal;
       }
           
-      printf("ADC1015SE: loopCounter=%d\n", loopCounter); 
-   
       // use shift operator to be independent on byte ordering
       resultValue = readData[0] << 8 | readData[1] ;
 
