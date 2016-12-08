@@ -210,8 +210,8 @@ phony += prepare
 prepare:
 	@touch $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a
-	@touch $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.a
-	@chmod 666 $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.a
+	@touch $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o
+	@chmod 666 $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o
 	@touch $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
 	@touch $(CONFIG_INSTALL_Target)/lib/lpc1768.xml
