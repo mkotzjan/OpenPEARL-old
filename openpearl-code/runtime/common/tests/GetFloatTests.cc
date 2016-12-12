@@ -78,6 +78,9 @@ TEST(GetFloat, conversions) {
       EXPECT_TRUE((f53 == pearlrt::Float<53>(1)).getBoolean());
       EXPECT_NO_THROW(pearlrt::GetFloat<53>::fromF(f53, 2, 0, source));
       EXPECT_TRUE((f53 == pearlrt::Float<53>(2)).getBoolean());
+      // empty input
+      EXPECT_THROW(pearlrt::GetFloat<53>::fromF(f53, 2, 0, source),
+          pearlrt::FixedValueSignal);
    }
    // illegal w,d
    {
@@ -308,7 +311,7 @@ TEST(getFloat, EFormat) {
       rc.setWork(d);
       source.rewind();
       EXPECT_THROW(pearlrt::GetFloat<24>::fromE(f24, 6, 1, 4, source),
-        pearlrt::NoDataInFieldSignal);
+        pearlrt::ExpValueSignal);
    }
    // error: illegal value only -
    {

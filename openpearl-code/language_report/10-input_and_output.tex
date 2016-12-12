@@ -1459,7 +1459,8 @@ number in the following representation:
 [ [ + $\mid$ - ] pi [ . [ pi ] ] ]
 
 \item Spaces preceding or following the number are ignored.
-\item If the entire field is empty, value 0 is read in.
+%%%%\item If the entire field is empty, value 0 is read in.
+\item If the entire field is empty, the FixedValueSignal is induced.
 \item If no decimal point occurs in the representation, the last d
 digits are interpreted as positions following a decimal point.
 \item If a decimal point occurs in front of the last b digits in the
@@ -1618,6 +1619,7 @@ value  & format    & output \\ \hline
 %%%\removedtext{0}\addedtext{1}
 d+1 , no assignment happens and  
          the ExpFormatSignal is induced
+\item If the field  is empty, the ExpValueSignal is induced.
 \item If the data in the field does not match a valid number, 
  no data is assigned and the ExpValueSignal is induced.
 \item A field of length w is read,

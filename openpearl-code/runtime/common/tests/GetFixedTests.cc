@@ -77,6 +77,9 @@ TEST(GetFixed, conversions) {
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(1)).getBoolean());
       EXPECT_NO_THROW(pearlrt::GetFixed<15>::fromF(f15, 2, 0, source));
       EXPECT_TRUE((f15 == pearlrt::Fixed<15>(2)).getBoolean());
+      // read empty field
+      EXPECT_THROW(pearlrt::GetFixed<15>::fromF(f15, 2, 0, source),
+          pearlrt::FixedValueSignal);
    }
    // illegal w,d
    {

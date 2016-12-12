@@ -523,7 +523,7 @@ endSampling:
          return;
       }
 
-      throw theNoDataInFieldSignal;
+      throw theBitValueSignal;
    }
 
 
@@ -575,7 +575,7 @@ endSampling:
          return;
       }
 
-      throw theNoDataInFieldSignal;
+      throw theBitValueSignal;
    }
 
 
@@ -660,7 +660,8 @@ endSampling:
          }
       }
 
-      return;
+      Log::error("F-format: no data in field");
+      throw theFixedValueSignal;
    }
 
    void GetHelper::readFloatByF(Float<53> * value, int d) {
@@ -686,8 +687,11 @@ endSampling:
         } 
      }
 
+     Log::error("F-format: no data in field");
+     throw theFixedValueSignal;
+     // specification changed
      // no data in field --> this is 0 be specification
-     value->x = 0.0;
+     //value->x = 0.0;
    }
 
    double GetHelper::pow10(int exp) {
@@ -787,7 +791,7 @@ endSampling:
 
      // no data in field 
      Log::error("E-format: no data in field");
-     throw theNoDataInFieldSignal;
+     throw theExpValueSignal;
    }
 
 }
