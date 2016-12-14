@@ -53,7 +53,6 @@ public class Compiler {
     static boolean trace = true;
     static boolean diagnostics = false;
     static String encoding = null;
-    static boolean inspectAST = false;
     static boolean SLL = false;
     static boolean nosemantic = true;
     static int verbose = 1;
@@ -119,18 +118,6 @@ public class Compiler {
             if (printAST) {
                 System.out.println("Parse tree:");
                 System.out.println(tree.toStringTree(parser));
-            }
-
-            if (inspectAST) {
-                System.out.println("Inspect Parse tree:");
-                // visualize parse tree in dialog box
-                tree.inspect(parser);
-                System.out.println("Press any key");
-                try {
-                    int ch = System.in.read();
-                }
-                catch (IOException ex) {
-                }
             }
 
             if (dumpDFA) {
@@ -211,8 +198,6 @@ public class Compiler {
                 "  --trace                                                           \n" +
                 "  --nosemantic                Disable semantic checker              \n" +
                 "  --printAST                  Print Abtract Syntax Tree             \n" +
-                "  --inspectAST                Show graphical representation         \n" +
-                "                              of the Abtract Syntax Tree            \n" +
                 "  --dumpDFA                   Print DFA                             \n" +
                 "  --dumpSymbolTable           Print the symboltable                 \n" +
                 "  --dumpConstantPool          Print the constant pool               \n" +
@@ -247,8 +232,6 @@ public class Compiler {
                 System.exit(0);
             } else if (arg.equals("--printAST")) {
                 printAST = true;
-            } else if (arg.equals("--inspectAST")) {
-                inspectAST = true;
             } else if (arg.equals("--gui")) {
                 gui = true;
             } else if (arg.equals("--tokens")) {
