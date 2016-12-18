@@ -29,7 +29,8 @@ help:
 
 all:	build install
 
-build: configuration/include/autoconf.h runtime compiler
+build: configuration/include/autoconf.h  configuration/include/auto.conf \
+	 runtime compiler
 
 runtime:
 	(cd runtime; make all; )
@@ -37,7 +38,7 @@ runtime:
 compiler:
 	(cd compiler/src; make all; )
 
-prepare:
+prepare: configuration/include/autoconf.h
 ifeq ($(USERID),0)
 	   (cd runtime; make prepare; )
 	   (cd imc; make prepare; )

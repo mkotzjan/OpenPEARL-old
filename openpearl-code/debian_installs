@@ -1,0 +1,8 @@
+# make vanilla tex install for development
+apt-get install gcc g++ git gdb make flex astyle gawk openjdk-7-jdk
+apt-get install perl graphwiz doxygen libncurses5-dev
+cpan App::cpanminus
+cpanm Spreadsheet::Read
+cpanm Spreadsheet::ReadSXC
+
+
