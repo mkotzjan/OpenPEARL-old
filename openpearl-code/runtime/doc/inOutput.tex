@@ -736,13 +736,16 @@ Remarks:
 \end{itemize}
 
 \section{Interface for User supplied Drivers for Basic Dations}
-{\bf \it PRELIMINARY} For currently not supported system interfaces a C++ class must be supplied to 
+For new  system interfaces a C++ class must be supplied to 
 provide the system device.
 
 \subsection{System Dation Name}
 Define the name and parameters for the system dation.
 The new class must be derived from \verb|SystemDationB|.
 The parameters will be passed to the constructor of the class.
+The parameters of type \verb|int| and \verb|char*| are supported
+by the InterModuleChecker. The IMC maps FIXED and BIT-constants 
+to \verb|int| and character constants to \verb|char*|
 
 Basic dations are used in combination with the PEARL statements TAKE and
 SEND.
@@ -779,6 +782,12 @@ input data to the location specified by \verb|destination|.
 The runtime system expects that this method blocks the calling thread,
 if no data are available.
 The method should make shure that only an opened dation may be used.
+If the device requires blocking of the calling PEARL task, it 
+must use a suitable blocking mechanism. In the linux environment,
+the linux device driver does this implicitly. 
+The FreeRTOS environment a FreeRTOS-semaphore is very useful. For details
+see the chapter \ref{sec_microcontroller_devicedriver}.
+
 
 \subsection{Write}
 A method \verb|dationWrite(void * source, size_t size)|
@@ -869,6 +878,28 @@ The runtime system expects that this method blocks the calling thread,
 until all data is transfered.
 
 \subsection{Error Conditions}
-The methods may throw C++ exceptions, which are defines in the signal list.
+The methods may throw C++ exceptions, which are defined in the signal list.
 Existing signals should be reused as far as possible.
+
+\section{Connection Provider}
+OpenPEARL allows the usage of connection of system elements  with other 
+system elements. These connections have a definite type which is defined
+by the connection provider.
+The connection interface should be platform independent in order to reuse
+the connection clients without any changes. 
+There is no restriction about the interface of a connection provider.  
+
+\subsection{Design Principles}
+\begin{enumerate}
+\item The ctor may used parameters of type \verb|int| and \verb|char*|.
+  The InterModuleChecker (IMC) maps PEARL FIXED and BIT-Values to \verb|int|
+  and CHAR(..) constants to \verb|char*|.
+  If other types are required, the IMC must be extended at this point.
+\item A connection provider is instanciated before the main function
+  is entered. In case of trouble, the ctor should exit by throwing a 
+  PEARL signal and writing a log-message using the Log::error()  mathod.
+\item the implentation of a connection provider must be aware, that 
+   the multiple clients may interact with the provider simulaneously.
+   A mutex-locking mechanism should be used to avoid race conditions.
+\end{enumerate}
 

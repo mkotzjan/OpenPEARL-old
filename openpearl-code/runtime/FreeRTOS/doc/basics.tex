@@ -345,6 +345,8 @@ This mechanism reduces the stack usage of the logging down to 17 words. This
 is important for the case of logging the stack overflow situation.
 
 \section{Device Driver}
+\label{sec_microcontroller_devicedriver}
+
 The device drivers should be implemented with zero-copy principle.
 If a background task is suitable for the device operation, the 
 tasks priority must be registered in the class PrioMapper. The usage
@@ -355,20 +357,44 @@ The operation of the driver job is passed to an interrupt service routine and
 the calling thread is blocked by a FreeRTOS mechanism e.q. binary semaphore.
 At completion of the driver job in the isr the calling thread is continued.
 
+The semaphore handle will be a class attribute.
+\begin{verbatim}
+SemaphoreHandle_t blockSema;
+\end{verbatim}
+
+ In the ctor,
+the semaphore will be created with 
+\begin{verbatim}
+blockSema = xSemaphoreCreateBinary();
+\end{verbatim}
+
+The read/write operation triggers usually the interrupt mechanism and blocks
+the calling thread like:
+\begin{verbatim}
+xSemaphoreTake(blockSema, portMAX_DELAY);
+\end{verbatim}
+
+
+When the interrupt service routine detects that the i/o-operation is completed
+the semaphore becomes released:
+\begin{verbatim}
+xSemaphoreGiveFromISR(recvCommand.blockSema, NULL);
+\end{verbatim}
+
 A device driver is ether derived from \verb|UserdationNB|,
  \verb|SystemdationB| or \verb|Interrupt|.
 It must implement the virtual methods according their
 expected behavior. For details please check the doxygen documentation
 of these methods.
 
-UserdateionNB works internally only with the newline character to 
+UserdationNB works internally only with the newline character to 
 perform a skip. The translation into carriage return and linefeed must
 be done in the driver if this is desired.
 
 The usual device driver does not support reentrant operations from
-different  tasks. 
-The mechanism of the \verb|USERDATION| enshures that only one dation
-operation is avtive at on time on the same userdation. In cases, where
+different tasks. 
+The mechanism of the \verb|UserDation| enshures that only one dation
+operation is active at on time on the same userdation. In cases, where
 a system device may be used in more than one userdation, a buffering
 algorithmn must be implemented. 
 
@@ -376,7 +402,10 @@ The usual kind of operation is:
 \begin{enumerate}
 \item provide an interrupt service routine with a name fitting to the
    setting in \verb|startup_xxx.S|
-\item choose an interrupt priority, eg. 10
+\item If the controller supports interrupt prioritios,
+choose an interrupt priority, which fits to the system design.
+ The log-device should have better priority than all other
+ system device to allow print-statements for debugging purpose.
 \item check the device parameters in the ctor. The ctor is the last chance to
    allocate any memory on the FreeRTOS-heap.
 \item provide the virtual methods from the base class. Mutual exclusion
@@ -393,6 +422,7 @@ The usual kind of operation is:
   \item section in the plattform specific part
   \item as entry in the table of devices
   \end{enumerate}
+\item supply the device description for the IMC as described in the IMC-documentation.
 \end{enumerate}
 
 
