@@ -97,7 +97,7 @@ menuconfig:
 #jenkins: jenkins_prepare
 #	make install
 
-flashinterface.inc: ./configuration/include/auto.conf
+flashinterface.inc: ./configuration/.config
 	@awk -F"=" 							\
 	   'BEGIN { found = "CONFIG_INSTALL_FLASHINTERFACE_is_not_set" }\
 	    $$1=="CONFIG_INSTALL_FLASHINTERFACE" { found = $$2 }	\
