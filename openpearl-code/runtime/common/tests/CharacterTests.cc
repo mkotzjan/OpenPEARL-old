@@ -9,12 +9,12 @@
 /**
 Test of class Character
 */
-TEST(Char, operations) {
-   {
+TEST(Char, asize) {
       pearlrt::Character<10> c;
       EXPECT_EQ(c.upb().x, 10);
       EXPECT_EQ(sizeof(c), 10);
-   }
+}
+TEST(Char, compare) {
    {
       pearlrt::Character<6> h(6, (char*)"World.");
       pearlrt::Character<6> w(6, (char*)"World.");
@@ -103,6 +103,8 @@ TEST(Char, operations) {
       pearlrt::Character<1> h(1, (char*)" ");
       EXPECT_TRUE((h.toFixed() == (pearlrt::Fixed<8>)32).getBoolean());
    }
+}
+TEST(Char, throw) {
    {
       ASSERT_THROW(
          pearlrt::Character<32768> c, pearlrt::CharacterTooLongSignal);

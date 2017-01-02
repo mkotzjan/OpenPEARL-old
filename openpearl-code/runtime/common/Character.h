@@ -128,6 +128,7 @@ namespace pearlrt {
          size_t i;
 
          if (length > 32767 || length < 1) {
+            printf("Character: illegal length (%d)\n", length);
             throw theCharacterTooLongSignal;
          }
 
@@ -149,6 +150,7 @@ namespace pearlrt {
          unsigned int l = strlen(string);
 
          if (length > 32767 || l > length) {
+            printf("Character: illegal length (%d)\n", length);
             throw theCharacterTooLongSignal;
          }
 
@@ -177,6 +179,7 @@ namespace pearlrt {
          unsigned int l = len;
 
          if (length > 32767 || l > length) {
+            //printf("Character: illegal length (%d)", length);
             throw theCharacterTooLongSignal;
          }
 
@@ -214,6 +217,7 @@ namespace pearlrt {
       */
       Character<1>  getCharAt(size_t p) {
          if (p > length || p < 1) {
+            //printf("Character: index out of range (%d)", p);
             throw theCharacterIndexOutOfRangeSignal;
          }
 
@@ -234,6 +238,7 @@ namespace pearlrt {
       */
       void setCharAt(size_t p, Character<1> c) {
          if (p > length || p < 1) {
+            //printf("Character: index out of range (%d)", p);
             throw theCharacterIndexOutOfRangeSignal;
          }
 
@@ -252,6 +257,7 @@ namespace pearlrt {
       */
       Fixed<8> toFixed() {
          if (length > 1) {
+            //printf("Character::toFixed: illegale length (%d)", length);
             throw theCharacterTooLongSignal;
          }
 
@@ -301,6 +307,7 @@ namespace pearlrt {
       int j = 0;
 
       if ((left.upb() + right.upb() != res.upb()).getBoolean()) {
+         //printf("Character::catChar: result type too small");
          throw theCharacterTooLongSignal;
       }
 
@@ -339,10 +346,13 @@ namespace pearlrt {
       size_t len = end - start + 1;
 
       if (len > (size_t)(res.upb().x)) {
+         //printf("Character::getSliceChar: result type too small");
          throw theCharacterTooLongSignal;
       }
 
       if (start < 1 || end > (size_t)(c.upb().x)) {
+         //printf("Character::getSliceChar: illegal slice(%d:%d)",
+         //  start, end);
          throw theCharacterIndexOutOfRangeSignal;
       }
 
@@ -374,10 +384,13 @@ namespace pearlrt {
       size_t len = end - start + 1;
 
       if (len < (size_t)(c.upb().x)) {
+         //printf("Character::setSliceChar: result type too small");
          throw theCharacterTooLongSignal;
       }
 
       if (start < 1 || end > (size_t)(res.upb().x)) {
+         //printf("Character::setSliceChar: illegal slice(%d:%d)",
+         //  start, end);
          throw theCharacterIndexOutOfRangeSignal;
       }
 
