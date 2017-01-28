@@ -29,7 +29,6 @@
 
 package org.smallpearl.compiler;
 
-import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.*;
 import org.stringtemplate.v4.*;
 
@@ -45,7 +44,6 @@ public class Compiler {
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
     static boolean printAST = false;
-    static boolean gui = false;
     static String psFile = null;
     static String outputFilename = null;
     static boolean showTokens = false;
@@ -201,7 +199,6 @@ public class Compiler {
                 "  --dumpSymbolTable           Print the SymbolTable                 \n" +
                 "  --dumpConstantPool          Print the constant pool               \n" +
                 "  --debug                     Generate debug information            \n" +
-                "  --debugSTG                  Start the stg debug gui               \n" +
                 "  --stacktrace                Print stacktrace in case of an        \n" +
                 "                              exception                             \n" +
                 "  --warninglevel <m_level>      Set the warning m_level                 \n" +
@@ -231,8 +228,6 @@ public class Compiler {
                 System.exit(0);
             } else if (arg.equals("--printAST")) {
                 printAST = true;
-            } else if (arg.equals("--gui")) {
-                gui = true;
             } else if (arg.equals("--tokens")) {
                 showTokens = true;
             } else if (arg.equals("--trace")) {
