@@ -107,7 +107,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST taskspec = group.getInstanceOf("TaskSpecifier");
 
         LinkedList<TaskEntry> taskEntries = this.m_module.scope.getTaskDeclarations();
-
         ArrayList<String> listOfTaskNames = new ArrayList<String>();
 
         for (int i = 0; i < taskEntries.size(); i++) {

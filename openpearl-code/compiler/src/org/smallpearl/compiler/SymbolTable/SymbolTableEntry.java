@@ -27,66 +27,40 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.smallpearl.compiler;
+package org.smallpearl.compiler.SymbolTable;
 
-public class ConstantBitValue extends ConstantValue {
-    private String m_value;
-    private int m_no;
+public abstract class SymbolTableEntry  implements Comparable<SymbolTableEntry> {
 
-    ConstantBitValue(String str) {
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
+    private String m_name;
 
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
-
-        m_value = str;
-        m_no = -1;
+    SymbolTableEntry() {
+        m_name = null;
     }
 
-    public void setNo(int no) { m_no = no; }
-
-    public int getLength() { return m_value.length(); }
-
-    public String getValue() {
-        return m_value;
+    SymbolTableEntry(String name) {
+        m_name = name;
     }
 
-    public String getBaseType() {
-        return "BitString";
+    public String getName() {
+        return m_name;
     }
 
-    public String toString() {
-//        String name = "CONSTANT_" + getBaseType().toUpperCase();
-//        name += "_" + m_value.length() + "_" + canonicalize(m_value);
-        String name = "CONSTANT_BITSTRING_" + m_no;
-        return name;
+    public String toString(int level) {
+        return indentString(level) + Integer.toString(level) + ": "  + m_name + " ";
     }
 
-    public String canonicalize(String str) {
-        String res = "";
+    protected String indentString(int level) {
+        String indent = "";
 
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
+        for (int i = 0; i < level; i++) {
+            indent += "  ";
         }
 
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
+        return indent;
+    }
 
-        for ( int i = 0; i < str.length(); i++) {
-            Character ch = str.charAt(i);
-
-            if ( !(( ch >= 'a' && ch <= 'z') || ( ch >= 'A' && ch <= 'Z' ) || ( ch >= '0' && ch <= '9'))) {
-                ch = '_';
-            }
-
-            res += String.valueOf(ch);
-
-        }
-
-        return res;
+    @Override
+    public int compareTo(SymbolTableEntry o) {
+        return this.m_name.compareTo(o.m_name);
     }
 }

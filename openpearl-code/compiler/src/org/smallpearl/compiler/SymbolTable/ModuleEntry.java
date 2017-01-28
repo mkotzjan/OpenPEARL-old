@@ -27,66 +27,43 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.smallpearl.compiler;
+package org.smallpearl.compiler.SymbolTable;
 
-public class ConstantBitValue extends ConstantValue {
-    private String m_value;
-    private int m_no;
+import org.smallpearl.compiler.SmallPearlParser;
 
-    ConstantBitValue(String str) {
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
+public class ModuleEntry extends SymbolTableEntry {
 
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
-
-        m_value = str;
-        m_no = -1;
+    public ModuleEntry() {
     }
 
-    public void setNo(int no) { m_no = no; }
 
-    public int getLength() { return m_value.length(); }
-
-    public String getValue() {
-        return m_value;
+    public ModuleEntry(String name, SmallPearlParser.ModuleContext ctx, SymbolTable scope) {
+        super(name);
+        this.scope = scope;
+        this.m_ctx = ctx;
     }
 
-    public String getBaseType() {
-        return "BitString";
+
+    public String toString(int level) {
+        return indentString(level) + super.toString(level) + "module" + scopeString(level);
     }
 
-    public String toString() {
-//        String name = "CONSTANT_" + getBaseType().toUpperCase();
-//        name += "_" + m_value.length() + "_" + canonicalize(m_value);
-        String name = "CONSTANT_BITSTRING_" + m_no;
-        return name;
+    protected String scopeString(int m_level) {
+        return scope == null ? "" : "\n" + scope.toString(m_level);
     }
 
-    public String canonicalize(String str) {
-        String res = "";
-
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
-
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
-
-        for ( int i = 0; i < str.length(); i++) {
-            Character ch = str.charAt(i);
-
-            if ( !(( ch >= 'a' && ch <= 'z') || ( ch >= 'A' && ch <= 'Z' ) || ( ch >= '0' && ch <= '9'))) {
-                ch = '_';
-            }
-
-            res += String.valueOf(ch);
-
-        }
-
-        return res;
+    public int getSourceLineNo() {
+        return m_ctx.getStart().getLine();
     }
+
+    public int getCharPositionInLine() {
+        return m_ctx.getStart().getCharPositionInLine();
+    }
+
+    /**
+     * Local scope for this function.
+     */
+    public SymbolTable scope;
+
+    private SmallPearlParser.ModuleContext m_ctx;
 }

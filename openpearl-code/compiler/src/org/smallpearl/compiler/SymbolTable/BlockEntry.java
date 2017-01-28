@@ -27,66 +27,62 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.smallpearl.compiler;
+package org.smallpearl.compiler.SymbolTable;
 
-public class ConstantBitValue extends ConstantValue {
-    private String m_value;
-    private int m_no;
+import org.smallpearl.compiler.SmallPearlParser;
 
-    ConstantBitValue(String str) {
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
+public class BlockEntry extends SymbolTableEntry {
 
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
 
-        m_value = str;
-        m_no = -1;
+    /**
+     * Construct this with null data fields.
+     */
+    public BlockEntry() {
     }
 
-    public void setNo(int no) { m_no = no; }
 
-    public int getLength() { return m_value.length(); }
-
-    public String getValue() {
-        return m_value;
+    /**
+     * Construct this with the given data field values.
+     */
+    public BlockEntry(String name, SmallPearlParser.Block_statementContext ctx, SymbolTable scope) {
+        super(name);
+        this.m_ctx = ctx;
+        this.scope = scope;
     }
 
-    public String getBaseType() {
-        return "BitString";
+    /**
+     * Return the string rep of this.
+     */
+    public String toString(int level) {
+        return indentString(level) + super.toString(level) + "block" + scopeString(level);
     }
 
-    public String toString() {
-//        String name = "CONSTANT_" + getBaseType().toUpperCase();
-//        name += "_" + m_value.length() + "_" + canonicalize(m_value);
-        String name = "CONSTANT_BITSTRING_" + m_no;
-        return name;
+    /**
+     * Called by toString to stringify the list of formal parameter names.
+     */
+//    protected String formalsString(int m_level) {
+//        return formals == null ? "" : "\n" + indentString(m_level) +
+//                " Formals: " + formals.toString(m_level + 5);
+//    }
+
+    /**
+     * Called by toString to recursively stringify the scope, if non-null.
+     */
+    protected String scopeString(int m_level) {
+        return scope == null ? "" : "\n " + indentString(m_level) +
+                scope.toString(m_level);
     }
 
-    public String canonicalize(String str) {
-        String res = "";
-
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
-
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
-
-        for ( int i = 0; i < str.length(); i++) {
-            Character ch = str.charAt(i);
-
-            if ( !(( ch >= 'a' && ch <= 'z') || ( ch >= 'A' && ch <= 'Z' ) || ( ch >= '0' && ch <= '9'))) {
-                ch = '_';
-            }
-
-            res += String.valueOf(ch);
-
-        }
-
-        return res;
+    public int getSourceLineNo() {
+        return m_ctx.getStart().getLine();
     }
+
+    public int getCharPositionInLine() {
+        return m_ctx.getStart().getCharPositionInLine();
+    }
+
+    /** Local scope for this function. */
+    public SymbolTable scope;
+
+    private SmallPearlParser.Block_statementContext m_ctx;
 }

@@ -29,6 +29,7 @@
 
 package org.smallpearl.compiler;
 
+import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.*;
 import org.stringtemplate.v4.*;
 
@@ -350,6 +351,7 @@ public class Compiler {
             catch (IOException ex) {
             }
         }
+
 
         outputFileName = outputFileName.substring(0, outputFileName.lastIndexOf('.'));
         outputFileName = outputFileName.concat(".xml");

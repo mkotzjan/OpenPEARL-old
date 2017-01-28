@@ -27,66 +27,37 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.smallpearl.compiler;
+package org.smallpearl.compiler.SymbolTable;
 
-public class ConstantBitValue extends ConstantValue {
-    private String m_value;
-    private int m_no;
+import org.antlr.v4.runtime.ParserRuleContext;
 
-    ConstantBitValue(String str) {
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
+class SourceCodePosition {
+    private int m_line;
+    private int m_column;
 
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
-
-        m_value = str;
-        m_no = -1;
+    SourceCodePosition(int line, int column) {
+        this.m_line = line;
+        this.m_column = column;
     }
 
-    public void setNo(int no) { m_no = no; }
-
-    public int getLength() { return m_value.length(); }
-
-    public String getValue() {
-        return m_value;
+    SourceCodePosition(ParserRuleContext ctx) {
+        this.m_line = ctx.start.getLine();
+        this.m_column = ctx.start.getCharPositionInLine();
     }
 
-    public String getBaseType() {
-        return "BitString";
+    public int getLine() {
+        return m_line;
+    }
+
+    public int getColumn() {
+        return m_column;
+    }
+
+    public String getLocation() {
+        return m_line + ":" + m_column;
     }
 
     public String toString() {
-//        String name = "CONSTANT_" + getBaseType().toUpperCase();
-//        name += "_" + m_value.length() + "_" + canonicalize(m_value);
-        String name = "CONSTANT_BITSTRING_" + m_no;
-        return name;
-    }
-
-    public String canonicalize(String str) {
-        String res = "";
-
-        if( str.startsWith("'")) {
-            str = str.substring(1, str.length());
-        }
-
-        if( str.endsWith("'")) {
-            str = str.substring(0, str.length() - 1);
-        }
-
-        for ( int i = 0; i < str.length(); i++) {
-            Character ch = str.charAt(i);
-
-            if ( !(( ch >= 'a' && ch <= 'z') || ( ch >= 'A' && ch <= 'Z' ) || ( ch >= '0' && ch <= '9'))) {
-                ch = '_';
-            }
-
-            res += String.valueOf(ch);
-
-        }
-
-        return res;
+        return "Source Code Position [" + getLocation() + "]";
     }
 }
