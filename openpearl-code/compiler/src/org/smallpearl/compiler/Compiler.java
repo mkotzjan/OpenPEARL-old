@@ -1,6 +1,6 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012-2016 Marcel Schaible
+ *  Copyright (c) 2012-2017 Marcel Schaible
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,14 @@ package org.smallpearl.compiler;
 import org.antlr.v4.runtime.*;
 import org.stringtemplate.v4.*;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Collections;
 
 public class Compiler {
-    static String version = "v0.8.2";
+    static String version = "v0.8.4";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -54,12 +52,12 @@ public class Compiler {
     static boolean diagnostics = false;
     static String encoding = null;
     static boolean SLL = false;
-    static boolean nosemantic = true;
-    static int verbose = 1;
+    static boolean nosemantic = false;
+    static int verbose = 0;
     static String groupFile = "SmallPearlCpp.stg";
     static boolean lineSeparatorHasToBeModified = true;
     static boolean dumpDFA = false;
-    static boolean dumpSymbolTable = true;
+    static boolean dumpSymbolTable = false;
     static boolean dumpConstantPool = true;
     static boolean debug = false;
     static boolean debugSTG = false;
@@ -108,11 +106,8 @@ public class Compiler {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             System.out.println("Start compiling of:" + inputFiles.get(i).toString());
-
             System.out.println("Performing syntax check");
-
             ParserRuleContext tree = parser.program();
-
             System.out.flush();
 
             if (printAST) {
@@ -125,28 +120,31 @@ public class Compiler {
             }
 
             if (parser.getNumberOfSyntaxErrors() <= 0) {
-                BuildSymbolTableVisitor buildSymbolTableVisitor = new BuildSymbolTableVisitor(verbose);
-                buildSymbolTableVisitor.visit(tree);
+                SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
+                symbolTableVisitor.visit(tree);
+
+                if (dumpSymbolTable) {
+                    symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
+                }
 
                 ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose,debug);
                 constantPoolVisitor.visit(tree);
 
-                ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug);
+                ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug,symbolTableVisitor);
                 expressionTypeVisitor.visit(tree);
 
                 if (!nosemantic) {
-                    SemanticCheckVisitor semanticCheckVisitor = new SemanticCheckVisitor(verbose);
-                    semanticCheckVisitor.visit(tree);
+                    SemanticCheck semanticCheck = new SemanticCheck(lexer.getSourceName(), verbose, debug, tree, symbolTableVisitor, expressionTypeVisitor);
                 }
 
                 if (imc) {
                     SystemPartExport(lexer.getSourceName(),tree);
                 }
 
-
+//                System.exit(0);
 
 //                try {
-                    CppGenerate(lexer.getSourceName(), tree, expressionTypeVisitor);
+                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor);
 /*                }
                 catch(Exception ex) {
                     System.err.println(ex.getMessage());
@@ -159,12 +157,12 @@ public class Compiler {
                     System.exit(-1);
                 }
 */
-                if (dumpSymbolTable) {
-                    SymbolTable symtab = SymbolTable.getSymbolTable();
-                    System.out.println(symtab);
-                    symtab.getGlobalsDeclarations();
-                    symtab.getProcedureDeclarations();
-                }
+//                if (dumpSymbolTable) {
+//                    SymbolTable symtab = SymbolTable.getSymbolTable();
+//                    System.out.println(symtab);
+//                    symtab.getGlobalsDeclarations();
+//                    symtab.getProcedureDeclarations();
+//                }
 
                 if (dumpConstantPool) {
                     constantPoolVisitor.dump();
@@ -199,13 +197,13 @@ public class Compiler {
                 "  --nosemantic                Disable semantic checker              \n" +
                 "  --printAST                  Print Abtract Syntax Tree             \n" +
                 "  --dumpDFA                   Print DFA                             \n" +
-                "  --dumpSymbolTable           Print the symboltable                 \n" +
+                "  --dumpSymbolTable           Print the SymbolTable                 \n" +
                 "  --dumpConstantPool          Print the constant pool               \n" +
                 "  --debug                     Generate debug information            \n" +
                 "  --debugSTG                  Start the stg debug gui               \n" +
                 "  --stacktrace                Print stacktrace in case of an        \n" +
                 "                              exception                             \n" +
-                "  --warninglevel <level>      Set the warning level                 \n" +
+                "  --warninglevel <m_level>      Set the warning m_level                 \n" +
                 "                              Level   0: no warning                 \n" +
                 "                              Level 255: all warnings (default)     \n" +
                 " --imc                        Enable Inter Module Checker           \n" +
@@ -285,7 +283,7 @@ public class Compiler {
                 i++;
             } else if (arg.equals("--warninglevel")) {
                 if (i >= args.length) {
-                    System.err.println("missing warning level on --warninglevel");
+                    System.err.println("missing warning m_level on --warninglevel");
                     return false;
                 }
                 warninglevel = Integer.parseInt(args[i]);
@@ -296,8 +294,8 @@ public class Compiler {
         return true;
     }
 
-    private static Void CppGenerate(String sourceFileName, ParserRuleContext tree, ExpressionTypeVisitor expressionTypeVisitor) {
-        CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor(sourceFileName, groupFile, verbose, debug, expressionTypeVisitor);
+    private static Void CppGenerate(String sourceFileName, ParserRuleContext tree, SymbolTableVisitor symbolTableVisitor, ExpressionTypeVisitor expressionTypeVisitor) {
+        CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor(sourceFileName, groupFile, verbose, debug, symbolTableVisitor, expressionTypeVisitor);
         ST code = cppCodeGenerator.visit(tree);
 
         if ( debugSTG ) {

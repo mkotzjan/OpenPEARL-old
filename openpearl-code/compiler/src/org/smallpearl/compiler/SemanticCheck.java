@@ -29,64 +29,46 @@
 
 package org.smallpearl.compiler;
 
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.stringtemplate.v4.ST;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.smallpearl.compiler.SemanticAnalysis.CheckAssignment;
+import org.smallpearl.compiler.SemanticAnalysis.CheckTemplate;
+import org.smallpearl.compiler.SymbolTable.ModuleEntry;
+import org.smallpearl.compiler.SymbolTable.SymbolTable;
 
-import java.util.ArrayList;
-
-public class TypeVisitor extends SmallPearlBaseVisitor<TypeDefinition> implements SmallPearlVisitor<TypeDefinition> {
+public class SemanticCheck {
 
     private int m_verbose;
+    private boolean m_debug;
+    private String m_sourceFileName;
+    private ExpressionTypeVisitor m_expressionTypeVisitor;
+    private SymbolTableVisitor m_symbolTableVisitor;
+    private SymbolTable m_symboltable;
+    private SymbolTable m_currentSymbolTable;
+    private ModuleEntry m_module;
+    private ParserRuleContext m_parseTree;
 
-    public TypeVisitor(int verbose) {
+    public SemanticCheck(String sourceFileName,
+                         int verbose,
+                         boolean debug,
+                         ParserRuleContext tree,
+                         SymbolTableVisitor symbolTableVisitor,
+                         ExpressionTypeVisitor expressionTypeVisitor) {
+        m_debug = debug;
         m_verbose = verbose;
-    }
+        m_sourceFileName = sourceFileName;
+        m_symbolTableVisitor = symbolTableVisitor;
+        m_expressionTypeVisitor = expressionTypeVisitor;
+        m_symboltable = symbolTableVisitor.symbolTable;
+        m_parseTree = tree;
 
-    @Override
-    public TypeDefinition visitFormalParameter(SmallPearlParser.FormalParameterContext ctx) {
-        TypeDefinition typeDef = null;
-        if (ctx != null) {
-            for (int i = 0; i < ctx.ID().size(); i++) {
-                typeDef = visitParameterType(ctx.parameterType());
-            }
+        m_verbose= 1;
+
+        if (m_verbose > 0) {
+            System.out.println( "Performing semantic check");
         }
 
-        return typeDef;
-    }
-
-    @Override
-    public TypeDefinition visitParameterType(SmallPearlParser.ParameterTypeContext ctx) {
-        TypeDefinition typeDef = null;
-        for (ParseTree c : ctx.children) {
-            if (c instanceof SmallPearlParser.SimpleTypeContext) {
-                typeDef = visitSimpleType(ctx.simpleType());
-            }
-        }
-
-        return typeDef;
-    }
-
-    @Override
-    public TypeDefinition visitSimpleType(SmallPearlParser.SimpleTypeContext ctx) {
-        TypeDefinition typeDef = null;
-        if (ctx != null) {
-            if (ctx.typeInteger() != null) {
-                typeDef = visitTypeInteger(ctx.typeInteger());
-            }
-        }
-
-        return typeDef;
-    }
-
-    @Override
-    public TypeDefinition visitTypeInteger(SmallPearlParser.TypeIntegerContext ctx) {
-        Integer size = 31;
-
-        if ( ctx.mprecision() != null ) {
-            size = Integer.parseInt(ctx.mprecision().integerWithoutPrecision().IntegerConstant().getText());
-        }
-
-        return new TypeFixed(size);
+        new CheckTemplate(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
+        new CheckAssignment(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
     }
 
 }

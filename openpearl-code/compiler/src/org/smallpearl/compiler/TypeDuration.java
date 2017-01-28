@@ -31,26 +31,13 @@ package org.smallpearl.compiler;
 
 
 public class TypeDuration extends TypeDefinition {
-    public static final int FIXED_DEFAULT_PRECISION = 15;
-
-    private int m_precision;
 
     TypeDuration() {
         super("DURATION");
-        this.m_precision = FIXED_DEFAULT_PRECISION;
-    }
-
-    TypeDuration(int precision) {
-        super("DURATION");
-        this.m_precision = precision;
-    }
-
-    public Integer getPrecision() {
-        return m_precision;
     }
 
     public String toString() {
-        return "TypeDuration:" + this.getName() + " m_precision=" + this.m_precision;
+        return this.getName();
     }
 
 }

@@ -31,9 +31,10 @@ package org.smallpearl.compiler;
 
 public class NoDeclarationException extends RuntimeException {
 
+/*
     public NoDeclarationException(Symbol s) {
         super("Error at line " + s.getLine() + ":" + s.getColumn() + ": Symbol " + s.getName() +
                 " has not been declared.");
     }
-
+*/
 }

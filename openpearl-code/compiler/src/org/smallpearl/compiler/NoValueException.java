@@ -31,10 +31,12 @@ package org.smallpearl.compiler;
 
 public class NoValueException extends RuntimeException {
 
+/* TODO
     public NoValueException(String name, int line, int column, int type) {
         super("Error at line " + line + ":" + column +
                 ": A variable or a constant was expected, but " + Symbol.SYMBOLNAME_LC[type] + " " + name +
                 " has been found.");
     }
+     */
 
 }

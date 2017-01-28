@@ -30,10 +30,10 @@
 package org.smallpearl.compiler;
 
 public class NotAssignableException extends OperationMismatchException {
-
+/* TODO
     public NotAssignableException(Definition d) {
         super("Error at line " + d.getPosition().getLocation() + ": Cannot assign a value to " +
                 d.toString() + ".");
     }
-
+*/
 }

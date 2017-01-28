@@ -50,7 +50,6 @@ public class TypeFloat extends TypeDefinition {
     }
 
     public String toString() {
-        return "TypeFloat:" + this.getName() + " m_precision=" + this.m_precision;
+        return this.getName() + "(" + this.m_precision + ")";
     }
-
 }

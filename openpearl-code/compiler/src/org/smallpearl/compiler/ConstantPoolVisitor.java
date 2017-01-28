@@ -111,7 +111,6 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                     }
                 }
             }
-
         }
 
         if (!found) {
@@ -145,10 +144,6 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-        } else if (ctx.timeConstant() != null) {
-        } else if (ctx.durationConstant() != null) {
-        } else if (ctx.BitStringLiteral() != null) {
-            add(new ConstantBitValue(ctx.BitStringLiteral().toString()));
         }
 
         return null;
@@ -197,33 +192,6 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
         }
         return null;
     }
-
- /*   @Override
-    public Void visitVariableDenotation(SmallPearlParser.VariableDenotationContext ctx) {
-        //if (m_debug)
-            System.out.println("ConstantPoolVisitor: visitVariableDenotation");
-
-        if (ctx != null) {
-            for (ParseTree c : ctx.children) {
-                if (c instanceof SmallPearlParser.IdentifierDenotationContext) {
-                    identifierDenotationList = getIdentifierDenotation((SmallPearlParser.IdentifierDenotationContext) c);
-                } else if (c instanceof SmallPearlParser.AllocationProtectionContext) {
-                    hasAllocationProtection = true;
-                } else if (c instanceof SmallPearlParser.TypeAttributeContext) {
-                    typeAttribute = visitTypeAttribute((SmallPearlParser.TypeAttributeContext) c);
-                } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
-                    hasGlobalAttribute = true;
-                } else if (c instanceof SmallPearlParser.InitialisationAttributeContext) {
-                    initElementList = getInitialisationAttribute((SmallPearlParser.InitialisationAttributeContext) c);
-                }
-            }
-
-            if (initElementList != null && identifierDenotationList.size() != initElementList.size()) {
-                throw new NumberOfInitializerMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
-
-        return null;
-    }*/
 
     public Void dump(){
         int i;

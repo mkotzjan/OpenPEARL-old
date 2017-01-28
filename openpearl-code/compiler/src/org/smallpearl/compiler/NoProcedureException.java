@@ -31,10 +31,10 @@ package org.smallpearl.compiler;
 
 public class NoProcedureException extends RuntimeException {
 
-    public NoProcedureException(String name, int line, int column, int type) {
+/* TODO    public NoProcedureException(String name, int line, int column, int type) {
         super("Error at line " + line + ":" + column +
                 ": A procedure was expected, but " + Symbol.SYMBOLNAME_LC[type] + " " + name +
                 " has been found.");
     }
-
+*/
 }

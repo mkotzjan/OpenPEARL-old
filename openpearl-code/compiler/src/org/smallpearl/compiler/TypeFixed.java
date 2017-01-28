@@ -49,6 +49,11 @@ public class TypeFixed extends TypeDefinition {
         return m_precision;
     }
 
+    public Void setPrecision(int precision) {
+        m_precision = precision;
+        return null;
+    }
+
     public String toString() {
         return this.getName() + "(" + this.m_precision + ")";
     }

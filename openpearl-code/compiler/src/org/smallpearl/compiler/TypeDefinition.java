@@ -52,4 +52,8 @@ public abstract class TypeDefinition {
             return this.m_name;
         }
     }
+
+    public String toString() {
+        return this.getName();
+    }
 }

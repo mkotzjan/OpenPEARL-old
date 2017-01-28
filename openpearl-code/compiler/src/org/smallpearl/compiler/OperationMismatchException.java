@@ -31,9 +31,9 @@ package org.smallpearl.compiler;
 
 public class OperationMismatchException extends RuntimeException {
 
-    public OperationMismatchException(String s) {
+/* TODO   public OperationMismatchException(String s) {
         super(s);
     }
-
+*/
 
 }

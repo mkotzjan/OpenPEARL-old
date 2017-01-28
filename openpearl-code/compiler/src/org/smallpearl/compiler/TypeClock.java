@@ -45,7 +45,7 @@ public class TypeClock extends TypeDefinition {
 
 
     public String toString() {
-        return "TypeClock:" + this.getName() + " value=" + m_value;
+        return this.getName() + "(" + m_value + ")";
     }
 
 }

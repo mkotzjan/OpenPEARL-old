@@ -79,8 +79,11 @@ javac:
 	rm -f smallpearl_compiler.jar
 	cp SmallPearlCpp.stg $(OUTPUT_DIR)
 	cp IMC.stg $(OUTPUT_DIR)
-	cd $(OUTPUT_DIR) && jar cvf smallpearl_compiler.jar org/smallpearl/compiler/*.class \
-	SmallPearlCpp.stg IMC.stg
+	cd $(OUTPUT_DIR) && jar cf  smallpearl_compiler.jar \
+				    org/smallpearl/compiler/*.class \
+	                            org/smallpearl/compiler/SymbolTable/*.class \
+	                            org/smallpearl/compiler/SemanticAnalysis/*.class \
+			            SmallPearlCpp.stg IMC.stg
 
 ##############################################################################
 
@@ -112,6 +115,8 @@ clean:
 	$(RM) org/smallpearl/compiler/SmallPearlParser.java
 	$(RM) org/smallpearl/compiler/SmallPearlVisitor.java
 	$(RM) $(OUTPUT_DIR)/org/smallpearl/compiler/*.class
+	$(RM) $(OUTPUT_DIR)/org/smallpearl/compiler/SymbolTable/*.class
+	$(RM) $(OUTPUT_DIR)/org/smallpearl/compiler/SemanticAnalysis/*.class
 	$(RM) $(OUTPUT_DIR)/*.jar
 	$(RM) $(OUTPUT_DIR)/*.stg
 	$(RM) ../prl_cc.inc

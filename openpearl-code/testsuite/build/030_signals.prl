@@ -8,7 +8,7 @@ SYSTEM;
    SPC overfl SIGNAL;
    SPC div0   SIGNAL;
    SPC arith  SIGNAL;
-   X: PROC (p FIXED) 
+   XX: PROC (p FIXED) 
       DCL k FIXED(15);
 
       k := 2;

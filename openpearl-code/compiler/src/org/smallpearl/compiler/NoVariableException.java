@@ -31,10 +31,12 @@ package org.smallpearl.compiler;
 
 public class NoVariableException extends RuntimeException {
 
+/* TODO
     public NoVariableException(String name, int line, int column, int type) {
         super("Error at line " + line + ":" + column +
                 ": A variable was expected, but " + Symbol.SYMBOLNAME_LC[type] + " " + name +
                 " has been found.");
     }
+     */
 
 }

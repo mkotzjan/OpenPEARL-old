@@ -31,9 +31,10 @@ package org.smallpearl.compiler;
 
 public class DoubleDeclarationException extends RuntimeException {
 
+/* TODO
     public DoubleDeclarationException(Definition d, Definition dOld) {
         super("Error at line " + d.getPosition().getLocation() + ": Symbol " + d.getName() +
                 " has already been defined at line " + dOld.getPosition().getLocation() + ".");
     }
-
+*/
 }

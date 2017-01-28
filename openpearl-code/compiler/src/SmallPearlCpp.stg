@@ -443,7 +443,7 @@ TaskContinuation(task,Condition,priority,at,after) ::= <<
 >>
 
 expression(code,id,bitstring,operator,functionCall) ::= <%
-<if(id)><id><elseif(code)><code; wrap><elseif(bitstring)>pearlrt::BitString\<<bitstring>\><endif>
+<if(id)><id><elseif(code)><code; wrap><elseif(bitstring)><bitstring><endif>
 <if(operator)><operator><endif>
 <if(functionCall)><functionCall><endif>
 %>
@@ -460,11 +460,23 @@ ExorExpression(lhs,rhs) ::= <%
   ( <lhs> ^ <rhs> )
 %>
 
+CshiftExpression(lhs,rhs) ::= <%
+  <lhs>.bitCshift(<rhs>)
+%>
+
+ShiftExpression(lhs,rhs) ::= <%
+  <lhs>.bitShift(<rhs>)
+%>
+
+CatExpression(lhs,rhs) ::= <%
+  <lhs>.bitCat(<rhs>)
+%>
+
 FunctionCall(callee,ListOfActualParameters) ::= <%
 <user_procedure(callee)>( me<if(ListOfActualParameters)>, <ListOfActualParameters><endif>)
 %>
 
-literal(integer,float,string,time,duration) ::= <%
+literal(integer,float,string,time,duration,bit) ::= <%
 <if(integer)><integer><endif>
 <if(float)><float><endif>
 <if(string)><string><endif>
@@ -999,8 +1011,8 @@ IntegerConstant(value) ::= <<
 <value>
 >>
 
-BitStringConstant(value) ::= <<
-<value>
+BitStringConstant(value,length) ::= <<
+pearlrt::BitString\<<length>\>(<value>)
 >>
 
 TimeConstant(value) ::= <<
@@ -1163,7 +1175,7 @@ TemporarySemaphoreArrays(array) ::= <<
 <array: {temp|<temp>}>
 >>
 
-TemporarySemaphoreArray(name,semaphore) ::= <%
+TemporarySemaphoreArray(semaphore) ::= <%
 static pearlrt::Semaphore *<semaphore: {sema|<sema>} ; separator="_">_semas[] = {<semaphore: {sema|&_<sema>} ; separator=",">}; <\n>
 %>
 
@@ -1501,4 +1513,8 @@ CaseOut(statements) ::= <%
 
 ConstantCharacterValue(name) ::= <%
     <name>
+%>
+
+CastBitToBoolean(name) ::= <%
+    <name>.getBoolean()
 %>

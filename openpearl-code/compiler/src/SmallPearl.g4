@@ -150,8 +150,8 @@ system_part:
 
 problem_part:
     'PROBLEM' ';'
-    ( scalarVariableDeclaration | semaDeclaration | identification | dationSpecification | dationDeclaration | cpp_inline )*
-    ( taskDeclaration | procedureDeclaration | cpp_inline )*
+    ( scalarVariableDeclaration | semaDeclaration | identification | dationSpecification | dationDeclaration | taskDeclaration | procedureDeclaration | cpp_inline )*
+//    ( taskDeclaration | procedureDeclaration | cpp_inline )*
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -658,8 +658,27 @@ exitStatement
 ////////////////////////////////////////////////////////////////////////////////
 
 assignment_statement
-    : ID ( ':=' | '=' ) expression ';'
+    : ( ID | stringSelection ) ( ':=' | '=' ) expression ';'
     ;
+////////////////////////////////////////////////////////////////////////////////
+
+stringSelection
+  	: bitSelection
+   	| charSelection
+   	;
+
+////////////////////////////////////////////////////////////////////////////////
+
+bitSelection
+    : ID '.' 'BIT' '(' expression ')'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+charSelection
+    : ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ')'
+    ;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 sequential_control_statement
@@ -1624,9 +1643,14 @@ expression
     | op='ABS' expression                                   # absExpression
     | op='SIGN' expression                                  # signExpression
     | op='SIZEOF' expression                                # sizeofExpression
+    | op='NOT' expression                                   # notExpression
+    | op='TOBIT' expression                                 # TOBITExpression
+    | op='TOFIXED' expression                               # TOFIXEDExpression
+    | op='TOFLOAT' expression                               # TOFLOATExpression
+    | op='TOCHAR' expression                                # TOCHARExpression
     | op='ENTIER' expression                                # entierExpression
     | op='ROUND' expression                                 # roundExpression
-    | op='NOT' expression                                   # notExpression
+    | op='CONT' expression                                  # CONTExpression
     | expression op='AND' expression                        # AndExpression
     | expression op='OR' expression                         # OrExpression
     | expression op='EXOR' expression                       # ExorExpression
@@ -1704,14 +1728,27 @@ primaryExpression
     | ID listOfActualParameters?
     | literal
     | semaTry
-    | monadicExplicitTypeConversionOperators
-    | stringSelection
+//    | monadicExplicitTypeConversionOperators
+    | stringSlice
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-stringSelection
-	: ID '.' ( 'BIT' | 'CHAR' | 'CHARACTER' ) '(' expression ( ':' expression ) ')'
+stringSlice
+	: bitSlice
+	| charSlice
+	;
+
+////////////////////////////////////////////////////////////////////////////////
+
+bitSlice
+	: ID '.' 'BIT' '(' expression ( ':' expression ) ')'
+	;
+
+////////////////////////////////////////////////////////////////////////////////
+
+charSlice
+	: ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ( ':' expression ) ')'
 	;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1736,15 +1773,15 @@ stringSelection
 
 ////////////////////////////////////////////////////////////////////////////////
 
-monadicExplicitTypeConversionOperators
-    : 'TOFIXED' expression               # TOFIXED
-    | 'TOFLOAT' expression               # TOFLOAT
-    | 'TOBIT'   expression               # TOBIT
-    | 'TOCHAR'  expression               # TOCHAR
-    | 'ENTIER'  expression               # ENTIER
-    | 'ROUND'   expression               # ROUND
-    | 'CONT'    expression               # CONT
-    ;
+//xmonadicExplicitTypeConversionOperators
+//    : 'TOFIXED' expression               # TOFIXED
+//    | 'TOFLOAT' expression               # TOFLOAT
+//    | 'TOBIT'   expression               # TOBIT
+//    | 'TOCHAR'  expression               # TOCHAR
+//    | 'ENTIER'  expression               # ENTIER
+//    | 'ROUND'   expression               # ROUND
+//    | 'CONT'    expression               # CONT
+//    ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2071,7 +2108,6 @@ Newline
 ErrorCharacter :
     .
     ;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// END OF FILE /////////////////////////////////////

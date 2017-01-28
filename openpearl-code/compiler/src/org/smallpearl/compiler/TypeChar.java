@@ -48,7 +48,7 @@ public class TypeChar extends TypeDefinition {
     }
 
     public String toString() {
-        return "TypeChar:" + this.getName() + " size=" + this.m_size;
+        return this.getName() + "(" + this.m_size + ")";
     }
 
 }
