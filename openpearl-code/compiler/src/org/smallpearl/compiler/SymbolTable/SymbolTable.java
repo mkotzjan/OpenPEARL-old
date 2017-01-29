@@ -238,6 +238,20 @@ public class SymbolTable {
         return listOfSemaEntries;
     }
 
+    public LinkedList<BoltEntry> getBoltDeclarations() {
+        LinkedList<BoltEntry>  listOfBoltEntries = new  LinkedList<BoltEntry>();
+        SymbolTableEntry e;
+
+        for (Iterator it = m_entries.values().iterator(); it.hasNext(); ) {
+            SymbolTableEntry symbolTableEntry = (SymbolTableEntry) it.next();
+            if (symbolTableEntry instanceof BoltEntry) {
+                BoltEntry boltEntry = (BoltEntry) symbolTableEntry;
+                listOfBoltEntries.add(boltEntry);
+            }
+        }
+
+        return listOfBoltEntries;
+    }
 
     public LinkedList<ModuleEntry> getModules() {
         LinkedList<ModuleEntry>  listOfModules = new  LinkedList<ModuleEntry>();

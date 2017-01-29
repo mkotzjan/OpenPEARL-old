@@ -99,6 +99,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                     visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext) c);
                 } else if (c instanceof SmallPearlParser.SemaDeclarationContext) {
                     visitSemaDeclaration((SmallPearlParser.SemaDeclarationContext) c);
+                } else if (c instanceof SmallPearlParser.BoltDeclarationContext) {
+                    visitBoltDeclaration((SmallPearlParser.BoltDeclarationContext) c);
                 } else if (c instanceof SmallPearlParser.TaskDeclarationContext) {
                     visitTaskDeclaration((SmallPearlParser.TaskDeclarationContext) c);
                 } else if (c instanceof SmallPearlParser.DationSpecificationContext) {
@@ -644,6 +646,37 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         visitChildren(ctx);
         m_currentSymbolTable = m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitBoltDeclaration( SmallPearlParser.BoltDeclarationContext ctx)
+    {
+        boolean hasGlobalAttribute = false;
+
+        if (m_verbose > 0) {
+            System.out.println("SymbolTableVisitor: visitBoltDeclaration");
+        }
+
+        ArrayList<String> identifierDenotationList = null;
+
+        if (ctx != null) {
+            if (ctx.globalAttribute() != null) {
+                hasGlobalAttribute = true;
+            }
+
+            if (ctx.identifierDenotation() != null) {
+                identifierDenotationList = getIdentifierDenotation(ctx.identifierDenotation());
+            }
+        }
+
+        for (int i = 0; i < identifierDenotationList.size(); i++) {
+            BoltEntry entry = new BoltEntry(identifierDenotationList.get(i), ctx);
+            if (!m_currentSymbolTable.enter(entry)) {
+                System.out.println("ERR: Double definition of " + identifierDenotationList.get(i));
+            }
+        }
+
         return null;
     }
 

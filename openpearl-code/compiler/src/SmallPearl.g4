@@ -150,8 +150,7 @@ system_part:
 
 problem_part:
     'PROBLEM' ';'
-    ( scalarVariableDeclaration | semaDeclaration | identification | dationSpecification | dationDeclaration | taskDeclaration | procedureDeclaration | cpp_inline )*
-//    ( taskDeclaration | procedureDeclaration | cpp_inline )*
+    ( scalarVariableDeclaration | semaDeclaration | boltDeclaration | identification | dationSpecification | dationDeclaration | taskDeclaration | procedureDeclaration | cpp_inline )*
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -943,6 +942,10 @@ startCondition
 task_coordination_statement
     : semaRequest
     | semaRelease
+    | boltReserve
+    | boltFree
+    | boltEnter
+    | boltLeave
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -973,10 +976,18 @@ semaTry
 // BoltDeclaration ::=
 //   { DECLARE | DCL } Identifier or IdentifierList [ DimensionAttribute ] BOLT [ GlobalAttribute ] ;
 //
+
+boltDeclaration :
+    ( 'DECLARE' | 'DCL' ) identifierDenotation 'BOLT' globalAttribute? ';'
+    ;
+
 // BoltSpecification ::=
 //   { SPECIFY | SPC } Identifier or IdentifierList [ VirtualDimensionAttribute ]
 //   BOLT { GlobalAttribute | IdentificationAttribute } ;
 //
+
+
+////////////////////////////////////////////////////////////////////////////////
 // BoltStatement ::=
 //      RESERVE Name§Bolt [ , Name§Bolt ] ... ;
 //    | FREE    Name§Bolt [ , Name§Bolt ] ... ;
@@ -984,38 +995,28 @@ semaTry
 //    | LEAVE   Name§Bolt [ , Name§Bolt ] ... ;
 ////////////////////////////////////////////////////////////////////////////////
 
-// boltStatement :
-//       reserve
-//     | free
-//     | enter
-//     | leave
-//     ;
+boltReserve:
+     'RESERVE'  ID ( ',' ID)* ';'
+      ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// reserve:
-//     'RESERVE'  ID ( ',' ID)* ';'
-//      ;
+boltFree:
+     'FREE' ID ( ',' ID)* ';'
+      ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// free:
-//     'FREE' ID ( ',' ID)* ';'
-//      ;
+boltEnter:
+     'ENTER'   ID ( ',' ID)* ';'
+     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// enter:
-//     'ENTER'   ID ( ',' ID)* ';'
-//     ;
+boltLeave:
+     'LEAVE'   ID ( ',' ID)* ';'
+     ;
 
-////////////////////////////////////////////////////////////////////////////////
-
-// leave:
-//     'LEAVE'   ID ( ',' ID)* ';'
-//     ;
-
-////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 // Interrupt-Anweisung ::=

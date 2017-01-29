@@ -30,6 +30,7 @@
 package org.smallpearl.compiler;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.smallpearl.compiler.SymbolTable.*;
 
@@ -1484,7 +1485,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         } else if (ctx.durationConstant() != null) {
             m_properties.put(ctx, new TypeDuration());
         } else if (ctx.BitStringLiteral() != null) {
-            m_properties.put(ctx, new TypeBit());
+            m_properties.put(ctx, new TypeBit(Utils.getBitStringLength(ctx.BitStringLiteral().getText())));
         }
 
         return null;
@@ -1839,29 +1840,94 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAndExpression(SmallPearlParser.AndExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitAndExpression");
         }
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
 
-        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
+            m_properties.put(ctx, new TypeBit( Math.max( ((TypeBit)op1).getPrecision(),((TypeBit)op2).getPrecision())));
+        }
+        else {
+            throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return null;
     }
 
     @Override
     public Void visitOrExpression(SmallPearlParser.OrExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitOrExpression");
         }
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
 
-        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
+            m_properties.put(ctx, new TypeBit( Math.max( ((TypeBit)op1).getPrecision(),((TypeBit)op2).getPrecision())));
+        }
+        else {
+            throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return null;
     }
 
     @Override
     public Void visitExorExpression(SmallPearlParser.ExorExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitExorExpression");
         }
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
 
-        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
+            m_properties.put(ctx, new TypeBit( Math.max( ((TypeBit)op1).getPrecision(),((TypeBit)op2).getPrecision())));
+        }
+        else {
+            throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return null;
     }
-
 }
