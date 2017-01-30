@@ -66,7 +66,7 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
         m_currentSymbolTable = m_symboltable;
 
         if (m_verbose > 0) {
-            System.out.println( "Semantic: Check Assignments");
+            System.out.println( "    Check Assignments");
         }
     }
 

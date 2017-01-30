@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.4";
+    static String version = "v0.8.5";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -79,9 +79,9 @@ public class Compiler {
         }
 
         for (i = 0; i < inputFiles.size(); i++) {
-            SmallPearlLexer lexer = null;
+            OpenPEARLLexer lexer = null;
             try {
-                lexer = new SmallPearlLexer(new ANTLRFileStream(inputFiles.get(i)));
+                lexer = new OpenPEARLLexer(new ANTLRFileStream(inputFiles.get(i)));
             }
             catch(IOException ex) {
                 System.out.println("Error:" + ex.getMessage());

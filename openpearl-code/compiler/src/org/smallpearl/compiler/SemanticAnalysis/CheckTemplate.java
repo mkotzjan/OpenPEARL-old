@@ -60,7 +60,7 @@ public class CheckTemplate extends SmallPearlBaseVisitor<Void> implements SmallP
         m_currentSymbolTable = m_symboltable;
 
         if (m_verbose > 0) {
-            System.out.println( "Semantic: Check Template");
+            System.out.println( "    Check Template");
         }
     }
 

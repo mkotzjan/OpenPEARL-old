@@ -51,7 +51,6 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
 
         m_verbose = verbose;
         m_debug = debug;
-        m_debug = true;
 
         if (m_verbose > 0) {
             System.out.println("Semantic Check: Create ConstantPool");
@@ -242,7 +241,6 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                             Integer value = -1 * Integer.parseInt(literal_ctx.IntegerConstant().toString());
                             Integer precision = Integer.toBinaryString(Math.abs(value)).length() + 1;
                             add(new ConstantFixedValue(value));
-                            System.out.println("fixed:(" + value + "," + precision + ")");
                         } catch (NumberFormatException ex) {
                             throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
                         }

@@ -44,6 +44,7 @@ tokens {
      Sign
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Excerpt from PEARL 90 LANGUAGE REPORT, Version 2.2 September 1998, page 135
 //
@@ -2105,10 +2106,32 @@ Newline
 
 ////////////////////////////////////////////////////////////////////////////////
 
+STRING: '"' (~'"')* '"'
+    ;
+
+INCLUDE_TOKEN:
+    '#INCLUDE' Whitespace? STRING
+    {
+        try {
+            System.out.println( "include file:" + getText());
+     //       ANTLRFileStream inputStream = new ANTLRFileStream("test");
+     //       OpenPEARLLexer subLexer = new OpenPEARLLexer(inputStream);
+            nextToken();
+        }
+        catch(Exception ex) {
+             System.out.println("Error:" + ex.getMessage());
+             System.exit(-2);
+        }
+    }
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
 // handle characters which failed to match any other token
 ErrorCharacter :
     .
     ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////// END OF FILE /////////////////////////////////////
