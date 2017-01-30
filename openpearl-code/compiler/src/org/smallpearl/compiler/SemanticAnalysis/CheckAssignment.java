@@ -82,7 +82,6 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
         if ( lhs instanceof VariableEntry) {
             VariableEntry v = (VariableEntry) lhs;
             TypeDefinition vt = v.getType();
-
             String l1 = v.getType().getName();
 
             if ( rhs == null ) {
@@ -90,9 +89,19 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
             }
 
             String l2 = rhs.getName();
-
             if(!l1.equals(l2) ) {
                 throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            if ( vt instanceof TypeBit) {
+                int lhs_size = ((TypeBit)vt).getPrecision();
+                if (rhs instanceof TypeBit) {
+                    int rhs_size =  ((TypeBit)rhs).getPrecision();
+
+                    if ( lhs_size < rhs_size) {
+                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    }
+                }
             }
         }
         else {
