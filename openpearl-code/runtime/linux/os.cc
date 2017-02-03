@@ -460,11 +460,12 @@ int main() {
    LogFile * logfile = new LogFile(disc, "pearl_log.txt");
    new Log(logfile,(char*)"EWDI"); // all levels enabled
 
+   scanPearlRc();
+
    // set desired log level
    Log::setLevel(entries[LOGLEVEL].value);
    // --- log setup complete ---
 
-   scanPearlRc();
 
    numberOfCpus = sysconf(_SC_NPROCESSORS_ONLN);
    Log::info("PEARL system startup");
