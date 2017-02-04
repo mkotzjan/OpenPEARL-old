@@ -1790,6 +1790,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         TypeDefinition typ = m_expressionTypeVisitor.lookupType(ctx);
         ST expr = null;
 
+        // TODO: bitwise
         if ( typ instanceof TypeBit) {
             TypeBit b = (TypeBit)typ;
             if ( b.getPrecision() == 1 ) {
@@ -2148,6 +2149,26 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitSemaTry(SmallPearlParser.SemaTryContext ctx) {
         ST st = group.getInstanceOf("SemaTry");
+        LinkedList<String> listOfNames = new LinkedList<String>();
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            listOfNames.add(ctx.ID(i).getText());
+        }
+
+        Collections.sort(listOfNames);
+
+        for (int i = 0; i < listOfNames.size(); i++) {
+            st.add("names", listOfNames.get(i));
+        }
+
+        st.add("noofsemas", ctx.ID().size());
+
+        return st;
+    }
+
+    @Override
+    public ST visitSemaRelease(SmallPearlParser.SemaReleaseContext ctx) {
+        ST st = group.getInstanceOf("SemaRelease");
         LinkedList<String> listOfNames = new LinkedList<String>();
 
         for (int i = 0; i < ctx.ID().size(); i++) {

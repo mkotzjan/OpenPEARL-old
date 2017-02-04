@@ -80,6 +80,7 @@ public class Compiler {
 
         for (i = 0; i < inputFiles.size(); i++) {
             OpenPEARLLexer lexer = null;
+
             try {
                 lexer = new OpenPEARLLexer(new ANTLRFileStream(inputFiles.get(i)));
             }

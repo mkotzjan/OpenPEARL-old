@@ -31,6 +31,7 @@ package org.smallpearl.compiler;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.smallpearl.compiler.SemanticAnalysis.CheckAssignment;
+import org.smallpearl.compiler.SemanticAnalysis.CheckProcedureCall;
 import org.smallpearl.compiler.SemanticAnalysis.CheckTemplate;
 import org.smallpearl.compiler.SymbolTable.ModuleEntry;
 import org.smallpearl.compiler.SymbolTable.SymbolTable;
@@ -69,6 +70,7 @@ public class SemanticCheck {
 
         new CheckTemplate(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckAssignment(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
+        new CheckProcedureCall(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
     }
 
 }
