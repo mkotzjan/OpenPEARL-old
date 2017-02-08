@@ -2296,10 +2296,26 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
             if (idfFilenames.size() == 1) {
                 String fname = idfFilenames.get(0).toString();
-                fname = fname.substring(1, fname.length() - 1);
+//                fname = fname.substring(1, fname.length() - 1);
 
-                stmt.add("fname", fname);
-                stmt.add("flen", fname.length());
+                ST declFilename = group.getInstanceOf("declare_idf_filename");
+                ST refFilename = group.getInstanceOf("reference_idf_filename");
+
+                SymbolTableEntry entry = m_currentSymbolTable.lookup(fname);
+
+                if ( entry instanceof VariableEntry ) {
+                    declFilename.add("variable",fname);
+                    refFilename.add("variable",fname);
+                }
+                else {
+                    declFilename.add("stringConstant",fname);
+                    declFilename.add("lengthOfStringConstant", fname.length());
+                    refFilename.add("stringConstant",fname);
+                }
+
+                stmt.add("declFileName", declFilename);
+                stmt.add("refFileName", refFilename);
+
             }
 
             ArrayList<String> rstVars = getOpenRstVariables(ctx.open_parameterlist());
@@ -2329,6 +2345,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     if (c.StringLiteral() != null) {
                         filenames.add(c.StringLiteral().toString());
                     } else if (c.ID() != null) {
+                        SymbolTableEntry entry = m_currentSymbolTable.lookup(c.ID().getText());
+
+                        if ( !(entry instanceof VariableEntry )) {
+                            throw new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+
+
                         filenames.add(c.ID().toString());
                     }
                 }

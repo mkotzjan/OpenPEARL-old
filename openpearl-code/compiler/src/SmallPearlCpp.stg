@@ -703,17 +703,17 @@ take_send_control_position(dation,expression1,expression2,expression3) ::= <%
 <endif>
 %>
 
-open_statement(id,paramlist,fname,flen,rst_var) ::= <<
+open_statement(id,paramlist,declFileName,refFileName,flen,rst_var) ::= <<
 {
-    <if(fname)>static Character\<<flen>\> idf_filename("<fname>"); <\n> <endif>
+    <if(declFileName)><declFileName><endif>
     _<id>.dationOpen(
     <if(paramlist)>
         <paramlist>
     <else>
         0
     <endif>
-    <if(fname)>
-    , &idf_filename
+    <if(refFileName)>
+    <refFileName>
     <else>
     , (pearlrt::Character\<1>*) 0
     <endif>
@@ -724,6 +724,15 @@ open_statement(id,paramlist,fname,flen,rst_var) ::= <<
     <endif>
     );
 }
+>>
+
+declare_idf_filename(variable,stringConstant,lengthOfStringConstant) ::= <<
+<if(stringConstant)>static pearlrt::Character\<<lengthOfStringConstant>\> idf_filename("<stringConstant>"); <\n> <endif>
+>>
+
+reference_idf_filename(variable,stringConstant) ::= <<
+    <if(stringConstant)>, &idf_filename<endif>
+    <if(variable)>, &<user_variable(variable)><endif>
 >>
 
 open_parameterlist(parameter) ::= <%
