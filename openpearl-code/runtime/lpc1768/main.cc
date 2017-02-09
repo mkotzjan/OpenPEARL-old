@@ -66,11 +66,14 @@ independent parts.
 #include "Clock.h"
 #include "chip.h"
 #include "service.h"
+#include "Lpc17xxClock.h"
 
 // read options from menuconfig
 #include "../../../../configuration/include/autoconf.h"
 
- extern "C" {  extern int _write(int fd, char * ptr, int len);};
+extern "C" {
+   extern int _write(int fd, char * ptr, int len);
+};
 
 using namespace pearlrt;
 /*-----------------------------------------------------------*/
@@ -88,6 +91,13 @@ __attribute__((weak)) int main(void) {
 
    printf("OpenPEARL started \n");
 
+   // test for clock initialization
+   if (!Lpc17xxClock::isClockSelected()) {
+      printf("set default clock source");
+      Lpc17xxClock dummy(0);  // the object may be discarded immediatelly
+   }
+
+   Log::getInstance()->setLevel(0x0e);
 
    // obtain the reset reason
    resetReason = Chip_SYSCTL_GetSystemRSTStatus();
