@@ -59,7 +59,7 @@ public class SystemEntry {
 	private int line;
 	private boolean isUsed = false;
 	private boolean codeIsCompleted = false;
-	private int configItemNbr=0;
+	static private int configItemNbr=0;
 
 	private List<AssociationEntry> mustProvide = new ArrayList<AssociationEntry>();
 
