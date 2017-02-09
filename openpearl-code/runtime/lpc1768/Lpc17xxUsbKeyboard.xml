@@ -1,0 +1,6 @@
+   <dation name="Lpc17xxUsbKeyboard">
+      <parameters>
+      </parameters>
+      <attributes>FORWARD, IN, SYSTEM</attributes>
+      <data>ALPHIC</data>
+   </dation>

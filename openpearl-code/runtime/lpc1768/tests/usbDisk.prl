@@ -1,0 +1,23 @@
+MODULE(usbdisk);
+SYSTEM;
+__cpp__('pearlrt::Lpc17xxUsbDisk dummy;');
+Post(0);
+Lpc17xxClock(4);
+disk : FatFs('2:/',10);
+
+PROBLEM;
+
+   SPC disk DATION INOUT SYSTEM ALL GLOBAL;
+   DCL tab DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk);
+
+ttt: TASK MAIN;
+   DCL fileName CHAR(12) INIT('file1.txt');
+   AFTER 5 SEC RESUME;
+   OPEN tab BY IDF(fileName), ANY;
+   PUT 'Hallo' TO tab BY A, SKIP;
+   CLOSE tab;
+END;
+MODEND;
+
+
+

@@ -1,0 +1,8 @@
+   <dation name="FatFs">
+      <parameters>
+        <CHAR length="32767"> <NotEmpty/> </CHAR>
+        <FIXED length="31"> <FIXEDGT>0</FIXEDGT> </FIXED>
+      </parameters>
+      <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALL</data>
+   </dation>
