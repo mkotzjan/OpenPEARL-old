@@ -12,7 +12,7 @@ CXX := $(CROSS)$(CXX)
 AR := $(CROSS)$(AR)
 
 # make silent compilations
-COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(TARGET_ARCH) -c
+COMPILE.c = @echo compile $<; $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 #COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(LINK.cc)
@@ -50,6 +50,7 @@ include ../FreeRTOS/PEARL/Files
 CXXSRCS += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_SRC))
 CHECK_FILES += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_SRC))
 INCS += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_INC))
+XMLFILES += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_XML))
 
 # -------------------- add cortex-M clock to project
 CXXSRCS += ../FreeRTOS/addOns/CortexMClock.cc
@@ -74,9 +75,12 @@ LPCOpen_CSRC += $(LPCOpen)/clock_17xx_40xx.c
 LPCOpen_CSRC += $(LPCOpen)/rtc_17xx_40xx.c
 LPCOpen_CSRC += $(LPCOpen)/iocon_17xx_40xx.c
 
+CXXSRCS += main.cc Log.cc
+CHECK_FILES += main.cc Log.cc
+
 CSRC += Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.c
 XMLFILES += Hy32.xml
-CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.ca \
+CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc \
 	Hy32.h Hy32LowLevel.h
 # ------- add board specific stuff to project
 BOARDSUPPORT := 
@@ -100,7 +104,13 @@ BOARDSUPPORT += Lpc17xxUart.cc
 XMLFILES     += Lpc17xxUart.xml
 CHECK_FILES += $(BOARDSUPPORT)
 CHECK_FILES += $(addsuffix .h,$(basename $(BOARDSUPPORT)))
+
+### do not check the assembly source
 BOARDSUPPORT += startup_lpc1768.S 
+
+BOARDSUPPORT += Lpc17xxISRProxy.cc
+CHECK_FILES += Lpc17xxISRProxy.cc  Lpc17xxISRProxy.h
+
 ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
 BOARDSUPPORT += ../FreeRTOS/addOns/testStackOverflow.cc
 endif
@@ -108,6 +118,50 @@ ifeq ($(CONFIG_LPC1768_CAN),y)
 LPCOpen_CSRC += $(LPCOpen)/can_17xx_40xx.c
 BOARDSUPPORT += Lpc17xxCan.cc
 XMLFILES     += Lpc17xxCan.xml
+endif
+ifeq ($(CONFIG_LPC1768_HAS_USB),y)
+CPPFLAGS += -D__LPC175X_6X__ -DUSB_HOST_ONLY
+LPCUSB_Base= ../cortexM/LPCOpen/software/LPCUSBLib/Drivers/USB
+LPCUSB_Core= $(LPCUSB_Base)/Core
+LPCUSB_Class= $(LPCUSB_Base)/Class
+LPCOpen_CSRC += $(LPCUSB_Core)/Host.c
+LPCOpen_CSRC += $(LPCUSB_Core)/HostStandardReq.c
+LPCOpen_CSRC += $(LPCUSB_Core)/USBTask.c
+LPCOpen_CSRC += $(LPCUSB_Core)/ConfigDescriptor.c
+LPCOpen_CSRC += $(LPCUSB_Core)/Pipe.c
+LPCOpen_CSRC += $(LPCUSB_Core)/PipeStream.c
+LPCOpen_CSRC += $(LPCUSB_Core)/USBMemory.c
+LPCOpen_CSRC += $(LPCUSB_Core)/USBController.c
+LPCOpen_CSRC += $(LPCUSB_Core)/HCD/HCD.c
+LPCOpen_CSRC += $(LPCUSB_Core)/HCD/OHCI/OHCI.c
+LPCOpen_CSRC += $(LPCUSB_Core)/HAL/LPC17XX/HAL_LPC17xx.c
+CXXSRCS += Lpc17xxUsb.cc
+CHECK_FILES += Lpc17xxUsb.cc  Lpc17xxUsb.h
+INCS += $(LPCUSB_Base) 
+endif
+ifeq ($(CONFIG_LPC1768_USB_Disk),y)
+LPCUSB_FS= ../cortexM/LPCOpen/software/filesystems
+CHAN_FS= ../FreeRTOS/chanFatFs/src
+LPCOpen_CSRC += $(LPCUSB_Class)/Host/MassStorageClassHost.c
+LPCOpen_CSRC += $(CHAN_FS)/ff.c
+LPCOpen_CSRC += $(CHAN_FS)/diskio.c
+#LPCOpen_CSRC += $(LPCUSB_FS)/fatfslpc/rtc.c
+#LPCOpen_CSRC += $(LPCUSB_FS)/fatfslpc/fs_usb.c
+
+CXXSRCS += Lpc17xxUsbDisk.cc
+CHECK_FILES += Lpc17xxUsbDisk.cc Lpc17xxUsbDisk.h
+#XMLFILES += Lpc17xxUsbDisk.xml
+#INCS += $(LPCUSB_FS)/fatfs/src 
+INCS += $(CHAN_FS)
+INCS += $(LPCUSB_Base)/Class/Host 
+endif
+
+ifeq ($(CONFIG_LPC1768_USB_Keyboard),y)
+LPCOpen_CSRC += $(LPCUSB_Class)/Host/HIDClassHost.c
+LPCOpen_CSRC += $(LPCUSB_Class)/Common/HIDParser.c
+CXXSRCS += Lpc17xxUsbKeyboard.cc
+CHECK_FILES += Lpc17xxUsbKeyboard.cc Lpc17xxUsbKeyboard.h
+XMLFILES += Lpc17xxUsbKeyboard.xml
 endif
 
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
@@ -145,6 +199,7 @@ BOARDSUPPORT_OBJ := \
 		 $(addsuffix .o,$(basename $(LPCOpen_CSRC)))
 
 INCLUDES := $(addsuffix .h,$(basename $(CXXSRCS)))
+#PLIB_OBJS +=  $(addsuffix .o,$(basename $(LPCOpen_CSRC)))
 PLIB_OBJS := $(addsuffix .o,$(basename $(CXXSRCS)))
 PLIB_OBJS += $(addsuffix .o,$(basename $(CSRC)))
 
@@ -184,7 +239,7 @@ lpc1768.xml: $(XMLFILES)
 phony += depend
 depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
 	@echo "[create] .depend"
-	@$(CXX) -MM $(CFLAGS) $(INCS) $^ >.depend
+	@$(CXX) -MM $(CFLAGS) $(CPPFLAGS) $(INCS) $^ >.depend
 
 phony += clean
 clean:
@@ -265,6 +320,7 @@ info:
 	@echo "Makefile Summary"
 	@echo "targets: " $(targets)
 	@echo "CFLAGS " $(CFLAGS)
+	@echo "CPPFLAGS " $(CPPFLAGS)
 	@echo "INCS " $(INCS)
 	@echo "CXXFLAGS " $(CXXFLAGS)
 	@echo "LFLAGS " $(LFLAGS)

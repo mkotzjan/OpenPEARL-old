@@ -58,8 +58,8 @@ namespace pearlrt {
 #endif
 
    static void doitSync(const Character<7>& type,
-                      const char * format,
-                      va_list args) ;
+                        const char * format,
+                        va_list args) ;
 
    static void logTask(void * p) {
 #ifdef LOGTASK
@@ -135,8 +135,8 @@ namespace pearlrt {
    }
 
    static void doitSync(const Character<7>& type,
-                      const char * format,
-                      va_list args) {
+                        const char * format,
+                        va_list args) {
       Character<128> line;
       RefCharacter rc(line);
 

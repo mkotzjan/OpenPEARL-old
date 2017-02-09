@@ -116,3 +116,10 @@ extern "C" {
 #include "Hy32.h"
 #include "Hy32LowLevel.h"
 
+#ifdef CONFIG_LPC1768_USB_Keyboard
+#include "Lpc17xxUsbKeyboard.h"
+#endif
+#ifdef CONFIG_LPC1768_USB_Disk
+#include "Lpc17xxUsbDisk.h"
+#include "FatFs.h"
+#endif

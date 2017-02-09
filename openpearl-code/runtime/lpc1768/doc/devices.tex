@@ -197,19 +197,45 @@ Orientation & Font & Lines & Columns \\
 \hline
 \end{tabular}
 
+\subsection{Lpc17xxUsbKeyboard}
+There is no hub support on microcontroller systems. Therefore only one keyboard
+may be attached to the system.
+The driver uses the USB stack of LPCOpen.
+The USB stack was modified in order to remove active wait loops.
+The steps of the enumeration is now invoked from the usb-poll task, which
+runs on a cycle time of 10ms. The cycle limits were reduced to wait only one 
+or two intervals.
+
+The interrupt service routine was moved into the sepaarte module Lpc17xxISRProxy. 
+This module invokes the interrupt service routine from LPCOpen via a
+ dynamically set function pointer.
+
+The common part to all USB devices is located in the module Lpc17xxUsb. 
+A callback mechanism is used to finalize the setup of the device enumeration,
+the notification of disconnection and the body of the usb poll task. The poll task
+itself is located in the Lpx17xxUsb module.
+The detection of new devices is treated in the module Lpc17xxUsb. New devices are logged 
+with info-level.
+
+The USB HID device delivers scan codes and modifiers. These codes are translated according
+the german keyboard layout into 7-bit-ASCII codes. Keys which are not included in this
+character set are ignored.
+
+
 \subsection{Device Summary}
 Table \ref{lpc17_device_list} contains all avaliable device drivers 
 with additional information for the system overview.
 
 \begin{table}
-\begin{tabular}{|l|r|r|}
+\begin{tabular}{|l|r|r|r|r|}
 \hline
-Name             & Int\_Prio & Excepion Number(s) \\
+Name             & Int\_Prio & Exception Number(s) & RAM & ROM \\
 \hline
 Lpc17xxRTC       &  5 & 33 \\ 
 Lpc17xxTimer0    &  5 &  17 \\
-Lpc15xxInterrupt & 10 &  37 \\
-Lpc15xxUart      & 10 &  21(UART0), 23(UART2) \\ 
+Lpc17xxInterrupt & 10 &  37 \\
+Lpc17xxUart      & 10 &  21(UART0), 23(UART2) \\ 
+Lpc17xxUsbKeyboard  & 10 &  40 & 4kB & 8.9 kB \\ 
 \hline
 \end{tabular}
 \caption{Device Drivers with interrupt usage.}
