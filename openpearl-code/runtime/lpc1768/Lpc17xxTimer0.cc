@@ -93,6 +93,10 @@ namespace pearlrt {
 //printf("Timer0: gettime %"PRIu64" \n", *nsectime);
    }
 
+   void Lpc17xxTimer0::settime(const uint64_t *nsectime) {
+      nsec = *nsectime;
+   }
+
    void Lpc17xxTimer0::start() {
 
       ticksPerSecond = Chip_Clock_GetSystemClockRate();

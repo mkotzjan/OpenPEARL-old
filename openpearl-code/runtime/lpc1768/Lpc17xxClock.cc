@@ -83,7 +83,7 @@ extern "C" {
 
    This function is the interrupt service routine of the real time clock (RTC)
    of the LPC1768.
-   The RTC is used with interrzpt, when the timer0 should run synchronized
+   The RTC is used with interrupt, when the timer0 should run synchronized
    with the RTC. This is necessary in some cases to avoid large differences
    between these two clock sources.
    */
@@ -97,6 +97,13 @@ extern "C" {
 
       if (firstInterrupt) {
          printf("RTC: first tick\n");
+         // set the time base of Timer0 to the current time of the RTC
+         // to enable the date-functions
+         // now may be used for setting the current time in timer0
+
+         pearlrt::Lpc17xxRTC::gettime(&now);
+         pearlrt::Lpc17xxTimer0::settime(&now);
+
          pearlrt::Lpc17xxTimer0::start();
          pearlrt::Lpc17xxTimer0::gettime(&now);
       } else {
@@ -119,15 +126,27 @@ extern "C" {
 
 namespace pearlrt {
 
+   bool Lpc17xxClock::clockSelected = false;
+
+   bool Lpc17xxClock::isClockSelected() {
+      return clockSelected;
+   }
+
    Lpc17xxClock::Lpc17xxClock(const int typeOfClock) {
-      static const struct tm  defaultDate = {0, 0, 0,
-                1, 0, 2016 - 1900,
-                5, 0, 0
-      }; // 1.1.2016 0:00:00
+      uint64_t now;
+      static const struct tm  defaultDate = {0, 0, 0,	// sec, min, hour,
+                1, 0, 2016 - 1900,			// mday, mon, year
+                5, 0, 0						// wday, yday, isdst
+      }; // Fr 1.1.2016 0:00:00
+
+      if (clockSelected) {
+         Log::error("Lpc17xxClock: already a clock source selected");
+         throw theIllegalParamSignal;
+      }
 
       switch (typeOfClock) {
       default:
-         Log::error("Lpc17xxClock: Illegale selector %d", typeOfClock);
+         Log::error("Lpc17xxClock: Illegal selector %d", typeOfClock);
          throw theIllegalParamSignal;
 
       case 0: // only systick
@@ -196,10 +215,19 @@ namespace pearlrt {
          // to RTC 1 second interrupt
          tickHook = NULL;   // nothing to do Lpc17xxTimer0::tick;
          synchronize2RTC = true;
+         // set the time base of Timer0 to the current time of the RTC
+         // to enable the date-functions
+         // now may be used for setting the current time in timer0
+
+         pearlrt::Lpc17xxRTC::gettime(&now);
+         pearlrt::Lpc17xxTimer0::settime(&now);
+
          Lpc17xxTimer0::registerTimeBase();
          Lpc17xxRTC::enableInterrupt();
          break;
       }
+
+      clockSelected = true;
    }
 }
 

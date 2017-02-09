@@ -91,6 +91,14 @@ namespace pearlrt {
       static void gettime(uint64_t * nsec);
 
       /**
+      write current time in nsecs
+
+      \param nsec pointer to the storage which contains the current time
+                     in units of ns
+      */
+      static void settime(const uint64_t * nsec);
+
+      /**
       To be called from vApplicationTickHook()
 
       ... does nothing useful ...

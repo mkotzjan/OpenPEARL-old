@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2015 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2015-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -47,10 +47,13 @@ namespace pearlrt {
    for an application. The parameter selects one of the possible
    clock sources.
 
+   The default clock Lpc17xxClock(0) is set automatically in
+   system startup procedure, if no other setting was selected.
+
    Usage:
    \verbatim
    SYSTEM;
-      myClock : Lpc17xxClock(1); ! 0=Systick, 1=RTC initial time + Systick
+      Lpc17xxClock(1); ! 0=Systick, 1=RTC initial time + Systick
    PROBLEM;
       ! no access to this device in the problem part
    \endverbatim
@@ -59,6 +62,7 @@ namespace pearlrt {
    class Lpc17xxClock {
 
    private:
+      static bool clockSelected;
 
    public:
 
@@ -74,6 +78,13 @@ namespace pearlrt {
 
       */
       Lpc17xxClock(const int typeOfClock);
+
+      /**
+      check if a clock was selected
+
+      \return true, if a clock source was selected
+      */
+      static bool isClockSelected();
    };
 }
 #endif
