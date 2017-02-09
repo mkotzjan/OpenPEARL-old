@@ -186,20 +186,20 @@ username_declaration_with_data_flow_direction:
 ////////////////////////////////////////////////////////////////////////////////
 
 user_configuration:
-       user_configuration_without_association       #userConfigurationWithoutAssociation
+      user_configuration_without_association        #userConfigurationWithoutAssociation
     | user_configuration_with_association           #userConfigurationWithAssociation
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 user_configuration_without_association:
-    ID username_parameters ';'
+    ID username_parameters? ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 user_configuration_with_association:
-    ID username_parameters '---' ID ';'
+    ID username_parameters? '---' ID ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1732,6 +1732,47 @@ primaryExpression
     | semaTry
 //    | monadicExplicitTypeConversionOperators
     | stringSlice
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ConvertToStatement ::=
+//   CONVERT Expression [ , Expression ] ... TO Name§CharacterStringVariable
+//   [ BY FormatOrPositionConvert [ , FormatOrPositionConvert ] ... ] ;
+//
+// ConvertFromStatement ::=
+//    CONVERT Name§Variable [ , Name§Variable ] ... FROM Expression§CharacterString
+//    [ BY FormatOrPositionConvert [ , FormatOrPositionConvert ] ... ] ;
+//
+// FormatOrPositionConvert ::=
+//    [ FormatFactor ] { Format | PositionConvert }
+//    | FormatFactor ( FormatOrPositionConvert [ , FormatOrPositionConvert ]... )
+//
+// PositionConvert ::=
+//   RST ( Name§ErrorVariable-FIXED )
+//   | X [ ( Expression ) ]
+//   | { POS | ADV } ( Expression )
+//   | SOP ( Name§PositionVariable-FIXED )
+////////////////////////////////////////////////////////////////////////////////
+
+convertToStatement
+    : 'CONVERT' expression (',' expression)* 'TO' ID ( 'BY' formatOrPositionConvert (',' formatOrPositionConvert)* )?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+formatOrPositionConvert
+    :
+//    [ FormatFactor ] { Format | PositionConvert }
+//    | FormatFactor ( FormatOrPositionConvert [ , FormatOrPositionConvert ]... )
+    ;
+////////////////////////////////////////////////////////////////////////////////
+
+positionConvert
+    : 'RST' '(' ID ')'                        # positionConvertRST
+    | 'X' ( '(' expression ')' )?             # positionConvertX
+    | 'POS' '(' expression ')'                # positionConvertPOS
+    | 'ADV' '(' expression ')'                # positionConvertADV
+    | 'SOP' '(' ID ')'                        # positionConvertSOP
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
