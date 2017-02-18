@@ -820,7 +820,7 @@ put_statement_factor_position(dation,format) ::= <%
 %>
 
 put_statement_factor_position_rst(element) ::= <%
-    toRst(<element>)
+    rst(<element>)
 %>
 
 put_statement_factor_position_skip(element) ::= <%
@@ -895,7 +895,7 @@ get_statement_factor_position(dation,format) ::= <%
 %>
 
 get_statement_factor_position_rst(element) ::= <%
-    fromRst(<element>)
+    rst(<element>)
 %>
 
 get_statement_factor_position_skip(element) ::= <%
