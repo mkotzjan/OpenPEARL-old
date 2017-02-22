@@ -32,7 +32,6 @@ package org.smallpearl.compiler.SemanticAnalysis;
 import org.smallpearl.compiler.*;
 import org.smallpearl.compiler.SymbolTable.*;
 import org.stringtemplate.v4.ST;
-import sun.font.TrueTypeGlyphMapper;
 
 public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
