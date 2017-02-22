@@ -683,4 +683,13 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public SymbolTable getSymbolTablePerContext(ParseTree ctx) {
         return m_symboltablePerContext.get(ctx);
     }
+
+    @Override
+    public Void visitDationDeclaration(SmallPearlParser.DationDeclarationContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("SymbolTableVisitor: visitDationDeclaration");
+        }
+
+        return null;
+    }
 }

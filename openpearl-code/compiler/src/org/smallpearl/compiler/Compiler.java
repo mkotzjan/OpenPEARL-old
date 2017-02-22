@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.6";
+    static String version = "v0.8.7";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -127,7 +127,8 @@ public class Compiler {
                     symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
                 }
 
-                ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose,debug);
+                ConstantPool constantPool = new ConstantPool();
+                ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose,debug, constantPool);
                 constantPoolVisitor.visit(tree);
 
                 ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug,symbolTableVisitor);
@@ -165,7 +166,7 @@ public class Compiler {
 //                }
 
                 if (dumpConstantPool) {
-                    constantPoolVisitor.dump();
+                    constantPool.dump();
                 }
 
             }

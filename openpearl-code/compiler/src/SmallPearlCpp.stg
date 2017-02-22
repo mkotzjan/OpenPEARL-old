@@ -1486,8 +1486,8 @@ ProcedureDeclaration(id,listOfFormalParameters,body,resultAttribute,globalAttrib
 
 >>
 
-ProcedureBody(scalarDeclarations,statements) ::= <<
-<scalarDeclarations>
+ProcedureBody(declarations,statements) ::= <<
+<declarations>
 <statements>
 >>
 

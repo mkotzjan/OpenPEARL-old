@@ -429,7 +429,7 @@ procedureDeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
 procedureBody :
-    scalarVariableDeclaration*
+    ( scalarVariableDeclaration | dationDeclaration )*
     statement*
     ;
 

@@ -34,20 +34,22 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.stringtemplate.v4.ST;
+import sun.reflect.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
+public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
     private int m_verbose;
     private boolean m_debug;
+    private int m_counter = 0;
+    private ConstantPool m_constantPool = null;
 
     private ParseTreeProperty<TypeDefinition> m_properties = null;
-    static List<ConstantValue> constantPool = new ArrayList<ConstantValue>();
 
-    public ConstantPoolVisitor(int verbose, boolean debug) {
+    public ConstantPoolVisitor(int verbose, boolean debug, ConstantPool constantPool) {
 
         m_verbose = verbose;
         m_debug = debug;
@@ -60,12 +62,13 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
             System.out.println("Semantic Check: Enabled debugging information");
         }
 
+        m_constantPool = constantPool;
         m_properties = new ParseTreeProperty<TypeDefinition>();
 
         // Add commonly used constants:
-        add(new ConstantFixedValue(0));
-        add(new ConstantFixedValue(1));
-        add(new ConstantFixedValue(-1));
+        m_constantPool.add(new ConstantFixedValue(0));
+        m_constantPool.add(new ConstantFixedValue(1));
+        m_constantPool.add(new ConstantFixedValue(-1));
     }
 
     private Void add(ConstantValue value) {
@@ -74,11 +77,11 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
 
         boolean found = false;
 
-        for (i = 0; i < constantPool.size(); i++) {
+        for (i = 0; i < m_constantPool.constantPool.size(); i++) {
             if ( value instanceof ConstantFixedValue) {
-                if (constantPool.get(i) instanceof ConstantFixedValue) {
+                if (m_constantPool.constantPool.get(i) instanceof ConstantFixedValue) {
                     Long a = ((ConstantFixedValue)(value)).getValue();
-                    Long b = ((ConstantFixedValue)(constantPool.get(i))).getValue();
+                    Long b = ((ConstantFixedValue)(m_constantPool.constantPool.get(i))).getValue();
 
                     if ( a.equals(b) ) {
                         found = true;
@@ -87,17 +90,17 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                 }
             }
             else if ( value instanceof ConstantFloatValue) {
-                if (constantPool.get(i) instanceof ConstantFloatValue) {
-                    if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(constantPool.get(i))).getValue()) == 0) {
+                if (m_constantPool.constantPool.get(i) instanceof ConstantFloatValue) {
+                    if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(m_constantPool.constantPool.get(i))).getValue()) == 0) {
                         found = true;
                         break;
                     }
                 }
             }
             else if ( value instanceof ConstantCharacterValue) {
-                if (constantPool.get(i) instanceof ConstantCharacterValue) {
+                if (m_constantPool.constantPool.get(i) instanceof ConstantCharacterValue) {
                     String s1 = ((ConstantCharacterValue)(value)).getValue();
-                    String s2 = ((ConstantCharacterValue)(constantPool.get(i))).getValue();
+                    String s2 = ((ConstantCharacterValue)(m_constantPool.constantPool.get(i))).getValue();
 
                     if ( s1.equals(s2)) {
                         found = true;
@@ -106,10 +109,10 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                 }
             }
             else if ( value instanceof ConstantBitValue) {
-                if (constantPool.get(i) instanceof ConstantBitValue) {
+                if (m_constantPool.constantPool.get(i) instanceof ConstantBitValue) {
                     constantBitNo = constantBitNo + 1;
                     String s1 = ((ConstantBitValue)(value)).getValue();
-                    String s2 = ((ConstantBitValue)(constantPool.get(i))).getValue();
+                    String s2 = ((ConstantBitValue)(m_constantPool.constantPool.get(i))).getValue();
 
                     if ( s1.equals(s2)) {
                         found = true;
@@ -125,73 +128,11 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                 ((ConstantBitValue) (value)).setNo(constantBitNo);
             }
 
-            constantPool.add(value);
+            m_constantPool.add(value);
         }
 
         return null;
     }
-
-//    public ConstantValue lookup(String value) {
-//        int i;
-//        boolean found = false;
-//
-//        for (i = 0; i < constantPool.size(); i++) {
-//            if ( value instanceof ConstantFixedValue) {
-//                if (constantPool.get(i) instanceof ConstantFixedValue) {
-//                    Long a = ((ConstantFixedValue)(value)).getValue();
-//                    Long b = ((ConstantFixedValue)(constantPool.get(i))).getValue();
-//
-//                    if ( a.equals(b) ) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            else if ( value instanceof ConstantFloatValue) {
-//                if (constantPool.get(i) instanceof ConstantFloatValue) {
-//                    if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(constantPool.get(i))).getValue()) == 0) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            else if ( value instanceof ConstantCharacterValue) {
-//                if (constantPool.get(i) instanceof ConstantCharacterValue) {
-//                    String s1 = ((ConstantCharacterValue)(value)).getValue();
-//                    String s2 = ((ConstantCharacterValue)(constantPool.get(i))).getValue();
-//
-//                    if ( s1.equals(s2)) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            else if ( value instanceof ConstantBitValue) {
-//                if (constantPool.get(i) instanceof ConstantBitValue) {
-//                    constantBitNo = constantBitNo + 1;
-//                    String s1 = ((ConstantBitValue)(value)).getValue();
-//                    String s2 = ((ConstantBitValue)(constantPool.get(i))).getValue();
-//
-//                    if ( s1.equals(s2)) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        if (!found) {
-//            if ( value instanceof ConstantBitValue) {
-//                constantBitNo = constantBitNo + 1;
-//                ((ConstantBitValue) (value)).setNo(constantBitNo);
-//            }
-//
-//            constantPool.add(value);
-//        }
-//
-//        return null;
-//    }
 
     @Override
     public Void visitLiteral(SmallPearlParser.LiteralContext ctx) {
@@ -202,7 +143,7 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
             try {
                 Integer value = Integer.parseInt(ctx.IntegerConstant().toString());
                 Integer precision = Integer.toBinaryString(Math.abs(value)).length();
-                add(new ConstantFixedValue(value));
+                m_constantPool.add(new ConstantFixedValue(value));
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
@@ -213,7 +154,7 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                 Double value = Double.parseDouble(ctx.FloatingPointConstant().toString());
                 String strval = ctx.FloatingPointConstant().toString();
                 Integer precision = 24;
-                add(new ConstantFloatValue(value,precision));
+                m_constantPool.add(new ConstantFloatValue(value,precision));
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
@@ -262,19 +203,6 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
                 }
             }
         }
-        return null;
-    }
-
-    public Void dump(){
-        int i;
-        System.out.println("");
-        System.out.println("ConstantPool:");
-        System.out.println("  Entries:" + constantPool.size());
-
-        for ( i = 0; i < constantPool.size(); i++) {
-            System.out.println( "    " + constantPool.get(i).toString());
-        }
-
         return null;
     }
 
@@ -402,6 +330,4 @@ public  class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements
 //        return formatBitStringConstant(l,nb);
         return null;
     }
-
-
 }

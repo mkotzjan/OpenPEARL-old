@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.smallpearl.compiler.ConstantPoolVisitor.*;
+
 public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implements SmallPearlVisitor<ST> {
 
     private STGroup group;
@@ -123,31 +125,31 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private ST generateConstantPool() {
         ST pool = group.getInstanceOf("ConstantPoolList");
 
-        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
-            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFixedValue ) {
+        for (int i = 0; i < ConstantPool.constantPool.size(); i++) {
+            if (ConstantPool.constantPool.get(i) instanceof ConstantFixedValue ) {
                 ST entry = group.getInstanceOf("ConstantPoolEntry");
-                entry.add("name", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).toString());
-                entry.add("type", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).getBaseType());
-                entry.add("precision", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).getPrecision());
-                entry.add("value", ((ConstantFixedValue) ConstantPoolVisitor.constantPool.get(i)).getValue());
+                entry.add("name", ((ConstantFixedValue) ConstantPool.constantPool.get(i)).toString());
+                entry.add("type", ((ConstantFixedValue) ConstantPool.constantPool.get(i)).getBaseType());
+                entry.add("precision", ((ConstantFixedValue) ConstantPool.constantPool.get(i)).getPrecision());
+                entry.add("value", ((ConstantFixedValue) ConstantPool.constantPool.get(i)).getValue());
                 pool.add("constants", entry);
             }
         }
 
-        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
-            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantFloatValue) {
+        for (int i = 0; i < ConstantPool.constantPool.size(); i++) {
+            if (ConstantPool.constantPool.get(i) instanceof ConstantFloatValue) {
                 ST entry = group.getInstanceOf("ConstantPoolEntry");
-                entry.add("name", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).toString());
-                entry.add("type", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).getBaseType());
-                entry.add("precision", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).getPrecision());
-                entry.add("value", ((ConstantFloatValue) ConstantPoolVisitor.constantPool.get(i)).getValue());
+                entry.add("name", ((ConstantFloatValue) ConstantPool.constantPool.get(i)).toString());
+                entry.add("type", ((ConstantFloatValue) ConstantPool.constantPool.get(i)).getBaseType());
+                entry.add("precision", ((ConstantFloatValue) ConstantPool.constantPool.get(i)).getPrecision());
+                entry.add("value", ((ConstantFloatValue) ConstantPool.constantPool.get(i)).getValue());
                 pool.add("constants", entry);
             }
         }
 
-        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
-            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantCharacterValue) {
-                ConstantCharacterValue value = (ConstantCharacterValue) ConstantPoolVisitor.constantPool.get(i);
+        for (int i = 0; i < ConstantPool.constantPool.size(); i++) {
+            if (ConstantPool.constantPool.get(i) instanceof ConstantCharacterValue) {
+                ConstantCharacterValue value = (ConstantCharacterValue) ConstantPool.constantPool.get(i);
                 ST entry = group.getInstanceOf("ConstantPoolCharacterEntry");
                 entry.add("name", value.toString());
                 entry.add("type", value.getBaseType());
@@ -157,9 +159,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         }
 
-        for (int i = 0; i < ConstantPoolVisitor.constantPool.size(); i++) {
-            if (ConstantPoolVisitor.constantPool.get(i) instanceof ConstantBitValue) {
-                ConstantBitValue value = (ConstantBitValue) ConstantPoolVisitor.constantPool.get(i);
+        for (int i = 0; i < ConstantPool.constantPool.size(); i++) {
+            if (ConstantPool.constantPool.get(i) instanceof ConstantBitValue) {
+                ConstantBitValue value = (ConstantBitValue) ConstantPool.constantPool.get(i);
                 ST entry = group.getInstanceOf("ConstantPoolBitEntry");
                 entry.add("name", value.toString());
                 entry.add("type", value.getBaseType());
@@ -1913,9 +1915,16 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().getText();
+            s = s.replaceAll("^'","");
+            s = s.replaceAll("'$","");
             ST constantCharacterValue = group.getInstanceOf("ConstantCharacterValue");
-            constantCharacterValue.add("name",new ConstantCharacterValue(s).toString());
-            literal.add("string", constantCharacterValue);
+            ConstantCharacterValue value = ConstantPool.lookupCharacterValue(s);
+            if ( value != null ) {
+                literal.add("string", value);
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
         } else if (ctx.FloatingPointConstant() != null) {
             // literal.add("float", Double.valueOf(ctx.FloatingPointConstant().toString()));
 
@@ -3380,16 +3389,16 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST st = group.getInstanceOf("read_write_pos_position");
 
         if ( ctx.expression().size() == 3  ) {
-            st.add("expression1", ctx.expression(0).getText());
-            st.add("expression2", ctx.expression(1).getText());
-            st.add("expression3", ctx.expression(2).getText());
+            st.add("expression1", getExpression(ctx.expression(0)));
+            st.add("expression2", getExpression(ctx.expression(1)));
+            st.add("expression3", getExpression(ctx.expression(2)));
         }
         else if ( ctx.expression().size() == 2  ) {
-            st.add("expression1", ctx.expression(0).getText());
-            st.add("expression2", ctx.expression(1).getText());
+            st.add("expression1", getExpression(ctx.expression(0)));
+            st.add("expression2", getExpression(ctx.expression(1)));
         }
         else if ( ctx.expression().size() == 1  ) {
-            st.add("expression1", ctx.expression(0).getText());
+            st.add("expression1", getExpression(ctx.expression(0)));
         }
 
         return st;
@@ -4207,9 +4216,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if(ctx != null && ctx.children != null ) {
             for (ParseTree c : ctx.children) {
                 if (c instanceof SmallPearlParser.ScalarVariableDeclarationContext) {
-                    st.add("scalarDeclarations", visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext) c));
+                    st.add("declarations", visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext) c));
                 } else if (c instanceof SmallPearlParser.StatementContext) {
                     st.add("statements", visitStatement((SmallPearlParser.StatementContext) c));
+                } else if (c instanceof SmallPearlParser.DationDeclarationContext) {
+                    new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
             }
         }

@@ -31,6 +31,7 @@ package org.smallpearl.compiler;
 
 public class ConstantCharacterValue  extends ConstantValue {
     private String m_value;
+    private String m_uuid;
 
     ConstantCharacterValue(String str) {
         if( str.startsWith("'")) {
@@ -42,6 +43,7 @@ public class ConstantCharacterValue  extends ConstantValue {
         }
 
         m_value = str;
+        m_uuid = Utils.getUUIDString();
     }
 
     public int getLength() { return m_value.length(); }
@@ -56,7 +58,7 @@ public class ConstantCharacterValue  extends ConstantValue {
 
     public String toString() {
         String name = "CONSTANT_" + getBaseType().toUpperCase();
-        name += "_" + m_value.length() + "_" + canonicalize(m_value);
+        name += "_" + m_uuid;
         return name;
     }
 

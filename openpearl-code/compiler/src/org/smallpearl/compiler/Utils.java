@@ -29,6 +29,7 @@
 
 package org.smallpearl.compiler;
 
+import java.util.UUID;
 import org.stringtemplate.v4.ST;
 
 public class Utils {
@@ -191,4 +192,11 @@ public class Utils {
         return Long.toBinaryString(i).length();
     }
 
+    public static
+    String getUUIDString() {
+        UUID uuid = UUID.randomUUID();
+        String s = uuid.toString();
+        s = s.replaceAll("-", "_");
+        return s;
+    }
 }
