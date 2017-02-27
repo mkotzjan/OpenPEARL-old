@@ -428,9 +428,63 @@ choose an interrupt priority, which fits to the system design.
 
 \input{interrupt_priorities.tex}
 
-\subsection{To be done}
+\section{FAT File System}
+In order to provide FAT file system facilities, the code from Chan
+is used. 
+The licence provides enough freedom to use the code.
+
+The FatFs module is configurable to support different features. 
+The selected features are:
+\begin{itemize}
+\item 2 volumes (0: for SD and 1: for USB-memory stick)
+\item volume locking for concurrent usage
+\item short file names,
+      since Microsoft has a patent on the long file name feature
+\item only one (1) partiion on the volume
+\item codepage ???
+\item .... ??
+\end{itemize}
+
+The structure is shown in fig \ref{fig_chanfs}.
+\begin{figure}
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{tikzpicture} [
+    node distance=2.0cm,
+    block/.style= {rectangle, draw=black,
+                   thick,
+                   text centered,
+                   minimum width={width("Low Level Device Control")+2pt},
+                   }]
+    \node[block](lowLevDevContr)at (0,10)
+            {\shortstack{Low Level Device Control\\
+                         RTC, SD-Card, USB, ...}};
+    \node[block, above=0.2cm of lowLevDevContr](fatfs) {FatFs Module};
+    \node[block, above=0.2cm of fatfs](app) {Application};
+\end{tikzpicture}
+\caption{structure of Chan FatFs}
+\label{fig_chanfs}
+\end{center}
+\end{figure}
+
+The date and time for the FAT system is derived from the system time
+in the FatFs.cpp module.
+
+The low level device drivers depend on the specific target hardware plattform.
+They are selected using {\em Configuration Items} in the OpenPEARL system part.
+These modules will register themself in the diskio-module, which delegates 
+the calls from tghe fatfs-modukle (ff.c) to the device drivers.
+.
+The following volume names are reserved in OpenPEARL:
+\begin{description}
+\item[0:/] denotes the SD-card
+\item[1:/] denotes the USB-memory stick
+\end{description}
+
+
+\section{To be done}
   \begin{itemize}
-  \item provide device drivers for the standard devices (USB, SD, Ethernet)
+  \item provide device drivers for the standard devices (SD, Ethernet)
   \item device wait queue for tasks in begin/end-sequence?
   \end{itemize}
 

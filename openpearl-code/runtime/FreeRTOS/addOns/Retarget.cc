@@ -34,8 +34,10 @@
 #include "semphr.h"
 #include "Retarget.h"
 #include <stdio.h>
+#include "lpc17_interruptState.h"
 
 #include "SystemConsole.h"
+
 
 extern "C" {
    static pearlrt::GenericUart * console = 0;
@@ -53,7 +55,7 @@ extern "C" {
          console = pearlrt::SystemConsole::getInstance();
       }
 
-      if (useInterruptFlag) {
+      if (useInterruptFlag && !lpc17_isInterrupt()) {
          // output in interrupt  mode
          struct StdInOutJob job;
 

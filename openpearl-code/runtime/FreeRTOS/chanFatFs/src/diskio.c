@@ -51,8 +51,7 @@ DSTATUS disk_initialize (
 	BYTE pdrv	/* Physical drive nmuber to identify the drive */
 )
 {
-	DSTATUS stat;
-	int result;
+	DSTATUS result;
 
     if (pdrv <0 || pdrv >= nbrPdrv || !registered[pdrv].di) {
 	   return STA_NOINIT;
@@ -74,7 +73,7 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {
-	int result;
+	DRESULT result;
 
     if (pdrv <0 || pdrv >= nbrPdrv || !registered[pdrv].dr) {
 	return RES_PARERR;
@@ -97,7 +96,7 @@ DRESULT disk_write (
 	UINT count		/* Number of sectors to write */
 )
 {
-	int result;
+	DRESULT result;
 
     if (pdrv <0 || pdrv >= nbrPdrv || !registered[pdrv].dw) {
 	return RES_PARERR;
@@ -118,8 +117,7 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	DRESULT res;
-	int result;
+	DRESULT result;
 
     if (pdrv <0 || pdrv >= nbrPdrv || !registered[pdrv].dctl) {
 	return RES_PARERR;

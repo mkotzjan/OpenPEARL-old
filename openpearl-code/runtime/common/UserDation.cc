@@ -62,19 +62,23 @@ namespace pearlrt {
          dationParams |= p;
       }
 
-      closeSystemDation(dationParams);
+      // mark the dation to be closed, even if errors during
+      // closing the system dation occur
       dationStatus = CLOSED;
+      closeSystemDation(dationParams);
    }
 
    void UserDation::beginSequence(TaskCommon * me) {
       // this method is called before any dation operation starts
       // in the application
+
       // verify that the dation is really open
       assertOpen();
 
       mutex.lock();
       currentTask = me;
-    
+      rstValue = NULL;
+
       if (me) {
          // for testing purpose it it possible to use
          // without a task object

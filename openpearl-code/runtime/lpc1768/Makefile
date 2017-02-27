@@ -49,6 +49,7 @@ INCS += $(addprefix ../FreeRTOS/addOns/,$(ADDONINCS))
 include ../FreeRTOS/PEARL/Files
 CXXSRCS += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_SRC))
 CHECK_FILES += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_SRC))
+CHECK_FILES += $(addprefix ../FreeRTOS/PEARL/,$(addsuffix .h,$(basename $(PEARL_FREERTOS_SRC))))
 INCS += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_INC))
 XMLFILES += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_XML))
 
@@ -145,12 +146,9 @@ CHAN_FS= ../FreeRTOS/chanFatFs/src
 LPCOpen_CSRC += $(LPCUSB_Class)/Host/MassStorageClassHost.c
 LPCOpen_CSRC += $(CHAN_FS)/ff.c
 LPCOpen_CSRC += $(CHAN_FS)/diskio.c
-#LPCOpen_CSRC += $(LPCUSB_FS)/fatfslpc/rtc.c
-#LPCOpen_CSRC += $(LPCUSB_FS)/fatfslpc/fs_usb.c
-
 CXXSRCS += Lpc17xxUsbDisk.cc
 CHECK_FILES += Lpc17xxUsbDisk.cc Lpc17xxUsbDisk.h
-#XMLFILES += Lpc17xxUsbDisk.xml
+XMLFILES += Lpc17xxUsbDisk.xml
 #INCS += $(LPCUSB_FS)/fatfs/src 
 INCS += $(CHAN_FS)
 INCS += $(LPCUSB_Base)/Class/Host 
@@ -160,7 +158,8 @@ ifeq ($(CONFIG_LPC1768_USB_Keyboard),y)
 LPCOpen_CSRC += $(LPCUSB_Class)/Host/HIDClassHost.c
 LPCOpen_CSRC += $(LPCUSB_Class)/Common/HIDParser.c
 CXXSRCS += Lpc17xxUsbKeyboard.cc
-CHECK_FILES += Lpc17xxUsbKeyboard.cc Lpc17xxUsbKeyboard.h
+#CHECK_FILES += Lpc17xxUsbKeyboard.cc Lpc17xxUsbKeyboard.h
+CHECK_FILES += Lpc17xxUsbKeyboard.h
 XMLFILES += Lpc17xxUsbKeyboard.xml
 endif
 
@@ -268,6 +267,7 @@ prepare:
 	@touch $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o
 	@touch $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
+	@mkdir -p $(CONFIG_INSTALL_Target)/lib/ldscripts
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/ldscripts/OpenPEARLlpc1768.ld
 	@touch $(CONFIG_INSTALL_Target)/lib/lpc1768.xml
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/lpc1768.xml

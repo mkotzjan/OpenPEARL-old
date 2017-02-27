@@ -39,6 +39,9 @@
 #include "Dation.h"
 #include "Log.h"
 #include "Signals.h"
+#include "Mutex.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
 //#include <time.h>
 #include <sys/time.h>
 
@@ -71,38 +74,37 @@ extern "C" {
 };
 
 namespace pearlrt {
-   FatFs::FatFsFile::FatFsFile(FatFs* disc) {
-      inUse = false;
-      myFatFs = disc;
-   }
+   FatFs::FatFsFile * FatFs::FatFsFile::firstUsedFatFsFile[_VOLUMES] =
+   {NULL};
 
-   FatFs::~FatFs() {
-      delete[] object;
-   }
+   FatFsVolume *volumes[_VOLUMES] = {0};
+
+
 
    FatFs::FatFs(const char* dev, const int nbrOfFiles) :
       SystemDationNB() {
       /* ctor is called before multitasking starts --> no mutex required */
-      FILINFO fileinfo;
       devicePath = (char*)dev;
       mutex.name("FatFs");
       capacity = nbrOfFiles;
 
-#if 0
-
-      // check if path points to normal file,directory or devicefile
-      if (f_stat(devicePath, &fileinfo) != FR_OK) {
-         //can't get stat -> throw signal
-         Log::error("FatFs: could not locate %s", dev);
+      if (*dev < '0' ||  *dev >= '0' + _VOLUMES) {
+         Log::error("FatFs: %s invalid volume number", dev);
          throw theIllegalPathSignal;
       }
 
-      if (!(fileinfo.fattrib  & AM_DIR)) {
-         Log::error("FatFs: %s is not a directory", dev);
+      /* concrete volumes are configured via configuration items
+         in the system part. The IMC makes shure that theese
+         elements are instanciated before dation objects
+         The array of volumes is set configured. If the desired
+         pointer is stiff 0, the corresponding device is missing.
+      */
+      vol = volumes[(*dev) - '0'];
+
+      if (! vol) {
+         Log::error("FatFs: %s : no device configured", dev);
          throw theIllegalPathSignal;
       }
-
-#endif
 
       // check for trailing /
       if (devicePath[strlen(devicePath) - 1] != '/') {
@@ -110,16 +112,11 @@ namespace pearlrt {
          throw theIllegalPathSignal;
       }
 
-      // initialize data elements
-      usedCapacity = 0;
+
       // check folder permissions
       cap = IDF | DIRECT | FORWARD;
 
-      if (fileinfo.fattrib & AM_RDO) {
-         cap |= IN;
-      } else {
-         cap |= OUT | IN;
-      }
+      cap |= OUT | IN | INOUT;
 
       if (cap & OUT) {
          cap |= (NEW | ANY | PRM | CAN);
@@ -129,57 +126,8 @@ namespace pearlrt {
          cap |= (OLD | ANY);
       }
 
-      Character<80> capString;
-      RefCharacter rc(capString);
-      rc.clear();
-
-      if (cap & IDF) {
-         rc.add("IDF ");
-      }
-
-      if (cap & IN) {
-         rc.add("IN ");
-      }
-
-      if (cap & OUT) {
-         rc.add("OUT ");
-      }
-
-      if (cap & INOUT) {
-         rc.add("INOUT ");
-      }
-
-      if (cap & OLD) {
-         rc.add("OLD ");
-      }
-
-      if (cap & NEW) {
-         rc.add("NEW ");
-      }
-
-      if (cap & ANY) {
-         rc.add("ANY ");
-      }
-
-      if (cap & CAN) {
-         rc.add("CAN ");
-      }
-
-      if (cap & PRM) {
-         rc.add("PRM ");
-      }
-
-      if (cap & DIRECT) {
-         rc.add("DIRECT ");
-      }
-
-      if (cap & FORWARD) {
-         rc.add("FORWARD ");
-      }
-
-      if (cap & FORBACK) {
-         rc.add("FORBACK ");
-      }
+      // initialize data elements
+      usedCapacity = 0;
 
       if (capacity < 1) {
          Log::error("FatFs: need at least 1 channels (demanded was %d)",
@@ -202,21 +150,21 @@ namespace pearlrt {
             throw theIllegalParamSignal;
          }
       }
+   }
 
-      Log::info("FatFs: folder %s provides %s ", devicePath, rc.getCstring());
+   FatFs::~FatFs() {
+      delete[] object;
    }
 
    int FatFs::capabilities() {
       return cap;
    }
 
-   int FatFs::FatFsFile::capabilities() {
-      return 0;  // will never called; the parents capabilities are requested
-   }
 
    FatFs::FatFsFile * FatFs::dationOpen(const char * idfValue,
                                         int openParams) {
-      char fileName[40]; // autoamtic filename
+      char fileName[40]; // automatic filename
+      const char * fn = idfValue;
       mutex.lock();
 
       if (usedCapacity >=  capacity) {
@@ -234,6 +182,7 @@ namespace pearlrt {
          }
       }
 
+
       // check parameters
       if ((openParams & ANY) == 0 &&
             ((openParams & IDF) != IDF || idfValue == 0)) {
@@ -244,40 +193,97 @@ namespace pearlrt {
 
       // setup objects data
       FatFs::FatFsFile * o = object[f];
-      Character<256> completeFilename;
-      RefCharacter rc(completeFilename);
-      rc.clear();
-      rc.add(devicePath);
 
       if (openParams & ANY && idfValue == 0) {
          // create temp file name
          struct timeval tv;
          gettimeofday(&tv, NULL);
          sprintf(fileName, "AutoFile%ld.%06ld", time(NULL), tv.tv_usec);
-         rc.add(fileName);
-      } else {
-         rc.add(idfValue);
+         fn = fileName;
       }
 
-      o->dationOpen(rc.getCstring(), openParams);
+
+      o->dationOpen(fn, openParams);
       o->inUse = true;
       usedCapacity ++;
       mutex.unlock();
       return o;
    }
 
+   void FatFs::dationClose(int closeParams) {
+   }
+
+   void FatFs::dationRead(void * destination, size_t size) {
+   }
+   void FatFs::dationWrite(void * destination, size_t size) {
+   }
+   void FatFs::dationUnGetChar(const char x) {
+   }
+   void FatFs::FatFs::translateNewLine(bool doNewLineTranslation) {
+      // do nothing
+   }
+   char * FatFs::getDevicePath() {
+      return devicePath;
+   }
+
+   void FatFs::registerVolume(int nbr, FatFsVolume* v) {
+      if (nbr < 0 || nbr >= _VOLUMES) {
+         Log::error("illegal volume number (%d)", nbr);
+      } else {
+         volumes[nbr] = v;
+      }
+   }
+
+   /* ============================================================= */
+   /* FatFsFile - stuff                                             */
+   /* ============================================================= */
+   FatFs::FatFsFile::FatFsFile(FatFs* disc) {
+      inUse = false;
+      myFatFs = disc;
+   }
+
+   int FatFs::FatFsFile::capabilities() {
+      return 0;  // will never called; the parents capabilities are requested
+   }
+
+
+   char* FatFs::FatFsFile::getFileName() {
+      return completeFileName.get();
+   }
+
    FatFs::FatFsFile* FatFs::FatFsFile::dationOpen(const char * fn,
          int openParams) {
+
+      char * completeFn;
+      int volumeNbr;
+
+      // setup completeFileName
+      rcFn.setWork(completeFileName);
+      rcFn.clear();
+      rcFn.add(myFatFs->getDevicePath());
+      rcFn.add(fn);
+      completeFn = rcFn.getCstring();  // force null-byte at the end
+
+      volumeNbr = (*completeFn) - '0';
+
+      // check if a file with the same name is already opened
+      // this would crash the FAT-fs module as described in
+      // the application note
+      for (FatFs::FatFsFile* curr = firstUsedFatFsFile[volumeNbr];
+            curr != NULL; curr = curr->nextUsedFatFsFile) {
+         if (strcmp(completeFn, curr->getFileName()) == 0) {
+            Log::error("FastFs: %s already opened", completeFn);
+            myFatFs->mutex.unlock();
+            throw theOpenFailedSignal;
+         }
+      }
+
       // setup open mode
       //            IN      OUT      INOUT  precondition
       //  OLD       r        w+       w+    file must exist
       //  NEW       !!       w        r+    file must not exist
       //  ANY       like OLD, if file exists
       //            like NEW, if file does not exist
-
-      rcFn.setWork(completeFileName);
-      rcFn.clear();
-      rcFn.add(fn);
 
       // easy case: NEW+IN is ridiculous
       if ((openParams & (NEW | IN)) == (NEW | IN)) {
@@ -290,7 +296,10 @@ namespace pearlrt {
       FIL fpTest;
       FRESULT result;
 
-      result = f_open(&fpTest, fn, FA_READ | FA_OPEN_EXISTING);
+      myFatFs->vol->lock();
+      myFatFs->vol->treatVolumeStatus();
+      result = f_open(&fpTest, completeFn, FA_READ | FA_OPEN_EXISTING);
+      myFatFs->vol->unlock();
 
       if (result != FR_OK) {
          if (openParams & OLD || openParams & IN) {
@@ -308,7 +317,10 @@ namespace pearlrt {
          }
       } else {
          // file exists
+
+         myFatFs->vol->lock();
          f_close(&fpTest);
+         myFatFs->vol->unlock();
 
          if (openParams & NEW) {
             Log::error("FatFs: exists: %s", fn);
@@ -333,7 +345,9 @@ namespace pearlrt {
          throw theOpenFailedSignal;
       }
 
-      result = f_open(&fil, fn, mode);
+      myFatFs->vol->lock();
+      result = f_open(&fil, completeFn, mode);
+      myFatFs->vol->unlock();
 
       if (result != FR_OK) {
          Log::error("FatFs: error opening file %s (%d)", fn, result);
@@ -341,19 +355,44 @@ namespace pearlrt {
          throw theOpenFailedSignal;
       }
 
-      return this;
-   }
+      nextUsedFatFsFile = firstUsedFatFsFile[volumeNbr];
+      firstUsedFatFsFile[volumeNbr] = this;
 
-   void FatFs::dationClose(int closeParams) {
+      return this;
    }
 
    void FatFs::FatFsFile::dationClose(int closeParams) {
       int ret;
+      int volumeNbr;
+
+      volumeNbr = (*getFileName()) - '0';
+
       myFatFs->mutex.lock();
       inUse = false;
       myFatFs->usedCapacity --;
-      myFatFs->mutex.unlock();
+
+      // remove entry from list of open files
+      FatFs::FatFsFile* curr = firstUsedFatFsFile[volumeNbr];
+
+      if (curr == this) {
+         firstUsedFatFsFile[volumeNbr] = this->nextUsedFatFsFile;
+      } else {
+         for (
+            /* preset already done */;
+            curr != NULL; curr = curr->nextUsedFatFsFile) {
+            if (curr->nextUsedFatFsFile == this)  {
+               curr->nextUsedFatFsFile = this->nextUsedFatFsFile;
+               break;  // leave loop
+            }
+         }
+      }
+
+      myFatFs->vol->lock();
+      myFatFs->vol->treatVolumeStatus();
       ret = f_close(&fil);
+      myFatFs->vol->unlock();
+
+      myFatFs->mutex.unlock();
 
       if (ret != FR_OK) {
          Log::error("FatFs: error at close (%d)", ret);
@@ -361,7 +400,10 @@ namespace pearlrt {
       }
 
       if (closeParams & CAN) {
+         myFatFs->vol->lock();
+         myFatFs->vol->treatVolumeStatus();
          ret = f_unlink(rcFn.getCstring());
+         myFatFs->vol->unlock();
 
          if (ret) {
             Log::error("FatFs: file %s error at close/remove (%d)",
@@ -371,20 +413,15 @@ namespace pearlrt {
       }
    }
 
-   void FatFs::dationRead(void * destination, size_t size) {
-   }
-   void FatFs::dationWrite(void * destination, size_t size) {
-   }
-   void FatFs::dationUnGetChar(const char x) {
-   }
-   void FatFs::FatFs::translateNewLine(bool doNewLineTranslation) {
-      // do nothing
-   }
 
    void FatFs::FatFsFile::dationRead(void * destination, size_t size) {
       FRESULT ret;
       UINT got;
+
+      myFatFs->vol->lock();
+      myFatFs->vol->treatVolumeStatus();
       ret = f_read(&fil, destination, size, &got);
+      myFatFs->vol->unlock();
 
       if (ret != FR_OK) {
          Log::error("FatFs: error at read (%d)", ret);
@@ -401,7 +438,11 @@ namespace pearlrt {
    void FatFs::FatFsFile::dationWrite(void * source, size_t size) {
       FRESULT ret;
       UINT written;
+
+      myFatFs->vol->lock();
+      myFatFs->vol->treatVolumeStatus();
       ret = f_write(&fil, source, size, &written);
+      myFatFs->vol->unlock();
 
       if (ret != FR_OK || written != size) {
          Log::error("FatFs: error at write (error=%d, bytes=%d)", (int)ret,
@@ -416,7 +457,10 @@ namespace pearlrt {
       FRESULT ret;
 
       if (dationParam & Dation::DIRECT) {
+         myFatFs->vol->lock();
+         myFatFs->vol->treatVolumeStatus();
          ret = f_lseek(&fil, p.x);
+         myFatFs->vol->unlock();
 
          if (ret != 0) {
             Log::error("FatFs: positioning failed (%d)", ret);
@@ -430,6 +474,7 @@ namespace pearlrt {
          Log::error("FatFs: FORBACK not supported");
       }
    }
+
    void FatFs::FatFsFile::dationUnGetChar(const char x) {
       //ungetc(x, fp);
    }
@@ -437,5 +482,7 @@ namespace pearlrt {
    void FatFs::FatFsFile::translateNewLine(bool doNewLineTranslation) {
       // do nothing
    }
+
+
 
 }

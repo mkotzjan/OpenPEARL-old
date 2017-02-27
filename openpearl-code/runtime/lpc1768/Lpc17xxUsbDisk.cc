@@ -1,17 +1,46 @@
+/*
+ [A "BSD license"]
+ Copyright (c) 2017 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include "Lpc17xxUsb.h"
 #include "Lpc17xxUsbDisk.h"
 #include "Log.h"
-//extern "C" {
-//#include "fsusb_cfg.h"
-//};
 #include "ff.h"
 #include "diskio.h"  //registerDisk.h"
+#include "FatFs.h"
+#include "FatFsVolume.h"
+
+#define VOLUMENAME "1:/"
 
 static SCSI_Capacity_t DiskCapacity;
-static FATFS  fatFS;
-//static FIL    fileObj;
-static bool enumerationComplete = false;
+static pearlrt::FatFsVolume volume(VOLUMENAME);
+
+
 typedef USB_ClassInfo_MS_Host_t DISK_HANDLE_T;
 
 //static uint8_t buffer[8*1024];
@@ -31,7 +60,9 @@ static USB_ClassInfo_MS_Host_t FlashDisk_MS_Interface = {
 extern "C" {
 
    static void disconnectDevice() {
-      enumerationComplete = false;
+      volume.setVolumeStatus(pearlrt::FatFsVolume::WasRemoved);
+      pearlrt::Log::info("UsbDisk disconnected");
+
    }
 
    /* ------------- ChanFS support functions ------------------- */
@@ -95,7 +126,8 @@ extern "C" {
          /* Check if an error other than a logical command error (device busy)
             was received */
          if (ErrorCode != MS_ERROR_LOGICAL_CMD_FAILED) {
-            pearlrt::Log::info("Failed");
+            //pearlrt::Log::info("Failed");
+            // try to switch to default configuration
             USB_Host_SetDeviceConfiguration(hDisk->Config.PortNumber, 0);
             return 0;
          }
@@ -105,6 +137,7 @@ extern "C" {
 
       if (MS_Host_ReadDeviceCapacity(hDisk, 0, &DiskCapacity)) {
          pearlrt::Log::error("Error retrieving device capacity.");
+         // try to switsch to default configuration
          USB_Host_SetDeviceConfiguration(hDisk->Config.PortNumber, 0);
          return 0;
       }
@@ -137,7 +170,8 @@ extern "C" {
                                     uint32_t numSec) {
       if (MS_Host_ReadDeviceBlocks(hDisk, 0, secStart, numSec,
                                    DiskCapacity.BlockSize, buff)) {
-         pearlrt::Log::error("Error reading device block.");
+         // pearlrt::Log::error("Error reading device block.");
+         // try to switsch to default configuration
          USB_Host_SetDeviceConfiguration(
             FlashDisk_MS_Interface.Config.PortNumber, 0);
          return 0;
@@ -194,14 +228,6 @@ extern "C" {
          return STA_NOINIT;	/* wrong parameter */
       }
 
-#if 0
-
-      /* No card in the socket? */
-      if (Stat & STA_NODISK) {
-         return Stat;
-      }
-
-#endif
 
       if (Stat != STA_NOINIT) {
          return Stat;			/* card is already enumerated */
@@ -218,7 +244,7 @@ extern "C" {
       /* Enumerate the card once detected.
          Note this function may block for a little while. */
       if (!FSUSB_DiskAcquire(hDisk)) {
-         printf("Disk Enumeration failed...\r\n");
+         // printf("Disk Enumeration failed...\r\n");
          return Stat;
       }
 
@@ -283,6 +309,7 @@ extern "C" {
          return RES_NOTRDY;
       }
 
+
       if (FSUSB_DiskReadSectors(hDisk, buff, sector, count)) {
          return RES_OK;
       }
@@ -307,6 +334,7 @@ extern "C" {
          return RES_PARERR;
       }
 
+
       if (Stat & STA_NOINIT) {
          return RES_NOTRDY;
       }
@@ -327,7 +355,6 @@ extern "C" {
    static void Lpc17xxUsbDiskCompleteEnumeration(const uint8_t corenum,
          size_t ConfigDescriptorSize,
          void* ConfigDescriptorData) {
-      FRESULT res;
 
       FlashDisk_MS_Interface.Config.PortNumber = corenum;
 
@@ -338,8 +365,7 @@ extern "C" {
          return;
       }
 
-      if (USB_Host_SetDeviceConfiguration(
-               FlashDisk_MS_Interface.Config.PortNumber, 1)
+      if (USB_Host_SetDeviceConfiguration(corenum, 1)
             != HOST_SENDCONTROL_Successful) {
          pearlrt::Log::error("Error Setting Device Configuration.");
          return;
@@ -349,55 +375,44 @@ extern "C" {
 
       if (MS_Host_GetMaxLUN(&FlashDisk_MS_Interface, &MaxLUNIndex)) {
          pearlrt::Log::error("Error retrieving max LUN index.");
-         USB_Host_SetDeviceConfiguration(FlashDisk_MS_Interface.Config.PortNumber, 0);
+         USB_Host_SetDeviceConfiguration(corenum, 0);
          return;
       }
 
-      pearlrt::Log::info("Total LUNs: %d - Using first LUN in device.",
-                         (MaxLUNIndex + 1));
+      //pearlrt::Log::info("Total LUNs: %d - Using first LUN in device.",
+      //                   (MaxLUNIndex + 1));
 
       if (MS_Host_ResetMSInterface(&FlashDisk_MS_Interface)) {
-         pearlrt::Log::error("Error resetting Mass Storage interface.");
-         USB_Host_SetDeviceConfiguration(FlashDisk_MS_Interface.Config.PortNumber, 0);
+         pearlrt::Log::error("Error resetting mass storage interface.");
+         USB_Host_SetDeviceConfiguration(corenum, 0);
          return;
       }
+
+      // we must read these value and may discard them
+      // otherwise the usb system is blocked
 
       SCSI_Request_Sense_Response_t SenseData;
 
       if (MS_Host_RequestSense(&FlashDisk_MS_Interface, 0, &SenseData) != 0) {
          pearlrt::Log::error("Error retrieving device sense.");
-         USB_Host_SetDeviceConfiguration(FlashDisk_MS_Interface.Config.PortNumber, 0);
+         USB_Host_SetDeviceConfiguration(corenum, 0);
          return;
       }
 
       SCSI_Inquiry_Response_t InquiryData;
 
       if (MS_Host_GetInquiryData(&FlashDisk_MS_Interface, 0, &InquiryData)) {
-         pearlrt::Log::error("Error retrieving device Inquiry data.");
-         USB_Host_SetDeviceConfiguration(FlashDisk_MS_Interface.Config.PortNumber, 0);
+         pearlrt::Log::error("Error retrieving device inquiry data.");
+         USB_Host_SetDeviceConfiguration(corenum, 0);
          return;
       }
 
-      disk_initialize(2);
 
-      res = f_mount(&fatFS, "2:/", 1);
+      disk_initialize(DEV_USB);
 
-      if (res != FR_OK) {
-         pearlrt::Log::error("could not mount usb disk");
-      }
+      volume.setVolumeStatus(pearlrt::FatFsVolume::WasInserted);
+      pearlrt::Log::info("USB Disk inserted");
 
-      char label[24];
-
-      res = f_getlabel("2:/", label, NULL);
-
-      if (res != FR_OK) {
-         pearlrt::Log::error("could not read volume label");
-      } else {
-         pearlrt::Log::info("volume >%s<", label);
-      }
-
-      pearlrt::Log::info("usb disk is ready.");
-      enumerationComplete = true;
    }
 };
 
@@ -418,21 +433,25 @@ namespace pearlrt {
          usb_disk_ioctl
       };
 
+      /* register usb disk as the only usb device in the system */
       ret = registerUsbDevice(Lpc17xxUsbDiskPoll,
                               Lpc17xxUsbDiskCompleteEnumeration,
                               disconnectDevice);
 
       if (ret) {
-         Log::error("Lpc17xxUsbDisk: failed to initialize");
+         Log::error("Lpc17xxUsbDisk: failed to register device");
          throw theInternalDationSignal;
       }
 
+      /* register the usb disk as low level driver for the fat fs */
       ret = disk_registerDrive(DEV_USB, &diof);
 
       if (ret) {
          Log::error("Lpc17xxUsbDisk: failed to register volume");
          throw theInternalDationSignal;
       }
+
+      FatFs::registerVolume(DEV_USB, &volume);
 
    }
 

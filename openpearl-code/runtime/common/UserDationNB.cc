@@ -478,7 +478,7 @@ namespace pearlrt {
       }
 
       if (currentTask) {
-         Log::info("UserDation::toSkip: scheduleCallback() invocation\n");
+//         Log::info("UserDation::toSkip: scheduleCallback() invocation\n");
          currentTask->scheduleCallback(false);
       }
    }
@@ -600,7 +600,7 @@ namespace pearlrt {
       }
 
       if (currentTask) {
-         Log::info("UserDation::fromSkip: scheduleCallback() invocation\n");
+//         Log::info("UserDation::fromSkip: scheduleCallback() invocation\n");
          currentTask->scheduleCallback(false);
       }
    }

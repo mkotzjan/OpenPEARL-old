@@ -127,6 +127,7 @@ namespace pearlrt {
                              " variable given");
                   throw theIllegalParamSignal;
                }
+               *rst = 0; // clear error variable
             }
 
             if ((!!(p & Dation::IDF)) != (idf != 0)) {
@@ -182,6 +183,7 @@ namespace pearlrt {
                   throw theIllegalParamSignal;
                }
 
+               *rst = 0;  // clear RST value
                intRst  = rst;
             }
             internalDationClose(p);

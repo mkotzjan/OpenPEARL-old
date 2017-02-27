@@ -30,6 +30,7 @@
 #include "Log.h"
 #include "Mutex.h"
 #include "Signals.h"
+#include "lpc17_interruptState.h"
 
 namespace pearlrt {
    static Mutex mutex;
@@ -45,26 +46,35 @@ namespace pearlrt {
                   va_list args) {
       Character<128> line;
       RefCharacter rc(line);
+      bool usePrintf = false;
 
       try {
          doFormat(type, rc, format, args);
 
-         mutex.lock();
-         if (provider) {
-            provider->dationWrite(rc.getCstring(), rc.getCurrent());
-         } else {
-        	 printf(rc.getCstring());
+         if (!provider) {
+            usePrintf = true;
          }
-         mutex.unlock();
+
+         if (lpc17_isInterrupt()) {
+            usePrintf = true;
+         }
+
+         if (!usePrintf) {
+            mutex.lock();
+            provider->dationWrite(rc.getCstring(), rc.getCurrent());
+            mutex.unlock();
+         } else {
+            printf(rc.getCstring());
+         }
       } catch (CharacterTooLongSignal s) {
-         mutex.lock();
          if (provider) {
+            mutex.lock();
             provider->dationWrite(line.get(), (size_t)(line.upb().x));
             provider->dationWrite((void*)ERRORMESSAGE, strlen(ERRORMESSAGE));
+            mutex.unlock();
          } else {
             printf(line.get());
          }
-         mutex.unlock();
       }
 
    }

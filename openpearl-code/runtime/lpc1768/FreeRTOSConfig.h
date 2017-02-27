@@ -90,7 +90,7 @@
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 100000000 )
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 80 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 2 * 1024 ) )
+#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 3 * 1024 ) )
 #define configUSE_STATIC_STACK_AND_TCB	1	// <<< added
 #define configUSE_TASK_AUTORESTART	1	// <<< added
 #define configUSE_MALLOC_FAILED_HOOK	1

@@ -94,7 +94,7 @@ __attribute__((weak)) int main(void) {
    // test for clock initialization
    if (!Lpc17xxClock::isClockSelected()) {
       printf("set default clock source");
-      Lpc17xxClock dummy(0);  // the object may be discarded immediatelly
+      Lpc17xxClock dummy(0);  // the object may be discarded immediately
    }
 
    Log::getInstance()->setLevel(0x0e);

@@ -1,6 +1,7 @@
 /*-----------------------------------------------------------------------/
 /  Low level disk interface modlue include file   (C)ChaN, 2014          /
 /-----------------------------------------------------------------------*/
+// with extension for media change in OpenPEARL
 
 #ifndef _DISKIO_DEFINED
 #define _DISKIO_DEFINED
@@ -26,9 +27,10 @@ typedef enum {
 } DRESULT;
 
 /* Definitions of physical drive number for each drive */
-#define DEV_RAM		0	/* Map Ramdisk to physical drive 0 */
-#define DEV_MMC		1	/* Map MMC/SD card to physical drive 1 */
-#define DEV_USB		2	/* Map USB MSD to physical drive 2 */
+// no RAM disk support planned
+//#define DEV_RAM	0	/* Map Ramdisk to physical drive 0 */
+#define DEV_MMC		0	/* Map MMC/SD card to physical drive 1 */
+#define DEV_USB		1	/* Map USB MSD to physical drive 2 */
 
 typedef DSTATUS (*Disk_status)(BYTE pdrv);
 typedef DSTATUS (*Disk_initialize)(BYTE pdrv);

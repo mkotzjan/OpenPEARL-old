@@ -7,3 +7,7 @@ cpanm Spreadsheet::Read
 cpanm Spreadsheet::ReadSXC
 
 wget http://www.antlr.org/download/antlr-4.5-complete.jar -O /usr/local/lib/antlr-4.5-complete.jar 
+
+# ------------------
+# microcontroller stuff
+wget http://lauchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q1-20150921-linux.tar.gz -O /tmp/

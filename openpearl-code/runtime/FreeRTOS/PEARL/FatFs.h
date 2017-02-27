@@ -42,6 +42,7 @@
 #include "Mutex.h"
 #include "Character.h"
 #include "RefChar.h"
+#include "FatFsVolume.h"
 
 namespace pearlrt {
 
@@ -68,6 +69,9 @@ namespace pearlrt {
    */
 
    class FatFs: public SystemDationNB {
+   private:
+      static FatFsVolume * volume[_VOLUMES];
+      FatFsVolume        * vol;
 
    public:
       /**
@@ -78,8 +82,13 @@ namespace pearlrt {
       private:
          FIL fil;
          RefCharacter   rcFn;
-         Character<256> completeFileName;
+         Character<64> completeFileName;
          FatFs * 	myFatFs;
+         FatFsFile 	* nextUsedFatFsFile;
+         static FatFsFile * firstUsedFatFsFile[_VOLUMES];
+         static Mutex volumeLock[_VOLUMES];
+
+
       public:
          /**
             shows whether this pool element is in use
@@ -169,15 +178,22 @@ namespace pearlrt {
          */
          void dationUnGetChar(const char c);
 
-      /**
-      translate newline
-  
-      this is empty since linux uses \n for newline
-      
-      \param doNewLineTranslation enbale/disable the translation
+         /**
+         translate newline
+
+         this is empty since linux uses \n for newline
+
+         \param doNewLineTranslation enbale/disable the translation
              (has no effect)
-      */
-      void translateNewLine(bool doNewLineTranslation);
+         */
+         void translateNewLine(bool doNewLineTranslation);
+
+         /**
+           retrieve the file name of the opened file
+           \return C-string of the file name
+         */
+         char * getFileName();
+
       };
 
    private:
@@ -205,6 +221,7 @@ namespace pearlrt {
       FatFsFile**  object;
 
       char * devicePath; //< C-string of the directory
+
    public:
 
       /**
@@ -307,14 +324,23 @@ namespace pearlrt {
 
       /**
       translate newline
-  
+
       this is empty since linux uses \n for newline
-      
+
       \param doNewLineTranslation enbale/disable the translation
              (has no effect)
       */
       void translateNewLine(bool doNewLineTranslation);
 
+      /**
+      retrieve the path to the device name, which is needed in the FatFsFile
+      object
+
+      \returns the pointer to the device path
+      */
+      char* getDevicePath();
+
+      static void registerVolume(int nbr, FatFsVolume * v);
    };
 }
 #endif

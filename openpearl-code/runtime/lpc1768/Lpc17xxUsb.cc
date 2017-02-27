@@ -199,7 +199,7 @@ extern "C" {
       USB_Init(0, USB_MODE_Host);
 
       // create poll task
-      ret = xTaskCreate(usbTask, "USBKbTask", STACK_SIZE_USBTASK,
+      ret = xTaskCreate(usbTask, "USBPollTask", STACK_SIZE_USBTASK,
                         &createParameters, PRIO_TASK_SERVICE, &pollTaskHandle);
 
       if (ret != pdPASS) {

@@ -1,6 +1,5 @@
 PEARL_FREERTOS_SRC += \
 	CSema.cc \
-	Log.cc \
 	Mutex.cc \
 	PrioMapper.cc \
 	Task.cc \
@@ -8,7 +7,10 @@ PEARL_FREERTOS_SRC += \
 	TaskTimer.cc \
 	GenericUart.cc
 
+#	Log.cc \
+
 ifeq ($(CONFIG_LPC1768_USB_Disk),y)
+PEARL_FREERTOS_SRC += FatFsVolume.cc 
 PEARL_FREERTOS_SRC += FatFs.cc 
 PEARL_FREERTOS_XML += FatFs.xml
 endif

@@ -64,7 +64,7 @@ extern "C" {
       }
 
       if (USB_Host_SetDeviceConfiguration(corenum, 1)
-              != HOST_SENDCONTROL_Successful) {
+            != HOST_SENDCONTROL_Successful) {
          pearlrt::Log::error("error setting device configuration");
          return;
       }
@@ -96,19 +96,8 @@ namespace pearlrt {
    }
 
    void Lpc17xxUsbKeyboard::kbHostTask(void * interface) {
-      /*
-       * scan code to ascii mapping is treated for german keyboard only
-       * HID_KEYBOARD_SC_A .. HID_KEYBOARD_SC_Z  is easy, just regard SHIFT status
-       * HID_KEYBOARD_SC_1_AND_EXCLAMATIONMARK -- regard shift; use mapping table
-       * 	    * HID_KEYBOARD_SC_ENTER..SPACE is easy -- do not regard SHIFT status
-       * HID_KEYBOARD_SC_MINUS_AND_UNDERSCORE .. HID_KEYBOARD_SC_SLASH_AND_QUESTIONMARK
-       * 			-- language specific, use SHAIFT use mapping table
-       * HID_KEYBOARD_SC_F1 .. HID_KEYBOARD_PRINT_SCREEN -- easy; ignore SHIFT
-       * HID_KEYBOARD_SCREEN_SCROLL_LOCK -- just toggle LED
-       * HID_
-       *
-       * HID_KEY_BOARD_MUINU
-       */
+      /* scan code to ascii mapping is treated for german keyboard only */
+
       USB_ClassInfo_HID_Host_t* keyboardHidInterface =
          (USB_ClassInfo_HID_Host_t*) interface;
       uint8_t keycode;
@@ -172,8 +161,8 @@ namespace pearlrt {
                   ascii = 0;
 
                   // new key pressed --> translate key code
-                  if (keycode >= HID_KEYBOARD_SC_A && 
-                      keycode <= HID_KEYBOARD_SC_Z) {
+                  if (keycode >= HID_KEYBOARD_SC_A &&
+                        keycode <= HID_KEYBOARD_SC_Z) {
                      if (keycode == HID_KEYBOARD_SC_Y) {
                         keycode = HID_KEYBOARD_SC_Z;
                      } else if (keycode == HID_KEYBOARD_SC_Z) {

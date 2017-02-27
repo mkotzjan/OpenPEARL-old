@@ -197,10 +197,10 @@ Orientation & Font & Lines & Columns \\
 \hline
 \end{tabular}
 
-\subsection{Lpc17xxUsbKeyboard}
-There is no hub support on microcontroller systems. Therefore only one keyboard
+\subsection{USB Support on LPC1768}
+There is no hub support on microcontroller systems. Therefore only one USB device
 may be attached to the system.
-The driver uses the USB stack of LPCOpen.
+The USB stack of LPCOpen is used.
 The USB stack was modified in order to remove active wait loops.
 The steps of the enumeration is now invoked from the usb-poll task, which
 runs on a cycle time of 10ms. The cycle limits were reduced to wait only one 
@@ -217,10 +217,22 @@ itself is located in the Lpx17xxUsb module.
 The detection of new devices is treated in the module Lpc17xxUsb. New devices are logged 
 with info-level.
 
-The USB HID device delivers scan codes and modifiers. These codes are translated according
-the german keyboard layout into 7-bit-ASCII codes. Keys which are not included in this
-character set are ignored.
+\paragraph{Licencing}
+The LPCOpen USB stack may only be used in conjunction of a microcontroller from NXP.
+This is fullfilled by default, since the LPCOpen functions work only with NXP
+controllers.
 
+\subsection{Lpc17xxUsbKeyboard}
+This driver supports a keyboard with german key layout.
+Only the codes of the 7-bit-US-ASCII code are treated - all other
+keys are dead.
+
+\subsection{Lpc17xxUsbDisk}
+This driver provides a disk functionality via the USB-stack.
+The OpenPEARL device is choosen by the FatFS system entry, which 
+depends only on Chan FAT filesystem.
+The Lpc17xxUsbDisk configuration entry
+activates the low level device driver via the LPCOpen USB stack.
 
 \subsection{Device Summary}
 Table \ref{lpc17_device_list} contains all avaliable device drivers 
