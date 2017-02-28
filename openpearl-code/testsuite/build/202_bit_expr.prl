@@ -1,0 +1,54 @@
+MODULE(bitexpr);
+
+PROBLEM;
+
+
+p1: PROC;
+    DCL b BIT(1) INIT('0'B1);
+    DCL (c,d,e) BIT(1);
+    DCL b2 BIT(2) INIT('01'B1);
+
+   c := b;
+   d := NOT b;
+   e := c AND d;
+   e := c OR d;
+   e := c EXOR d;
+   b2 := b2 SHIFT 1;
+   b2 := b2 CSHIFT 4;
+   b2 := c CAT d;
+   ! expected c++ code
+   ! _d = _b.bitNot();
+   ! _e = _c.bitAnd(_d);
+   ! _e = _c.bitOr(_d);
+   ! _e = _c.bitXor(_d);
+   ! _b2 = _b2.bitShift((pearlrt::Fixed<15>)(1));
+   ! _b2 = _b2.bitCshift((pearlrt::Fixed<15>)(1));
+   ! _b2 = _c.bitCat(_d);
+END;
+
+
+T1: TASK MAIN;
+    DCL b BIT(2) INIT('01'B1);
+    DCL (c,d,e) BIT(2);
+    DCL b4 BIT(4) INIT('0001'B1);
+
+   c := b;
+   d := NOT b;
+   e := c AND d;
+   e := c OR d;
+   e := c EXOR d;
+   b4 := b4 SHIFT 1;
+   b4 := b4 CSHIFT 4;
+   b4 := c CAT d;
+   ! expected c++ code
+   ! _d = _b.bitNot();
+   ! _e = _c.bitAnd(_d);
+   ! _e = _c.bitOr(_d);
+   ! _e = _c.bitXor(_d);
+   ! _b4 = _b4.bitShift((pearlrt::Fixed<15>)(1));
+   ! _b4 = _b4.bitCshift((pearlrt::Fixed<15>)(1));
+   ! _b4 = _c.bitCat(_d);
+END;
+
+MODEND;
+

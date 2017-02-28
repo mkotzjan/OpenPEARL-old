@@ -13,8 +13,12 @@ T1: TASK MAIN;
     DCL z FIXED(63) INIT(1234567890);
 
     ! If no length is given in the pearl code, a default length should be used - in the decade of 32-bit micro controllers: Fixed<31>
-    ! If no gloBal attribute is given, the storage prefix 'static' should be used outside of TASK and PROC blocks. The SPC should be translated to 'extern'.
-END;
+    ! If no global attribute is given, the storage prefix 'static'
+    ! should be used outside of TASK and PROC blocks.
+    ! The SPC .. GLOBAL should be translated to 'extern'.
+   DCL x0 FIXED(0);
 
+END;
+    
 MODEND;
 
