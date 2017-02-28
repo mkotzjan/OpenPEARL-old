@@ -46,6 +46,7 @@ implemented in Fixed.h
 Unit tests for fixed sizes
 */
 TEST(Fixed, Sizes) {
+   EXPECT_EQ(sizeof((pearlrt::Fixed<0>)0), 1);
    EXPECT_EQ(sizeof((pearlrt::Fixed<1>)1), 1);
    EXPECT_EQ(sizeof((pearlrt::Fixed<8>)1), 2);
    EXPECT_EQ(sizeof((pearlrt::Fixed<16>)1), 4);
@@ -56,6 +57,9 @@ TEST(Fixed, Sizes) {
 Unit tests for fixed value ranges at the constructor
 */
 TEST(Fixed, RangesCreation) {
+   ASSERT_NO_THROW((pearlrt::Fixed<0>)0);
+   ASSERT_NO_THROW((pearlrt::Fixed<0>)-1);
+   ASSERT_THROW((pearlrt::Fixed<0>)1, pearlrt::FixedRangeSignal);
    ASSERT_NO_THROW((pearlrt::Fixed<5>)31);
    ASSERT_THROW((pearlrt::Fixed<5>)32, pearlrt::FixedRangeSignal);
    ASSERT_NO_THROW((pearlrt::Fixed<15>)32767);
