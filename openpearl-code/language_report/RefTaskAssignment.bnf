@@ -1,8 +1,4 @@
-\begin{discuss}
-so korrekt mit der Alternative?
-
 \htgt{RefTaskAssignment} ::=\\
 \x \hlink{Name}\S RefTaskVariable \{ := $\mid$ = \} 
 \{\hlink{Identifier}\S Task $\mid$ \hlink{Name}\S RefTaskVariable \} ;
-\end{discuss}
 

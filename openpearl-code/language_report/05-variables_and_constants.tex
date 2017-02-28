@@ -104,7 +104,9 @@ the numerical constant.
 
 Example: 123(31) \x Integer 123 is presented in 31 bit positions.
 
-If no precision is given, the precision is derived from the constants.
+If no precision is given for a constant,
+the precision is derived from the %%%%constants.
+corresponding LENGTH specification.
 
 Variables for integers are declared with the type attribute FIXED.
 
@@ -189,7 +191,7 @@ The precision for float literals is derived in the priority from:
 \begin{enumerate}
 \item the given precision like 1.0(53)
 \item the {\bf LENGTH} statement
-\item is set to 24 as default value in \OpenPEARL
+\item the default value is given in table \ref{tab_default_length}
 \end{enumerate}
 %%%\end{added}
 
@@ -361,6 +363,29 @@ Example:
 
 For a length definition, the same validity rules are valid as for
 variable declarations (see 4.3, Block Structure).
+
+%%%%% added
+The default length for the data types is shown in table \ref{tab_default_length}.
+
+\begin{table}[bpht]
+\begin{center}
+\begin{tabular}{|l|r|}
+\hline
+Type & default length \\
+\hline
+FIXED & 31 \\
+\hline
+FLOAT & 24 \\
+\hline
+CHAR & 1 \\
+\hline
+BIT & 1 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Default length of the data types in OpenPEARL}
+\label{tab_default_length}
+\end{table}
 
 \section{Times (CLOCK)}   % 5.7
 \label{sec_type_clock}

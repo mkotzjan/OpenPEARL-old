@@ -1,7 +1,4 @@
-\begin{discuss}
-mit der Alternative ok?
-
 \htgt{RefProcAssignment} ::=\\
 \x \hlink{Name}\S RefProcVariable \{ := $\mid$ = \} 
 \{ \hlink{Identifier}\S Procedure $\mid$ \hlink{Name}\S RefProcVariable \} ;
-\end{discuss}
+
