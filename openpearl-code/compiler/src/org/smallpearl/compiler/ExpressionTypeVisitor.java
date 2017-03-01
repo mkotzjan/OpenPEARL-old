@@ -51,6 +51,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         m_verbose = verbose;
         m_debug = debug;
 
+        m_debug = true;
+        m_verbose = 1;
+
         m_symbolTableVisitor = symbolTableVisitor;
         m_symboltable = symbolTableVisitor.symbolTable;
 
@@ -1604,7 +1607,10 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
+        SmallPearlParser.ExpressionContext expr = ctx.expression();
         visitChildren(ctx);
+        TypeDefinition type = m_properties.get(expr);
+
         return null;
     }
 
@@ -1628,106 +1634,593 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         return null;
     }
 
-    @Override
-    public Void visitLtRelationalExpression(SmallPearlParser.LtRelationalExpressionContext ctx) {
-        if (m_verbose > 0) {
-            System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression");
-        }
-
-        m_properties.put(ctx, new TypeBit(1));
-
-        return null;
-    }
+    //
+    // Reference: OpenPEARL Language Report
+    //            Table 6.6: Dyadic comparison operators
+    // -----------+--------------+-----------+--------------+---------------------------------
+    // Expression | Type of      | Type of   | Result type  | Meaning of operation
+    //            | operand 1    | operand 2 |              |
+    // -----------+------------- +-----------+--------------+---------------------------------
+    // op1 == op2 | FIXED(g1)    | FIXED(g2) | BIT(1)       | “equal”
+    //    or      | FIXED(g1)    | FLOAT(g2) |              | If op1 is equal op2,
+    // op1 EQ op2 | FLOAT(g1)    | FIXED(g1) |              | the result has value ’1’B,
+    //            | FLOAT(g1)    | FLOAT(g2) |              | otherwise ’0’B.
+    //            | CLOCK        | CLOCK     |              | If lg2 = lg1, the shorter
+    //            | DURATION     | DURATION  |              | character or bit string, resp.,
+    //            | CHAR(lg1)    | CHAR(lg2) |              | is padded with blanks or zeros,
+    //            | BIT(lg1)     | BIT(lg2)  |              | resp., on the right side to match
 
     @Override
     public Void visitEqRelationalExpression(SmallPearlParser.EqRelationalExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression");
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#1");
+        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#2");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#3");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#4");
+        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#5");
+        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#6");
+        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#7");
+        } else if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#7");
+
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
 
+    //
+    // Reference: OpenPEARL Language Report
+    //            Table 6.6: Dyadic comparison operators
+    // -----------+--------------+-----------+--------------+---------------------------------
+    // Expression | Type of      | Type of   | Result type  | Meaning of operation
+    //            | operand 1    | operand 2 |              |
+    // -----------+------------- +-----------+--------------+---------------------------------
+    //  op1 < op2 | FIXED(g1)    | FIXED(g2) | BIT(1)       | “less than”
+    //    or      | FIXED(g1)    | FLOAT(g2) |              | If op1 is less than op2,
+    // op1 LT op2 | FLOAT(g1)    | FIXED(g1) |              | the result has value ’1’B,
+    //            | FLOAT(g1)    | FLOAT(g2) |              | otherwise ’0’B.
+    //            | CLOCK        | CLOCK     |              |
+    //            | DURATION     | DURATION  |              |
+    //            |              |           |              |
+    //            | CHAR(lg1)    | CHAR(lg2) |              | character string comparison
+    //            |              |           |              | if lg1 <> lg2 the shorter
+    //            |              |           |              | character string is padded with
+    //            |              |           |              | spaces on the right side to
+    //            |              |           |              | match the length. Then the
+    //            |              |           |              | internal represenations are
+    //            |              |           |              | compared character by character
+    //            |              |           |              | from left to right
+
+
+    @Override
+    public Void visitLtRelationalExpression(SmallPearlParser.LtRelationalExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
+        if (m_verbose > 0) {
+            System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression");
+        }
+
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#1");
+        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#2");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#3");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#4");
+        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#5");
+        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#6");
+        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#7");
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return null;
+    }
+
+    //
+    // Reference: OpenPEARL Language Report
+    //            Table 6.6: Dyadic comparison operators
+    // -----------+--------------+-----------+--------------+---------------------------------
+    // Expression | Type of      | Type of   | Result type  | Meaning of operation
+    //            | operand 1    | operand 2 |              |
+    // -----------+------------- +-----------+--------------+---------------------------------
+    // op1 /= op2 | FIXED(g1)    | FIXED(g2) | BIT(1)       | “not equal”
+    //    or      | FIXED(g1)    | FLOAT(g2) |              | If op1 is not equal op2,
+    // op1 NE op2 | FLOAT(g1)    | FIXED(g1) |              | the result has value ’1’B,
+    //            | FLOAT(g1)    | FLOAT(g2) |              | otherwise ’0’B.
+    //            | CLOCK        | CLOCK     |              | If lg2 = lg1, the shorter
+    //            | DURATION     | DURATION  |              | character or bit string, resp.,
+    //            | CHAR(lg1)    | CHAR(lg2) |              | is padded with blanks or zeros,
+    //            | BIT(lg1)     | BIT(lg2)  |              | resp., on the right side to match
+
     @Override
     public Void visitNeRelationalExpression(SmallPearlParser.NeRelationalExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression");
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#1");
+        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#2");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#3");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#4");
+        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#5");
+        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#6");
+        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#7");
+        } else if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#7");
+
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
 
+    //
+    // Reference: OpenPEARL Language Report
+    //            Table 6.6: Dyadic comparison operators
+    // -----------+--------------+-----------+--------------+---------------------------------
+    // Expression | Type of      | Type of   | Result type  | Meaning of operation
+    //            | operand 1    | operand 2 |              |
+    // -----------+------------- +-----------+--------------+---------------------------------
+    // op1 <= op2 | FIXED(g1)    | FIXED(g2) | BIT(1)       | “less or equal”
+    //    or      | FIXED(g1)    | FLOAT(g2) |              | If op1 is less or equal op2,
+    // op1 LE op2 | FLOAT(g1)    | FIXED(g1) |              | the result has value ’1’B,
+    //            | FLOAT(g1)    | FLOAT(g2) |              | otherwise ’0’B.
+    //            | CLOCK        | CLOCK     |              |
+    //            | DURATION     | DURATION  |              |
+    //            |              |           |              |
+    //            | CHAR(lg1)    | CHAR(lg2) |              | character string comparison
+    //            |              |           |              | if lg1 <> lg2 the shorter
+    //            |              |           |              | character string is padded with
+    //            |              |           |              | spaces on the right side to
+    //            |              |           |              | match the length. Then the
+    //            |              |           |              | internal represenations are
+    //            |              |           |              | compared character by character
+    //            |              |           |              | from left to right
 
     @Override
     public Void visitLeRelationalExpression(SmallPearlParser.LeRelationalExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression");
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#1");
+        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#2");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#3");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#4");
+        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#5");
+        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#6");
+        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#7");
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
 
+    //
+    // Reference: OpenPEARL Language Report
+    //            Table 6.6: Dyadic comparison operators
+    // -----------+--------------+-----------+--------------+---------------------------------
+    // Expression | Type of      | Type of   | Result type  | Meaning of operation
+    //            | operand 1    | operand 2 |              |
+    // -----------+------------- +-----------+--------------+---------------------------------
+    // op1 > op2  | FIXED(g1)    | FIXED(g2) | BIT(1)       | “greater”
+    //    or      | FIXED(g1)    | FLOAT(g2) |              | If op1 is greater op2,
+    // op1 GT op2 | FLOAT(g1)    | FIXED(g1) |              | the result has value ’1’B,
+    //            | FLOAT(g1)    | FLOAT(g2) |              | otherwise ’0’B.
+    //            | CLOCK        | CLOCK     |              |
+    //            | DURATION     | DURATION  |              |
+    //            |              |           |              |
+    //            | CHAR(lg1)    | CHAR(lg2) |              | character string comparison
+    //            |              |           |              | if lg1 <> lg2 the shorter
+    //            |              |           |              | character string is padded with
+    //            |              |           |              | spaces on the right side to
+    //            |              |           |              | match the length. Then the
+    //            |              |           |              | internal represenations are
+    //            |              |           |              | compared character by character
+    //            |              |           |              | from left to right
+
     @Override
     public Void visitGtRelationalExpression(SmallPearlParser.GtRelationalExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression");
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
+
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
+
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#1");
+        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#2");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#3");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#4");
+        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#5");
+        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#6");
+        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#7");
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
 
+    //
+    // Reference: OpenPEARL Language Report
+    //            Table 6.6: Dyadic comparison operators
+    // -----------+--------------+-----------+--------------+---------------------------------
+    // Expression | Type of      | Type of   | Result type  | Meaning of operation
+    //            | operand 1    | operand 2 |              |
+    // -----------+------------- +-----------+--------------+---------------------------------
+    // op1 >= op2 | FIXED(g1)    | FIXED(g2) | BIT(1)       | “greater or equal”
+    //    or      | FIXED(g1)    | FLOAT(g2) |              | If op1 is greater or equal op2,
+    // op1 GE op2 | FLOAT(g1)    | FIXED(g1) |              | the result has value ’1’B,
+    //            | FLOAT(g1)    | FLOAT(g2) |              | otherwise ’0’B.
+    //            | CLOCK        | CLOCK     |              |
+    //            | DURATION     | DURATION  |              |
+    //            |              |           |              |
+    //            | CHAR(lg1)    | CHAR(lg2) |              | character string comparison
+    //            |              |           |              | if lg1 <> lg2 the shorter
+    //            |              |           |              | character string is padded with
+    //            |              |           |              | spaces on the right side to
+    //            |              |           |              | match the length. Then the
+    //            |              |           |              | internal represenations are
+    //            |              |           |              | compared character by character
+    //            |              |           |              | from left to right
+
     @Override
     public Void visitGeRelationalExpression(SmallPearlParser.GeRelationalExpressionContext ctx) {
+        TypeDefinition op1;
+        TypeDefinition op2;
+        TypeDefinition res;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression");
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        visit(ctx.expression(0));
+        op1 = m_properties.get(ctx.expression(0));
 
-        return null;
-    }
-
-    @Override
-    public Void visitConditionalAndExpression(SmallPearlParser.ConditionalAndExpressionContext ctx) {
-        if (m_verbose > 0) {
-            System.out.println("ExpressionTypeVisitor: visitConditionalAndExpression");
+        if (op1 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        visit(ctx.expression(1));
+        op2 = m_properties.get(ctx.expression(1));
 
-        return null;
-    }
-
-    @Override
-    public Void visitConditionalOrExpression(SmallPearlParser.ConditionalOrExpressionContext ctx) {
-        if (m_verbose > 0) {
-            System.out.println("ExpressionTypeVisitor: visitConditionalOrExpression");
+        if (op2 == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        m_properties.put(ctx, new TypeBit(1));
+        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#1");
+        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#2");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#3");
+        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#4");
+        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#5");
+        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#6");
+        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
+            res = new TypeBit(1);
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#7");
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         return null;
     }
 
+    // TODO: XXXXX
     @Override
     public Void visitStringSelection(SmallPearlParser.StringSelectionContext ctx) {
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitStringSelection");
         }
 
-//        m_properties.put(ctx, new TypeBit(1));
         throw new NotSupportedFeatureException("visitStringSelection", ctx.start.getLine(), ctx.start.getCharPositionInLine(), "???");
-
-        //return null;
     }
+
 
     @Override
     public Void visitCshiftExpression(SmallPearlParser.CshiftExpressionContext ctx) {
@@ -1752,13 +2245,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1 instanceof TypeBit && op2 instanceof TypeFixed) {
-            m_properties.put(ctx, new TypeBit(((TypeBit)op1).getPrecision()));
+            m_properties.put(ctx, new TypeBit(((TypeBit) op1).getPrecision()));
 
             if (m_debug) {
                 System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
             }
-        }
-        else {
+        } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1789,13 +2281,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1 instanceof TypeBit && op2 instanceof TypeFixed) {
-            m_properties.put(ctx, new TypeBit(((TypeBit)op1).getPrecision()));
+            m_properties.put(ctx, new TypeBit(((TypeBit) op1).getPrecision()));
 
             if (m_debug) {
                 System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
             }
-        }
-        else {
+        } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1825,13 +2316,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit(((TypeBit)op1).getPrecision() + ((TypeBit)op2).getPrecision()));
+            m_properties.put(ctx, new TypeBit(((TypeBit) op1).getPrecision() + ((TypeBit) op2).getPrecision()));
 
             if (m_debug) {
                 System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
             }
-        }
-        else {
+        } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1860,9 +2350,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit( Math.max( ((TypeBit)op1).getPrecision(),((TypeBit)op2).getPrecision())));
-        }
-        else {
+            m_properties.put(ctx, new TypeBit(Math.max(((TypeBit) op1).getPrecision(), ((TypeBit) op2).getPrecision())));
+        } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1891,9 +2380,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit( Math.max( ((TypeBit)op1).getPrecision(),((TypeBit)op2).getPrecision())));
-        }
-        else {
+            m_properties.put(ctx, new TypeBit(Math.max(((TypeBit) op1).getPrecision(), ((TypeBit) op2).getPrecision())));
+        } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1908,12 +2396,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitExorExpression");
         }
+
         visit(ctx.expression(0));
         op1 = m_properties.get(ctx.expression(0));
 
         if (op1 == null) {
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
+
         visit(ctx.expression(1));
         op2 = m_properties.get(ctx.expression(1));
 
@@ -1922,9 +2412,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit( Math.max( ((TypeBit)op1).getPrecision(),((TypeBit)op2).getPrecision())));
-        }
-        else {
+            m_properties.put(ctx, new TypeBit(Math.max(((TypeBit) op1).getPrecision(), ((TypeBit) op2).getPrecision())));
+        } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 

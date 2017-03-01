@@ -456,28 +456,22 @@ expression(code,id,bitstring,operator,functionCall) ::= <%
 <if(functionCall)><functionCall><endif>
 %>
 
-AndBooleanExpression(lhs,rhs) ::= <%
-  ( (<lhs>).getBoolean() && (<rhs>).getBoolean() )
+NotBitwiseExpression(rhs) ::= <%
+  <rhs>.bitNot()
 %>
+
 
 AndBitwiseExpression(lhs,rhs) ::= <%
-  (<lhs>).bitAnd(<rhs>)
+  <lhs>.bitAnd(<rhs>)
 %>
 
-OrBooleanExpression(lhs,rhs) ::= <%
-  ( (<lhs>).getBoolean() || (<rhs>).getBoolean() )
-%>
 
 OrBitwiseExpression(lhs,rhs) ::= <%
-  (<lhs>).bitOr(<rhs>)
-%>
-
-ExorBooleanExpression(lhs,rhs) ::= <%
-  ( (<lhs>).getBoolean() ^ (<rhs>).getBoolean() )
+  <lhs>.bitOr(<rhs>)
 %>
 
 ExorBitwiseExpression(lhs,rhs) ::= <%
-  (<lhs>).bitXor(<rhs>)
+  <lhs>.bitXor(<rhs>)
 %>
 
 CshiftExpression(lhs,rhs) ::= <%
@@ -1161,27 +1155,27 @@ TANH(operand) ::= <%
 
 /* --------------------- Relational Operators -------------------------- */
 EQ(lhs,rhs) ::= <%
-(<lhs> == <rhs>).getBoolean()
+(<lhs> == <rhs>)
 %>
 
 NE(lhs,rhs) ::= <%
-(<lhs> != <rhs>).getBoolean()
+(<lhs> != <rhs>)
 %>
 
 LT(lhs,rhs) ::= <%
-(<lhs> \< <rhs>).getBoolean()
+(<lhs> \< <rhs>)
 %>
 
 LE(lhs,rhs) ::= <%
-(<lhs> \<= <rhs>).getBoolean()
+(<lhs> \<= <rhs>)
 %>
 
 GT(lhs,rhs) ::= <%
-(<lhs> > <rhs>).getBoolean()
+(<lhs> > <rhs>)
 %>
 
 GE(lhs,rhs) ::= <%
-(<lhs> >= <rhs>).getBoolean()
+(<lhs> >= <rhs>)
 %>
 
 /* --------------------------------------------------------------------- */

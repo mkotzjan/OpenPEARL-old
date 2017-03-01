@@ -1214,6 +1214,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitShiftExpression(((SmallPearlParser.ShiftExpressionContext) ctx)));
             } else if (ctx instanceof SmallPearlParser.CatExpressionContext) {
                 st.add("code", visitCatExpression(((SmallPearlParser.CatExpressionContext) ctx)));
+            } else if (ctx instanceof SmallPearlParser.NotExpressionContext) {
+                st.add("code", visitNotExpression(((SmallPearlParser.NotExpressionContext) ctx)));
             }
         }
 
@@ -1357,8 +1359,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         TypeDefinition x = m_expressionTypeVisitor.lookupType(ctx.expression());
 
-
-        stmt.add("rhs", getExpression(ctx.expression()));
+        ST cast = group.getInstanceOf("CastBitToBoolean");
+        cast.add("name", getExpression(ctx.expression()));
+        stmt.add("rhs", cast);
 
         if (ctx.then_block() != null) {
             stmt.add("then_block", visitThen_block(ctx.then_block()));
@@ -1618,14 +1621,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
                 if ( variable.getType() instanceof TypeBit ) {
                     TypeBit type = (TypeBit) variable.getType();
-
-                    if ( type.getPrecision() == 1 ) {
-                        ST cast = group.getInstanceOf("CastBitToBoolean");
-                        cast.add("name", getUserVariable(ctx.ID().getText()));
-                        expression.add("id", cast);
-                    } else {
-                        expression.add("id", getUserVariable(ctx.ID().getText()));
-                    }
+                    expression.add("id", getUserVariable(ctx.ID().getText()));
                 }
                 else {
                     expression.add("id", getUserVariable(ctx.ID().getText()));
@@ -1788,22 +1784,31 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     }
 
     @Override
-    public ST visitAndExpression(SmallPearlParser.AndExpressionContext ctx) {
+    public ST visitNotExpression(SmallPearlParser.NotExpressionContext ctx) {
         TypeDefinition typ = m_expressionTypeVisitor.lookupType(ctx);
         ST expr = null;
 
         // TODO: bitwise
         if ( typ instanceof TypeBit) {
             TypeBit b = (TypeBit)typ;
-            if ( b.getPrecision() == 1 ) {
-                expr = group.getInstanceOf("AndBooleanExpression");
-            }
-            else if ( b.getPrecision() > 1 ) {
-                expr = group.getInstanceOf("AndBitwiseExpression");
-            }
-            else {
-                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
+            expr = group.getInstanceOf("NotBitwiseExpression");
+        } else {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        expr.add("rhs", visit(ctx.expression()));
+
+        return expr;
+    }
+
+    @Override
+    public ST visitAndExpression(SmallPearlParser.AndExpressionContext ctx) {
+        TypeDefinition typ = m_expressionTypeVisitor.lookupType(ctx);
+        ST expr = null;
+
+        if ( typ instanceof TypeBit) {
+            TypeBit b = (TypeBit)typ;
+            expr = group.getInstanceOf("AndBitwiseExpression");
         } else {
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
@@ -1821,15 +1826,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if ( typ instanceof TypeBit) {
             TypeBit b = (TypeBit)typ;
-            if ( b.getPrecision() == 1 ) {
-                expr = group.getInstanceOf("OrBooleanExpression");
-            }
-            else if ( b.getPrecision() > 1 ) {
-                expr = group.getInstanceOf("OrBitwiseExpression");
-            }
-            else {
-                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
+            expr = group.getInstanceOf("OrBitwiseExpression");
         } else {
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
@@ -1847,15 +1844,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if ( typ instanceof TypeBit) {
             TypeBit b = (TypeBit)typ;
-            if ( b.getPrecision() == 1 ) {
-                expr = group.getInstanceOf("ExorBooleanExpression");
-            }
-            else if ( b.getPrecision() > 1 ) {
-                expr = group.getInstanceOf("ExorBitwiseExpression");
-            }
-            else {
-                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
+            expr = group.getInstanceOf("ExorBitwiseExpression");
         } else {
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }

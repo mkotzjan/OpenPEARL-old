@@ -1674,8 +1674,6 @@ expression
     | expression op=( '<='|'LE') expression                 # leRelationalExpression
     | expression op=( '>'|'GT') expression                  # gtRelationalExpression
     | expression op=( '>='|'GE') expression                 # geRelationalExpression
-    | expression ('&&' expression)                          # conditionalAndExpression
-    | expression ('||' expression)                          # conditionalOrExpression
     | op='NOW'                                              # nowFunction
     | op='DATE'                                             # dateFunction
     ;
@@ -1785,13 +1783,13 @@ stringSlice
 ////////////////////////////////////////////////////////////////////////////////
 
 bitSlice
-	: ID '.' 'BIT' '(' expression ( ':' expression ) ')'
+	: ID '.' 'BIT' '(' expression ( ':' expression )? ')'
 	;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 charSlice
-	: ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ( ':' expression ) ')'
+	: ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ( ':' expression )? ')'
 	;
 
 ////////////////////////////////////////////////////////////////////////////////
