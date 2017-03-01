@@ -4063,8 +4063,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if ( ctx.loopStatement_while() != null && ctx.loopStatement_while().expression() != null) {
             ST wc = getExpression(ctx.loopStatement_while().expression());
             String s = wc.toString();
-            if ( wc.toString().length() > 0 )
-                st.add( "while_cond", wc);
+            if ( wc.toString().length() > 0 ) {
+                ST cast = group.getInstanceOf("CastBitToBoolean");
+                cast.add("name", wc);
+                st.add("while_cond", cast);
+            }
         }
 
         for (int i = 0; i < ctx.scalarVariableDeclaration().size(); i++) {
