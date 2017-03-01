@@ -53,6 +53,15 @@ TEST(Float, Sizes) {
 }
 
 /**
+Unit tests for Ctor
+*/
+TEST(Float, CTor) {
+   pearlrt::Fixed<31> x(2000000000);
+   pearlrt::Float<24> y(x);
+   ASSERT_EQ(y.x, x.x);
+}
+
+/**
 Unit tests for  operations with Float(24) operands
 */
 TEST(Float, Float_24) {
