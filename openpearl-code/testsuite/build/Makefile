@@ -18,7 +18,6 @@
 DONOTBUILD= 030_signals 031_signalsInduce  \
 	041_if_if \
 	043_switch \
-	202_bit_expr \
 	400_char_dcl \
 	401_char_expr1 \
 	090_tasking  \
