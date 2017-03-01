@@ -139,6 +139,20 @@ namespace pearlrt {
       /**
       ctor with given preset. The preset value is passed as double,
 
+      Since this is a common floating point type in c++ covering all
+      values of both supported Float(x) types.
+      If the given value is inf or nan a signal is created.
+
+      \param xx the preset value
+      */
+      Float<S>(double xx) {
+         x = xx;
+         FloatHelper::testFloatResult(x);
+      }
+
+      /**
+      ctor with given preset. The preset value is passed as Fixed<31>,
+
       Since this is common floating point type in c++ covering all
       values of both supported Float(x) types.
       If the given value does not fit into a Float<24> a signal
@@ -146,9 +160,8 @@ namespace pearlrt {
 
       \param xx the preset value
       */
-      Float<S>(double xx) {
-         x = xx;
-         FloatHelper::testFloatResult(x);
+      Float<S>(Fixed<31> xx) {
+         x = xx.x;  // use the c++ internal type conversion
       }
 
       /**
