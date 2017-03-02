@@ -750,7 +750,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#7");
         } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
-            res = new ExpressionResult(new TypeFloat(53), op1.isConstant() && op2.isConstant());
+            res = new ExpressionResult(new TypeFloat(24), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)

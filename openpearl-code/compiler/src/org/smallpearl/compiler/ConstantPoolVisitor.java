@@ -147,6 +147,8 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
             // TODO
         } else if (ctx.FloatingPointConstant() != null) {
             // TODO
+        } else if (ctx.StringLiteral() != null) {
+            add(new ConstantCharacterValue(ctx.StringLiteral().toString()));
         }else if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = null;
@@ -164,8 +166,6 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-        } else if (ctx.StringLiteral() != null) {
-            add(new ConstantCharacterValue(ctx.StringLiteral().toString()));
         }
 
         return null;

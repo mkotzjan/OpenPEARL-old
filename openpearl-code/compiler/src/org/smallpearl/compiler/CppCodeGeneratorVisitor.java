@@ -1862,6 +1862,18 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         } else if (ctx.timeConstant() != null) {
             literal.add("time", getTime(ctx.timeConstant()));
+        } else if (ctx.StringLiteral() != null) {
+            String s = ctx.StringLiteral().getText();
+            s = s.replaceAll("^'","");
+            s = s.replaceAll("'$","");
+            ST constantCharacterValue = group.getInstanceOf("ConstantCharacterValue");
+            ConstantCharacterValue value = ConstantPool.lookupCharacterValue(s);
+            if ( value != null ) {
+                literal.add("string", value);
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
         } else if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = null;
@@ -1884,18 +1896,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 }
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
-        } else if (ctx.StringLiteral() != null) {
-            String s = ctx.StringLiteral().getText();
-            s = s.replaceAll("^'","");
-            s = s.replaceAll("'$","");
-            ST constantCharacterValue = group.getInstanceOf("ConstantCharacterValue");
-            ConstantCharacterValue value = ConstantPool.lookupCharacterValue(s);
-            if ( value != null ) {
-                literal.add("string", value);
-            }
-            else {
-                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         }
 
