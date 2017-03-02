@@ -38,9 +38,19 @@ public class ConstantFixedValue extends ConstantValue {
         m_precision = Long.toBinaryString(Math.abs(m_value)).length();
     }
 
+    ConstantFixedValue(Integer value, Integer precision) {
+        m_value = value.longValue();
+        m_precision = precision;
+    }
+
     ConstantFixedValue(Long value) {
         m_value = value;
         m_precision = Long.toBinaryString(Math.abs(m_value)).length();
+    }
+
+    ConstantFixedValue(Long value, Integer precision) {
+        m_value = value;
+        m_precision = precision;
     }
 
     public Long getValue() {

@@ -45,6 +45,11 @@ public abstract class SymbolTableEntry  implements Comparable<SymbolTableEntry> 
         return m_name;
     }
 
+    public Void setName(String name ) {
+        m_name = name;
+        return null;
+    }
+
     public String toString(int level) {
         return indentString(level) + Integer.toString(level) + ": "  + m_name + " ";
     }

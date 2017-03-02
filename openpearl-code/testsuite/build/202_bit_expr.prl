@@ -52,9 +52,7 @@ p1: PROC;
    IF e NE '1'B1 THEN
       PUT 'error#6 with CSHIFT' TO console BY A, SKIP;
    FIN;
-
 END;
-
 
 p2: PROC;
     DCL b BIT(4) INIT('0001'B1);

@@ -31,13 +31,11 @@ package org.smallpearl.compiler;
 
 
 public class TypeFixed extends TypeDefinition {
-    public static final int FIXED_DEFAULT_PRECISION = 15;
-
     private int m_precision;
 
     TypeFixed() {
         super("FIXED");
-        this.m_precision = FIXED_DEFAULT_PRECISION;
+        this.m_precision = Defaults.FIXED_PRECISION;
     }
 
     TypeFixed(int precision) {

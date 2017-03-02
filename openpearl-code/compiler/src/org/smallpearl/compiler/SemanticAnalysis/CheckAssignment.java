@@ -70,6 +70,16 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // The type of the variable given to the left of the assignment sign has to match the type of the  value of the
+    // expression, with the following exceptions:
+    //  (1) The value of a FIXED variable or an integer, resp., may be assigned to a FLOAT variable.
+    //  (2) The precision of a numeric variable to the left of an assignment sign may be greater than the precision of
+    //      the value of the expression.
+    //  (3) A bit or character string, resp., to the left may have a greater length than the value to be assigned; if
+    //      needed, the latter is extended by zeros or spaces, resp., on the right.
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
     public Void visitAssignment_statement(SmallPearlParser.Assignment_statementContext ctx) {
         if (m_debug) {
@@ -78,29 +88,71 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
 
         SymbolTableEntry lhs = m_currentSymbolTable.lookup(ctx.ID().getText());
         TypeDefinition rhs = m_expressionTypeVisitor.lookupType(ctx.expression());
+        ExpressionResult rhs1 = m_expressionTypeVisitor.lookup(ctx.expression());
 
         if ( lhs instanceof VariableEntry) {
-            VariableEntry v = (VariableEntry) lhs;
-            TypeDefinition vt = v.getType();
-            String l1 = v.getType().getName();
+            VariableEntry variable = (VariableEntry) lhs;
 
             if ( rhs == null ) {
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
 
-            String l2 = rhs.getName();
-            if(!l1.equals(l2) ) {
-                throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
+            if ( variable.getType() instanceof TypeFloat ) {
+                TypeFloat lhs_type = (TypeFloat) variable.getType();
 
-            if ( vt instanceof TypeBit) {
-                int lhs_size = ((TypeBit)vt).getPrecision();
-                if (rhs instanceof TypeBit) {
-                    int rhs_size =  ((TypeBit)rhs).getPrecision();
+                if ( !(rhs instanceof  TypeFloat || rhs instanceof TypeFixed) ) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
 
-                    if ( lhs_size < rhs_size) {
+                if ( rhs instanceof TypeFloat ) {
+                    TypeFloat rhs_type = (TypeFloat)rhs;
+
+                    if ( rhs_type.getPrecision() >  lhs_type.getPrecision() ) {
                         throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                     }
+                }
+                else if ( rhs instanceof TypeFixed ) {
+                    TypeFixed rhs_type = (TypeFixed) rhs;
+
+//                    if ( rhs_type.getPrecision() >  lhs_type.getPrecision() ) {
+//                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+//                    }
+                }
+            }
+            else if ( variable.getType() instanceof TypeFixed ) {
+                TypeFixed lhs_type = (TypeFixed) variable.getType();
+
+                if ( !(rhs instanceof TypeFixed) ) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+
+                TypeFixed rhs_type = (TypeFixed) rhs;
+
+                if ( rhs_type.getPrecision() >  lhs_type.getPrecision() ) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+            }
+            else if ( variable.getType() instanceof TypeClock ) {
+                if ( !(rhs instanceof TypeClock) ) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+            }
+            else if ( variable.getType() instanceof TypeDuration ) {
+                if ( !(rhs instanceof TypeDuration) ) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+            }
+            else if ( variable.getType() instanceof TypeBit ) {
+                TypeBit lhs_type = (TypeBit) variable.getType();
+
+                if (!(rhs instanceof TypeBit)) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+
+                TypeBit rhs_type = (TypeBit) rhs;
+
+                if (rhs_type.getPrecision() > lhs_type.getPrecision()) {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
             }
         }

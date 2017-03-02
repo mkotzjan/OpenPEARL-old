@@ -54,6 +54,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public SymbolTableVisitor(int verbose) {
 
         m_verbose = verbose;
+        m_verbose = 1;
 
         if (m_verbose > 0) {
             System.out.println("Building new symbol table");
@@ -109,6 +110,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                     visitDationDeclaration((SmallPearlParser.DationDeclarationContext) c);
                 } else if (c instanceof SmallPearlParser.ProcedureDeclarationContext) {
                     visitProcedureDeclaration((SmallPearlParser.ProcedureDeclarationContext) c);
+                } else if (c instanceof SmallPearlParser.LengthDefinitionContext) {
+                    visitLengthDefinition((SmallPearlParser.LengthDefinitionContext) c);
                 }
             }
         }
@@ -145,7 +148,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public Void visitProcedureDeclaration(SmallPearlParser.ProcedureDeclarationContext ctx) {
         String globalId = null;
         LinkedList<FormalParameter> formalParameters = null;
-        TypeDefinition resultType = null;
+        ExpressionResult resultType = null;
 
         if (m_verbose > 0) {
             System.out.println("SymbolTableVisitor: visitProcedureDeclaration");
@@ -153,7 +156,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         for (ParseTree c : ctx.children) {
             if (c instanceof SmallPearlParser.ResultAttributeContext) {
-                resultType = getResultAttribute((SmallPearlParser.ResultAttributeContext)c);
+                resultType = new ExpressionResult(getResultAttribute((SmallPearlParser.ResultAttributeContext)c));
             } else
             if (c instanceof SmallPearlParser.GlobalAttributeContext) {
                 SmallPearlParser.GlobalAttributeContext globalCtx = (SmallPearlParser.GlobalAttributeContext) c;
@@ -290,7 +293,6 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         boolean hasAllocationProtection = false;
 
         ArrayList<String> identifierDenotationList = null;
-        ArrayList<ST> initElementList = null;
 
         m_type = null;
 
@@ -305,10 +307,6 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                 } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
                     hasGlobalAttribute = true;
                 }
-            }
-
-            if (initElementList != null && identifierDenotationList.size() != initElementList.size()) {
-                throw new NumberOfInitializerMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
 
             for (int i = 0; i < identifierDenotationList.size(); i++) {
@@ -353,7 +351,9 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitTypeInteger(SmallPearlParser.TypeIntegerContext ctx) {
-        Integer size = 31;
+        Integer size;
+
+        size = m_currentSymbolTable.lookupDefaultFixedLength();
 
         if (ctx != null) {
             for (ParseTree c : ctx.children) {
@@ -369,7 +369,6 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitTypeBitString(SmallPearlParser.TypeBitStringContext ctx) {
-
         Integer length = 1;
 
         if (ctx.IntegerConstant() != null) {
@@ -424,6 +423,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         m_type = new TypeDuration();
         return null;
     }
+
     private ArrayList<String> getIdentifierDenotation(SmallPearlParser.IdentifierDenotationContext ctx) {
         ArrayList<String> identifierDenotationList = new ArrayList<String>();
 
@@ -688,6 +688,36 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public Void visitDationDeclaration(SmallPearlParser.DationDeclarationContext ctx) {
         if (m_verbose > 0) {
             System.out.println("SymbolTableVisitor: visitDationDeclaration");
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitLengthDefinition(SmallPearlParser.LengthDefinitionContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("SymbolTableVisitor: visitLengthDefinition");
+        }
+
+        if ( ctx.lengthDefinitionType() instanceof SmallPearlParser.LengthDefinitionFixedTypeContext) {
+            TypeFixed typ = new TypeFixed( Integer.valueOf((ctx.IntegerConstant().toString())));
+            LengthEntry entry = new LengthEntry(typ,ctx);
+            m_currentSymbolTable.enterOrReplace(entry);
+        }
+        else if ( ctx.lengthDefinitionType() instanceof SmallPearlParser.LengthDefinitionFloatTypeContext) {
+            TypeFloat typ = new TypeFloat( Integer.valueOf((ctx.IntegerConstant().toString())));
+            LengthEntry entry = new LengthEntry(typ,ctx);
+            m_currentSymbolTable.enterOrReplace(entry);
+        }
+        else if ( ctx.lengthDefinitionType() instanceof SmallPearlParser.LengthDefinitionBitTypeContext) {
+            TypeBit typ = new TypeBit( Integer.valueOf((ctx.IntegerConstant().toString())));
+            LengthEntry entry = new LengthEntry(typ,ctx);
+            m_currentSymbolTable.enterOrReplace(entry);
+        }
+        else if ( ctx.lengthDefinitionType() instanceof SmallPearlParser.LengthDefinitionCharacterTypeContext) {
+            TypeChar typ = new TypeChar( Integer.valueOf((ctx.IntegerConstant().toString())));
+            LengthEntry entry = new LengthEntry(typ,ctx);
+            m_currentSymbolTable.enterOrReplace(entry);
         }
 
         return null;

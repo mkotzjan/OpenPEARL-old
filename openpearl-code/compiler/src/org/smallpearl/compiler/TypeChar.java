@@ -35,7 +35,7 @@ public class TypeChar extends TypeDefinition {
 
     TypeChar() {
         super("CHAR");
-        this.m_size = 1;
+        this.m_size = Defaults.CHARACTER_LENGTH;
     }
 
     TypeChar(int size) {

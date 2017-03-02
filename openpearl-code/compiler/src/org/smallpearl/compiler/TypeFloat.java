@@ -31,13 +31,11 @@ package org.smallpearl.compiler;
 
 
 public class TypeFloat extends TypeDefinition {
-    public static final int FLOAT_DEFAULT_PRECISION = 15;
-
     private int m_precision;
 
     TypeFloat() {
         super("FLOAT");
-        this.m_precision = FLOAT_DEFAULT_PRECISION;
+        this.m_precision = Defaults.FLOAT_PRECISION;
     }
 
     TypeFloat(int precision) {

@@ -30,6 +30,14 @@
 
 package org.smallpearl.compiler.SymbolTable;
 
+import org.smallpearl.compiler.Defaults;
+import org.smallpearl.compiler.InternalCompilerErrorException;
+import org.smallpearl.compiler.TypeFixed;
+import org.smallpearl.compiler.TypeFloat;
+import org.smallpearl.compiler.TypeBit;
+import org.smallpearl.compiler.TypeChar;
+
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -118,8 +126,6 @@ public class SymbolTable {
         SymbolTable st;
         SymbolTableEntry se;
 
-        // System.out.println("lookup of " + name);
-
        for (st = this; st != null; st = st.parent) {
             if ((se = (SymbolTableEntry) st.m_entries.get(name)) != null) {
                 return se;
@@ -130,13 +136,20 @@ public class SymbolTable {
     }
 
     public SymbolTableEntry lookupLocal(String name) {
-//        System.out.println("SymbolTable.lookup:"+name);
         return (SymbolTableEntry) m_entries.get(name);
     }
 
     public boolean enter(SymbolTableEntry se) {
         if (lookupLocal(se.getName()) != null) {
             return false;
+        }
+        m_entries.put(se.getName(), se);
+        return true;
+    }
+
+    public boolean enterOrReplace(SymbolTableEntry se) {
+        if (lookupLocal(se.getName()) != null) {
+            m_entries.remove(se.getName());
         }
         m_entries.put(se.getName(), se);
         return true;
@@ -265,6 +278,60 @@ public class SymbolTable {
         }
 
         return listOfModules;
+    }
+
+    public int lookupDefaultFixedLength() {
+        SymbolTableEntry entry = this.lookup("~LENGTH_FIXED~");
+
+        if ( entry != null ) {
+            if ( entry instanceof LengthEntry) {
+                LengthEntry e = (LengthEntry) entry;
+                if (e.getType() instanceof TypeFixed ) {
+                    TypeFixed typ = (TypeFixed) e.getType();
+                    return typ.getPrecision();
+                }
+            }
+        } else {
+            return Defaults.FIXED_PRECISION;
+        }
+
+        return -1;
+    }
+
+    public int lookupDefaultFloatLength() {
+        SymbolTableEntry entry = this.lookup("~LENGTH_FLOAT~");
+
+        if ( entry != null ) {
+            if ( entry instanceof LengthEntry) {
+                LengthEntry e = (LengthEntry) entry;
+                if (e.getType() instanceof TypeFloat ) {
+                    TypeFloat typ = (TypeFloat) e.getType();
+                    return typ.getPrecision();
+                }
+            }
+        } else {
+            return Defaults.FLOAT_PRECISION;
+        }
+
+        return -1;
+    }
+
+    public int lookupDefaultCharLength() {
+        SymbolTableEntry entry = this.lookup("~LENGTH_CHAR~");
+
+        if ( entry != null ) {
+            if ( entry instanceof LengthEntry) {
+                LengthEntry e = (LengthEntry) entry;
+                if (e.getType() instanceof TypeFloat ) {
+                    TypeFloat typ = (TypeFloat) e.getType();
+                    return typ.getPrecision();
+                }
+            }
+        } else {
+            return Defaults.CHARACTER_LENGTH;
+        }
+
+        return -1;
     }
 
     public SymbolTable parent;

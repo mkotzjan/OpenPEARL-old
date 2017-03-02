@@ -149,9 +149,30 @@ system_part:
 //    IN | OUT | INOUT
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+//  Declaration ::=
+//    LengthDefinition
+//    | TypeDefinition
+//    | VariableDeclaration
+//    | FormatDeclaration
+//    | ProcedureDeclaration
+//    | TaskDeclaration
+////////////////////////////////////////////////////////////////////////////////
+
 problem_part:
     'PROBLEM' ';'
-    ( scalarVariableDeclaration | semaDeclaration | boltDeclaration | identification | dationSpecification | dationDeclaration | taskDeclaration | procedureDeclaration | cpp_inline )*
+    (
+          lengthDefinition
+        | scalarVariableDeclaration
+        | semaDeclaration
+        | boltDeclaration
+        | identification
+        | dationSpecification
+        | dationDeclaration
+        | taskDeclaration
+        | procedureDeclaration
+        | cpp_inline
+    )*
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,6 +362,11 @@ integerWithoutPrecision :
     IntegerConstant
     ;
 
+////////////////////////////////////////////////////////////////////////////////
+//  Integer ::=
+//    IntegerWithoutPrecision [ ( Precision ) ]
+////////////////////////////////////////////////////////////////////////////////
+
 typeReference :
     ;
 
@@ -384,13 +410,13 @@ initialisationAttribute :
 ////////////////////////////////////////////////////////////////////////////////
 
 initElement :
-    constant
+    expression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 variable_init :
-    'INIT' '(' constant ')'
+    'INIT' '(' expression ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +455,7 @@ procedureDeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
 procedureBody :
-    ( scalarVariableDeclaration | dationDeclaration )*
+    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition)*
     statement*
     ;
 
@@ -560,7 +586,7 @@ task_main: 'MAIN';
 ////////////////////////////////////////////////////////////////////////////////
 
 taskBody:
-    ( scalarVariableDeclaration | dationDeclaration )*
+    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition)*
     procedureDeclaration*
     statement*
     ;
@@ -785,7 +811,7 @@ index_section
 
 block_statement:
     'BEGIN'
-    ( scalarVariableDeclaration | dationDeclaration )*
+    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition )*
     statement*
     'END' ID? ';'
     ;
@@ -802,7 +828,7 @@ block_statement:
 loopStatement:
     loopStatement_for? loopStatement_from? loopStatement_by? loopStatement_to? loopStatement_while?
     'REPEAT'
-    ( scalarVariableDeclaration | dationDeclaration )*
+    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition)*
     statement*
     loopStatement_end ';'
     ;
@@ -1827,7 +1853,7 @@ charSlice
 ////////////////////////////////////////////////////////////////////////////////
 
 literal
-    : IntegerConstant
+    : IntegerConstant ( '(' IntegerConstant ')' )?
     | FloatingPointConstant
     | StringLiteral
     | BitStringLiteral
@@ -2088,9 +2114,17 @@ cpp_inline
 ////////////////////////////////////////////////////////////////////////////////
 
 
-length_definition
-    : 'LENGTH' (( 'FIXED'  | 'FLOAT' )'(' precision ')' )
-    | (( 'BIT' | 'CHARACTER' | 'CHAR' ) '(' length ')' ) ';'
+lengthDefinition
+    : 'LENGTH' lengthDefinitionType '(' IntegerConstant ')' ';'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+lengthDefinitionType
+    : 'FIXED'                          #lengthDefinitionFixedType
+    | 'FLOAT'                          #lengthDefinitionFloatType
+    | 'BIT'                            #lengthDefinitionBitType
+    | ( 'CHARACTER' | 'CHAR' )         #lengthDefinitionCharacterType
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2104,8 +2138,6 @@ length_definition
  length
      : IntegerConstant
      ;
-
-////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -44,7 +44,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
     private org.smallpearl.compiler.SymbolTable.SymbolTable m_symboltable;
     private org.smallpearl.compiler.SymbolTable.SymbolTable m_currentSymbolTable;
     private org.smallpearl.compiler.SymbolTable.ModuleEntry m_module;
-    private ParseTreeProperty<TypeDefinition> m_properties = null;
+    private ParseTreeProperty<ExpressionResult> m_properties = null;
 
     public ExpressionTypeVisitor(int verbose, boolean debug, SymbolTableVisitor symbolTableVisitor) {
 
@@ -73,10 +73,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         m_module = listOfModules.get(0);
         m_currentSymbolTable = m_module.scope;
-        m_properties = new ParseTreeProperty<TypeDefinition>();
+        m_properties = new ParseTreeProperty<ExpressionResult>();
     }
 
     public TypeDefinition lookupType(ParserRuleContext ctx) {
+        return m_properties.get(ctx).getType();
+    }
+
+    public ExpressionResult lookup(ParserRuleContext ctx) {
         return m_properties.get(ctx);
     }
 
@@ -87,13 +91,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         if (ctx.primaryExpression() != null) {
             visitPrimaryExpression(ctx.primaryExpression());
-            TypeDefinition typeDefinition = m_properties.get(ctx.primaryExpression());
-            if (typeDefinition != null) {
-                m_properties.put(ctx, typeDefinition);
+            ExpressionResult expressionResult = m_properties.get(ctx.primaryExpression());
+            if (expressionResult != null) {
+                m_properties.put(ctx, expressionResult);
 
                 if (m_debug) {
                     System.out.println("ExpressionTypeVisitor: visitBaseExpression: exp=" + ctx.primaryExpression().getText());
-                    System.out.println("ExpressionTypeVisitor: visitBaseExpression: res=(" + typeDefinition + ")");
+                    System.out.println("ExpressionTypeVisitor: visitBaseExpression: res=(" + expressionResult + ")");
                 }
             }
         }
@@ -107,27 +111,29 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         if (ctx.expression() != null) {
             visit(ctx.expression());
-            TypeDefinition typeDefinition = m_properties.get(ctx.expression());
-            if (typeDefinition != null) {
-                m_properties.put(ctx, typeDefinition);
+            ExpressionResult expressionResult = m_properties.get(ctx.expression());
+            if (expressionResult != null) {
+                m_properties.put(ctx, expressionResult);
             }
         } else if (ctx.literal() != null) {
             visitLiteral(ctx.literal());
-            TypeDefinition typeDefinition = m_properties.get(ctx.literal());
-            if (typeDefinition != null) {
-                m_properties.put(ctx, typeDefinition);
+            ExpressionResult expressionResult = m_properties.get(ctx.literal());
+            if (expressionResult != null) {
+                m_properties.put(ctx, expressionResult);
             } else {
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         } else if (ctx.ID() != null) {
             SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
             if (entry instanceof VariableEntry) {
-                m_properties.put(ctx, ((VariableEntry) entry).getType());
+                ExpressionResult expressionResult = new ExpressionResult(((VariableEntry) entry).getType(),((VariableEntry) entry).getAssigmentProtection());
+                m_properties.put(ctx, expressionResult);
             } else if (entry instanceof ProcedureEntry) {
                 ProcedureEntry proc = (ProcedureEntry) entry;
                 TypeDefinition resultType = proc.getResultType();
                 if (resultType != null) {
-                    m_properties.put(ctx, resultType);
+                    ExpressionResult expressionResult = new ExpressionResult(resultType);
+                    m_properties.put(ctx, expressionResult);
                 } else {
                     throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
@@ -136,9 +142,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             }
         } else if (ctx.semaTry() != null) {
             visit(ctx.semaTry());
-            TypeDefinition typeDefinition = m_properties.get(ctx.semaTry());
-            if (typeDefinition != null) {
-                m_properties.put(ctx, typeDefinition);
+            ExpressionResult expressionResult= m_properties.get(ctx.semaTry());
+            if (expressionResult != null) {
+                m_properties.put(ctx, expressionResult);
             }
         }
 
@@ -162,9 +168,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAdditiveExpression(SmallPearlParser.AdditiveExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitAdditiveExpression");
@@ -182,48 +188,48 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#4");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeClock) {
-            res = new TypeClock();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeClock(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AdditiveExpression: rule#6");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeDuration) {
-            res = new TypeClock();
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeClock(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -252,9 +258,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSubtractiveExpression(SmallPearlParser.SubtractiveExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSubtractiveExpression");
@@ -272,48 +278,48 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#4");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeClock) {
-            res = new TypeClock();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeClock(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#6");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeDuration) {
-            res = new TypeClock();
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeClock(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -338,9 +344,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitUnaryAdditiveExpression(SmallPearlParser.UnaryAdditiveExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitUnaryAdditiveExpression");
@@ -352,20 +358,20 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed) {
-            res = new TypeFixed(((TypeFixed) op1).getPrecision());
+        if (op1.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFixed(((TypeFixed) op1.getType()).getPrecision()));
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: UnaryAdditiveExpression: rule#1");
-        } else if (op1 instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op1).getPrecision());
+        } else if (op1.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op1.getType()).getPrecision()), op1.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: UnaryAdditiveExpression: rule#2");
-        } else if (op1 instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -390,8 +396,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitUnarySubtractiveExpression(SmallPearlParser.UnarySubtractiveExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitUnarySubtractiveExpression");
@@ -403,20 +409,20 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFixed(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFixed(((TypeFixed) op.getType()).getPrecision()));
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: UnarySubtractiveExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: UnarySubtractiveExpression: rule#2");
-        } else if (op instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -439,8 +445,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitNotExpression(SmallPearlParser.NotExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitNotExpression");
@@ -452,8 +458,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeBit) {
-            res = new TypeBit(((TypeBit) op).getPrecision());
+        if (op.getType() instanceof TypeBit) {
+            res = new ExpressionResult(new TypeBit(((TypeBit) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -478,8 +484,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAbsExpression(SmallPearlParser.AbsExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitAbsExpression");
@@ -491,20 +497,20 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFixed(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFixed(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AbsExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: AbsExpression: rule#2");
-        } else if (op instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -530,8 +536,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSignExpression(SmallPearlParser.SignExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSignExpression");
@@ -543,20 +549,20 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFixed(1);
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFixed(1), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SignExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFixed(1);
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFixed(1), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SignExpression: rule#2");
-        } else if (op instanceof TypeDuration) {
-            res = new TypeFixed(1);
+        } else if (op.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeFixed(1), op.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -587,9 +593,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitMultiplicativeExpression(SmallPearlParser.MultiplicativeExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression");
@@ -607,48 +613,48 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#4");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeFixed) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#5");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#6");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeFloat) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -677,9 +683,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitDivideExpression(SmallPearlParser.DivideExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitDivideExpression");
@@ -697,54 +703,54 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#4");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeFixed) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#5");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeDuration) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#6");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeFloat) {
-            res = new TypeDuration();
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: DivideExpression: rule#7");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeFloat(53);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeFloat(53), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -769,9 +775,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitDivideIntegerExpression(SmallPearlParser.DivideIntegerExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitDivideIntegerExpression");
@@ -789,9 +795,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -817,9 +823,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitRemainderExpression(SmallPearlParser.RemainderExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitRemainderExpression");
@@ -837,16 +843,16 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitRemainderExpression: rule#1");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = Math.max(((TypeFloat) op1).getPrecision(), ((TypeFloat) op2).getPrecision());
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            Integer precision = Math.max(((TypeFloat) op1.getType()).getPrecision(), ((TypeFloat) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -871,9 +877,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitExponentiationExpression(SmallPearlParser.ExponentiationExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitExponentiationExpression");
@@ -891,15 +897,15 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = Math.max(((TypeFixed) op1).getPrecision(), ((TypeFixed) op2).getPrecision());
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ExponentiationExpression: rule#1");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFloat) op1).getPrecision());
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op1.getType()).getPrecision()), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -925,9 +931,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitFitExpression(SmallPearlParser.FitExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitFitExpression");
@@ -945,16 +951,16 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            Integer precision = ((TypeFixed) op2).getPrecision();
-            res = new TypeFixed(precision);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            Integer precision = ((TypeFixed) op2.getType()).getPrecision();
+            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: FitExpression: rule#1");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            Integer precision = ((TypeFloat) op2).getPrecision();
-            res = new TypeFloat(precision);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            Integer precision = ((TypeFloat) op2.getType()).getPrecision();
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -985,8 +991,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSqrtExpression(SmallPearlParser.SqrtExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSqrtExpression");
@@ -998,13 +1004,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SqrtExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SqrtExpression: rule#2");
@@ -1017,8 +1023,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSinExpression(SmallPearlParser.SinExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSinExpression");
@@ -1030,13 +1036,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SinExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SinExpression: rule#2");
@@ -1049,8 +1055,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitCosExpression(SmallPearlParser.CosExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitCosExpression");
@@ -1062,13 +1068,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: CosExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: CosExpression: rule#2");
@@ -1081,8 +1087,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitExpExpression(SmallPearlParser.ExpExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitExpExpression");
@@ -1094,13 +1100,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ExpExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ExpExpression: rule#2");
@@ -1113,8 +1119,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitLnExpression(SmallPearlParser.LnExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitLnExpression");
@@ -1126,13 +1132,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: LnExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: LnExpression: rule#2");
@@ -1145,8 +1151,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitTanExpression(SmallPearlParser.TanExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTanExpression");
@@ -1158,13 +1164,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TanExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TanExpression: rule#2");
@@ -1177,8 +1183,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAtanExpression(SmallPearlParser.AtanExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitATanExpression");
@@ -1190,13 +1196,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ATanExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ATanExpression: rule#2");
@@ -1209,8 +1215,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitTanhExpression(SmallPearlParser.TanhExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTanhExpression");
@@ -1222,13 +1228,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TanhExpression: rule#1");
-        } else if (op instanceof TypeFloat) {
-            res = new TypeFloat(((TypeFloat) op).getPrecision());
+        } else if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TanhExpression: rule#2");
@@ -1261,8 +1267,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitTOFIXEDExpression(SmallPearlParser.TOFIXEDExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTOFIXEDExpression");
@@ -1274,12 +1280,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeBit) {
-            res = new TypeFixed(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeBit) {
+            res = new ExpressionResult(new TypeFixed(((TypeBit) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
-                System.out.println("ExpressionTypeVisitor: TOFLOAT: rule#1");
-        } else if (op instanceof TypeChar) {
+                System.out.println("ExpressionTypeVisitor: TOFIXED: rule#1");
+        } else if (op.getType() instanceof TypeChar) {
             throw new NotYetImplementedException("CHARACTER", ctx.start.getLine(), ctx.start.getCharPositionInLine());
         } else {
             throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
@@ -1290,8 +1296,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitTOFLOATExpression(SmallPearlParser.TOFLOATExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTOFLOATExpression");
@@ -1303,8 +1309,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeFloat(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TOFLOAT: rule#1");
@@ -1317,8 +1323,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitTOBITExpression(SmallPearlParser.TOBITExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitTOBITExpression");
@@ -1330,8 +1336,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFixed) {
-            res = new TypeBit(((TypeFixed) op).getPrecision());
+        if (op.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TOBIT: rule#1");
@@ -1358,8 +1364,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitEntierExpression(SmallPearlParser.EntierExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitEntierExpression");
@@ -1371,8 +1377,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFloat) {
-            res = new TypeFixed(((TypeFloat) op).getPrecision());
+        if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFixed(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ENTIER: rule#1");
@@ -1394,8 +1400,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitRoundExpression(SmallPearlParser.RoundExpressionContext ctx) {
-        TypeDefinition op;
-        TypeDefinition res;
+        ExpressionResult op;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitRoundExpression");
@@ -1407,8 +1413,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op instanceof TypeFloat) {
-            res = new TypeFixed(((TypeFloat) op).getPrecision());
+        if (op.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeFixed(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: ROUND: rule#1");
@@ -1440,7 +1446,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitSemaTry(SmallPearlParser.SemaTryContext ctx) {
-        TypeDefinition res;
+        ExpressionResult res;
 
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitSemaTry");
@@ -1449,7 +1455,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        res = new TypeBit(1);
+        res = new ExpressionResult(new TypeBit(1));
         m_properties.put(ctx, res);
 
         if (m_debug)
@@ -1463,34 +1469,41 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitLiteral");
 
-        if (ctx.IntegerConstant() != null) {
-            try {
-                Integer value = Integer.parseInt(ctx.IntegerConstant().toString());
-                Integer precision = Integer.toBinaryString(Math.abs(value)).length();
-                m_properties.put(ctx, new TypeFixed(precision));
-            } catch (NumberFormatException ex) {
-                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
-        } else if (ctx.StringLiteral() != null) {
-            m_properties.put(ctx, new TypeChar());
+        if (ctx.durationConstant() != null) {
+            ExpressionResult expressionResult = new ExpressionResult(new TypeDuration(), true);
+            m_properties.put(ctx, expressionResult);
         } else if (ctx.FloatingPointConstant() != null) {
             try {
                 Float value = Float.parseFloat(ctx.FloatingPointConstant().toString());
                 Integer precision = 24;
-                m_properties.put(ctx, new TypeFloat(precision));
+                ExpressionResult expressionResult = new ExpressionResult( new TypeFloat(precision),true);
+                m_properties.put(ctx, expressionResult);
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-
         } else if (ctx.timeConstant() != null) {
-            m_properties.put(ctx, new TypeClock(getTime(ctx.timeConstant())));
-
-        } else if (ctx.durationConstant() != null) {
-            m_properties.put(ctx, new TypeDuration());
+            ExpressionResult expressionResult = new ExpressionResult( new TypeClock(getTime(ctx.timeConstant())),true);
+            m_properties.put(ctx, expressionResult);
         } else if (ctx.BitStringLiteral() != null) {
-            m_properties.put(ctx, new TypeBit(Utils.getBitStringLength(ctx.BitStringLiteral().getText())));
-        }
+            ExpressionResult expressionResult = new ExpressionResult(  new TypeBit(Utils.getBitStringLength(ctx.BitStringLiteral().getText())), true);
+            m_properties.put(ctx, expressionResult);
+        } else if (ctx.IntegerConstant() != null) {
+            try {
+                Integer precision = Defaults.FIXED_PRECISION;
 
+                if ( ctx.IntegerConstant().size() == 2 ) {
+                    precision = Integer.parseInt(ctx.IntegerConstant(1).toString());
+                }
+
+                ExpressionResult expressionResult = new ExpressionResult(new TypeFixed(precision), true);
+                m_properties.put(ctx, expressionResult);
+            } catch (NumberFormatException ex) {
+                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        } else if (ctx.StringLiteral() != null) {
+            ExpressionResult expressionResult = new ExpressionResult(new TypeChar(), true);
+            m_properties.put(ctx, expressionResult);
+        }
         return null;
     }
 
@@ -1609,7 +1622,6 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         SmallPearlParser.ExpressionContext expr = ctx.expression();
         visitChildren(ctx);
-        TypeDefinition type = m_properties.get(expr);
 
         return null;
     }
@@ -1620,7 +1632,10 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             System.out.println("ExpressionTypeVisitor: visitNowFunction");
         }
 
-        m_properties.put(ctx, new TypeClock());
+        TypeClock type = new TypeClock();
+        ExpressionResult expressionResult = new ExpressionResult(type);
+        m_properties.put(ctx, expressionResult);
+
         return null;
     }
 
@@ -1630,7 +1645,10 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             System.out.println("ExpressionTypeVisitor: visitSizeofExpression");
         }
 
-        m_properties.put(ctx, new TypeFixed(31));
+        TypeFixed type = new TypeFixed(Defaults.FIXED_PRECISION);
+        ExpressionResult expressionResult = new ExpressionResult(type);
+        m_properties.put(ctx, expressionResult);
+
         return null;
     }
 
@@ -1652,9 +1670,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitEqRelationalExpression(SmallPearlParser.EqRelationalExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression");
@@ -1674,50 +1692,50 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#4");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#6");
-        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitEqRelationalExpression: rule#7");
-        } else if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -1756,9 +1774,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitLtRelationalExpression(SmallPearlParser.LtRelationalExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression");
@@ -1778,44 +1796,44 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#4");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLtRelationalExpression: rule#6");
-        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -1845,9 +1863,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitNeRelationalExpression(SmallPearlParser.NeRelationalExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression");
@@ -1867,50 +1885,50 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#4");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#6");
-        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitNeRelationalExpression: rule#7");
-        } else if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -1948,9 +1966,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitLeRelationalExpression(SmallPearlParser.LeRelationalExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression");
@@ -1970,44 +1988,44 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#4");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitLeRelationalExpression: rule#6");
-        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -2044,9 +2062,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitGtRelationalExpression(SmallPearlParser.GtRelationalExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression");
@@ -2066,44 +2084,44 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#4");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGtRelationalExpression: rule#6");
-        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -2140,9 +2158,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitGeRelationalExpression(SmallPearlParser.GeRelationalExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
-        TypeDefinition res;
+        ExpressionResult op1;
+        ExpressionResult op2;
+        ExpressionResult res;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression");
@@ -2162,44 +2180,44 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeFixed && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#1");
-        } else if (op1 instanceof TypeFixed && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#2");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFixed) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFixed) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#3");
-        } else if (op1 instanceof TypeFloat && op2 instanceof TypeFloat) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#4");
-        } else if (op1 instanceof TypeClock && op2 instanceof TypeClock) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#5");
-        } else if (op1 instanceof TypeDuration && op2 instanceof TypeDuration) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeDuration) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitGeRelationalExpression: rule#6");
-        } else if (op1 instanceof TypeChar && op2 instanceof TypeChar) {
-            res = new TypeBit(1);
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            res = new ExpressionResult(new TypeBit(1), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
@@ -2224,8 +2242,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitCshiftExpression(SmallPearlParser.CshiftExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
+        ExpressionResult op1;
+        ExpressionResult op2;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitCshiftExpression");
@@ -2244,8 +2262,10 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeBit && op2 instanceof TypeFixed) {
-            m_properties.put(ctx, new TypeBit(((TypeBit) op1).getPrecision()));
+        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeFixed) {
+            TypeBit type = new TypeBit(((TypeBit)op1.getType()).getPrecision());
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
 
             if (m_debug) {
                 System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
@@ -2260,8 +2280,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitShiftExpression(SmallPearlParser.ShiftExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
+        ExpressionResult op1;
+        ExpressionResult op2;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitShiftExpression");
@@ -2280,8 +2300,10 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeBit && op2 instanceof TypeFixed) {
-            m_properties.put(ctx, new TypeBit(((TypeBit) op1).getPrecision()));
+        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeFixed) {
+            TypeBit type = new TypeBit(((TypeBit)op1.getType()).getPrecision());
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
 
             if (m_debug) {
                 System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
@@ -2295,8 +2317,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitCatExpression(SmallPearlParser.CatExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
+        ExpressionResult op1;
+        ExpressionResult op2;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitCatExpression");
@@ -2315,8 +2337,10 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit(((TypeBit) op1).getPrecision() + ((TypeBit) op2).getPrecision()));
+        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+            TypeBit type = new TypeBit(((TypeBit)op1.getType()).getPrecision() + ((TypeBit)op2.getType()).getPrecision());
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
 
             if (m_debug) {
                 System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
@@ -2330,8 +2354,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAndExpression(SmallPearlParser.AndExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
+        ExpressionResult op1;
+        ExpressionResult op2;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitAndExpression");
@@ -2349,9 +2373,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit(Math.max(((TypeBit) op1).getPrecision(), ((TypeBit) op2).getPrecision())));
-        } else {
+        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+            TypeBit type = new TypeBit( Math.max( ((TypeBit)op1.getType()).getPrecision(),((TypeBit)op2.getType()).getPrecision()));
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
+        }
+        else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -2360,8 +2387,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitOrExpression(SmallPearlParser.OrExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
+        ExpressionResult op1;
+        ExpressionResult op2;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitOrExpression");
@@ -2379,9 +2406,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit(Math.max(((TypeBit) op1).getPrecision(), ((TypeBit) op2).getPrecision())));
-        } else {
+        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+            TypeBit type = new TypeBit( Math.max( ((TypeBit)op1.getType()).getPrecision(),((TypeBit)op2.getType()).getPrecision()));
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
+        }
+        else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -2390,8 +2420,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitExorExpression(SmallPearlParser.ExorExpressionContext ctx) {
-        TypeDefinition op1;
-        TypeDefinition op2;
+        ExpressionResult op1;
+        ExpressionResult op2;
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitExorExpression");
@@ -2411,9 +2441,12 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op1 instanceof TypeBit && op2 instanceof TypeBit) {
-            m_properties.put(ctx, new TypeBit(Math.max(((TypeBit) op1).getPrecision(), ((TypeBit) op2).getPrecision())));
-        } else {
+        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+            TypeBit type = new TypeBit( Math.max( ((TypeBit)op1.getType()).getPrecision(),((TypeBit)op2.getType()).getPrecision()));
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
+        }
+        else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 

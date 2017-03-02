@@ -30,6 +30,7 @@
 package org.smallpearl.compiler.SymbolTable;
 
 import org.smallpearl.compiler.SmallPearlParser;
+import org.smallpearl.compiler.ExpressionResult;
 import org.smallpearl.compiler.TypeDefinition;
 
 import java.util.LinkedList;
@@ -40,13 +41,13 @@ public class ProcedureEntry extends SymbolTableEntry {
     private String  m_globalId;
     private Integer m_priority;
     private LinkedList<FormalParameter> m_formalParameters;
-    private TypeDefinition m_resultType;
+    private ExpressionResult m_resultType;
 
     public ProcedureEntry() {
         this.m_formalParameters = null;
     }
 
-    public ProcedureEntry(String name, LinkedList<FormalParameter> formalParameters, TypeDefinition resultType, String globalId, SmallPearlParser.ProcedureDeclarationContext ctx, SymbolTable scope) {
+    public ProcedureEntry(String name, LinkedList<FormalParameter> formalParameters, ExpressionResult resultType, String globalId, SmallPearlParser.ProcedureDeclarationContext ctx, SymbolTable scope) {
         super(name);
         this.m_formalParameters = formalParameters;
         this.m_ctx = ctx;
@@ -93,7 +94,7 @@ public class ProcedureEntry extends SymbolTableEntry {
     public int getCharPositionInLine() {
         return m_ctx.getStart().getCharPositionInLine();
     }
-    public TypeDefinition getResultType() { return m_resultType; }
+    public TypeDefinition getResultType() { return m_resultType.getType(); }
 
     public SymbolTable scope;
     private  SmallPearlParser.ProcedureDeclarationContext m_ctx;

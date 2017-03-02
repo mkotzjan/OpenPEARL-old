@@ -53,10 +53,10 @@ public class ConstantPool {
         for (i = 0; i < constantPool.size(); i++) {
             if ( value instanceof ConstantFixedValue) {
                 if (constantPool.get(i) instanceof ConstantFixedValue) {
-                    Long a = ((ConstantFixedValue)(value)).getValue();
-                    Long b = ((ConstantFixedValue)(constantPool.get(i))).getValue();
+                    ConstantFixedValue a = (ConstantFixedValue)(value);
+                    ConstantFixedValue b = (ConstantFixedValue)(constantPool.get(i));
 
-                    if ( a.equals(b) ) {
+                    if ( a.getValue().equals(b.getValue()) && a.getPrecision().equals(b.getPrecision())) {
                         found = true;
                         break;
                     }

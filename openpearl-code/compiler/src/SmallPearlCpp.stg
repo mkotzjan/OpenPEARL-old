@@ -1224,6 +1224,14 @@ DATE() ::= <%
 pearlrt::Clock::date()
 %>
 
+BITSTOFIXED(operand) ::= <%
+pearlrt::Bits::toFixed(<operand>)
+%>
+
+CHARACTERSTOFIXED(operand) ::= <%
+pearlrt::Characters::toFixed(<operand>)
+%>
+
 /* --------------------- Temporary Semaphore Arrays -------------------------- */
 
 TemporarySemaphoreArrays(array) ::= <<
@@ -1410,9 +1418,9 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
     <endif>
 
     <if(to)>
-        while ((((s_value > CONSTANT_FIXED_POS_0_1).getBoolean()) &&
+        while ((((s_value > CONSTANT_FIXED_POS_0_31).getBoolean()) &&
                 ((a_value \<= e_value).getBoolean())) ||
-                (((s_value \< CONSTANT_FIXED_POS_0_1).getBoolean()) &&
+                (((s_value \< CONSTANT_FIXED_POS_0_31).getBoolean()) &&
                 ((a_value >= e_value).getBoolean())))
         {<\n>
             <if(variable)>
@@ -1428,9 +1436,9 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
 
             me->setLocation(<srcLine>, filename);
 
-            if (((s_value > CONSTANT_FIXED_POS_0_1).getBoolean() &&
+            if (((s_value > CONSTANT_FIXED_POS_0_31).getBoolean() &&
                  (a_value \<= (e_value - s_value)).getBoolean()) ||
-                ((s_value \< CONSTANT_FIXED_POS_0_1).getBoolean() &&
+                ((s_value \< CONSTANT_FIXED_POS_0_31).getBoolean() &&
                 (a_value >= (e_value - s_value)).getBoolean())) {
                 a_value = a_value + s_value;
             } else {
