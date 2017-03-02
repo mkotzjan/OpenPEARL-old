@@ -1,53 +1,130 @@
 MODULE(bitexpr);
+SYSTEM;
+term: StdOut;
 
 PROBLEM;
-
+ SPC term DATION OUT SYSTEM ALPHIC;
+ DCL console DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(term);
+ DCL success BIT(1) INIT('1'B);
 
 p1: PROC;
-    DCL b BIT(1) INIT('0'B1);
-    DCL (c,d,e) BIT(1);
+    DCL f BIT(1) INIT('0'B1);
+    DCL t BIT(1) INIT('1'B1);
+    DCL (d,d1,e) BIT(1);
     DCL b2 BIT(2) INIT('01'B1);
 
-   c := b;
-   d := NOT b;
-   e := c AND d;
-   e := c OR d;
-   e := c EXOR d;
-   b2 := b2 SHIFT 1;
-   b2 := b2 CSHIFT 4;
-   b2 := c CAT d;
-   ! expected c++ code
-   ! _d = _b.bitNot();
-   ! _e = _c.bitAnd(_d);
-   ! _e = _c.bitOr(_d);
-   ! _e = _c.bitXor(_d);
-   ! _b2 = _b2.bitShift((pearlrt::Fixed<15>)(1));
-   ! _b2 = _b2.bitCshift((pearlrt::Fixed<15>)(1));
-   ! _b2 = _c.bitCat(_d);
+   PUT 'BIT(1) tests' TO console BY A, SKIP;
+   d := NOT f;
+   d1 := NOT d;
+   IF (d NE '1'B1) OR
+      (d1 NE '0'B1) OR
+      (NOT '0'B1) NE '1'B1 OR
+      (NOT '1'B1) NE '0'B1
+   THEN
+      PUT 'error with NOT' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+
+   e := NOT(t AND f) AND NOT( f AND f) AND NOT(f AND t) AND (t AND t);
+   IF e NE '1'B1 THEN
+      PUT 'error with AND ' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+
+   e := NOT(t OR f) OR ( f OR f) OR NOT(f OR t) OR NOT (t OR t);
+   IF e NE '0'B1 THEN
+      PUT 'error with OR ' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+
+   e := NOT(t EXOR f) OR ( f EXOR f) OR NOT(f EXOR t) OR (t EXOR t);
+   IF e NE '0'B1 THEN
+      PUT 'error with EXOR ' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+   
+   e := t SHIFT 1;
+   IF e NE '0'B1 THEN
+      PUT 'error with SHIFT' TO console BY A, SKIP;
+   FIN;
+
+   e := t CSHIFT 1;
+   IF e NE '1'B1 THEN
+      PUT 'error with CSHIFT' TO console BY A, SKIP;
+   FIN;
+
 END;
 
+
+p2: PROC;
+    DCL b BIT(4) INIT('0001'B1);
+    DCL e BIT(4);
+
+   PUT 'BIT(4) tests' TO console BY A, SKIP;
+
+   IF (NOT '0101'B1) NE  '1010'B1 THEN
+       PUT 'error with NOT' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ('0011'B AND '1110'B) NE  '0001'B THEN
+       PUT 'error with AND' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ('0011'B OR '0110'B) NE  '0111'B THEN
+       PUT 'error with OR' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ('0111'B EXOR '1110'B) NE  '1001'B THEN
+       PUT 'error with EXOR' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ( ('0111'B SHIFT 1) NE  '1110'B ) OR
+      ( ('0111'B SHIFT -1) NE '0011'B ) OR
+      ( ('0111'B SHIFT 4) NE '0000'B ) OR
+      ( ('0111'B SHIFT -3) NE '0000'B )
+   THEN
+       PUT 'error with SHIFT' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ( ('0111'B CSHIFT 1) NE  '1110'B ) OR
+      ( ('0111'B CSHIFT 2) NE '1101'B ) OR
+      ( ('0111'B CSHIFT -1) NE '1011'B ) OR
+      ( ('0111'B CSHIFT 10) NE '1101'B ) OR
+      ( ('0111'B CSHIFT -3) NE '1110'B )
+   THEN
+       PUT 'error with CSHIFT' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ( ('01'B1 CAT '10'B1) NE '0110'B1) THEN
+       PUT 'error with CAT' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+        
+END;
 
 T1: TASK MAIN;
     DCL b BIT(2) INIT('01'B1);
     DCL (c,d,e) BIT(2);
     DCL b4 BIT(4) INIT('0001'B1);
 
-   c := b;
-   d := NOT b;
-   e := c AND d;
-   e := c OR d;
-   e := c EXOR d;
-   b4 := b4 SHIFT 1;
-   b4 := b4 CSHIFT 4;
-   b4 := c CAT d;
-   ! expected c++ code
-   ! _d = _b.bitNot();
-   ! _e = _c.bitAnd(_d);
-   ! _e = _c.bitOr(_d);
-   ! _e = _c.bitXor(_d);
-   ! _b4 = _b4.bitShift((pearlrt::Fixed<15>)(1));
-   ! _b4 = _b4.bitCshift((pearlrt::Fixed<15>)(1));
-   ! _b4 = _c.bitCat(_d);
+    OPEN console;
+    CALL p1;
+    CALL p2;
+    IF success THEN
+        PUT '*** success' TO console BY A, SKIP;
+    ELSE
+        PUT '*** fail' TO console BY A, SKIP;
+        __cpp__('pearlrt::Control::setExitCode(1);');
+    FIN;
+
+    CLOSE console;
+
 END;
 
 MODEND;
