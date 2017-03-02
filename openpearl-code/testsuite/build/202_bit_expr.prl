@@ -21,36 +21,36 @@ p1: PROC;
       (NOT '0'B1) NE '1'B1 OR
       (NOT '1'B1) NE '0'B1
    THEN
-      PUT 'error with NOT' TO console BY A, SKIP;
+      PUT 'error#1 with NOT' TO console BY A, SKIP;
       success := '0'B1;
    FIN;
 
    e := NOT(t AND f) AND NOT( f AND f) AND NOT(f AND t) AND (t AND t);
    IF e NE '1'B1 THEN
-      PUT 'error with AND ' TO console BY A, SKIP;
+      PUT 'error#2 with AND ' TO console BY A, SKIP;
       success := '0'B1;
    FIN;
 
    e := NOT(t OR f) OR ( f OR f) OR NOT(f OR t) OR NOT (t OR t);
    IF e NE '0'B1 THEN
-      PUT 'error with OR ' TO console BY A, SKIP;
+      PUT 'error#3 with OR ' TO console BY A, SKIP;
       success := '0'B1;
    FIN;
 
    e := NOT(t EXOR f) OR ( f EXOR f) OR NOT(f EXOR t) OR (t EXOR t);
    IF e NE '0'B1 THEN
-      PUT 'error with EXOR ' TO console BY A, SKIP;
+      PUT 'error#4 with EXOR ' TO console BY A, SKIP;
       success := '0'B1;
    FIN;
    
    e := t SHIFT 1;
    IF e NE '0'B1 THEN
-      PUT 'error with SHIFT' TO console BY A, SKIP;
+      PUT 'error#5 with SHIFT' TO console BY A, SKIP;
    FIN;
 
    e := t CSHIFT 1;
    IF e NE '1'B1 THEN
-      PUT 'error with CSHIFT' TO console BY A, SKIP;
+      PUT 'error#6 with CSHIFT' TO console BY A, SKIP;
    FIN;
 
 END;
@@ -63,31 +63,31 @@ p2: PROC;
    PUT 'BIT(4) tests' TO console BY A, SKIP;
 
    IF (NOT '0101'B1) NE  '1010'B1 THEN
-       PUT 'error with NOT' TO console BY A, SKIP;
+       PUT 'error#7 with NOT' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
 
    IF ('0011'B AND '1110'B) NE  '0001'B THEN
-       PUT 'error with AND' TO console BY A, SKIP;
+       PUT 'error#8 with AND' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
 
    IF ('0011'B OR '0110'B) NE  '0111'B THEN
-       PUT 'error with OR' TO console BY A, SKIP;
+       PUT 'error#9 with OR' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
 
    IF ('0111'B EXOR '1110'B) NE  '1001'B THEN
-       PUT 'error with EXOR' TO console BY A, SKIP;
+       PUT 'error#10 with EXOR' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
 
-   IF ( ('0111'B SHIFT 1) NE  '1110'B ) OR
+   IF ( ('0111'B SHIFT  1) NE '1110'B ) OR
       ( ('0111'B SHIFT -1) NE '0011'B ) OR
-      ( ('0111'B SHIFT 4) NE '0000'B ) OR
+      ( ('0111'B SHIFT  4) NE '0000'B ) OR
       ( ('0111'B SHIFT -3) NE '0000'B )
    THEN
-       PUT 'error with SHIFT' TO console BY A, SKIP;
+       PUT 'error#11 with SHIFT' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
 
@@ -97,12 +97,12 @@ p2: PROC;
       ( ('0111'B CSHIFT 10) NE '1101'B ) OR
       ( ('0111'B CSHIFT -3) NE '1110'B )
    THEN
-       PUT 'error with CSHIFT' TO console BY A, SKIP;
+       PUT 'error#12 with CSHIFT' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
 
    IF ( ('01'B1 CAT '10'B1) NE '0110'B1) THEN
-       PUT 'error with CAT' TO console BY A, SKIP;
+       PUT 'error#13 with CAT' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
         
