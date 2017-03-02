@@ -165,6 +165,7 @@ problem_part:
           lengthDefinition
         | scalarVariableDeclaration
         | structVariableDeclaration
+        | arrayVariableDeclaration
         | semaDeclaration
         | boltDeclaration
         | identification
@@ -495,6 +496,47 @@ structureDenotationS :
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// ArrayDeclaration ::=
+//   { DECLARE | DCL } ArrayDenotation [ , ArrayDenotation ] ... ;
+////////////////////////////////////////////////////////////////////////////////
+
+arrayVariableDeclaration :
+    ( 'DECLARE' | 'DCL' ) arrayDenotation ( ',' arrayDenotation )* ';'
+    | cpp_inline
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ArrayDenotation ::=
+//   OneIdentifierOrList DimensionAttribute [ INV ] TypeAttributeForArray
+//  [ GlobalAttribute ] [ InitialisationAttribute ]
+////////////////////////////////////////////////////////////////////////////////
+
+arrayDenotation :
+     ( ID | '(' ID ( ',' ID)* ')' ) dimensionAttribute assignmentProtection? typeAttributeForArray globalAttribute?
+     initialisationAttribute?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// TypeAttributeForArray ::=
+//    TypeInteger | TypeFloat
+//  | TypeDuration | TypeClock
+//  | TypeBitString | TypeCharacterString
+//  | TypeDefinition
+//  | REF { TypeDation | SEMA | BOLT
+//  | TypeProcedure | TASK | CHAR()
+//  ??? INTERRUPT, IPRT,SIGNAL
+////////////////////////////////////////////////////////////////////////////////
+
+typeAttributeForArray :
+      type_fixed
+    | type_float
+    | type_duration
+    | type_clock
+    | type_bit
+    | type_char
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 //  SemaDeclaration ::=
 //   { DECLARE | DCL } Identifier or IdentifierList [ DimensionAttribute ] SEMA [ GlobalAttribute ]
 ////////////////////////////////////////////////////////////////////////////////
@@ -530,7 +572,7 @@ procedureDeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
 procedureBody :
-    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition)*
+    ( scalarVariableDeclaration | structVariableDeclaration | arrayVariableDeclaration | dationDeclaration | lengthDefinition)*
     statement*
     ;
 
@@ -662,7 +704,7 @@ task_main: 'MAIN';
 ////////////////////////////////////////////////////////////////////////////////
 
 taskBody:
-    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition)*
+    ( scalarVariableDeclaration | structVariableDeclaration | arrayVariableDeclaration | dationDeclaration | lengthDefinition)*
     procedureDeclaration*
     statement*
     ;
@@ -887,7 +929,7 @@ index_section
 
 block_statement:
     'BEGIN'
-    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition )*
+    ( scalarVariableDeclaration | structVariableDeclaration | arrayVariableDeclaration | dationDeclaration | lengthDefinition )*
     statement*
     'END' ID? ';'
     ;
@@ -904,7 +946,7 @@ block_statement:
 loopStatement:
     loopStatement_for? loopStatement_from? loopStatement_by? loopStatement_to? loopStatement_while?
     'REPEAT'
-    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition)*
+    ( scalarVariableDeclaration | structVariableDeclaration | arrayVariableDeclaration | dationDeclaration | lengthDefinition)*
     statement*
     loopStatement_end ';'
     ;
@@ -1695,11 +1737,11 @@ typologyAttribute
 ////////////////////////////////////////////////////////////////////////////////
 
 dimensionAttribute
-    : '(' boundaryDenotation ( ',' boundaryDenotation )? ')'
+    : '(' boundaryDenotation ( ',' boundaryDenotation )* ')'
     ;
 
 boundaryDenotation
-    : IntegerConstant
+    : IntegerConstant ( ':' IntegerConstant )?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
