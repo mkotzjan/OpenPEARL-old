@@ -147,7 +147,7 @@ namespace pearlrt {
       GetClock::fromT(f, w, d, source);
    }
 
-   void DationPG::toD(const Duration& f,
+   void DationPG::toD(const Duration f,
                       const Fixed<31> w,
                       const Fixed<31> d) {
       PutDuration::toD(f, w, d, sink);

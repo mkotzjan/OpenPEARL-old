@@ -269,7 +269,7 @@ namespace pearlrt {
       \tparam S size of the string
       */
       template<int S>
-      void toB1(BitString<S> & s, Fixed<31> w) {
+      void toB1(BitString<S>  s, Fixed<31> w) {
          PutBitString<S>::toB1(s,w,sink);
       }
 
@@ -294,7 +294,7 @@ namespace pearlrt {
       \tparam S size of the string
       */
       template<int S>
-      void toB2(BitString<S> & s, Fixed<31> w) {
+      void toB2(BitString<S>  s, Fixed<31> w) {
          PutBitString<S>::toB2(s,w,sink);
       }
 
@@ -319,7 +319,7 @@ namespace pearlrt {
       \tparam S size of the string
       */
       template<int S>
-      void toB3(BitString<S> & s, Fixed<31> w) {
+      void toB3(BitString<S>  s, Fixed<31> w) {
          PutBitString<S>::toB3(s,w,sink);
       }
 
@@ -344,7 +344,7 @@ namespace pearlrt {
       \tparam S size of the string
       */
       template<int S>
-      void toB4(BitString<S> & s, Fixed<31> w) {
+      void toB4(BitString<S>  s, Fixed<31> w) {
          PutBitString<S>::toB4(s,w,sink);
       }
 
@@ -371,7 +371,7 @@ namespace pearlrt {
        \tparam  S width of the fixed value type
        */
       template<int S>
-      void toF(Fixed<S> & f,
+      void toF(Fixed<S>  f,
                const Fixed<31> w,
                const Fixed<31> d = 0) {
          PutFixed<S>::toF(f, w, d, sink);
@@ -401,7 +401,7 @@ namespace pearlrt {
        \tparam  S width of the float value type
        */
       template<int S>
-      void toF(Float<S> & f,
+      void toF(Float<S>  f,
                const Fixed<31> w,
                const Fixed<31> d = 0) {
          PutFloat<S>::toF(f, w, d, sink);
@@ -434,7 +434,7 @@ namespace pearlrt {
        \tparam  S width of the float value type
        */
       template<int S>
-      void toE(Float<S> & f,
+      void toE(Float<S>  f,
                const Fixed<31> w,
                const Fixed<31> d,
                const Fixed<31> s,
@@ -491,7 +491,7 @@ namespace pearlrt {
        \param w width of the output field
        \param d number of decimals to be used
        */
-      void toD(const Duration& f,
+      void toD(const Duration f,
                const Fixed<31> w,
                const Fixed<31> d = 0);
 

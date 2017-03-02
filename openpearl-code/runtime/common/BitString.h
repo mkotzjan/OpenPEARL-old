@@ -245,13 +245,18 @@ namespace pearlrt {
       BitString<S> bitCshift(const Fixed<15> l) {
          BitString<S> retval;
          retval.x = x;
+         Fixed<15> effectiveShift;
 
-         if (l.x > 0) {
-            retval.x <<= l.x;
-            retval.x |= (x >> (S - l.x));
+         // we do not need to perform multiple cycles, if
+         // the desired number of rotations os larger than
+         // the length of the bit string
+         effectiveShift = l.modulo(S);
+         if (effectiveShift.x > 0) {
+            retval.x <<= effectiveShift.x;
+            retval.x |= (x >> (S - effectiveShift.x));
          } else {
-            retval.x >>= -l.x;
-            retval.x |= x << (S + l.x);
+            retval.x >>= -effectiveShift.x;
+            retval.x |= x << (S + effectiveShift.x);
          }
 
          retval.x &= mask;
@@ -284,9 +289,20 @@ namespace pearlrt {
       */
       template<int P> BitString < S + P >
       bitCat(BitString<P> y) {
-         BitString < S + P > z;
+         BitString < S + P > z,z1;
+
+         // adjust the first operant to target size
          z.x = x << ((sizeof(z) - sizeof(x)) * 8);
-         z.x |= y.x << ((sizeof(z) - sizeof(x)) * 8 - S);
+
+         // adjust 2nd operand to target size or target position
+         if (sizeof(z) > sizeof(y)) {
+            z1.x = y.x << ((sizeof(z) - sizeof(y)) * 8 - S);
+         } else {
+            z1.x = y.x >> S;
+         }
+
+         // perform OR to concatenate
+         z.x |= z1.x;
          return z;
       }
 

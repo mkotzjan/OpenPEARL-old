@@ -57,6 +57,7 @@ END;
 p2: PROC;
     DCL b BIT(4) INIT('0001'B1);
     DCL e BIT(4);
+    DCL ss FIXED INIT(-1);
 
    PUT 'BIT(4) tests' TO console BY A, SKIP;
 
@@ -65,7 +66,7 @@ p2: PROC;
        success = '0'B1;
    FIN;
 
-   IF ('0011'B AND '1110'B) NE  '0001'B THEN
+   IF ('0011'B AND '1110'B) NE  '0010'B THEN
        PUT 'error#8 with AND' TO console BY A, SKIP;
        success = '0'B1;
    FIN;
@@ -96,11 +97,23 @@ p2: PROC;
       ( ('0111'B CSHIFT -3) NE '1110'B )
    THEN
        PUT 'error#12 with CSHIFT' TO console BY A, SKIP;
+       e := '0111'B CSHIFT 1;
+       PUT e TO console BY B1(4), SKIP;
+       e := '0111'B CSHIFT 2;
+       PUT e TO console BY B1(4), SKIP;
+       e := '0111'B CSHIFT -1;
+       PUT e TO console BY B1(4), SKIP;
+       e:= '0111'B CSHIFT 10;
+       PUT e TO console BY B1(4), SKIP;
+       e:= '0111'B CSHIFT -3;
+       PUT e TO console BY B1(4), SKIP;
+
        success = '0'B1;
    FIN;
 
    IF ( ('01'B1 CAT '10'B1) NE '0110'B1) THEN
        PUT 'error#13 with CAT' TO console BY A, SKIP;
+       PUT '01'B1 CAT '10'B1 TO console BY B1(4), SKIP;
        success = '0'B1;
    FIN;
         

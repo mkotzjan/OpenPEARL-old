@@ -128,7 +128,7 @@ namespace pearlrt {
          size_t i;
 
          if (length > 32767 || length < 1) {
-            printf("Character: illegal length (%d)\n", length);
+            printf("Character: illegal length (%d)\n", (int)length);
             throw theCharacterTooLongSignal;
          }
 
@@ -150,7 +150,7 @@ namespace pearlrt {
          unsigned int l = strlen(string);
 
          if (length > 32767 || l > length) {
-            printf("Character: illegal length (%d)\n", length);
+            printf("Character: illegal length (%d)\n", (int)length);
             throw theCharacterTooLongSignal;
          }
 

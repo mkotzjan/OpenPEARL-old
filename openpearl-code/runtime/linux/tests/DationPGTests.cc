@@ -184,9 +184,11 @@ TEST(DationPG, simple_get) {
    pearlrt::Fixed<31>  x;
    logbuch.fromA(text);
    EXPECT_TRUE((text == expect).getBoolean());
-   // the value 42 is in the next line; read now should deliver 0
-   logbuch.fromF(x, (pearlrt::Fixed<31>)3);
-   EXPECT_EQ((x == (pearlrt::Fixed<31>)0).getBoolean(), true);
+   // modified, since no data in field now throws FixedValueSignal
+   //// the value 42 is in the next line; read now should deliver 0
+   //logbuch.fromF(x, (pearlrt::Fixed<31>)3);
+   //EXPECT_EQ((x == (pearlrt::Fixed<31>)0).getBoolean(), true);
+   EXPECT_THROW(logbuch.fromF(x, (pearlrt::Fixed<31>)3),pearlrt::FixedValueSignal);
    logbuch.fromSkip(1);
    logbuch.fromF(x, (pearlrt::Fixed<31>)3);
    EXPECT_EQ((x == (pearlrt::Fixed<31>)42).getBoolean(), true);
