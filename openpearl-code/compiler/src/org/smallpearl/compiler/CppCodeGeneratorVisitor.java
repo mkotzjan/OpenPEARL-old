@@ -533,7 +533,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     private ST getBitStringConstant(SmallPearlParser.ConstantContext ctx) {
         int nb = 1;
-        Long l = convertBitStringToLong(ctx.bitStringConstant().BitStringLiteral().toString());
+        Long l = Utils.convertBitStringToLong(ctx.bitStringConstant().BitStringLiteral().toString());
 
         // walk up the AST and get VariableDenotationContext:
         ParserRuleContext sctx = ctx.getParent();
@@ -615,61 +615,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         return constant;
     }
-
-    private Long convertBitStringToLong(String bitstring) {
-        int base = 0;
-        StringBuilder sb = new StringBuilder(bitstring.length());
-
-        if( bitstring.startsWith("'")) {
-            bitstring = bitstring.substring(1, bitstring.length());
-        }
-
-        if( bitstring.endsWith("'")) {
-            bitstring = bitstring.substring(0, bitstring.length() - 1);
-        }
-
-        if ( bitstring.charAt(bitstring.length() -1 ) == '1' ) {
-            base = 2;
-        }
-        else if ( bitstring.charAt(bitstring.length() -1 ) == '2' ) {
-            base = 4;
-        }
-        else if ( bitstring.charAt(bitstring.length() -1 ) == '3' ) {
-            base = 8;
-        }
-        else if ( bitstring.charAt(bitstring.length() -1 ) == '4' ) {
-            base = 16;
-        }
-
-        Long i = 0L;
-        for( int j = 0; j < bitstring.length() - 3; j++) {
-            int num = 0;
-            switch( bitstring.charAt(j) ) {
-                case '0': num =  0; break;
-                case '1': num =  1; break;
-                case '2': num =  2; break;
-                case '3': num =  3; break;
-                case '4': num =  4; break;
-                case '5': num =  5; break;
-                case '6': num =  6; break;
-                case '7': num =  7; break;
-                case '8': num =  8; break;
-                case '9': num =  9; break;
-                case 'A': num = 10; break;
-                case 'B': num = 11; break;
-                case 'C': num = 12; break;
-                case 'D': num = 13; break;
-                case 'E': num = 14; break;
-                case 'F': num = 15; break;
-            }
-
-            i *= base;
-            i += num;
-        }
-
-        return i;
-    }
-
 
     @Override
     public ST visitDurationConstant(SmallPearlParser.DurationConstantContext ctx) {

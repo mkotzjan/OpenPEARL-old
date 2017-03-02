@@ -38,7 +38,9 @@ public class Utils {
     public static
     Long convertBitStringToLong(String bitstring) {
         int base = 0;
-        StringBuilder sb = new StringBuilder(bitstring.length());
+        int bitsPerPosition = 0;
+        int noOfBits = 0;
+        String postfix = "";
 
         if( bitstring.startsWith("'")) {
             bitstring = bitstring.substring(1, bitstring.length());
@@ -48,21 +50,30 @@ public class Utils {
             bitstring = bitstring.substring(0, bitstring.length() - 1);
         }
 
-        if ( bitstring.charAt(bitstring.length() -1 ) == '1' ) {
-            base = 2;
+        postfix = bitstring.substring(bitstring.indexOf("'") + 1, bitstring.length() );
+        bitstring = bitstring.substring(0, bitstring.indexOf("'"));
+
+        if ( postfix.equals("B") || postfix.equals("B1")) {
+            base =2;
+            bitsPerPosition = 1;
         }
-        else if ( bitstring.charAt(bitstring.length() -1 ) == '2' ) {
+        else if ( postfix.equals("B2") ) {
             base = 4;
+            bitsPerPosition = 2;
         }
-        else if ( bitstring.charAt(bitstring.length() -1 ) == '3' ) {
+        else if ( postfix.equals("B3") ) {
             base = 8;
+            bitsPerPosition = 3;
         }
-        else if ( bitstring.charAt(bitstring.length() -1 ) == '4' ) {
+        else if ( postfix.equals("B4") ) {
             base = 16;
+            bitsPerPosition = 4;
         }
 
+        noOfBits = bitstring.length() * bitsPerPosition;
+
         Long i = 0L;
-        for( int j = 0; j < bitstring.length() - 3; j++) {
+        for( int j = 0; j < bitstring.length(); j++) {
             int num = 0;
             switch( bitstring.charAt(j) ) {
                 case '0': num =  0; break;
@@ -138,7 +149,7 @@ public class Utils {
     }
 
     public static
-    int getBitStringLength(String bitstring) {
+    int getBitStringLength1(String bitstring) {
         int base = 0;
         StringBuilder sb = new StringBuilder(bitstring.length());
 
@@ -190,6 +201,40 @@ public class Utils {
         }
 
         return Long.toBinaryString(i).length();
+    }
+
+    public static
+    int getBitStringLength(String bitstring) {
+        int bitsPerPosition = 0;
+        int noOfBits = 0;
+        String postfix = "";
+
+        if( bitstring.startsWith("'")) {
+            bitstring = bitstring.substring(1, bitstring.length());
+        }
+
+        if( bitstring.endsWith("'")) {
+            bitstring = bitstring.substring(0, bitstring.length() - 1);
+        }
+
+        postfix = bitstring.substring(bitstring.indexOf("'") + 1, bitstring.length() );
+        bitstring = bitstring.substring(0, bitstring.indexOf("'"));
+
+        if ( postfix.equals("B") || postfix.equals("B1")) {
+            bitsPerPosition = 1;
+        }
+        else if ( postfix.equals("B2") ) {
+            bitsPerPosition = 2;
+        }
+        else if ( postfix.equals("B3") ) {
+            bitsPerPosition = 3;
+        }
+        else if ( postfix.equals("B4") ) {
+            bitsPerPosition = 4;
+        }
+
+        noOfBits = bitstring.length() * bitsPerPosition;
+        return  noOfBits;
     }
 
     public static
