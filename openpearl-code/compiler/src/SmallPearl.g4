@@ -164,6 +164,7 @@ problem_part:
     (
           lengthDefinition
         | scalarVariableDeclaration
+        | structVariableDeclaration
         | semaDeclaration
         | boltDeclaration
         | identification
@@ -420,6 +421,80 @@ variable_init :
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// StructureDeclaration ::=
+//   { DECLARE | DCL } StructureDenotation [ , StructureDenotation ] ... ;
+////////////////////////////////////////////////////////////////////////////////
+
+structVariableDeclaration :
+    ( 'DECLARE' | 'DCL' ) structureDenotation ( ',' structureDenotation )* ';'
+    | cpp_inline
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructureDenotation ::=
+//   IdentifierDenotation§MainStructure [ DimensionAttribute ][INV ]
+//   TypeStructure [ GlobalAttribute ][ InitialisationAttribute ]
+////////////////////////////////////////////////////////////////////////////////
+
+structureDenotation :
+    ID dimensionAttribute? assignmentProtection? typeStructure globalAttribute? initialisationAttribute?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// TypeStructure ::=
+//   STRUCT [ StructureComponent [ , StructureComponent ] ... ]
+////////////////////////////////////////////////////////////////////////////////
+
+typeStructure :
+    'STRUCT' '[' structureComponent ( ',' structureComponent )* ']'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructureComponent ::=
+//   OneIdentifierOrList§ForStructureComponent [ DimensionAttribute ]
+//   TypeAttributeInStructureComponent
+////////////////////////////////////////////////////////////////////////////////
+
+structureComponent :
+    ( ID | '(' ID ( ',' ID)* ')' ) dimensionAttribute? typeAttributeInStructureComponent
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// TypeAttributeInStructureComponent ::=
+//   [ INV ] { SimpleType | StructuredType | TypeReference }
+////////////////////////////////////////////////////////////////////////////////
+
+typeAttributeInStructureComponent :
+    assignmentProtection? (simpleType | structuredType )
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructuredType ::=
+//   TypeStructure | Identifier§ForNewDefinedType
+////////////////////////////////////////////////////////////////////////////////
+
+structuredType :
+    typeStructure | ID
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructureSpecification ::=
+//   { SPECIFY | SPC } StructureDenotationS [ , StructureDenotationS ] ... ;
+////////////////////////////////////////////////////////////////////////////////
+
+structureSpecfication :
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructureDenotationS ::=
+//   OneIdentifierOrList§MainRecord [ VirtualDimensionList ]
+//   [ INV ] TypeStructure { GlobalAttribute | IdentificationAttribute}
+////////////////////////////////////////////////////////////////////////////////
+
+structureDenotationS :
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 //  SemaDeclaration ::=
 //   { DECLARE | DCL } Identifier or IdentifierList [ DimensionAttribute ] SEMA [ GlobalAttribute ]
 ////////////////////////////////////////////////////////////////////////////////
@@ -455,7 +530,7 @@ procedureDeclaration
 ////////////////////////////////////////////////////////////////////////////////
 
 procedureBody :
-    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition)*
+    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition)*
     statement*
     ;
 
@@ -500,6 +575,7 @@ parameterType :
       simpleType
     | typeDation
     ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: TypeRealTimeObject ::=
@@ -586,7 +662,7 @@ task_main: 'MAIN';
 ////////////////////////////////////////////////////////////////////////////////
 
 taskBody:
-    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition)*
+    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition)*
     procedureDeclaration*
     statement*
     ;
@@ -811,7 +887,7 @@ index_section
 
 block_statement:
     'BEGIN'
-    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition )*
+    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition )*
     statement*
     'END' ID? ';'
     ;
@@ -828,7 +904,7 @@ block_statement:
 loopStatement:
     loopStatement_for? loopStatement_from? loopStatement_by? loopStatement_to? loopStatement_while?
     'REPEAT'
-    ( scalarVariableDeclaration | dationDeclaration | lengthDefinition)*
+    ( scalarVariableDeclaration | structVariableDeclaration | dationDeclaration | lengthDefinition)*
     statement*
     loopStatement_end ';'
     ;
