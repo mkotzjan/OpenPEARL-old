@@ -282,22 +282,24 @@ test TOFIXED conversion
 */
 TEST(BitTest, toFixed) {
    pearlrt::BitString<6> x6;
-   pearlrt::Fixed<6> f6, h6;
-   pearlrt::BitString<17> x17;
+   pearlrt::Fixed<5> f5, h5;
+   pearlrt::BitString<18> x18;
    pearlrt::Fixed<17> f17, h17;
 
-   for (f6 = 0; (f6 < (pearlrt::Fixed<6>)63).getBoolean();
-         f6 = f6 + (pearlrt::Fixed<6>)1) {
-      x6 = (pearlrt::BitString<6>)f6.x;
-      h6 = x6.toFixed();
-      ASSERT_TRUE((f6 == h6).getBoolean());
+   for (f5 = (pearlrt::Fixed<5>)-32; (f5 < (pearlrt::Fixed<5>)31).getBoolean();
+         f5 = f5 + (pearlrt::Fixed<5>)1) {
+      x6 = (pearlrt::BitString<6>)f5.x;
+      h5 = x6.toFixed();
+      ASSERT_TRUE((f5 == h5).getBoolean());
    }
 
-   for (f17 = 0;
-         (f17 < (pearlrt::Fixed<17>)129072).getBoolean();
+   f17 = (pearlrt::Fixed<17>)-0x1FFFF;
+   f17 = f17 - (pearlrt::Fixed<17>)(1); // this is the lowest value
+   for (;
+         (f17 < (pearlrt::Fixed<17>)0x1FFFF).getBoolean();
          f17 = f17 + (pearlrt::Fixed<17>)1) {
-      x17 = (pearlrt::BitString<17>)f17.x;
-      h17 = x17.toFixed();
+      x18 = (pearlrt::BitString<18>)f17.x;
+      h17 = x18.toFixed();
       ASSERT_TRUE((f17 == h17).getBoolean());
    }
 }

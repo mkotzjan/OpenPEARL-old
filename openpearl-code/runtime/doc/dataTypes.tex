@@ -294,7 +294,7 @@ DCL x BIT(4) INIT ('1'B4);
 DCL y BIT(4);
 DCL z BIT(3);
 DCL c BIT(8);
-DCL f FIXED(4) INIT(2);
+DCL f FIXED(3) INIT(2);
 y := '01'B1;  // implicit conversion BIT(2) -> BIT(4)
 y := x CSHIFT 1;
 z := y AND x;
@@ -307,7 +307,7 @@ z.BIT(2,2)  := c.BIT(1,2);
 \begin{CppCode}
 BitString<4> x4(1);
 BitString<4> y;
-Fixed<4> f(2);
+Fixed<3> f(2);
 y = (pearlrt::BitString<2>)(1);
 y = x.bitCshift(1);
 z = y.bitAnd(x);

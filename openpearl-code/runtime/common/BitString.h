@@ -76,6 +76,7 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint8_t BitType;
+      typedef int8_t SignedBitType;
    };
 
    /** helper class to set the used data type for bit string
@@ -89,6 +90,7 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint16_t BitType;
+      typedef int16_t  SignedBitType;
    };
 
    /** helper class to set the used data type for bit string
@@ -102,6 +104,7 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint32_t BitType;
+      typedef int32_t  SignedBitType;
    };
 
    /** helper class to set the used data type for bit string
@@ -115,6 +118,7 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint64_t BitType;
+      typedef int64_t  SignedBitType;
    };
 
 #include "IfThenElseTemplate.h"
@@ -154,6 +158,14 @@ namespace pearlrt {
       \returns just the data type definition
       */
       typedef typename Bits<len>::BitType DataType;
+
+      /**
+      Synonym for the data type of the internal storage
+      as signed integer, which is needed for toFixed()
+
+      \returns just the data type definition
+      */
+      typedef typename Bits<len>::SignedBitType SignedDataType;
 
       /**
       the data storage
@@ -417,13 +429,14 @@ namespace pearlrt {
       The fixed value is the binary representation of the bit string
       with proper alignment for the fixed value.
 
-      The sign bit of the fixed value is always zero (positive)
+      The sign bit of the fixed value is defined by the first bit
+      of the bit string
 
-      \returns the bits as positive Fixed<S> value
+      \returns the bits as (signed) Fixed<S> value
       */
-      Fixed<S> toFixed() const {
-         Fixed<S> returnValue;
-         returnValue.x = x >> shiftSize;
+      Fixed<S-1> toFixed() const {
+         Fixed<S-1> returnValue;
+         returnValue.x = ((SignedDataType)x) >> shiftSize;
          return returnValue;
       }
 
