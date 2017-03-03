@@ -119,10 +119,19 @@ p2: PROC;
         
 END;
 
+p3: PROC;
+   DCL b15 BIT(15);
+   DCL f14 FIXED(14);
+
+   b15 := '011'B CAT 'FFF'B4;
+   f14 = TOFIXED b15;
+
+   ! this statement causes a nullpointer exception in the compiler
+   !b15 := TOBIT f14;
+
+END;
+
 T1: TASK MAIN;
-    DCL b BIT(2) INIT('01'B1);
-    DCL (c,d,e) BIT(2);
-    DCL b4 BIT(4) INIT('0001'B1);
 
     OPEN console;
     CALL p1;
