@@ -206,6 +206,12 @@ namespace pearlrt {
             value.
       */
       BitString(DataType y) NOSTACKCHECK {
+// test for overflow
+//         DataType m = ((DataType)(-1) >> shiftSize);
+//         if (y & ~ m) {
+//             Log::error("BitString: Ctor with too large value");
+//             throw theBitOverflowSignal;
+//         }
          x = y;
          x <<= shiftSize;
          x &= mask;

@@ -433,7 +433,15 @@ A1 := {\bf ROUND} -3.5; \> /* delivers -4 */ \\
 C := {\bf TOBIT} A {\bf AND} B;\\
 A := {\bf ROUND} X + {\bf TOFIXED} B;
 \end{tabbing}
+\begin{discuss}
+C := {\bf TOBIT} A {\bf AND} B;\\
+muesste einen Fehler liefern, da 
+  TOBIT A ist eine BIT(32)
+  bei AND B wird B rechts erweitert auf BIT(32)
+  Die Zuweisung auf BIT(15) ginge auf den kleineren Typ.
 
+  Was ist eigentlich {\bf X}?
+\end{discuss}
 
 \begin{table} % 7.3
 \begin{center}
@@ -641,7 +649,7 @@ D:={\bf TOBIT} (A {\bf FIT} 1(16)); \x \= \kill
 /* conversion of FIXED and BIT objects  */ \\
 /* without conversion of the internal presentation */ \\
 A:={\bf TOFIXED} D; \> /* ok */\\
-A:=({\bf TOFIXED} D) {\bf FIT} A; \> /* FIT A is obsolete! */\\
+A:=({\bf TOFIXED} D) {\bf FIT} A; \> /* ok; FIT A is obsolete! */\\
 D:={\bf TOBIT} (A {\bf FIT} 1(16));  \> /* error assign BIT(17) to BIT(16) not ok */  \\
 D:={\bf TOBIT} A;    \> /* ok */
 \end{tabbing}
@@ -1119,7 +1127,10 @@ Bit12 := Bit8 $><$ '11'B; \> \> \> /* Bit12 has value '100011001100'B */ \\
 Bit8 := Bit8 {\bf CSHIFT} 3; \> \> \> /* Bit8 has value '01100100'B */ \\
 Bit12 := Bit8 {\bf SHIFT} -6; \> \> \> /* Bit12 has value '000000100011'B */ \\
 \end{tabbing}
-
+\begin{discuss}
+Bit8 SHIFT -6 liefert '00000001'B1
+Bit12 muesste dann doch der Wert '000000000001'B1 haben?
+\end{discuss}
 It is possible to declare variables with an attribute for assignment
 protection (cf.  \ref{sec_inv}). Assignments to such variables result in error
 messages.
