@@ -17,18 +17,12 @@ variable.
 
 Example:
 
-\begin{tabbing}
-SPECIFY Status BIT (16) GLOBAL; xx \= \kill
-
-{\bf DECLARE} switch {\bf BIT}; \> /* declaration of a variable
-                                   switch of type bit string of  \\
-                                \> length 1 */ \\
-                                \> \\
-{\bf SPECIFY} status {\bf BIT}(16) {\bf GLOBAL};
-                                \> /* specification of a global
-                                   variable status of type bit string \\
-                                \> of length 16 */
-\end{tabbing}
+/* declaration of a variable switch of type bit string of length 1 */ \\
+{\bf DECLARE} switch {\bf BIT}; \\
+\\
+/* specification of a global variable status of type bit string 
+of length 16 */ \\
+{\bf SPECIFY} status {\bf BIT}(16) {\bf GLOBAL}(otherModule);
 
 A variable denotes {\it one} data element, e.g. {\it one} integer, {\it
 one} bit string, etc.; in the following, such scalar variables are

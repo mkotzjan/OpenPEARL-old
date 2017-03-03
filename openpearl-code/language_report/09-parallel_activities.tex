@@ -1851,7 +1851,7 @@ Example:
 \begin{tabbing}
 Initialisation: \= \kill
 
-{\bf MODULE}; \> \\
+{\bf MODULE}(moduleName); \> \\
 {\bf SYSTEM}; \> \\
 \x Ready: Hard\_Int(7); ! Hard\_Int is the system name \> \\
    \> \\
@@ -1921,7 +1921,7 @@ execution and ends upon execution of an enable statement.
 
 Example:
 
-{\bf MODULE};\\
+{\bf MODULE}(moduleName);\\
 {\bf SYSTEM};\\
 \x Alarm: INT;\\
 \x ...\\
@@ -1959,7 +1959,7 @@ Example:
 \begin{tabbing}
 \hspace{6cm} \= \kill
 
-{\bf MODULE};                 \> {\bf MODULE}(Test);\\
+{\bf MODULE}(moduleName);     \> {\bf MODULE}(Test);\\
 {\bf SYSTEM};                 \> {\bf PROBLEM};\\
          \> \\
 \x Ready: Soft\_Int;          \> \x {\bf SPC} Ready {\bf IRPT GLOBAL};\\

@@ -69,7 +69,7 @@ declared.
 
 Example:
 
-{\bf MODULE};
+{\bf MODULE(moduleName)};
 
 {\bf SYSTEM};\\
 \x description of the connections and introduction of names for the
@@ -179,6 +179,7 @@ block                  & --           & x    & x         & x  \\
 Sema, Bolt variable    & x            & --   & --        & -- \\
 data station, format   & x            & --   & --        & -- \\
 type                   & x            & x    & x         & x \\
+signal                 & x            & --   & --        & -- \\ 
 \hline
 \end{tabular}
 \end{table}
@@ -361,42 +362,47 @@ Example:
 All data stations, interrupts and signals given in the system part of a
 certain module are regarded as declared (implicitly) with the global
 attribute.
-\begin{discuss}
-Diese Sonderbehandlung ist schwer nachvollziehbar. 
-Systemnamen sind immer GLOBAL. Daher sollte GLOBAL immer 
-bei deren SPC-Anweisungen angegeben sein.
-
-Dies ist Thema in der AK-Sitzung im November 2016.
-
+%%%%%\begin{discuss}
+%%%%%Diese Sonderbehandlung ist schwer nachvollziehbar. 
+%%%%%Systemnamen sind immer GLOBAL. Daher sollte GLOBAL immer 
+%%%%%bei deren SPC-Anweisungen angegeben sein.
+%%%%%
+%%%%%Dies ist Thema in der AK-Sitzung im November 2016.
+%%%%%
 \begin{removed}
 Thus, they are only specified in the problem parts of the
 program; here the global attribute can be omitted in the problem part of
 the same module, in all other modules it must be defined.
 \end{removed}
-\end{discuss}
+%%%%%\end{discuss}
 
 The general form of the global attribute reads:
 
 \input{GlobalAttribute.bnf}
 \index{GLOBAL@\textbf{GLOBAL}}
 
-\begin{discuss}
-in der deutschen Fassung des Sprachreports von 1995 ist noch dargelegt,
-dass Identifier(Module) nur dokumentatorischen Character hat.
-In dieser Fassung ist diese Anmerkung entfallen.
-
-Dies ist Thema in der AK-Sitzung im November 2016.
-
-Klaerungsmoeglichkeit 1:\\
-Identifer(Module) entfaellt in der Sprachdefinition
-
-Klaerungsmoeglichkeit 2: Modulangabe ist notwendig\\
-\begin{added}
-The identifer$\S $Module denotes the module name of the corresponding
-declaration. Multiple declarations of the same identifier in different modules
-are distinct.
-\end{added}  
-\end{discuss}
+%%%%\begin{discuss}
+%%%%in der deutschen Fassung des Sprachreports von 1995 ist noch dargelegt,
+%%%%dass Identifier(Module) nur dokumentatorischen Character hat.
+%%%%In dieser Fassung ist diese Anmerkung entfallen.
+%%%%
+%%%%Dies ist Thema in der AK-Sitzung im November 2016.
+%%%%
+%%%%Klaerungsmoeglichkeit 1:\\
+%%%%Identifer(Module) entfaellt in der Sprachdefinition
+%%%%
+%%%%Klaerungsmoeglichkeit 2: Modulangabe ist notwendig\\
+%%%%\begin{added}
+%%%%The identifer$\S $Module is mandatory in the specification of
+%%%%an element from a different module.
+In declarations is the specification of the identifier$\S $ModuleOfThe forbidden.
+If identifer$\S $OfTheModule  is omitted, the identifier of the module is inserted.
+It denotes the module name of the corresponding
+declaration.
+Multiple declarations of the same identifier in different source files 
+are possible.
+%%%%\end{added}  
+%%%%\end{discuss}
 
 %%%%%\begin{discuss}
 %%%%%Formulierung bezueglich Laengenangabe ist schwer  verst"andlich.
@@ -413,7 +419,7 @@ are distinct.
 %%%%%\begin{added}
 When specifying an object, all attributes have to be taken over from its
 declaration, except for a given priority. 
-The effective precission or length 
+The effective precision or length 
 must fit exactly. Maybe the literal specification and declaration differ 
 due to different length declarations
  in the corresponding section of the program.
@@ -430,10 +436,11 @@ Example:
 \begin{tabbing}
 \x P: {\bf PROC} (A(,) {\bf FIXED IDENT})\=  \kill
 
-{\bf MODULE};                     \> {\bf MODULE};\\
+{\bf MODULE(a)};                  \> {\bf MODULE(b)};\\
 {\bf PROBLEM};                    \> {\bf PROBLEM};\\
-\x T: {\bf TASK PRIO 3 GLOBAL};   \> \x {\bf SPC} T {\bf TASK GLOBAL},\\
-\x \x \x ! task body              \> \x \x P {\bf ENTRY} ((,) {\bf FIXED IDENT}) {\bf GLOBAL};\\
+\x T: {\bf TASK PRIO 3 GLOBAL};   \> \x {\bf SPC} T {\bf TASK GLOBAL}(a),\\
+\x \x \x ! task body              \> \x \x P {\bf ENTRY} ((,) {\bf FIXED IDENT}) \\
+				  \> \x \x \x \x {\bf GLOBAL}(a);\\
 \x {\bf END}; ! T              \> \x INIT: {\bf TASK};\\
                                   \> \x \x {\bf DCL} TAB (10,20) {\bf FIXED;}\\
 \x P: {\bf PROC} (A(,) {\bf FIXED IDENT}) \> \x \x ...\\

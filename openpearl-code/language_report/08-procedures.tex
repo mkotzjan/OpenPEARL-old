@@ -56,21 +56,23 @@ returned be of type FIXED. Next\_Machine shall be declared and called
 within the task Supply.
 
 {\bf PROBLEM};\\
-\x {\bf DCL} Occ\_Plan ...;
+\x {\bf DCL} Occ\_Plan ...; 
+
+\x Next\_Machine: {\bf PROCEDURE RETURNS (FIXED)};\\
+\x \x {\bf DCL} No {\bf FIXED}; ! No of the next machine\\
+\x \x ! establishing of No with the help of Occ\_Plan\\
+\x \x ...\\
+\x \x {\bf RETURN} (No);\\
+\x {\bf END} ! Declaration of Next\_Machine
 
 \x Supply: {\bf TASK};\\
-\x \x \x {\bf DCL} Mach\_No {\bf FIXED};\\
-\x \x \x ... \\
-\x \x \x Next\_Machine: {\bf PROCEDURE RETURNS (FIXED)};\\
-\x \x \x \x \x {\bf DCL} No {\bf FIXED}; ! No of the next machine\\
-\x \x \x \x \x \x ! establishing of No with the help of Occ\_Plan\\
-\x \x \x \x \x {\bf RETURN} (No);\\
-\x \x \x \x {\bf END} ! Declaration of Next\_Machine\\
-\x \x \x ...
+\x \x {\bf DCL} Mach\_No {\bf FIXED};\\
+\x \x ... \\
+\x \x ...
 
-\x \x \x Mach\_No := Next\_Machine;\\
-\x \x \x ... \\
-\x \x {\bf END}; ! Declaration of Supply\\
+\x \x Mach\_No := Next\_Machine;\\
+\x \x ... \\
+\x {\bf END}; ! Declaration of Supply\\
 \x ...
 
 Since the variable Occ\_Plan is declared at module level, it can be used

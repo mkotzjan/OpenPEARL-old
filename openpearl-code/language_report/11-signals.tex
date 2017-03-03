@@ -52,7 +52,7 @@ Example:
 %%%\begin{added}
 FixedOverflowSignal and DationEOFSignal are system names.
 
-{\bf MODULE};\\
+{\bf MODULE}(moduleName);\\
 \x {\bf SYSTEM};\\
 \x \x overflow : FixedOverflowSignal;\\
 \x \x eof : DationEOFSignal;
@@ -72,24 +72,21 @@ The general form of the specification of signals reads:
 %%%\end{front}
 \input{SignalSpecification.bnf}
 
-\begin{discuss}
-
-Proposal fuer UserSignals
-
-Dies ist Thema auf der AK-Sitzung im November 2016
-
+%%%%%\begin{added}
+%%%%%
+%%%%%Proposal fuer UserSignals
+%%%%%
+%%%%%Dies ist Thema auf der AK-Sitzung im November 2016
 
 In larger software systems it may be useful to define own signals, e.g.
 for wrong usage of functions. 
+The declaration of a user defined signal is allowed on module level.
 
-UserSignalDeclaration :==\\
-\x \{ {\bf DCL $\mid$ DECLARE \} } \hlink{Identifier} SIGNAL\\
-\x \x  {\bf RST (} \hlink{ConstantFIXEDExpression}$\S $ErrorNumber \\
-\x \x [ \hlink{GlobalAttribute} ] ;
+\input{UserSignalDeclaration.bnf}
 
 Valid ranges for the error number are listed in the plattform specific manual.
 
-\end{discuss}
+%%%%%\end{added}
 
 \section{Signal Reactions}
 The reaction planned for the occurrence of a signal is scheduled with
@@ -230,26 +227,29 @@ SignalName can be induced for the error with the number ErrorNumber by
 
 {\bf INDUCE} SignalName {\bf RST} ( ErrorNumber ) ;
 
-\begin{discuss}
-Im letzten Satz des vorherigen Abschnitts muss "'In this case"' gestrichen 
-werden, oder?
+%%%%%\begin{modified}
+%%%%%Im letzten Satz des vorherigen Abschnitts muss "'In this case"' gestrichen 
+%%%%%werden, oder?
 
-\begin{added}
+%%%%%\begin{added}
 In case of inducing a signal with an error number, the predefined number
-is superseeded for this action with the given value. This does not change
-the identify of a signal, when setting the actual number to the
-system number of another signal. 
-\end{added}
-\end{discuss}
+is superseeded for only this action with the given value. This does not change
+the identity of a signal, when setting the actual number to the
+system number of another signal.  
+
+
+%%%%%\end{added}
+%%%%%\end{discuss}
 
 Example:
 
-The signal TaskSignal shall be simulated with the error number
-``1010'', and the causing task shall react by writing out the error
+The signal TaskSignal shall be simulated with the 
+superseeded error number ``1010`` and not superseeded error number
+The causing task shall react by writing out the error
 number on the console:
 
 {\bf PROBLEM};\\
-\x {\bf SPC} TaskSignal {\bf SIGNAL};\\
+\x {\bf SPC} TaskSignal {\bf SIGNAL};  ! assume signal number as 1234\\
 \x {\bf DCL} ErrorNummer {\bf FIXED};
 
 Regulator: {\bf TASK PRIO} 20;\\
@@ -258,18 +258,23 @@ restart:\\
 \x \x BEGIN \\
 \x \x \x {\bf PUT} ErrorNumber {\bf TO} Console;\\
 \x \x \x GOTO restart;\\
-\x \x END;  ! of error handler
+\x \x END;  ! of error handler \\
 \x \x ...\\
 \x {\bf CALL} Test;\\
 \x \x ...\\
 \x {\bf END}; ! Regulator
 
 Start: {\bf TASK MAIN};\\
-\x {\bf ALL} ... {\bf ACTIVATE} Regulator;\\   % ??? Ta ???
+\x {\bf ALL} ... {\bf ACTIVATE} Regulator;\\  
 \x {\bf END}; ! Start
 
 Test: {\bf PROC};\\
-\x {\bf INDUCE} TaskSignal {\bf RST} (1010);\\
-\x ...\\
+\x {\bf IF} ... {\bf THEN} \\
+\x \x {\bf INDUCE} TaskSignal; ! prints 1234\\
+\x \x...\\
+\x {\bf ELSE} \\
+\x\x {\bf INDUCE} TaskSignal {\bf RST} (1010); ! prints 1010\\
+\x \x...\\
+\x {\bf FIN;} \\
 \x {\bf END}; ! Test
 

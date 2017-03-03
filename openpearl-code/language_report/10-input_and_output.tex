@@ -550,7 +550,7 @@ table with 300 lines and 5 columns (elements per line) is to be created.
 Let the table elements be floating point numbers; the access takes place
 to elements directly and only reading.
 
-{\bf MODULE};\\
+{\bf MODULE}(modulename);\\
 
 {\bf SYSTEM};\\
 %%%\removedtext{\x Disk: PSP31;\\}
@@ -737,7 +737,7 @@ or the RST variable is set with the error number.
 
 Example:
 
-{\bf MODULE};\\
+{\bf MODULE}(modulename);\\
 {\bf SYSTEM};\\
 \x Printer: DRUA;\\
 %%%\removedtext{\x Disk: PSP31;\\} \acceptedtext{\x Disk: Disc('/home' ,10);\\}
@@ -1281,7 +1281,7 @@ re-started with the first element of the format position list. In each
 case, the transmission is terminated, when the variable list is
 exhausted.
 
-The above analogously holds for the put statement with ``variable''
+The above analogously holds for the PUT statement with ``variable''
 replaced by ``expression''.
 
 The data station must possess the class attribute ALPHIC, a structure,
@@ -1314,6 +1314,11 @@ list format             & all given data types
 
 In detail, the formats have the following forms and meanings (the
 position statements were explained in \ref{sec_read_write}).
+
+%%%%%% added
+If no FormatOrPosition elements are specified the default format is {\bf LIST} for
+each data element terminated by a {\bf SKIP} positioning statement.
+%%%%%% end added
 
 %%%\begin{accepted}
 % already stated at read/write

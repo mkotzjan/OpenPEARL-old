@@ -302,6 +302,9 @@ description.
 \x $\mid$ \hlink{FormatDeclaration}\\
 \x $\mid$ \hlink{ProcedureDeclaration}\\
 \x $\mid$ \hlink{TaskDeclaration}\\
+%%%% added
+\x $\mid$ \hlink{UserSignalDeclaration}\\
+
 %%%%%\begin{removed}
 %%%%%\x $\mid$ OperatorDefinition\\
 %%%%%\x $\mid$ PredenceDefinition\\
@@ -465,16 +468,16 @@ Doppelte Regel mit DationDeclaration
         
 \input{PriorityAttribute.bnf}
 
-\begin{removed}
-\input{OperatorDefinition.bnf}
-
-\input{OpName.bnf}
-
-\input{OpParameter.bnf}
-
-\input{PrecedenceDefinition.bnf}
-
-\end{removed}
+%%%%%\begin{removed}
+%%%%%\input{OperatorDefinition.bnf}
+%%%%%
+%%%%%\input{OpName.bnf}
+%%%%%
+%%%%%\input{OpParameter.bnf}
+%%%%%
+%%%%%\input{PrecedenceDefinition.bnf}
+%%%%%
+%%%%%\end{removed}
 
 \subsection{Specification and Identification}    % A 3.4.2
 \begin{discuss}
@@ -653,6 +656,7 @@ Auswirkung auf alte Teile pruefen
 %%%%%\end{removed}
 
 %%%%%\begin{added}
+\input{UserSignalDeclaration.bnf}
 \input{SignalStatement.bnf}
 \input{SignalReaction.bnf}
 \input{SignalFinalStatement.bnf}
