@@ -441,6 +441,9 @@ muesste einen Fehler liefern, da
   Die Zuweisung auf BIT(15) ginge auf den kleineren Typ.
 
   Was ist eigentlich {\bf X}?
+  Aus letztem Beispiel ein FLOAT (FLOAT(24)?)
+  Bei FLOAT(53) darf es nicht gehen, da ROUND dann eine FIXED(53) liefert.
+  Macht die Regel ROUND bzw. ENTIER FLOAT(g) ergibt FIXED(g) Sinn?
 \end{discuss}
 
 \begin{table} % 7.3
