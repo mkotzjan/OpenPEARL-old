@@ -1,0 +1,5 @@
+UserSignalDeclaration :==\\
+\x \{ {\bf DCL $\mid$ DECLARE \} } \hlink{Identifier} SIGNAL\\
+\x \x  {\bf RST (} \hlink{ConstantFIXEDExpression}$\S $ErrorNumber {\bf )} \\
+\x \x [ \hlink{GlobalAttribute} ] ;
+
