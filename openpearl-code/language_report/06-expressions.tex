@@ -1128,12 +1128,9 @@ Time(1) := 11:00:00; \> \> \>\\
 Bit8 := '10001100'B; \> \> \> \\
 Bit12 := Bit8 $><$ '11'B; \> \> \> /* Bit12 has value '100011001100'B */ \\
 Bit8 := Bit8 {\bf CSHIFT} 3; \> \> \> /* Bit8 has value '01100100'B */ \\
-Bit12 := Bit8 {\bf SHIFT} -6; \> \> \> /* Bit12 has value '000000100011'B */ \\
+% 10.3.2017 wrong result whith SHIFT, since Bit8 was modidied in the line above
+Bit12 := Bit8 {\bf SHIFT} -6; \> \> \> /* Bit12 has value '000000000001'B */ \\
 \end{tabbing}
-\begin{discuss}
-Bit8 SHIFT -6 liefert '00000001'B1
-Bit12 muesste dann doch der Wert '000000000001'B1 haben?
-\end{discuss}
 It is possible to declare variables with an attribute for assignment
 protection (cf.  \ref{sec_inv}). Assignments to such variables result in error
 messages.
