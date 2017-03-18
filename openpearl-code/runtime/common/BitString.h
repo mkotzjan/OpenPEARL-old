@@ -48,7 +48,6 @@ the next most integral data type will be used.
 #include <stdint.h>
 
 #include "Fixed.h"
-//#include "Fixed63.h"
 #include "Signals.h"
 #include "Log.h"
 
@@ -201,18 +200,31 @@ namespace pearlrt {
 
        \param y the preset value, given as a c++ native integral value
 
-      \note the length S must be derived from the given PEARL initial
+       \note the length S must be derived from the given PEARL initial
             value. Eg. '011'B1 denotes a BIT(3) value and '0'B4 is a BIT(4)
             value.
       */
       BitString(DataType y) NOSTACKCHECK {
-// test for overflow
-//         DataType m = ((DataType)(-1) >> shiftSize);
-//         if (y & ~ m) {
-//             Log::error("BitString: Ctor with too large value");
-//             throw theBitOverflowSignal;
-//         }
          x = y;
+         x <<= shiftSize;
+         x &= mask;
+      }
+
+      /**
+       construct with given preset value of a FIXED-type.
+
+       In OpenPEARL, the operations TOFIXED and TOBIT operate as 
+       direct copy of the internal operation. Thus TOBIT converts
+       a FIXED(S) into an BIT(S+1) type and TOFIXED vice versa.
+
+       Due to class depedency problems there is no toBit() method
+       in the Fixed-class. This operation must be mapped by the compiler
+       to this BitString-ctor.
+
+       \param y the preset value, given as a Fixed<S-1> type
+      */
+      BitString(Fixed<S-1> y) NOSTACKCHECK {
+         x = y.x;
          x <<= shiftSize;
          x &= mask;
       }

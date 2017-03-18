@@ -120,14 +120,26 @@ p2: PROC;
 END;
 
 p3: PROC;
-   DCL b15 BIT(15);
+   DCL (b15,c15) BIT(15);
    DCL f14 FIXED(14);
 
    b15 := '011'B CAT 'FFF'B4;
-   f14 = TOFIXED b15;
+   ! next line procudes wrong code
+   ! f14 = TOFIXED b15;
+   __cpp__('_f14 = _b15.toFixed();');
+   IF f14 NE 2047 THEN
+      PUT 'error#13 with TOFIXED; result=',f14 TO console BY A,F(6), SKIP;
+      success = '0'B1;
+   FIN; 
 
    ! this statement causes a nullpointer exception in the compiler
-   !b15 := TOBIT f14;
+   ! c15 := TOBIT f14;
+   __cpp__('_c15 = pearlrt::BitString<15>(_f14);');
+   IF (b15 NE c15) THEN
+      PUT 'error#14 with TOBIT ' ,b15,' NE ', c15 TO console
+        BY A,B1(15),A,B1(15), SKIP;
+      success = '0'B1;
+   FIN;
 
 END;
 
