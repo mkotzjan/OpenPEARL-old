@@ -1225,7 +1225,7 @@ pearlrt::Clock::date()
 %>
 
 BITSTOFIXED(operand) ::= <%
-pearlrt::Bits::toFixed(<operand>)
+<operand>.toFixed()
 %>
 
 CHARACTERSTOFIXED(operand) ::= <%
@@ -1580,4 +1580,12 @@ ConstantCharacterValue(name) ::= <%
 
 CastBitToBoolean(name) ::= <%
     <name>.getBoolean()
+%>
+
+TOBIT(noOfBits,operand) ::= <%
+    pearlrt::BitString\<<noOfBits>>(<operand>)
+%>
+
+TOFLOAT(precision,operand) ::= <%
+(pearlrt::Float\<<precision>>(<operand>))
 %>

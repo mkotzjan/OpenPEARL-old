@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9";
+    static String version = "v0.8.9.1";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -67,6 +67,7 @@ public class Compiler {
     static int     warninglevel = 255;
     static int     lineWidth = 80;
 
+
     public static void main(String[] args) throws Exception {
         int i, j;
         if (args.length < 1) {
@@ -79,10 +80,10 @@ public class Compiler {
         }
 
         for (i = 0; i < inputFiles.size(); i++) {
-            OpenPEARLLexer lexer = null;
+            OpenPearlLexer lexer = null;
 
             try {
-                lexer = new OpenPEARLLexer(new ANTLRFileStream(inputFiles.get(i)));
+                lexer = new OpenPearlLexer(new ANTLRFileStream(inputFiles.get(i)));
             }
             catch(IOException ex) {
                 System.out.println("Error:" + ex.getMessage());

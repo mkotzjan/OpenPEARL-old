@@ -34,6 +34,7 @@ grammar SmallPearl;
 @header
 {
     package org.smallpearl.compiler;
+    import org.smallpearl.compiler.OpenPearlLexer;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1876,6 +1877,52 @@ primaryExpression
     | stringSlice
     ;
 
+
+////////////////////////////////////////////////////////////////////////////////
+// ConstantExpression ::=
+//   { + | - } FloatingPointNumber
+//   | { + | - } DurationConstant
+//   | ConstantFIXEDExpression
+////////////////////////////////////////////////////////////////////////////////
+constanExpression
+    : FloatingPointConstant
+    | ( '+' | '-' )? durationConstant
+    | constantFixedExpression
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ConstantFIXEDExpression ::=
+//   Term [ { + | - } Term ] ...
+////////////////////////////////////////////////////////////////////////////////
+constantFixedExpression
+    : constantExpressionTerm ( ( '+' | '-' ) constantExpressionTerm )*
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// Term ::=
+//   Factor [ {∗ | // | REM } Factor ] ...
+////////////////////////////////////////////////////////////////////////////////
+constantExpressionTerm
+    : constantExpressionFactor ( ( '*' | '//' | 'REM' ) constantExpressionFactor )*
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// Factor ::=
+//   [+ | -] {  Integer
+//             | ( ConstantFIXEDExpression )
+//             | TOFIXED { CharacterStringConstant§OfLength1 | BitStringConstant }
+//             | Identifier§NamedFIXEDConstant
+//           }
+// [ FIT ConstantFIXEDExpression ]
+////////////////////////////////////////////////////////////////////////////////
+
+constantExpressionFactor
+    : ( '+' | '-' )? ( IntegerConstant
+                       | '(' constantFixedExpression ')'
+                       | ID )
+      ( 'FIT' constantFixedExpression ) ?
+    ;
+
 ////////////////////////////////////////////////////////////////////////////////
 // ConvertToStatement ::=
 //   CONVERT Expression [ , Expression ] ... TO Name§CharacterStringVariable
@@ -2299,18 +2346,26 @@ STRING: '"' (~'"')* '"'
     ;
 
 INCLUDE_TOKEN:
-    '#INCLUDE' Whitespace? STRING
+    '#INCLUDE' Whitespace? STRING ';'
     {
-        try {
-            System.out.println( "include file:" + getText());
-     //       ANTLRFileStream inputStream = new ANTLRFileStream("test");
-     //       OpenPEARLLexer subLexer = new OpenPEARLLexer(inputStream);
-            nextToken();
-        }
-        catch(Exception ex) {
-             System.out.println("Error:" + ex.getMessage());
-             System.exit(-2);
-        }
+//        try {
+//            System.out.println( "include file:" + getText());
+//            ANTLRFileStream inputStream = new ANTLRFileStream("/home/marcel/repositories/openpearl-code/openpearl-code/testsuite/build/TEST.PRL");
+//            org.smallpearl.compiler.OpenPearlLexer subLexer = new org.smallpearl.compiler.OpenlPearlLexer(inputStream);
+//            subLexer.setFilename("/home/marcel/repositories/openpearl-code/openpearl-code/testsuite/build/TEST.PRL");
+//            selector.push(sublexer);
+//            selector.retry();
+//            nextToken();
+//        }
+//        catch(Exception ex) {
+//             System.out.println("Error:" + ex.getMessage());
+//             System.exit(-2);
+//        }
+//
+//        System.out.println( "include file:" + getText());
+//        System.out.println( _input);
+          nextToken();
+
     }
     ;
 

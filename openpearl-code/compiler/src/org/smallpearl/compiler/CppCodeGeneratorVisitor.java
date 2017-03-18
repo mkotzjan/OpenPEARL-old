@@ -4248,9 +4248,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     @Override
     public ST visitTOFIXEDExpression(SmallPearlParser.TOFIXEDExpressionContext ctx) {
-        if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitTOFIXEDExpression");
-
         TypeDefinition op = m_expressionTypeVisitor.lookupType(ctx.expression());
 
         if ( op instanceof TypeBit) {
@@ -4269,21 +4266,34 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     @Override
     public ST visitTOFLOATExpression(SmallPearlParser.TOFLOATExpressionContext ctx) {
-        if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitTOFLOATExpression");
+        TypeDefinition op = m_expressionTypeVisitor.lookupType(ctx.expression());
 
         ST st = group.getInstanceOf("TOFLOAT");
-        st.add("operand", visit(ctx.getChild(1)));
+        st.add("operand",  getExpression(ctx.expression()));
+
+        if ( op instanceof TypeFixed) {
+            st.add("precision", ((TypeFixed)op).getPrecision());
+        }
+        else {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         return st;
     }
 
     @Override
     public ST visitTOBITExpression(SmallPearlParser.TOBITExpressionContext ctx) {
-        if (m_debug)
-            System.out.println("ExpressionTypeVisitor: visitTOBITExpression");
+        TypeDefinition op = m_expressionTypeVisitor.lookupType(ctx.expression());
 
         ST st = group.getInstanceOf("TOBIT");
-        st.add("operand", visit(ctx.getChild(1)));
+        st.add("operand",  getExpression(ctx.expression()));
+
+        if ( op instanceof TypeFixed) {
+            st.add("noOfBits", ((TypeFixed)op).getPrecision() + 1);
+        }
+        else {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
         return st;
     }
 
