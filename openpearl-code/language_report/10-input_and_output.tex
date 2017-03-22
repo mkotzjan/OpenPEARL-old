@@ -663,24 +663,25 @@ statement (see below).
 The file is still there after executing the close statement, and again
 accessible with the same name after re-executing an open statement.
 %%%\begin{discuss}
-\item EXCLUSIVE\index{EXCLUSIVE@\textbf{EXCLUSIVE}} \\
-The dation (not file) may be opened only once.
-Subsequent attempts to open the already
-opened  dation produce an error message, or the RST variable is set with the
-error number.
+%%% removed, since multiple OPENs are forbidden now (22.3.2017)
+%%%\item EXCLUSIVE\index{EXCLUSIVE@\textbf{EXCLUSIVE}} \\
+%%%The dation (not file) may be opened only once.
+%%%Subsequent attempts to open the already
+%%%opened  dation produce an error message, or the RST variable is set with the
+%%%error number.
 %%%\end{discuss}
 \end{itemize}
 
-\begin{removed}
-If open parameters are lacking, ANY and PRM are assumed.
-\end{removed}
+%%%\begin{removed}
+%%%If open parameters are lacking, ANY and PRM are assumed.
+%%%\end{removed}
 
-\begin{added}
+%%%\begin{added}
 If the open parameter about the previous state of the file (e.g. OLD, NEW, ANY)
 is missing ANY is assumed.
 If the parameter about the state of the file after closing (e.g. CAN, PRM)
 is missing in OPEN and CLOSE statements PRM is assumed.
-\end{added}
+%%%\end{added}
 
 When executing the close statement, a file is closed; i.e., it is
 usable again not before the execution of an open statement.
@@ -709,16 +710,21 @@ Generally, the following rules hold:
 \item The close parameters may not conflict --- e.g. ether CAN or PRM is allowed
 %%%\end{added}
 \item Not every task executing an access to a data station must execute
-an open or close statement.
-\item However, at least one open statement must be executed concerning
-the access to a data station.
-\item The same number of close statements and open statements must
-be executed to close the data station.
+an OPEN or CLOSE statement.
+%%% removed: OPEN allowed only once
+%%%\item However, at least one open statement must be executed concerning
+%%%the access to a data station.
+%%% removed: OPEN allowed only once
+%%%\item The same number of close statements and open statements must
+%%%be executed to close the data station.
 %%%\begin{added}
-\item The close statement which leads to the closing of the data station
-defines the action concerning CAN and PRM.
+%%%\item The close statement which leads to the closing of the data station
+%%%defines the action concerning CAN and PRM.
 %%%\end{added}
-\item Corresponding open and close statements need not be executed by
+%%% added}
+\item The dation must be opened before any access to its data.
+
+\item Corresponding OPEN and CLOSE statements need not be executed by
 the same task.
 \item Upon lacking parameters, PRM is assumed, unless earlier
 executed close or open statements have made explicit settings.
@@ -727,11 +733,21 @@ executed close or open statements have made explicit settings.
 %%%IDF attribute. The attributes CAN or PRM must be identical 
 %%%in all concurrent OPEN statements. Otherwise an error message is produced
 %%%or the RST variable is set with the error number.
-\item
-Executing the OPEN statement on an already opened dation need identical 
-open parameters IDF, CAN and PRM. Otherwise an error message is produced
-or the RST variable is set with the error number.
 
+%%%% removed: OPEN allowed only once 
+%%%\item
+%%%Executing the OPEN statement on an already opened dation need identical 
+%%%open parameters IDF, CAN and PRM. Otherwise an error message is produced
+%%%or the RST variable is set with the error number.
+%%%% added: OPEN allowed only once 
+\item
+Executing the OPEN statement on an already opened dation
+will cause an error message or the RST variable is set with the error
+number.
+\item
+Executing the CLOSE statement on an already closed dation
+will cause an error message or the RST variable is set with the error
+number.
 %%%\end{added}
 \end{itemize}
 
