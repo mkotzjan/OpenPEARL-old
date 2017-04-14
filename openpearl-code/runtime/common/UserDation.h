@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2017 Rainer Mueller
  Copyright (c) 2013-2014 Holger Koelle
  All rights reserved.
 
@@ -42,6 +42,7 @@ namespace pearlrt {
 */
 
 #include "Mutex.h"
+#include "Rst.h"
 #include "SystemDation.h"
 #include "Signals.h"
 #include "TaskCommon.h"
@@ -73,10 +74,10 @@ namespace pearlrt {
      The current task working with this dation is specified by 'me' at
      the call of beginSequence().
    */
-   class UserDation : public Dation {
+   class UserDation : public Dation, public Rst {
    private:
       Mutex mutex;
-      Fixed<15> * rstValue;
+//      Fixed<15> * rstValue;
    protected:
       /** pointer to the task, which performs an i/o-operation on this
           dation
@@ -232,7 +233,7 @@ namespace pearlrt {
       operations.
       */
       void endSequence();
-
+#if 0
       /**
         set the rst variable
         \param rstVar the variable, which should be set is case of
@@ -247,6 +248,7 @@ namespace pearlrt {
          \returns false, if RST-variable was NOT defined
       */
       bool updateRst(Signal * s);
+#endif
    public:
       /**
        suspend

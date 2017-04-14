@@ -95,7 +95,7 @@ namespace pearlrt {
 
       mutex.unlock();
    }
-
+#if 0
    void UserDation::rst(Fixed<15> & rst) {
       rstValue = & rst;
       rst = (Fixed<15>)0;
@@ -109,6 +109,7 @@ namespace pearlrt {
 
       return false;
    }
+#endif
 
    void UserDation::suspend() {
       mutex.unlock();
