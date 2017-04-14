@@ -1,0 +1,99 @@
+MODULE(convert);
+SYSTEM;
+termout: StdOut;
+
+PROBLEM;
+
+   SPC termout DATION OUT SYSTEM  ALPHIC;
+
+   DCL stdout DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(termout);
+   DCL ok BIT(1) INIT('1'B1);
+
+convertTests: TASK MAIN;
+ 
+     OPEN stdout;
+     CALL convertTo;
+     CALL convertFrom;
+
+     IF ok THEN
+         PUT '*** success' TO stdout BY A, SKIP;
+     ELSE
+         PUT '*** error(s) found' TO stdout BY A, SKIP;
+     FIN;
+     CLOSE stdout;
+END;
+
+convertTo: PROC;
+  DCL text CHAR(8); ! INIT('PEARL...');
+  DCL result CHAR(40); ! INIT('PEARL... 42');
+  DCL buffer CHAR(40);
+  DCL x FIXED INIT(42);
+  text := 'PEARL...'; 
+  result := 'PEARL...    42';
+  !CONVERT text, x TO buffer BY A, F(3);
+  __cpp__(
+' {  // define helper variables in local block'
+'    pearlrt::RefCharacter rc(_buffer); '
+'    pearlrt::StringDationConvert dc(&rc,  true); //dc=dationConvert '
+'    try { '
+'       dc.toA(_text); '
+'       dc.toX(pearlrt::Fixed<31>(3)); '
+'       dc.toF(_x,pearlrt::Fixed<31>(3)); '
+'    } catch (pearlrt::Signal & s) {'
+'       if (!dc.updateRst(&s)) { ' 
+'         throw;		'
+'      }  			'
+'   }				'
+'  }  // end of block '
+  );
+
+  
+  IF buffer NE result THEN
+     PUT 'error@1: buffer=>', buffer, '<',
+         '         result=>',result,'<' TO stdout
+      BY A,A,A,SKIP,A,A,A, SKIP;
+     ok = '0'B1;
+  FIN;
+
+END;
+
+convertFrom: PROC;
+  DCL text CHAR(8); ! INIT('PEARL...');
+  DCL buffer CHAR(40);
+  DCL result CHAR(8); ! INIT('PEA');
+  DCL x FIXED;
+  result := 'PEA';
+  buffer := 'PEARL... 42'; 
+  !CONVERT text, x TO buffer BY A(3), X(5), F(3);
+  __cpp__(
+' {  // define helper variables in local block'
+'    pearlrt::RefCharacter rc(_buffer); '
+'    pearlrt::StringDationConvert dc(&rc,  false); //dc=dationConvert '
+'    try { '
+'       dc.fromA(_text,pearlrt::Fixed<31>(3)); '
+'       dc.fromX(pearlrt::Fixed<31>(5)); '
+'       dc.fromF(_x,pearlrt::Fixed<31>(3)); '
+'    } catch (pearlrt::Signal & s) {'
+'       if (!dc.updateRst(&s)) { ' 
+'         throw;		'
+'      }  			'
+'   }				'
+' //  rc.store(_buffer);  // fill with spaces '
+'  }  // end of block '
+  );
+
+  IF text NE result  THEN
+     PUT 'error@in1: text=>', text, '<' TO stdout BY A,A,A,SKIP;
+     ok = '0'B1;
+  FIN; 
+  IF x NE 42 THEN
+     PUT 'error@in2: x=',x TO stdout  BY A,F(6), SKIP;
+     ok = '0'B1;
+  FIN;
+
+END;
+
+MODEND;
+
