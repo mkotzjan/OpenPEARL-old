@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A BSD license"]
+ Copyright (c) 2012-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -112,5 +112,13 @@ namespace pearlrt {
 
    size_t RefCharacter::getCurrent() {
       return current;
+   }
+
+   void RefCharacter::setCurrent(size_t newCurrent) {
+      if (newCurrent >= max) {
+         throw theCharacterTooLongSignal;
+      }
+      current = newCurrent;
+      return;
    }
 }

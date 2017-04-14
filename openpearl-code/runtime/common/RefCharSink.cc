@@ -45,5 +45,14 @@ namespace pearlrt {
    void RefCharSink::putChar(char c) {
       sinkObj->add(c);
    };
+
+   void RefCharSink::pos(size_t newColumn) {
+      sinkObj->setCurrent(newColumn);
+   }
+
+   size_t RefCharSink::sop() {
+      return sinkObj->getCurrent();
+   }
+
 }
 

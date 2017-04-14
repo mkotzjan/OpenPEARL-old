@@ -51,7 +51,7 @@ namespace pearlrt {
       /** the data object which contains the characters */
       RefCharacter * sourceObj;
 
-      size_t readPtr; //< index of next char to return
+//      size_t readPtr; //< index of next char to return
    public:
       /**
        Constructor
@@ -75,6 +75,23 @@ namespace pearlrt {
 
       */
       void rewind();
+
+      /** set position 
+
+      useful method for CVONVERT statement
+  
+      \params  new  read position
+      */
+      void pos(size_t pos);
+
+      /** get position 
+
+      useful method for CVONVERT statement
+  
+      \returns current read position
+      */
+      size_t sop();
+
    };
 }
 #endif

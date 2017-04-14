@@ -64,6 +64,20 @@ namespace pearlrt {
       \throws CharacterTooLongSignal if the ref char is full
       */
       void putChar(char c);
+
+      /**
+      set the current write position
+     
+      \param newColumn  the new position to continue writing 
+      */
+      void pos(size_t newColumn);
+   
+      /**
+      get the current write position
+     
+      \returns the current position 
+      */
+      size_t sop();
    };
 }
 #endif

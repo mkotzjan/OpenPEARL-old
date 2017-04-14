@@ -202,6 +202,16 @@ namespace pearlrt {
       size_t getCurrent();
 
       /**
+         set current content size
+ 
+         this feature is needed for positioning in convert
+
+         \throws CharacterTooLongSignal, if new position would be
+                                         outside of the string
+      */
+      void setCurrent(size_t newpos);
+
+      /**
           add one character
 
           \param rhs the char to be added
