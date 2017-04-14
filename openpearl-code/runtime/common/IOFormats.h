@@ -1,0 +1,400 @@
+/*
+ [A "BSD license"]
+ Copyright (c) 2014-2017 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+#ifndef IOFORMATS_H_INCLUDED
+#define IOFORMATS_H_INCLUDED
+/**
+\file
+
+\brief format routines for PUT/GET-userdation and CONVERT
+
+*/
+#include "Sink.h"
+#include "Source.h"
+#include "PutFixed.h"
+#include "GetFixed.h"
+#include "GetFloat.h"
+#include "PutFloat.h"
+#include "PutCharacter.h"
+#include "GetCharacter.h"
+#include "PutBitString.h"
+#include "GetBitString.h"
+
+namespace pearlrt {
+
+   /**
+   \file
+
+   \brief I/O Formats for DationPG and CONVERT
+   */
+
+   /**
+     I/O-Formats 
+      */
+   class IOFormats {
+
+   private:
+
+      Sink  *sink;
+      Source  *source;
+
+   public:
+      /**
+        configure source and sink object to perfom the i/o
+        operations 
+
+        \param _sink pointer to the output data stream
+        \param _source poingter to the input data stream
+      */
+      void setupIOFormats(Sink * _sink, Source* _source);
+
+      /**
+      check if enough space/data is available for the operation
+
+      \param n number of bytes which are wanted to read or write
+      
+      \throws an exception if the dation/string has less space
+      */
+      virtual void checkCapacity(Fixed<31> n) = 0;
+
+      /**
+      output format A
+
+      \param s string to be printed
+      \tparam S size of the string
+      */
+      template<size_t S>
+      void toA(Character<S> & s) {
+         toA(s, S);
+      };
+
+      /**
+      input format A
+
+      \param s string to be read
+      \tparam S size of the string
+      */
+      template<size_t S>
+      void fromA(Character<S> & s) {
+         fromA(s, S);
+      };
+
+      /**
+      output format A(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<size_t S>
+      void toA(Character<S> & s, Fixed<31> w) {
+         checkCapacity(w);
+         RefCharacter rc;
+         rc.setWork(s);
+         // performs checks and output
+         return PutHelper::doPutChar(w.x, &rc, sink);
+      }
+
+      /**
+      input format A(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+
+      template<size_t S>
+      void fromA(Character<S> & s, Fixed<31> w) {
+         checkCapacity(w);
+         GetCharacter<S>::fromA(s, w, *source);
+         return;
+      }
+
+
+      /**
+      output format B1(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB1(BitString<S>  s, Fixed<31> w) {
+         checkCapacity(w);
+         PutBitString<S>::toB1(s,w,*sink);
+      }
+
+      /**
+      input format B1(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB1(BitString<S> & s, Fixed<31> w) {
+         checkCapacity(w);
+         GetBitString<S>::fromB123(s, w, 1, *source);
+         return;
+      }
+
+      /**
+      output format B2(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB2(BitString<S>  s, Fixed<31> w) {
+         checkCapacity(w);
+         PutBitString<S>::toB2(s,w,*sink);
+      }
+
+      /**
+      input format B2(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB2(BitString<S> & s, Fixed<31> w) {
+         checkCapacity(w);
+         GetBitString<S>::fromB123(s, w, 2, *source);
+         return;
+      }
+
+      /**
+      output format B3(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB3(BitString<S>  s, Fixed<31> w) {
+         checkCapacity(w);
+         PutBitString<S>::toB3(s,w,*sink);
+      }
+
+      /**
+      input format B3(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB3(BitString<S> & s, Fixed<31> w) {
+         checkCapacity(w);
+         GetBitString<S>::fromB123(s, w, 3, *source);
+         return;
+      }
+
+      /**
+      output format B4(w)
+
+      \param s string to be printed
+      \param w width of the output field
+      \tparam S size of the string
+      */
+      template<int S>
+      void toB4(BitString<S>  s, Fixed<31> w) {
+         checkCapacity(w);
+         PutBitString<S>::toB4(s,w,*sink);
+      }
+
+      /**
+      input format B4(w)
+
+      \param s string to be read
+      \param w width of the input field
+      \tparam S size of the string
+      */
+      template<int S>
+      void fromB4(BitString<S> & s, Fixed<31> w) {
+         checkCapacity(w);
+         GetBitString<S>::fromB4(s, w, *source);
+         return;
+      }
+
+
+      /**
+       output format F with Fixed
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the fixed value type
+       */
+      template<int S>
+      void toF(Fixed<S>  f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0) {
+         checkCapacity(w);
+         PutFixed<S>::toF(f, w, d, *sink);
+      };
+
+      /**
+      input format F with FIXED
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      \tparam  S width of the fixed value type
+      */
+      template<int S>
+      void fromF(Fixed<S> & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0) {
+         checkCapacity(w);
+         GetFixed<S>::fromF(f, w, d, *source);
+      };
+
+      /**
+       output format F with FLOAT
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the float value type
+       */
+      template<int S>
+      void toF(Float<S>  f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0) {
+         checkCapacity(w);
+         PutFloat<S>::toF(f, w, d, *sink);
+      };
+
+      /**
+      input format F with FLOAT
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      \tparam  S width of the float value type
+      */
+      template<int S>
+      void fromF(Float<S> & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0) {
+         checkCapacity(w);
+         GetFloat<S>::fromF(f, w, d, *source);
+      };
+
+
+      /**
+       output format E with FLOAT
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       \param s number of significant digits 
+       \param e number of digits in exponent field
+       \tparam  S width of the float value type
+       */
+      template<int S>
+      void toE(Float<S>  f,
+               const Fixed<31> w,
+               const Fixed<31> d,
+               const Fixed<31> s,
+               const Fixed<31> e) {
+         checkCapacity(w);
+         PutFloat<S>::toE(f, w, d, s, e, *sink);
+      };
+
+      /**
+      input format E with FLOAT
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      \param s number of significant digits 
+      \param e number of digits in exponent field
+      \tparam  S width of the fixed value type
+      */
+      template<int S>
+      void fromE(Float<S> & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d,
+                 const Fixed<31> s) {
+         checkCapacity(w);
+         GetFloat<S>::fromE(f, w, d, s, *source);
+      };
+
+
+      /**
+       output format T
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       */
+      void toT(const Clock f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0);
+
+
+      /**
+      input format T
+
+      \param f value to be read
+      \param w width of the input field
+      \param d number of decimals to be used
+      */
+      void fromT(Clock & f,
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0) ;
+
+      /**
+       output format D
+
+       \param f value to be printed
+       \param w width of the output field
+       \param d number of decimals to be used
+       */
+      void toD(const Duration f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0);
+
+      /**
+       input format D
+
+       \param f value to be read
+       \param w width of the input field
+       \param d number of decimals to be used
+       */
+      void fromD(Duration& f,
+               const Fixed<31> w,
+               const Fixed<31> d = 0);
+
+   };
+}
+#endif
