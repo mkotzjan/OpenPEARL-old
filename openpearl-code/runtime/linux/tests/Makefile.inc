@@ -67,7 +67,8 @@ GTEST_DATION_SRCS += tests/gtest_main.cc tests/myTests.cc  \
   tests/DiscTests.cc tests/PipeTests.cc \
   tests/UserDationNBTests.cc\
   tests/StdStreamTests.cc \
-  tests/DationRWTests.cc tests/DationPGTests.cc
+  tests/DationRWTests.cc tests/DationPGTests.cc \
+  tests/StringDationConvertTests.cc
 
 ifeq ($(CONFIG_LINUX_Octopus),y)
   GTEST_DATION_SRCS += OctopusDigitalOutTest.cc
@@ -84,6 +85,11 @@ GTEST_SRCS += $(addprefix ../common/tests/,$(CXX_COMMON_GTESTS))
 GTEST_OBJS =$(GTEST_SRCS:.cc=.o)
 
 GTEST_DATION_OBJS =$(GTEST_DATION_SRCS:.cc=.o)
+
+TEST_FILES_2_REMOVE = $(GTEST_OBJS) $(GTEST_DATION_OBJS) 
+TEST_FILES_2_REMOVE += $(addpostfix .o,$(targets))
+
+$(info $(TEST_FILES_2_REMOVE))
 
 # ----------------------------------------
 # define rules to build the targets

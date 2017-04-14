@@ -288,6 +288,7 @@ clean:
 	@rm -f ../common/signals.log
 	@rm -f sysincs.h  pearl2.h pearl.h
 	@rm -f cc_bin.inc run_bin.inc
+	@rm -f $(TEST_FILES_2_REMOVE)
 
 phony += checkformat
 checkformat: 

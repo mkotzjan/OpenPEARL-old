@@ -77,6 +77,7 @@ Only this file mus be included.
 #include "SystemDationB.h"
 #include "UserDation.h"
 #include "DationPG.h"
+#include "StringDationConvert.h"
 #include "DationRW.h"
 #include "DationTS.h"
 #include "UserDationNB.h"

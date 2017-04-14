@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2014-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -336,3 +336,82 @@ TEST(DationPG, notOpened) {
    ASSERT_THROW(logbuch.beginSequence(NULL),
       pearlrt::NotAllowedSignal);
 }
+
+TEST(DationPG, lineOverflow) {
+   pearlrt::Log::info("*** DationPG: line overflow start ***");
+   pearlrt::Character<9> filename("put_3.txt");
+   pearlrt::SystemDationNB* disc_ =
+      static_cast<pearlrt::SystemDationNB*>(_disc);
+   pearlrt::DationDim1 dim(15);
+   pearlrt::Fixed<15> rstValue;
+   /* -------------------------------------------- */
+   pearlrt::Log::info("      DationPG: line overflow start   ");
+   pearlrt::DationPG logbuch(disc_,
+                             pearlrt::Dation::OUT |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::NOSTREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim);
+   ASSERT_NO_THROW(
+      logbuch.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::ANY ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+   pearlrt::Character<8> text("PEARL");
+   logbuch.beginSequence(NULL);
+   try {
+      logbuch.rst(rstValue);
+//      logbuch.toX(pearlrt::Fixed<31>(20));
+      logbuch.toA(text);
+      logbuch.toA(text);
+      logbuch.toA(text);
+   } catch (pearlrt::Signal & s) {
+      if (!logbuch.updateRst(&s)) {
+         logbuch.endSequence();
+         throw;
+      }
+
+      logbuch.endSequence();
+   };
+   ASSERT_EQ(pearlrt::theDationIndexBoundSignal.whichRST(),
+             rstValue.x);
+   printf("rstval=%d\n", rstValue.x);
+
+   logbuch.dationClose(pearlrt::Dation::PRM, (pearlrt::Fixed<15>*)0);
+ 
+#if 0   /* read binary and compare */
+   pearlrt::Character<1> data[12];
+   pearlrt::Character<1> rdata[12];
+   data[0] = pearlrt::toChar('P');
+   data[1] = pearlrt::toChar('E');
+   data[2] = pearlrt::toChar('A');
+   data[3] = pearlrt::toChar('R');
+   data[4] = pearlrt::toChar('L');
+   data[5] = pearlrt::toChar(' ');
+   data[6] = pearlrt::toChar(' ');
+   data[7] = pearlrt::toChar(' ');
+   data[8] = pearlrt::toChar('\n');
+   data[9] = pearlrt::toChar(' ');
+   data[10] = pearlrt::toChar('4');
+   data[11] = pearlrt::toChar('2');
+   pearlrt::DationRW log_bin(disc_,
+                             pearlrt::Dation::IN |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::STREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim,
+                             (pearlrt::Fixed<15>)1);
+   ASSERT_NO_THROW(
+      log_bin.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::OLD ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+   log_bin.dationRead(&rdata, sizeof(rdata));
+   log_bin.dationClose(0, (pearlrt::Fixed<15>*)0);
+   ASSERT_TRUE(
+      ARRAY_EQUAL(12, data, rdata));
+#endif
+}
+
