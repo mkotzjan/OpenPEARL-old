@@ -275,6 +275,40 @@ namespace pearlrt {
          return data;
       }
 
+   /**
+    assign string
+
+    the shorter string is expanded with spaces
+
+     \param lhs left hand side parameter
+     \param rhs right hand side parameter
+
+   */
+   template<size_t LRHS>
+   Character<length>&  operator=(const Character<LRHS> & rhs) {
+      size_t i;
+
+      if (length < LRHS) {
+          printf("intenal error: assign to smaller string\n");
+          throw theInternalSignal;
+      }
+
+      // compare the object to check if theay are the same
+      // due the the template characteristics we compare the void*
+      if ((void*)this != (void*)&rhs) {
+         for (i=0; i< length; i++) {
+            data[i] = rhs.data[i]; 
+         }
+    
+         if (length > LRHS) {
+            for( /* start with last i */; i<length; i++) {
+               data[i] = ' ';
+            }
+         }
+      }
+      return *this; 
+   }        
+
    };   // end of class  Character
 
    /* ********************************************************* */
