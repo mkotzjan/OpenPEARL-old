@@ -59,6 +59,16 @@ namespace pearlrt {
       return data[index];
    }
 
+   char RefCharacter::getNextChar() {
+      char result;
+
+      if (current + 1 > max) {
+         throw theCharacterTooLongSignal;
+      }
+      result = data[current];
+      current ++;
+      return result;
+   }
 
    char * RefCharacter::getCstring() {
       if (current + 1 > max) {

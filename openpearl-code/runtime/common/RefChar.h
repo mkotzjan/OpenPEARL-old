@@ -111,7 +111,7 @@ namespace pearlrt {
       template<size_t S>
       RefCharacter(Character<S> & rhs) {
          max = rhs.upb().x;
-         current = max;
+         current = 0; //max;
          data = &rhs.data[0];
       }
 
@@ -130,7 +130,7 @@ namespace pearlrt {
       template<size_t S>
       void setWork(Character<S> & rhs) {
          max = rhs.upb().x;
-         current = max;
+         current = 0; //max;
          data = &rhs.data[0];
       }
 
@@ -144,6 +144,17 @@ namespace pearlrt {
         \throws CharacterIndexOutOfRangeSignal, if the index i out of range
       */
       char getCharAt(size_t index) ;
+
+      /**
+       getNextChar
+
+       retrieve the next data element at the current index
+ 
+       \returns the next character
+       \throws CharacterIndexOutOfRangeSignal, if no more characters
+                are available
+      */
+      char getNextChar();
 
       /**
         getCstring
