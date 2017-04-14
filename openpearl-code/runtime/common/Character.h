@@ -289,14 +289,14 @@ namespace pearlrt {
       size_t i;
 
       if (length < LRHS) {
-          printf("intenal error: assign to smaller string\n");
+          printf("internal error: assign to smaller string\n");
           throw theInternalSignal;
       }
 
-      // compare the object to check if theay are the same
+      // compare the object to check if they are the same
       // due the the template characteristics we compare the void*
       if ((void*)this != (void*)&rhs) {
-         for (i=0; i< length; i++) {
+         for (i=0; i< LRHS; i++) {
             data[i] = rhs.data[i]; 
          }
     
