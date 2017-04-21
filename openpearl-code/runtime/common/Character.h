@@ -280,8 +280,10 @@ namespace pearlrt {
 
     the shorter string is expanded with spaces
 
-     \param lhs left hand side parameter
+     \tparam LRHS length of right hand side parameter
      \param rhs right hand side parameter
+
+     \returns reference to the assigned string
 
    */
    template<size_t LRHS>

@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014 Rainer Mueller
  All rights reserved.
 
@@ -33,9 +33,10 @@
 
 \page Testprograms
 
-\section Dation System Device Disc
-There are some tests to enshure proper operation of the Disc system dation
+\section DiscTests tests/DiscTests.cc
 
+There are some tests to enshure proper operation of the Disc system dation
+The tests  are implemented a gtest unit tests.
 */
 #include <gtest/gtest.h>
 #include "Signals.h"
@@ -44,7 +45,8 @@ There are some tests to enshure proper operation of the Disc system dation
 #include "Fixed.h"
 using namespace std;
 
-#define HOME "/tmp/"
+
+#define HOME "/tmp/"    ///< the location of the files to create
 
 /**
   path tests

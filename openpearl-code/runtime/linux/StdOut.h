@@ -46,6 +46,10 @@
 #include <unistd.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
 
    /**
    \brief generic non-basic systemdation class
@@ -66,7 +70,6 @@ namespace pearlrt {
    \endverbatim
 
    */
-
    class StdOut: public SystemDationNB {
 
    private:
@@ -95,11 +98,6 @@ namespace pearlrt {
 
        PEARL attributes: FORWARD IN or OUT ALPHIC or type
 
-       \param streamNumber number  of the system stream
-                        (0=stdin, 1=stdout, 2=stderr)
-
-       \throws IllegalParamSignal, if the required stream
-                   is invalid
       */
       StdOut();
 
@@ -190,5 +188,6 @@ namespace pearlrt {
       void translateNewLine(bool doNewLineTranslation);
 
    };
+   /** @} */
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014     Rainer Mueller
  All rights reserved.
 
@@ -33,10 +33,12 @@
 
 \page Testprograms
 
-\section Dation OctopusDigitalIn-device
+\section OctoputDigitalInOutTests tests/OctopusDigitaInOutTests.cc
 
 
-There are several unit tests using the google test framework.
+
+There are several unit tests using the google test framework
+for the OctopusDigitalIn-device
 
 
 */

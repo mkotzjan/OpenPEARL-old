@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014 Rainer Mueller
  All rights reserved.
 
@@ -45,7 +45,6 @@
 namespace pearlrt {
 
    /**
-   \file
 
    \brief Basic system device for Octopus Digital Input
 

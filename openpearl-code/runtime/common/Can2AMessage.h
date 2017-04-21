@@ -44,7 +44,6 @@
 namespace pearlrt {
 
    /**
-   \file
 
    \brief common definition of the interface of CAN-bus (2.0A) devices 
    for various system device implementations 
@@ -60,10 +59,10 @@ namespace pearlrt {
    class Can2AMessage {
 
    public:
-     Fixed<11> identifier;
-     BitString<1> rtrRequest;
-     Fixed<4> dataLength;
-     BitString<8> data[8];
+     Fixed<11> identifier;    ///< the CAN identifier
+     BitString<1> rtrRequest; ///< the Remote Transmission Request flag
+     Fixed<4> dataLength;     ///< number of data to transfer
+     BitString<8> data[8];    ///< the data storage for read and write
 
    };
 }

@@ -41,14 +41,20 @@
 
 namespace pearlrt {
    /**
-     Defines the methods for the communication of userdations
-     (with class attribute "ALPHIC").
-     They read/write with the methods PUT/GET (defined by PEARL)
-     in external format.
-     Some interfaces are inherited from upper classes UserDation.
+     \addtogroup io_common
+     @{
+   */
+
+   /**
+     \brief Provides the methods for the formatting from and to character string
 
      The i/o-operations are done via a source/sink object which decouples
      the i/o from the formatting statements.
+
+     In case of violating the string boundaries with an i/o statement,
+     an exception is thrown, without performing the violation i/o statement.
+     If an RST-value is set, the try-catch-block will update the RST-value
+     and exit the CONVERT.
 
    PEARL Example
 
@@ -115,25 +121,31 @@ namespace pearlrt {
 
         \param string pointer to the RefCharacter object containing 
                       the soure/target string
-        \param isOutput flag to select source/sink
+        \param isOutput flag to select source(=false) or sink(=true)
       */
       StringDationConvert(RefCharacter* string, bool isOutput);
 
-      /**
+     private:
+    /**
        return a character back to the input source
        \param c the character to be returned
        */
       void dationUnGetChar(const char c);
 
      /**
-      check if enough space/data is available for the operation
+      check if enough space/data is available for the operation.
+      The read/write pointer is not modified.
+      By this trick, the subsequent i/o-operation will not starve 
+      on characters -- the operation will stop with an error (exception)
+     
 
       \param n number of bytes which are wanted to read or write
 
-      \throws CharCCCCC if the string has less space
+      \throws CharacterTooLongSignal if the string has less space
       */
       void checkCapacity(Fixed<31> n);
 
+     public:
       /**
       X-format for output
 
@@ -151,7 +163,7 @@ namespace pearlrt {
       /**
       ADV-format for in-/output
 
-      \param n delta to new  position
+      \param n delta to new  position.  
       */
       void adv(Fixed<31> n);
 
@@ -170,5 +182,7 @@ namespace pearlrt {
       void sop(Fixed<31> &n);
 
    };
+
+   /** @} */
 }
 #endif

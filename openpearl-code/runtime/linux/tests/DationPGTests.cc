@@ -33,8 +33,9 @@
 
 \page Testprograms
 
-\section DationPG
+\section DationPGTests tests/DationPGTests.cc
 
+Test case for gtest for PUT/GET operations
 
 */
 #include <gtest/gtest.h>
@@ -63,7 +64,6 @@ static pearlrt::Device* _disc = &disc;
 /**
   Writing simple text to  testfile and verify by binary read with DationRW
 */
-
 TEST(DationPG, simple_put) {
    pearlrt::Log::info("*** DationPG: simple_put start ***");
    pearlrt::Character<9> filename("put_1.txt");
@@ -128,7 +128,6 @@ TEST(DationPG, simple_put) {
   Writing simple using binary write to testfile
   and verify by GET read with DationPG
 */
-
 TEST(DationPG, simple_get) {
    pearlrt::Log::info("*** DationPG: simple_get start ***");
    pearlrt::Character<9> filename("get_1.txt");
@@ -199,7 +198,6 @@ TEST(DationPG, simple_get) {
 /**
   test signals on CYCLIC and DationPG
 */
-
 TEST(DationPG, cyclicFails) {
    pearlrt::Log::info("*** DationPG: cyclic fails ***");
    pearlrt::SystemDationNB* disc_ =
@@ -309,6 +307,9 @@ TEST(DationPG, signal_get) {
    logbuch.dationClose(0, (pearlrt::Fixed<15>*)0);
 }
 
+/**
+test on closed files
+*/
 TEST(DationPG, notOpened) {
    pearlrt::Log::info("*** DationPG: not opened start ***");
    pearlrt::Character<9> filename("put_1.txt");
@@ -337,6 +338,9 @@ TEST(DationPG, notOpened) {
       pearlrt::NotAllowedSignal);
 }
 
+/**
+test for NOSTREAM overflow detection
+*/
 TEST(DationPG, lineOverflow) {
    pearlrt::Log::info("*** DationPG: line overflow start ***");
    pearlrt::Character<9> filename("put_3.txt");

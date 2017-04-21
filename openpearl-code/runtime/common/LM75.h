@@ -43,10 +43,12 @@
 #include <stdint.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_common_drivers
+   @{
+   */
 
    /**
-   \file
-
    \brief Basic system device for an i2c element lm75  basic dation
 
       This device provides a simple input of an fixed(15) value with the
@@ -67,11 +69,14 @@ namespace pearlrt {
       /**
       constructor to create the bit group and set the
       bits to output direction
+     
+      \param provider reference to the i2cbus object
+      \param addr the i2c bus adress
 
       \throws IllegalParamSignal in case of init failure
 
       */
-      LM75(I2CProvider * provider, int _addr);
+      LM75(I2CProvider * provider, int addr);
 
       /**
       Open the  dation
@@ -131,6 +136,7 @@ namespace pearlrt {
       */
       int capabilities();
    };
+   /** @} */
 }
 #endif
 

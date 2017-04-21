@@ -60,7 +60,15 @@ namespace pearlrt {
            with the class attribute "ALPHIC"
    */
 
+   /** 
+   \addtogroup io_common
+   @{
+   */
+
    /**
+   \brief READ/WRITE-userdation interface for userdations
+           with the class attribute "ALPHIC".
+
      Defines the methods for the communication of userdations
      (with class attribute "ALPHIC").
      They read/write with the methods PUT/GET (defined by PEARL)
@@ -77,7 +85,7 @@ namespace pearlrt {
       home: Disc("/home/", 5);
 
    PROBLEM;
-      SPC home DATION INOUT ALL;
+      SPC home DATION SYSTEM INOUT ALL;
       DCL table DATION OUT ALPHIC DIM(*,20)
                 FORWARD NOCYCLIC STREAM CREATED(home);
 
@@ -219,5 +227,6 @@ namespace pearlrt {
       */
       void checkCapacity(Fixed<31> n);
    };
+   /** @} */
 }
 #endif

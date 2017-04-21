@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -43,6 +43,12 @@ This class provides the operations of the data type ref char.
 #include "Character.h"
 
 namespace pearlrt {
+
+   /**
+   \addtogroup datatypes
+   @{
+   */
+   
    /**
    Type REF CHAR
    \brief REF CHAR Type for variable string length
@@ -94,7 +100,7 @@ namespace pearlrt {
       size_t max;     ///< the maximum size (derived from the container)
       size_t current; ///< the current content length
       char * data;    ///< pointer to the data area in the container
-   public:
+ 
       /**
          constructor
       */
@@ -217,6 +223,9 @@ namespace pearlrt {
  
          this feature is needed for positioning in convert
 
+         \param newpos set the read/write pointer to this offset.
+                The positions starts counting with 0.
+
          \throws CharacterTooLongSignal, if new position would be
                                          outside of the string
       */
@@ -283,6 +292,7 @@ namespace pearlrt {
          }
       }
    };
+   /** @} */
 }
 
 #endif

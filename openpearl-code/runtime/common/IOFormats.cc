@@ -28,7 +28,7 @@
 */
 
 /**
-\file 
+\file
 \brief implementation of  I/O-Formats for PG-userdation and CONVERT
 
 */
@@ -45,34 +45,34 @@
 namespace pearlrt {
 
    void IOFormats::setupIOFormats(Sink * _sink, Source * _source) {
-     sink = _sink;
-     source = _source;
+      sink = _sink;
+      source = _source;
    }
 
    void IOFormats::toT(const Clock f,
-                      const Fixed<31> w,
-                      const Fixed<31> d) {
+                       const Fixed<31> w,
+                       const Fixed<31> d) {
       checkCapacity(w);
       PutClock::toT(f, w, d, *sink);
    }
 
    void IOFormats::fromT(Clock & f,
-                        const Fixed<31> w,
-                        const Fixed<31> d) {
+                         const Fixed<31> w,
+                         const Fixed<31> d) {
       checkCapacity(w);
       GetClock::fromT(f, w, d, *source);
    }
 
    void IOFormats::toD(const Duration f,
-                      const Fixed<31> w,
-                      const Fixed<31> d) {
+                       const Fixed<31> w,
+                       const Fixed<31> d) {
       checkCapacity(w);
       PutDuration::toD(f, w, d, *sink);
    }
 
    void IOFormats::fromD(Duration & f,
-                        const Fixed<31> w,
-                        const Fixed<31> d) {
+                         const Fixed<31> w,
+                         const Fixed<31> d) {
       checkCapacity(w);
       GetDuration::fromD(f, w, d, *source);
    }

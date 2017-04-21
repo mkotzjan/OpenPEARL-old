@@ -44,9 +44,12 @@
 #include <libpcan.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
 
    /**
-   \file
 
    \brief system device for the PEAK CAN device adapters.
 
@@ -145,6 +148,7 @@ namespace pearlrt {
       */
       int capabilities();
    };
+   /** @} */
 }
 #endif
 

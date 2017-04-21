@@ -8,7 +8,7 @@
 #ifndef FLOAT_H_INCLUDED
 #define FLOAT_H_INCLUDED
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014-2014 Rainer Mueller
  All rights reserved.
 
@@ -92,6 +92,10 @@ namespace pearlrt {
    };
 
    /**
+
+   \brief the type FLOAT(S)
+
+
    Floats are specified with the number of mantissa bits.
    Only 24 bit (float) and 53 bit (double) are provided in this
    implementation.
@@ -103,19 +107,35 @@ namespace pearlrt {
    public:
 
       /**
-      calculate result type for mixed operations
+      template prototype for the result type 
+      of mixed operations
       */
       template<int fixedSize, int floatSize> struct FloatResult;
+
+      /**
+      template specialisation for FLOAT(x),FLOAT(24)-operations
+      
+      - All sizes <= 24 deliver FLOAT(24).
+      - All sizes > 24 deliver FLOAT(53).
+
+      */
       template<int fixedSize > struct FloatResult<fixedSize, 24> {
          typedef Float < fixedSize <= 24 ? 24 : 53 > ResultType;
       };
 
+      /**
+      template specialisation for FLOAT(x),FLOAT(53)-operations
+      delivers always FLOAT(53).
+      */
       template<int fixedSize> struct FloatResult<fixedSize, 53> {
+         /**
+         the result type of mixed operations with Float(53)
+         */
          typedef  Float<53>  ResultType;
       };
 
       /**
-      The internal type of theFloat(S) value.
+      The internal type of the Float(S) value.
 
       \note If S does not fit to the concrete defined lengths the c++ compiler
       will produce some error messages.
@@ -515,7 +535,6 @@ namespace pearlrt {
          return result;
       }
 
-
    };
 
    /**
@@ -585,7 +604,6 @@ namespace pearlrt {
       FloatHelper::testFloatResult(result.x);
       return result;
    }
-
 }
 #endif
 

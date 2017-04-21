@@ -33,7 +33,24 @@
 #include "I2CProvider.h"
 #include "Mutex.h"
 
+/**
+\file
+*/
+
+
 namespace pearlrt {
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
+
+   /**
+   \brief an I2CBusProvider using the linux device node /dev/i2c-x
+
+    long test jsjsjs sds ds
+    jkl asd jl
+  
+   */
    class I2CBus : public I2CProvider {
    private:
       int i2c_file;   // file decriptor for the i2c-connection
@@ -79,6 +96,7 @@ namespace pearlrt {
       */
       void rdwr(int n, I2CMessage* data);
    };
+   /** @} */
 }
 #endif
 

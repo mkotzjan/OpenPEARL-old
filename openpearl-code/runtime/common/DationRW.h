@@ -32,7 +32,7 @@
 /**
 \file
 
-\brief Linux specific READ/WRITE-userdation interface for userdations
+\brief READ/WRITE-userdation interface for userdations
        with the class attribute "TYPE"
 
 */
@@ -45,21 +45,19 @@
 
 
 namespace pearlrt {
-
    /**
-   \file
-
-   \brief Linux specific READ/WRITE-userdation interface for userdations
-           with the class attribute "TYPE"
+   \addtogroup io_common
+   @{
    */
 
    /**
+   \brief READ/WRITE-userdation interface for userdations
+           with the class attribute "TYPE"
+
      Defines the methods for the communication of userdations
      (with class attribute "TYPE").
      They read/write with the methods READ/WRITE (defined by PEARL)
      in binary format.
-     some interfaces are inherited from upper classes UserDation
-     and DationPGCommon.
 
 
    PEARL Example RW Dation
@@ -69,7 +67,7 @@ namespace pearlrt {
       home: Disc("/home/", 5);
 
    PROBLEM;
-      SPC home DATION INOUT ALL;
+      SPC home DATION SYSTEM INOUT ALL;
       DCL table DATION OUT FIXED(15) DIM(10,20)
                 DIRECT CYCLIC NOSTREAM CREATED(home);
 
@@ -213,5 +211,6 @@ namespace pearlrt {
        */
       void dationUnGetChar(const char c);
    };
+   /** @} */
 }
 #endif

@@ -39,7 +39,6 @@
 
 \brief output formating  helper object
 
-This class provides several helper routines for PUT-processing.
 
 \author R. Mueller
 
@@ -47,9 +46,19 @@ This class provides several helper routines for PUT-processing.
 
 namespace pearlrt {
    /**
-     Helper class providing utility functions for output format
+     \addtogroup io_common_helper
+     @{
+  */
+
+  /**
+     \brief Helper class providing utility functions for output format
      processing.
+
+     This class provides several helper routines for PUT-processing.
+     This should reduce  the program size for the templated operations
+     with Character types.
      This helps primarily to reduce the code footprint.
+
    */
    class PutHelper {
 
@@ -59,7 +68,8 @@ namespace pearlrt {
          perform the A-format
 
          All action is placed in this routine to reduce memory
-         footprint. Only the wrapper towards RefChar is templated
+         footprint.
+         Only the wrapper towards RefChar is templated
 
          \param length length of the output field
          \param rc RefChar element wrapping the Character variable to be
@@ -69,14 +79,19 @@ namespace pearlrt {
       */
       static void doPutChar(int length, RefCharacter* rc, Sink * s);
 
-   /** the values of the exponents with only one bit set
-   */
-   const static Float<53> binExpValues[];
-   const static int nbrBinExpValues;
+      /**
+      the values of the exponents with only one bit set
+      */
+      const static Float<53> binExpValues[];
+
+      /**
+      the length of the array binExpValues
+      */
+      const static int nbrBinExpValues;
 
    };
 
-
+   /** @} */
 }
 #endif
 

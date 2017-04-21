@@ -1,7 +1,7 @@
 #ifndef GETCLOCK_H_INCLUDED
 #define GETCLOCK_H_INCLUDED
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -49,8 +49,13 @@
 
 
 namespace pearlrt {
+   /** 
+   \addtogroup io_common_helper
+   @{
+   */
+
    /**
-      Input processing of clock values.
+      \brief Input processing of clock values.
    */
    class GetClock {
    public:
@@ -90,6 +95,7 @@ namespace pearlrt {
                        const Fixed<31> d,
                        Source & source);
    };
+   /** @} */
 }
 #endif
 

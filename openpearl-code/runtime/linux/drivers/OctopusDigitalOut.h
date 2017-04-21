@@ -45,7 +45,6 @@
 namespace pearlrt {
 
    /**
-   \file
 
    \brief Basic system device for Octopus Digital Output
 

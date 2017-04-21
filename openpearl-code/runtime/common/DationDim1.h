@@ -35,8 +35,13 @@
 #include "DationDim.h"
 
 namespace pearlrt {
+   /** 
+   \addtogroup io_common
+   @{
+   */
+
    /**
-   class for 1 dimentional dation
+   \brief 1 dimensional dation
 
    This class provides constructor and positioning for 1 dimensional
    dation dimensions. For details see: DationDim.h
@@ -83,7 +88,7 @@ namespace pearlrt {
       */
       void adv(const Fixed<31> c);
    };
-
+   /** @} */
 }
 #endif
 

@@ -46,14 +46,16 @@
 #include <unistd.h>
 
 namespace pearlrt {
-
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
+   
    /**
    \brief generic non-basic systemdation class
 
-   With this class it is possible to generate linux stream
-   devices.
-
-   The parameter of the Ctor defines which stream should be used.
+   With this class it is possible to access linux input stream
+   stdin.
 
    Usage:
    \verbatim
@@ -65,7 +67,6 @@ namespace pearlrt {
    \endverbatim
 
    */
-
    class StdIn: public SystemDationNB {
 
    private:
@@ -165,7 +166,7 @@ namespace pearlrt {
       \param destination source area for the bytes to be written
       \param size number of bytes to write
 
-      \throws DateionNotSupportedSignal in any case
+      \throws DationNotSupportedSignal in any case
 
       */
       void dationWrite(void * destination, size_t size);
@@ -182,6 +183,8 @@ namespace pearlrt {
      /** check if at least one dation of the given type is defined 
 
      This is required in the simple console command processor in os.cc
+
+     \return true, if at least one dation of this type exists
      */
      static bool isDefined();
 
@@ -195,7 +198,7 @@ namespace pearlrt {
       */
       void translateNewLine(bool doNewLineTranslation);
 
-
    };
+   /** @} */
 }
 #endif

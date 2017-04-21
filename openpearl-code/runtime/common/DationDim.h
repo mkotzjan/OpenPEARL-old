@@ -35,7 +35,12 @@
 
 namespace pearlrt {
    /**
-   parent class for all possible dations dimensions
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+   \brief parent class for all possible dations dimensions
 
    PEARL allows dations to be organised in tables of
    <ul>
@@ -45,7 +50,7 @@ namespace pearlrt {
    </ul>
 
    Not all dimensions must be used.
-   As compiler API differend dimensioning classes are provided.
+   As compiler API different dimensioning classes are provided.
    They are derived from this class.
    Each user dation needs a dimension specification.
 
@@ -226,7 +231,7 @@ namespace pearlrt {
       */
       bool isBounded();
    };
-
+   /** @} */
 }
 #endif
 

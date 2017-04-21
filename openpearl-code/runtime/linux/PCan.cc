@@ -37,6 +37,7 @@
 #include <fcntl.h> /* O_RDWR */
 
 /**
+ \file 
  \brief Implementation of the PEAK CAN device systemdation
 
 

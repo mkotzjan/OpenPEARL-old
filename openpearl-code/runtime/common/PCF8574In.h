@@ -43,9 +43,12 @@
 #include <stdint.h>
 
 namespace pearlrt {
+  /** 
+  \addtogroup io_common_drivers
+  @{
+  */
 
    /**
-   \file
 
    \brief Basic system device for an i2c element pcf8574  basic dation
 
@@ -59,18 +62,21 @@ namespace pearlrt {
       int16_t addr;
       int handle;
       uint8_t mask, start;
-//      void internalDationOpen();
-//      void internalDationClose();
 
    public:
       /**
       constructor to create the bit group and set the
       bits to output direction
 
+      \param provider reference to the i2cbus object
+      \param addr the i2c bus adress of the module
+      \param s the starting bit number (7..0) starting with 7 at the MSB
+      \param w the number of bits
+
       \throws IllegalParamSignal in case of init failure
 
       */
-      PCF8574In(I2CProvider * provider, int _addr, int s, int w);
+      PCF8574In(I2CProvider * provider, int addr, int s, int w);
 
       /**
       Open the  dation
@@ -128,6 +134,7 @@ namespace pearlrt {
       */
       int capabilities();
    };
+   /** @} */
 }
 #endif
 

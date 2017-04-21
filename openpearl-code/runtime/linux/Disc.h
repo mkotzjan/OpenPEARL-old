@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
  Copyright (c) 2014-2014 Rainer Mueller
  All rights reserved.
@@ -46,6 +46,10 @@
 #include <unistd.h>
 
 namespace pearlrt {
+   /** 
+   \addtogroup io_linux_driver
+   @{
+   */
 
    /**
    \brief generic non-basic systemdation class
@@ -73,6 +77,8 @@ namespace pearlrt {
 
    public:
       /**
+      \brief a file in the folder specified by Disc
+
       A DiscFile represents a file on a Disc. This class is responsible
       for all operations with the  operating system.
       */
@@ -318,5 +324,6 @@ namespace pearlrt {
       void translateNewLine(bool doNewLineTranslation);
 
    };
+   /** @} */
 }
 #endif

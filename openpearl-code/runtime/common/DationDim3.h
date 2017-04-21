@@ -36,7 +36,12 @@
 
 namespace pearlrt {
    /**
-   class for 3 dimentional dation
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+   \brief 3 dimensional dation.
 
    This class provides constructors and positioning methods. For details
    see: DationDim.h
@@ -136,7 +141,7 @@ namespace pearlrt {
       Fixed<31> getElements4Page(const Fixed<31> n);
 
    };
-
+   /** @} */
 }
 #endif
 

@@ -44,12 +44,17 @@
 namespace pearlrt {
 
    /**
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
    \brief general interface for all types of dations.
 
-          this class defines the interface for the basic operations
-           darionRead, dationWrite and dationSeek and common attributes,
+          This class defines the interface for the basic operations
+          dationRead, dationWrite and dationSeek and common attributes,
           which have either to be implemented in all kinds of dations
-           or are all the same in all kinds of dations.
+          or are all the same in all kinds of dations.
 
           dationOpen, dationClose differ between system
           dations and user dations
@@ -89,30 +94,55 @@ namespace pearlrt {
       \note default is PRM
       */
       enum DationParams {
-         // direction
+         /** direction: only input */
          IN = 0x0001,
+         /** direction: only output */
          OUT = 0x0002,
+         /** direction: input and output */
          INOUT = 0x0004,
-         // open
+         /** open with filename */
          IDF = 0x0008,
-         ANY = 0x0010, NEW = 0x0020, OLD = 0x0040,
-         // close
-         PRM = 0x0080, CAN = 0x0100,
+         /** open behavior: may exist, create if not */
+         ANY = 0x0010, 
+         /** open behavior: must not exist, create new */
+         NEW = 0x0020,
+         /** open behavior: must exist */
+         OLD = 0x0040,
+         /** close behavior: do not delete  */
+         PRM = 0x0080,
+         /** close behavior: delete  */
+         CAN = 0x0100,
          /** support direct positioning on the device */
          DIRECT = 0x0200,
          /** supports sequential forward read/write access */
          FORWARD = 0x0400,
          /** supports sequential reading and backward sequential
-         positioning */
+         positioning 
+         \note not implemented
+         */
          FORBACK = 0x0800,
 
          /** has RST variable set */
          RST = 0x1000,
 
-         /** dimension handling */
+         /** dimension handling:
+          automatical rewind at the end of the specified dimension
+         */
          CYCLIC = 0x2000,
+
+         /** dimension handling:
+          no automatical rewind at the end of the specified dimension (default)
+         */
          NOCYCL = 0x4000,
+
+         /** dimension handling:
+          silent ignore the end of an internal dimension limit (default)
+         */
          STREAM = 0x08000,
+
+         /** dimension handling:
+          do not ignore the end of an internal dimension limit
+         */
          NOSTREAM = 0x10000
       };
 
@@ -151,7 +181,10 @@ namespace pearlrt {
        Status of the dation
       */
       enum DationStatus {
-         OPENED = 1, CLOSED = 2
+         /** dation is open */
+         OPENED = 1, 
+         /** dation is closed */
+         CLOSED = 2
       };
 
 
@@ -204,5 +237,6 @@ namespace pearlrt {
       virtual void dationSeek(const Fixed<31> & p, const int dationParam) ;
 
    };
+   /** @} */
 }
 #endif

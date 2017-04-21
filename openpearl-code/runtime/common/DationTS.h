@@ -44,15 +44,15 @@
 
 
 namespace pearlrt {
-
    /**
-   \file
-
-   \brief userdation interface for userdations
-           with the class attribute BASIC
+   \addtogroup io_common
+   @{
    */
 
    /**
+   \brief userdation interface for userdations
+           with the class attribute BASIC.
+
      Defines the methods for the communication of userdations
      (with class attribute BASIC).
      They read/write with the methods READ/WRITE (defined by PEARL)
@@ -203,5 +203,6 @@ namespace pearlrt {
       */
       void dationWrite(void* data, size_t size);
    };
+   /** @} */
 }
 #endif

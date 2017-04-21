@@ -34,8 +34,8 @@
 
 \page Testprograms
 
-\section DationRW
-
+\section DationRWTests tests/DationRWTests.cc
+gtest test cases for DationRM API
 
 */
 #include <gtest/gtest.h>
@@ -104,7 +104,7 @@ TEST(DationRW, read_write_FORWARD) {
    ASSERT_TRUE((x == x1).getBoolean());
 }
 
-/* \test
+/**
   READ/Write 2 dimenional checkerfield
 */
 TEST(DationRW, Read_Write_checkerfield) {
@@ -474,7 +474,7 @@ TEST(DationRW, toSkip3Dim) {
    pearlrt::Log::info("*** DationRW: toSkip3Dim end ***");
 }
 
-/* \test
+/**
   READ/Write 3 dimensional checkerfield
 */
 TEST(DationRW, Read_Write_checkerfield3) {

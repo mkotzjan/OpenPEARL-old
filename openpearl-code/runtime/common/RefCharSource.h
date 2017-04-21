@@ -43,8 +43,16 @@ namespace pearlrt {
    */
 
    /**
-   This class defines a source which provides sequential access to charcters
-   in a in a ref char variable
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+   \brief a Source, which operates upon a RefCharacter variable
+
+   This class defines a source which provides sequential access to characters
+   in a in a ref char variable.
+   This class is used as data source in CONVERT .. FROM statements.
    */
    class RefCharSource: public Source {
    private:
@@ -78,9 +86,9 @@ namespace pearlrt {
 
       /** set position 
 
-      useful method for CVONVERT statement
+      useful method for the implementation of the CONVERT statement
   
-      \params  new  read position
+      \param pos  new  read position
       */
       void pos(size_t pos);
 
@@ -93,6 +101,7 @@ namespace pearlrt {
       size_t sop();
 
    };
+   /** @} */
 }
 #endif
 

@@ -33,7 +33,7 @@
 /**
 \file
 
-\brief class to support RST-format 
+\brief class to support RST-format
 
 */
 
@@ -42,19 +42,32 @@
 
 namespace pearlrt {
    /**
-     This class provides RST format behavior for UserDation and CONVERT
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+   \brief This class provides RST format behavior for UserDation and CONVERT
 
 
-     All exceptions in the try catch block will be handed towards
-     the updateRst()-method. If the rst-formatting element was set,
+     All exceptions in the try catch block of an i/o or CONVERT statement
+     will be handed towards the updateRst()-method.
+     If the rst-formatting element was set,
      the exception is treated, else it is rethrown.
 
    */
    class Rst {
    protected:
+      /**
+          pointer to error variable.
+
+          If this pointer is NULL, no rst variable is set.
+          This attribute is preset with NULL in the start of the i/o
+          operation.
+      */
       Fixed<15> * rstValue;
 
-    public:
+   public:
       /**
         set the rst variable
 
@@ -65,11 +78,19 @@ namespace pearlrt {
 
       /**
          update the RST variable if set
-         \param s pointer to the sigbal which was caught
+
+         This method is intended to be called in the exception handler
+         of an i/o statement. If an rst-variable is active,
+         its value is set by the number of the given signal
+
+         \param s pointer to the signal which was caught
          \returns true, if RST-variable was defined
          \returns false, if RST-variable was NOT defined
       */
       bool updateRst(Signal * s);
    };
+
+   /** @} */
+
 }
 #endif

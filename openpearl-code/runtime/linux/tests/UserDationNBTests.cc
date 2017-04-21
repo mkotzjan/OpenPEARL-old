@@ -34,7 +34,7 @@
 
 \page Testprograms
 
-\section Dation SystemDation
+\section UserDationNBTests tests/UserDationNBTests.cc
 Test routines generic non-basic systemdations
 
 There are several unit tests using the google test framework.

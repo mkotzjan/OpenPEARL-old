@@ -33,7 +33,9 @@
 
 \page Testprograms
 
-\section Dation SUSPEND and TERMINATE tests
+\section DationSuspendTerminateTests tests/DationSuspendSuspendTerminateTests.cc
+
+Dation SUSPEND and TERMINATE tests
 Task READER opens dation as input. And tries to read.
 Task CONTROL sunspends READER AFTER 1 sec. The task state of READER
 should remain ACTIVE until the SKIP is reached.
@@ -55,13 +57,15 @@ These tests must be done interactive.
 
 using namespace std;
 
-pearlrt::Pipe myPipe("/tmp/pipe1", 10, "CAN OPEN1");
-pearlrt::StdOut stdOut;
-pearlrt::Fixed<31>  x(42);
+static pearlrt::Pipe myPipe("/tmp/pipe1", 10, "CAN OPEN1");
+static pearlrt::StdOut stdOut;
+static pearlrt::Fixed<31>  x(42);
 
 SPCTASK(READER);
 SPCTASK(CONROL);
-
+/**
+the READER task
+*/
 DCLTASK(READER, pearlrt::Prio(30), pearlrt::BitString<1>(0)) {
    pearlrt::DationDim2 dim(80);
    pearlrt::DationPG reader(&myPipe,
@@ -97,6 +101,9 @@ printf("READER: got signal\n");
 printf("Task READER terminates\n");
 }
 
+/**
+the CONTROL task
+*/
 DCLTASK(CONTROL, pearlrt::Prio(10), pearlrt::BitString<1>(1)) {
    pearlrt::Fixed<31>  y;
    pearlrt::DationDim2 dim(80);

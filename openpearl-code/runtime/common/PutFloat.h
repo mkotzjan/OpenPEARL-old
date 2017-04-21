@@ -50,10 +50,13 @@ This module contains the output formatting of FIXED F(w,d,s)-format
 
 using namespace std;
 namespace pearlrt {
+   /**
+   \addtogroup io_common_helper
+   @{
+   */
 
    /**
-   Class containing the output formatting of float variables
-   all methods are defined as static.
+   \brief Class containing the output formatting of float variables.
 
    \tparam S length of the Float type
 
@@ -205,6 +208,8 @@ namespace pearlrt {
       significance denoting the number of shown digits<br>
 
       The value will be set right adjusted into the output field.
+
+      \todo move implementation into non template version
 
       \param floatValue the data to be formatted
       \param w the width of the output field.
@@ -365,6 +370,7 @@ namespace pearlrt {
          sink.putChar(ch);
       }
    };
+   /** @} */
 }
 #endif
 

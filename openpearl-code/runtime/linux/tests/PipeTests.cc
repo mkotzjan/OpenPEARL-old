@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014 Rainer Mueller
  All rights reserved.
 
@@ -33,7 +33,8 @@
 
 \page Testprograms
 
-\section Dation System Device Pipe
+\section PipeTests tests/PipeTests.cc
+Dation System Device Pipe
 There are some tests to enshure proper operation of the Pipe system dation
 
 */

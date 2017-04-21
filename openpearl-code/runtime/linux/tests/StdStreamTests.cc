@@ -33,7 +33,7 @@
 
 \page Testprograms
 
-\section Dation System Device StdStream
+\section StdStreamTests tests/StdStreamTests.cc
 There are some tests to enshure proper operation of the StdStream system dation
 
 */

@@ -45,7 +45,12 @@
 
 namespace pearlrt {
    /**
-      Output formatting of clock values
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+      \brief Output formatting of clock values
    */
    class PutClock {
    public:
@@ -66,6 +71,7 @@ namespace pearlrt {
                       const Fixed<31>& w, const Fixed<31>& d,
                       Sink& sink) ;
    };
+   /** @} */
 }
 #endif
 

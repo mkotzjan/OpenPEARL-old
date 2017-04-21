@@ -48,7 +48,6 @@ The I/O-processing must translate other behavior to this pattern.
 
 #include <stdint.h>
 #include <stdio.h>
-
 #include "Fixed.h"
 #include "Fixed63.h"
 #include "Clock.h"
@@ -58,8 +57,14 @@ The I/O-processing must translate other behavior to this pattern.
 
 namespace pearlrt {
    /**
-     Helper class providing utility functions for input format
+   \addtogroup io_common_helper
+   @{
+   */
+  
+   /**
+     \brief Helper class providing utility functions for input format
      processing.
+
      The functions operate on a source object and manage
      the input data processing of the input field of a given length.
      Field separators are detected.
@@ -71,7 +76,13 @@ namespace pearlrt {
       int delimiter;
 
    public:
-      static double pow10(int exp);  // returns pow(10,exp), with exp >= 0 
+      /**
+      calculate 10**exp 
+
+      \param exp the exponent. 
+      \returns pow(10,exp)
+      */
+      static double pow10(int exp);
 
       /**
       create a Helper object
@@ -135,6 +146,8 @@ namespace pearlrt {
 
       \param x pointer to int value for the data element
       \param digits number of digits allowed
+      \param decimals number of decimal. This element is applied,
+             if the input field does not contain a decimal point
 
       \returns number of processed digits (> 0 on normal execution)
       */
@@ -177,11 +190,29 @@ namespace pearlrt {
       /**
       field delimiter codes.
       Several codes may be ored together.
+
+      The default value is 0 -- the exact field width must be reached.
       */
       enum Delimiters {
+         /** 
+         treat two (2) space characters as field delimiter.
+
+         This is useful for keyboard input.
+         */
          DoubleSpace = 1,
+
+         /**
+         accept end of line ('\\n') as input delimiter
+         */
          EndOfLine = 2,
+
+         /**
+         accept comma (',') as input delimiter
+         */
          Comma = 4,
+         /**
+         accept end of file  as input delimiter
+         */
          EndOfFile = 8
       };
 
@@ -276,6 +307,7 @@ namespace pearlrt {
       */
       void readFloatByE(Float<53> * value);
    };
+   /** @} */
 }
 #endif
 

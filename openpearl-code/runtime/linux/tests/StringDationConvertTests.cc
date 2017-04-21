@@ -33,8 +33,10 @@
 
 \page Testprograms
 
-\section Convert
+\section StringDationConvertTests tests/StringDationConvertTests.cc
 
+Test whether the API of StringDationConvert works.
+Implemented as gtest unit test
 
 */
 #include <gtest/gtest.h>
@@ -53,7 +55,6 @@ using namespace std;
   read/write some data to a StringDationConvert and verify operation
   with A and F -format and POS,SOP,X
 */
-
 TEST(Convert, simplePut) {
    pearlrt::Log::info("*** Convert: simplePut start ***");
    {
@@ -95,6 +96,9 @@ TEST(Convert, simplePut) {
 
 }
 
+/**
+check positioning and read position
+*/
 TEST(Convert, putPosSop) {
    pearlrt::Log::info("*** Convert: putPosSOP start ***");
    {
@@ -132,6 +136,9 @@ TEST(Convert, putPosSop) {
    }
 }
 
+/**
+test CONVERT FROM 
+*/
 TEST(Convert, simpleGet) {
    pearlrt::Log::info("*** Convert: simpleGut start ***");
    {
@@ -170,6 +177,9 @@ TEST(Convert, simpleGet) {
 
 }
 
+/**
+test positioning and read poosition during CONVERT FROM
+*/
 TEST(Convert, getPosSop) {
    pearlrt::Log::info("*** Convert: getPosSOP start ***");
    {

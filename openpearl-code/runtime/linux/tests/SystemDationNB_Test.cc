@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
  All rights reserved.
 
@@ -33,7 +33,7 @@
 
 \page Testprograms
 
-\section Dation SystemDation
+\section SystemDationNB_Test tests/SystemDationNB_Tests.cc
 Test routines generic non-basic systemdations and systemdation dir
 
 There are several unit tests using the google test framework.

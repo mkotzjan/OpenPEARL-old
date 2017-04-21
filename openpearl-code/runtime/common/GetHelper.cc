@@ -190,13 +190,12 @@ namespace pearlrt {
       int decimalPointPosition = -1; // no decimal point detected yet
       int ch;
       int digitsProcessed = 0;
-      bool hasLeadingZeros = false;
 
       while (digitsProcessed < 9 && width > 0) {
          ch = readChar();
 
          if (ch == '0' && high == 0) {
-            hasLeadingZeros = true;
+            // ignore leading zeros 
          } else if (isdigit(ch)) {
             high = high * 10 + ch - '0';
             digitsProcessed ++;

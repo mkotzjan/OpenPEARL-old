@@ -42,7 +42,17 @@ namespace pearlrt {
    */
 
    /**
-   This class defines a sink which puts all characters in a ref char variable
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+
+   \brief a Sink which operates upon a RefCharacter variable
+
+   This class defines a sink which puts all characters in a ref char variable.
+   The output of a CONVERT ... TO statement is collected by this class.
+   
    */
    class RefCharSink: public Sink {
    private:
@@ -79,6 +89,7 @@ namespace pearlrt {
       */
       size_t sop();
    };
+   /** @} */
 }
 #endif
 

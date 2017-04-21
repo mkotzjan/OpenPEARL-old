@@ -46,6 +46,10 @@
 #include <unistd.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
 
    /**
    \brief generic non-basic systemdation class for stderr
@@ -185,5 +189,6 @@ namespace pearlrt {
       void translateNewLine(bool doNewLineTranslation);
 
    };
+   /** @} */
 }
 #endif

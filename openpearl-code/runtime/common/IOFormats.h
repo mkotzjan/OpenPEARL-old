@@ -54,7 +54,17 @@ namespace pearlrt {
    */
 
    /**
-     I/O-Formats 
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+     \brief I/O-Formats for DationPG and CONVERT
+
+     This class provides the formating routines for DationPG and CONVERT.
+     In order to decouple the formating stuff from the low level input and
+     output, all methods operate on specialized Source or Sink objects.
+     
       */
    class IOFormats {
 
@@ -66,7 +76,7 @@ namespace pearlrt {
    public:
       /**
         configure source and sink object to perfom the i/o
-        operations 
+        operations
 
         \param _sink pointer to the output data stream
         \param _source poingter to the input data stream
@@ -74,10 +84,15 @@ namespace pearlrt {
       void setupIOFormats(Sink * _sink, Source* _source);
 
       /**
-      check if enough space/data is available for the operation
+      Check if enough space/data is available for the operation
+
+      This real implementation of this method is called before
+      each i/o format statement to enshure enough space in the 
+      input or output stream. If there is not enough space or data
+      an exception must be thrown.
 
       \param n number of bytes which are wanted to read or write
-      
+
       \throws an exception if the dation/string has less space
       */
       virtual void checkCapacity(Fixed<31> n) = 0;
@@ -108,7 +123,8 @@ namespace pearlrt {
       output format A(w)
 
       \param s string to be printed
-      \param w width of the output field
+      \param w width of the output field. This field limits the number of
+               charavters to be written
       \tparam S size of the string
       */
       template<size_t S>
@@ -124,7 +140,8 @@ namespace pearlrt {
       input format A(w)
 
       \param s string to be read
-      \param w width of the input field
+      \param w width of the input field. This field limits the number of 
+               characters to be read
       \tparam S size of the string
       */
 
@@ -146,7 +163,7 @@ namespace pearlrt {
       template<int S>
       void toB1(BitString<S>  s, Fixed<31> w) {
          checkCapacity(w);
-         PutBitString<S>::toB1(s,w,*sink);
+         PutBitString<S>::toB1(s, w, *sink);
       }
 
       /**
@@ -173,7 +190,7 @@ namespace pearlrt {
       template<int S>
       void toB2(BitString<S>  s, Fixed<31> w) {
          checkCapacity(w);
-         PutBitString<S>::toB2(s,w,*sink);
+         PutBitString<S>::toB2(s, w, *sink);
       }
 
       /**
@@ -200,7 +217,7 @@ namespace pearlrt {
       template<int S>
       void toB3(BitString<S>  s, Fixed<31> w) {
          checkCapacity(w);
-         PutBitString<S>::toB3(s,w,*sink);
+         PutBitString<S>::toB3(s, w, *sink);
       }
 
       /**
@@ -227,7 +244,7 @@ namespace pearlrt {
       template<int S>
       void toB4(BitString<S>  s, Fixed<31> w) {
          checkCapacity(w);
-         PutBitString<S>::toB4(s,w,*sink);
+         PutBitString<S>::toB4(s, w, *sink);
       }
 
       /**
@@ -313,10 +330,15 @@ namespace pearlrt {
       /**
        output format E with FLOAT
 
+       \note On output, the E-format element has an additional parameter
+             for the number of decimals in the exponent field.
+             On input any valid number is accepted.
+
        \param f value to be printed
        \param w width of the output field
        \param d number of decimals to be used
-       \param s number of significant digits 
+       \param s number of significant digits (number of digits in from of the 
+               decimal point)
        \param e number of digits in exponent field
        \tparam  S width of the float value type
        */
@@ -333,11 +355,16 @@ namespace pearlrt {
       /**
       input format E with FLOAT
 
+       \note On output, the E-format element has an additional parameter
+             for the number of decimals in the exponent field.
+             On input any valid number is accepted.
+      \note the parameters w and s are only used to check 
+            the valid values - during the input processing they are ignored
+
       \param f value to be read
       \param w width of the input field
       \param d number of decimals to be used
-      \param s number of significant digits 
-      \param e number of digits in exponent field
+      \param s number of significant digits
       \tparam  S width of the fixed value type
       */
       template<int S>
@@ -392,9 +419,10 @@ namespace pearlrt {
        \param d number of decimals to be used
        */
       void fromD(Duration& f,
-               const Fixed<31> w,
-               const Fixed<31> d = 0);
+                 const Fixed<31> w,
+                 const Fixed<31> d = 0);
 
    };
+   /** @} */
 }
 #endif

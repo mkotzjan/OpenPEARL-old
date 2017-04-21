@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -34,8 +34,8 @@
 
 \author R. Mueller
 
-This module contains the output formatting von BitStrings
-for B1,B3 and B4-format.
+This module contains the input formatting von BitStrings
+for B1,B2,B3 and B4-format.
 */
 
 #ifndef GETBITSTRING_H_INCLUDED
@@ -48,29 +48,15 @@ for B1,B3 and B4-format.
 
 using namespace std;
 namespace pearlrt {
+   /**
+   \addtogroup io_common_helper
+   @{
+   */
 
    /**
-   Class containing the input formatting of bit string variables
-   all methods are defined as static.
+   \brief Input formatting of bit string variables.
 
-
-   Sample usage in PEARL:
-   \verbatim
-   DCL x BIT(3) INIT('011'B1);
-   ...
-   GET x FROM console BY B4(1);
-   \endverbatim
-
-   Should compile in C++ to:
-   \verbatim
-   //DCL x BIT(3) INIT('011'B1);
-   pearlrt:BitString<3> x(3);
-   ...
-   //GET x FROM console BY B4(1);
-   // the console object should provide access to the data sink object
-   pearlrt::GetBitString<3>::fromB4(x, 1, console.getSource());
-   \endverbatim
-
+   \tparam S the length of the BitString
    */
    template<int S> class GetBitString {
    private:
@@ -100,8 +86,8 @@ namespace pearlrt {
       \param w the width of the input field.
       \param base is 1 (B1), 2(B2) or 3(B3)-format
       \param source the origin of the character sequence
-      \throws  BitFormatSignal, if w is < 0, or <br>
-      \throws  BitValueSignal, if field was empty
+      \throws  BitFormatSignal  if w is < 0, or <br>
+      \throws  BitValueSignal if field was empty
       */
       static void fromB123(
          BitString<S> &bitstring,
@@ -146,7 +132,7 @@ namespace pearlrt {
       \param bitstring the data to be read
       \param w the width of the input field.
       \param source the origin of the character sequence
-      \throws BitFormatSignal, if w is < 0, or <br>
+      \throws BitFormatSignal if w is < 0, or <br>
       \throws BitValueSignal if field was empty
       */
       static void fromB4(
@@ -172,6 +158,7 @@ namespace pearlrt {
       }
 
    };
+   /** @} */
 }
 #endif
 

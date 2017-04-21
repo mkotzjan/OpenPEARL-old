@@ -43,9 +43,12 @@
 #include <stdint.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_common_drivers
+   @{
+   */
 
    /**
-   \file
 
    \brief Basic system device for an i2c element pcf8574  basic dation
 
@@ -129,6 +132,7 @@ namespace pearlrt {
       */
       int capabilities();
    };
+   /** @} */
 }
 #endif
 

@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -45,8 +45,11 @@
 
 namespace pearlrt {
    /**
-   \file
+   \addtogroup io_common_helper
+   @{
+   */
 
+   /**
    \brief output formatting for type DURATION
    */
 
@@ -83,7 +86,7 @@ namespace pearlrt {
                       const Fixed<31>& d,
                       Sink& s);
    };
-
+   /** @} */
 }
 
 #endif

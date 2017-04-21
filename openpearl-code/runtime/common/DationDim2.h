@@ -36,7 +36,12 @@
 
 namespace pearlrt {
    /**
-   class for 2 dimentional dation
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+   \brief 2 dimensional dation
 
    This class provides constructors and positining methods for
    2 dimenional dations. For details see: DationDim.h
@@ -110,7 +115,7 @@ namespace pearlrt {
       */
       Fixed<31> getElements4Skip(const Fixed<31> n);
    };
-
+   /** @} */
 }
 #endif
 

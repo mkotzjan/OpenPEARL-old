@@ -52,19 +52,18 @@ the next most integral data type will be used.
 #include "Log.h"
 
 #include "../../configuration/include/autoconf.h"
-#if (TARGET == 2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1)
-  // disable stack checking for the template methods in the applicaton code
-# define NOSTACKCHECK __attribute__((no_instrument_function))
-#else
-# define NOSTACKCHECK /* nothing */
-#endif
+#include "stackcheck.h"
 
 namespace pearlrt {
 #include "NumberOfBytes.h"
 
+   /**
+   template interface
+   */
    template<int S> class Bits;
 
-   /** helper class to set the used data type for bit string
+
+   /** \brief helper class to set the used data type for bit string
        which fit into one byte
    */
    template<> class Bits<1> {
@@ -75,10 +74,18 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint8_t BitType;
+
+      /**
+      type definition of the native integral data type with sign
+      to use for storing BIT(1) .. BIT(8) values
+
+      This type is needed with toFixed conversion
+      \returns just defines the type
+      */
       typedef int8_t SignedBitType;
    };
 
-   /** helper class to set the used data type for bit string
+   /** \brief helper class to set the used data type for bit string
        which fit into two bytes
    */
    template<> class Bits<2> {
@@ -89,10 +96,18 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint16_t BitType;
+
+      /**
+      type definition of the native integral data type with sign
+      to use for storing BIT(9) .. BIT(16) values
+
+      This type is needed with toFixed conversion
+      \returns just defines the type
+      */
       typedef int16_t  SignedBitType;
    };
 
-   /** helper class to set the used data type for bit string
+   /** \brief helper class to set the used data type for bit string
        which fit into four bytes
    */
    template<> class Bits<4> {
@@ -103,10 +118,18 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint32_t BitType;
+
+      /**
+      type definition of the native integral data type with sign
+      to use for storing BIT(17) .. BIT(32) values
+
+      This type is needed with toFixed conversion
+      \returns just defines the type
+      */
       typedef int32_t  SignedBitType;
    };
 
-   /** helper class to set the used data type for bit string
+   /** \brief helper class to set the used data type for bit string
        which fit into eight bytes
    */
    template<> class Bits<8> {
@@ -117,18 +140,33 @@ namespace pearlrt {
       \returns just defines the type
       */
       typedef uint64_t BitType;
+
+      /**
+      type definition of the native integral data type with sign
+      to use for storing BIT(33) .. BIT(64) values
+
+      This type is needed with toFixed conversion
+      \returns just defines the type
+      */
       typedef int64_t  SignedBitType;
    };
 
 #include "IfThenElseTemplate.h"
-
+   /** 
+   \addtogroup datatypes
+   @{
+   */
    /**
+   \brief Implemenation of BitString 
+
    BitString contains a fixed number of bits.
    Depending on the length of the bit string, different data conatiners are
-   used. 1-8 bit are stored in one byte,
-   9-16 bits are stored in 16 bit integer,
-   17-32 bits are stored in a 32 bit integer.
-   33-64 bits are stored in a 64 bit integer.
+   used.
+ 
+   - 1-8 bit are stored in one byte (type Bits<1>),
+   - 9-16 bits are stored in 16 bit integer (type Bits<2>),
+   - 17-32 bits are stored in a 32 bit integer (type Bits<4>),
+   - 33-64 bits are stored in a 64 bit integer (type Bits<8>).
 
    The bits are stored adjusted at the msb of the data container.
 
@@ -140,6 +178,7 @@ namespace pearlrt {
    tests are done, since shifting bits out of a bit string
    is a normal operation. Therefore no BitRangeSignal exists.
 
+   \tparam S the length of the BitString
    */
    template<int S> class BitString {
 
@@ -625,7 +664,10 @@ namespace pearlrt {
       realizes a bitwise AND of two bit string.
       The shorter bit string will be extended at the right side to the
       length of the longer bit string.
-      The result type is given by the longer bit string.
+     
+      \tparam P length of the right hand side BitString
+      \param y the right hand side BitString
+      \returns the result with the longer type
       */
       template<int P>
       BitString < (S < P) ? P : S > bitAnd(BitString<P> y) {
@@ -640,6 +682,10 @@ namespace pearlrt {
       The shorter bit string will be extended at the right side to the
       length of the longer bit string.
       The result type is given by the longer bit string.
+     
+      \tparam P length of the right hand side BitString
+      \param y the right hand side BitString
+      \returns the result with the longer type
       */
       template<int P>
       BitString < (S < P) ? P : S > bitOr(BitString<P> y) {
@@ -654,6 +700,10 @@ namespace pearlrt {
       The shorter bit string will be extended at the right side to the
       length of the longer bit string.
       The result type is given by the longer bit string.
+     
+      \tparam P length of the right hand side BitString
+      \param y the right hand side BitString
+      \returns the result with the longer type
       */
       template< int P>
       BitString < (S < P) ? P : S > bitXor(BitString<P> y) {
@@ -670,6 +720,8 @@ namespace pearlrt {
       The shorter bit string is extended with 0 at the right side
       up to the length of the longer bit string
 
+      \tparam P length of the right hand side BitString
+      \param y the right hand side BitString
       \returns '1'B1  if both are equal, '0'B1 else.
       */
       template<int P>
@@ -685,6 +737,9 @@ namespace pearlrt {
 
       The shorter bit string is extended with 0 at the right side
       up to the length of the longer bit string
+
+      \tparam P length of the right hand side BitString
+      \param y the right hand side BitString
       \returns '1'B1  if both are equal, '0'B1 else.
       */
       template<int P>
@@ -694,7 +749,7 @@ namespace pearlrt {
       }
 
    };
-
+   /** @} */
 }
 # undef NOSTACKCHECK
 #endif
