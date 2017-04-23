@@ -12,7 +12,7 @@ T1: TASK MAIN;
    z := 0;
    null = 0;
    __cpp__ (' try {');
-   x := x / y;
+   x := x // y;
    __cpp__('} catch (FixedDivideByZeroSignal s) { ');
       z := 1;
    __cpp__('}');
