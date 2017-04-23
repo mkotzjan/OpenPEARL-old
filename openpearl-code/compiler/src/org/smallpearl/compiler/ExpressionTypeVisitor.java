@@ -13,7 +13,7 @@
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
  *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
+ *     derived from this software without specific prior written permissision.
  *
  *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -705,7 +705,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeFixed) {
             Integer precision = Math.max(((TypeFixed) op1.getType()).getPrecision(), ((TypeFixed) op2.getType()).getPrecision());
-            res = new ExpressionResult(new TypeFixed(precision), op1.isConstant() && op2.isConstant());
+            res = new ExpressionResult(new TypeFloat(precision), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
