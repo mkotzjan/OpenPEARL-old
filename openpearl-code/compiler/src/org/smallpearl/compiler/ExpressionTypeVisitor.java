@@ -647,18 +647,25 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#5");
-        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeDuration) {
+        } else if (op1.getType() instanceof TypeFixed && op2.getType() instanceof TypeDuration) {
             res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#6");
-        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeFloat) {
+
+        } else if (op1.getType() instanceof TypeFloat && op2.getType() instanceof TypeDuration) {
             res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#7");
+        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeFloat) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
+            m_properties.put(ctx, res);
+
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: visitMultiplicativeExpression: rule#8");
         } else {
             throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }

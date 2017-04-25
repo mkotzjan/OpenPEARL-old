@@ -1930,37 +1930,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return stmt;
     }
 
-    private ST getTaskStartConditions(SmallPearlParser.TaskStartContext ctx) {
-        ST st = group.getInstanceOf("TaskStartConditions");
-
-        if (ctx.startCondition() instanceof SmallPearlParser.StartConditionATContext) {
-            st.add("Condition", "AT");
-        } else if (ctx.startCondition() instanceof SmallPearlParser.StartConditionAFTERContext) {
-            st.add("Condition", "AFTER");
-        }
-
-        if (ctx.frequency() != null) {
-            SmallPearlParser.FrequencyContext c = ctx.frequency();
-            st.add("Condition", "ALL");
-
-            for (int i = 0; i < c.getChildCount(); i++) {
-                if (c.getChild(i) instanceof TerminalNodeImpl) {
-                    if (((TerminalNodeImpl) c.getChild(i)).getSymbol().getText().equals("UNTIL")) {
-                        st.add("Condition", "UNTIL");
-                    } else if (((TerminalNodeImpl) c.getChild(i)).getSymbol().getText().equals("DURING")) {
-                        st.add("Condition", "DURING");
-                    }
-                }
-            }
-        }
-
-        if (ctx.priority() != null) {
-            st.add("Condition", "PRIO");
-        }
-
-        return st;
-    }
-
     @Override
     public ST visitTaskStart(SmallPearlParser.TaskStartContext ctx) {
         ST st = group.getInstanceOf("task_start");
@@ -1970,30 +1939,30 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.startCondition() instanceof SmallPearlParser.StartConditionATContext) {
             SmallPearlParser.StartConditionATContext c = (SmallPearlParser.StartConditionATContext) ctx.startCondition();
             st.add("Condition", "AT");
-            if (c.timeConstant() != null) {
-                st.add("at", getTime(c.timeConstant()));
+            if (c.expression() != null) {
+                st.add("at", getExpression(c.expression()));
             }
         } else if (ctx.startCondition() instanceof SmallPearlParser.StartConditionAFTERContext) {
             SmallPearlParser.StartConditionAFTERContext c = (SmallPearlParser.StartConditionAFTERContext) ctx.startCondition();
             st.add("Condition", "AFTER");
-            if (c.durationConstant() != null) {
-                st.add("after", getDuration(c.durationConstant()).toString());
+            if (c.expression() != null) {
+                st.add("after", getExpression(c.expression()));
             }
         }
 
         if (ctx.frequency() != null) {
             SmallPearlParser.FrequencyContext c = ctx.frequency();
             st.add("Condition", "ALL");
-            st.add("all", getDuration(c.durationConstant().get(0)).toString());
+            st.add("all",getExpression(c.expression(0)));
 
             for (int i = 0; i < c.getChildCount(); i++) {
                 if (c.getChild(i) instanceof TerminalNodeImpl) {
                     if (((TerminalNodeImpl) c.getChild(i)).getSymbol().getText().equals("UNTIL")) {
                         st.add("Condition", "UNTIL");
-                        st.add("until", getTime(c.timeConstant()).toString());
+                        st.add("until", getExpression(c.expression(1)));
                     } else if (((TerminalNodeImpl) c.getChild(i)).getSymbol().getText().equals("DURING")) {
                         st.add("Condition", "DURING");
-                        st.add("during", getDuration(c.durationConstant().get(1)).toString());
+                        st.add("during", getExpression(c.expression(1)));
                     }
                 }
             }
@@ -2040,14 +2009,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.startCondition() instanceof SmallPearlParser.StartConditionATContext) {
             SmallPearlParser.StartConditionATContext c = (SmallPearlParser.StartConditionATContext) ctx.startCondition();
             st.add("Condition", "AT");
-            if (c.timeConstant() != null) {
-                st.add("at", getTime(c.timeConstant()));
+            if (c.expression() != null) {
+                st.add("at", getExpression(c.expression()));
             }
         } else if (ctx.startCondition() instanceof SmallPearlParser.StartConditionAFTERContext) {
             SmallPearlParser.StartConditionAFTERContext c = (SmallPearlParser.StartConditionAFTERContext) ctx.startCondition();
             st.add("Condition", "AFTER");
-            if (c.durationConstant() != null) {
-                st.add("after", getDuration(c.durationConstant()).toString());
+            if (c.expression() != null) {
+                st.add("after", getExpression(c.expression()));
             }
         }
 
@@ -2066,14 +2035,14 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.startCondition() instanceof SmallPearlParser.StartConditionATContext) {
             SmallPearlParser.StartConditionATContext c = (SmallPearlParser.StartConditionATContext) ctx.startCondition();
             st.add("Condition", "AT");
-            if (c.timeConstant() != null) {
-                st.add("at", getTime(c.timeConstant()).toString());
+            if (c.expression() != null) {
+                st.add("at", getExpression(c.expression()));
             }
         } else if (ctx.startCondition() instanceof SmallPearlParser.StartConditionAFTERContext) {
             SmallPearlParser.StartConditionAFTERContext c = (SmallPearlParser.StartConditionAFTERContext) ctx.startCondition();
             st.add("Condition", "AFTER");
-            if (c.durationConstant() != null) {
-                st.add("after", getDuration(c.durationConstant()).toString());
+            if (c.expression() != null) {
+                st.add("after", getExpression(c.expression()));
             }
         }
 
