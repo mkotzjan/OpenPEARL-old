@@ -1773,12 +1773,23 @@ ioStructureComponent
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// Ranks of the operators defined in PEARL
+//
+// rank      dyadic operators         evaluation order
+// -------------------------------------------------------------
+//  1        **, FIT, LWB, UPB        from the right to the left
+//  2        *, /, ><, //, REM        from the left to the right
+//  3        +, -, <>, SHIFT          from the left to the right
+//  4        <, >, <=, >=             from the left to the right
+//  5        ==, /=, IS, ISNT         from the left to the right
+//  6        AND                      from the left to the right
+//  7        OR, EXOR                 from the left to the right
+//
+// All monadic standard operators have rank 1.
+////////////////////////////////////////////////////////////////////////////////
 
 expression
     : primaryExpression                                     # baseExpression
-    | op=('*'|'/') expression                               # unaryMultiplicativeExpression
-    | op='-' expression                                     # unarySubtractiveExpression
-    | op='+' expression                                     # unaryAdditiveExpression
     | op='ATAN' expression                                  # atanExpression
     | op='COS' expression                                   # cosExpression
     | op='EXP' expression                                   # expExpression
@@ -1798,29 +1809,32 @@ expression
     | op='ENTIER' expression                                # entierExpression
     | op='ROUND' expression                                 # roundExpression
     | op='CONT' expression                                  # CONTExpression
-    | expression op='AND' expression                        # AndExpression
-    | expression op='OR' expression                         # OrExpression
-    | expression op='EXOR' expression                       # ExorExpression
-    | expression op=('CAT'|'><') expression                 # catExpression
-    | expression op=('CSHIFT'|'<>') expression              # cshiftExpression
-    | expression op='SHIFT' expression                      # shiftExpression
+    | op='NOW'                                              # nowFunction
+    | op='DATE'                                             # dateFunction
     | expression op='**' <assoc=right> expression           # exponentiationExpression
+    | expression op='FIT' expression                        # fitExpression
+    | op=('*'|'/') expression                               # unaryMultiplicativeExpression
+    | op='-' expression                                     # unarySubtractiveExpression
+    | op='+' expression                                     # unaryAdditiveExpression
     | expression op='*' expression                          # multiplicativeExpression
     | expression op='/' expression                          # divideExpression
     | expression op='//' expression                         # divideIntegerExpression
     | expression op='REM' expression                        # remainderExpression
-    | expression op='FIT' expression                        # fitExpression
+    | expression op=('CAT'|'><') expression                 # catExpression
     | expression op='+' expression                          # additiveExpression
     | expression op='-' expression                          # subtractiveExpression
-    | expression unaryLiteralExpression                     # unarySignedLiteralExpression
-    | expression op=( '=='|'EQ') expression                 # eqRelationalExpression
-    | expression op=( '/='|'NE') expression                 # neRelationalExpression
+    | expression op=('CSHIFT'|'<>') expression              # cshiftExpression
+    | expression op='SHIFT' expression                      # shiftExpression
     | expression op=( '<'|'LT') expression                  # ltRelationalExpression
     | expression op=( '<='|'LE') expression                 # leRelationalExpression
     | expression op=( '>'|'GT') expression                  # gtRelationalExpression
     | expression op=( '>='|'GE') expression                 # geRelationalExpression
-    | op='NOW'                                              # nowFunction
-    | op='DATE'                                             # dateFunction
+    | expression op=( '=='|'EQ') expression                 # eqRelationalExpression
+    | expression op=( '/='|'NE') expression                 # neRelationalExpression
+    | expression op='AND' expression                        # AndExpression
+    | expression op='OR' expression                         # OrExpression
+    | expression op='EXOR' expression                       # ExorExpression
+    | expression unaryLiteralExpression                     # unarySignedLiteralExpression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
