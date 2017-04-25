@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.1";
+    static String version = "v0.8.9.2";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();

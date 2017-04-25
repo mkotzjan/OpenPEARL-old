@@ -312,14 +312,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#5");
-        } else if (op1.getType() instanceof TypeDuration && op2.getType() instanceof TypeClock) {
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeDuration) {
             res = new ExpressionResult(new TypeClock(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: SubtractiveExpression: rule#6");
-        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeDuration) {
-            res = new ExpressionResult(new TypeClock(), op1.isConstant() && op2.isConstant());
+        } else if (op1.getType() instanceof TypeClock && op2.getType() instanceof TypeClock) {
+            res = new ExpressionResult(new TypeDuration(), op1.isConstant() && op2.isConstant());
             m_properties.put(ctx, res);
 
             if (m_debug)
