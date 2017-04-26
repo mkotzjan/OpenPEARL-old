@@ -9,13 +9,15 @@ T1: TASK MAIN;
 
    AT c ALL d DURING 4*d ACTIVATE T1;
    AFTER d ALL 5*d UNTIL c+d ACTIVATE T1;
+   PREVENT T1;   ! let's void endless reactications
    AFTER d RESUME;
 
-   AT c CONTINUE;
+   ! the next line is commented out in order to
+   ! reach a soon termination
+   ! AT c CONTINUE;
+
+
    AFTER d CONTINUE;
-
-   ! this test program does not finish
-
 
 END;
 
