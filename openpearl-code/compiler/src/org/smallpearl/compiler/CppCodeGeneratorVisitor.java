@@ -1025,13 +1025,16 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitTaskDeclaration(SmallPearlParser.TaskDeclarationContext ctx) {
         ST taskdecl = group.getInstanceOf("task_declaration");
-        Integer priority = 255;
+        ST priority = group.getInstanceOf("expression");
         Integer main = 0;
 
         this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
 
         if (ctx.priority() != null) {
-            priority = Integer.parseInt(ctx.priority().IntegerConstant().getText());
+            priority = getExpression(ctx.priority().expression());
+        }
+        else {
+            priority.add("code", Defaults.DEFAULT_TASK_PRIORITY);
         }
 
         if (ctx.task_main() != null) {
@@ -1970,7 +1973,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if (ctx.priority() != null) {
             st.add("Condition", "PRIO");
-            st.add("priority", Integer.parseInt(ctx.priority().IntegerConstant().getText()));
+            st.add("priority", getExpression(ctx.priority().expression()));
         }
 
         return st;
@@ -2022,7 +2025,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if (ctx.priority() != null) {
             st.add("Condition", "PRIO");
-            st.add("priority", Integer.parseInt(ctx.priority().IntegerConstant().getText()));
+            st.add("priority", getExpression(ctx.priority().expression()));
         }
 
         return st;

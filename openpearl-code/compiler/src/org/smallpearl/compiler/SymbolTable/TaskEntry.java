@@ -35,16 +35,16 @@ public class TaskEntry extends SymbolTableEntry {
 
     private Boolean m_isMain;
     private Boolean m_isGlobal;
-    private Integer m_priority;
+    private SmallPearlParser.PriorityContext m_priority;
 
     public TaskEntry() {
     }
 
-    public TaskEntry(String name, Integer priority, Boolean isMain, Boolean isGlobal, SmallPearlParser.TaskDeclarationContext ctx, SymbolTable scope) {
+    public TaskEntry(String name, SmallPearlParser.PriorityContext priority, Boolean isMain, Boolean isGlobal, SmallPearlParser.TaskDeclarationContext ctx, SymbolTable scope) {
         super(name);
 
         m_priority = priority;
-        m_isMain = isMain;
+        m_isMain   = isMain;
         m_isGlobal = isGlobal;
 
         this.m_ctx = ctx;
@@ -53,7 +53,7 @@ public class TaskEntry extends SymbolTableEntry {
 
     public String toString(int level) {
         return  indentString(level) + super.toString(level) + "task" +
-                " priority(" + m_priority + ")" +
+                " priority(" + m_priority.expression().getText() + ")" +
                 (m_isMain ? " main" : "") +
                 (m_isGlobal ? " global" : "") +
                 scopeString(level);

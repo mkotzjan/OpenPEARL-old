@@ -123,7 +123,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public Void visitTaskDeclaration(SmallPearlParser.TaskDeclarationContext ctx) {
         Boolean isMain = false;
         Boolean isGlobal = false;
-        Integer priority = -1;
+        SmallPearlParser.PriorityContext priority = null;
 
         if (m_verbose > 0) {
             System.out.println("SymbolTableVisitor: vistTaskDeclaration");
@@ -131,7 +131,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         isMain = ctx.task_main() != null;
         if (ctx.priority() != null) {
-            priority = Integer.parseInt(ctx.priority().IntegerConstant().getText());
+            priority = ctx.priority();
         }
 
         TaskEntry taskEntry = new TaskEntry(ctx.ID().getText(), priority, isMain, isGlobal, ctx, this.m_currentSymbolTable);
