@@ -172,10 +172,12 @@ namespace pearlrt {
          } else if (condition & TaskCommon::DURING) {
             // the AT-value is transformed into an AFTER some lines
             // above --> treat both
+/* ignore delayed start for the interpretation of DURING -->
+    theses lines must vanish
             if (condition & (TaskCommon::AT | TaskCommon::AFTER)) {
                during = during - after;
             }
-
+*/
             if ((during <= nullDelay).getBoolean()) {
                Log::error("Task %s: negative (effective) value at DURING",
                           task->getName());

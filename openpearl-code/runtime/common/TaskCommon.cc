@@ -169,10 +169,6 @@ namespace pearlrt {
          throw theIllegalSchedulingSignal;
       }
 
-//      if (condition & TaskCommon::WHEN) {
-//         Log::error("task %s: activate: WHEN not supported", name);
-//         throw theInternalTaskSignal;
-//      }
    }
 
    void TaskCommon::block(BlockData *w) {
@@ -557,7 +553,7 @@ namespace pearlrt {
    }
 
 
-   // is called from try-catch protected block --> max throw
+   // is called from try-catch protected block --> may throw
    void TaskCommon::scheduledActivate(int condition,
                                       Fixed<15>& prio,
                                       Clock& at,
