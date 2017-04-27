@@ -1,0 +1,11 @@
+MODULE(systempart);
+! should be compiled with linux due to the system names
+
+SYSTEM;
+   stdout: StdOut;
+   Log('EWDI') --- stdout;   ! send all log messages to stdout
+
+   i2cbus : I2CBus('/dev/i2c-1');
+   bit1   : PCF8574Out('20'B4, 7,1);
+
+MODEND;
