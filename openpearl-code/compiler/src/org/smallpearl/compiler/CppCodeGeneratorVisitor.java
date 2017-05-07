@@ -1867,16 +1867,17 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             literal.add("time", getTime(ctx.timeConstant()));
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().getText();
-            s = s.replaceAll("^'","");
-            s = s.replaceAll("'$","");
+            s = s.replaceAll("^'", "");
+            s = s.replaceAll("'$", "");
             ST constantCharacterValue = group.getInstanceOf("ConstantCharacterValue");
             ConstantCharacterValue value = ConstantPool.lookupCharacterValue(s);
-            if ( value != null ) {
+            if (value != null) {
                 literal.add("string", value);
-            }
-            else {
+            } else {
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
+        } else if ( ctx.BitStringLiteral() != null ) {
+            literal.add( "bit",  Utils.convertBitStringToLong(ctx.BitStringLiteral().getText()));
         } else if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = null;

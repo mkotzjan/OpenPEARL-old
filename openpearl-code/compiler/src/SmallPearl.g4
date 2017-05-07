@@ -2032,12 +2032,12 @@ charSlice
 ////////////////////////////////////////////////////////////////////////////////
 
 literal
-    : IntegerConstant ( '(' IntegerConstant ')' )?
-    | FloatingPointConstant
-    | StringLiteral
+    : StringLiteral
     | BitStringLiteral
     | timeConstant
     | durationConstant
+    | IntegerConstant ( '(' IntegerConstant ')' )?
+    | FloatingPointConstant
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

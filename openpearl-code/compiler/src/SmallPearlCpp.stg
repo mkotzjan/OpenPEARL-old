@@ -490,12 +490,13 @@ FunctionCall(callee,ListOfActualParameters) ::= <%
 <user_procedure(callee)>( me<if(ListOfActualParameters)>, <ListOfActualParameters><endif>)
 %>
 
-literal(integer,float,string,time,duration,bit) ::= <%
+literal(integer,float,string,time,duration,bitstring) ::= <%
 <if(integer)><integer><endif>
 <if(float)><float><endif>
 <if(string)><string><endif>
 <if(time)>pearlrt::Clock(<time>)<endif>
 <if(duration)>pearlrt::Duration(<duration>)<endif>
+<if(bitstring)>(<bitstring>)<endif>
 %>
 
 float(value,precision) ::= <%
