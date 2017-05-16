@@ -1877,7 +1877,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         } else if ( ctx.BitStringLiteral() != null ) {
-            literal.add( "bit",  Utils.convertBitStringToLong(ctx.BitStringLiteral().getText()));
+            literal.add( "bitstring",  Utils.convertBitStringToLong(ctx.BitStringLiteral().getText()));
         } else if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = null;
