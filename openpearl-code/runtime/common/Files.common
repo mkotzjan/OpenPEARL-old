@@ -101,7 +101,8 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	TaskTimerCommon.h \
 	compare.h \
 	SystemDation.h \
-	SystemDationNB.h 
+	SystemDationNB.h \
+	Cont.h
 
 
 ifeq ($(CONFIG_CANSUPPORT),y)
