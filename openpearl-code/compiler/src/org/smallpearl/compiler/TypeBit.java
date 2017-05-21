@@ -55,4 +55,16 @@ public class TypeBit extends TypeDefinition {
     public String toString() {
         return this.getName() + "(" + this.m_precision + ")";
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeBit)) {
+            return false;
+        }
+
+        TypeBit that = (TypeBit) other;
+
+        // Custom equality check here.
+        return this.m_precision == that.m_precision;
+    }
 }

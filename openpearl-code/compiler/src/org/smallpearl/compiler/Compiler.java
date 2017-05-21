@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.2";
+    static String version = "v0.8.9.3";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -120,56 +120,46 @@ public class Compiler {
                 parser.dumpDFA();
             }
 
-            if (parser.getNumberOfSyntaxErrors() <= 0) {
-                SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
-                symbolTableVisitor.visit(tree);
+            try {
+                if (parser.getNumberOfSyntaxErrors() <= 0) {
+                    SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
+                    symbolTableVisitor.visit(tree);
 
-                if (dumpSymbolTable) {
-                    symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
-                }
-
-                ConstantPool constantPool = new ConstantPool();
-                ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose,debug, constantPool);
-                constantPoolVisitor.visit(tree);
-
-                ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug,symbolTableVisitor);
-                expressionTypeVisitor.visit(tree);
-
-                if (!nosemantic) {
-                    SemanticCheck semanticCheck = new SemanticCheck(lexer.getSourceName(), verbose, debug, tree, symbolTableVisitor, expressionTypeVisitor);
-                }
-
-                if (imc) {
-                    SystemPartExport(lexer.getSourceName(),tree);
-                }
-
-//                System.exit(0);
-
-//                try {
-                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor);
-/*                }
-                catch(Exception ex) {
-                    System.err.println(ex.getMessage());
-                    System.err.println("Compilation aborted.");
-
-                    if ( stacktrace )  {
-                        System.err.println( getStackTrace(ex));
+                    if (dumpSymbolTable) {
+                        symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
                     }
 
-                    System.exit(-1);
-                }
-*/
-//                if (dumpSymbolTable) {
-//                    SymbolTable symtab = SymbolTable.getSymbolTable();
-//                    System.out.println(symtab);
-//                    symtab.getGlobalsDeclarations();
-//                    symtab.getProcedureDeclarations();
-//                }
+                    ConstantPool constantPool = new ConstantPool();
+                    ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose, debug, constantPool);
+                    constantPoolVisitor.visit(tree);
 
-                if (dumpConstantPool) {
-                    constantPool.dump();
+                    ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
+                    expressionTypeVisitor.visit(tree);
+
+                    if (!nosemantic) {
+                        SemanticCheck semanticCheck = new SemanticCheck(lexer.getSourceName(), verbose, debug, tree, symbolTableVisitor, expressionTypeVisitor);
+                    }
+
+                    if (imc) {
+                        SystemPartExport(lexer.getSourceName(), tree);
+                    }
+
+                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor);
+
+                    if (dumpConstantPool) {
+                        constantPool.dump();
+                    }
+                }
+            }
+            catch(Exception ex) {
+                System.err.println(ex.getMessage());
+                System.err.println("Compilation aborted.");
+
+                if ( stacktrace )  {
+                    System.err.println( getStackTrace(ex));
                 }
 
+                System.exit(-1);
             }
 
             noOfErrors = parser.getNumberOfSyntaxErrors();

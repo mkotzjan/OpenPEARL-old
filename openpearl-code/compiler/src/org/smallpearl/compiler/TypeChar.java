@@ -51,4 +51,16 @@ public class TypeChar extends TypeDefinition {
         return this.getName() + "(" + this.m_size + ")";
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeChar)) {
+            return false;
+        }
+
+        TypeChar that = (TypeChar) other;
+
+        // Custom equality check here.
+        return this.m_size == that.m_size;
+    }
+
 }

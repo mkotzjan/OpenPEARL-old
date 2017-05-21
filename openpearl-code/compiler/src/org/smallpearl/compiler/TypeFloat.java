@@ -50,4 +50,16 @@ public class TypeFloat extends TypeDefinition {
     public String toString() {
         return this.getName() + "(" + this.m_precision + ")";
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeFloat)) {
+            return false;
+        }
+
+        TypeFloat that = (TypeFloat) other;
+
+        // Custom equality check here.
+        return this.m_precision == that.m_precision;
+    }
 }

@@ -113,24 +113,20 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
                 }
                 else if ( rhs instanceof TypeFixed ) {
                     TypeFixed rhs_type = (TypeFixed) rhs;
-
-//                    if ( rhs_type.getPrecision() >  lhs_type.getPrecision() ) {
-//                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-//                    }
                 }
             }
             else if ( variable.getType() instanceof TypeFixed ) {
                 TypeFixed lhs_type = (TypeFixed) variable.getType();
 
-                if ( !(rhs instanceof TypeFixed) ) {
+                if ( rhs instanceof TypeReference) {
+                    TypeReference rhs_type = (TypeReference)rhs;
+                    if (! (rhs_type.getBaseType() instanceof TypeFixed)) {
+                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    }
+                }
+                else if ( !(rhs instanceof TypeFixed) ) {
                     throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
-
-//                TypeFixed rhs_type = (TypeFixed) rhs;
-//
-//                if ( rhs_type.getPrecision() >  lhs_type.getPrecision() ) {
-//                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-//                }
             }
             else if ( variable.getType() instanceof TypeClock ) {
                 if ( !(rhs instanceof TypeClock) ) {
@@ -153,6 +149,35 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
 
                 if (rhs_type.getPrecision() > lhs_type.getPrecision()) {
                     throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+            }
+            else if ( variable.getType() instanceof TypeReference ) {
+                TypeReference lhs_type = (TypeReference) variable.getType();
+                TypeDefinition rhs_type;
+
+                if ( ctx.dereference() == null ) {
+                    if ( rhs1.getVariable() == null ) {
+                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    }
+
+                    TypeDefinition lt = lhs_type.getBaseType();
+
+                    if ( rhs instanceof TypeReference) {
+                        rhs_type = ((TypeReference) rhs).getBaseType();
+                    }
+                    else {
+                        rhs_type = rhs;
+                    }
+
+                    if ( !(lt.equals(rhs_type))) {
+                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    }
+                }
+                else {
+                    TypeDefinition lt = lhs_type.getBaseType();
+                    if ( !(lt.equals(rhs))) {
+                        throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    }
                 }
             }
         }

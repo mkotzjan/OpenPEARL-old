@@ -76,8 +76,8 @@ public class ProcedureEntry extends SymbolTableEntry {
             s += " )";
         }
 
-        if ( m_resultType != null ) {
-            s += " returns " + m_resultType;
+        if ( m_resultType != null && m_resultType.getType() != null) {
+            s += " returns " + m_resultType.getType();
         }
 
         s += scopeString(m_level);

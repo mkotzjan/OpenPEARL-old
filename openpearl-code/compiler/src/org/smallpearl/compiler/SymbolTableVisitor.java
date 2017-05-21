@@ -54,7 +54,6 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public SymbolTableVisitor(int verbose) {
 
         m_verbose = verbose;
-        m_verbose = 1;
 
         if (m_verbose > 0) {
             System.out.println("Building new symbol table");
@@ -168,6 +167,11 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             }
         }
 
+        SymbolTableEntry entry = symbolTable.lookup(ctx.ID().toString());
+        if ( entry != null ) {
+            throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
         ProcedureEntry procedureEntry = new ProcedureEntry(ctx.ID().getText(), formalParameters, resultType, globalId, ctx, this.m_currentSymbolTable);
         this.m_currentSymbolTable = this.m_currentSymbolTable.newLevel(procedureEntry);
 
@@ -188,14 +192,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     }
 
     private TypeDefinition getResultAttribute(SmallPearlParser.ResultAttributeContext ctx) {
-        for (ParseTree c : ctx.resultType().children) {
-            if (c instanceof SmallPearlParser.SimpleTypeContext) {
-                visitSimpleType((SmallPearlParser.SimpleTypeContext)c);
-                return m_type;
-            }
-        }
-
-        return null;
+        visitChildren(ctx.resultType());
+        return m_type;
     }
 
     private  LinkedList<FormalParameter> getListOfFormalParameters(SmallPearlParser.ListOfFormalParametersContext ctx) {
@@ -325,6 +323,9 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         if (ctx.simpleType() != null) {
             visitSimpleType(ctx.simpleType());
         }
+        else if (ctx.typeReference() != null ){
+            visitTypeReference(ctx.typeReference());
+        }
         return null;
     }
 
@@ -346,6 +347,55 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             }
         }
 
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReference(SmallPearlParser.TypeReferenceContext ctx) {
+        visitChildren(ctx);
+        m_type = new TypeReference(m_type);
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceSimpleType(SmallPearlParser.TypeReferenceSimpleTypeContext ctx) {
+        visitSimpleType(ctx.simpleType());
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceTaskType(SmallPearlParser.TypeReferenceTaskTypeContext ctx) {
+        m_type = new TypeTask();
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceSemaType(SmallPearlParser.TypeReferenceSemaTypeContext ctx) {
+        m_type = new TypeSemaphore();
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceBoltType(SmallPearlParser.TypeReferenceBoltTypeContext ctx) {
+        m_type = new TypeBolt();
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceProcedureType(SmallPearlParser.TypeReferenceProcedureTypeContext ctx) {
+        m_type = new TypeProcedure();
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceInterruptType(SmallPearlParser.TypeReferenceInterruptTypeContext ctx) {
+        m_type = new TypeInterrupt();
+        return null;
+    }
+
+    @Override
+    public Void visitTypeReferenceSignalType(SmallPearlParser.TypeReferenceSignalTypeContext ctx) {
+        m_type = new TypeSignal();
         return null;
     }
 

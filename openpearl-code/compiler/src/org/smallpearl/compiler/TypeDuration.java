@@ -40,4 +40,15 @@ public class TypeDuration extends TypeDefinition {
         return this.getName();
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeDuration)) {
+            return false;
+        }
+
+        TypeDuration that = (TypeDuration) other;
+
+        // Custom equality check here.
+        return true;
+    }
 }

@@ -31,6 +31,14 @@ package org.smallpearl.compiler;
 
 public class DoubleDeclarationException extends RuntimeException {
 
+    public DoubleDeclarationException(String sNumber, int line, int column) {
+        super("Error at line " + line + ":" + column + ": Double declaration error.");
+    }
+
+    public DoubleDeclarationException(String sNumber, int line, int column, String sReason) {
+        super("Error at line " + line + ":" + column + ": Double declaration error: " + sReason);
+    }
+
 /* TODO
     public DoubleDeclarationException(Definition d, Definition dOld) {
         super("Error at line " + d.getPosition().getLocation() + ": Symbol " + d.getName() +

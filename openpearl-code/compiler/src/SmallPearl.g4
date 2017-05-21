@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2012-2014 Marcel Schaible
+ Copyright (c) 2012-2017/mnt/sdb1/home/marcel/repositories/openpearl-code/openpearl-code/compiler/src/SmallPearl.g4 Marcel Schaible
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -325,8 +325,9 @@ globalAttribute :
 //      SimpleType | TypeReference | Identifier§ForType
 ////////////////////////////////////////////////////////////////////////////////
 
-typeAttribute :
-     simpleType
+typeAttribute
+    : simpleType
+    | typeReference
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -369,9 +370,6 @@ integerWithoutPrecision :
 //  Integer ::=
 //    IntegerWithoutPrecision [ ( Precision ) ]
 ////////////////////////////////////////////////////////////////////////////////
-
-typeReference :
-    ;
 
 typeFloatingPointNumber :
     'FLOAT' ( '(' IntegerConstant ')' )?
@@ -538,6 +536,72 @@ typeAttributeForArray :
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// TypeReference ::=
+//   REF
+//   { [ VirtualDimensionList ] [ INV ] { SimpleType | StructuredType }
+//   | [ VirtualDimensionList ] { TypeDation | SEMA | BOLT }
+//   | TypeProcedure | TASK | INTERRUPT | IRPT | SIGNAL
+//   | CHAR( )
+//   }
+////////////////////////////////////////////////////////////////////////////////
+
+typeReference
+    : 'REF' typeReferences
+    ;
+
+typeReferences
+    : typeReferenceSimpleType
+    | typeReferenceStructuredType
+    | typeReferenceDationType
+    | typeReferenceSemaType
+    | typeReferenceBoltType
+    | typeReferenceProcedureType
+    | typeReferenceTaskType
+    | typeReferenceInterruptType
+    | typeReferenceSignalType
+    ;
+
+typeReferenceSimpleType
+    : assignmentProtection? simpleType
+    ;
+
+typeReferenceStructuredType
+    :
+    ;
+
+typeReferenceDationType
+    :
+    ;
+
+typeReferenceSemaType
+    : 'SEMA'
+    ;
+
+typeReferenceBoltType
+    : 'BOLT'
+    ;
+
+typeReferenceProcedureType
+    : ('PROCEDURE' | 'PROC' )  listOfFormalParameters? resultAttribute? globalAttribute?
+    ;
+
+typeReferenceTaskType
+    : 'TASK'
+    ;
+
+typeReferenceInterruptType
+    : ( 'INTERRUPT' | 'IRPT' )
+    ;
+
+typeReferenceSignalType
+    : 'SIGNAL'
+    ;
+
+typeReferenceCharType
+    : 'CHAR' ( '(' expression ')' )?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 //  SemaDeclaration ::=
 //   { DECLARE | DCL } Identifier or IdentifierList [ DimensionAttribute ] SEMA [ GlobalAttribute ]
 ////////////////////////////////////////////////////////////////////////////////
@@ -617,6 +681,7 @@ passIdentical:
 parameterType :
       simpleType
     | typeDation
+    | typeReference
     ;
 
 
@@ -801,10 +866,25 @@ exitStatement
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// Assignment ::=
+//    ScalarAssignment | StructureAssignment | RefProcAssignment
+////////////////////////////////////////////////////////////////////////////////
 
 assignment_statement
-    : ( ID | stringSelection ) ( ':=' | '=' ) expression ';'
+    : ( dereference? ID | stringSelection ) ( ':=' | '=' ) expression ';'
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+dereference
+    : 'CONT'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructureAssignment ::=
+//    Name§Structure 1 { := | = } Expression§Structure 2;
+////////////////////////////////////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////////////////////////
 
 stringSelection
@@ -1569,6 +1649,7 @@ type
     : simple_type
     | type_realtime_object
     | typeTime
+    | typeReference
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1898,7 +1979,7 @@ primaryExpression
 //   | { + | - } DurationConstant
 //   | ConstantFIXEDExpression
 ////////////////////////////////////////////////////////////////////////////////
-constanExpression
+constantExpression
     : FloatingPointConstant
     | ( '+' | '-' )? durationConstant
     | constantFixedExpression
@@ -2032,12 +2113,12 @@ charSlice
 ////////////////////////////////////////////////////////////////////////////////
 
 literal
-    : StringLiteral
+    : IntegerConstant ( '(' IntegerConstant ')' )?
+    | FloatingPointConstant
+    | StringLiteral
     | BitStringLiteral
     | timeConstant
     | durationConstant
-    | IntegerConstant ( '(' IntegerConstant ')' )?
-    | FloatingPointConstant
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

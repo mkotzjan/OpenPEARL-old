@@ -29,6 +29,7 @@
 
 package org.smallpearl.compiler.SymbolTable;
 
+import org.smallpearl.compiler.Defaults;
 import org.smallpearl.compiler.SmallPearlParser;
 
 public class TaskEntry extends SymbolTableEntry {
@@ -52,8 +53,18 @@ public class TaskEntry extends SymbolTableEntry {
     }
 
     public String toString(int level) {
+        String taskPriority;
+        if( m_priority != null ) {
+            taskPriority = m_priority.expression().getText();
+        }
+        else
+        {
+            taskPriority = Integer.toString(Defaults.DEFAULT_TASK_PRIORITY);
+
+        }
+
         return  indentString(level) + super.toString(level) + "task" +
-                " priority(" + m_priority.expression().getText() + ")" +
+                " priority(" +taskPriority + ")" +
                 (m_isMain ? " main" : "") +
                 (m_isGlobal ? " global" : "") +
                 scopeString(level);

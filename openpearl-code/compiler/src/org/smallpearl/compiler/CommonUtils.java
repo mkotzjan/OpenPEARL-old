@@ -32,7 +32,7 @@ package org.smallpearl.compiler;
 import java.util.UUID;
 import org.stringtemplate.v4.ST;
 
-public class Utils {
+public class CommonUtils {
 
 
     public static

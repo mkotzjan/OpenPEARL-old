@@ -259,6 +259,40 @@ duration_type(init) ::= <<
 pearlrt::Duration
 >>
 
+TypeReferenceSimpleType(BaseType) ::= <<
+<BaseType> *
+>>
+
+TypeReferenceTask() ::= <<
+/* REF TASK */
+>>
+
+TypeReferenceProcedure() ::= <<
+/* REF PROC */
+>>
+
+TypeReferenceSema() ::= <<
+/*  REF SEMA */
+>>
+
+TypeReferenceBolt() ::= <<
+/* REF BOLT */
+>>
+
+TypeReferenceInterrupt() ::= <<
+/* REF INTERRUPT */
+>>
+
+TypeReferenceSignal() ::= <<
+/* REF SIGNAL */
+>>
+
+TypeReferenceChar() ::= <<
+/* REF CHAR */
+>>
+
+
+
 /*********************** STATEMENTS ***********************/
 
 empty_statement() ::= <<
@@ -294,7 +328,7 @@ PUTStatement(expression,format,destination) ::= <<
 >>
 
 assignment_statement(lhs,rhs) ::= <<
-_<lhs> = <rhs>;
+    <lhs> = <rhs>;
 >>
 
 if_statement(rhs, then_block, else_block) ::= <<
@@ -485,6 +519,13 @@ ShiftExpression(lhs,rhs) ::= <%
 CatExpression(lhs,rhs) ::= <%
   <lhs>.bitCat(<rhs>)
 %>
+
+ReferenceExpression(code,id,bitstring,operator,functionCall) ::= <%
+<if(id)>&<id><elseif(code)>&<code; wrap><elseif(bitstring)><bitstring><endif>
+<if(operator)><operator><endif>
+<if(functionCall)><functionCall><endif>
+%>
+
 
 FunctionCall(callee,ListOfActualParameters) ::= <%
 <user_procedure(callee)>( me<if(ListOfActualParameters)>, <ListOfActualParameters><endif>)
@@ -991,8 +1032,8 @@ GlobalAttribute() ::= <<
 *** GlobalAttribute ***
 >>
 
-TypeAttribute(SimpleType) ::= <<
-<if(SimpleType)><SimpleType><endif>
+TypeAttribute(Type) ::= <<
+<Type>
 >>
 
 SimpleType(TypeInteger,TypeFloatingPointNumber,TypeBitString,TypeDuration,TypeSemaphore,TypeTime,TypeCharacterString) ::= <%
@@ -1590,3 +1631,8 @@ TOBIT(noOfBits,operand) ::= <%
 TOFLOAT(precision,operand) ::= <%
 (pearlrt::Float\<<precision>>(<operand>))
 %>
+
+CONT(operand) ::= <%
+pearlrt::Cont(<operand>)
+%>
+

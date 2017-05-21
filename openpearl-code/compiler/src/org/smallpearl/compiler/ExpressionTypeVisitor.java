@@ -30,7 +30,6 @@
 package org.smallpearl.compiler;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.smallpearl.compiler.SymbolTable.*;
 
@@ -50,9 +49,6 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         m_verbose = verbose;
         m_debug = debug;
-
-        m_debug = true;
-        m_verbose = 1;
 
         m_symbolTableVisitor = symbolTableVisitor;
         m_symboltable = symbolTableVisitor.symbolTable;
@@ -125,8 +121,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             }
         } else if (ctx.ID() != null) {
             SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
+
+            if ( entry == null ) {
+                throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
             if (entry instanceof VariableEntry) {
-                ExpressionResult expressionResult = new ExpressionResult(((VariableEntry) entry).getType(),((VariableEntry) entry).getAssigmentProtection());
+                ExpressionResult expressionResult = new ExpressionResult(((VariableEntry) entry).getType(),((VariableEntry) entry).getAssigmentProtection(), (VariableEntry)entry);
                 m_properties.put(ctx, expressionResult);
             } else if (entry instanceof ProcedureEntry) {
                 ProcedureEntry proc = (ProcedureEntry) entry;
@@ -1492,7 +1493,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             ExpressionResult expressionResult = new ExpressionResult( new TypeClock(getTime(ctx.timeConstant())),true);
             m_properties.put(ctx, expressionResult);
         } else if (ctx.BitStringLiteral() != null) {
-            ExpressionResult expressionResult = new ExpressionResult(  new TypeBit(Utils.getBitStringLength(ctx.BitStringLiteral().getText())), true);
+            ExpressionResult expressionResult = new ExpressionResult(  new TypeBit(CommonUtils.getBitStringLength(ctx.BitStringLiteral().getText())), true);
             m_properties.put(ctx, expressionResult);
         } else if (ctx.IntegerConstant() != null) {
             try {
@@ -1624,7 +1625,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
         if (!(entry instanceof VariableEntry)) {
-            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
         SmallPearlParser.ExpressionContext expr = ctx.expression();
@@ -2459,4 +2460,32 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         return null;
     }
+
+    @Override
+    public Void visitCONTExpression(SmallPearlParser.CONTExpressionContext ctx) {
+        ExpressionResult op;
+        ExpressionResult res;
+
+        if (m_debug)
+            System.out.println("ExpressionTypeVisitor: visitCONTExpression");
+
+        visit(ctx.expression());
+        op = m_properties.get(ctx.expression());
+
+        if (op == null) {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        if (op.getType() instanceof TypeReference) {
+            ExpressionResult expressionResult = new ExpressionResult(op.getType());
+            m_properties.put(ctx, expressionResult);
+            if (m_debug)
+                System.out.println("ExpressionTypeVisitor: CONT: rule#1");
+        } else {
+            throw new IllegalExpressionException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        return null;
+    }
+
 }

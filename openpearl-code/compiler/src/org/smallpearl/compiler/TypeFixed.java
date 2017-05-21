@@ -56,4 +56,16 @@ public class TypeFixed extends TypeDefinition {
         return this.getName() + "(" + this.m_precision + ")";
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeFixed)) {
+            return false;
+        }
+
+        TypeFixed that = (TypeFixed) other;
+
+        // Custom equality check here.
+        return this.m_precision == that.m_precision;
+    }
+
 }

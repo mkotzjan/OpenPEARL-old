@@ -43,7 +43,7 @@ public class ConstantCharacterValue  extends ConstantValue {
         }
 
         m_value = str;
-        m_uuid = Utils.getUUIDString();
+        m_uuid = CommonUtils.getUUIDString();
     }
 
     public int getLength() { return m_value.length(); }

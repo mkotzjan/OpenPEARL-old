@@ -48,4 +48,15 @@ public class TypeClock extends TypeDefinition {
         return this.getName() + "(" + m_value + ")";
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeClock)) {
+            return false;
+        }
+
+        TypeClock that = (TypeClock) other;
+
+        // Custom equality check here.
+        return this.m_value == that.m_value;
+    }
 }
