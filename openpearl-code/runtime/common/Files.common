@@ -102,7 +102,7 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	compare.h \
 	SystemDation.h \
 	SystemDationNB.h \
-	Cont.h
+	Ref.h
 
 
 ifeq ($(CONFIG_CANSUPPORT),y)

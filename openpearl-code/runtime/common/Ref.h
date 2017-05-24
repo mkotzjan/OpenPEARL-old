@@ -70,6 +70,17 @@ namespace pearlrt {
            
     \throws   RefNotInitializedSignal if the parameter x ist NULL 
    */
+   template<class C> C& cont(C* x) {
+      if (x) {
+         return *x;
+      }
+      Log::error("use of uninitialized reference");
+      throw theRefNotInitializedSignal; 
+   }
+
+   /**
+   depricated version of cont
+   */
    template<class C> C& Cont(C* x) {
       if (x) {
          return *x;
