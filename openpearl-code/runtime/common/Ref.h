@@ -59,8 +59,8 @@ namespace pearlrt {
    Fixed<15> * y;
    ...
    y = & x;           // assignment to the reference variable
-   x = Cont(y) + x;   // usage in an expression
-   Cont(y) = x;       // Usage in an assignment
+   x = cont(y) + x;   // usage in an expression
+   cont(y) = x;       // Usage in an assignment
    \endcode 
 
    \tparam C the class of the referenced variable. This may be any 
