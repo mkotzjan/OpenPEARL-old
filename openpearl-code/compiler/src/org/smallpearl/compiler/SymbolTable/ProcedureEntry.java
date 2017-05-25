@@ -94,7 +94,7 @@ public class ProcedureEntry extends SymbolTableEntry {
     public int getCharPositionInLine() {
         return m_ctx.getStart().getCharPositionInLine();
     }
-    public TypeDefinition getResultType() { return m_resultType.getType(); }
+    public TypeDefinition getResultType() { return m_resultType != null ? m_resultType.getType() : null; }
 
     public SymbolTable scope;
     private  SmallPearlParser.ProcedureDeclarationContext m_ctx;

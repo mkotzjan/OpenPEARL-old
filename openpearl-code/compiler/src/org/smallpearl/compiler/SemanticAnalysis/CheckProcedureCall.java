@@ -133,6 +133,20 @@ public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements S
             System.out.println( "Semantic: Check ProcedureCall: visitCallStatement");
         }
 
+        SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
+
+        if (entry instanceof ProcedureEntry) {
+            if (m_debug)
+                System.out.println("Semantic: Check ProcedureCall: found call in expression");
+
+            ProcedureEntry proc = (ProcedureEntry) entry;
+            TypeDefinition resultType = proc.getResultType();
+
+            if ( resultType != null ) {
+                throw new ResultDiscardedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
         if ( ctx.listOfActualParameters() != null ) {
             visitListOfActualParameters(ctx.listOfActualParameters());
         }
