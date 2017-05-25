@@ -235,6 +235,31 @@ public class SymbolTable {
         return listOfTaskEntries;
     }
 
+    public LinkedList<VariableEntry> getVariableDeclarations() {
+        LinkedList<VariableEntry>  listOfVariableDeclarationsEntries = new  LinkedList<VariableEntry>();
+        SymbolTableEntry e;
+
+        for (Iterator it = m_entries.values().iterator(); it.hasNext(); ) {
+            SymbolTableEntry symbolTableEntry = (SymbolTableEntry) it.next();
+            if ( symbolTableEntry instanceof VariableEntry ) {
+                VariableEntry variableEntry = (VariableEntry)symbolTableEntry;
+                listOfVariableDeclarationsEntries.add(variableEntry);
+            }
+        }
+
+        return listOfVariableDeclarationsEntries;
+    }
+
+
+    public LinkedList<VariableEntry> getAllArrayDeclarations(SymbolTable symbolTable) {
+        LinkedList<VariableEntry> listOfArrayDeclarations = new LinkedList<VariableEntry>();
+
+        for (Iterator it = m_entries.values().iterator(); it.hasNext(); ) {
+            SymbolTableEntry entry = (SymbolTableEntry)it.next();
+       }
+
+        return listOfArrayDeclarations;
+    }
 
     public LinkedList<SemaphoreEntry> getSemaphoreDeclarations() {
         LinkedList<SemaphoreEntry>  listOfSemaEntries = new  LinkedList<SemaphoreEntry>();

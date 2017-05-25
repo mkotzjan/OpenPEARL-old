@@ -30,50 +30,41 @@
 package org.smallpearl.compiler;
 
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+public class ArrayDimension  {
+    private int m_lowerBoundary;
+    private int m_upperBoundary;
 
-public class TypeBit extends TypeDefinition {
-    private int m_precision;
-
-    TypeBit() {
-        super("BIT");
-        this.m_precision = Defaults.BIT_LENGTH;
+    ArrayDimension() {
+        this.m_lowerBoundary = 0;
+        this.m_upperBoundary = 0;
     }
 
-    TypeBit(int precision) {
-        super("BIT");
-        this.m_precision = precision;
+    ArrayDimension(int lowerBoundary, int upperBoundary) {
+        this.m_lowerBoundary = lowerBoundary;
+        this.m_upperBoundary = upperBoundary;
     }
 
-    public Integer getPrecision() {
-        return m_precision;
-    }
-
-    public Void setPrecision(int precision) {
-        m_precision = precision;
-        return null;
-    }
 
     public String toString() {
-        return this.getName() + "(" + this.m_precision + ")";
+        return Integer.toString(this.m_lowerBoundary) + ":" + Integer.toString(this.m_upperBoundary);
     }
 
-    public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
-        st.add("size", m_precision);
-        return st;
+    public int getNoOfElements() {
+        return m_upperBoundary - m_lowerBoundary + 1;
     }
+
+    public int getLowerBoundary() { return this.m_lowerBoundary; }
+    public int getUpperBoundary() { return this.m_upperBoundary; }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof TypeBit)) {
+        if (!(other instanceof ArrayDimension)) {
             return false;
         }
 
-        TypeBit that = (TypeBit) other;
+        ArrayDimension that = (ArrayDimension) other;
 
         // Custom equality check here.
-        return this.m_precision == that.m_precision;
+        return this.m_lowerBoundary == that.m_lowerBoundary && this.m_upperBoundary == that.m_upperBoundary;
     }
 }

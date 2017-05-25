@@ -138,7 +138,7 @@ globalDecl(decls) ::= <<
 
 /*********************** PROBLEM PART ***********************/
 
-ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, temporarySemaphoreArrays,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations) ::= <<
+ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, temporarySemaphoreArrays,ArrayDescriptors,ArrayVariableDeclarations,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations) ::= <<
 /////////////////////////////////////////////////////////////////////////////
 // PROBLEM PART
 /////////////////////////////////////////////////////////////////////////////
@@ -193,6 +193,20 @@ ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, tempo
 <BoltDeclarations>
 <endif>
 
+<if(ArrayDescriptors)>
+/////////////////////////////////////////////////////////////////////////////
+// ARRAY DESCRIPTORS
+/////////////////////////////////////////////////////////////////////////////
+<ArrayDescriptors>
+<endif>
+
+
+<if(ArrayVariableDeclarations)>
+/////////////////////////////////////////////////////////////////////////////
+// ARRAY VARIABLES DECLARATIONS
+/////////////////////////////////////////////////////////////////////////////
+<ArrayVariableDeclarations>
+<endif>
 
 <if(ProcedureDeclarations)>
 /////////////////////////////////////////////////////////////////////////////
@@ -240,7 +254,7 @@ pearlrt::Fixed\<<size>\>
 >>
 
 char_type(size) ::= <<
-Character\<<size>\>
+pearlrt::Character\<<size>\>
 >>
 
 float_type(size) ::= <<
@@ -1633,6 +1647,37 @@ TOFLOAT(precision,operand) ::= <%
 %>
 
 CONT(operand) ::= <%
-pearlrt::Cont(<operand>)
+pearlrt::cont(<operand>)
 %>
 
+ArrayVariableDeclarations(declarations) ::= <<
+<declarations: {declaration|<declaration>}>
+>>
+
+ArrayVariableDeclaration(name,type,assignmentProtection,totalNoOfElements) ::= <%
+<type> data_<name>[<totalNoOfElements>]; <\n>
+%>
+
+ArrayDescriptors(descriptors) ::= <<
+<descriptors: {descriptor|<descriptor>} ; separator="\n">
+>>
+
+ArrayDescriptor(name,dimensions,limits) ::= <%
+DCLARRAY(<name>, <dimensions>, <limits>);
+%>
+
+ArrayDimensions(dimensions) ::= <%
+<dimensions: {dimension|<dimension>} ; separator=",">
+%>
+
+ArrayDimension(lowerBoundary,upperBoundary) ::= <%
+<lowerBoundary>,<upperBoundary>
+%>
+
+ArrayLimits(limits) ::= <%
+LIMITS({<limits: {limit|<limit>} ; separator=",">})
+%>
+
+ArrayLimit(lowerBoundary,upperBoundary,noOfElemenstOnNextSubArray) ::= <%
+{<lowerBoundary>,<upperBoundary>,<noOfElemenstOnNextSubArray>}
+%>

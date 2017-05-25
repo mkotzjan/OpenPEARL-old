@@ -1,0 +1,20 @@
+MODULE (array_dcl);
+
+PROBLEM;
+
+T1: TASK MAIN;
+    DCL switch_on(1:3)  FIXED(4);
+    DCL x(10:20)        FIXED(31);
+    DCL y(1:10,10:20)   FIXED;
+
+
+    DCL z(1:3,1:3)      FLOAT(24);
+    DCL zz(1:10)        CHAR(1);
+
+!    switch_on(1):=’0001’B;
+!    switch_on(2):=’0010’B;
+!    switch_on(3):=’0100’B;
+END;
+    
+MODEND;
+

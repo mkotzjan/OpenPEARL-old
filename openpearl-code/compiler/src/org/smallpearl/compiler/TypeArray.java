@@ -30,50 +30,74 @@
 package org.smallpearl.compiler;
 
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+import java.util.ArrayList;
 
-public class TypeBit extends TypeDefinition {
-    private int m_precision;
+public class TypeArray extends TypeDefinition {
+    private TypeDefinition m_baseType;
+    private ArrayList<ArrayDimension> m_dimensions;
 
-    TypeBit() {
-        super("BIT");
-        this.m_precision = Defaults.BIT_LENGTH;
+
+    TypeArray() {
+        super("ARRAY");
+        this.m_baseType = null;
+        this.m_dimensions = new ArrayList<ArrayDimension>();
     }
 
-    TypeBit(int precision) {
-        super("BIT");
-        this.m_precision = precision;
+    TypeArray(TypeDefinition type, ArrayList<ArrayDimension> dimensions) {
+        super("ARRAY");
+        this.m_baseType = type;
+        this.m_dimensions = new ArrayList<ArrayDimension>();
     }
 
-    public Integer getPrecision() {
-        return m_precision;
-    }
-
-    public Void setPrecision(int precision) {
-        m_precision = precision;
+    public Void addDimension(ArrayDimension dimension) {
+        m_dimensions.add(dimension);
         return null;
     }
 
-    public String toString() {
-        return this.getName() + "(" + this.m_precision + ")";
+    public Void setBaseType(TypeDefinition type) {
+        this.m_baseType = type;
+        return null;
     }
 
-    public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
-        st.add("size", m_precision);
-        return st;
+    public TypeDefinition getBaseType() {
+        return this.m_baseType;
+    }
+
+    public ArrayList<ArrayDimension> getDimensions() {
+        return m_dimensions;
+    }
+
+    public int getNoOfDimensions() {
+        if ( m_dimensions != null ) {
+            return m_dimensions.size();
+        }
+        else {
+            return 0;
+        }
+    }
+
+    public int getTotalNoOfElements() {
+        int totalNoOfElements = 1;
+        for (int i = 0; i < m_dimensions.size(); i++) {
+            totalNoOfElements *= m_dimensions.get(i).getNoOfElements();
+        }
+
+        return totalNoOfElements;
+    }
+
+    public String toString() {
+        return this.getName() + " " + this.m_baseType + " " + this.m_dimensions;
     }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof TypeBit)) {
+        if (!(other instanceof TypeArray)) {
             return false;
         }
 
-        TypeBit that = (TypeBit) other;
+        TypeArray that = (TypeArray) other;
 
         // Custom equality check here.
-        return this.m_precision == that.m_precision;
+        return this.m_baseType.equals(that.getBaseType());
     }
 }

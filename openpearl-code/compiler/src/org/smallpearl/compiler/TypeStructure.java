@@ -30,50 +30,25 @@
 package org.smallpearl.compiler;
 
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+import org.smallpearl.compiler.SymbolTable.SemaphoreEntry;
 
-public class TypeBit extends TypeDefinition {
-    private int m_precision;
+import java.util.LinkedList;
 
-    TypeBit() {
-        super("BIT");
-        this.m_precision = Defaults.BIT_LENGTH;
-    }
+public class TypeStructure extends TypeDefinition {
+    private LinkedList<StructureComponent> m_listOfComponents;
 
-    TypeBit(int precision) {
-        super("BIT");
-        this.m_precision = precision;
-    }
-
-    public Integer getPrecision() {
-        return m_precision;
-    }
-
-    public Void setPrecision(int precision) {
-        m_precision = precision;
-        return null;
+    TypeStructure() {
+        super("STRUCTURE");
     }
 
     public String toString() {
-        return this.getName() + "(" + this.m_precision + ")";
+        return "Type:" + this.getName() ;
     }
 
-    public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
-        st.add("size", m_precision);
-        return st;
+    public boolean addComponent(StructureComponent component) {
+        System.out.println("TypeStructure:addComponent:" + component);
+        m_listOfComponents.add(component);
+        return true;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof TypeBit)) {
-            return false;
-        }
-
-        TypeBit that = (TypeBit) other;
-
-        // Custom equality check here.
-        return this.m_precision == that.m_precision;
-    }
 }

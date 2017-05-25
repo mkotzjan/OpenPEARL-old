@@ -1,3 +1,4 @@
+
 /*
  * [The "BSD license"]
  *  Copyright (c) 2012-2016 Marcel Schaible
@@ -29,51 +30,10 @@
 
 package org.smallpearl.compiler;
 
+import org.smallpearl.compiler.SymbolTable.SymbolTable;
+import org.smallpearl.compiler.SymbolTable.SymbolTableEntry;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-
-public class TypeBit extends TypeDefinition {
-    private int m_precision;
-
-    TypeBit() {
-        super("BIT");
-        this.m_precision = Defaults.BIT_LENGTH;
-    }
-
-    TypeBit(int precision) {
-        super("BIT");
-        this.m_precision = precision;
-    }
-
-    public Integer getPrecision() {
-        return m_precision;
-    }
-
-    public Void setPrecision(int precision) {
-        m_precision = precision;
-        return null;
-    }
-
-    public String toString() {
-        return this.getName() + "(" + this.m_precision + ")";
-    }
-
-    public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
-        st.add("size", m_precision);
-        return st;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof TypeBit)) {
-            return false;
-        }
-
-        TypeBit that = (TypeBit) other;
-
-        // Custom equality check here.
-        return this.m_precision == that.m_precision;
-    }
+public class StructureComponent {
+    public String          m_id;
+    public TypeDefinition  m_type;
 }

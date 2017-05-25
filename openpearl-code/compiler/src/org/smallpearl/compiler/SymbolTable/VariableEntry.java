@@ -11,7 +11,7 @@ public class VariableEntry extends SymbolTableEntry {
     public VariableEntry() {
     }
 
-    public VariableEntry(String name, TypeDefinition type, SmallPearlParser.VariableDenotationContext ctx)
+    public VariableEntry(String name, TypeDefinition type, org.antlr.v4.runtime.ParserRuleContext ctx)
     {
         super(name);
         this.m_ctx = ctx;
@@ -38,7 +38,7 @@ public class VariableEntry extends SymbolTableEntry {
     public int getCharPositionInLine() {
         return m_ctx.getStart().getCharPositionInLine();
     }
-    private SmallPearlParser.VariableDenotationContext m_ctx;
+    private org.antlr.v4.runtime.ParserRuleContext m_ctx;
     public TypeDefinition getType() { return m_type; }
     public Boolean getAssigmentProtection() { return m_hasAssigmentProtection; }
 }

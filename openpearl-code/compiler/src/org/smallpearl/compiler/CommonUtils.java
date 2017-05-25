@@ -29,11 +29,14 @@
 
 package org.smallpearl.compiler;
 
+import java.util.LinkedList;
 import java.util.UUID;
+
+import org.smallpearl.compiler.SymbolTable.SymbolTable;
+import org.smallpearl.compiler.SymbolTable.VariableEntry;
 import org.stringtemplate.v4.ST;
 
 public class CommonUtils {
-
 
     public static
     Long convertBitStringToLong(String bitstring) {
@@ -243,5 +246,13 @@ public class CommonUtils {
         String s = uuid.toString();
         s = s.replaceAll("-", "_");
         return s;
+    }
+
+    public static
+    String getArrayDescriptorName(VariableEntry entry) {
+        String name = "ad_";
+        TypeArray type = ((TypeArray)entry.getType());
+
+        return name;
     }
 }

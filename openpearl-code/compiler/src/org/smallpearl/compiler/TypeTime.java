@@ -30,50 +30,33 @@
 package org.smallpearl.compiler;
 
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+public class TypeTime extends TypeDefinition {
+    Double m_value = 0.0;
 
-public class TypeBit extends TypeDefinition {
-    private int m_precision;
+    TypeTime() {
+        super("TIME");
 
-    TypeBit() {
-        super("BIT");
-        this.m_precision = Defaults.BIT_LENGTH;
     }
 
-    TypeBit(int precision) {
-        super("BIT");
-        this.m_precision = precision;
+    TypeTime(Double value) {
+        super("TIME");
+        m_value = value;
     }
 
-    public Integer getPrecision() {
-        return m_precision;
-    }
-
-    public Void setPrecision(int precision) {
-        m_precision = precision;
-        return null;
-    }
 
     public String toString() {
-        return this.getName() + "(" + this.m_precision + ")";
-    }
-
-    public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
-        st.add("size", m_precision);
-        return st;
+        return this.getName() + "(" + m_value + ")";
     }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof TypeBit)) {
+        if (!(other instanceof TypeTime)) {
             return false;
         }
 
-        TypeBit that = (TypeBit) other;
+        TypeTime that = (TypeTime) other;
 
         // Custom equality check here.
-        return this.m_precision == that.m_precision;
+        return this.m_value == that.m_value;
     }
 }

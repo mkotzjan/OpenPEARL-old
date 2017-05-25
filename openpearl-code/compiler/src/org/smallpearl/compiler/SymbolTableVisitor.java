@@ -48,6 +48,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     private SymbolTableEntry m_currentEntry;
     private SymbolTable m_currentSymbolTable;
     private LinkedList<LinkedList<SemaphoreEntry>> m_listOfTemporarySemaphoreArrays;
+    private LinkedList<ArrayDescriptor> m_listOfArrayDescriptors;
+
     private TypeDefinition m_type;
     private ParseTreeProperty<SymbolTable> m_symboltablePerContext = null;
 
@@ -61,6 +63,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         this.symbolTable = new org.smallpearl.compiler.SymbolTable.SymbolTable();
         this.m_listOfTemporarySemaphoreArrays = new LinkedList<LinkedList<SemaphoreEntry>>();
+        this.m_listOfArrayDescriptors = new LinkedList<ArrayDescriptor>();
         this.m_symboltablePerContext =  new ParseTreeProperty<SymbolTable>();
     }
 
@@ -505,6 +508,122 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     }
 
     @Override
+    public Void visitArrayVariableDeclaration(SmallPearlParser.ArrayVariableDeclarationContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("SymbolTableVisitor: visitArrayVariableDeclaration");
+        }
+
+        visitChildren(ctx);
+
+        return null;
+    }
+
+    @Override
+    public Void visitArrayDenotation(SmallPearlParser.ArrayDenotationContext ctx) {
+        boolean hasGlobalAttribute = false;
+        boolean hasAssigmentProtection = false;
+        ArrayList<String> identifierDenotationList = new ArrayList<String>();;
+
+        m_type = new TypeArray();
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.ID().size(); i++) {
+                identifierDenotationList.add(ctx.ID().get(i).toString());
+            }
+        }
+
+        if (ctx != null) {
+            for (ParseTree c : ctx.children) {
+                if (c instanceof SmallPearlParser.DimensionAttributeContext) {
+                    visitDimensionAttribute((SmallPearlParser.DimensionAttributeContext) c);
+                } else if (c instanceof SmallPearlParser.AssignmentProtectionContext) {
+                    hasAssigmentProtection = true;
+                } else if (c instanceof SmallPearlParser.TypeAttributeForArrayContext) {
+                    visitTypeAttributeForArray((SmallPearlParser.TypeAttributeForArrayContext)c);
+                } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
+                    hasGlobalAttribute = true;
+                }
+            }
+
+            m_listOfArrayDescriptors.add( new ArrayDescriptor(((TypeArray)m_type).getNoOfDimensions(),((TypeArray)m_type).getDimensions()));
+
+            for (int i = 0; i < identifierDenotationList.size(); i++) {
+                VariableEntry variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type,hasAssigmentProtection,null);
+                if (!m_currentSymbolTable.enter(variableEntry)) {
+                    System.out.println("ERR: Double definition of " + identifierDenotationList.get(i));
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitDimensionAttribute(SmallPearlParser.DimensionAttributeContext ctx) {
+        visitChildren(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitBoundaryDenotation(SmallPearlParser.BoundaryDenotationContext ctx) {
+        if (ctx.IntegerConstant().size() == 1 ) {
+            ((TypeArray)m_type).addDimension(new ArrayDimension(
+                    Integer.parseInt(ctx.IntegerConstant(0).getText()),
+                    Integer.parseInt(ctx.IntegerConstant(0).getText())));
+        }
+        else {
+            ((TypeArray)m_type).addDimension(new ArrayDimension(
+                    Integer.parseInt(ctx.IntegerConstant(0).getText()),
+                    Integer.parseInt(ctx.IntegerConstant(1).getText())));
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitTypeAttributeForArray(SmallPearlParser.TypeAttributeForArrayContext ctx) {
+        if ( ctx.type_bit() != null ) {
+            ((TypeArray)m_type).setBaseType(new TypeBit());
+        }
+        else if ( ctx.type_char() != null ) {
+            ((TypeArray)m_type).setBaseType(new TypeChar());
+        }
+        else if ( ctx.type_clock() != null ) {
+            ((TypeArray)m_type).setBaseType(new TypeClock());
+        }
+        else if ( ctx.type_duration() != null ) {
+            ((TypeArray)m_type).setBaseType(new TypeDuration());
+        }
+        else if ( ctx.type_fixed() != null ) {
+            visitType_fixed(ctx.type_fixed());
+            ((TypeArray)m_type).setBaseType(new TypeFixed());
+        }
+        else if ( ctx.type_float() != null  ) {
+            ((TypeArray)m_type).setBaseType(new TypeFloat());
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitType_fixed(SmallPearlParser.Type_fixedContext ctx) {
+        Integer width = Defaults.FIXED_PRECISION;
+
+        if (ctx.IntegerConstant() != null) {
+            width = Integer.parseInt(ctx.IntegerConstant().getText());
+            if (width < 1 || width > 63) {
+                throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        if ( m_type != null && m_type instanceof TypeArray) {
+            width =90;
+        }
+
+        return null;
+    }
+
+    @Override
     public Void visitSemaDeclaration(SmallPearlParser.SemaDeclarationContext ctx) {
         boolean hasGlobalAttribute = false;
 
@@ -665,6 +784,10 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         return m_listOfTemporarySemaphoreArrays;
     }
 
+    public LinkedList<ArrayDescriptor>  getListOfArrayDescriptors() {
+        return m_listOfArrayDescriptors;
+    }
+
     @Override
     public Void visitLoopStatement(SmallPearlParser.LoopStatementContext ctx) {
         String blockLabel = null;
@@ -675,6 +798,10 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         for (int i = 0; i < ctx.scalarVariableDeclaration().size(); i++) {
             visitScalarVariableDeclaration(ctx.scalarVariableDeclaration(i));
+        }
+
+        for (int i = 0; i < ctx.arrayVariableDeclaration().size(); i++) {
+            visitArrayVariableDeclaration(ctx.arrayVariableDeclaration(i));
         }
 
         for ( int i = 0; i < ctx.statement().size(); i++) {

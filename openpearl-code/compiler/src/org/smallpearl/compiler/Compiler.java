@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.3";
+    static String version = "v0.8.9.4";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -277,6 +277,9 @@ public class Compiler {
                 }
                 warninglevel = Integer.parseInt(args[i]);
                 i++;
+            } else {
+                System.out.println("Unknown command line argument:" + arg);
+                return false;
             }
         }
 

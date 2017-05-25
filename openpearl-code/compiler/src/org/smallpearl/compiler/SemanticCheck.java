@@ -72,6 +72,7 @@ public class SemanticCheck {
         new CheckVariableDeclaration(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckCondition(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckCase(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
+        new CheckInterrupt(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
     }
 
 }
