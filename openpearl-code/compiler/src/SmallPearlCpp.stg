@@ -1658,8 +1658,8 @@ ArrayVariableDeclarations(declarations) ::= <<
 <declarations: {declaration|<declaration>}>
 >>
 
-ArrayVariableDeclaration(name,type,assignmentProtection,totalNoOfElements) ::= <%
-<type> data_<name>[<totalNoOfElements>]; <\n>
+ArrayVariableDeclaration(name,type,assignmentProtection,totalNoOfElements,initElements) ::= <%
+<type> data_<name>[<totalNoOfElements>] <if(initElements)> = <initElements><endif>; <\n>
 %>
 
 ArrayDescriptors(descriptors) ::= <<
@@ -1700,4 +1700,8 @@ ArrayIndex(index) ::= <<
 
 ArrayRHS(name,descriptor,indices) ::= <%
 *(data_<name> + <descriptor>->offset(<indices>))
+%>
+
+ArrayInitalisations(initelements)::= <%
+{<initelements: {initelement|<initelement>} ; separator=",">}
 %>

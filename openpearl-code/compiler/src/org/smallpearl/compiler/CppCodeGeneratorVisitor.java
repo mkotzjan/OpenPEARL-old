@@ -527,6 +527,28 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return presetList;
     }
 
+
+    private ST getArrayInitialisationAttribute(SmallPearlParser.ArrayInitialisationAttributeContext ctx, int noOfElements) {
+        ST st = group.getInstanceOf("ArrayInitalisations");
+        ST last_value = null;
+
+        if ( noOfElements < ctx.initElement().size()) {
+            throw new NumberOfInitializerMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        for (int i = 0; i < noOfElements; i++) {
+            ST element = group.getInstanceOf("InitElement");
+
+            if ( i < ctx.initElement().size()) {
+                last_value = getExpression(ctx.initElement().get(i).expression());
+            }
+
+            st.add("initelements", last_value);
+        }
+
+        return st;
+    }
+
     private ArrayList<ST> getInitialisationAttribute(SmallPearlParser.InitialisationAttributeContext ctx) {
         ArrayList<ST> initElementList = new ArrayList<ST>();
 
@@ -4696,6 +4718,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             VariableEntry variableEntry = (VariableEntry)entry;
 
             if ( variableEntry.getType() instanceof TypeArray) {
+                ArrayList<ST> initElementList = null;
+
                 ST declaration = group.getInstanceOf("ArrayVariableDeclaration");
 
                 declaration.add("name", variableEntry.getName());
@@ -4709,6 +4733,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 }
                 declaration.add("assignmentProtection", variableEntry.getAssigmentProtection());
                 declaration.add("totalNoOfElements", ((TypeArray)variableEntry.getType()).getTotalNoOfElements());
+
+                if (ctx.arrayInitialisationAttribute() != null) {
+                    declaration.add("initElements", getArrayInitialisationAttribute(ctx.arrayInitialisationAttribute(),
+                                                                                    ((TypeArray)variableEntry.getType()).getTotalNoOfElements()));
+                }
 
                 declarations.add("declarations",declaration);
             }
