@@ -30,6 +30,9 @@
 package org.smallpearl.compiler;
 
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public class TypeClock extends TypeDefinition {
     Double m_value = 0.0;
 
@@ -59,4 +62,10 @@ public class TypeClock extends TypeDefinition {
         // Custom equality check here.
         return this.m_value == that.m_value;
     }
+
+    public ST toST(STGroup group) {
+        ST st = group.getInstanceOf("clock_type");
+        return st;
+    }
+
 }

@@ -85,7 +85,22 @@ public class ArrayDescriptor {
 
         ArrayDescriptor that = (ArrayDescriptor) other;
 
-        // Custom equality check here.
-        return this.m_noOfDimensions == that.m_noOfDimensions && this.m_listOfDimensions == that.m_listOfDimensions;
+        if (this.m_noOfDimensions != that.m_noOfDimensions) {
+            return false;
+        }
+
+        if (m_listOfDimensions.size() != that.m_listOfDimensions.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < m_listOfDimensions.size(); i++) {
+            if (m_listOfDimensions.get(i).getLowerBoundary() != that.m_listOfDimensions.get(i).getLowerBoundary() ||
+                    m_listOfDimensions.get(i).getUpperBoundary() != that.m_listOfDimensions.get(i).getUpperBoundary()) {
+                return false;
+            }
+        }
+
+        return true;
     }
+
 }

@@ -2,18 +2,126 @@ MODULE (array_dcl);
 
 PROBLEM;
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 3x3 Matrix multiplication
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+test_matmul : PROC;
+    DCL MA(1:3,1:3) FLOAT;
+    DCL MB(1:3,1:3) FLOAT;
+    DCL MC(1:3,1:3) FLOAT;
+    DCL ME(1:3,1:3) FLOAT;
+    DCL rc          BIT(1) INIT('0'B);
+
+    DCL sum FLOAT INIT(0.0);
+    DCL f   FLOAT;
+
+    ! Initialize matrix MA
+    MA(1,1) := 1.0;     MA(1,2) := 2.0;     MA(1,3) := 3.0;
+    MA(2,1) := 4.0;     MA(2,2) := 5.0;     MA(2,3) := 6.0;
+    MA(3,1) := 7.0;     MA(3,2) := 8.0;     MA(3,3) := 9.0;
+
+    ! Initialize matrix MB
+    MB(1,1) := 9.0;     MB(1,2) := 8.0;     MB(1,3) := 7.0;
+    MB(2,1) := 6.0;     MB(2,2) := 5.0;     MB(2,3) := 4.0;
+    MB(3,1) := 3.0;     MB(3,2) := 2.0;     MB(3,3) := 1.0;
+
+    ! Initialize matrix MC
+    FOR i FROM 1 BY 1 TO 3
+    REPEAT
+        FOR j FROM 1 BY 1 TO 3
+        REPEAT
+            MC(i,j) := 0.0;
+        END;
+    END;
+
+    ! Expected result im ME:
+    ME(1,1) :=  30.0;     ME(1,2) :=  24.0;     ME(1,3) := 18.0;
+    ME(2,1) :=  84.0;     ME(2,2) :=  69.0;     ME(2,3) := 54.0;
+    ME(3,1) := 138.0;     ME(3,2) := 114.0;     ME(3,3) := 90.0;
+
+    ! perform calculation:
+    FOR i FROM 1 BY 1 TO 3
+    REPEAT
+        FOR j FROM 1 BY 1 TO 3
+        REPEAT
+        BEGIN
+            sum := 0.0;
+
+            FOR k FROM 1 TO 3
+            REPEAT
+                sum := sum + MA(i,k) * MB(k,j);
+            END;
+
+            MC(i,j) := sum;
+        END;
+        END;
+    END;
+
+    ! Check the results:
+    FOR i FROM 1 BY 1 TO 3
+    REPEAT
+        FOR j FROM 1 BY 1 TO 3
+        REPEAT
+            IF ME(i,j) /= MC(i,j) THEN
+                rc := '1'B1;
+                __cpp__(
+                    '       printf("ERROR: Indices %d:%d!\\n", _i, _j);'
+                    '       pearlrt::Control::setExitCode(1);'
+                );
+            FIN;
+        END;
+    END;
+
+    __cpp__('printf("\\nResult:\\n");'
+    );
+
+    FOR i FROM 1 BY 1 TO 3
+    REPEAT
+        FOR j FROM 1 BY 1 TO 3
+        REPEAT
+            f := MC(i,j);
+            __cpp__('printf("%10.4f  ",_f);');
+        END;
+
+        __cpp__( 'printf("\\n");'         );
+
+    END;
+
+
+    IF rc EQ '1'B
+    THEN
+        __cpp__(
+            '       printf("ERROR: Matrix muliplication failed!\\n");'
+            '       pearlrt::Control::setExitCode(1);'
+        );
+    FIN;
+
+END;
+
 T1: TASK MAIN;
-    DCL switch_on(1:3)  FIXED(4);
-    DCL x(10:20)        FIXED(31);
-    DCL y(1:10,10:20)   FIXED;
+    DCL switch_on(1:3)              BIT;
+    DCL x(10:20)                    FIXED(31);
+    DCL y(1:10,10:20)               FIXED;
+    DCL z(1:3,1:3)                  FLOAT(24);
+    DCL zz(1:10)                    CHAR(1);
+    DCL clock_array(1:10)           CLOCK;
+    DCL duration_array(10:20)       DURATION;
 
+    DCL ref_fixed_array(1:2)         REF FIXED(10);
+    DCL ref_float_array(1:2)         REF FLOAT(24);
+    DCL ref_char_array(1:2)          REF CHAR(10);
+    DCL ref_bit_array(1:2)           REF BIT;
 
-    DCL z(1:3,1:3)      FLOAT(24);
-    DCL zz(1:10)        CHAR(1);
+    x(10) := 42;
+    y(10,15) := 0;
 
-!    switch_on(1):=’0001’B;
-!    switch_on(2):=’0010’B;
-!    switch_on(3):=’0100’B;
+    x(10) := x(15) * x(14);
+
+!    switch_on(1) := ’0001’B1;
+!    switch_on(2) := ’0010’B1;
+!    switch_on(3) := ’0100’B1;
+
+    CALL test_matmul;
 END;
     
 MODEND;

@@ -60,7 +60,7 @@ public class TypeBit extends TypeDefinition {
     }
 
     public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
+        ST st = group.getInstanceOf("bit_type");
         st.add("size", m_precision);
         return st;
     }

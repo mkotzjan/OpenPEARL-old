@@ -33,6 +33,8 @@ import org.smallpearl.compiler.*;
 import org.smallpearl.compiler.SymbolTable.*;
 import org.stringtemplate.v4.ST;
 
+import java.util.List;
+
 public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
     private int m_verbose;
@@ -166,28 +168,21 @@ public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements S
                 TypeDefinition resultType = proc.getResultType();
             }
 
-            if ( ctx.listOfActualParameters() != null ) {
-                visitListOfActualParameters(ctx.listOfActualParameters());
+            if ( ctx.expression() != null ) {
+                checkListOfActualParameters(ctx.expression());
             }
-
         }
 
         return null;
     }
 
-    @Override
-    public Void visitListOfActualParameters(SmallPearlParser.ListOfActualParametersContext ctx) {
+    private Void checkListOfActualParameters(List<SmallPearlParser.ExpressionContext> parameters) {
         if (m_debug) {
-            System.out.println( "Semantic: Check ProcedureCall: visitListOfActualParameters");
+            System.out.println( "Semantic: Check ProcedureCall: checkListOfActualParameters");
         }
 
-        if ( ctx.expression() != null ) {
-            for (int i = 0; i < ctx.expression().size(); i++) {
-                // getExpression(ctx.expression(i)));
-            }
-        }
+        // TODO: Check paraneter types
 
         return null;
     }
-
 }

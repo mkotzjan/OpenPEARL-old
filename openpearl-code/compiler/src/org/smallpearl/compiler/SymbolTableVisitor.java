@@ -545,7 +545,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                 }
             }
 
-            m_listOfArrayDescriptors.add( new ArrayDescriptor(((TypeArray)m_type).getNoOfDimensions(),((TypeArray)m_type).getDimensions()));
+            addArrayDescriptor(new ArrayDescriptor(((TypeArray)m_type).getNoOfDimensions(),((TypeArray)m_type).getDimensions()));
 
             for (int i = 0; i < identifierDenotationList.size(); i++) {
                 VariableEntry variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type,hasAssigmentProtection,null);
@@ -600,6 +600,12 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         }
         else if ( ctx.type_float() != null  ) {
             ((TypeArray)m_type).setBaseType(new TypeFloat());
+        }
+        else if ( ctx.typeReference() != null  ) {
+            TypeDefinition tempType = m_type;
+            visitTypeReference(ctx.typeReference());
+            ((TypeArray)tempType).setBaseType(m_type);
+            m_type = tempType;
         }
 
         return null;
@@ -897,6 +903,20 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             m_currentSymbolTable.enterOrReplace(entry);
         }
 
+        return null;
+    }
+
+    private Void addArrayDescriptor(ArrayDescriptor descriptor) {
+        boolean found = false;
+        for ( int i = 0; i < m_listOfArrayDescriptors.size(); i++) {
+            if ( m_listOfArrayDescriptors.get(i).equals(descriptor)) {
+                found = true;
+            }
+        }
+
+        if ( !found) {
+            m_listOfArrayDescriptors.add( descriptor);
+        }
         return null;
     }
 }

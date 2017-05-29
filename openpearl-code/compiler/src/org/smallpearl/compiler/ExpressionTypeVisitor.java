@@ -29,6 +29,7 @@
 
 package org.smallpearl.compiler;
 
+import com.sun.org.apache.xpath.internal.operations.Variable;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.smallpearl.compiler.SymbolTable.*;
@@ -105,13 +106,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         if (m_debug)
             System.out.println("ExpressionTypeVisitor: visitPrimaryExpression");
 
-        if (ctx.expression() != null) {
-            visit(ctx.expression());
-            ExpressionResult expressionResult = m_properties.get(ctx.expression());
-            if (expressionResult != null) {
-                m_properties.put(ctx, expressionResult);
-            }
-        } else if (ctx.literal() != null) {
+
+        if (ctx.literal() != null) {
             visitLiteral(ctx.literal());
             ExpressionResult expressionResult = m_properties.get(ctx.literal());
             if (expressionResult != null) {
@@ -127,7 +123,17 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             }
 
             if (entry instanceof VariableEntry) {
-                ExpressionResult expressionResult = new ExpressionResult(((VariableEntry) entry).getType(),((VariableEntry) entry).getAssigmentProtection(), (VariableEntry)entry);
+                ExpressionResult expressionResult;
+
+                VariableEntry variable = (VariableEntry) entry;
+
+                if ( variable.getType() instanceof TypeArray ) {
+                    expressionResult = new ExpressionResult(((TypeArray) variable.getType()).getBaseType(), variable.getAssigmentProtection(), variable);
+                }
+                else {
+                    expressionResult = new ExpressionResult(variable.getType(), variable.getAssigmentProtection(), variable);
+                }
+
                 m_properties.put(ctx, expressionResult);
             } else if (entry instanceof ProcedureEntry) {
                 ProcedureEntry proc = (ProcedureEntry) entry;
@@ -147,9 +153,19 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             if (expressionResult != null) {
                 m_properties.put(ctx, expressionResult);
             }
+        } else if (ctx.expression() != null) {
+            if ( ctx.expression().size() > 1 ) {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            visit(ctx.expression(0));
+            ExpressionResult expressionResult = m_properties.get(ctx.expression(0));
+            if (expressionResult != null) {
+                m_properties.put(ctx, expressionResult);
+            }
         }
 
-        return null;
+            return null;
     }
 
     //
@@ -2237,7 +2253,6 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         return null;
     }
 
-    // TODO: XXXXX
     @Override
     public Void visitStringSelection(SmallPearlParser.StringSelectionContext ctx) {
         if (m_verbose > 0) {

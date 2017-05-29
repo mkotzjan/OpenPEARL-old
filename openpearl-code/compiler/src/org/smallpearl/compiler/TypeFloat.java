@@ -56,6 +56,7 @@ public class TypeFloat extends TypeDefinition {
 
     public ST toST(STGroup group) {
         ST st = group.getInstanceOf("float_type");
+        st.add("size", m_precision);
         return st;
     }
 

@@ -533,6 +533,7 @@ typeAttributeForArray :
     | type_clock
     | type_bit
     | type_char
+    | typeReference
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -871,7 +872,7 @@ exitStatement
 ////////////////////////////////////////////////////////////////////////////////
 
 assignment_statement
-    : ( dereference? ID | stringSelection ) ( ':=' | '=' ) expression ';'
+    : ( dereference? ID indices? | stringSelection ) ( ':=' | '=' ) expression ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1867,6 +1868,12 @@ boundaryDenotation
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+indices
+    : '(' expression ( ',' expression )* ')'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 //  CompoundType ::=
 //    IO-Structure | Identifier§ForNewTypeFromSimpleTypes
 ////////////////////////////////////////////////////////////////////////////////
@@ -2005,7 +2012,9 @@ numericLiteralNegative
 primaryExpression
 	: '(' expression ')'
     | ID
-    | ID listOfActualParameters?
+//    | ID indices
+    | ID '(' expression  ( ',' expression )* ')'
+//    | ID listOfActualParameters?
     | literal
     | semaTry
 //    | monadicExplicitTypeConversionOperators

@@ -30,6 +30,9 @@
 package org.smallpearl.compiler;
 
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public class TypeReference extends TypeDefinition {
     private TypeDefinition m_baseType;
 
@@ -68,4 +71,11 @@ public class TypeReference extends TypeDefinition {
         // Custom equality check here.
         return this.m_baseType.equals(that.getBaseType());
     }
+
+    public ST toST(STGroup group) {
+        ST st = group.getInstanceOf("TypeReferenceSimpleType");
+        st.add("BaseType", m_baseType.toST(group));
+        return st;
+    }
+
 }

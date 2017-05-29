@@ -253,12 +253,16 @@ fixed_type(size) ::= <<
 pearlrt::Fixed\<<size>\>
 >>
 
+bit_type(size) ::= <<
+pearlrt::BitString\<<size>\>
+>>
+
 char_type(size) ::= <<
 pearlrt::Character\<<size>\>
 >>
 
 float_type(size) ::= <<
-double
+pearlrt::Float\<<size>\>
 >>
 
 time_type(clock_type,duration_type) ::= <<
@@ -1680,4 +1684,20 @@ LIMITS({<limits: {limit|<limit>} ; separator=",">})
 
 ArrayLimit(lowerBoundary,upperBoundary,noOfElemenstOnNextSubArray) ::= <%
 {<lowerBoundary>,<upperBoundary>,<noOfElemenstOnNextSubArray>}
+%>
+
+ArrayLHS(name,descriptor,indices) ::= <%
+(*(data_<name> + <descriptor>->offset(<indices>)))
+%>
+
+ArrayIndices(indices) ::= <<
+    <indices: {index|<index>} ; separator=",\n">
+>>
+
+ArrayIndex(index) ::= <<
+    pearlrt::Fixed\<31>(<index>)
+>>
+
+ArrayRHS(name,descriptor,indices) ::= <%
+*(data_<name> + <descriptor>->offset(<indices>))
 %>
