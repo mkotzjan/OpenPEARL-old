@@ -58,7 +58,7 @@ test_matmul : PROC;
         FOR j FROM 1 BY 1 TO 3
         REPEAT
             f := MA(i,j);
-            __cpp__('printf("%10.4f  ",_f);');
+            __cpp__('printf("%10.4f  ",_f.x);');
         END;
 
         __cpp__( 'printf("\\n");'         );
@@ -72,7 +72,7 @@ test_matmul : PROC;
         FOR j FROM 1 BY 1 TO 3
         REPEAT
             f := MB(i,j);
-            __cpp__('printf("%10.4f  ",_f);');
+            __cpp__('printf("%10.4f  ",_f.x);');
         END;
 
         __cpp__( 'printf("\\n");'         );
@@ -86,7 +86,7 @@ test_matmul : PROC;
         FOR j FROM 1 BY 1 TO 3
         REPEAT
             f := MC(i,j);
-            __cpp__('printf("%10.4f  ",_f);');
+            __cpp__('printf("%10.4f  ",_f.x);');
         END;
 
         __cpp__( 'printf("\\n");'         );
@@ -100,7 +100,7 @@ test_matmul : PROC;
         FOR j FROM 1 BY 1 TO 3
         REPEAT
             f := ME(i,j);
-            __cpp__('printf("%10.4f  ",_f);');
+            __cpp__('printf("%10.4f  ",_f.x);');
         END;
 
         __cpp__( 'printf("\\n");'         );
@@ -133,7 +133,7 @@ test_matmul : PROC;
             IF ME(i,j) /= MC(i,j) THEN
                 rc := '1'B1;
                 __cpp__(
-                    '       printf("ERROR: Indices %d:%d!\\n", _i, _j);'
+                    '       printf("ERROR: Indices %d:%d!\\n", _i.x, _j.x);'
                     '       pearlrt::Control::setExitCode(1);'
                 );
             FIN;
@@ -148,7 +148,7 @@ test_matmul : PROC;
         FOR j FROM 1 BY 1 TO 3
         REPEAT
             f := MC(i,j);
-            __cpp__('printf("%10.4f  ",_f);');
+            __cpp__('printf("%10.4f  ",_f.x);');
         END;
 
         __cpp__( 'printf("\\n");'         );
