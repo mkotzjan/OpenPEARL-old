@@ -29,13 +29,8 @@
 
 package org.smallpearl.compiler;
 
-public class TypeMismatchException extends RuntimeException {
-    public TypeMismatchException(String sNumber, int line, int column) {
-        super("Error at line " + line + ":" + column + ": Type mismatch");
+public class SemanticError extends RuntimeException {
+    public SemanticError(String sNumber, int line, int column, String sReason) {
+        super("Error at line " + line + ":" + column + ": Semantic Error: " + sReason);
     }
-
-    public TypeMismatchException(String sNumber, int line, int column, String sReason) {
-        super("Error at line " + line + ":" + column + ": Type mismatch: " + sReason);
-    }
-
 }

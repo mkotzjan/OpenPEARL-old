@@ -6,7 +6,8 @@ import org.smallpearl.compiler.TypeDefinition;
 public class VariableEntry extends SymbolTableEntry {
 
     private TypeDefinition  m_type;
-    private Boolean m_hasAssigmentProtection;
+    private Boolean         m_hasAssigmentProtection;
+    private Boolean         m_loopControlVariable;
 
     public VariableEntry() {
     }
@@ -17,6 +18,7 @@ public class VariableEntry extends SymbolTableEntry {
         this.m_ctx = ctx;
         this.m_type = type;
         this.m_hasAssigmentProtection = false;
+        this.m_loopControlVariable = false;
     }
 
     public VariableEntry(String name, TypeDefinition type, Boolean hasAssigmentProtection, SmallPearlParser.VariableDenotationContext ctx)
@@ -25,11 +27,12 @@ public class VariableEntry extends SymbolTableEntry {
         this.m_ctx = ctx;
         this.m_type = type;
         this.m_hasAssigmentProtection = hasAssigmentProtection;
+        this.m_loopControlVariable = false;
     }
 
     public String toString(int level) {
         String assigmenProtection = this.m_hasAssigmentProtection ? "INV" : "";
-        return indentString(level) + super.toString(level) + "var " + m_type + " " + assigmenProtection;
+        return indentString(level) + super.toString(level) + "var " + m_type + " " + assigmenProtection + (this.m_loopControlVariable ? " LC" :"");
     }
 
     public int getSourceLineNo() {
@@ -41,4 +44,11 @@ public class VariableEntry extends SymbolTableEntry {
     private org.antlr.v4.runtime.ParserRuleContext m_ctx;
     public TypeDefinition getType() { return m_type; }
     public Boolean getAssigmentProtection() { return m_hasAssigmentProtection; }
+
+    public Void setLoopControlVariable() {
+        m_loopControlVariable = true;
+        return null;
+    }
+
+    public Boolean getLoopControlVariable() { return m_loopControlVariable; }
 }

@@ -93,6 +93,14 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
         if ( lhs instanceof VariableEntry) {
             VariableEntry variable = (VariableEntry) lhs;
 
+            if ( lhs == null ) {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            if ( variable.getLoopControlVariable()) {
+                throw new SemanticError(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine(), "Loop control variable cannot be changed");
+            }
+
             if ( rhs == null ) {
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }

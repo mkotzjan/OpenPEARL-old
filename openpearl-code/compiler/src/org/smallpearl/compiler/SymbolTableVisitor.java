@@ -313,7 +313,17 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             for (int i = 0; i < identifierDenotationList.size(); i++) {
                 VariableEntry variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, ctx);
                 if (!m_currentSymbolTable.enter(variableEntry)) {
-                    System.out.println("ERR: Double definition of " + identifierDenotationList.get(i));
+
+                    SymbolTableEntry entry = m_currentSymbolTable.lookupLocal(identifierDenotationList.get(i));
+                    if ( entry != null ) {
+                        if ( entry instanceof VariableEntry) {
+                            if (((VariableEntry)entry).getLoopControlVariable() ) {
+                                throw new SemanticError(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine(), "Loop control variable cannot be declared");
+                            }
+                        }
+                    }
+
+                    throw new SemanticError(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine(), "Double definition of " + identifierDenotationList.get(i));
                 }
             }
         }
@@ -802,6 +812,17 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             System.out.println("SymbolTableVisitor: visitLoopStatement");
         }
 
+        LoopEntry loopEntry = new LoopEntry(blockLabel, ctx, m_currentSymbolTable);
+
+        m_currentSymbolTable = m_currentSymbolTable.newLevel(loopEntry);
+        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
+
+        if ( ctx.loopStatement_for() != null) {
+            VariableEntry controlVariable = new VariableEntry(ctx.loopStatement_for().ID().getText(), new TypeFixed(31), true, null);
+            controlVariable.setLoopControlVariable();
+            m_currentSymbolTable.enter(controlVariable);
+        }
+
         for (int i = 0; i < ctx.scalarVariableDeclaration().size(); i++) {
             visitScalarVariableDeclaration(ctx.scalarVariableDeclaration(i));
         }
@@ -811,23 +832,22 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         }
 
         for ( int i = 0; i < ctx.statement().size(); i++) {
+            SmallPearlParser.StatementContext stmt = ctx.statement(i);
+
+            if (stmt.block_statement() != null) {
+                visitBlock_statement(stmt.block_statement());
+            } else if (stmt.unlabeled_statement() != null) {
+                visitUnlabeled_statement(stmt.unlabeled_statement());
+            }
         }
 
         if ( ctx.loopStatement_end().ID() != null) {
             blockLabel = ctx.loopStatement_end().ID().getText();
         }
 
-        LoopEntry loopEntry = new LoopEntry(blockLabel, ctx, m_currentSymbolTable);
 
-        m_currentSymbolTable = m_currentSymbolTable.newLevel(loopEntry);
-        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
+//        visitChildren(ctx);
 
-        if ( ctx.loopStatement_for() != null) {
-            VariableEntry controlVariable = new VariableEntry(ctx.loopStatement_for().ID().getText(), new TypeFixed(31), true, null);
-            m_currentSymbolTable.enter(controlVariable);
-        }
-
-        visitChildren(ctx);
         m_currentSymbolTable = m_currentSymbolTable.ascend();
         return null;
     }

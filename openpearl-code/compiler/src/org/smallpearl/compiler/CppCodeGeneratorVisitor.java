@@ -1751,6 +1751,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
 
         if ( entry == null ) {
+            m_currentSymbolTable.dump(m_currentSymbolTable);
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -4323,6 +4324,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitBlock_statement(SmallPearlParser.Block_statementContext ctx) {
         ST st = group.getInstanceOf("block_statement");
 
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
+
         for (ParseTree c : ctx.children) {
             if ( c instanceof SmallPearlParser.ScalarVariableDeclarationContext ) {
                 st.add("code", visitScalarVariableDeclaration((SmallPearlParser.ScalarVariableDeclarationContext)c));
@@ -4335,6 +4338,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         }
 
+        this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+
         return st;
     }
 
@@ -4346,6 +4351,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         TypeDefinition toType = null;
         Integer rangePrecision = 31;
         Boolean loopCounterNeeded = false;
+
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
 
         st.add("srcLine", ctx.start.getLine());
 
@@ -4423,6 +4430,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (loopCounterNeeded) {
             st.add( "GenerateLoopCounter", 1);
         }
+
+        this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
 
         return st;
     }
