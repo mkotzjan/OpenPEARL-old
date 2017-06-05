@@ -80,7 +80,8 @@ T1: TASK MAIN;
    CALL proc_003(f, f15+1);
    CALL proc_004(f, f15);
    CALL proc_005(f, f15);
-!   CALL proc_008(f);
+!   CALL proc_008(f);      ! not ok - dicarding result value
+!   proc_008(f);	   ! not ok - discarding result value
 
 END;
 
