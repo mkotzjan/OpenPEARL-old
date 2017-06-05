@@ -78,16 +78,6 @@ namespace pearlrt {
       throw theRefNotInitializedSignal; 
    }
 
-   /**
-   depricated version of cont
-   */
-   template<class C> C& Cont(C* x) {
-      if (x) {
-         return *x;
-      }
-      Log::error("use of uninitialized reference");
-      throw theRefNotInitializedSignal; 
-   }
    /** @} */
 }
 
