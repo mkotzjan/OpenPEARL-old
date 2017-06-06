@@ -170,7 +170,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             }
         }
 
-        SymbolTableEntry entry = symbolTable.lookup(ctx.ID().toString());
+        String id = ctx.ID().toString();
+        SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
         if ( entry != null ) {
             throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
