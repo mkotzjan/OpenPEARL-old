@@ -130,6 +130,11 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         if (m_verbose > 0) {
             System.out.println("SymbolTableVisitor: vistTaskDeclaration");
         }
+        String id = ctx.ID().toString();
+        SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
+        if ( entry != null ) {
+            throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
 
         isMain = ctx.task_main() != null;
         if (ctx.priority() != null) {
@@ -170,7 +175,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             }
         }
 
-        SymbolTableEntry entry = symbolTable.lookup(ctx.ID().toString());
+        SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
         if ( entry != null ) {
             throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
