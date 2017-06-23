@@ -32,7 +32,8 @@ convertTo: PROC;
   DCL x FIXED INIT(42);
   text := 'PEARL...'; 
   result := 'PEARL...    42';
-  !CONVERT text, x TO buffer BY A, F(3);
+  CONVERT text, x TO buffer BY A, F(3);
+/*
   __cpp__(
 ' {  // define helper variables in local block'
 '    pearlrt::RefCharacter rc(_buffer); '
@@ -48,6 +49,7 @@ convertTo: PROC;
 '   }				'
 '  }  // end of block '
   );
+*/
 
   
   IF buffer NE result THEN
@@ -66,7 +68,8 @@ convertFrom: PROC;
   DCL x FIXED;
   result := 'PEA';
   buffer := 'PEARL... 42'; 
-  !CONVERT text, x TO buffer BY A(3), X(5), F(3);
+  CONVERT text, x TO buffer BY A(3), X(5), F(3);
+/*
   __cpp__(
 ' {  // define helper variables in local block'
 '    pearlrt::RefCharacter rc(_buffer); '
@@ -83,6 +86,7 @@ convertFrom: PROC;
 ' //  rc.store(_buffer);  // fill with spaces '
 '  }  // end of block '
   );
+*/
 
   IF text NE result  THEN
      PUT 'error@in1: text=>', text, '<' TO stdout BY A,A,A,SKIP;
