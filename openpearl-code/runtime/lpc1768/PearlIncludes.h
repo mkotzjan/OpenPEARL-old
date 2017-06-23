@@ -123,3 +123,8 @@ extern "C" {
 #include "Lpc17xxUsbDisk.h"
 #include "FatFs.h"
 #endif
+#ifdef CONFIG_LPC1768_SDCARD
+#include "Lpc17xxSDCard.h"
+#include "FatFs.h"
+#endif
+

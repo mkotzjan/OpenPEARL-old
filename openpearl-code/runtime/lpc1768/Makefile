@@ -29,6 +29,9 @@ INCS = .
 CXXSRCS =
 CRCS =
 
+CHAN_FS= ../FreeRTOS/chanFatFs/src
+LPCOPEN_FS= ../cortexM/LPCOpen/software/filesystems
+
 targets := OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a lpc1768.xml
 
 # -------------------- add CMSIS support to project
@@ -79,10 +82,13 @@ LPCOpen_CSRC += $(LPCOpen)/iocon_17xx_40xx.c
 CXXSRCS += main.cc Log.cc
 CHECK_FILES += main.cc Log.cc
 
+ifeq ($(CONFIG_LPC1768_HY32A),y)
 CSRC += Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.c
 XMLFILES += Hy32.xml
 CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc \
 	Hy32.h Hy32LowLevel.h
+endif
+
 # ------- add board specific stuff to project
 BOARDSUPPORT := 
 #BOARDSUPPORT += lpc17_uart_retarget.c
@@ -140,27 +146,39 @@ CXXSRCS += Lpc17xxUsb.cc
 CHECK_FILES += Lpc17xxUsb.cc  Lpc17xxUsb.h
 INCS += $(LPCUSB_Base) 
 endif
+
+ifeq ($(CONFIG_HAS_FAT),y)
+   INCS += $(CHAN_FS)
+   LPCOpen_CSRC += $(CHAN_FS)/ff.c
+   LPCOpen_CSRC += $(CHAN_FS)/ff_errors.c
+   LPCOpen_CSRC += $(CHAN_FS)/diskio.c
+endif
+
 ifeq ($(CONFIG_LPC1768_USB_Disk),y)
-LPCUSB_FS= ../cortexM/LPCOpen/software/filesystems
-CHAN_FS= ../FreeRTOS/chanFatFs/src
-LPCOpen_CSRC += $(LPCUSB_Class)/Host/MassStorageClassHost.c
-LPCOpen_CSRC += $(CHAN_FS)/ff.c
-LPCOpen_CSRC += $(CHAN_FS)/diskio.c
-CXXSRCS += Lpc17xxUsbDisk.cc
-CHECK_FILES += Lpc17xxUsbDisk.cc Lpc17xxUsbDisk.h
-XMLFILES += Lpc17xxUsbDisk.xml
-#INCS += $(LPCUSB_FS)/fatfs/src 
-INCS += $(CHAN_FS)
-INCS += $(LPCUSB_Base)/Class/Host 
+   LPCOpen_CSRC += $(LPCUSB_Class)/Host/MassStorageClassHost.c
+   CXXSRCS += Lpc17xxUsbDisk.cc
+   CHECK_FILES += Lpc17xxUsbDisk.cc Lpc17xxUsbDisk.h
+   XMLFILES += Lpc17xxUsbDisk.xml
+   INCS += $(LPCUSB_Base)/Class/Host 
 endif
 
 ifeq ($(CONFIG_LPC1768_USB_Keyboard),y)
-LPCOpen_CSRC += $(LPCUSB_Class)/Host/HIDClassHost.c
-LPCOpen_CSRC += $(LPCUSB_Class)/Common/HIDParser.c
-CXXSRCS += Lpc17xxUsbKeyboard.cc
+   LPCOpen_CSRC += $(LPCUSB_Class)/Host/HIDClassHost.c
+   LPCOpen_CSRC += $(LPCUSB_Class)/Common/HIDParser.c
+   CXXSRCS += Lpc17xxUsbKeyboard.cc
 #CHECK_FILES += Lpc17xxUsbKeyboard.cc Lpc17xxUsbKeyboard.h
-CHECK_FILES += Lpc17xxUsbKeyboard.h
-XMLFILES += Lpc17xxUsbKeyboard.xml
+   CHECK_FILES += Lpc17xxUsbKeyboard.h
+   XMLFILES += Lpc17xxUsbKeyboard.xml
+endif
+
+ifeq ($(CONFIG_LPC1768_SDCARD),y)
+   LPCOpen_CSRC +=  $(LPCOpen)/spi_17xx_40xx.c
+   LPCOpen_CSRC +=  $(LPCOpen)/ssp_17xx_40xx.c
+#LPCOpen_CSRC +=  $(LPCOpen)/sdmmc_17xx_40xx.c
+#LPCOpen_CSRC +=  $(LPCOpen)/sdc_17xx_40xx.c
+   CXXSRCS += Lpc17xxSDCard.cc
+   CHECK_FILES += Lpc17xxSDCard.cc Lpc17xxSDCard.h
+   XMLFILES += Lpc17xxSDCard.xml
 endif
 
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))

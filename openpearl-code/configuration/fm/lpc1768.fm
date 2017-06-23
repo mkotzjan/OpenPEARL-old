@@ -69,6 +69,14 @@ config LPC1768_HAS_USB
      bool
      default n
 
+config HAS_FAT
+     bool
+     default n
+
+config HAS_SDCARDSPI
+     bool
+     default n
+
 config LPC1768_USB_Keyboard
      bool "USB keyboard support"
      default n
@@ -82,10 +90,19 @@ config LPC1768_USB_Disk
      bool "USB mass storage support"
      default n
      select LPC1768_HAS_USB
+     select HAS_FAT
      help
      This option provides mass storage access via the usb interface.
      A common usb flash disc device may be attached.
      Only 1 usb device may be attached.
+
+config LPC1768_SDCARD
+     bool "SD-card mass storage support"
+     select HAS_FAT
+     select HAS_SDCARDSPI
+     default n
+     help
+     This option provides mass storage access via spi/sd card interface.
 
 config LPC1768_UART
      bool "UART support"

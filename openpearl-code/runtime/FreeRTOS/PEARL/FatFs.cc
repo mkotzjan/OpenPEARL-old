@@ -33,6 +33,8 @@
 
 */
 
+#include "ff.h"
+#include "ff_errors.h"
 #include "FatFs.h"
 #include "Character.h"
 #include "RefChar.h"
@@ -46,6 +48,16 @@
 #include <sys/time.h>
 
 extern "C" {
+   /**
+   get the system clock.
+
+   This function is usually avaiable in <time.h>, but the cross compiler
+   does not contain this element in the standatd include file.
+
+   \param c identier of the clock base. We need CLOCK_REALTIME
+   \param t struct receiving the system clock value
+   \returns 0 if success\n -1 if fail 
+   */
    extern int clock_gettime(clockid_t c, struct timespec* t);
 
    /**
@@ -77,7 +89,8 @@ namespace pearlrt {
    FatFs::FatFsFile * FatFs::FatFsFile::firstUsedFatFsFile[_VOLUMES] =
    {NULL};
 
-   FatFsVolume *volumes[_VOLUMES] = {0};
+   // pointer to the volume working storage
+   static FatFsVolume *volumes[_VOLUMES] = {0};
 
 
 
@@ -94,10 +107,10 @@ namespace pearlrt {
       }
 
       /* concrete volumes are configured via configuration items
-         in the system part. The IMC makes shure that theese
+         in the system part. The IMC makes shure that these
          elements are instanciated before dation objects
          The array of volumes is set configured. If the desired
-         pointer is stiff 0, the corresponding device is missing.
+         pointer is still 0, the corresponding device is missing.
       */
       vol = volumes[(*dev) - '0'];
 
@@ -272,7 +285,7 @@ namespace pearlrt {
       for (FatFs::FatFsFile* curr = firstUsedFatFsFile[volumeNbr];
             curr != NULL; curr = curr->nextUsedFatFsFile) {
          if (strcmp(completeFn, curr->getFileName()) == 0) {
-            Log::error("FastFs: %s already opened", completeFn);
+            Log::error("FatFs: %s already opened", completeFn);
             myFatFs->mutex.unlock();
             throw theOpenFailedSignal;
          }
@@ -303,7 +316,7 @@ namespace pearlrt {
 
       if (result != FR_OK) {
          if (openParams & OLD || openParams & IN) {
-            Log::error("FatFs: not found: %s", fn);
+            Log::error("FatFs: not found: %s (%s)", fn, f_strerror(result));
             myFatFs->mutex.unlock();
             throw theOpenFailedSignal;
          }
@@ -350,7 +363,8 @@ namespace pearlrt {
       myFatFs->vol->unlock();
 
       if (result != FR_OK) {
-         Log::error("FatFs: error opening file %s (%d)", fn, result);
+         Log::error("FatFs: error opening file %s (%s)",
+                     fn, f_strerror(result));
          myFatFs->mutex.unlock();
          throw theOpenFailedSignal;
       }
@@ -362,7 +376,7 @@ namespace pearlrt {
    }
 
    void FatFs::FatFsFile::dationClose(int closeParams) {
-      int ret;
+      FRESULT ret;
       int volumeNbr;
 
       volumeNbr = (*getFileName()) - '0';
@@ -395,7 +409,7 @@ namespace pearlrt {
       myFatFs->mutex.unlock();
 
       if (ret != FR_OK) {
-         Log::error("FatFs: error at close (%d)", ret);
+         Log::error("FatFs: error at close (%s)", f_strerror(ret));
          throw theCloseFailedSignal;
       }
 
@@ -406,8 +420,8 @@ namespace pearlrt {
          myFatFs->vol->unlock();
 
          if (ret) {
-            Log::error("FatFs: file %s error at close/remove (%d)",
-                       rcFn.getCstring(), ret);
+            Log::error("FatFs: file %s error at close/remove (%s)",
+                       rcFn.getCstring(), f_strerror(ret));
             throw theCloseFailedSignal;
          }
       }
@@ -424,7 +438,7 @@ namespace pearlrt {
       myFatFs->vol->unlock();
 
       if (ret != FR_OK) {
-         Log::error("FatFs: error at read (%d)", ret);
+         Log::error("FatFs: error at read (%s)", f_strerror(ret));
          throw theReadingFailedSignal;
       }
 
@@ -445,7 +459,7 @@ namespace pearlrt {
       myFatFs->vol->unlock();
 
       if (ret != FR_OK || written != size) {
-         Log::error("FatFs: error at write (error=%d, bytes=%d)", (int)ret,
+         Log::error("FatFs: error at write (%s, bytes=%d)", f_strerror(ret),
                     (int) written);
          throw theWritingFailedSignal;
       }
@@ -463,7 +477,7 @@ namespace pearlrt {
          myFatFs->vol->unlock();
 
          if (ret != 0) {
-            Log::error("FatFs: positioning failed (%d)", ret);
+            Log::error("FatFs: positioning failed (%s)", f_strerror(ret));
             throw thePositioningFailedSignal;
          }
       } else if (dationParam & Dation::FORWARD) {
