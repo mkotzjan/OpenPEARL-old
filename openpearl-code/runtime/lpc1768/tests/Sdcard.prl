@@ -63,6 +63,7 @@ ttt: TASK MAIN;
 
    CLOSE tab1 BY RST(error);
    PUT 'close: RST-value=', error TO console BY A, F(6), SKIP;
+
    CLOSE tab1 BY RST(error);
    PUT '2nd close: RST-value=', error TO console BY A, F(6), SKIP;
 

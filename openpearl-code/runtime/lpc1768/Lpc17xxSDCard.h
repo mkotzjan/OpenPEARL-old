@@ -37,11 +37,28 @@
 #define LPC17XXSDCARD_INCLUDED
 #include "SDCardSpi.h"
 
+/*
+3.7.2017 (rm): Attempt to use DMA for sector transfer aborted.
+    There was no mode found where command transmission worked after 
+    the first sector was read. The reading of CID and CSD worked with DMA
+    Consequence: Switch back to polling mode.
+*/
+//#define USE_DMA
+
+#ifdef USE_DMA
+#include <stdint.h>
+#endif
+
 namespace pearlrt {
    /**
     Class for SD-card mass storage devices 
    */
    class Lpc17xxSDCard : public SDCardSpi {
+   private:
+#ifdef USE_DMA
+      uint8_t dmaTxChannel, dmaRxChannel;
+      char ff[512];
+#endif
 
    public:
       Lpc17xxSDCard();

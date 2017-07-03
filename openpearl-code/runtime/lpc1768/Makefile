@@ -174,8 +174,7 @@ endif
 ifeq ($(CONFIG_LPC1768_SDCARD),y)
    LPCOpen_CSRC +=  $(LPCOpen)/spi_17xx_40xx.c
    LPCOpen_CSRC +=  $(LPCOpen)/ssp_17xx_40xx.c
-#LPCOpen_CSRC +=  $(LPCOpen)/sdmmc_17xx_40xx.c
-#LPCOpen_CSRC +=  $(LPCOpen)/sdc_17xx_40xx.c
+#   LPCOpen_CSRC +=  $(LPCOpen)/gpdma_17xx_40xx.c
    CXXSRCS += Lpc17xxSDCard.cc
    CHECK_FILES += Lpc17xxSDCard.cc Lpc17xxSDCard.h
    XMLFILES += Lpc17xxSDCard.xml
