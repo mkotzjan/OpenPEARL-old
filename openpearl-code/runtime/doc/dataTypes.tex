@@ -14,7 +14,23 @@ For details about ctor parameters and member functions please check the
 doxygen documentation, which can be created for a specific plattform
 by \verb|make doc| in the corresponding directory.
 
+The classes for the simple data types are named as:
 
+\begin{tabular}{|l|l|l|}
+\hline\\
+PEARL name & class name & remarks\\
+\hline
+FIXED & Fixed & templated with the length\\
+FLOAT & Float & templated with the length\\
+BIT & BitString & templated with the length\\
+CHAR & Character & templated with the length\\
+REF CHAR & RefCharacter & \\
+DURATION & Duration & \\
+CLOCK & Clock & \\
+\hline
+\end{tabular}
+
+\if0
 \section{Fixed}
 The class {\em Fixed63} provides save operations on fixed values 
 with 63 bits plus sign. This development of this class was influenced by
@@ -563,4 +579,5 @@ Duration diff;
 current = now();
 diff = current - start;
 \end{CppCode}
+\fi
 

@@ -9,6 +9,7 @@ User dations are created upon a system dation.
 System part and problem part may be compiled separatelly. Therefore 
 no information from the system part may be used to compile the problem part.
 
+\if0
 \section{Language Problems}
 The language definition lacks some details in the region of the
 interface between system part and problem part as well as the 
@@ -57,11 +58,12 @@ Remarks:
 \item the dation parameters in the comment in the specification
    are not required 
 \end{itemize}
+\fi
 
 \section{Not Supported Language Elements}
 \begin{description}
-\item[TFU] should be ignored by the compiler
-\item[TFU(MAX)] should be ignored by the compiler
+%\item[TFU] should be ignored by the compiler
+%\item[TFU(MAX)] should be ignored by the compiler
 \item[FORBACK] is not supported yet, since tape drives are
    difficult to find
 \item[R()] remote format must be treated by the compiler
@@ -162,12 +164,39 @@ E.g.:
 
 \paragraph{Note:} The client has access to the provider by default, since
 the provider is passed as first argument in the ctor of the client.
+If the provider needs access to the client, the ctor of the client
+should register itself at the provider.
+
 
 \paragraph{Note:} The second parameter in I2CBus is used in microcontroller
    environmants. The linux systems define the transmission speed at
    another location.
 
 \section{Common Elements and Devices for all Plattforms}
+\subsection{Log --- Logging}
+The class \texttt{Log} defines the logging. The Log-class needs 
+a provider of type AlphicOutProvider, which sends the log messages to the
+log device.
+The characters EDWI - given as text parameter - select whether
+errors, warnings, debug or informatice messages should be logged.
+
+Sample Usage:
+\begin{PEARLCode}
+Log('EW') --- StdErr;
+\end{PEARLCode}
+
+
+\subsection{LogFile}
+Provides the capability to specify the log file name. This class
+supports AlphicOutProvider and needs a NamedAlphicOutProvider,
+which is usually something like a disc.
+
+Sample Usage:
+\begin{PEARLCode}
+disc: Disc('/tmp/' ,10); ! linux specific disc definition
+Log('EW') --- LogFile('pearl.log') --- disc;
+\end{PEARLCode}
+
 \subsection{I2C-Bus}
 The class \texttt{I2CProvider} defines the interface for all i2c-bus 
 implementations. Each implementation open the i2c hardware interface 
@@ -446,7 +475,7 @@ This behavior is achieved by the {\em beginSequence} and
 {\em endSequence} clause. 
 This clause locks mutex of the dation object to block concurrent
 i/o-statments upon the same dation.
-The task''s object reference (me-pointer) is passed with
+The task's object reference (me-pointer) is passed with
 the {\em beginSequence} call.
 
 In case of abnormal termination due to signals in the try-block
@@ -458,7 +487,7 @@ Task suspending and termination within the try-block would cause an
 eternal blocking of the dation. 
 This behavior is not desired.
 Thus the suspend and terminate will not be done only at the end of a record
-{\em SKIP}) or after the completion of the i/o-statement.
+({\em SKIP}) or after the completion of the i/o-statement.
 This is realized internally in the runtime system.
 
 \begin{PEARLCode}

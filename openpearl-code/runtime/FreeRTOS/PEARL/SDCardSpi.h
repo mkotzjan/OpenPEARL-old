@@ -262,56 +262,6 @@ namespace pearlrt {
       */
       int sdDiskWriteSectors(void * b, int sector, int count);
 
-   private:
-#if 0
-      /**
-      disk initialize
-
-      wrapper method, which implements the interface for Chans FAT-FS module
-      */
-      static DSTATUS chanDiskInitialize(BYTE drv);
-
-      /** Disk Drive miscellaneous Functions
-      wrapper method, which implements the interface for Chans FAT-FS module
-
-      \param drv index of the volume
-      \param ctrl index of the desired feature to set or get
-      \param buff pointer to the data which should be retrieved or written
-      \return 1, od ok\n0 if fail
-      */
-      static DRESULT chanDiskIoctl(BYTE drv, BYTE ctrl, void *buff);
-
-      /**
-      read data from sd card with the interface for Chans FAT-FS module
-
-      \param drv index of the volume
-      \param buff pointer to the storage, where the be read are placed
-      \param sector the starting sector number
-      \param count the number of sectors to read
-      \returns FATFS-error codes
-      */
-      DRESULT chanDiskRead(BYTE drv, BYTE *buff,
-                           DWORD sector, UINT count);
-
-      /**
-      write data to the sd card with the interface for Chans FAT-FS module
-
-      \param drv index of the volume
-      \param buff pointer to the storage, where the be written are placed
-      \param sector the starting sector number
-      \param count the number of sectors to write
-      \returns FATFS-error codes
-      */
-      static DRESULT chanDiskWrite(BYTE drv, const BYTE *buff,
-                                   DWORD sector, UINT count);
-
-      /**
-       Get Disk Status
-      */
-      DSTATUS chanDiskStatus(BYTE drv);
-
-#endif
-
    };
 }
 #endif

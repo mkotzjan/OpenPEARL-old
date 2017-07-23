@@ -1,24 +1,24 @@
 \chapter{Introduction}
 
 This document describes the overview of the runtime system
-of OpenPEARL for all plattforms.
+of OpenPEARL for all platforms.
 The compiler API is described.
 Internal methods are documented as far as need for comprehension.
 Details on methods and parameters are 
 described in the source code based documentation with doxygen.
 
 \section{Structure of Files}
-The project targets different plattform. 
+The project targets different platform. 
 This is reflected in the directory structure inside the runtime system.
 
 The structure is kept flat. The top level of runtime directories
-just contains folders for the diffent plattforms and the plattform
-independent part. Files, which are special to a specific plattform
+just contains folders for the diffent platforms and the platform
+independent part. Files, which are special to a specific platform
 are stored in parallel folders which are named according the content.
 \begin{description}
-\item[common] contains the plattform independent parts.
+\item[common] contains the platform independent parts.
    The file \verb|Files.common| contains lists which are used in the
-  plattform specific  \verb|Makefile|
+  platform specific  \verb|Makefile|
 \item[linux] contains the linux specific parts, as well as the common
    linux device drivers. 
 \item[FreeRTOS] contains the FreeRTOS specific parts
@@ -42,14 +42,15 @@ are stored in parallel folders which are named according the content.
 \item[codeStyle] contains source code formating check routines
 \end{description}
 
-Some modules have a plattform independent part and a plattform
+Some modules have a platform independent part and a platform
 depended part. The naming is usually done in that way that the 
-plattform independent part is named as e.q. {\em TaskCommon} and the 
-plattform depended part is names eq. {\em Task}. This provides a simple
+platform independent part is named as e.q. {\em TaskCommon} and the 
+platform depended part is names eq. {\em Task}. This provides a simple
 interface towards the compiler, since the compiler just instanciates
 an object of type {\em Task}.
 
 \section{Build System}
+\label{sec:buildsystem}
 The build system for the complete OpenPEARL system is based on the 
 configuarion tools of the Linux system and make.
 Only \texttt{make menuconfig} is tested.
@@ -72,7 +73,7 @@ The runtime system delegates the build process to specific makefiles
 for each target system. A result, there are
 \begin{itemize}
 \item a include files (\texttt{PearlIncludes.h} for all target systems
-\item plattform specific libraries and linker files for each target system
+\item platform specific libraries and linker files for each target system
 \item one compile/linkrun command (\texttt{prl})
 \end{itemize}
 The install directory may be specified in the configuration tool.
@@ -84,14 +85,65 @@ path substitutions.
 In order to distinguish the different targets in the common header include
 file, each target system is assigned with an unique number.
 
-\begin{tabular}{|r|l|}
+\begin{table}[bpht]
+\begin{tabular}{|r|c|l|}
 \hline
-number & target system \\
+number & short form & target system \\
 \hline
-1 & linux \\
-2 & lpc1768 for the Landtiger board \\
+1 & linux &  Linux, even Rasperry Pi\\
+2 & lpc1768 & LPC1768 Landtiger board \\
 \hline
 \end{tabular}
+\caption{Mapping of Target System on an  Id}
+\label{tab:targetId}
+\end{table}
+
+\subsection{Minimal Porting Guide for a new Linux derivate}
+Linux systems are very similar on the sourcecode level. Differences are
+at the presence of devices and especially for maker scene systems at 
+the i/o-capabilities.
+
+It should be poissible to manage these differences with the 
+configuration menu (see chapter \ref{sec:buildsystem})
+
+Use the Raspberry Pi as reference to  add a new derivate. 
+Define the required menu items and use them in the Makefile in the 
+linux part of the runtime build.
+
+\subsection{Minimal Porting Guide for a new FreRTOS based Microcontroller}
+A different microcontroller adds completely new devices and may be different
+compilers to the build system. That the reason why there is mor to do.
+
+\begin{enumerate}
+\item add a new target system id to table \ref{tab:targetId} and 
+      invent a shortform for this target
+\item create a suitable directory under \verb|runtime/| - use the same name
+   as the short form description
+\item add this target into \verb|runtime/Makefile| 
+\item provide in the platform specific directory the files for
+      build (\verb|cc_bin.inc|) and download/run (\verb|run_bin.inc|)
+\item use the files from the lpc1768 platform as reference for your
+      platform. The minimal support must provide 
+      \begin{itemize}
+      \item main.cc
+      \item console support via e.g. an UART. This part is divided
+            into a low level part (see \verb|Lpc17xxUartInternal|), 
+            the dation support (see \verb|Lpc17xxUart|)
+            and print-support (\verb|SystemConsole.cc|).
+      \item adopt Makefile for your required files
+      \item adopt makefile.conf for compiler and linker settings
+      \item adopt PearlIncludes.h. It must list the common and specific 
+            header files for this new platform
+      \item adopt the startup routine (see \verb|startup_lpc1768.S|)
+      \item adopt the linker script (see \verb|OpenPEARLlpc1768.ld|)
+      \end{itemize}
+\item check the FreeRTOSConfig.h setting for your device
+\item in case you need some files unchanged, please move them into a 
+      directory which is used by all targets. If the source depends on
+      FreeRTOS, place the folder under FreeRTOS, if it depends on 
+      Cortex-M, move it under cortexM. In other cases find a good place for
+      it.
+\end{enumerate}
 
 \section{Companion Tools}
 \subsection{Include Composer}

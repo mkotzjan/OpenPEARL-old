@@ -344,6 +344,7 @@ are passed to the log-task.
 This mechanism reduces the stack usage of the logging down to 17 words. This
 is important for the case of logging the stack overflow situation.
 
+
 \section{Device Driver}
 \label{sec_microcontroller_devicedriver}
 
@@ -470,10 +471,15 @@ The structure is shown in fig \ref{fig_chanfs}.
 The date and time for the FAT system is derived from the system time
 in the FatFs.cpp module.
 
-The low level device drivers depend on the specific target hardware plattform.
-They are selected using {\em Configuration Items} in the OpenPEARL system part.
-These modules will register themself in the diskio-module, which delegates 
-the calls from tghe fatfs-modukle (ff.c) to the device drivers.
+For device locking, FreeRTOS semaphores are used by Elm Chan.
+
+To select the device driver, the sample version of disk.io 
+in the demonstration code  used a switch-statement.
+This was modified. Now the volume specific
+drivers register themself at diskio.c during their setup (ctor).
+This safes memory footprint, since only the really used volumes reside in
+the object file.
+The specific device drivers are selected in the OpenPEARL system part.
 .
 The following volume names are reserved in OpenPEARL:
 \begin{description}
@@ -481,10 +487,37 @@ The following volume names are reserved in OpenPEARL:
 \item[1:/] denotes the USB-memory stick
 \end{description}
 
+\subsection{Generic SD-Card via SPI Support}
+\label{sec:SDCardSpi}
+The operation of SD-cards is described in the "'SD Specifications -- 
+Simplified Specification V6.0"' and in the online paper of
+Elm Chan.
+
+The operation need the wait for replies of the card. The duration
+varies between some mircoseconds and some milliseconds. If the 
+operation is not finished in some poll cycles, the calling thread 
+is delayed for 2 ticks (2 ms) in order to safe cpu time for other threads.
+
+The platform specific hardware support function for
+\begin{itemize}
+\item detect card \verb|spiIsCardInserted|
+\item drive the CS line \verb|spiSelect|
+\item set transmission speed \verb|spiHighSpeed|
+\item single byte transfer \verb|spiRwByte|
+\item send block \verb|spiSendBlock|
+\item receive block \verb|spiReadBlock|
+\end{itemize}
+are defined as pure virtual. They must be supported by the platform specific 
+sdcard driver.
+
+
+\paragraph{Note:} There is no support for MMC crads, since UI found no card
+to test. The code was tested with cards of 2GB and 8GB size.
+If other cards are detected a warning will be issued.
 
 \section{To be done}
   \begin{itemize}
-  \item provide device drivers for the standard devices (SD, Ethernet)
+  \item provide device drivers for the standard devices (Ethernet)
   \item device wait queue for tasks in begin/end-sequence?
   \end{itemize}
 

@@ -1,5 +1,6 @@
 \chapter{Language Elements to be treated by the Compiler}
-The following language elements must be treated by the compiler.
+The following language elements must be treated by the compiler 
+without suport by the runtime system.
 
 \begin{description}
 \item[LENGTH] of FIXED, FLOAT, BIT, CHAR must be evaluated by the 
@@ -14,8 +15,9 @@ The following language elements must be treated by the compiler.
    Perhaps the TYPE can be mapped on \verb|typedef|.
 \item[INV] denotes invariant. This should be checked by the compiler internally.
     Perhaps the C++ \verb|const| may work. 
-\item[ARRAY] defines an array of elements (\verb|[]| should work)
-\item[STRUCT] must be mapped to C++ \verb|struct| by the compiler
+%\item[ARRAY] defines an array of elements (\verb|[]| should work)
+\item[STRUCT] must be mapped to C++ \verb|struct| by the compiler 
+(see section \ref{sec:struct})
 \item[TYPE] defines a type  upon e.g. a struct (\verb|typedef| should work)
 \item[DCL] defines a element. The compiler must instantiate an object
     of the requested type. The C++ storage class modifiers should work

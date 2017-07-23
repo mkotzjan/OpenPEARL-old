@@ -40,7 +40,7 @@ namespace pearlrt {
    <li> the setter method to update the function pointer
    </ul>
 
-   \param ISR_NAME ist the name of the isr as specified in startap.S
+   \param ISR_NAME ist the name of the isr as specified in startup.S
    */
 #define PLAIN_PROXY(ISR_NAME)				\
    static ISR ptr##ISR_NAME=NULL;			\
