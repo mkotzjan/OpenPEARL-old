@@ -297,6 +297,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return simple_type;
     }
 
+
+    @Override
+    public ST visitTypeReferenceTaskType(SmallPearlParser.TypeReferenceTaskTypeContext ctx) {
+        ST st = group.getInstanceOf("TypeReferenceTaskType");
+        return st;
+    }
+
     @Override
     public ST visitTypeReference(SmallPearlParser.TypeReferenceContext ctx) {
         return visitChildren(ctx);
