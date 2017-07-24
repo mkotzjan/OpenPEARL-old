@@ -319,13 +319,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     }
 
     @Override
-    public ST visitTypeReferenceTaskType(SmallPearlParser.TypeReferenceTaskTypeContext ctx) {
-//        ST st = group.getInstanceOf("TypeReferenceTask");
-//        return st;
-        throw new NotYetImplementedException("REF TASK", ctx.start.getLine(), ctx.start.getCharPositionInLine());
-    }
-
-    @Override
     public ST visitTypeReferenceProcedureType(SmallPearlParser.TypeReferenceProcedureTypeContext ctx) {
 //        ST st = group.getInstanceOf("TypeReferenceProcedure");
 //        return st;
@@ -1425,7 +1418,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitTOFLOATExpression(((SmallPearlParser.TOFLOATExpressionContext) ctx)));
             } else if (ctx instanceof SmallPearlParser.TOBITExpressionContext) {
                 st.add("code", visitTOBITExpression(((SmallPearlParser.TOBITExpressionContext) ctx)));
+            } else if (ctx instanceof SmallPearlParser.TaskFunctionContext) {
+                st.add("code", visitTaskFunction(((SmallPearlParser.TaskFunctionContext) ctx)));
             }
+
         }
 
         return st;
@@ -1802,13 +1798,16 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 }
                 else {
                     stmt.add("lhs", getUserVariable(ctx.ID().getText()));
+
                     if ( rhs_type instanceof TypeReference) {
                         stmt.add("rhs", getExpression(ctx.expression()));
                     }
-                    else {
+                    else if ( rhs_type instanceof TypeTask) {
+                        ST st = group.getInstanceOf("TASK");
+                        stmt.add("rhs", st);
+                    } else {
                         stmt.add("rhs", getReferenceExpression(ctx.expression()));
                     }
-
                 }
             }
             else {

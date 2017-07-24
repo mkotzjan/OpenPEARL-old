@@ -1945,6 +1945,7 @@ expression
     | op='CONT' expression                                  # CONTExpression
     | op='NOW'                                              # nowFunction
     | op='DATE'                                             # dateFunction
+    | op='TASK'                                             # taskFunction
     | expression op='**' <assoc=right> expression           # exponentiationExpression
     | expression op='FIT' expression                        # fitExpression
     | op=('*'|'/') expression                               # unaryMultiplicativeExpression

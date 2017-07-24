@@ -36,4 +36,7 @@ public class Defaults  {
     public static final int CHARACTER_LENGTH =  1;
 
     public static final int DEFAULT_TASK_PRIORITY = 255;
+
+    public static final int DEFAULT_ARRAY_LWB = 1;
+
 }

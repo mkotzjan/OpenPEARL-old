@@ -168,6 +168,19 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             return null;
     }
 
+    @Override
+    public Void visitTaskFunction(SmallPearlParser.TaskFunctionContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("ExpressionTypeVisitor: visitTaskFunction");
+        }
+
+        TypeTask type = new TypeTask();
+        ExpressionResult expressionResult = new ExpressionResult(type);
+        m_properties.put(ctx, expressionResult);
+
+        return null;
+    }
+
     //
     // Reference: OpenPEARL Language Report 6.1 Expressions
     //

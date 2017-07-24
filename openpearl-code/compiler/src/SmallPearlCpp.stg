@@ -281,8 +281,8 @@ TypeReferenceSimpleType(BaseType) ::= <<
 <BaseType> *
 >>
 
-TypeReferenceTask() ::= <<
-/* REF TASK */
+TypeReferenceTask(Task) ::= <<
+pearlrt::Task *
 >>
 
 TypeReferenceProcedure() ::= <<
@@ -1290,6 +1290,10 @@ BITSTOFIXED(operand) ::= <%
 
 CHARACTERSTOFIXED(operand) ::= <%
 pearlrt::Characters::toFixed(<operand>)
+%>
+
+TASK() ::= <%
+me
 %>
 
 /* --------------------- Temporary Semaphore Arrays -------------------------- */

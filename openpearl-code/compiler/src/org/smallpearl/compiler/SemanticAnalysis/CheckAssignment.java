@@ -164,7 +164,7 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
                 TypeDefinition rhs_type;
 
                 if ( ctx.dereference() == null ) {
-                    if ( rhs1.getVariable() == null ) {
+                    if ( (rhs1.getVariable() == null) && ( !(rhs1.getType() instanceof TypeTask))) {
                         throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                     }
 
@@ -187,6 +187,9 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
                         throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                     }
                 }
+            }
+            else if ( variable.getType() instanceof TypeTask ) {
+                System.out.println("Semantic: visitAssignment_statement: TASK");
             }
         }
         else {

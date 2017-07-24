@@ -33,7 +33,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.smallpearl.compiler.*;
 import org.smallpearl.compiler.SymbolTable.ModuleEntry;
 import org.smallpearl.compiler.SymbolTable.SymbolTable;
+import org.smallpearl.compiler.SymbolTable.SymbolTableEntry;
+import org.smallpearl.compiler.SymbolTable.VariableEntry;
 import org.stringtemplate.v4.ST;
+
+import java.util.ArrayList;
 
 public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
@@ -59,6 +63,8 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
         m_expressionTypeVisitor = expressionTypeVisitor;
         m_symboltable = symbolTableVisitor.symbolTable;
         m_currentSymbolTable = m_symboltable;
+
+        m_debug = true;
 
         if (m_verbose > 0) {
             System.out.println( "    Check Variable Declaration");
@@ -143,4 +149,211 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
         return null;
     }
+
+    @Override
+    public Void visitScalarVariableDeclaration(SmallPearlParser.ScalarVariableDeclarationContext ctx) {
+        if (ctx != null) {
+            for (int i = 0; i < ctx.variableDenotation().size(); i++) {
+                visitVariableDenotation(ctx.variableDenotation().get(i));
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitVariableDenotation(SmallPearlParser.VariableDenotationContext ctx) {
+        boolean hasGlobalAttribute = false;
+        boolean hasAllocationProtection = false;
+
+        ArrayList<String> identifierDenotationList = null;
+        ArrayList<ConstantValue> initElementList = null;
+
+        if (ctx != null) {
+            for (ParseTree c : ctx.children) {
+                if (c instanceof SmallPearlParser.IdentifierDenotationContext) {
+                    identifierDenotationList = getIdentifierDenotation((SmallPearlParser.IdentifierDenotationContext) c);
+                } else if (c instanceof SmallPearlParser.AllocationProtectionContext) {
+                    hasAllocationProtection = true;
+                } else if (c instanceof SmallPearlParser.TypeAttributeContext) {
+                    visitTypeAttribute((SmallPearlParser.TypeAttributeContext) c);
+                } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
+                    hasGlobalAttribute = true;
+                } else if (c instanceof SmallPearlParser.InitialisationAttributeContext) {
+                    getInitialisationAttribute((SmallPearlParser.InitialisationAttributeContext) c);
+                }
+            }
+
+            if (initElementList != null && identifierDenotationList.size() != initElementList.size()) {
+                throw new NumberOfInitializerMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            for (int i = 0; i < identifierDenotationList.size(); i++) {
+                if (initElementList != null)
+                    initElementList.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    private ArrayList<String> getIdentifierDenotation(SmallPearlParser.IdentifierDenotationContext ctx) {
+        ArrayList<String> identifierDenotationList = new ArrayList<String>();
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.ID().size(); i++) {
+                identifierDenotationList.add(ctx.ID().get(i).toString());
+            }
+        }
+
+        return identifierDenotationList;
+    }
+
+    private ArrayList<Integer> getPreset(SmallPearlParser.PresetContext ctx) {
+        ArrayList<Integer> presetList = new ArrayList<Integer>();
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.integerWithoutPrecision().size(); i++) {
+                Integer preset = Integer.parseInt(ctx.integerWithoutPrecision(i).IntegerConstant().getText());
+                presetList.add(preset);
+            }
+        }
+
+        return presetList;
+    }
+
+    private ArrayList<ConstantValue> getInitialisationAttribute(SmallPearlParser.InitialisationAttributeContext ctx) {
+        ArrayList<ConstantValue> initList = new ArrayList<ConstantValue>();
+        if (ctx != null) {
+            for (int i = 0; i < ctx.initElement().size(); i++) {
+                // TODO: expression
+//                initList.add(getInitElement(ctx.initElement(i).constant()));
+            }
+        }
+
+        return null;
+    }
+
+    private ConstantValue getInitElement(SmallPearlParser.ConstantContext ctx) {
+        if (ctx != null)
+        {
+            if (ctx.IntegerConstant() != null)
+            {
+                Integer value;
+                Integer sign = 1;
+
+                value = Integer.parseInt(ctx.IntegerConstant().getText());
+
+                if (ctx.getChildCount() > 1)
+                {
+                    if (ctx.getChild(0).getText().equals("-"))
+                    {
+                        value = -value;
+                    }
+                }
+
+                if (Integer.toBinaryString(Math.abs(value)).length() < 31)
+                {
+                    value.toString();
+                }
+                else
+                {
+                    // value.toString() + "LL";
+                }
+            }
+            else if (ctx.durationConstant() != null)
+            {
+                visitDurationConstant(ctx.durationConstant());
+            }
+            else if (ctx.timeConstant() != null)
+            {
+                visitTimeConstant(ctx.timeConstant());
+            }
+            else if (ctx.FloatingPointConstant() != null) {
+                Double value;
+                Integer sign = 1;
+
+                value = Double.parseDouble(ctx.FloatingPointConstant().getText());
+
+                if (ctx.getChildCount() > 1)
+                {
+                    if (ctx.getChild(0).getText().equals("-"))
+                    {
+                        value = -value;
+                    }
+                }
+
+                Float f11;
+//                new org.smallpearl.compiler.ConstantFloatValue(f11);
+                return null;
+            }
+            else if (ctx.StringLiteral() != null)
+            {
+                String s = ctx.StringLiteral().toString();
+
+                if (s.startsWith("'"))
+                {
+                    s = s.substring(1, s.length());
+                }
+
+                if (s.endsWith("'"))
+                {
+                    s = s.substring(0, s.length() - 1);
+                }
+            }
+            else if (ctx.bitStringConstant() != null)
+            {
+                // constant.add("BitStringConstant", getBitStringConstant(ctx));
+            }
+        }
+
+        return null;
+    }
+    @Override
+    public Void visitArrayVariableDeclaration(SmallPearlParser.ArrayVariableDeclarationContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println( "Semantic: Check Variable Declaration: visitArrayVariableDeclaration");
+        }
+
+        if (ctx != null) {
+            for (ParseTree c : ctx.children) {
+                if (c instanceof SmallPearlParser.ArrayDenotationContext) {
+                    visitArrayDenotation((SmallPearlParser.ArrayDenotationContext) c);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitArrayDenotation(SmallPearlParser.ArrayDenotationContext ctx) {
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().get(i).toString());
+
+            if ( entry == null || !(entry instanceof VariableEntry)) {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            VariableEntry variableEntry = (VariableEntry)entry;
+
+            if ( variableEntry.getType() instanceof TypeArray) {
+                ArrayList<ST> initElementList = null;
+
+                if ( variableEntry.getType() instanceof TypeArray) {
+                    TypeArray type = (TypeArray)variableEntry.getType();
+                }
+                else {
+                    throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+
+                if (ctx.arrayInitialisationAttribute() != null) {
+                }
+
+            }
+        }
+
+        return null;
+    }
+
 }

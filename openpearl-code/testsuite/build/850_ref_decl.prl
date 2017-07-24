@@ -1,6 +1,5 @@
 MODULE(ref_decl);
 
-
 PROBLEM;
 
 DCL
@@ -10,8 +9,7 @@ DCL
     (rk1,rk2) REF FIXED,     /* fixed reference variable */
     rx        REF FLOAT;     /* float reference variable */
 
-!DCL task_ptr  REF TASK;
-!DCL proc_ptr  REF PROC (p REF FIXED);
+DCL t         CLOCK;
 
 /*==========================================================================*/
 
@@ -106,27 +104,82 @@ END;
 p2: PROC(fixed_ptr REF FIXED);
 END;
 
+/*==========================================================================*/
+
+
 p3: PROC(fixed FIXED, fixed_ptr REF FIXED) RETURNS (REF FLOAT);
     DCL local_ptr REF FLOAT;
+    DCL local_float FLOAT INIT(3.1415926);
+
     ! error -- returning uninitialized pointer !
     RETURN(local_ptr);
 END;
 
 /*==========================================================================*/
 
-p4: PROC;
-!    DCL task_ptr      REF TASK;
+p4: PROC RETURNS (REF FLOAT);
+    DCL local_ptr REF FLOAT;
+    DCL local_float FLOAT INIT(3.1415926);
+
+    local_ptr := local_float;
+    ! error -- returning pointer to stack variable!
+    RETURN(local_ptr);
+END;
+
+/*==========================================================================*/
+
+p5: PROC;
+    DCL fixed_ptr     REF FIXED;
+    DCL fixed8_ptr    REF FIXED(8);
+    DCL float_ptr     REF FLOAT;
+    DCL float24_prt   REF FLOAT(24);
+
+    DCL task_ptr      REF TASK;
+
 !    DCL proc_ptr      REF PROC (p REF FIXED);
 !    DCL signal_ptr    REF SIGNAL;
 !    DCL bolt_ptr      REF BOLT;
-!    DCL char_ptr      REF CHAR;
+!    DCL char1_ptr     REF CHAR;
+!    DCL char10_ptr    REF CHAR(10);
 !    DCL interrupt_ptr REF INTERRUPT;
+
+END;
+
+/*==========================================================================*/
+
+p6: PROC;
+!    DCL Consumer(3) INV REF TASK GLOBAL INIT (Consumer1, Consumer2, Consumer3);
+
+END;
+
+/*==========================================================================*/
+
+Consumer1: TASK;
+END;
+
+Consumer2: TASK;
+END;
+
+Consumer3: TASK;
+END;
+
+
+/*==========================================================================*/
+
+p7: PROC;
+    DCL me  REF TASK;
+
+    me := TASK;
+
 END;
 
 /*==========================================================================*/
 
 maintask: TASK  MAIN;
-    CALL p1;
+!   t := NOW;
+    p1;
+    p5;
+    p6;
 END;
 
 MODEND;

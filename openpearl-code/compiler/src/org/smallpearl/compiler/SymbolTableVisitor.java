@@ -130,7 +130,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         if (m_verbose > 0) {
             System.out.println("SymbolTableVisitor: vistTaskDeclaration");
         }
-        String id = ctx.ID().toString();
+
         SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
         if ( entry != null ) {
             throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
@@ -583,7 +583,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     public Void visitBoundaryDenotation(SmallPearlParser.BoundaryDenotationContext ctx) {
         if (ctx.IntegerConstant().size() == 1 ) {
             ((TypeArray)m_type).addDimension(new ArrayDimension(
-                    Integer.parseInt(ctx.IntegerConstant(0).getText()),
+                    Defaults.DEFAULT_ARRAY_LWB,
                     Integer.parseInt(ctx.IntegerConstant(0).getText())));
         }
         else {
