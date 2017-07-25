@@ -68,18 +68,18 @@ namespace pearlrt {
       if (stat(devicePath, &attribut) == -1) {
          //can't get stat -> throw signal
          Log::error("Disc: could not locate %s", dev);
-         throw theIllegalPathSignal;
+         throw theDationParamSignal;
       }
 
       if (!(attribut.st_mode & S_IFDIR)) {
          Log::error("Disc: %s is not a directory", dev);
-         throw theIllegalPathSignal;
+         throw theDationParamSignal;
       }
 
       // check for trailing /
       if (devicePath[strlen(devicePath) - 1] != '/') {
          Log::error("Disc: %s needs trailing /", dev);
-         throw theIllegalPathSignal;
+         throw theDationParamSignal;
       }
 
       // initialize data elements
@@ -193,14 +193,14 @@ namespace pearlrt {
       if (capacity < 1) {
          Log::error("Disc: need at least 1 channels (demanded was %d)",
                     capacity);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       object = new Disc::DiscFile*[capacity];
 
       if (object == NULL) {
          Log::error("Disc: could not allocate %d channels", capacity);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       for (int i = 0; i < capacity; i++) {
@@ -208,7 +208,7 @@ namespace pearlrt {
 
          if (object[i] == NULL) {
             Log::error("Disc: could not allocate channel %d", i);
-            throw theIllegalParamSignal;
+            throw theDationParamSignal;
          }
       }
 
@@ -247,7 +247,7 @@ namespace pearlrt {
             ((openParams & IDF) != IDF || idfValue == 0)) {
          Log::error("Disc: open need filename");
          mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       // setup objects data
@@ -291,7 +291,7 @@ namespace pearlrt {
       if ((openParams & (NEW | IN)) == (NEW | IN)) {
          Log::error("Disc: open NEW+IN is ridiculous");
          myDisc->mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       const char * mode = 0;  // illegal combination as preset

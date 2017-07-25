@@ -44,7 +44,7 @@ namespace pearlrt {
 
    void Dation::dationSeek(const Fixed<31> & p, const int dationParam) {
       Log::error("Dation: no seek implemented");
-      throw theDationSeekNotRealizedSignal;
+      throw theInternalDationSignal;
    }
 
 }

@@ -607,7 +607,7 @@ TEST(DationRW, read_CYCLIC) {
                                    pearlrt::Dation::CYCLIC,
                                    &dim,
                                    pearlrt::Fixed<15>(4)),
-         pearlrt::IllegalParamSignal);
+         pearlrt::InternalDationSignal);
       pearlrt::DationRW logbuch(disc_,
                                 pearlrt::Dation::IN |
                                 pearlrt::Dation::DIRECT |

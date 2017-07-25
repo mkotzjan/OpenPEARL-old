@@ -99,19 +99,19 @@ namespace pearlrt {
 
       if (port != 0 && port != 2) {
          Log::error("Lpc17xxInterrupt: Illegal port (%d)", port);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if ((intBits[port / 2] & (1 << bit)) == 0) {
          Log::error("Lpc17xxInterrupt: no interrupt on bit(P%d:%d)",
                     port, bit);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (bitsInUse[port / 2] & (1 << bit)) {
          Log::error("Lpc17xxInterrupt: no interrupt already in use (P%d:%d)",
                     port, bit);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       LPC_GPIO[port].DIR &= ~(1 <<  bit); // set input mode

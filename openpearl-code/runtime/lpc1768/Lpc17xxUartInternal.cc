@@ -81,7 +81,7 @@ namespace pearlrt {
          bool xon) {
       if (_port != 0 && _port != 2) {
          Log::error("Lpc17xxUartInternal: illegal port number (%d)", _port);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (!uartObject[_port / 2]) {
@@ -102,7 +102,7 @@ namespace pearlrt {
       // test parameters
       if (_port != 0 && _port != 2) {
          Log::error("Lpc17xxUart: illegal port: %d", _port);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       found = false;
@@ -118,25 +118,25 @@ namespace pearlrt {
       if (! found) {
          Log::error("Lpc17xxUart: illegal baud rate: %d",
                     baudRate);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (bitsPerCharacter < 5 || bitsPerCharacter > 8) {
          Log::error("Lpc17xxUart: illegal number of bits per character: %d",
                     bitsPerCharacter);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (stopBits < 1 || stopBits > 2) {
          Log::error("Lpc17xxUart: illegal number of stop bits: %d",
                     stopBits);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (parity != 'O' && parity != 'E' && parity != 'N') {
          Log::error("Lpc17xxUart: illegal parity: %c",
                     parity);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       // setup uart

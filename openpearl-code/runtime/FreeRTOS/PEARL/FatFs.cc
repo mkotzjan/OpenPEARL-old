@@ -103,7 +103,7 @@ namespace pearlrt {
 
       if (*dev < '0' ||  *dev >= '0' + _VOLUMES) {
          Log::error("FatFs: %s invalid volume number", dev);
-         throw theIllegalPathSignal;
+         throw theInternalDationSignal;
       }
 
       /* concrete volumes are configured via configuration items
@@ -116,13 +116,13 @@ namespace pearlrt {
 
       if (! vol) {
          Log::error("FatFs: %s : no device configured", dev);
-         throw theIllegalPathSignal;
+         throw theDationParamSignal;
       }
 
       // check for trailing /
       if (devicePath[strlen(devicePath) - 1] != '/') {
          Log::error("FatFs: %s needs trailing /", dev);
-         throw theIllegalPathSignal;
+         throw theDationParamSignal;
       }
 
 
@@ -145,14 +145,14 @@ namespace pearlrt {
       if (capacity < 1) {
          Log::error("FatFs: need at least 1 channels (demanded was %d)",
                     capacity);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       object = new FatFs::FatFsFile*[capacity];
 
       if (object == NULL) {
          Log::error("FatFs: could not allocate %d channels", capacity);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       for (int i = 0; i < capacity; i++) {
@@ -160,7 +160,7 @@ namespace pearlrt {
 
          if (object[i] == NULL) {
             Log::error("FatFs: could not allocate channel %d", i);
-            throw theIllegalParamSignal;
+            throw theInternalDationSignal;
          }
       }
    }
@@ -201,7 +201,7 @@ namespace pearlrt {
             ((openParams & IDF) != IDF || idfValue == 0)) {
          Log::error("FatFs: open need filename");
          mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       // setup objects data
@@ -302,7 +302,7 @@ namespace pearlrt {
       if ((openParams & (NEW | IN)) == (NEW | IN)) {
          Log::error("FatFs: open NEW+IN is ridiculous");
          myFatFs->mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       BYTE mode = -1;

@@ -318,7 +318,7 @@ namespace pearlrt {
          int openParams) {
       if (openParams & (Dation::IDF | Dation::CAN)) {
          Log::error("Lpc17xxUsbKeyboard: does not support IDF and CAN");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       mutex.lock();
@@ -350,7 +350,7 @@ namespace pearlrt {
       if (closeParams & Dation::CAN) {
          Log::error("Lpc17xxUsbKeyboard: CAN not supported");
          mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       nbrOpenUserDations--;
@@ -363,7 +363,7 @@ namespace pearlrt {
 
       if (nbrOpenUserDations == 0) {
          Log::error("Lpc17xxUsbKeyboard: not opened");
-         throw theIllegalParamSignal;
+         throw theDationNotOpenSignal;
       }
 
       if (!enumerationComplete) {

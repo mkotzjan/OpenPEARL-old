@@ -126,19 +126,19 @@ namespace pearlrt {
                if (! rst) {
                   Log::error("UserDation: RST is set but no"
                              " variable given");
-                  throw theIllegalParamSignal;
+                  throw theInternalDationSignal;
                }
                *rst = 0; // clear error variable
             }
 
             if ((!!(p & Dation::IDF)) != (idf != 0)) {
                Log::error("UserDation: ether both or non of IDF and filename");
-               throw theIllegalParamSignal;
+               throw theInternalDationSignal;
             }
 
             if (S > 64) {
                Log::error("filename exceeds 64 characters");
-               throw theIllegalParamSignal;
+               throw theDationParamSignal;
             }
 
             RefCharacter rc;
@@ -181,7 +181,7 @@ namespace pearlrt {
             if (p & RST) {
                if (! rst) {
                   Log::error("UserDation: RST is set but no variable given");
-                  throw theIllegalParamSignal;
+                  throw theInternalDationSignal;
                }
 
                *rst = 0;  // clear RST value
@@ -207,7 +207,7 @@ namespace pearlrt {
    protected:
       /** assert dation properties
 
-       \throw NotAllowedSignal if condition is not met
+       \throw DationNotOpenSignal if condition is not met
       */
       void assertOpen();
 
@@ -233,22 +233,7 @@ namespace pearlrt {
       operations.
       */
       void endSequence();
-#if 0
-      /**
-        set the rst variable
-        \param rstVar the variable, which should be set is case of
-                      exception after this call
-      */
-      void rst(Fixed<15> & rstVar);
 
-      /**
-         update the RST variable if set
-         \param s pointer to the sigbal which was caught
-         \returns true, if RST-variable was defined
-         \returns false, if RST-variable was NOT defined
-      */
-      bool updateRst(Signal * s);
-#endif
    public:
       /**
        suspend

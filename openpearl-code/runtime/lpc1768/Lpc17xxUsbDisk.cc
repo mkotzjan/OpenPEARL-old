@@ -168,7 +168,7 @@ extern "C" {
    static int FSUSB_DiskReadSectors(DISK_HANDLE_T *hDisk,
                                     void *buff, uint32_t secStart,
                                     uint32_t numSec) {
-printf("FSUSB: sec=%x numsec=%d\n",secStart, numSec);
+printf("FSUSB: sec=%x numsec=%d\n", (unsigned int)secStart, (int)numSec);
       if (MS_Host_ReadDeviceBlocks(hDisk, 0, secStart, numSec,
                                    DiskCapacity.BlockSize, buff)) {
          // pearlrt::Log::error("Error reading device block.");

@@ -54,7 +54,7 @@ namespace pearlrt {
 
       if (dimensions == NULL) {
          Log::error("UserDationNB: no dimension passed");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       dim = dimensions;
@@ -64,7 +64,7 @@ namespace pearlrt {
             !!(params & INOUT) +
             !!(params & OUT) != 1) {
          Log::error("UserDationNB: no or more than 1 direction specified");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (!!(params & FORWARD) +
@@ -72,31 +72,31 @@ namespace pearlrt {
             !!(params & DIRECT) != 1) {
          Log::error(
             "UserDationNB: no or more than 1 positioning attribute specified");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (!((params & STREAM) | (params & NOSTREAM))) {
          params |= STREAM;  // set default
       } else if (!((params & STREAM) ^ (params & NOSTREAM))) {
          Log::error("UserDationNB: ether STREAM or NOSTREAM required");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (!((params & CYCLIC) | (params & NOCYCL))) {
          params |= NOCYCL;  // set default
       } else if (!((params & CYCLIC) ^ (params & NOCYCL))) {
          Log::error("UserDationNB: ether CYCLIC or NOCYCL required");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (params & CYCLIC && !dim->isBounded()) {
          Log::error("UserDationNB: CYCLIC requires bounded dimension");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (params & CYCLIC && !(params & DIRECT)) {
          Log::error("UserDationNB: CYCLIC requires DIRECT");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       // verify compatibility of system device capabilities with dation
@@ -105,7 +105,7 @@ namespace pearlrt {
             (params & DIRECTIONMASK)) {
          Log::error(
             "UserDationNB: required direction not supported by system dation");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if ((system->capabilities() & POSITIONINGMASK & params) !=
@@ -113,7 +113,7 @@ namespace pearlrt {
          Log::error(
             "UserDationNB: required positioning are "
             "not supported by system dation");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       dationParams = params;
@@ -136,7 +136,7 @@ namespace pearlrt {
       switch (dim->getDimensions()) {
       case 0:
          Log::error("UserDationNB: POS needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 1:
@@ -181,12 +181,12 @@ namespace pearlrt {
       switch (dim->getDimensions()) {
       case 0:
          Log::error("UserDationNB: POS needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 1:
          Log::error("UserDationNB: POS(x,y) needs two DIMs");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
 
       case 2: {
          DationDim2 * d2 = (DationDim2*)dim;
@@ -221,13 +221,13 @@ namespace pearlrt {
       switch (dim->getDimensions()) {
       case 0:
          Log::error("UserDationNB: POS needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 1:
       case 2:
          Log::error("UserDationNB: POS(x,y,z) needs three DIMs");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
 
       case 3: {
          DationDim3 * d3 = (DationDim3*)dim;
@@ -255,7 +255,7 @@ namespace pearlrt {
 
       if (dim->getDimensions() < 2) {
          Log::error("UserDationNB: SOP(x,y) needs two DIMs");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       *element = dim->getColumn() + one;
@@ -269,7 +269,7 @@ namespace pearlrt {
 
       if (dim->getDimensions() < 3) {
          Log::error("UserdationNB: SOP needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       *element = dim->getColumn() + one;
@@ -284,7 +284,7 @@ namespace pearlrt {
       switch (dim->getDimensions()) {
       case 0:
          Log::error("UserDationNB: ADV needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 1: {
@@ -322,12 +322,12 @@ namespace pearlrt {
       switch (dim->getDimensions()) {
       case 0:
          Log::error("UserDationNB: ADV needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 1:
          Log::error("UserDationNB: ADV(x,y) needs two DIMs");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 2: {
@@ -359,13 +359,13 @@ namespace pearlrt {
       switch (dim->getDimensions()) {
       case 0:
          Log::error("UserDationNB: ADV needs DIM");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
          break;
 
       case 1:
       case 2:
          Log::error("UserDationNB: ADV(x,y,z) needs three DIMs");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
 
       case 3: {
          DationDim3 * d3 = (DationDim3*)dim;
@@ -463,7 +463,7 @@ namespace pearlrt {
       assertOpenDirectOrForward();
 
       if (dim->getDimensions() < 2) {
-         Log::error("UserDation: Skip needs >1 dimension");
+         Log::error("UserDationNB: Skip needs >1 dimension");
          throw theInternalDationSignal;
       }
 
@@ -478,7 +478,7 @@ namespace pearlrt {
       }
 
       if (currentTask) {
-//         Log::info("UserDation::toSkip: scheduleCallback() invocation\n");
+//         Log::info("UserDationNB::toSkip: scheduleCallback() invocation\n");
          currentTask->scheduleCallback(false);
       }
    }
@@ -488,7 +488,7 @@ namespace pearlrt {
       assertOpenDirectOrForward();
 
       if (dim->getDimensions() < 3) {
-         Log::error("DationRW: Page needs >2 dimension");
+         Log::error("UserDationNB: Page needs >2 dimension");
          throw theInternalDationSignal;
       }
 
@@ -585,7 +585,7 @@ namespace pearlrt {
       assertOpenDirectOrForward();
 
       if (dim->getDimensions() < 2) {
-         Log::error("UserDation: Skip needs >1 dimension");
+         Log::error("UserDationNB: Skip needs >1 dimension");
          throw theInternalDationSignal;
       }
 
@@ -600,7 +600,7 @@ namespace pearlrt {
       }
 
       if (currentTask) {
-//         Log::info("UserDation::fromSkip: scheduleCallback() invocation\n");
+//         Log::info("UserDationNB::fromSkip: scheduleCallback() invocation\n");
          currentTask->scheduleCallback(false);
       }
    }
@@ -610,7 +610,7 @@ namespace pearlrt {
       assertOpenDirectOrForward();
 
       if (dim->getDimensions() < 3) {
-         Log::error("DationRW: Page needs >2 dimension");
+         Log::error("UserDationNB: Page needs >2 dimension");
          throw theInternalDationSignal;
       }
 
@@ -638,36 +638,36 @@ namespace pearlrt {
       }
 
       if (dationStatus == OPENED) {
-         Log::error((char*)"Dation is already open");
-         throw theNotAllowedSignal;
+         Log::error((char*)"UserDationNB: Dation is already open");
+         throw theOpenFailedSignal;
       }
 
       if ((system->capabilities() & IDF) && !(p & IDF) && !(p & ANY)) {
-         Log::error("UserDation: system dation requires IDF");
-         Log::error("!(p&IDF) %d p&ANY) %d ", !(p & IDF), p & ANY);
-         throw theIllegalParamSignal;
+         Log::error("UserDationNB: system dation requires IDF");
+         //Log::error("!(p&IDF) %d p&ANY) %d ", !(p & IDF), p & ANY);
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & IDF) && (p & IDF)) {
-         Log::error("UserDation: system dation does not support IDF");
-         throw theIllegalParamSignal;
+         Log::error("UserDationNB: system dation does not support IDF");
+         throw theDationParamSignal;
       }
 
       if ((system->capabilities() & OPENMASK & p) !=
             (p & OPENMASK)) {
-         Log::error("UserDation: open parameter not supported "
+         Log::error("UserDationNB: open parameter not supported "
                     "by system device");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (!(p & IDF) && (!!(p & NEW) + !!(p & OLD)) > 0) {
-         Log::error("UserDation: OLD/NEW requires IDF");
-         throw theIllegalParamSignal;
+         Log::error("UserDationNB: OLD/NEW requires IDF");
+         throw theDationParamSignal;
       }
 
       if ((!!(p & CAN) + !!(p & PRM)) > 1) {
-         Log::error("UserDation: ether CAN or PRM allowed");
-         throw theIllegalParamSignal;
+         Log::error("UserDationNB: ether CAN or PRM allowed");
+         throw theInternalDationSignal;
       }
 
       if (p & OPENMASK) {
@@ -769,15 +769,15 @@ namespace pearlrt {
       assertOpen();
 
       if ((dationParams & DIRECT) == 0) {
-         Log::error("DIRECT dation required");
-         throw thePositioningForbiddenSignal;
+         Log::error("UserDationNB: DIRECT dation required");
+         throw theInternalDationSignal;
       }
    }
    void UserDationNB::assertOpenDirectOrForward() {
       assertOpen();
 
       if ((dationParams & (DIRECT | FORWARD)) == 0) {
-         Log::error("DIRECT or FORWARD dation required");
+         Log::error("UserDationNB: DIRECT or FORWARD dation required");
          throw theDationNotSupportedSignal;
       }
    }

@@ -57,13 +57,13 @@ TEST(Disc, path) {
       ASSERT_NO_THROW(pearlrt::Disc disc(HOME, 10));
       ASSERT_THROW(
          pearlrt::Disc disc1("/home", 10),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
       ASSERT_THROW(
          pearlrt::Disc disc2("/etc/motd", 10),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
       ASSERT_THROW(
          pearlrt::Disc disc3("/xxx/", 10),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
    }
 }
 
@@ -134,7 +134,7 @@ TEST(Disc, openClose) {
                              pearlrt::Dation::NEW |
                              pearlrt::Dation::IDF |
                              pearlrt::Dation::IN),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    // no file + NEW + OUT --> ok
    ASSERT_NO_THROW(
       work = disc.dationOpen("file1.tst",
@@ -209,7 +209,7 @@ TEST(Disc, openClose) {
                              pearlrt::Dation::NEW |
                              pearlrt::Dation::IDF |
                              pearlrt::Dation::IN),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    // file + NEW + OUT --> OpenFailed
    ASSERT_THROW(
       work = disc.dationOpen("file1.tst",
@@ -236,10 +236,10 @@ TEST(Disc, capacity) {
    pearlrt::SystemDationNB* work[100];
    ASSERT_THROW(
       pearlrt::Disc disc(HOME, 0),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    ASSERT_THROW(
       pearlrt::Disc disc(HOME, -1),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    pearlrt::Disc disc(HOME, 10);
    noSignalGot = true;
 

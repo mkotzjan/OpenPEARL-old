@@ -56,23 +56,23 @@ namespace pearlrt {
 
       if (port < 0 || port > 4) {
          Log::error("Lpc17xxDigitalOut: illegal port number (%d)", port);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (start < 0 || start > 31) {
          Log::error("Lpc17xxDigitalOut: illegal start bit number (%d)", start);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (width < 1 || width > 32) {
          Log::error("Lpc17xxDigitalOut: illegal width (%d)", width);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (start - width + 1 < 0) {
          Log::error("Lpc17xxDigitalOut: width too large (start=%d, width=%d)",
                     start, width);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       // create mask of used bits for this device
@@ -89,7 +89,7 @@ namespace pearlrt {
          Log::error("Lpc17xxDigitalOut: not (all) requested bits are "
                     "available (%x)",
                     (unsigned int)(Lpc17xxBits[port] & mask));
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
 
@@ -102,17 +102,17 @@ namespace pearlrt {
          int openParam) {
       if (idf != 0) {
          Log::error("IDF not allowed for Lpc17xxDigitalOut device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (openParam != 0) {
          Log::error("No open parameters allowed for Lpc17xxDigitalOut device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("Lpc17xxDigitalOut: Dation already open");
-         throw theNotAllowedSignal;
+         throw theOpenFailedSignal;
       }
 
       dationStatus = OPENED;
@@ -122,19 +122,19 @@ namespace pearlrt {
       if (closeParam != 0) {
          Log::error("No close parameters allowed for "
                     "Lpc17xxDigitalOut device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("Lpc17xxDigitalOut: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       dationStatus = CLOSED;
    }
 
    void Lpc17xxDigitalOut::dationRead(void* data, size_t size) {
-      throw theNotAllowedSignal;
+      throw theInternalDationSignal;
    }
 
    void Lpc17xxDigitalOut::dationWrite(void* data, size_t size) {
@@ -142,7 +142,7 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("Lpc17xxDigitalOut: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // write data to application memory
@@ -161,7 +161,7 @@ namespace pearlrt {
 
       default:
          Log::error("Lpc17xxDigitalOut: illegal size (%d) ", size);
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       d <<= (start - width + 1);   // shift to correct position

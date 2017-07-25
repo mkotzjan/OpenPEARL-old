@@ -112,12 +112,12 @@ namespace pearlrt {
 
       if (!!(mode & OLD) + !!(mode & NEW) + !!(mode & ANY) > 1) {
          Log::error("Pipe: %s: one of OLD, NEW and ANY allowed", dev);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (!!(mode & PRM) + !!(mode & CAN) > 1) {
          Log::error("Pipe: %s: only one of PRM and CAN allowed", dev);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       removeFile = !!(mode & CAN);
@@ -133,7 +133,7 @@ namespace pearlrt {
          if (mode & OLD) {
             //can't get stat -> throw signal
             Log::error("Pipe: could not locate %s", dev);
-            throw theIllegalPathSignal;
+            throw theDationParamSignal;
          }
 
          if (mode & (NEW | ANY)) {
@@ -141,7 +141,7 @@ namespace pearlrt {
             if (mkfifo(devicePath, 0777) == -1) {
                Log::error("Pipe: could not create fifo %s", devicePath);
                Log::error("   %s", strerror(errno));
-               throw theIllegalPathSignal;
+               throw theDationParamSignal;
             }
 
             cap |= (IN | OUT | INOUT);
@@ -149,12 +149,12 @@ namespace pearlrt {
       } else {
          if (mode & NEW) {
             Log::error("Pipe: %s exists in system", dev);
-            throw theIllegalParamSignal;
+            throw theDationParamSignal;
          }
 
          if (!(attribut.st_mode & S_IFIFO)) {
             Log::error("Pipe: %s is not a FIFO", dev);
-            throw theIllegalPathSignal;
+            throw theDationParamSignal;
          }
 
          if (geteuid() == attribut.st_uid) {
@@ -249,14 +249,14 @@ namespace pearlrt {
       if (capacity < 1) {
          Log::error("Pipe: need at least 1 channels (demanded was %d)",
                     capacity);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       object = new Pipe::PipeFile*[capacity];
 
       if (object == NULL) {
          Log::error("Pipe: could not allocate %d channels", capacity);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       for (int i = 0; i < capacity; i++) {
@@ -264,7 +264,7 @@ namespace pearlrt {
 
          if (object[i] == NULL) {
             Log::error("Pipe: could not allocate channel %d", i);
-            throw theIllegalParamSignal;
+            throw theDationParamSignal;
          }
       }
 
@@ -313,7 +313,7 @@ namespace pearlrt {
       if (openParams & IDF) {
          Log::error("Pipe: no IDF allowed");
          mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       // setup objects data
@@ -339,7 +339,7 @@ namespace pearlrt {
       if (openParams & NEW) {
          Log::error("Pipe: %s: open NEW is ridiculous", devicePath);
          myPipe->mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       const char * mode = 0;  // illegal combination as preset
@@ -359,7 +359,7 @@ namespace pearlrt {
       if (mode == NULL) {
          Log::error("Pipe: confusing open parameters %x", openParams);
          myPipe->mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       fp = fopen(devicePath, mode);
@@ -392,7 +392,7 @@ namespace pearlrt {
 
       if (closeParams & CAN) {
          Log::error("Pipe: file %s CAN not allowed", devicePath);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
    }
 

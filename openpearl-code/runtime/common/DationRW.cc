@@ -68,12 +68,12 @@ namespace pearlrt {
 
       if (!(dationParams & (IN | INOUT))) {
          Log::error("DationRW: dation not opened as input");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & (IN | INOUT))) {
          Log::error("DationRW: device does not support read");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationParams & NOCYCL) {
@@ -119,12 +119,12 @@ namespace pearlrt {
 
       if (!(dationParams & (OUT | INOUT))) {
          Log::error("DationRW: Only writing is allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & (OUT | INOUT))) {
          Log::error("DationRW: device does not support read");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationParams & NOCYCL) {

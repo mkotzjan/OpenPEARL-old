@@ -69,7 +69,7 @@ namespace pearlrt {
    StdOut* StdOut::dationOpen(const char * idf, int openParams) {
       if (openParams & (Dation::IDF | Dation::CAN)) {
          Log::error("StdOut: does not support IDF and CAN");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       mutex.lock();
@@ -95,7 +95,7 @@ namespace pearlrt {
       if (closeParams & Dation::CAN) {
          Log::error("StdOut: CAN not supported");
          mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       mutex.unlock();

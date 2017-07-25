@@ -210,7 +210,7 @@ TEST(DationPG, cyclicFails) {
                                 pearlrt::Dation::STREAM |
                                 pearlrt::Dation::CYCLIC,
                                 &dim),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
 }
 
 /**
@@ -335,7 +335,7 @@ TEST(DationPG, notOpened) {
    pearlrt::Character<8> text("PEARL");
    pearlrt::Fixed<31>  x(42);
    ASSERT_THROW(logbuch.beginSequence(NULL),
-      pearlrt::NotAllowedSignal);
+      pearlrt::DationNotOpenSignal);
 }
 
 /**

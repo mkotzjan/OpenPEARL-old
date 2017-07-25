@@ -54,7 +54,7 @@ namespace pearlrt {
       if (p & CLOSEMASK) {
          if (!!(p & PRM) && !!(p & CAN)) {
             Log::error("UserDation: ether CAN or PRM allowed");
-            throw theIllegalParamSignal;
+            throw theInternalDationSignal;
          }
 
          // superseed previous settings
@@ -122,7 +122,7 @@ namespace pearlrt {
    void UserDation::assertOpen() {
       if (dationStatus == CLOSED) {
          Log::error("dation open required");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
    }
 

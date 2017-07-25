@@ -53,7 +53,7 @@ namespace pearlrt {
 
       if (params & (NOCYCL | CYCLIC | FORWARD | DIRECT | FORBACK)) {
          Log::error("DationTS: illegal declartion parameters");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       dationParams = params;
@@ -88,12 +88,12 @@ namespace pearlrt {
 
       if (!(dationParams & (IN | INOUT))) {
          Log::error("DationTS: dation not opened as input");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       if (!(system->capabilities() & (IN | INOUT))) {
          Log::error("DationTS: device does not support read");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       work->dationRead(data, size);
@@ -104,12 +104,12 @@ namespace pearlrt {
 
       if (!(dationParams & (OUT | INOUT))) {
          Log::error("DationTS: Only writing is allowed");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       if (!(system->capabilities() & (OUT | INOUT))) {
          Log::error("DationTS: device does not support read");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       work->dationWrite(data, size);

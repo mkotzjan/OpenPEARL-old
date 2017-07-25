@@ -58,9 +58,10 @@ namespace pearlrt {
       : UserDationNB(parent, params, dimensions, UserDationNB::ALPHIC) {
       dationStatus = CLOSED;
 
+#warning "wieso hat DationPG kein CYCLIC support?"
       if (params & CYCLIC) {
          Log::error("DationPG: does not support CYCLIC");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
    }
 
@@ -70,12 +71,12 @@ namespace pearlrt {
 
       if (!(dationParams & (IN | INOUT))) {
          Log::error("DationPG: dation not opened as input");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & (IN | INOUT))) {
          Log::error("DationPG: device does not support read");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       // get first character from unget buffer
@@ -93,12 +94,12 @@ namespace pearlrt {
 
       if (!(dationParams & (OUT | INOUT))) {
          Log::error("DationPG: Only writing is allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & (OUT | INOUT))) {
          Log::error("DationPG: device does not support write");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       // send data to sink

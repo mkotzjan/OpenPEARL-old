@@ -59,13 +59,13 @@ TEST(Pipe, path) {
       ASSERT_NO_THROW(pearlrt::Pipe pipe(HOME, 10, "ANY"));
       ASSERT_THROW(
          pearlrt::Pipe pipe1("/home/", 10, "ANY"),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
       ASSERT_THROW(
          pearlrt::Pipe pipe2("/tmp/pipes/", 10, "ANY"),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
       ASSERT_THROW(
          pearlrt::Pipe pipe2("/etc/motd", 10, "ANY"),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
    }
 }
 
@@ -84,7 +84,7 @@ TEST(Pipe, param) {
    {
       ASSERT_THROW(
          pearlrt::Pipe pipe1(HOME, 10, "OLD"),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
    }
    {
       ASSERT_NO_THROW(pearlrt::Pipe pipe(HOME, 10, "ANY"));
@@ -115,7 +115,7 @@ TEST(Pipe, openClose) {
                       pearlrt::Dation::ANY |
                       pearlrt::Dation::IDF |
                       pearlrt::Dation::OUT),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
 
    //
    ASSERT_NO_THROW(
@@ -124,19 +124,19 @@ TEST(Pipe, openClose) {
                              pearlrt::Dation::IN));
    ASSERT_THROW(
       work->dationClose(pearlrt::Dation::CAN),
-      pearlrt::IllegalParamSignal
+      pearlrt::DationParamSignal
    );
    ASSERT_THROW(
       work = pipe.dationOpen(NULL,
                              pearlrt::Dation::OLD |
                              pearlrt::Dation::INOUT),
-      pearlrt::IllegalParamSignal
+      pearlrt::DationParamSignal
    );
    ASSERT_THROW(
       work = pipe.dationOpen(NULL,
                              pearlrt::Dation::NEW |
                              pearlrt::Dation::OUT),
-      pearlrt::IllegalParamSignal
+      pearlrt::DationParamSignal
    );
 }
 /**
@@ -149,10 +149,10 @@ TEST(Pipe, capacity) {
    pearlrt::SystemDationNB* work[100];
    ASSERT_THROW(
       pearlrt::Pipe pipe(HOME, 0),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    ASSERT_THROW(
       pearlrt::Pipe pipe1(HOME, -1),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    pearlrt::Pipe pipe2(HOME, 10, "OPEN1 CAN");
    noSignalGot = true;
 

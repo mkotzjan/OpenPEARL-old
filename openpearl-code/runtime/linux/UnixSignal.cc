@@ -88,14 +88,14 @@ namespace pearlrt {
 
       default:
          Log::error("UnixSignal: illegal number: %d", sig);
-         throw theIllegalParamSignal;
+         throw theInternalDatatypeSignal;
       }
 
       if (irupt) {
          irupt->trigger();
       } else {
          Log::error("UnixSignal: handler got spurious signal");
-         throw theInternalTaskSignal;
+         throw theInternalDatatypeSignal;
       }
    }
 
@@ -131,7 +131,7 @@ namespace pearlrt {
 
       default:
          Log::error("UnixSignal: illegal number: %d", sig);
-         throw theIllegalParamSignal;
+         throw theInternalDatatypeSignal;
       }
 
       if (irupt) {
@@ -194,12 +194,12 @@ namespace pearlrt {
 
       default:
          Log::error("UnixSignal: illegal number: %d", sigNum);
-         throw theIllegalParamSignal;
+         throw theInternalDatatypeSignal;
       }
 
       if (isSet & (1 << sigNum)) {
          Log::error("UnixSignal %d used more than once", sigNum);
-         throw theIllegalParamSignal;
+         throw theInternalDatatypeSignal;
       }
 
       isSet |= 1 << sigNum;
@@ -207,13 +207,13 @@ namespace pearlrt {
 
    void UnixSignal::devEnable() {
       // the signals are treated via the signalfd() - file
-      // is tís difficult to modify the mask in running mode
+      // it is difficult to modify the mask in running mode
       // we keep them always on
    }
 
    void UnixSignal::devDisable() {
       // the signals are treated via the signalfd() - file
-      // is tís difficult to modify the mask in running mode
+      // it is difficult to modify the mask in running mode
       // we keep them always on
    }
 }

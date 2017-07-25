@@ -141,13 +141,13 @@ namespace pearlrt {
 
       if (clockSelected) {
          Log::error("Lpc17xxClock: already a clock source selected");
-         throw theIllegalParamSignal;
+         throw theInternalConfigurationSignal;
       }
 
       switch (typeOfClock) {
       default:
          Log::error("Lpc17xxClock: Illegal selector %d", typeOfClock);
-         throw theIllegalParamSignal;
+         throw theInternalConfigurationSignal;
 
       case 0: // only systick
          // no absolute time from RTC desired

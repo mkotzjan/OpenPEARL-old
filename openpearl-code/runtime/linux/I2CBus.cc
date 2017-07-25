@@ -47,7 +47,7 @@ namespace pearlrt {
 
       if (i2c_file < 0) {
          Log::error("I2CBus: %s", strerror(errno));
-         throw theIllegalParamSignal;
+         throw theDeviceNotFoundSignal;
       }
       
       /* there is no ioctl function to modify the transmisssion speed
@@ -56,6 +56,7 @@ namespace pearlrt {
       if (ret != 0) {
          Log::error("I2CBus: error setting transmission speed to %d  (%s)"
               speed, strerror(errno));
+         throw theDationParamSignal;
       }
       */
    }
@@ -75,8 +76,8 @@ namespace pearlrt {
 
       if (ioctl(i2c_file, I2C_SLAVE, a) < 0) {
          mutex.unlock();
-         Log::error("I2CBus::read: %s", strerror(errno));
-         throw theIllegalParamSignal;
+         Log::error("I2CBus::read/ioctl: %s", strerror(errno));
+         throw theInternalDationSignal;
       }
 
       received  = read(i2c_file, data, n);
@@ -100,7 +101,7 @@ namespace pearlrt {
       if (ioctl(i2c_file, I2C_SLAVE, a) < 0) {
          mutex.unlock();
          Log::error("I2CBus::write: %s", strerror(errno));
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       written = write(i2c_file, data, n);
@@ -136,7 +137,7 @@ namespace pearlrt {
       // the I2C_RDWR is atomic by definition
       if (ioctl(i2c_file, I2C_RDWR, &packets) < 0) {
          Log::error("I2CBus::rdwr: %s", strerror(errno));
-         throw theIllegalParamSignal;
+         throw theReadingFailedSignal;
       }
    }
 
