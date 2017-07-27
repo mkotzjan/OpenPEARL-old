@@ -1,0 +1,80 @@
+\chapter{Bolt}
+PEARL requires a BOLT implementation with simultaneous locking
+mechanism.
+
+A single PEARL BOLT is
+a state variable and a counter --- 
+and for diagnosic purposes a pointer to the bolt's name.
+
+All public bolt operations lock the class mutex to avoid race conditions 
+with other tasks bolt operations.
+
+On freeing or leaving a PEARL bolt variable,
+ the wait queue content is checked if a 
+task may become continued. The wait queue is searched in order of the tasks 
+priority. 
+
+To block a task the class must provided the methods {\em block} and 
+{\em unblock}.
+
+\section{Declaration}
+The declaration of a PEARL bolt variable is done without preset value..
+
+\begin{PEARLCode}
+DCL b0 BOLT;
+DCL b1 BOLT;
+DCL b2 BOLT;
+SPC b2 BOLT;
+\end{PEARLCode}
+
+The class {\em Bolt} provides two macros for definition and 
+specification of a bolt variable.
+\begin{description}
+\item[DCLBOLT] takes 1 parameter: the bolt's name.
+\item[SPCBOLT] takes 1 parameter:  the bolt's name.
+\end{description}
+
+\begin{CppCode}
+DCLBOLT(b0);
+DCLBOLT(b1);
+DCLBOLT(b2);
+SPCBOLT(b2);
+\end{CppCode}
+
+\section{Operations}
+The class {\em Bolt} provides the \verb|static| operations 
+{\em enter()}, {\em leave()}, {\em reserve()} and  {\em free()}.
+
+PEARL provides the simultaneous locking pattern on bolt variables.
+This leads to the interface of the operations:
+\begin{CppCode}
+void Bolt::enter(Task *me, int nbrOfBolts, Bolt **bolts);
+void Bolt::leave(Task *me, int nbrOfBolts, Bolt **bolts);
+void Bolt::reserve(Task *me, int nbrOfBolts, Bolt **bolts);
+void Bolt::free(Task *me, int nbrOfBolts, Bolt **bolts);
+\end{CppCode}
+
+\section{Sample Usage}
+
+\begin{PEARLCode}
+ENTER b0,b1,b2;
+\end{PEARLCode}
+
+\begin{CppCode}
+{
+   static Bolt * bolts[] = {&b0,&b1,&b2};
+   Bolt::enter(me,
+               sizeof(bolts[])/sizeof(bolts[0]),
+               &bolts);
+}
+\end{CppCode}
+
+The new block allows the reuse of the identifier {\em bolts} in multiple
+{\em enter}, {\em leave}, {\em reserve} and {\em free} operations
+ in the same module.
+The static storage declaration provides the initialization before run time.
+The size calculation should be executed by the C++-compiler.
+
+\section{Error Handling}
+If a LEAVE or FREE is executed upon an non ENTERed or RESERVEd
+bolt variable the {\em BoltStateSignal} is induced.
