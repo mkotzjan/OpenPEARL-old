@@ -36,6 +36,7 @@
 
 CXX_COMMON = \
 	Array.cc \
+	Bolt.cc \
 	LogFile.cc\
 	Dation.cc \
 	Log.cc \

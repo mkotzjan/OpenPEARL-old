@@ -86,6 +86,7 @@ Only this file mus be included.
 #include "DationDim2.h"
 #include "DationDim3.h"
 #include "Semaphore.h"
+#include "Bolt.h"
 
 #include "SystemDationNBSink.h"
 #include "SystemDationNBSource.h"

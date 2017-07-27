@@ -269,6 +269,7 @@ clean:
 	@rm -f .depend
 	@rm -f ../common/tests/*.new
 	@rm -f ../common/tests/*.diff
+	@rm -f ../common/tests/*.o
 	@rm -f ../common/*.new
 	@rm -f ../common/*.diff
 	@rm -f ../common/*.o
