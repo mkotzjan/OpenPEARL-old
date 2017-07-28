@@ -1,0 +1,10 @@
+This stuff was extracted from the linux kernel sources version 4.10.1
+
+It seems that the GPL applies to this code.
+
+The Makefile was modified for standalone operation under linux.
+confdata.c was modified to suppress the split_config-output 
+           include/ does not contain a config/-directory any longer
+           and it produces a LaTeX fitting include
+ztab.conf.c_shipped was modified to show "OpenPEARL System Configuration"
+
