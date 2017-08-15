@@ -29,11 +29,6 @@
 
 #ifndef FIXED63_INCLUDED
 #define FIXED63_INCLUDED
-// this code is based on the great work of
-//   LeBlanc, David. Integer Handling with the C++ SafeInt Class.
-//   http://msdn.microsoft.com/library/default.asp?
-//        url=/library/en-us/dncode/html/secure01142004.asp
-//   (2004).
 
 #include <stdint.h>
 
@@ -53,12 +48,6 @@ namespace pearlrt {
    This class implements integer operations, which throw exceptions if the
    result would be wrong due to the limited number of bits or other undefined
    operation like divide by zero.
-
-   This code is based on the great work of
-      LeBlanc, David.Integer Handling with the C++ SafeInt Class. <br>
-      http://msdn.microsoft.com/library/default.asp?
-          url=/library/en-us/dncode/html/secure01142004.asp
-      (2004).
 
       In case an operation would leave the range of 64 bit,
       an exception will be thrown.
