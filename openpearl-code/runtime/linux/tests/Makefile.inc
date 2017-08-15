@@ -88,6 +88,7 @@ GTEST_DATION_OBJS =$(GTEST_DATION_SRCS:.cc=.o)
 
 TEST_FILES_2_REMOVE = $(GTEST_OBJS) $(GTEST_DATION_OBJS) 
 TEST_FILES_2_REMOVE += $(addpostfix .o,$(targets))
+TEST_FILES_2_REMOVE += tests/DationSuspendTerminateTests.o
 
 $(info $(TEST_FILES_2_REMOVE))
 

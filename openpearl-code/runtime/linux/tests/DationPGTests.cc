@@ -366,7 +366,6 @@ TEST(DationPG, lineOverflow) {
    logbuch.beginSequence(NULL);
    try {
       logbuch.rst(rstValue);
-//      logbuch.toX(pearlrt::Fixed<31>(20));
       logbuch.toA(text);
       logbuch.toA(text);
       logbuch.toA(text);
@@ -419,3 +418,68 @@ TEST(DationPG, lineOverflow) {
 #endif
 }
 
+/**
+test for EOF operation
+*/
+TEST(DationPG, eof) {
+   pearlrt::Log::getInstance()->setLevel(0x0f);
+   pearlrt::Log::info("*** DationPG: eof start ***");
+   pearlrt::Character<9> filename("put_4.txt");
+   pearlrt::SystemDationNB* disc_ =
+      static_cast<pearlrt::SystemDationNB*>(_disc);
+   pearlrt::DationDim2 dim(15);
+   pearlrt::Fixed<15> rstValue;
+   pearlrt::Fixed<15> line;
+   /* -------------------------------------------- */
+   pearlrt::DationPG logbuch(disc_,
+                             pearlrt::Dation::OUT |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::NOSTREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim);
+   ASSERT_NO_THROW(
+      logbuch.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::ANY ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+   pearlrt::Character<8> text("PEARL");
+   for (int i=0; i<4; i++) {
+      logbuch.beginSequence(NULL);
+      try {
+         logbuch.rst(rstValue);
+         logbuch.toF(line,6);
+         line = line + pearlrt::Fixed<15>(1);
+         logbuch.toA(text);
+         logbuch.toSkip(1);
+      } catch (pearlrt::Signal & s) {
+         if (!logbuch.updateRst(&s)) {
+            logbuch.endSequence();
+            throw;
+         }
+
+      }
+      logbuch.endSequence();
+   }
+      line = pearlrt::Fixed<15>(10);
+      logbuch.beginSequence(NULL);
+      try {
+         logbuch.rst(rstValue);
+         logbuch.eof();
+         logbuch.toF(line,6);
+         line = line + pearlrt::Fixed<15>(1);
+         logbuch.toA(text);
+         logbuch.toSkip(1);
+      } catch (pearlrt::Signal & s) {
+         if (!logbuch.updateRst(&s)) {
+            logbuch.endSequence();
+            throw;
+         }
+
+      }
+      logbuch.endSequence();
+      ASSERT_EQ(rstValue.x, 0);
+
+   logbuch.dationClose(pearlrt::Dation::PRM, (pearlrt::Fixed<15>*)0);
+   pearlrt::Log::info("*** DationPG: eof end ***");
+}

@@ -22,6 +22,18 @@ ticket126: TASK;
      CLOSE table;
 END;
 
+ticket216: TASK;
+     DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
+     DCL f FIXED(15) INIT(42);
+     DCL (f4,f5) FIXED(15) INIT(0,0);
+     DCL error FIXED(15);
+
+     OPEN table BY ANY,IDF('file1.txt');
+
+     WRITE f4 TO table BY EOF;
+     CLOSE table;
+END;
+
 FileTest1: TASK MAIN;
      DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
      DCL f FIXED(15) INIT(42);

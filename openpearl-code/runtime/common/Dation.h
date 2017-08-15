@@ -1,6 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -196,7 +197,7 @@ namespace pearlrt {
 
       via OPENMASK, CLOSEMASK, POSITIONINGMASK  they can be selected
       */
-      /* DationParams*/ int dationParams;
+      int dationParams;  ///<< type is int and not DationParams
 
       /** Classinternal stat variable for dation stat.
           should prevent from open a already opened dation
@@ -223,18 +224,6 @@ namespace pearlrt {
       \throws * may throw exceptions in case of problems in execution
       */
       virtual void dationWrite(void * destination, size_t size) = 0;
-
-      /**
-      set absolut position on dation/file
-
-      The method applies only on DIRECT or FORBACK dations.
-      FORWARD dations will write 0 bytes or discard input on read.
-
-      \param p the target position of the read/write pointer (conted in bytes)
-      \param dationParam specified the dation type (DIRECT,FORWARD,..)
-      \throws may throw different exceptions - not defined yet
-      */
-      virtual void dationSeek(const Fixed<31> & p, const int dationParam) ;
 
    };
    /** @} */

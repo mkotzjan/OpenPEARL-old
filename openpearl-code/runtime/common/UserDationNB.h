@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2014 Rainer Mueller
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -64,9 +64,8 @@ namespace pearlrt {
    protected:
       /**
       The type of the dation is ether ALPHIC or TYPE;
-      UNKNOWN is obsolete.
       */
-      enum DationType {/* UNKNOWN = 0,*/ ALPHIC, TYPE};
+      enum DationType {ALPHIC, TYPE};
 
    private:
       static const Fixed<31> one;
@@ -447,6 +446,11 @@ namespace pearlrt {
       void fromPage(const Fixed<31> n);
 
       /**
+      position to EOF (end of file)
+      */
+      void eof();
+    
+      /**
         internal open function. build path to device, performs
         pre and post Open and creates the FILE descriptor (dev)
 
@@ -465,6 +469,7 @@ namespace pearlrt {
 
       */
       virtual void internalClose() = 0;
+
 
    private:
       /**

@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2013-2014 Holger Koelle
- Copyright (c) 2014 Rainer Mueller
+ Copyright (c) 2014-17 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -384,6 +384,7 @@ namespace pearlrt {
    }
    void Disc::dationUnGetChar(const char x) {
    }
+
    void Disc::Disc::translateNewLine(bool doNewLineTranslation) {
       // do nothing
    }
@@ -437,6 +438,24 @@ namespace pearlrt {
    void Disc::DiscFile::dationUnGetChar(const char x) {
       ungetc(x, fp);
    }
+
+   Fixed<31> Disc::DiscFile::dationEof() {
+       off_t location;
+
+       if (fseeko(fp, 0, SEEK_END) != 0) {
+          Log::error("Disc: positioning failed (%s)",
+                     strerror(ferror(fp)));
+          throw thePositioningFailedSignal;
+       }
+       location = ftello(fp);
+       if (location == -1) {
+          Log::error("Disc: read position failed (%s)",
+                     strerror(ferror(fp)));
+          throw thePositioningFailedSignal;
+       }
+       Fixed<31> fileLocation(location);
+       return fileLocation;
+   } 
 
    void Disc::DiscFile::translateNewLine(bool doNewLineTranslation) {
       // do nothing

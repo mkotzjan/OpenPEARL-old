@@ -1,7 +1,7 @@
 /*
  [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2016 Rainer Mueller
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
 #define SYSTEMDATIONNB_INCLUDED
 
 #include "SystemDation.h"
+#include "Fixed.h"
 
 /**
 \file
@@ -104,6 +105,29 @@ namespace pearlrt {
       \param doNewLineTranslation must be true to enable the translation
       */
       virtual void translateNewLine(bool doNewLineTranslation) = 0; 
+
+      /**
+      set absolut position on dation/file
+
+      This method must be overwritten by systemdations which are SEEKABLE
+
+      The method applies only on DIRECT or FORBACK dations.
+      FORWARD dations will write 0 bytes or discard input on read.
+
+      \param p the target position of the read/write pointer (counted in bytes)
+      \param dationParam specified the dation type (DIRECT,FORWARD,..)
+      \throws may throw different exceptions - not defined yet
+      */
+      virtual void dationSeek(const Fixed<31> & p, const int dationParam) ;
+
+      /**
+      set position on dation/file to end of file
+      and return the absolute position  if the dation is SEEKABLE
+
+      \param dationParam specified the dation type (DIRECT,FORWARD,..)
+      \throws may throw different exceptions - not defined yet
+      */      
+      virtual Fixed<31> dationEof();
 
    };
 }

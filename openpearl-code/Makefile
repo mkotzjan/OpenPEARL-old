@@ -87,7 +87,8 @@ clean:
 	rm -f prl
 
 menuconfig:
-	(cd configuration; make menuconfig; ./scripts/kconfig/conf -s fm/main.fm; cd .. )
+	(cd configuration; make menuconfig; cd .. )
+#	(cd configuration; make menuconfig; ./kconfig/conf -s fm/main.fm; cd .. )
 
 #.PHONY: jenkins_prepare
 #jenkins_prepare:

@@ -177,6 +177,14 @@ namespace pearlrt {
          */
          void dationUnGetChar(const char c);
 
+         /**
+         set the file location to End Of File and return the byte offset
+         as return value
+
+         \returns byte offset of the eof-location
+         */
+         Fixed<31> dationEof();
+
       /**
       translate newline
   

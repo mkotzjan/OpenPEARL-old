@@ -1,6 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -168,8 +169,7 @@ namespace pearlrt {
       // curretly we have one dimensional system devices
       Fixed<31> tempPos;
       tempPos = dim->getIndex() * stepSize;
-      //work->dationSeek(tempPos, dationParams);
-      dationSeek(tempPos, dationParams);
+      work->dationSeek(tempPos, dationParams);
    }
 
    void UserDationNB::pos(Fixed<31> row, Fixed<31> element) {
@@ -205,8 +205,7 @@ namespace pearlrt {
       // curretly we have one dimensional system devices
       Fixed<31> tempPos;
       tempPos = dim->getIndex() * stepSize;
-      //work->dationSeek(tempPos, dationParams);
-      dationSeek(tempPos, dationParams);
+      work->dationSeek(tempPos, dationParams);
    }
 
    void UserDationNB::pos(Fixed<31> page,
@@ -240,8 +239,7 @@ namespace pearlrt {
       // curretly we have one dimensional system devices
       Fixed<31> tempPos;
       tempPos = dim->getIndex() * stepSize;
-      //work->dationSeek(tempPos, dationParams);
-      dationSeek(tempPos, dationParams);
+      work->dationSeek(tempPos, dationParams);
    }
 
    void UserDationNB::sop(Fixed<31>* element) {
@@ -388,8 +386,7 @@ namespace pearlrt {
          Fixed<31> tempPos;
          adv(element);
          tempPos = dim->getIndex();
-         //work->dationSeek(tempPos * stepSize, dationParams);
-         dationSeek(tempPos * stepSize, dationParams);
+         work->dationSeek(tempPos * stepSize, dationParams);
       } else if (dationParams & Dation::FORWARD)  {
          Fixed<31> diff = adv(element);
 
@@ -406,8 +403,7 @@ namespace pearlrt {
 
       if (dationParams & Dation::DIRECT)  {
          adv(row, element);
-         //work->dationSeek(dim->getIndex() * stepSize, dationParams);
-         dationSeek(dim->getIndex() * stepSize, dationParams);
+         work->dationSeek(dim->getIndex() * stepSize, dationParams);
       } else if (dationParams & Dation::FORWARD)  {
          if (dationType == ALPHIC) {
             Fixed<31> oldCol, oldRow;
@@ -432,8 +428,7 @@ namespace pearlrt {
 
       if (dationParams & Dation::DIRECT)  {
          adv(page, row, element);
-         //work->dationSeek(dim->getIndex() * stepSize, dationParams);
-         dationSeek(dim->getIndex() * stepSize, dationParams);
+         work->dationSeek(dim->getIndex() * stepSize, dationParams);
       } else if (dationParams & Dation::FORWARD)  {
          if (dationType == ALPHIC) {
             Fixed<31> oldCol, oldRow, oldPage;
@@ -510,8 +505,7 @@ namespace pearlrt {
          Fixed<31> tempPos;
          adv(element);
          tempPos = dim->getIndex();
-         //work->dationSeek(tempPos * stepSize, dationParams);
-         dationSeek(tempPos * stepSize, dationParams);
+         work->dationSeek(tempPos * stepSize, dationParams);
       } else if (dationParams & Dation::FORWARD)  {
          Fixed<31> diff = adv(element);
 
@@ -528,8 +522,7 @@ namespace pearlrt {
 
       if (dationParams & Dation::DIRECT)  {
          adv(row, element);
-         //work->dationSeek(dim->getIndex() * stepSize, dationParams);
-         dationSeek(dim->getIndex() * stepSize, dationParams);
+         work->dationSeek(dim->getIndex() * stepSize, dationParams);
       } else if (dationParams & Dation::FORWARD)  {
          if (dationType == ALPHIC) {
             Fixed<31> oldCol, oldRow;
@@ -554,8 +547,7 @@ namespace pearlrt {
 
       if (dationParams & Dation::DIRECT)  {
          adv(page, row, element);
-         //work->dationSeek(dim->getIndex() * stepSize, dationParams);
-         dationSeek(dim->getIndex() * stepSize, dationParams);
+         work->dationSeek(dim->getIndex() * stepSize, dationParams);
       } else if (dationParams & Dation::FORWARD)  {
          if (dationType == ALPHIC) {
             Fixed<31> oldCol, oldRow, oldPage;
@@ -600,7 +592,6 @@ namespace pearlrt {
       }
 
       if (currentTask) {
-//         Log::info("UserDationNB::fromSkip: scheduleCallback() invocation\n");
          currentTask->scheduleCallback(false);
       }
    }
@@ -625,6 +616,49 @@ namespace pearlrt {
       }
    }
 
+   void UserDationNB::eof() {
+      Fixed<31> endOfFilePos;
+      int dimensions;
+      Fixed<31> p,r,c;
+
+      assertOpenDirectOrForward();
+      endOfFilePos = work->dationEof();
+      if (dationParams & Dation::DIRECT) {
+          dimensions = dim->getDimensions();
+          dim->reset();   // set virtual position to zero
+          switch (dimensions) {
+          case 0:
+             Log::error("UserDationNB: EOF needs DIM");
+             throw theInternalDationSignal;
+             break;
+
+          case 1: {
+                     DationDim1 * d1 = (DationDim1*)dim;
+                     d1->adv(endOfFilePos);
+                  }
+                  break;           
+          case 2: {
+                     DationDim2 * d2 = (DationDim2*)dim;
+                     r = endOfFilePos/dim->getColumns();
+                     c = endOfFilePos-(r*dim->getColumns());
+                     d2->adv(r,c);
+                  }
+                  break;           
+          case 3: {
+                     DationDim3 * d3 = (DationDim3*)dim;
+                     p = endOfFilePos/
+                         (dim->getRows() * dim->getColumns());
+                     endOfFilePos = endOfFilePos -
+                                    p *(dim->getRows() * dim->getColumns());
+                     r = endOfFilePos/dim->getColumns();
+                     c = endOfFilePos-(r*dim->getColumns());
+                     d3->adv(p,r,c);
+                  }
+                  break;
+          }           
+      }
+   }
+
    void UserDationNB::internalDationOpen(int p,
                                          RefCharacter * rc) {
       // enshure default open parameter
@@ -644,7 +678,6 @@ namespace pearlrt {
 
       if ((system->capabilities() & IDF) && !(p & IDF) && !(p & ANY)) {
          Log::error("UserDationNB: system dation requires IDF");
-         //Log::error("!(p&IDF) %d p&ANY) %d ", !(p & IDF), p & ANY);
          throw theDationParamSignal;
       }
 

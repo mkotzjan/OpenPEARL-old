@@ -82,7 +82,7 @@ namespace pearlrt {
       virtual Fixed<31> getIndex() const = 0;
 
       /**
-      calculate the number of elements of the dation dimansion
+      calculate the number of elements of the dation dimension
 
       This is only possible, if the dimension ist limited (not *).
 

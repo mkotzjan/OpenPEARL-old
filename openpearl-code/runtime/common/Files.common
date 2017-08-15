@@ -38,7 +38,6 @@ CXX_COMMON = \
 	Array.cc \
 	Bolt.cc \
 	LogFile.cc\
-	Dation.cc \
 	Log.cc \
 	Clock.cc  \
 	Duration.cc  \
@@ -62,6 +61,7 @@ CXX_COMMON = \
 	MutexCommon.cc CSemaCommon.cc \
 	Semaphore.cc PriorityQueue.cc \
 	Rst.cc \
+	SystemDationNB.cc \
 	DationRW.cc \
 	IOFormats.cc \
 	DationPG.cc \
@@ -96,13 +96,13 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	GetBitString.h \
 	Sink.h RefCharSink.h \
 	Fixed.h PutFixed.h GetFixed.h \
+	Dation.h \
 	Device.h UserDation.h \
 	PutCharacter.h \
 	Float.h \
 	TaskTimerCommon.h \
 	compare.h \
 	SystemDation.h \
-	SystemDationNB.h \
 	Ref.h
 
 
