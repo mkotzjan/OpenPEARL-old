@@ -21,8 +21,10 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
 
 # -- extend build variables; LDFLAGS are target specific
 CFLAGS += $(HOST_EXTRACFLAGS)
-mconf: LDFLAGS += $(HOSTLOADLIBES_mconf)
-nconf: LDFLAGS += -lpanel -lmenu  $(HOSTLOADLIBES_mconf)
+#mconf: LDFLAGS += $(HOSTLOADLIBES_mconf) -ltinfo
+#nconf: LDFLAGS += -lpanel -lmenu  $(HOSTLOADLIBES_mconf)
+mconf: LOADLIBES += $(HOSTLOADLIBES_mconf) -ltinfo
+nconf: LOADLIBES += -lpanel -lmenu  $(HOSTLOADLIBES_mconf)
 
 # ===========================================================================
 # Shared Makefile for the various kconfig executables:
@@ -97,4 +99,3 @@ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c $(obj)/zconf.hash.c
 .PHONY: clean
 clean:
 	rm -f $(cleanfiles)
-
