@@ -23,8 +23,8 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
 CFLAGS += $(HOST_EXTRACFLAGS)
 #mconf: LDFLAGS += $(HOSTLOADLIBES_mconf) -ltinfo
 #nconf: LDFLAGS += -lpanel -lmenu  $(HOSTLOADLIBES_mconf)
-mconf: LOADLIBES += $(HOSTLOADLIBES_mconf) -ltinfo
-nconf: LOADLIBES += -lpanel -lmenu  $(HOSTLOADLIBES_mconf)
+mconf: LDLIBS += $(HOSTLOADLIBES_mconf) -ltinfo
+nconf: LDLIBS += -lpanel -lmenu  $(HOSTLOADLIBES_mconf)
 
 # ===========================================================================
 # Shared Makefile for the various kconfig executables:
