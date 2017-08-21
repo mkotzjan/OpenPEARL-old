@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2012-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -136,6 +136,7 @@ namespace pearlrt {
             data[i] = ' ';
          }
       }
+
       /**
       create a character initialized with the given C-string.
       The resolving of quotation should have been treated by the compiler.
@@ -192,6 +193,31 @@ namespace pearlrt {
          }
       }
 
+      /**
+      create a character initialized with another Char-value
+
+      \param string the other character value
+             (may include 0-bytes)
+
+      \throws CharacterTooLongSignal
+      */
+      template<size_t T> Character(Character<T> &string) {
+         unsigned int i;
+
+         if (length < T) {
+            //printf("Character: illegal length (%d)", length);
+            throw theCharacterTooLongSignal;
+         }
+
+
+         for (i = 0; i < T; i++) {
+            data[i] = string.data[i];
+         }
+
+         for (i = T; i < length; i++) {
+            data[i] = ' ';
+         }
+      }
 
       /**
       upper bound
