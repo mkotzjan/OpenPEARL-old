@@ -1605,6 +1605,7 @@ readWriteRelativePosition :
     | 'PAGE'  ( '(' expression ')' )?                         # readWriteRelativePositionPAGE
     | 'ADV' '(' ( ( expression ',' )? expression ',' )?
       expression ')'                                          # readWriteRelativePositionADV
+    | 'EOF'                                                   # readWriteRelativePositionEOF
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

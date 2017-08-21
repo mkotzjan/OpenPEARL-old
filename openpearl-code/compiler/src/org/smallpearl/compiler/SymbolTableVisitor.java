@@ -48,6 +48,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     private SymbolTableEntry m_currentEntry;
     private SymbolTable m_currentSymbolTable;
     private LinkedList<LinkedList<SemaphoreEntry>> m_listOfTemporarySemaphoreArrays;
+    private LinkedList<LinkedList<BoltEntry>> m_listOfTemporaryBoltArrays;
     private LinkedList<ArrayDescriptor> m_listOfArrayDescriptors;
 
     private TypeDefinition m_type;
@@ -63,6 +64,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         this.symbolTable = new org.smallpearl.compiler.SymbolTable.SymbolTable();
         this.m_listOfTemporarySemaphoreArrays = new LinkedList<LinkedList<SemaphoreEntry>>();
+        this.m_listOfTemporaryBoltArrays = new LinkedList<LinkedList<BoltEntry>>();
         this.m_listOfArrayDescriptors = new LinkedList<ArrayDescriptor>();
         this.m_symboltablePerContext =  new ParseTreeProperty<SymbolTable>();
     }
@@ -805,6 +807,31 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         return m_listOfTemporarySemaphoreArrays;
     }
 
+    private Void addToListOfTemporaryBoltArrays( LinkedList<BoltEntry> listOfBolts) {
+        Boolean found = false;
+        for (int i = 0; i < m_listOfTemporaryBoltArrays.size(); i++) {
+            LinkedList<BoltEntry> bolts = m_listOfTemporaryBoltArrays.get(i);
+            if ( bolts.size() == listOfBolts.size()) {
+                for (int j = 0; j < bolts.size(); j++) {
+                    if ( bolts.get(j).compareTo(listOfBolts.get(j)) == 0) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ( !found) {
+            this.m_listOfTemporaryBoltArrays.add(listOfBolts);
+        }
+
+        return null;
+    }
+
+    public LinkedList<LinkedList<BoltEntry>>  getListOfTemporaryBoltArrays() {
+        return m_listOfTemporaryBoltArrays;
+    }
+
     public LinkedList<ArrayDescriptor>  getListOfArrayDescriptors() {
         return m_listOfArrayDescriptors;
     }
@@ -884,6 +911,127 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                 System.out.println("ERR: Double definition of " + identifierDenotationList.get(i));
             }
         }
+
+        return null;
+    }
+
+
+    @Override
+    public Void visitBoltReserve(SmallPearlParser.BoltReserveContext ctx) {
+        LinkedList<BoltEntry> listOfBolts = new LinkedList<BoltEntry>();
+
+        LinkedList<ModuleEntry> listOfModules = this.symbolTable.getModules();
+
+        if ( listOfModules.size() > 1 ) {
+            throw new NotYetImplementedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        ModuleEntry moduleEntry = listOfModules.get(0);
+        SymbolTable symbolTable = moduleEntry.scope;
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            SymbolTableEntry entry = symbolTable.lookup(ctx.ID(i).toString());
+
+            if ( entry != null && entry instanceof BoltEntry) {
+                listOfBolts.add((BoltEntry)entry);
+            }
+            else {
+                throw new ArgumentMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        Collections.sort(listOfBolts);
+        addToListOfTemporaryBoltArrays(listOfBolts);
+
+        return null;
+    }
+
+    @Override
+    public Void visitBoltFree(SmallPearlParser.BoltFreeContext ctx) {
+        LinkedList<BoltEntry> listOfBolts = new LinkedList<BoltEntry>();
+
+        LinkedList<ModuleEntry> listOfModules = this.symbolTable.getModules();
+
+        if ( listOfModules.size() > 1 ) {
+            throw new NotYetImplementedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        ModuleEntry moduleEntry = listOfModules.get(0);
+        SymbolTable symbolTable = moduleEntry.scope;
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            SymbolTableEntry entry = symbolTable.lookup(ctx.ID(i).toString());
+
+            if ( entry != null && entry instanceof BoltEntry) {
+                listOfBolts.add((BoltEntry)entry);
+            }
+            else {
+                throw new ArgumentMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        Collections.sort(listOfBolts);
+        addToListOfTemporaryBoltArrays(listOfBolts);
+
+        return null;
+    }
+
+    @Override
+    public Void visitBoltEnter(SmallPearlParser.BoltEnterContext ctx) {
+        LinkedList<BoltEntry> listOfBolts = new LinkedList<BoltEntry>();
+
+        LinkedList<ModuleEntry> listOfModules = this.symbolTable.getModules();
+
+        if ( listOfModules.size() > 1 ) {
+            throw new NotYetImplementedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        ModuleEntry moduleEntry = listOfModules.get(0);
+        SymbolTable symbolTable = moduleEntry.scope;
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            SymbolTableEntry entry = symbolTable.lookup(ctx.ID(i).toString());
+
+            if ( entry != null && entry instanceof BoltEntry) {
+                listOfBolts.add((BoltEntry)entry);
+            }
+            else {
+                throw new ArgumentMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        Collections.sort(listOfBolts);
+        addToListOfTemporaryBoltArrays(listOfBolts);
+
+        return null;
+    }
+
+    @Override
+    public Void visitBoltLeave(SmallPearlParser.BoltLeaveContext ctx) {
+        LinkedList<BoltEntry> listOfBolts = new LinkedList<BoltEntry>();
+
+        LinkedList<ModuleEntry> listOfModules = this.symbolTable.getModules();
+
+        if ( listOfModules.size() > 1 ) {
+            throw new NotYetImplementedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        ModuleEntry moduleEntry = listOfModules.get(0);
+        SymbolTable symbolTable = moduleEntry.scope;
+
+        for (int i = 0; i < ctx.ID().size(); i++) {
+            SymbolTableEntry entry = symbolTable.lookup(ctx.ID(i).toString());
+
+            if ( entry != null && entry instanceof BoltEntry) {
+                listOfBolts.add((BoltEntry)entry);
+            }
+            else {
+                throw new ArgumentMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        Collections.sort(listOfBolts);
+        addToListOfTemporaryBoltArrays(listOfBolts);
 
         return null;
     }
