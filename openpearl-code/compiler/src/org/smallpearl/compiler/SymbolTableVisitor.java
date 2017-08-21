@@ -810,10 +810,10 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     private Void addToListOfTemporaryBoltArrays( LinkedList<BoltEntry> listOfBolts) {
         Boolean found = false;
         for (int i = 0; i < m_listOfTemporaryBoltArrays.size(); i++) {
-            LinkedList<SemaphoreEntry> semaphores = m_listOfTemporarySemaphoreArrays.get(i);
-            if ( semaphores.size() == listOfBolts.size()) {
-                for (int j = 0; j < semaphores.size(); j++) {
-                    if ( semaphores.get(j).compareTo(listOfBolts.get(j)) == 0) {
+            LinkedList<BoltEntry> bolts = m_listOfTemporaryBoltArrays.get(i);
+            if ( bolts.size() == listOfBolts.size()) {
+                for (int j = 0; j < bolts.size(); j++) {
+                    if ( bolts.get(j).compareTo(listOfBolts.get(j)) == 0) {
                         found = true;
                         break;
                     }
