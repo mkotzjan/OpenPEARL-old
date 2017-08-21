@@ -48,6 +48,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     private SymbolTableEntry m_currentEntry;
     private SymbolTable m_currentSymbolTable;
     private LinkedList<LinkedList<SemaphoreEntry>> m_listOfTemporarySemaphoreArrays;
+    private LinkedList<LinkedList<BoltEntry>> m_listOfTemporaryBoltArrays;
     private LinkedList<ArrayDescriptor> m_listOfArrayDescriptors;
 
     private TypeDefinition m_type;
@@ -63,6 +64,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         this.symbolTable = new org.smallpearl.compiler.SymbolTable.SymbolTable();
         this.m_listOfTemporarySemaphoreArrays = new LinkedList<LinkedList<SemaphoreEntry>>();
+        this.m_listOfTemporaryBoltArrays = new LinkedList<LinkedList<BoltEntry>>();
         this.m_listOfArrayDescriptors = new LinkedList<ArrayDescriptor>();
         this.m_symboltablePerContext =  new ParseTreeProperty<SymbolTable>();
     }
@@ -803,6 +805,31 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     public LinkedList<LinkedList<SemaphoreEntry>>  getListOfTemporarySemaphoreArrays() {
         return m_listOfTemporarySemaphoreArrays;
+    }
+
+    private Void addToListOfTemporaryBoltArrays( LinkedList<BoltEntry> listOfBolts) {
+        Boolean found = false;
+        for (int i = 0; i < m_listOfTemporaryBoltArrays.size(); i++) {
+            LinkedList<SemaphoreEntry> semaphores = m_listOfTemporarySemaphoreArrays.get(i);
+            if ( semaphores.size() == listOfBolts.size()) {
+                for (int j = 0; j < semaphores.size(); j++) {
+                    if ( semaphores.get(j).compareTo(listOfBolts.get(j)) == 0) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ( !found) {
+            this.m_listOfTemporaryBoltArrays.add(listOfBolts);
+        }
+
+        return null;
+    }
+
+    public LinkedList<LinkedList<BoltEntry>>  getListOfTemporaryBoltArrays() {
+        return m_listOfTemporaryBoltArrays;
     }
 
     public LinkedList<ArrayDescriptor>  getListOfArrayDescriptors() {

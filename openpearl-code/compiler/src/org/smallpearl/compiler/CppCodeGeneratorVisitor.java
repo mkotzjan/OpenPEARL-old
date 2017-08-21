@@ -982,6 +982,20 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         problem_part.add("temporarySemaphoreArrays", semaphoreArrays);
 
+        ST boltArrays = group.getInstanceOf("TemporaryBoltArrays");
+        LinkedList<LinkedList<BoltEntry>>  listOfBoltDeclarations = m_symbolTableVisitor.getListOfTemporaryBoltArrays();
+
+        for (int i = 0; i < listOfBoltDeclarations.size(); i++) {
+            ST boltArray = group.getInstanceOf("TemporaryBoltArray");
+            LinkedList<BoltEntry> listOfBolts = listOfBoltDeclarations.get(i);
+            for (int j = 0; j < listOfBolts.size(); j++) {
+                boltArray.add("bolt", listOfBolts.get(j).getName());
+            }
+            boltArrays.add("array", boltArray);
+        }
+
+        problem_part.add("temporaryBoltArrays", boltArrays);
+
         ST arrayDescriptors = group.getInstanceOf("ArrayDescriptors");
         LinkedList<ArrayDescriptor>  listOfArrayDescriptors = m_symbolTableVisitor.getListOfArrayDescriptors();
 
@@ -1073,7 +1087,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         boolean hasGlobalAttribute = false;
 
         ArrayList<String> identifierDenotationList = null;
-        ArrayList<Integer> presetList = null;
 
         if (ctx != null) {
             if (ctx.globalAttribute() != null) {
