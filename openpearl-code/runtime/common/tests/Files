@@ -35,10 +35,12 @@ CXX_COMMON_TESTS := $(CXX_COMMON_TESTS1) $(CXX_COMMON_TESTS2)
 
 CXX_COMMON_GTESTS := $(CXX_COMMON_TESTS)
 	
-CXX_COMMON_TESTS += SampleBasicDationTests.cc \
+CXX_COMMON_TEST_PROGS := SampleBasicDationTests.cc \
 	sematest.cc \
 	bolttest.cc \
 	sematerminate.cc \
 	interruptTest.cc  \
-	log_test.cc
-	
+	log_test.cc \
+	RefTest.cc
+
+

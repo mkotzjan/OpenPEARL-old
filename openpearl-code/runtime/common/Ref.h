@@ -56,28 +56,56 @@ namespace pearlrt {
   
    \code
    Fixed<15> x;
-   Fixed<15> * y;
+   Ref< Fixed<15> > * y;
+   ...
+   Ref< Fixed<15> > * y1(&x);  // auto initialization
    ...
    y = & x;           // assignment to the reference variable
-   x = cont(y) + x;   // usage in an expression
-   cont(y) = x;       // Usage in an assignment
+   x = *y + x;   // usage in an expression
+   *y = x;       // Usage in an assignment
    \endcode 
 
    \tparam C the class of the referenced variable. This may be any 
              kind of class.
-   \param x the reference variable. If the value is not NULL, the referenced
-            object is returned as reference type of C++.
-           
-    \throws   RefNotInitializedSignal if the parameter x ist NULL 
    */
-   template<class C> C& cont(C* x) {
-      if (x) {
-         return *x;
-      }
-      Log::error("use of uninitialized reference");
-      throw theRefNotInitializedSignal; 
-   }
 
+   template<class C> class Ref {
+       private:
+          C * x;   ///< the pointer to the real object
+
+       public:
+          /**
+          ctor for plain REF variable declaration
+          */
+          Ref() {
+            x = NULL;
+          }
+ 
+          /**
+          ctor for REF variable declaration with preset
+          \param pValue the variable which should by adressed
+                         by this REF
+          */
+          Ref(C* pValue) : x(pValue){}
+         
+          /**
+          dereferenciation of a REF variable 
+      
+          This may be used in expressions and as target of assignments
+
+          \returns the object as reference type of C++.
+          
+          \throws   RefNotInitializedSignal if the reference is not
+                               initialized
+          */
+          C& operator*() {
+             if (x) {
+                return *x;
+             }
+             Log::error("Ref::use of uninitialized reference");
+             throw theRefNotInitializedSignal; 
+          }
+   };
    /** @} */
 }
 

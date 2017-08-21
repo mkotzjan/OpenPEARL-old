@@ -157,7 +157,10 @@ endif
 
 targets := libOpenPEARLlinux.a linux.xml
 
+$(warning $(CXX_COMMON_TEST_PROGS))
+
 ifeq ($(CONFIG_LINUX_tests),y)
+  include ../common/tests/Files
   include tests/Makefile.inc
   CHECK_FILES += $(GTEST_SRC) $(GTEST_DATION_SRC) $(TEST_SRC)
 endif
@@ -308,3 +311,6 @@ depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
 -include .depend
 
 .PHONY: $(phony)
+
+
+$(warning $(targets))

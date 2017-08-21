@@ -44,16 +44,17 @@ PLIB := libOpenPEARLlinux.a
 targets +=  \
 	tests/DataTypeTests \
 	tests/api  tests/lot_of_tasks  \
-	tests/log_test \
 	tests/susp_cont_test \
 	tests/sched_demo \
-	tests/interruptTest \
-	tests/SampleBasicDationTests \
-	tests/sematest tests/sematerminate  \
 	tests/signalTest\
 	tests/DationTests \
 	tests/DationSuspendTerminateTests 
-	
+
+$(warning $(targets))
+$(warning $(CXX_COMMON_TEST_PROGS))
+
+targets +=  $(addprefix tests/, $(basename $(CXX_COMMON_TEST_PROGS)))
+$(warning $(targets))
 
 GTEST_SRCS = tests/gtest_main.cc 
 GTEST_DATION_SRCS = tests/gtest_main.cc 
@@ -88,32 +89,28 @@ GTEST_DATION_OBJS =$(GTEST_DATION_SRCS:.cc=.o)
 
 TEST_FILES_2_REMOVE = $(GTEST_OBJS) $(GTEST_DATION_OBJS) 
 TEST_FILES_2_REMOVE += $(addpostfix .o,$(targets))
-TEST_FILES_2_REMOVE += tests/DationSuspendTerminateTests.o
+#TEST_FILES_2_REMOVE += tests/DationSuspendTerminateTests.o
 
-$(info $(TEST_FILES_2_REMOVE))
+#$(info $(TEST_FILES_2_REMOVE))
 
 # ----------------------------------------
 # define rules to build the targets
 #  due to problems von implicit rules, the link command is 
 #  given as explicit rule
 
+#define ruleCommonTests =
+#$$(tests/$(1)) : $$(../common/tests/$(1).o) $$($(PLIB)))
+#	$$($(LINK))
+#
+#endef
+#
+#$(foreach f,$(CXX_COMMON_TEST_PROGS),$(eval $(call ruleCommonTests,$($(basename($(f)))))))
+#
+
 tests/signalTest: tests/signalTest.o $(PLIB)
 	$(LINK)
 
-tests/interruptTest: ../common/tests/interruptTest.o $(PLIB)
-	$(LINK)
-
-tests/SampleBasicDationTests: ../common/tests/SampleBasicDationTests.o $(PLIB)
-	$(LINK)
-
 tests/api: tests/api.o $(PLIB)
-	$(LINK)
-
-tests/sched_demo: ../common/tests/sched_demo.o \
-	../common/tests/round_robin_test.o $(PLIB) 
-	$(LINK)
-
-tests/susp_cont_test: ../common/tests/susp_cont_test.o $(PLIB)
 	$(LINK)
 
 tests/lot_of_tasks: tests/lot_of_tasks.o $(PLIB)
@@ -125,13 +122,36 @@ tests/DataTypeTests: $(GTEST_OBJS) $(PLIB) /usr/local/lib/libgtest.a
 tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) /usr/local/lib/libgtest.a
 	$(LINK)
 
+tests/sematerminate: ../common/tests/sematerminate.o $(PLIB)
+	$(LINK)
+
+
+# ----- rules for sources from common/tests
+
+tests/interruptTest: ../common/tests/interruptTest.o $(PLIB)
+	$(LINK)
+
+tests/bolttest: ../common/tests/bolttest.o $(PLIB)
+	$(LINK)
+
+tests/RefTest: ../common/tests/RefTest.o $(PLIB)
+	$(LINK)
+
+tests/SampleBasicDationTests: ../common/tests/SampleBasicDationTests.o $(PLIB)
+	$(LINK)
+
+tests/sched_demo: ../common/tests/sched_demo.o \
+	../common/tests/round_robin_test.o $(PLIB) 
+	$(LINK)
+
+tests/susp_cont_test: ../common/tests/susp_cont_test.o $(PLIB)
+	$(LINK)
+
+
 tests/log_test: ../common/tests/log_test.o $(PLIB)
 	$(LINK)
 
 tests/sematest: ../common/tests/sematest.o $(PLIB)
-	$(LINK)
-
-tests/sematerminate: ../common/tests/sematerminate.o $(PLIB)
 	$(LINK)
 
 tests/DationSuspendTerminateTests: tests/DationSuspendTerminateTests.o $(PLIB)
