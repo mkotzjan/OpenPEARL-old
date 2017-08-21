@@ -1327,7 +1327,7 @@ TemporaryBoltArrays(array) ::= <<
 >>
 
 TemporaryBoltArray(bolt) ::= <%
-static pearlrt::Bolt *<bolt: {sbolt|<bolt>} ; separator="_">_bolts[] = {<bolt: {bolt|&_<bolt>} ; separator=",">}; <\n>
+static pearlrt::Bolt *<bolt: {bolt|<bolt>} ; separator="_">_bolts[] = {<bolt: {bolt|&_<bolt>} ; separator=",">}; <\n>
 %>
 
 /* --------------------- DATION -------------------------- */
