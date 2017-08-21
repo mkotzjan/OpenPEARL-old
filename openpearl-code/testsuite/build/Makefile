@@ -22,7 +22,8 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	401_char_expr1 \
 	700_dation_rw \
 	701_dation_pg \
-	706_convert
+	706_convert \
+	850_ref_decl
 
 DONOTRUN=000_empty \
 	703_userdation_dcl \
