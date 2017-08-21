@@ -896,6 +896,10 @@ put_statement_factor_position_x(element) ::= <%
     toX((pearlrt::Fixed\<31>)(<element>))
 %>
 
+put_statement_factor_position_eof() ::= <%
+    eof()
+%>
+
 put_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
     toF(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
 %>
@@ -969,6 +973,10 @@ get_statement_factor_position_skip(element) ::= <%
 
 get_statement_factor_position_x(element) ::= <%
     fromX((pearlrt::Fixed\<31>)(<element>))
+%>
+
+get_statement_factor_position_eof() ::= <%
+    eof()
 %>
 
 get_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%

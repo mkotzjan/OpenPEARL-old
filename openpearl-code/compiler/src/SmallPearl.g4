@@ -1428,6 +1428,7 @@ position :
       'RST' ( '(' ID ')' )               # positionRST
     | 'SKIP' ( '(' expression ')' )?     # positionSKIP
     | 'X' ( '(' expression ')' )?        # positionX
+    | 'EOF'                              # positionEOF
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
