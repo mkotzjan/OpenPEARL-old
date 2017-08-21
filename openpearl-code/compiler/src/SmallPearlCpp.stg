@@ -1166,23 +1166,23 @@ BoltDeclaration(decl) ::= <%
 <decl>
 %>
 
-BoltReserve(bolts,noofbolts) ::= <%
+BoltReserve(names,noofbolts) ::= <%
     pearlrt::Bolt::reserve( me, <noofbolts>, <names: {name|<name>_}>bolts);
 
 %>
 
-BoltFree(bolts,noofbolts) ::= <%
+BoltFree(names,noofbolts) ::= <%
     pearlrt::Bolt::free( me, <noofbolts>, <names: {name|<name>_}>bolts);
 
 %>
 
-BoltEnter(bolts,noofbolts) ::= <%
+BoltEnter(names,noofbolts) ::= <%
     pearlrt::Bolt::enter( me, <noofbolts>, <names: {name|<name>_}>bolts);
 
 
 %>
 
-BoltLeave(bolts,noofbolts) ::= <%
+BoltLeave(names,noofbolts) ::= <%
     pearlrt::Bolt::leave( me, <noofbolts>, <names: {name|<name>_}>bolts);
 
 
@@ -1327,7 +1327,7 @@ TemporaryBoltArrays(array) ::= <<
 >>
 
 TemporaryBoltArray(bolt) ::= <%
-static pearlrt::Bolt *<bolt: {bolt|<bolt>} ; separator="_">_bolts[] = {<bolt: {bolt|&_<bolt>} ; separator=",">}; <\n>
+static pearlrt::Bolt *<bolt: {bo|<bo>} ; separator="_">_bolts[] = {<bolt: {bo|&_<bo>} ; separator=",">}; <\n>
 %>
 
 /* --------------------- DATION -------------------------- */

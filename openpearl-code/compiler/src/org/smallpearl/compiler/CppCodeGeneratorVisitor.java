@@ -1121,7 +1121,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         Collections.sort(listOfNames);
 
         for (int i = 0; i < listOfNames.size(); i++) {
-            st.add("bolts", listOfNames.get(i));
+            st.add("names", listOfNames.get(i));
         }
 
         st.add("noofbolts", ctx.ID().size());
@@ -1141,7 +1141,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         Collections.sort(listOfNames);
 
         for (int i = 0; i < listOfNames.size(); i++) {
-            st.add("bolts", listOfNames.get(i));
+            st.add("names", listOfNames.get(i));
         }
 
         st.add("noofbolts", ctx.ID().size());
@@ -1161,7 +1161,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         Collections.sort(listOfNames);
 
         for (int i = 0; i < listOfNames.size(); i++) {
-            st.add("bolts", listOfNames.get(i));
+            st.add("names", listOfNames.get(i));
         }
 
         st.add("noofbolts", ctx.ID().size());
@@ -1181,7 +1181,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         Collections.sort(listOfNames);
 
         for (int i = 0; i < listOfNames.size(); i++) {
-            st.add("bolts", listOfNames.get(i));
+            st.add("names", listOfNames.get(i));
         }
 
         st.add("noofbolts", ctx.ID().size());
