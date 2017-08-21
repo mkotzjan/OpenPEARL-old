@@ -658,6 +658,10 @@ read_write_absolute_position_col(dation,expression) ::= <%
 <dation>.col(<expression>);
 %>
 
+read_write_eof_position(dation) ::= <%
+<dation>.eof();
+%>
+
 read_write_adv_position(dation,expression1,expression2,expression3) ::= <%
 <if(expression1 && expression2 && expression3)>
 <dation>.adv(<expression1>,<expression2>,<expression3>);

@@ -3587,8 +3587,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 }
                 else if ( c.readWriteRelativePosition() instanceof  SmallPearlParser.ReadWriteRelativePositionADVContext ) {
                     ST el = visitReadWriteRelativePositionADV((SmallPearlParser.ReadWriteRelativePositionADVContext) c.readWriteRelativePosition());
-                    el.add( "dation", getUserVariable(dation));
+                    el.add("dation", getUserVariable(dation));
                     st.add("elements", el);
+                }
+                else if ( c.readWriteRelativePosition() instanceof  SmallPearlParser.ReadWriteRelativePositionEOFContext ) {
+                        ST el = visitReadWriteRelativePositionEOF((SmallPearlParser.ReadWriteRelativePositionEOFContext) c.readWriteRelativePosition());
+                        el.add( "dation", getUserVariable(dation));
+                        st.add("elements", el);
                 }
             }
             else if ( ctx.readPosition(i) instanceof SmallPearlParser.ReadRSTPositionContext) {
@@ -3653,6 +3658,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 }
                 else if ( c.readWriteRelativePosition() instanceof  SmallPearlParser.ReadWriteRelativePositionADVContext ) {
                     ST el = visitReadWriteRelativePositionADV((SmallPearlParser.ReadWriteRelativePositionADVContext) c.readWriteRelativePosition());
+                    el.add( "dation", getUserVariable(ctx.ID().toString()));
+                    st.add("elements", el);
+                }
+                else if ( c.readWriteRelativePosition() instanceof  SmallPearlParser.ReadWriteRelativePositionEOFContext ) {
+                    ST el = visitReadWriteRelativePositionEOF((SmallPearlParser.ReadWriteRelativePositionEOFContext) c.readWriteRelativePosition());
                     el.add( "dation", getUserVariable(ctx.ID().toString()));
                     st.add("elements", el);
                 }
@@ -3796,6 +3806,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             st.add("expression1", ctx.expression(0).getText());
         }
 
+        return st;
+    }
+
+    @Override
+    public
+    ST visitReadWriteRelativePositionEOF(SmallPearlParser.ReadWriteRelativePositionEOFContext ctx) {
+        ST st = group.getInstanceOf("read_write_eof_position");
         return st;
     }
 
