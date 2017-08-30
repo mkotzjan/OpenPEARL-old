@@ -2659,7 +2659,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     SmallPearlParser.Open_parameter_idfContext c = (SmallPearlParser.Open_parameter_idfContext) ctx.open_parameter(i);
 
                     if (c.StringLiteral() != null) {
-                        filenames.add(c.StringLiteral().toString());
+                        String quoteless = c.StringLiteral().toString().subSequence(1, c.StringLiteral().toString().length() - 1).toString();
+                        filenames.add(quoteless);
                     } else if (c.ID() != null) {
                         SymbolTableEntry entry = m_currentSymbolTable.lookup(c.ID().getText());
 
