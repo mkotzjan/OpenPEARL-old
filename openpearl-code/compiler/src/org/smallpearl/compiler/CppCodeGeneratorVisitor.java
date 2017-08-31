@@ -2659,7 +2659,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     SmallPearlParser.Open_parameter_idfContext c = (SmallPearlParser.Open_parameter_idfContext) ctx.open_parameter(i);
 
                     if (c.StringLiteral() != null) {
-                        filenames.add(c.StringLiteral().toString());
+                        String quoteless = c.StringLiteral().toString().subSequence(1, c.StringLiteral().toString().length() - 1).toString();
+                        filenames.add(quoteless);
                     } else if (c.ID() != null) {
                         SymbolTableEntry entry = m_currentSymbolTable.lookup(c.ID().getText());
 
@@ -3359,6 +3360,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
             st.add("format", e);
         }
+        else if ( ctx.position() instanceof  SmallPearlParser.PositionEOFContext ) {
+            SmallPearlParser.PositionEOFContext c = (SmallPearlParser.PositionEOFContext) ctx.position();
+            ST e = group.getInstanceOf("put_statement_factor_position_eof");
+        }
 
         return st;
     }
@@ -3399,6 +3404,10 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
 
             st.add("format", e);
+        }
+        else if ( ctx.position() instanceof  SmallPearlParser.PositionEOFContext ) {
+            SmallPearlParser.PositionEOFContext c = (SmallPearlParser.PositionEOFContext) ctx.position();
+            ST e = group.getInstanceOf("get_statement_factor_position_eof");
         }
 
         return st;
