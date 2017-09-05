@@ -120,7 +120,7 @@ namespace pearlrt {
                                      PROT_READ | PROT_WRITE,
                                      MAP_SHARED, mem_fd, 0);
 
-         if (gpio_map < (void*)-1) {
+         if ((void*)gpio_map == MAP_FAILED) {
             Log::error("could not map GPIO registers");
             throw theInternalDationSignal;
          }
