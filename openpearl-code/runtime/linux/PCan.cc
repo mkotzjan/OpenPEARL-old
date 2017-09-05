@@ -53,7 +53,7 @@ namespace pearlrt {
       switch (speed) {
          default:
             Log::error("PCan: bitrate (%d) not supported", speed);
-            throw theIllegalParamSignal;
+            throw theDationParamSignal;
          case 125000:
            bitRate = CAN_BAUD_125K;
            break;
@@ -95,14 +95,14 @@ namespace pearlrt {
          h = LINUX_CAN_Open(deviceNode, O_RDWR);
          if (h == NULL) {
              Log::error("PCan: can't open device %s", deviceNode);
-	     throw theIllegalParamSignal;
+	     throw theDationParamSignal;
          }
 
          // use standard frames (11Bit ID)
          ret = CAN_Init(h, bitRate, CAN_INIT_TYPE_ST);
          if (ret) {
             Log::error("PCan: error in CAN_Init");
-	     throw theIllegalParamSignal;
+	     throw theDationParamSignal;
          }
       }
 
@@ -139,7 +139,7 @@ namespace pearlrt {
       if (size != sizeof(Can2AMessage)) {
          Log::error("PCan: %d byte expected (got %d)",
                     (int)(sizeof(Can2AMessage)), (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
@@ -150,7 +150,7 @@ namespace pearlrt {
       m.ID = d->identifier.x;
       if (d->dataLength.x > 8) {
           Log::error("PCan: write length too large (%d)", d->dataLength.x);
-          throw theIllegalParamSignal;
+          throw theDationParamSignal;
       }
       m.LEN = d->dataLength.x;
       if (d->rtrRequest.x) {
@@ -181,7 +181,7 @@ namespace pearlrt {
       if (size != sizeof(Can2AMessage)) {
          Log::error("PCan: %d byte expected (got %d)",
                     (int)(sizeof(Can2AMessage)), (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {

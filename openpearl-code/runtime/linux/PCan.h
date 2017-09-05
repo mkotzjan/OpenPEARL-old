@@ -81,7 +81,7 @@ namespace pearlrt {
       \param speed the transmission speed, which may be one of 125000, 250000,
          500000 or 1000000
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       */
       PCan(char* devicePath, int speed);
@@ -118,7 +118,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size is not equal
+      \throws DationParamSignal, if size is not equal
                        to the length of the Can2AMessage 
       \throws NotAllowedSignal, if  dation is not opened
       */
@@ -129,7 +129,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size is not equal
+      \throws DationParamSignal, if size is not equal
                        to the length of the Can2AMessage 
       \throws NotAllowedSignal, if  dation is not opened
       */

@@ -73,7 +73,7 @@ namespace pearlrt {
       \param provider reference to the i2cbus object
       \param addr the i2c bus adress
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       */
       LM75(I2CProvider * provider, int addr);
@@ -105,9 +105,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<4> value
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -119,7 +119,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws NotAllowedSignal, in any case
+      \throws DationParamSignal, in any case
       */
       void dationWrite(void * data, size_t size);
 

@@ -128,7 +128,7 @@ TEST(Disc, openClose) {
                              pearlrt::Dation::INOUT));
    ASSERT_NO_THROW(
       work->dationClose(pearlrt::Dation::CAN));
-   // no file + NEW + IN --> IllegalPara
+   // no file + NEW + IN --> DationParamSignal
    ASSERT_THROW(
       work = disc.dationOpen("file1.tst",
                              pearlrt::Dation::NEW |
@@ -203,7 +203,7 @@ TEST(Disc, openClose) {
                              pearlrt::Dation::IDF |
                              pearlrt::Dation::INOUT));
    ASSERT_NO_THROW(work->dationClose(pearlrt::Dation::PRM));
-   // file + NEW + IN --> IllegalParams
+   // file + NEW + IN --> DationParamSignal
    ASSERT_THROW(
       work = disc.dationOpen("file1.tst",
                              pearlrt::Dation::NEW |

@@ -73,7 +73,7 @@ namespace pearlrt {
       \param s the starting bit number (7..0) starting with 7 at the MSB
       \param w the number of bits
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       */
       PCF8574In(I2CProvider * provider, int addr, int s, int w);
@@ -86,7 +86,7 @@ namespace pearlrt {
       \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       PCF8574In* dationOpen(const char* idf = 0, int openParam = 0);
 
@@ -104,9 +104,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<width> value at maximum
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -115,9 +115,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
-                       expected for the Bit<width> value at maximum
-      \throws NotAllowedSignal, in any case
+      \throws InternalDationSignal, in any case
       */
       void dationWrite(void * data, size_t size);
 

@@ -85,7 +85,7 @@ namespace pearlrt {
 
       \return handle to table concrete PCF8574 chip
 
-      \throws IllegalParamSignal if at least one bit is already in use
+      \throws DationParamSignal if at least one bit is already in use
       \throws InternalDationError if more than 'nbrOfEntries' are defined
 
       */

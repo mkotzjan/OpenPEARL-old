@@ -231,9 +231,9 @@ namespace pearlrt {
        \param nbrOfFiles denotes the number of files opened
               at one time on this folder/disc
 
-       \throws IllegalPathSignal if dev denotes no folder name
-       \throws IllegalPathSignal if dev does not end with '/'
-       \throws IllegalParamSignal if the required number of
+       \throws DationParamSignal if dev denotes no folder name
+       \throws DationParamSignal if dev does not end with '/'
+       \throws DationParamSignal if the required number of
                    channels could not be allocated
       */
       FatFs(const char* dev, const int nbrOfFiles);
@@ -268,8 +268,7 @@ namespace pearlrt {
                   dation operations.
 
       \throws OpenFailedSignal in case of errors
-      \throws IllegalParamsSignal in case of errors
-      \throws IllegalPathSignal in case of errors
+      \throws DationParamSignal in case of errors
       */
       FatFsFile* dationOpen(const char * fileName, int openParams);
 

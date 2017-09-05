@@ -67,7 +67,7 @@ namespace pearlrt {
       constructor to create the bit group and set the
       bits to output direction
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       */
       SampleBasicDation();
@@ -101,9 +101,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<4> value
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -115,7 +115,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<4> value
       \throws NotAllowedSignal, if  dation is not opened
       */

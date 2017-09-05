@@ -119,7 +119,7 @@ namespace pearlrt {
 
       \param n number of rows to skip, must be >0
 
-      \throw IllegalParamSignal, if n <= 0
+      \throw DationParamSignal, if n <= 0
 
       \returns number of elements to beginning of n-th next row
       */
@@ -134,7 +134,7 @@ namespace pearlrt {
 
       \param n number of pages to skip, must be >0
 
-      \throw IllegalParamSignal, if n <= 0
+      \throw DationuParamSignal, if n <= 0
 
       \returns number of elements to beginning of n-th next row
       */

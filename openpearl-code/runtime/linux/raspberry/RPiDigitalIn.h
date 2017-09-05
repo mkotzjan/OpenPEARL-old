@@ -92,7 +92,7 @@ namespace pearlrt {
       \param closeParam close parameters if given
 
 
-      \throws NotAllowedSignal, if  dation is not opened and rst is not given
+      \throws CloseFailedSignal, if  dation is not opened and rst is not given
       */
       void dationClose(int closeParam = 0);
 
@@ -103,7 +103,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws notAllowedSignal, if used at all
+      \throws InternalDationSignal, if used at all
       */
       void dationWrite(void * data, size_t size);
 
@@ -112,8 +112,8 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size > 4
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationParamSignal, if size > 4
+      \throws DationNotOpenSignal, if  dation is not opened
 
       */
       void dationRead(void * data, size_t size);

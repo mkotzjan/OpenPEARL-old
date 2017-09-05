@@ -48,7 +48,7 @@ namespace pearlrt {
 
       if (addr < 0x48 || addr > 0x4f) {
          Log::error("LM75: illegal addres (%x)", addr);
-         throw theInternalDationSignal;
+         throw theDationParamSignal;
       }
 
       this->addr = addr;

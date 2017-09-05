@@ -53,7 +53,7 @@ namespace pearlrt {
    void OctopusDigitalIn::internalDationOpen() {
       if (dationStatus != CLOSED) {
          Log::error("OctopusDigitalIn: Dation already open");
-         throw theNotAllowedSignal;
+         throw theOpenFailedSignal;
       }
 
       dationStatus = OPENED;
@@ -62,14 +62,14 @@ namespace pearlrt {
      
       if (dationStatus != OPENED) {
          Log::error("OctopusDigitalOut: Dation not open");
-         throw theNotAllowedSignal;
+         throw theCloseFailedSignal;
       }
 
       dationStatus = CLOSED;
    }
 
    void OctopusDigitalIn::dationWrite(void* data, size_t size) {
-      throw theNotAllowedSignal;
+      throw theInternalDationSignal;
    }
 
    void OctopusDigitalIn::dationRead(void* data, size_t size) {
@@ -81,12 +81,12 @@ namespace pearlrt {
       // Therefore size must be 1
       if (size != 1) {
          Log::error("OctopusDigitalIn: 1 byte expected");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("OctopusDigitalIn: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // expect BitString<width> as data

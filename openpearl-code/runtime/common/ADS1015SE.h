@@ -74,7 +74,7 @@ namespace pearlrt {
       \param ch channel numbner (0..3)
       \param g gain (0=2/3,1,2,4,8,16)
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       */
       ADS1015SE(I2CProvider * provider, int _addr, int ch, int g);
@@ -87,7 +87,7 @@ namespace pearlrt {
       \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws DationNotOpenSignal, if  dation is not closed and rst is not given
       */
       ADS1015SE* dationOpen(const char* idf = 0, int openParam = 0);
 
@@ -105,8 +105,8 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 2
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationParamSignal, if size != 2
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -115,7 +115,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws NotAllowedSignal, in any case
+      \throws InternalDationSignal, in any case
       */
       void dationWrite(void * data, size_t size);
 

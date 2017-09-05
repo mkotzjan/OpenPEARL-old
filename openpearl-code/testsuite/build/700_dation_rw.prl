@@ -10,6 +10,18 @@ PROBLEM;
    SPC stdout DATION OUT SYSTEM ALPHIC;
    DCL stdOut DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
 
+ticket62: TASK;
+     DCL table DATION INOUT ALL DIM(*) DIRECT CREATED(disc);
+     DCL f FIXED(15) INIT(42);
+     DCL (f4,f5) FIXED(15) INIT(0,0);
+     DCL error FIXED(15);
+
+     OPEN table BY ANY,IDF('file1.txt');
+
+     WRITE f4 TO table BY POS(3);
+     CLOSE table;
+END;
+
 ticket126: TASK;
      DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
      DCL f FIXED(15) INIT(42);

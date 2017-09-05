@@ -12,12 +12,12 @@ namespace pearlrt {
 
       if (! octopus_init(&octopus)) {
          Log::error("Octopus: no board found (%s)", octopus.error_str);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (octopus_open(&octopus) < 0) {
          Log::error("Octopus: failed to open (%s)", octopus.error_str);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       octopus_get_hwdesc(&octopus, desc);
@@ -36,7 +36,7 @@ namespace pearlrt {
       if (octopus_close(&octopus) < 1) {
          Log::error("Octopus: error closing connection (%s)",
                     octopus.error_str);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       Log::info("Octopus deinitialized");
@@ -59,17 +59,17 @@ namespace pearlrt {
 
       if (p < 0 || p > 5) {
          Log::error("Octopus: illegal port");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (start > 7 || start < 0) {
          Log::error("Octopus: illegal starting bit number");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (width > 8 || width < 0 || start - width + 1 < 0) {
          Log::error("Octopus: illegal starting bit, width combination");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       mask = 0x0ff >> (8 - width);
@@ -78,7 +78,7 @@ namespace pearlrt {
       if (usedPortBits[p] & mask) {
          Log::error("Octopus: bits already in use (used %x, requested %x)",
                     usedPortBits[p], mask);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       usedPortBits[p] |= mask;
@@ -86,7 +86,7 @@ namespace pearlrt {
       switch (mode) {
       default:
          Log::error("Octopus: error set output dir bits");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
 
       case DIGOUT:
          portDirectionOut[p] |= mask;
@@ -94,7 +94,7 @@ namespace pearlrt {
          if (octopus_io_set_port_direction_out(
                   &octopus, p + 1, portDirectionOut[p]) < 0) {
             Log::error("Octopus: error set output dir bits");
-            throw theIllegalParamSignal;
+            throw theDationParamSignal;
          }
 
          break;
@@ -134,7 +134,7 @@ namespace pearlrt {
 
       if (result < 0) {
          Log::error("Octopus: error writing bits");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
    }
 
