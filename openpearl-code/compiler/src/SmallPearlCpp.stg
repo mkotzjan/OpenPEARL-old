@@ -1081,6 +1081,7 @@ SimpleType(TypeInteger,TypeFloatingPointNumber,TypeBitString,TypeDuration,TypeSe
 <if(TypeTime)><TypeTime><endif>
 <if(TypeSemaphore)><TypeSemaphore><endif>
 <if(TypeBolt)><TypeBolt><endif>
+<if(TypeCharacterString)><TypeCharacterString><endif>
 %>
 
 TypeReferenceTaskType() ::= <<
@@ -1744,4 +1745,18 @@ ArrayRHS(name,descriptor,indices) ::= <%
 
 ArrayInitalisations(initelements)::= <%
 {<initelements: {initelement|<initelement>} ; separator=",">}
+%>
+
+/* --------------------------- CONVERT STATEMENT -------------------------------------------*/
+
+ConvertStatement(convert) ::= <%
+*** CONVERT <convert> ***
+%>
+
+ConvertToStatement(convert) ::= <%
+*** CONVERT TO <convert> ***
+%>
+
+ConvertFromStatement(convert) ::= <%
+*** CONVERT FROM  <convert> ***
 %>
