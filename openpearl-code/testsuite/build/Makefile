@@ -17,7 +17,6 @@
  
 DONOTBUILD= 030_signals 031_signalsInduce  \
 	043_switch \
-	400_char_dcl \
 	401_char_expr1 \
 	701_dation_pg \
 	706_convert \
