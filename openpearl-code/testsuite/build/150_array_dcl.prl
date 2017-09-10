@@ -48,7 +48,7 @@ test_matmul : PROC;
     ME(3,1) := 138.0;     ME(3,2) := 114.0;     ME(3,3) := 90.0;
 **/
 
-    __cpp__('printf("\\nMA:\\n");');
+    __cpp__("printf(\"\\nMA:\\n\");");
 
     FOR i FROM 1 BY 1 TO 3
     REPEAT
@@ -57,14 +57,14 @@ test_matmul : PROC;
             DCL f   FLOAT;
 
             f := MA(i,j);
-            __cpp__('printf("%10.4f  ",_f.x);');
+            __cpp__("printf(\"%10.4f  \",_f.x);");
         END;
 
-        __cpp__( 'printf("\\n");'         );
+        __cpp__( "printf(\"\\n\");"         );
 
     END;
 
-    __cpp__('printf("\\nMB:\\n");');
+    __cpp__("printf(\"\\nMB:\\n\");");
 
     FOR i FROM 1 BY 1 TO 3
     REPEAT
@@ -73,14 +73,14 @@ test_matmul : PROC;
             DCL f   FLOAT;
 
             f := MB(i,j);
-            __cpp__('printf("%10.4f  ",_f.x);');
+            __cpp__("printf(\"%10.4f  \",_f.x);");
         END;
 
-        __cpp__( 'printf("\\n");'         );
+        __cpp__( "printf(\"\\n\");"         );
 
     END;
 
-    __cpp__('printf("\\nMC:\\n");');
+    __cpp__("printf(\"\\nMC:\\n\");");
 
     FOR i FROM 1 BY 1 TO 3
     REPEAT
@@ -89,14 +89,14 @@ test_matmul : PROC;
             DCL f   FLOAT;
 
             f := MC(i,j);
-            __cpp__('printf("%10.4f  ",_f.x);');
+            __cpp__("printf(\"%10.4f  \",_f.x);");
         END;
 
-        __cpp__( 'printf("\\n");'         );
+        __cpp__( "printf(\"\\n\");"         );
 
     END;
 
-    __cpp__('printf("\\nME:\\n");');
+    __cpp__("printf(\"\\nME:\\n\");");
 
     FOR i FROM 1 BY 1 TO 3
     REPEAT
@@ -105,10 +105,10 @@ test_matmul : PROC;
             DCL f   FLOAT;
 
             f := ME(i,j);
-            __cpp__('printf("%10.4f  ",_f.x);');
+            __cpp__("printf(\"%10.4f  \",_f.x);");
         END;
 
-        __cpp__( 'printf("\\n");'         );
+        __cpp__( "printf(\"\\n\");"         );
 
     END;
 
@@ -138,15 +138,15 @@ test_matmul : PROC;
             IF ME(i,j) /= MC(i,j) THEN
                 rc := '1'B1;
                 __cpp__(
-                    '       printf("ERROR: Indices %d:%d!\\n", _i.x, _j.x);'
-                    '       pearlrt::Control::setExitCode(1);'
+                    "       printf(\"ERROR: Indices %d:%d!\\n\", _i.x, _j.x);"
+                    "       pearlrt::Control::setExitCode(1);"
                 );
             FIN;
         END;
     END;
 
 
-    __cpp__('printf("\\nResult:\\n");');
+    __cpp__("printf(\"\\nResult:\\n\");");
 
     FOR i FROM 1 BY 1 TO 3
     REPEAT
@@ -155,10 +155,10 @@ test_matmul : PROC;
             DCL f   FLOAT;
 
             f := MC(i,j);
-            __cpp__('printf("%10.4f  ",_f.x);');
+            __cpp__("printf(\"%10.4f  \",_f.x);");
         END;
 
-        __cpp__( 'printf("\\n");'         );
+        __cpp__( "printf(\"\\n\");"         );
 
     END;
 
@@ -166,8 +166,8 @@ test_matmul : PROC;
     IF rc EQ '1'B
     THEN
         __cpp__(
-            '       printf("ERROR: Matrix muliplication failed!\\n");'
-            '       pearlrt::Control::setExitCode(1);'
+            "       printf(\"ERROR: Matrix muliplication failed!\\n\");"
+            "       pearlrt::Control::setExitCode(1);"
         );
     FIN;
 

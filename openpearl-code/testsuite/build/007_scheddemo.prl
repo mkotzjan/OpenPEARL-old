@@ -31,8 +31,8 @@ MODULE(sched_demo);
 SYSTEM;
  termout: StdOut;
 /*
-__cpp__('pearlrt::StdOut ___termout;');
-__cpp__('pearlrt::Device*  d_termout = &___termout;');
+__cpp__("pearlrt::StdOut ___termout;");
+__cpp__("pearlrt::Device*  d_termout = &___termout;");
 */
 
 PROBLEM;
@@ -44,11 +44,11 @@ DCL console DATION OUT ALPHIC DIM(*,80) FORWARD /* GLOBAL */ CREATED(termout);
 
 TASK1: TASK PRIO 2 MAIN;
 ! --- declare text constants (without prefix)
-     __cpp__ (' pearlrt::Character<10> tc_1("Task1 ..."); ');
-     __cpp__ (' pearlrt::Character<16> tc_2("Task1 works ..."); ');
-     __cpp__ (' pearlrt::Character<15> tc_3("Task1 finished"); ');
-     __cpp__ (' pearlrt::Character<30> tc_4("Task1: preventing Task3"); ');
-     __cpp__ (' pearlrt::Character<30> tc_5("Task1: terminate  Task2"); ');
+     __cpp__ (" pearlrt::Character<10> tc_1(\"Task1 ...\"); ");
+     __cpp__ (" pearlrt::Character<16> tc_2(\"Task1 works ...\"); ");
+     __cpp__ (" pearlrt::Character<15> tc_3(\"Task1 finished\"); ");
+     __cpp__ (" pearlrt::Character<30> tc_4(\"Task1: preventing Task3\"); ");
+     __cpp__ (" pearlrt::Character<30> tc_5(\"Task1: terminate  Task2\"); ");
 
      DCL end CLOCK;
      DCL d DURATION INIT (10SEC);
@@ -59,18 +59,18 @@ TASK1: TASK PRIO 2 MAIN;
 
      !PUT 'Task1...' TO console BY A, SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-             '   _console.toA(tc_1);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+             "   _console.toA(tc_1);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
      end := NOW;
      end := end + d;   ! d = 10SEC 
@@ -80,20 +80,20 @@ TASK1: TASK PRIO 2 MAIN;
       !    PUT NOW, 'Task 1 works' TO console BY T(15,6),X(3),A,SKIP;
       ! PUT NOW, tc_2 TO console BY T(15,6),X(3),A,SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-	     '   _console.toT(pearlrt::Clock::now(),15,6);'
-             '   _console.toX(3);'
-             '   _console.toA(tc_2);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+	     "   _console.toT(pearlrt::Clock::now(),15,6);"
+             "   _console.toX(3);"
+             "   _console.toA(tc_2);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
          AFTER 2 SEC RESUME;
 
@@ -101,57 +101,57 @@ TASK1: TASK PRIO 2 MAIN;
 
      ! PUT 'Task1: preventing Task3' TO console BY A,SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-             '   _console.toA(tc_4);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+             "   _console.toA(tc_4);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
      PREVENT TASK3;
      !__cpp__ ('_TASK3.prevent(); ');
 
      !PUT 'Task1: terminating Task2' TO console BY A,SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-             '   _console.toA(tc_5);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+             "   _console.toA(tc_5);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
      TERMINATE TASK2;
-     !__cpp__ ('_TASK2.terminate(); ');
+     !__cpp__ ("_TASK2.terminate(); ");
 
     ! CALL rr_test;
 
 
      ! PUT 'Task1 finished' TO console BY A,SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-             '   _console.toA(tc_3);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+             "   _console.toA(tc_3);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
       CLOSE console;
 
@@ -159,35 +159,35 @@ END;
 
 TASK2: TASK PRIO 4;
 ! --- declare text constants (without prefix)
-     __cpp__ (' pearlrt::Character<11> tc_1("Task2 works"); ');
+     __cpp__ (" pearlrt::Character<11> tc_1(\"Task2 works\"); ");
 
    AFTER 5 SEC ALL 3 SEC ACTIVATE TASK3;
 
-   __cpp__('_TASK3.activate(me, pearlrt::Task::PRIO | Task::AFTER | Task::ALL ,'
-            '           pearlrt::Prio(3),  // prio'
-            '           pearlrt::Clock(0.0),  // at'
-            '           pearlrt::Duration(5.0),  // after'
-            '           pearlrt::Duration(3.0),  // all'
-            '           pearlrt::Clock(0.0),             // until'
-            '           pearlrt::Duration(0.0));         // during' );
+   __cpp__("_TASK3.activate(me, pearlrt::Task::PRIO | Task::AFTER | Task::ALL ,"
+            "           pearlrt::Prio(3),  // prio"
+            "           pearlrt::Clock(0.0),  // at"
+            "           pearlrt::Duration(5.0),  // after"
+            "           pearlrt::Duration(3.0),  // all"
+            "           pearlrt::Clock(0.0),             // until"
+            "           pearlrt::Duration(0.0));         // during" );
 
    REPEAT
      !  PUT NOW(),'Task2 works' TO console BY T(15,6),X(15),A,SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-	     '   _console.toT(pearlrt::Clock::now(),15,6);'
-             '   _console.toX(15);'
-             '   _console.toA(tc_1);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+	     "   _console.toT(pearlrt::Clock::now(),15,6);"
+             "   _console.toX(15);"
+             "   _console.toA(tc_1);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
 
       AFTER 5 SEC RESUME;
@@ -197,25 +197,25 @@ END;
 
 TASK3: TASK PRIO 6;
 ! --- declare text constants (without prefix)
-     __cpp__ (' pearlrt::Character<11> tc_1("Task3 works"); ');
+     __cpp__ (" pearlrt::Character<11> tc_1(\"Task3 works\"); ");
 
 
    ! PUT NOW(),'Task 3 works' TO console BY T(15,6),X(25),A,SKIP;
      __cpp__(
-             'try {'
-             '   _console.beginSequence(me);'
-	     '   _console.toT(pearlrt::Clock::now(),15,6);'
-             '   _console.toX(25);'
-             '   _console.toA(tc_1);'
-             '   _console.toSkip(1);'
-             '   _console.endSequence();'
-             '} catch(pearlrt::Signal &s) {'
-             '   if (!_console.updateRst(&s)) {'
-             '      _console.endSequence();'
-             '      throw;'
-             '   } '
-             '   _console.endSequence();'
-             '}'); 
+             "try {"
+             "   _console.beginSequence(me);"
+	     "   _console.toT(pearlrt::Clock::now(),15,6);"
+             "   _console.toX(25);"
+             "   _console.toA(tc_1);"
+             "   _console.toSkip(1);"
+             "   _console.endSequence();"
+             "} catch(pearlrt::Signal &s) {"
+             "   if (!_console.updateRst(&s)) {"
+             "      _console.endSequence();"
+             "      throw;"
+             "   } "
+             "   _console.endSequence();"
+             "}");
 
 END;
 

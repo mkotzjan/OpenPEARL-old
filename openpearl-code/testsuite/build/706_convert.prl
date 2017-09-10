@@ -9,6 +9,7 @@ PROBLEM;
    DCL stdout DATION OUT ALPHIC DIM(*,80)
              FORWARD NOCYCL  STREAM 
              CREATED(termout);
+
    DCL ok BIT(1) INIT('1'B1);
 
 convertTests: TASK MAIN;
@@ -68,7 +69,7 @@ convertFrom: PROC;
   DCL x FIXED;
   result := 'PEA';
   buffer := 'PEARL... 42'; 
-  CONVERT text, x TO buffer BY A(3), X(5), F(3);
+  CONVERT text, x FROM buffer BY A(3), X(5), F(3);
 /*
   __cpp__(
 ' {  // define helper variables in local block'

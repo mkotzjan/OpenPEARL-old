@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.7";
+    static String version = "v0.8.9.9";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -74,6 +74,9 @@ public class Compiler {
             printHelp();
             return;
         }
+
+        SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
+        ConstantPool constantPool = new ConstantPool();
 
         if (!checkAndProcessArguments(args)) {
             return;
@@ -122,14 +125,12 @@ public class Compiler {
 
             try {
                 if (parser.getNumberOfSyntaxErrors() <= 0) {
-                    SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
                     symbolTableVisitor.visit(tree);
 
                     if (dumpSymbolTable) {
                         symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
                     }
 
-                    ConstantPool constantPool = new ConstantPool();
                     ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose, debug, constantPool);
                     constantPoolVisitor.visit(tree);
 
@@ -154,6 +155,14 @@ public class Compiler {
             catch(Exception ex) {
                 System.err.println(ex.getMessage());
                 System.err.println("Compilation aborted.");
+
+                if (dumpSymbolTable) {
+                    symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
+                }
+
+                if (dumpConstantPool) {
+                    constantPool.dump();
+                }
 
                 if ( stacktrace )  {
                     System.err.println( getStackTrace(ex));

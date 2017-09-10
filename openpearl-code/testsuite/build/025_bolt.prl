@@ -42,7 +42,7 @@ PROBLEM;
 DCL (s1,s2) BOLT;
 DCL n FIXED(15);
 
-__cpp__('char buffer[100];');
+__cpp__("char buffer[100];");
 
 T1: TASK PRIO 10 MAIN;
    DCL ok BIT(1);
@@ -57,13 +57,13 @@ T1: TASK PRIO 10 MAIN;
    FREE s1;
 
    PUT 'Task T1: just LEAVE' TO console BY A, SKIP;
-   __cpp__('try {');
+   __cpp__("try {");
    ok = '0'B1;
      LEAVE s1;
-   __cpp__( '} catch (BoltStateSignal s) {');
+   __cpp__( "} catch (BoltStateSignal s) {");
       ok = '1'B1;
          PUT '*** success got BoltStateSignal' TO console BY A, SKIP;
-      __cpp__('}');
+      __cpp__("}");
 
       IF NOT ok THEN
          PUT '*** fail got NO BoltStateSignal' TO console BY A, SKIP;
@@ -71,7 +71,7 @@ T1: TASK PRIO 10 MAIN;
 
    ! test multiple enter
    n = 0;
-   __cpp__('*buffer = 0;');
+   __cpp__("*buffer = 0;");
    ACTIVATE T2;
    ACTIVATE T3;
    AFTER 1SEC RESUME;
@@ -87,11 +87,11 @@ T1: TASK PRIO 10 MAIN;
    ELSE
       PUT '*** multiple LEAVE failed' TO console BY A, SKIP;
    FIN;
-   __cpp__('printf("sequence: %s\\n", buffer);');
+   __cpp__("printf(\"sequence: %s\\n\", buffer);");
 
    ! test multiple reserve
    n = 0;
-   __cpp__('*buffer = 0;');
+   __cpp__("*buffer = 0;");
    ACTIVATE R1;
    ACTIVATE R2;
    AFTER 1SEC RESUME;
@@ -106,29 +106,29 @@ T1: TASK PRIO 10 MAIN;
    ELSE
       PUT '*** multiple FREE failed' TO console BY A, SKIP;
    FIN;
-   __cpp__('printf("sequence: %s\\n", buffer);');
+   __cpp__("printf(\"sequence: %s\\n\", buffer);");
 
    ! test priority of reserve before enter
    PUT 'test reserve priority' TO console BY A, SKIP;
    n = 0;
-   __cpp__('*buffer = 0;');
+   __cpp__("*buffer = 0;");
    ACTIVATE R1;
    ACTIVATE T2;
    ACTIVATE R2;
    AFTER 5 SEC RESUME;
-   __cpp__('if (strcmp(buffer,"R1 R2 T2 ") == 0) {');
+   __cpp__("if (strcmp(buffer,\"R1 R2 T2 \") == 0) {");
       PUT '*** reserve has priority is ok' TO console BY A, SKIP;
-   __cpp__('} else {');
+   __cpp__("} else {");
       PUT '*** reserve has priority failed' TO console BY A, SKIP;
-   __cpp__('}');
-   __cpp__('printf("sequence: %s\\n", buffer);');
+   __cpp__("}");
+   __cpp__("printf(\"sequence: %s\\n\", buffer);");
 
 END;
 
 T2: TASK PRIO 20;
   ENTER s1, s2;
   n := n + 1;
-  __cpp__('strcat(buffer,"T2 ");');
+  __cpp__("strcat(buffer,\"T2 \");");
   AFTER 2SEC RESUME;
   LEAVE s1,s2;
   n := n - 1;
@@ -137,7 +137,7 @@ END;
 T3: TASK PRIO 20;
   ENTER s1, s2;
   n := n + 1;
-  __cpp__('strcat(buffer,"T3 ");');
+  __cpp__("strcat(buffer,\"T3 \");");
   AFTER 2SEC RESUME;
   LEAVE s1,s2;
   n := n - 1;
@@ -146,7 +146,7 @@ END;
 R1: TASK PRIO 20;
   RESERVE s1, s2;
   n := n + 1;
-  __cpp__('strcat(buffer,"R1 ");');
+  __cpp__("strcat(buffer,\"R1 \");");
   AFTER 1SEC RESUME;
   FREE s1,s2;
   n := n - 1;
@@ -155,7 +155,7 @@ END;
 R2: TASK PRIO 20;
   RESERVE s1, s2;
   n := n + 1;
-  __cpp__('strcat(buffer,"R2 ");');
+  __cpp__("strcat(buffer,\"R2 \");");
   AFTER 1SEC RESUME;
   FREE s1,s2;
   n := n - 1;

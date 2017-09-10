@@ -126,7 +126,7 @@ p3: PROC;
    b15 := '011'B CAT 'FFF'B4;
    ! next line procudes wrong code
    ! f14 = TOFIXED b15;
-   __cpp__('_f14 = _b15.toFixed();');
+   __cpp__("_f14 = _b15.toFixed();");
    IF f14 NE 2047 THEN
       PUT 'error#13 with TOFIXED; result=',f14 TO console BY A,F(6), SKIP;
       success = '0'B1;
@@ -134,7 +134,7 @@ p3: PROC;
 
    ! this statement causes a nullpointer exception in the compiler
    ! c15 := TOBIT f14;
-   __cpp__('_c15 = pearlrt::BitString<15>(_f14);');
+   __cpp__("_c15 = pearlrt::BitString<15>(_f14);");
    IF (b15 NE c15) THEN
       PUT 'error#14 with TOBIT ' ,b15,' NE ', c15 TO console
         BY A,B1(15),A,B1(15), SKIP;
@@ -152,7 +152,7 @@ T1: TASK MAIN;
         PUT '*** success' TO console BY A, SKIP;
     ELSE
         PUT '*** fail' TO console BY A, SKIP;
-        __cpp__('pearlrt::Control::setExitCode(1);');
+        __cpp__("pearlrt::Control::setExitCode(1);");
     FIN;
 
     CLOSE console;

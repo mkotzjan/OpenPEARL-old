@@ -72,19 +72,19 @@ FileTest1: TASK MAIN;
      IF (error /= 0) THEN
         PUT 'error: RST-value should be zero (', error ,') ' TO stdOut 
              BY A, F(3), A, SKIP;
-__cpp__('pearlrt::Control::setExitCode(1);');
+__cpp__("pearlrt::Control::setExitCode(1);");
      FIN;
 
      IF (f /= f5) THEN
         PUT 'error: did not read the same value (', f,',', f5,') ' TO stdOut
          BY A,F(6),A,F(6),A, SKIP;
-__cpp__('pearlrt::Control::setExitCode(1);');
+	 __cpp__("pearlrt::Control::setExitCode(1);");
        error = 1;
      FIN;
      IF (f4 /= 0) THEN
        PUT 'error: f4 should be zero (', f4, ') ' TO stdOut 
          BY A, F(6),A,SKIP;
-__cpp__('pearlrt::Control::setExitCode(1);');
+	 __cpp__("pearlrt::Control::setExitCode(1);");
        error = 1;
      FIN;
 

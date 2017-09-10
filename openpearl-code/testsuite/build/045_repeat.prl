@@ -11,10 +11,10 @@ T1: TASK MAIN;
      f1 := f1 + i;
   END;
   IF f1 ==  6 THEN
-     __cpp__('printf("success\\n");');
+     __cpp__("printf(\"success\\n\");");
    ELSE
-     __cpp__('printf("failure\\n");'
-             'pearlrt::Control::setExitCode(1);');
+     __cpp__("printf(\"failure\\n\");"
+             "pearlrt::Control::setExitCode(1);");
    FIN;
 
 END;

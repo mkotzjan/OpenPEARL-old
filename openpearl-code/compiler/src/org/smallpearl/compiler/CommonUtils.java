@@ -255,4 +255,169 @@ public class CommonUtils {
 
         return name;
     }
+
+    public static
+    String unescapeCppString(String st) {
+        StringBuilder sb = new StringBuilder(st.length());
+
+        for (int i = 0; i < st.length(); i++) {
+            char ch = st.charAt(i);
+            if (ch == '\\') {
+                char nextChar = (i == st.length() - 1) ? '\\' : st.charAt(i + 1);
+
+                switch (nextChar) {
+                    case '\\':
+                        ch = '\\';
+                        break;
+                    case 'b':
+                        ch = '\b';
+                        break;
+                    case 'f':
+                        ch = '\f';
+                        break;
+                    case 'r':
+                        ch = '\r';
+                        break;
+                    case 't':
+                        ch = '\t';
+                        break;
+                    case '\"':
+                        ch = '\"';
+                        break;
+                    case '\'':
+                        ch = '\'';
+                        break;
+                }
+
+                i++;
+            }
+            sb.append(ch);
+        }
+        return sb.toString();
+    }
+
+    public static
+    String unescapePearlString(String st) {
+        StringBuilder sb = new StringBuilder(st.length());
+        int state = 0;
+        String value = "";
+
+        for (int i = 0; i < st.length(); i++) {
+            char ch = st.charAt(i);
+
+            switch (state) {
+                case 0:
+                    if (ch == '\'') {
+                        state = 1;
+                    } else {
+                        sb.append(ch);
+                    }
+                    break;
+
+                case 1:
+                    if (ch == '\\') {
+                        state = 2;
+                    }
+                    else {
+                        state = 0;
+                        sb.append(ch);
+                    }
+                    break;
+
+                case 2:
+                    value += ch;
+                    state = 3;
+                    break;
+
+                case 3:
+                    value += ch;
+                    state = 4;
+                    break;
+
+                case 4:
+                    if (ch == '\\') {
+                        state = 5;
+                    }
+                    else {
+                        state = 0;
+                        sb.append(ch);
+                    }
+                    break;
+
+                case 5:
+                    state = 0;
+                    if (ch == '\'') {
+                        String octalValue = "\\0" + Integer.toString(Integer.parseInt(value, 16), 8);
+                        sb.append(octalValue);
+                    } else {
+                        sb.append(ch);
+                    }
+                    break;
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static
+    String remopveQuotes(String st) {
+        st = st.replaceAll("^'", "");
+        st = st.replaceAll("'$", "");
+        return st;
+    }
+
+    public static
+    int getStringLength(String st) {
+        int state = 0;
+        int len   = 0;
+
+        for (int i = 0; i < st.length(); i++) {
+            char ch = st.charAt(i);
+
+            switch (state) {
+                case 0:
+                    if (ch == '\\') {
+                        state = 1;
+                    } else {
+                        len++;
+                    }
+                    break;
+
+                case 1:
+                    if (ch == '0') {
+                        state = 2;
+                    }
+                    else {
+                        state = 0;
+                        len++;
+                    }
+                    break;
+
+                case 2:
+                    if ( ch >= '0' && ch <= '7') {
+                        state = 3;
+                    }
+                    else {
+                        state = 0;
+                        len++;
+                    }
+                    break;
+
+                case 3:
+                    if ( ch >= '0' && ch <= '7') {
+                        state = 0;
+                        len++;
+                    }
+                    else {
+                        state = 0;
+                        len++;
+                    }
+                    break;
+
+            }
+        }
+
+        return len;
+    }
+
 }
