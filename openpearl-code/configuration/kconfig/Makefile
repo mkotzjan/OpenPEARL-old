@@ -13,7 +13,6 @@ HOSTCC=gcc
 TARGETS := conf nconf mconf
 all: $(TARGETS)
 
-
 # Use recursively expanded variables so we do not call gcc unless
 # we really need to do so. (Do not call gcc as part of make mrproper)
 HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
@@ -42,8 +41,8 @@ lxdialog += lxdialog/textbox.o lxdialog/yesno.o lxdialog/menubox.o
 check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
 
 conf-objs	:= conf.o  zconf.tab.o
-mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
-nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
+mconf-objs     	:= mconf.o zconf.tab.o $(lxdialog)
+nconf-objs     	:= nconf.o zconf.tab.o nconf.gui.o
 
 cleanfiles += $(conf-objs) 
 cleanfiles += $(mconf-objs) 
