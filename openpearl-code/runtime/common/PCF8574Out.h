@@ -87,7 +87,7 @@ namespace pearlrt {
       \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       PCF8574Out* dationOpen(const char* idf = 0, int openParam = 0);
 

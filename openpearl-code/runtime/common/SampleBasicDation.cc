@@ -48,7 +48,7 @@ namespace pearlrt {
    SystemDationB* SampleBasicDation::dationOpen(const char * idf, int params) {
       if (idf) {
          Log::error("SampleBasicDation: no IDF allowed");
-         throw theInternalDationSignal;
+         throw theDationParamSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
@@ -69,7 +69,7 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("SampleBasicDation: Dation not open");
-         throw theCloseFailedSignal;
+         throw theDationNotOpenSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
@@ -87,12 +87,12 @@ namespace pearlrt {
       // Therefore size must be 2
       if (size != 2) {
          Log::error("SampleBasicDation: 2 byte expected (got %d)", (int)size);
-         throw theInternalDationSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("SampleBasicDation: Dation not open");
-         throw theOpenFailedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // write data to application memory
@@ -109,7 +109,7 @@ namespace pearlrt {
       // Therefore size must be 2
       if (size != 2) {
          Log::error("SampleBasicDation: 2 byte expected (got %d)", (int)size);
-         throw theInternalDationSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {

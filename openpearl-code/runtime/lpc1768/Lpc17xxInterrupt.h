@@ -63,8 +63,9 @@ namespace pearlrt {
       \param port the number of the gpio block, valid number are 0 and 2
       \param bit  the number of the bit; note that not all bits may be used
 
-      \throws theIllegalParamSignal if port:bit does not adress a valid
+      \throws theInternalDationSignal if port:bit does not adress a valid
                          gpio bit with interrupt support
+      \throws theDationParamSignal, if the interrupt is already in use
       */
       Lpc17xxInterrupt(int port, int bit);
 

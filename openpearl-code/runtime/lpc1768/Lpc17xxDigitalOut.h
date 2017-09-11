@@ -65,7 +65,8 @@ namespace pearlrt {
       constructor to create the bit group and set the
       bits to output direction
 
-      \throws IllegalParamSignal in case of init failure
+      \throws InternalDationSignal in case of init failure
+      \throws DationParamSignal in case of multiple use of gpio bits
 
       \param port is the port number (0..4)
       \param start is the starting bit number (31..0)
@@ -81,7 +82,8 @@ namespace pearlrt {
       \param idf pointer to IDF-value if given
       \returns pointer to the object itself as working object in the
                user dation
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
+      \throws DationParamSignal, if open parameters are specified
       */
       SystemDationB* dationOpen(const char* idf, int openParam);
 
@@ -90,7 +92,8 @@ namespace pearlrt {
 
       \param closeParam close parameters if given
 
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationParamSignal, if open parameters are specified
+      \throws CloseFailedSignal, if  dation is not opened
       */
       void dationClose(int closeParam = 0);
 
@@ -101,9 +104,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size is smaller than the number
+      \throws InternalDationSignal, if size is smaller than the number
                        of bits of the inout device
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationWrite(void * data, size_t size);
 
@@ -112,7 +115,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws notAllowedSignal, if used at all
+      \throws InternalDationSignal, if used at all
       */
       void dationRead(void * data, size_t size);
 

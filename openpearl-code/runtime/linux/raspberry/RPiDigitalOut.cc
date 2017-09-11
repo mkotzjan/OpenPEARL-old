@@ -80,7 +80,7 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalOut: Dation not open");
-         throw theDationParamSignal;
+         throw theDationNotOpenSignal;
       }
 
       dationStatus = CLOSED;

@@ -72,7 +72,7 @@ namespace pearlrt {
       absolute POS format
 
       \param c the new col position
-      \throws NotAllowedSignal if no DIRECT dation
+      \throws InternalDationSignal if no DIRECT dation
       \throws DationIndexBoundsSignal if new position would be out of bounds
       */
       void pos(const Fixed<31> c);
@@ -83,7 +83,7 @@ namespace pearlrt {
       relative positioning format
 
       \param c the number of cols to be moved (<0 if backward)
-      \throws NotAllowedSignal if no DIRECT dation
+      \throws InternalDationSignal if no DIRECT dation
       \throws DationIndexBoundsSignal if new position would be out of bounds
       */
       void adv(const Fixed<31> c);

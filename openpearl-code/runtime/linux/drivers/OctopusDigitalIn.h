@@ -97,11 +97,11 @@ namespace pearlrt {
         try {
            if (idf != 0) {
               Log::error("IDF not allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            if (openParam != 0) {
               Log::error("No open parameters allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            internalDationOpen();
         } catch (Signal *s) {
@@ -127,7 +127,7 @@ namespace pearlrt {
         try {
            if (closeParam != 0) {
               Log::error("No close parameters allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            internalDationClose();
         } catch (Signal *s) {

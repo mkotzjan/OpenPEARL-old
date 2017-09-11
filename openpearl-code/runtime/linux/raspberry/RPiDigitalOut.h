@@ -93,7 +93,7 @@ namespace pearlrt {
       \param closeParam close parameters if given
 
 
-      \throws NotAllowedSignal, if  dation is not opened and rst is not given
+      \throws DationNotOpenSignal, if  dation is not opened and rst is not given
       */
       void dationClose(int closeParam = 0);
 

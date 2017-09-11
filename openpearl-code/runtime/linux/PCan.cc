@@ -78,24 +78,20 @@ namespace pearlrt {
 
       if (idf) {
          Log::error("PCan: no IDF allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("PCan: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
-/*
-      if (dationStatus != CLOSED) {
-         Log::error("PCan: Dation already open");
-         throw theNotAllowedSignal;
-      }
-*/
+
+
       if (openCount == 0) {
          h = LINUX_CAN_Open(deviceNode, O_RDWR);
          if (h == NULL) {
              Log::error("PCan: can't open device %s", deviceNode);
-	     throw theDationParamSignal;
+	     throw theOpenFailedSignal;
          }
 
          // use standard frames (11Bit ID)
@@ -115,12 +111,12 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("PCan: Dation not open");
-         throw theNotAllowedSignal;
+         throw theCloseFailedSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("PCan: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       openCount --;
@@ -144,7 +140,7 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("PCan: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       m.ID = d->identifier.x;
@@ -186,7 +182,7 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("PCan: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // CAN_Reade blocks until data is available

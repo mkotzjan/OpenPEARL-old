@@ -222,7 +222,6 @@ namespace pearlrt {
       void sop(Fixed<31>* element);
 
       /**
-        row(line) write it to element.
 
         In case of the last position, the return value may be larger
         than the dimension specifies!
@@ -232,7 +231,7 @@ namespace pearlrt {
 
         \param row contains current row after execution
 
-        \throws NotAllowdSignal if dimension of the dation is one
+        \throws InternalDationSignal if dimension of the dation is one
 
         \note throws various exceptions
       */
@@ -252,7 +251,7 @@ namespace pearlrt {
 
         \param page contains current page after execution
 
-        \throws NotAllowesSignal if the dimension of the dation is
+        \throws InternalDationSignal if the dimension of the dation is
                 smaller than three
 
         \note throws various exceptions
@@ -270,7 +269,7 @@ namespace pearlrt {
 
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and c < 0
+        \throw PositioningFailedSignal if dation is FORWARD and c < 1
 
         \param c offset column versus current location
 
@@ -291,7 +290,8 @@ namespace pearlrt {
                violate the column boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and row < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param row offset position of the row versus the current location
         \param c offset column versus current location
@@ -315,7 +315,8 @@ namespace pearlrt {
                violate the row boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and page < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param page offset position of the row versus the current location
         \param row offset position of the row versus the current location
@@ -360,7 +361,7 @@ namespace pearlrt {
 
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and c < 0
+        \throw PositioningFailedSignal if dation is FORWARD and c < 1
 
         \param c offset column versus current location
 
@@ -381,7 +382,8 @@ namespace pearlrt {
                violate the column boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and row < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param row offset position of the row versus the current location
         \param c offset column versus current location
@@ -405,7 +407,8 @@ namespace pearlrt {
                violate the row boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and page < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param page offset position of the row versus the current location
         \param row offset position of the row versus the current location
@@ -493,14 +496,16 @@ namespace pearlrt {
    protected:
       /** assert dation properties
 
-       \throw NotAllowedSignal if condition is not met
+       \throw InternalDationSignal if dation is not direct
+       \throw DationNotOpenSignal if dation is not opened
       */
 
       void assertOpenDirect();
 
       /** assert dation properties
 
-       \throw NotAllowedSignal if condition is not met
+       \throw DationNotSupportedSignal if dation is nether DIRECT nor FORWARD
+       \throw DationNotOpenSignal if dation is not opened
       */
       void assertOpenDirectOrForward();
    };

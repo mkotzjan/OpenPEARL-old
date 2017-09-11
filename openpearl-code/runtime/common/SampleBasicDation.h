@@ -84,7 +84,8 @@ namespace pearlrt {
       \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws DationParamSignal, if  illegal open parameters were specified
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       SystemDationB* dationOpen(const char* idf = 0, int openParam = 0);
 
@@ -92,6 +93,8 @@ namespace pearlrt {
       Close the sample basic dation
 
       \param closeParam close parameters if given
+      \throws DationParamSignal, if  illegal close parameters were specified
+      \throws DationNotOpenSignal, if  dation is not open
       */
       void dationClose(int closeParam = 0);
 
@@ -117,7 +120,7 @@ namespace pearlrt {
 
       \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<4> value
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationWrite(void * data, size_t size);
 

@@ -76,7 +76,7 @@ namespace pearlrt {
 
       if (dationStatus != CLOSED) {
          Log::error("RPiDigitalIn: Dation already open");
-         throw theDationParamSignal;
+         throw theOpenFailedSignal;
       }
 
       dationStatus = OPENED;
@@ -92,7 +92,7 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalIn: Dation not open");
-         throw theDationParamSignal;
+         throw theDationNotOpenSignal;
       }
 
       dationStatus = CLOSED;
@@ -100,7 +100,7 @@ namespace pearlrt {
 
 
    void RPiDigitalIn::dationWrite(void* data, size_t size) {
-      throw theDationParamSignal;
+      throw theInternalDationSignal;
    }
 
    void RPiDigitalIn::dationRead(void* data, size_t size) {

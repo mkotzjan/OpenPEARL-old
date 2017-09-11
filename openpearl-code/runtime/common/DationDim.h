@@ -86,7 +86,7 @@ namespace pearlrt {
 
       This is only possible, if the dimension ist limited (not *).
 
-      \throws NotAllowedSignal, if the dation dimension is not limited
+      \throws InternalDationSignal, if the dation dimension is not limited
 
       \returns the total number of elements in the dation dimension
       */

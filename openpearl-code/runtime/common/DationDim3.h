@@ -92,7 +92,7 @@ namespace pearlrt {
       \param c the new absolute col position
       \param r the new absolute row position
       \param p the new absolute page position
-      \throws NotAllowedSignal if no DIRECT dation
+      \throws InternalDationSignal if no DIRECT dation
       \throws DationIndexBoundsSignal if new position would be out of bounds
       */
       void pos(const Fixed<31> p, const Fixed<31> r, const Fixed<31> c);
@@ -106,7 +106,7 @@ namespace pearlrt {
       \param p the number of pages to be moved (<0 if backward)
       \param r the number of rows to be moved (<0 if backward)
       \param c the number of cols to be moved (<0 if backward)
-      \throws NotAllowedSignal if no DIRECT dation
+      \throws InternalDationSignal if no DIRECT dation
       \throws DationIndexBoundsSignal if new position would be out of bounds
       */
       void adv(const Fixed<31> p, const Fixed<31> r, const Fixed<31> c);

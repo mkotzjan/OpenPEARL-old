@@ -253,7 +253,7 @@ namespace pearlrt {
       }
 
       /**
-      setCharAt(p,c)   .CHAR(p) in PEARL
+      setCharAt(p,c)   .CHAR(p) in PEARL on left hand side
 
       Replace the character at position p of the character string with
       the given parameter.

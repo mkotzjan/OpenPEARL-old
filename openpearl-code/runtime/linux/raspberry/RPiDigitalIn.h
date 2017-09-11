@@ -82,7 +82,8 @@ namespace pearlrt {
       Open the DigitalIn
       \param openParam open parameters if given
       \param idf pointer to IDF-value if given
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws DationParamSignal, if  open  parameters were specified
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       SystemDationB* dationOpen(const char * idf = 0, int openParam = 0);
 
@@ -92,7 +93,8 @@ namespace pearlrt {
       \param closeParam close parameters if given
 
 
-      \throws CloseFailedSignal, if  dation is not opened and rst is not given
+      \throws DationParamSignal, if  close  parameters were specified
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationClose(int closeParam = 0);
 
