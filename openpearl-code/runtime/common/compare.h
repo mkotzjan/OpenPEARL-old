@@ -33,6 +33,7 @@
 #include "Float.h"
 #include "BitString.h"
 #include "Character.h"
+#include "CharSlice.h"
 
 /**
 \file
@@ -350,7 +351,7 @@ namespace pearlrt {
    template<size_t S, size_t P>
    BitString<1> operator== (const Character<S> & lhs,
                             const Character<P> & rhs) {
-      int r = compareChar(lhs, rhs);
+      int r = characterCompare(lhs.data, S, rhs.data, P);
       return BitString<1>(r == 0);
    }
 
@@ -367,7 +368,7 @@ namespace pearlrt {
    template<size_t S, size_t P>
    BitString<1> operator!= (const Character<S> & lhs,
                             const Character<P> & rhs) {
-      int r = compareChar(lhs, rhs);
+      int r = characterCompare(lhs.data, S, rhs.data, P);
       return BitString<1>(r != 0);
    }
 
@@ -385,7 +386,7 @@ namespace pearlrt {
    template<size_t S, size_t P>
    BitString<1> operator< (const Character<S> & lhs,
                            const Character<P> & rhs) {
-      int r = compareChar(lhs, rhs);
+      int r = characterCompare(lhs.data, S, rhs.data, P);
       return BitString<1>(r < 0);
    }
 
@@ -402,7 +403,7 @@ namespace pearlrt {
    template<size_t S, size_t P>
    BitString<1> operator<= (const Character<S> & lhs,
                             const Character<P> & rhs) {
-      int r = compareChar(lhs, rhs);
+      int r = characterCompare(lhs.data, S, rhs.data, P);
       return BitString<1>(r <= 0);
    }
 
@@ -420,7 +421,7 @@ namespace pearlrt {
    template<size_t S, size_t P>
    BitString<1> operator> (const Character<S> & lhs,
                            const Character<P> & rhs) {
-      int r = compareChar(lhs, rhs);
+      int r = characterCompare(lhs.data, S, rhs.data, P);
       return BitString<1>(r > 0);
    }
 
@@ -438,9 +439,232 @@ namespace pearlrt {
    template<size_t S, size_t P>
    BitString<1> operator>= (const Character<S> & lhs,
                             const Character<P> & rhs) {
-      int r = compareChar(lhs, rhs);
+      int r = characterCompare(lhs.data, S, rhs.data, P);
       return BitString<1>(r >= 0);
    }
+
+   /* -------------------------------------------------------------- */
+   /* CharSlice,Character<S> comparisons                             */
+   /* -------------------------------------------------------------- */
+
+   /**
+   compare equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam P length of the right side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t P>
+   BitString<1> operator== (const CharSlice & lhs,
+                            const Character<P> & rhs) {
+      int r = characterCompare(lhs.data, lhs.length.x, rhs.data, P);
+      return BitString<1>(r == 0);
+   }
+
+   /**
+   compare not equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam P length of the right side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t P>
+   BitString<1> operator!= (const CharSlice & lhs,
+                            const Character<P> & rhs) {
+      int r = characterCompare(lhs.data, lhs.length.x, rhs.data, P);
+      return BitString<1>(r != 0);
+   }
+
+   /**
+   compare less operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam P length of the right side character string
+   \returns '1'B1, if the first value is less than the second value<br>
+            '0'B1 else
+   */
+   template<size_t P>
+   BitString<1> operator< (const CharSlice & lhs,
+                           const Character<P> & rhs) {
+      int r = characterCompare(lhs.data, lhs.length.x, rhs.data, P);
+      return BitString<1>(r < 0);
+   }
+
+   /**
+   compare less equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam P length of the right side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t P>
+   BitString<1> operator<= (const CharSlice & lhs,
+                            const Character<P> & rhs) {
+      int r = characterCompare(lhs.data, lhs.length.x, rhs.data, P);
+      return BitString<1>(r <= 0);
+   }
+
+
+   /**
+   compare greater than operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam P length of the right side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t P>
+   BitString<1> operator> (const CharSlice & lhs,
+                           const Character<P> & rhs) {
+      int r = characterCompare(lhs.data, lhs.length.x, rhs.data, P);
+      return BitString<1>(r > 0);
+   }
+
+
+   /**
+   compare greater or equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam P length of the right side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t P>
+   BitString<1> operator>= (const CharSlice & lhs,
+                            const Character<P> & rhs) {
+      int r = characterCompare(lhs.data, lhs.length.x, rhs.data, P);
+      return BitString<1>(r >= 0);
+   }
+
+   /* -------------------------------------------------------------- */
+   /* Character<S>,CharSlice> comparisons                            */
+   /* -------------------------------------------------------------- */
+
+   /**
+   compare equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam S length of the left side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t S>
+   BitString<1> operator== (const Character<S> & lhs,
+                            const CharSlice & rhs) {
+      int r = characterCompare(lhs.data, S, rhs.data, rhs.length.x);
+      return BitString<1>(r == 0);
+   }
+
+   /**
+   compare not equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam S length of the left side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t S>
+   BitString<1> operator!= (const Character<S> & lhs,
+                            const CharSlice & rhs) {
+      int r = characterCompare(lhs.data, S, rhs.data, rhs.length.x);
+      return BitString<1>(r != 0);
+   }
+
+   /**
+   compare less operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam S length of the left side character string
+   \returns '1'B1, if the first value is less than the second value<br>
+            '0'B1 else
+   */
+   template<size_t S>
+   BitString<1> operator< (const Character<S> & lhs,
+                           const CharSlice & rhs) {
+      int r = characterCompare(lhs.data, S, rhs.data, rhs.length.x);
+      return BitString<1>(r < 0);
+   }
+
+   /**
+   compare less equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam S length of the left side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t S>
+   BitString<1> operator<= (const Character<S> & lhs,
+                            const CharSlice & rhs) {
+      int r = characterCompare(lhs.data, S, rhs.data, rhs.length.x);
+      return BitString<1>(r <= 0);
+   }
+
+
+   /**
+   compare greater than operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam S length of the left side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t S>
+   BitString<1> operator> (const Character<S> & lhs,
+                           const CharSlice & rhs) {
+      int r = characterCompare(lhs.data, S, rhs.data, rhs.length.x);
+      return BitString<1>(r > 0);
+   }
+
+
+   /**
+   compare greater or equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \tparam S length of the left side character string
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   template<size_t S>
+   BitString<1> operator>= (const Character<S> & lhs,
+                            const CharSlice & rhs) {
+      int r = characterCompare(lhs.data, S, rhs.data, rhs.length.x);
+      return BitString<1>(r >= 0);
+   }
+
+   /* -------------------------------------------------------------- */
+   /* CharSlice,CharSlice comparisons are in the CharSlice class     */
+   /* -------------------------------------------------------------- */
+
 
 }
 #endif

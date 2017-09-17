@@ -61,6 +61,7 @@ Only this file mus be included.
 
 #include "Fixed63.h"
 #include "Character.h"
+#include "CharSlice.h"
 #include "PutCharacter.h"
 #include "GetCharacter.h"
 

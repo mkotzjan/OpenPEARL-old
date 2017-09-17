@@ -41,8 +41,53 @@ This class provides the operations of the data type character.
 #include <string.h>
 #include "Signals.h"
 #include "Fixed.h"
+//#include "VarCharacter.h"
 
 namespace pearlrt {
+   /**
+   perform the string compare according the PEARL rules
+
+   This method is used by various API methods for Character and CharSlice
+   comparisons
+
+   \param s1  pointer to the data of the first string
+   \param l1  length of the first string
+   \param s2  pointer to the data of the second string
+   \param l2  length of the second string
+   \return <0 , if the first string is smaller than the second string
+        <br>=0 , if the first string is equal with the second string
+        <br> >0 , if the first string is greater than the second string
+
+   */
+   int characterCompare(const char * s1, int l1, const char* s2, int l2);
+
+   /**
+   fill the data area with spaces
+
+   This method is used by various API methods for Character and CharSlice
+   operations.
+
+   If the length is less or equal 0 - no operation occurs
+
+   \param dest  pointer to the data area to fill
+   \param len the length of the data area
+   */
+   void characterFillSpaces(char * dest, int len);
+
+   /**
+   copy the data from source to destination
+
+   This method is aware about overlapping regions from source and
+   destination and performs the copy in the correct direction.
+
+   If the length is less or equal 0 - no operation occurs
+
+   \param dest pointer to the destination area
+   \param source pointer to the source area
+   \param len the number of bytes in the source area
+   */
+   void characterSafeCopy(char*dest, char* source, int len) ;
+
    /**
      \brief data type character
 
@@ -72,10 +117,11 @@ namespace pearlrt {
    The first valid index is '1' (according to the PEARL standard)
 
 
-
    The language reference indicates that assignment between character
    strings are only possible, if they have the same length.
    There is no explicit statement for this behavior.
+
+   The slice operations are treated by the class CharSlice.
 
    A too long initializer or length value may lead the
    CharacterTooLong-signal.
@@ -101,9 +147,9 @@ namespace pearlrt {
     Character<12> hw;
 
     {
-        Character<6> hello((char*)"Hello ");
-        Character<6> world((char*)"World.");
-        catChar(hello, world, hw);
+        Character<6> hello(6,(char*)"Hello ");
+        Character<6> world(6,(char*)"World.");
+         hw = hello.catChar(world);
     }
     </pre>
 
@@ -202,21 +248,16 @@ namespace pearlrt {
       \throws CharacterTooLongSignal
       */
       template<size_t T> Character(Character<T> &string) {
-         unsigned int i;
+         //unsigned int i;
 
          if (length < T) {
             //printf("Character: illegal length (%d)", length);
             throw theCharacterTooLongSignal;
          }
 
+         characterSafeCopy(data, string.data, T);
+         characterFillSpaces(data + T, length - T);
 
-         for (i = 0; i < T; i++) {
-            data[i] = string.data[i];
-         }
-
-         for (i = T; i < length; i++) {
-            data[i] = ' ';
-         }
       }
 
       /**
@@ -241,14 +282,14 @@ namespace pearlrt {
       \return Char at position p
       \throws CharacterIndexOutOfRangeSignal
       */
-      Character<1>  getCharAt(size_t p) {
-         if (p > length || p < 1) {
-            //printf("Character: index out of range (%d)", p);
+      Character<1>  getCharAt(Fixed<15> p) {
+         if ((size_t)p.x > length || p.x < 1) {
+            //printf("Character: index out of range (%d)", p.x);
             throw theCharacterIndexOutOfRangeSignal;
          }
 
          Character<1> c;
-         c.data[0] = data[p - 1];
+         c.data[0] = data[p.x - 1];
          return c;
       }
 
@@ -262,13 +303,13 @@ namespace pearlrt {
       \param c the new value of the character to be replaced
       \throws CharacterIndexOutOfRangeSignal
       */
-      void setCharAt(size_t p, Character<1> c) {
-         if (p > length || p < 1) {
+      void setCharAt(Fixed<15> p, Character<1> c) {
+         if ((size_t)p.x > length || p.x < 1) {
             //printf("Character: index out of range (%d)", p);
             throw theCharacterIndexOutOfRangeSignal;
          }
 
-         data[p - 1] = c.data[0];
+         data[p.x - 1] = c.data[0];
       }
 
 
@@ -283,7 +324,7 @@ namespace pearlrt {
       */
       Fixed<8> toFixed() {
          if (length > 1) {
-            //printf("Character::toFixed: illegale length (%d)", length);
+            //printf("Character::toFixed: illegal length (%d)", length);
             throw theCharacterTooLongSignal;
          }
 
@@ -301,46 +342,60 @@ namespace pearlrt {
          return data;
       }
 
-   /**
-    assign string
+      /**
+       assign string
 
-    the shorter string is expanded with spaces
+       the shorter string is expanded with spaces
 
-     \tparam LRHS length of right hand side parameter
-     \param rhs right hand side parameter
+        \tparam LRHS length of right hand side parameter
+        \param rhs right hand side parameter
 
-     \returns reference to the assigned string
+        \returns reference to the assigned string
 
-   */
-   template<size_t LRHS>
-   Character<length>&  operator=(const Character<LRHS> & rhs) {
-      size_t i;
+      */
+      template<size_t LRHS>
+      Character<length>&  operator=(const Character<LRHS> & rhs) {
+         size_t i;
 
-      if (length < LRHS) {
-          printf("internal error: assign to smaller string\n");
-          throw theInternalSignal;
+         if (length < LRHS) {
+            printf("internal error: assign to smaller string\n");
+            throw theInternalSignal;
+         }
+
+         // compare the object to check if they are the same
+         // due the the template characteristics we compare the void*
+         if ((void*)this != (void*)&rhs) {
+            characterSafeCopy(data, rhs, data, LRHS);
+            characterFillSpaces(data + LRHS, length - LRHS);
+         }
+
+         return *this;
       }
 
-      // compare the object to check if they are the same
-      // due the the template characteristics we compare the void*
-      if ((void*)this != (void*)&rhs) {
-         for (i=0; i< LRHS; i++) {
-            data[i] = rhs.data[i]; 
-         }
-    
-         if (length > LRHS) {
-            for( /* start with last i */; i<length; i++) {
-               data[i] = ' ';
-            }
-         }
+      /**
+      \brief concatenation (CAT or ><)
+
+       concatenates two character strings
+
+       \param rhs the string to be added to the current string
+       \tparam rhsLength the length of the string to be added
+       \return the concatinated string
+      */
+      template<size_t LRHS>
+      Character < length + LRHS > catChar(Character<LRHS> & rhs) {
+         Character < length + LRHS > result;
+
+         characterSafeCopy(result.data, data, length);
+         characterSafeCopy(result.data + length, rhs.data, LRHS);
+
+         return result;
       }
-      return *this; 
-   }        
+
 
    };   // end of class  Character
 
    /* ********************************************************* */
-   /* Template functions                                        */
+   /* companion functions                                        */
    /* ********************************************************* */
 
    /**
@@ -351,120 +406,7 @@ namespace pearlrt {
    */
    Character<1>  toChar(int x);
 
-
-   /**
-   \brief concatenation (CAT or ><)
-
-    concatenates two character strings
-
-    \param left starting part of the result string
-    \param right ending part of the result string
-    \param res the resulting string
-    \tparam Tres the result type
-    \tparam Tleft the type of the left hand parameeter
-    \tparam Tright the type of the left hand parameeter
-   */
-   template<class Tres, class Tleft, class Tright>
-   void catChar(Tleft& left, Tright& right, Tres& res) {
-      int j = 0;
-
-      if ((left.upb() + right.upb() != res.upb()).getBoolean()) {
-         //printf("Character::catChar: result type too small");
-         throw theCharacterTooLongSignal;
-      }
-
-      for (unsigned int i = 0; i < (size_t)(left.upb().x); i++) {
-         res.data[j++] = left.data[i];
-      }
-
-      for (unsigned int i = 0; i < (size_t)(right.upb().x); i++) {
-         res.data[j++] = right.data[i];
-      }
-   }
-
-   /**
-     getSliceChar(start,end) in PEARL: .CHAR(start,end)
-
-     get a slice of a string
-
-     In cases where the compiler can calculate the length of
-     the resulting character string this method may be used
-
-     If the target char-type is larger than the requested slice, it
-     will be filled with spaces
-
-     \param c the base character string
-     \param start starting position of the requested substring
-     \param end the last position of the requested substring
-     \param res the resulting substring
-     \throws CharacterTooLongSignal;
-     \throws CharacterIndexOutOfRangeSignal;
-
-     \tparam Tres type of the resulting substring
-     \tparam Tcharx type of the base character string
-   */
-   template<class Tres, class Tcharx>
-   void getSliceChar(Tcharx& c, size_t start, size_t end, Tres & res) {
-      size_t len = end - start + 1;
-
-      if (len > (size_t)(res.upb().x)) {
-         //printf("Character::getSliceChar: result type too small");
-         throw theCharacterTooLongSignal;
-      }
-
-      if (start < 1 || end > (size_t)(c.upb().x)) {
-         //printf("Character::getSliceChar: illegal slice(%d:%d)",
-         //  start, end);
-         throw theCharacterIndexOutOfRangeSignal;
-      }
-
-      for (size_t i = 0; i < len; i++) {
-         res.data[i] = c.data[start + i - 1];
-      }
-   }
-
-   /**
-     setSliceChar(start,end) in PEARL: .CHAR(start,end)
-
-     set a slice of a string
-
-     In cases where the compiler can calculate the length of
-     the resulting character string this method may be used
-
-     \param res the string, where the slice should be replaced
-     \param start starting position of the requested substring
-     \param end the last position of the requested substring
-     \param c the new slice data
-     \throws CharacterTooLongSignal;
-     \throws CharacterIndexOutOfRangeSignal;
-
-     \tparam Tres type of the resulting string
-     \tparam Tcharx type of the new slice
-   */
-   template<class Tres, class Tcharx>
-   void setSliceChar(Tres & res, size_t start, size_t end, Tcharx & c) {
-      size_t len = end - start + 1;
-
-      if (len < (size_t)(c.upb().x)) {
-         //printf("Character::setSliceChar: result type too small");
-         throw theCharacterTooLongSignal;
-      }
-
-      if (start < 1 || end > (size_t)(res.upb().x)) {
-         //printf("Character::setSliceChar: illegal slice(%d:%d)",
-         //  start, end);
-         throw theCharacterIndexOutOfRangeSignal;
-      }
-
-      for (size_t i = 0; i < len; i++) {
-         res.data[start - 1 + i] = c.data[i];
-      }
-
-      for (size_t i = len; i < (size_t)(c.upb().x); i++) {
-         res.data[start - 1 + i] = ' ';
-      }
-   }
-
+#if 0
    /**
     compare two strings
 
@@ -475,8 +417,10 @@ namespace pearlrt {
      \returns -1, if lhs<rhs <br>0, if lhs==rhs<br>+1, if lhs>rhs
 
    */
-   template<class Tcharl, class Tcharr>
-   int compareChar(Tcharl& lhs, Tcharr & rhs) {
+   template<size_t LLHS, size_t LRHS>
+   int compareChar(Character<LLHS>& lhs, Character<RLHS> & rhs) {
+      return BitString<1> (characterCompare(lhs.data, LLHS, rhs.data, LRHS));
+
       size_t i;
       size_t len = (size_t)(lhs.upb().x);
 
@@ -518,7 +462,7 @@ namespace pearlrt {
 
       return 0;
    }
-
+#endif
 }
 
 #endif

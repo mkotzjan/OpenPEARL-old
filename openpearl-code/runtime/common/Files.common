@@ -46,6 +46,7 @@ CXX_COMMON = \
 	ScheduleSignalAction.cc \
 	Fixed63.cc \
 	Prio.cc \
+	CharSlice.cc \
 	Character.cc RefChar.cc \
 	Interrupt.cc \
 	Source.cc \

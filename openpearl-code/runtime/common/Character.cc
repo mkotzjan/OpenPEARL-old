@@ -46,4 +46,88 @@ namespace pearlrt {
       return c;
    }
 
+   int characterCompare(const char*s1, int l1, const char* s2, int l2) {
+      int i;
+      int len = l1 < l2 ? l1 : l2;
+
+      for (i = 0; i < len; i++) {
+         if (*s1 != *s2) {
+            break;
+         }
+
+         s1 ++;
+         s2 ++;
+      }
+
+      if (i < len) {
+         return *s1 - *s2;
+      } else {
+         return 0;
+      }
+
+      if (len < l2) {
+         // string 1 was shorter -- let's see if there is a
+         // difference in the remaining part of string2 in
+         // comparison with space ' '
+
+         for (i = len; i < l2 && *s2 == ' '; i++) {
+            s2 ++;
+         }
+
+         if (i == l2) {
+            return 0;  // no difference found
+         } else {
+            return *s2 - ' ';
+         }
+      }
+
+      if (len < l1) {
+         // string 2 was shorter -- let's see if there is a
+         // difference in the remaining part of string1 in
+         // comparison with space ' '
+
+         for (i = len; i < l1 && *s1 == ' '; i++) {
+            s2 ++;
+         }
+
+         if (i == l1) {
+            return 0;  // no difference found
+         } else {
+            return *s1 - ' ';
+         }
+      }
+   }
+
+
+   void characterFillSpaces(char * dest, int len) {
+      for (int i = 0; i < len; i++) {
+         *dest ++ = ' ';
+      }
+   }
+
+   void characterSafeCopy(char*dest,
+                          char* source, int len) {
+      if (source < dest) {
+         // the source string has a smaller adress - the two strings
+         // may overlap in case of copy charSlices
+         //    source    XXXXXX
+         //    dest        XXXXXX
+         // --> let's start at the end
+         dest += len - 1;
+         source += len - 1;
+
+         for (int i = 0; i < len; i++) {
+            *dest-- = *source--;
+         }
+      } else {
+         //    source        XXXXXX
+         //    dest        XXXXXX
+         // --> let's start at the beginning - overlaps would no
+         //     make problems
+         for (int i = 0; i < len; i++) {
+            *dest++ = *source++;
+         }
+      }
+   }
+
 }
