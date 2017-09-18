@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2012-2014 Rainer Mueller
+ Copyright (c) 2012-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -662,9 +662,83 @@ namespace pearlrt {
    }
 
    /* -------------------------------------------------------------- */
-   /* CharSlice,CharSlice comparisons are in the CharSlice class     */
+   /* CharSlice,CharSlice comparisons 				     */
    /* -------------------------------------------------------------- */
 
+   /**
+   compare equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   BitString<1> operator== (const CharSlice & lhs,
+                            const CharSlice & rhs);
+
+   /**
+   compare not equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   BitString<1> operator!= (const CharSlice & lhs,
+                            const CharSlice & rhs);
+
+   /**
+   compare less operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \returns '1'B1, if the first value is less than the second value<br>
+            '0'B1 else
+   */
+   BitString<1> operator< (const CharSlice & lhs,
+                           const CharSlice & rhs);
+
+   /**
+   compare less equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   BitString<1> operator<= (const CharSlice & lhs,
+                            const CharSlice & rhs);
+
+
+   /**
+   compare greater than operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   BitString<1> operator> (const CharSlice & lhs,
+                           const CharSlice & rhs);
+
+
+   /**
+   compare greater or equal operation
+
+   the shorter type will be expanded to the size of the longer type
+
+   \param lhs the first parameter of the comparison
+   \param rhs the second parameter of the comparison
+   \returns '1'B1, if both are equal<br> '0'B1 else
+   */
+   BitString<1> operator>= (const CharSlice & lhs,
+                            const CharSlice & rhs);
 
 }
 #endif

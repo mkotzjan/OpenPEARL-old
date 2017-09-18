@@ -48,6 +48,7 @@ CXX_COMMON = \
 	Prio.cc \
 	CharSlice.cc \
 	Character.cc RefChar.cc \
+        compare.cc \
 	Interrupt.cc \
 	Source.cc \
 	RefCharSink.cc RefCharSource.cc \
@@ -102,7 +103,6 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	PutCharacter.h \
 	Float.h \
 	TaskTimerCommon.h \
-	compare.h \
 	Ref.h \
 	SystemDation.h 
 

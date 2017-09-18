@@ -45,17 +45,6 @@ compiler.
 
 namespace pearlrt {
 
-#if 0
-   CharSlice::CharSlice(char * start, Fixed<15> l) {
-      data = start;
-      length = l;
-
-      if (length.x < 1) {
-         printf("CharSlice: illegal length (%d)\n", (int)length.x);
-         throw theCharacterTooLongSignal;
-      }
-   }
-#endif
 
    /**
    upper bound
@@ -166,37 +155,6 @@ namespace pearlrt {
          characterSafeCopy(data, rhs.data, rhs.length.x);
          characterFillSpaces(data + rhs.length.x, length.x  - rhs.length.x);
       }
-   }
-
-   BitString<1> CharSlice::operator== (const CharSlice & rhs) {
-      int r = characterCompare(data, length.x, rhs.data, rhs.length.x);
-      return BitString<1>(r == 0);
-   }
-
-   BitString<1> CharSlice::operator!= (const CharSlice & rhs) {
-      int r = characterCompare(data, length.x, rhs.data, rhs.length.x);
-      return BitString<1>(r != 0);
-   }
-
-   BitString<1> CharSlice::operator< (const CharSlice & rhs) {
-      int r = characterCompare(data, length.x, rhs.data, rhs.length.x);
-      return BitString<1>(r < 0);
-   }
-
-   BitString<1> CharSlice::operator<= (const CharSlice & rhs) {
-      int r = characterCompare(data, length.x, rhs.data, rhs.length.x);
-      return BitString<1>(r <= 0);
-   }
-
-   BitString<1> CharSlice::operator> (const CharSlice & rhs) {
-      int r = characterCompare(data, length.x, rhs.data, rhs.length.x);
-      return BitString<1>(r > 0);
-   }
-
-
-   BitString<1> CharSlice::operator>= (const CharSlice & rhs) {
-      int r = characterCompare(data, length.x, rhs.data, rhs.length.x);
-      return BitString<1>(r >= 0);
    }
 
 }
