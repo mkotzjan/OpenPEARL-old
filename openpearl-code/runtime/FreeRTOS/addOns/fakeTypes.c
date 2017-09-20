@@ -143,14 +143,16 @@ int main() {
               " FakeTCB_t;\n",
                sizeTCB_T-sizeof(uint32_t));
 
-   fprintf(fp,"\n// Chan's FatFS stuff\n");
-   fprintf(fp,"typedef struct {uint32_t asserAlign; char data[%d];}"
-              " FakeFATFS;\n", sizeFATFS-sizeof(int32_t));
+   if (sizeFATFS > 0 && sizeFIL >0 && sizeVOLUMES > 0) {
+      fprintf(fp,"\n// Chan's FatFS stuff\n");
+      fprintf(fp,"typedef struct {uint32_t asserAlign; char data[%d];}"
+                 " FakeFATFS;\n", sizeFATFS-sizeof(int32_t));
 
-   fprintf(fp,"typedef struct {uint32_t asserAlign; char data[%d];}"
-              " FakeFIL;\n", sizeFIL-sizeof(int32_t));
+      fprintf(fp,"typedef struct {uint32_t asserAlign; char data[%d];}"
+                 " FakeFIL;\n", sizeFIL-sizeof(int32_t));
 
-   fprintf(fp,"#define FAKE_VOLUMES %d\n", sizeVOLUMES);
+      fprintf(fp,"#define FAKE_VOLUMES %d\n", sizeVOLUMES);
+   }
 
    fprintf(fp,"#ifdef _cplusplus\n"
               "}\n"
