@@ -225,7 +225,7 @@ CHECK_FILES := $(sort $(CHECK_FILES))
 #$(warning BOARDSUPPORT_OBJ=$(BOARDSUPPORT_OBJ))
 #$(warning XMLFILES=$(XMLFILES))
 
-all: depend mkFakeTypes $(targets)
+all: mkFakeTypes depend $(targets)
 
 tests/testStackOverflow.s: tests/testStackOverflow.cc
 	$(CXX) $^ -S $(CXXFLAGS)  $(PURECXXFLAGS)
@@ -333,7 +333,7 @@ checkformat:
 	@$(foreach f,$(CHECK_FILES),../codestyle/check.sh $(f);)
 
 phony += mkFakeTypes
-mkTypes: 
+mkFakeTypes: 
 	@echo "[create] $@"
 	@$(CC) $(INCS) -c ../FreeRTOS/addOns/mkFakeTypes.c
 	@mv mkFakeTypes.o ../FreeRTOS/addOns/
