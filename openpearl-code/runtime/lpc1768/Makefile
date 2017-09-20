@@ -341,7 +341,7 @@ mkTypes:
 	 gcc fakeTypes.c -o fakeTypes; ./fakeTypes)
 	@$(CXX) $(INCS) -c ../FreeRTOS/addOns/check_FakeTypes.c
 	@(cd ../FreeRTOS/addOns; \
-	rm -f sizes.txt mkTypes.o check_FakeTypes.o fakeTypes)
+	rm -f sizes.txt mkFakeTypes.o check_FakeTypes.o fakeTypes)
 
 -include .depend
 
