@@ -1,6 +1,8 @@
+//IncludeCollector::PassThru begin
 /**
 \file stackcheck.h
 */
+#ifndef NOSTACKCHECK
 
 #if (TARGET==2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1)
 /**
@@ -28,3 +30,6 @@ On normal linux systems this option is not supoorted by gcc.
 */
 #define NOSTACKCHECK /* nothing */
 #endif
+#endif
+//IncludeCollector::PassThru end
+

@@ -86,7 +86,7 @@ extern "C" {
 };
 
 namespace pearlrt {
-   FatFs::FatFsFile * FatFs::FatFsFile::firstUsedFatFsFile[_VOLUMES] =
+   FatFs::FatFsFile * FatFs::FatFsFile::firstUsedFatFsFile[] =
    {NULL};
 
    // pointer to the volume working storage
@@ -359,7 +359,7 @@ namespace pearlrt {
       }
 
       myFatFs->vol->lock();
-      result = f_open(&fil, completeFn, mode);
+      result = f_open((FIL*)&fil, completeFn, mode);
       myFatFs->vol->unlock();
 
       if (result != FR_OK) {
@@ -403,7 +403,7 @@ namespace pearlrt {
 
       myFatFs->vol->lock();
       myFatFs->vol->treatVolumeStatus();
-      ret = f_close(&fil);
+      ret = f_close((FIL*)&fil);
       myFatFs->vol->unlock();
 
       myFatFs->mutex.unlock();
@@ -434,7 +434,7 @@ namespace pearlrt {
 
       myFatFs->vol->lock();
       myFatFs->vol->treatVolumeStatus();
-      ret = f_read(&fil, destination, size, &got);
+      ret = f_read((FIL*)&fil, destination, size, &got);
       myFatFs->vol->unlock();
 
       if (ret != FR_OK) {
@@ -455,7 +455,7 @@ namespace pearlrt {
 
       myFatFs->vol->lock();
       myFatFs->vol->treatVolumeStatus();
-      ret = f_write(&fil, source, size, &written);
+      ret = f_write((FIL*)&fil, source, size, &written);
       myFatFs->vol->unlock();
 
       if (ret != FR_OK || written != size) {
@@ -473,7 +473,7 @@ namespace pearlrt {
       if (dationParam & Dation::DIRECT) {
          myFatFs->vol->lock();
          myFatFs->vol->treatVolumeStatus();
-         ret = f_lseek(&fil, p.x);
+         ret = f_lseek((FIL*)&fil, p.x);
          myFatFs->vol->unlock();
 
          if (ret != 0) {
@@ -491,6 +491,7 @@ namespace pearlrt {
 
    void FatFs::FatFsFile::dationUnGetChar(const char x) {
       //ungetc(x, fp);
+#warning no unget in FatFsFile?
    }
 
    void FatFs::FatFsFile::translateNewLine(bool doNewLineTranslation) {

@@ -171,7 +171,7 @@ void dump(pearlrt::Array * a, pearlrt::Fixed<31> * data) {
              i<=a->upb(pearlrt::Fixed<31>(1)).x;i++) {
    for (int j=a->lwb(pearlrt::Fixed<31>(2)).x; 
              j<=a->upb(pearlrt::Fixed<31>(2)).x;j++) {
-      printf("%4d", (data+
+      printf("%4d", (int)(data+
         a->offset(pearlrt::Fixed<31>(i),pearlrt::Fixed<31>(j)))->get());
    }
    printf("\n");

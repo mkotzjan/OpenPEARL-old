@@ -1092,6 +1092,8 @@ int conf_write_autoconf(void)
 	conf_write_heading(tristate, &tristate_printer_cb, NULL);
 
 	conf_write_heading(out_h, &header_printer_cb, NULL);
+        fprintf(out_h,"#ifndef AUTOCONF_H_INCLUDED\n"
+                      "#define AUTOCONF_H_INCLUDED\n");
 
 	conf_write_heading(out_tex, &tex_printer_cb, NULL);
 
@@ -1109,6 +1111,7 @@ int conf_write_autoconf(void)
 
 		conf_write_symbol(out_tex, sym, &tex_printer_cb, NULL);
 	}
+        fprintf(out_h,"#endif\n");
 	fclose(out);
 	fclose(tristate);
 	fclose(out_h);

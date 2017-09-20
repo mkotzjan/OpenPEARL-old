@@ -252,7 +252,7 @@ namespace pearlrt {
          }
 
          if ( eSize.x != 2 && eSize.x != 3) {
-            Log::info("E: exponent field with illegal (%d)", eSize.x);
+            Log::info("E: exponent field with illegal (%d)", (int)eSize.x);
             throw theExpFormatSignal;
          }
 

@@ -88,7 +88,7 @@ namespace pearlrt {
 
          Log::debug("   check::bolt: %s is %d nbrOfEnterOperations=%d",
                     bd->bolts[i]->getName(), (int)bd->bolts[i]->getState(),
-                    bd->bolts[i]->getNbrOfEnterOperations());
+                    (int)bd->bolts[i]->getNbrOfEnterOperations());
       }
 
       return wouldBlock;

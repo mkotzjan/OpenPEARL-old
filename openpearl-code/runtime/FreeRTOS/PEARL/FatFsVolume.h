@@ -37,7 +37,8 @@
 #ifndef FATFSVOLUME_INCLUDED
 #define FATFSVOLUME_INCLUDED
 #include "Mutex.h"
-#include "ff.h"
+
+#include "FakeTypes.h"
 
 namespace pearlrt {
    /**
@@ -51,7 +52,7 @@ namespace pearlrt {
       Mutex mutex;   /* the volume lock */
       int status;
       const char * path;
-      FATFS  fs;     /* the file system object  */
+      FakeFATFS  fs;     /* the file system object  */
    public:
       /**
       The Chan's FatFs library is not thread safe.

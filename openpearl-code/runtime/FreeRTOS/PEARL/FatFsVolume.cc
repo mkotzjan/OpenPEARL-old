@@ -30,16 +30,17 @@ namespace pearlrt {
    void FatFsVolume::treatVolumeStatus() {
       // this function is called while the volume is locked!
       FRESULT result;
+      FATFS * _fs = (FATFS*)&fs;
 
       if ((status & (IsMounted | WasRemoved)) == (IsMounted | WasRemoved)) {
          // device removed while mounted --> force unmount
-         f_mount(&fs, 0, 1);  // unmount
+         f_mount(_fs, 0, 1);  // unmount
          Log::info("unmounted");
          status &= ~(IsMounted | WasRemoved);
       }
 
       if (status & WasInserted) {
-         result = f_mount(&fs, path, 1);
+         result = f_mount(_fs, path, 1);
 
          if (result != FR_OK) {
             Log::error("could not mount disk >%s< (%s)",

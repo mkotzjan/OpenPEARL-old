@@ -1,8 +1,13 @@
 #include <stdio.h>
+
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "TaskList.h"
 #include "Task.h"
-#include "FreeRTOS.h"
+
 static void dumpStacks() ;
+
 extern "C" {
    void vApplicationStackOverflowHook() {
       printf("Stack Overflow\n");

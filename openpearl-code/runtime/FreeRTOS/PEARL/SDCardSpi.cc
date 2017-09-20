@@ -33,6 +33,10 @@
 \brief generic SD-Card support 
 */
 
+#include "FreeRTOS.h"
+#include "task.h"    // vTaskDelay for non busy wait and vTaskCreate
+#include "allTaskPriorities.h"
+
 #include "SDCardSpi.h"
 #include "Log.h"
 #include "Signals.h"
@@ -41,9 +45,6 @@
 #include "FatFs.h"
 #include "FatFsVolume.h"
 #include "chip.h"
-#include "task.h"    // vTaskDelay for non busy wait and vTaskCreate
-#include "allTaskPriorities.h"
-#include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 
 //#define DEBUG
@@ -609,7 +610,7 @@ card_not_known:
    int SDCardSpi::readConfig() {
       char buffer[16]; // ocr needs 4 bytes, cid and csd need 16 byte
       int i;
-      int voltageRange;
+      //int voltageRange;
       int serialNumber;
       int cardSize;
 
@@ -625,7 +626,7 @@ card_not_known:
              buffer[0], buffer[1], buffer[2], buffer[3]);
 #endif
 
-      voltageRange = ((buffer[2] >> 7) & 0x01) | (buffer[1] << 1);
+      //voltageRange = ((buffer[2] >> 7) & 0x01) | (buffer[1] << 1);
 //      printf("voltage Range=%x (0x1FF means 3.6-2.7 volts)\n", voltageRange);
       // we work normally with 3.3V.
       // This is supoorted by definition by all cards --> no need to check

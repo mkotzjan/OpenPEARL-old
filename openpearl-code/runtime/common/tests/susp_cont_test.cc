@@ -158,7 +158,7 @@ ok
 
 #include <stdio.h>
 #include "PearlIncludes.h"
-
+#include <inttypes.h>     
 using namespace pearlrt;
 using namespace std;
 
@@ -350,7 +350,7 @@ Log::info("C2: 1 sec active delay start");
 Log::info("C2: 1 sec active");
    me->setLocation(__LINE__,fn);
    if (counter1.get() > 0) {
-      printf("C2: counter1 should be 0 - is (%llu) fail\n", counter1.get());
+      printf("C2: counter1 should be 0 - is (%" PRId64 ") fail\n", counter1.get());
    } else {
       printf("C2: counter1 is  0 - ok\n");
    }

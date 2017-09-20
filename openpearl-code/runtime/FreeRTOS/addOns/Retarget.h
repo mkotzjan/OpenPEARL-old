@@ -27,11 +27,11 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "chip.h"
-#include "FreeRTOSConfig.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
+//#include "chip.h"
+//#include "FreeRTOSConfig.h"
+//#include "FreeRTOS.h"
+//#include "task.h"
+//#include "semphr.h"
 
 /*
 this module implements _write and _read for the retarget mechanism.
@@ -55,7 +55,7 @@ public:
      /**
      retrieve the next output character from a pending printf 
 
-     \param nexTransmitChar pointer to the location, where the next
+     \param nextTransmitChar pointer to the location, where the next
         character to transmit shozuld be stored
      \returns true, if there is a character to transmit<br>
               false, else

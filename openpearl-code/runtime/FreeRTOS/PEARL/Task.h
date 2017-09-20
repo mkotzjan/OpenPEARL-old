@@ -49,9 +49,7 @@
 #include "TaskTimer.h"
 
 #include "Signals.h"
-
-#include "FreeRTOS.h" /* freeRTOS */
-#include "task.h"  /* freeRTOS */
+#include "FakeTypes.h"
 
 
 namespace pearlrt {
@@ -66,8 +64,8 @@ namespace pearlrt {
    public:
       TaskTimer activateTimer;	///< Timer object
       TaskTimer continueTimer;	///< Timer object
-      TaskHandle_t xth;		///< FreeRTOS task handle
-      unsigned portSHORT stackDepth;	///< Stack depth
+      FakeTaskHandle_t xth;		///< FreeRTOS task handle
+      FakePortSHORT stackDepth;	///< Stack depth
 
 
    private:
@@ -77,10 +75,10 @@ namespace pearlrt {
       Task();
 
       /* the FreeRTOS task control block */
-      TCB_t tcb;
+      FakeTCB_t tcb;
 
       /* the FreeRTOS stack */
-      StackType_t stack[800];
+      FakeStackType_t stack[800];
 
    public:
       /**
@@ -209,7 +207,7 @@ namespace pearlrt {
               terminated
       \return NULL else
       */
-      TaskHandle_t getFreeRTOSTaskHandle();
+      FakeTaskHandle_t getFreeRTOSTaskHandle();
    };
 
 }

@@ -37,7 +37,8 @@
 \brief FAT filesystem wrapper over Chan's library
 */
 
-#include "ff.h"
+#include "FakeTypes.h"
+
 #include "SystemDationNB.h"
 #include "Mutex.h"
 #include "Character.h"
@@ -69,7 +70,7 @@ namespace pearlrt {
 
    class FatFs: public SystemDationNB {
    private:
-      static FatFsVolume * volume[_VOLUMES];
+      static FatFsVolume * volume[FAKE_VOLUMES];
       FatFsVolume        * vol;
 
    public:
@@ -79,13 +80,13 @@ namespace pearlrt {
       */
       class FatFsFile : public SystemDationNB {
       private:
-         FIL fil;
+         FakeFIL fil;
          RefCharacter   rcFn;
          Character<64> completeFileName;
          FatFs * 	myFatFs;
          FatFsFile 	* nextUsedFatFsFile;
-         static FatFsFile * firstUsedFatFsFile[_VOLUMES];
-         static Mutex volumeLock[_VOLUMES];
+         static FatFsFile * firstUsedFatFsFile[FAKE_VOLUMES];
+         static Mutex volumeLock[FAKE_VOLUMES];
 
 
       public:

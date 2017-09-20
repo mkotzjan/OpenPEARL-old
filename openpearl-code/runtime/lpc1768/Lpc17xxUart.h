@@ -99,7 +99,7 @@ namespace pearlrt {
          char * data;
          int nbr;
          int nbrReceived;
-         SemaphoreHandle_t blockSema;
+         FakeSemaphoreHandle_t blockSema;
       } sendCommand, recvCommand;
 
       char bufferedInputChar;	// one char may be buffered even if no
