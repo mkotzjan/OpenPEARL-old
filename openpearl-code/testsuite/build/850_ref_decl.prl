@@ -17,45 +17,45 @@ p1 : PROC;
    rk1 := k;                    /* rk1 points at k */
 
    __cpp__ (
-        'if (_rk1 == &_k) {                         '
-        '   printf("rk1 point to k: ok\\n");        '
-        '} else {                                   '
-        '   printf("rk1 should point to k\\n");     '
-        '   pearlrt::Control::setExitCode(1);       '
-        '} '
+        "if (_rk1 == &_k) {                         "
+        "   printf(\"rk1 point to k: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"rk1 should point to k\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
 	);
 
    rk1 := l;                    /* rk1 points at l */
 
    __cpp__ (
-        'if (_rk1 == &_l) {                         '
-        '   printf("rk1 point to l: ok\\n");        '
-        '} else {                                   '
-        '   printf("rk1 should point to l\\n");     '
-        '   pearlrt::Control::setExitCode(1);       '
-        '} '
+        "if (_rk1 == &_l) {                         "
+        "   printf(\"rk1 point to l: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"rk1 should point to l\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
 	);
 
    rk2 := rk1;                  /* rk2 points at l, pointer assignment */
 
    __cpp__ (
-        'if (_rk1 == _rk2) {                         '
-        '   printf("rk1 point to rk2: ok\\n");        '
-        '} else {                                   '
-        '   printf("rk1 should point to rk2\\n");     '
-        '   pearlrt::Control::setExitCode(1);       '
-        '} '
+        "if (_rk1 == _rk2) {                        "
+        "   printf(\"rk1 point to rk2: ok\n\");      "  
+        "} else {                                   "
+        "   printf(\"rk1 should point to rk2\n\");   "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
 	);
 
    rx  := x;                    /* rx points at x */
 
    __cpp__ (
-        'if (_rx == &_x) {                         '
-        '   printf("rx point to x: ok\\n");        '
-        '} else {                                   '
-        '   printf("rx should point to x\\n");     '
-        '   pearlrt::Control::setExitCode(1);       '
-        '} '
+        "if (_rx == &_x) {                         "
+        "   printf(\"rx point to x: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"rx should point to x\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
 	);
 
 !   rx  := k;                    /* wrong, type unequal */
@@ -64,12 +64,12 @@ p1 : PROC;
    k   := CONT rk1;             /* k obtains value 2 */
 
    __cpp__ (
-        'if ((_k == pearlrt::Fixed<2>(2)).getBoolean()) {            '
-        '   printf("k equal 2: ok\\n");        '
-        '} else {                                   '
-        '   printf("k should be equal to 2\\n");     '
-        '   pearlrt::Control::setExitCode(1);       '
-        '} '
+        "if ((_k == pearlrt::Fixed<2>(2)).getBoolean()) {            "
+        "   printf(\"k equal 2: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"k should be equal to 2\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
 	);
 
 !   k   := CONT rx;              /* wrong, type unequal */
@@ -78,23 +78,23 @@ p1 : PROC;
    CONT rk2 := 3;               /* l obtains value 3 */
 
   __cpp__ (
-       'if ((_l == pearlrt::Fixed<31>(3)).getBoolean()) {                         '
-       '   printf("l equal 3: ok\\n");        '
-       '} else {                                   '
-       '   printf("l should be equal to 3\\n");     '
-       '   pearlrt::Control::setExitCode(1);       '
-       '} '
+       "if ((_l == pearlrt::Fixed<31>(3)).getBoolean()) {                         "
+       "   printf(\"l equal 3: ok\n\");        "
+       "} else {                                   "
+       "   printf(\"l should be equal to 3\n\");     "
+       "   pearlrt::Control::setExitCode(1);       "
+       "} "
   );
 
    CONT rk2 := k;               /* l obtains value 2 */
 
   __cpp__ (
-       'if ((_l == pearlrt::Fixed<31>(2)).getBoolean()) {  '
-       '   printf("l equal 2: ok\\n");        '
-       '} else {                                   '
-       '   printf("l should be equal to 2\\n");     '
-       '   pearlrt::Control::setExitCode(1);       '
-       '} '
+       "if ((_l == pearlrt::Fixed<31>(2)).getBoolean()) {  "
+       "   printf(\"l equal 2: ok\n\");        "
+       "} else {                                   "
+       "   printf(\"l should be equal to 2\n\");     "
+       "   pearlrt::Control::setExitCode(1);       "
+       "} "
   );
 
 END;
