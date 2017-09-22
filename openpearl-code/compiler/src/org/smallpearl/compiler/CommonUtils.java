@@ -266,30 +266,11 @@ public class CommonUtils {
                 char nextChar = (i == st.length() - 1) ? '\\' : st.charAt(i + 1);
 
                 switch (nextChar) {
-                    case '\\':
-                        ch = '\\';
-                        break;
-                    case 'b':
-                        ch = '\b';
-                        break;
-                    case 'f':
-                        ch = '\f';
-                        break;
-                    case 'r':
-                        ch = '\r';
-                        break;
-                    case 't':
-                        ch = '\t';
-                        break;
-                    case '\"':
-                        ch = '\"';
-                        break;
-                    case '\'':
-                        ch = '\'';
+                    case '"':
+                        ch = '"';
+                        i++;
                         break;
                 }
-
-                i++;
             }
             sb.append(ch);
         }
