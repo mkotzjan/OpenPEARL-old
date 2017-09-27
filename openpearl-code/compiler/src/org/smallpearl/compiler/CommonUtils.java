@@ -270,6 +270,11 @@ public class CommonUtils {
                         ch = '"';
                         i++;
                         break;
+                    case '\\':
+                        ch = '\\';
+                        i++;
+                        break;
+
                 }
             }
             sb.append(ch);
