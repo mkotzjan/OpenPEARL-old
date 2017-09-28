@@ -80,6 +80,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitModule");
         }
 
+        Scope lastScope = m_currentScope;
+
         if ( m_currentScope  != Scope.UNKNOWN ) {
             throw new DeclarationScopeException(
                     ctx.getText(),
@@ -91,7 +93,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
         m_currentSymbolTable = ((ModuleEntry)symbolTableEntry).scope;
         m_currentScope = Scope.MODULE;
         visitChildren(ctx);
-        m_currentScope = Scope.MODULE;
+        m_currentScope = lastScope;
         m_currentSymbolTable = m_currentSymbolTable.ascend();
         return null;
     }
@@ -102,6 +104,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitProcedureDeclaration");
         }
 
+        Scope lastScope = m_currentScope;
+
         if ( m_currentScope  != Scope.MODULE ) {
             throw new DeclarationScopeException(
                     ctx.getText(),
@@ -114,7 +118,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
 
         visitChildren(ctx);
 
-        this.m_currentScope = Scope.PROCEDURE;
+        this.m_currentScope = lastScope;
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
         return null;
     }
@@ -125,6 +129,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitTaskDeclaration");
         }
 
+        Scope lastScope = m_currentScope;
+
         if ( m_currentScope  != Scope.MODULE ) {
             throw new DeclarationScopeException(
                     ctx.getText(),
@@ -137,7 +143,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
 
         visitChildren(ctx);
 
-        this.m_currentScope = Scope.TASK;
+        this.m_currentScope = lastScope;
         m_currentSymbolTable = m_currentSymbolTable.ascend();
         return null;
     }
@@ -148,6 +154,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitBlock_statement");
         }
 
+        Scope lastScope = m_currentScope;
+
         if (    m_currentScope  != Scope.PROCEDURE &&
                 m_currentScope != Scope.TASK  &&
                 m_currentScope != Scope.PROCEDURE &&
@@ -163,7 +171,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
 
         visitChildren(ctx);
 
-        this.m_currentScope = Scope.BLOCK;
+        this.m_currentScope = lastScope;
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
         return null;
     }
@@ -174,12 +182,14 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitLoopStatement");
         }
 
+        Scope lastScope = m_currentScope;
+
         this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
         this.m_currentScope = Scope.LOOP;
 
         visitChildren(ctx);
 
-        this.m_currentScope = Scope.LOOP;
+        this.m_currentScope = lastScope;
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
         return null;
     }
@@ -190,6 +200,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitDationDeclaration");
         }
 
+        Scope lastScope = m_currentScope;
+
         if ( m_currentScope  != Scope.MODULE ) {
             throw new DeclarationScopeException(
                     ctx.getText(),
@@ -197,6 +209,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
                     ctx.start.getCharPositionInLine());
         }
 
+        m_currentScope = lastScope;
         return null;
     }
 
@@ -205,6 +218,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
         if (m_debug) {
             System.out.println( "Semantic: Check Declaration Scope: visitLabel_statement");
         }
+
+        Scope lastScope = m_currentScope;
 
         if (    m_currentScope  != Scope.PROCEDURE &&
                 m_currentScope != Scope.TASK  &&
@@ -216,6 +231,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
                     ctx.start.getCharPositionInLine());
         }
 
+        m_currentScope = lastScope;
         return null;
     }
 
@@ -225,6 +241,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitBoltDeclaration");
         }
 
+        Scope lastScope = m_currentScope;
+
         if (    m_currentScope  != Scope.MODULE) {
             throw new DeclarationScopeException(
                     ctx.getText(),
@@ -232,6 +250,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
                     ctx.start.getCharPositionInLine());
         }
 
+        m_currentScope = lastScope;
         return null;
     }
 
@@ -241,6 +260,8 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
             System.out.println( "Semantic: Check Declaration Scope: visitSemaDeclaration");
         }
 
+        Scope lastScope = m_currentScope;
+
         if (    m_currentScope  != Scope.MODULE) {
             throw new DeclarationScopeException(
                     ctx.getText(),
@@ -248,6 +269,7 @@ public class CheckDeclarationScope extends SmallPearlBaseVisitor<Void> implement
                     ctx.start.getCharPositionInLine());
         }
 
+        m_currentScope = lastScope;
         return null;
     }
 
