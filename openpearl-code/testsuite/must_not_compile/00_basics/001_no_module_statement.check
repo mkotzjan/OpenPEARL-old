@@ -1,0 +1,6 @@
+PROBLEM;
+!!!!! BEGIN
+      ^
+ERROR : Syntax error :mismatched input 'PROBLEM' expecting 'MODULE'
+!!!!! END
+MODEND;

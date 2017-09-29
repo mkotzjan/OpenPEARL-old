@@ -1,0 +1,10 @@
+MODULE(m1);
+PROBLEM;
+
+a: TASK;
+  DCL f INV FIXED INIT(1);
+
+  f := 2;  ! illegal, since f is INV
+END;
+
+MODEND;

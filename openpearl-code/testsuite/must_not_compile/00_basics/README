@@ -1,0 +1,11 @@
+----------------------------------------------
+Test cases for module structure and input encoding
+00x: module structure
+02x: character set
+03x: SPC IDENT (only with FIXED and FLOAT as other type)
+tbd:
+04x: SPC/DCL syntax only and only for type FIXED
+     INIT semantic is checked at typeFixed
+05x: GLOBAL
+xxx: illegal declaration locations (in module, block, task, proc,..)
+----------------------------------------------

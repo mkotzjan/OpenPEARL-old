@@ -1,0 +1,3 @@
+041_fixed_inv_assignemt.prl:7:4: ERROR : illegal assignment to INV element
+  f := 2;  ! illegal, since f is INV
+    ^

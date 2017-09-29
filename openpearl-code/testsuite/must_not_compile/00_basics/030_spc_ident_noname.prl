@@ -1,0 +1,8 @@
+MODULE(m1);
+
+PROBLEM;
+   ! must fail -- missing identifier and brace
+   SPC x FIXED IDENT;
+
+END;
+MODEND;

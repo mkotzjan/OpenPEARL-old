@@ -1,0 +1,3 @@
+001_Fixed_Format_Field_Width_Float.prl:19:0: ERROR : type mismatch: field width must greater than zero 
+     PUT f TO pipe_out BY F(0),SKIP;
+                            ^

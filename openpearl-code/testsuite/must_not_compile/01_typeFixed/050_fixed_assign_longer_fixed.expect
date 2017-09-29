@@ -1,0 +1,3 @@
+050_fixed_assign_longer_fixed.prl:10:6: ERROR : cannot assign FIXED(16) to FIXED(15)
+   f1 := f2;
+      ^

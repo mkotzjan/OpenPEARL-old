@@ -1,0 +1,3 @@
+024_fixed_init_char.prl:5:22: ERROR : init element has incompatible type
+DCL f FIXED(15) INIT('123');
+                     ^

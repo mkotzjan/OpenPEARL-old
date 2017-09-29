@@ -1,0 +1,6 @@
+MODULE(m1);
+SYSTEM;
+
+SYSTEM;
+
+MODEND;

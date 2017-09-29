@@ -1,0 +1,3 @@
+009_multiple_problem_statements.prl:6:0: ERROR : Syntax error :extraneous input 'PROBLEM' expecting {'MODEND', 'SPECIFY', 'SPC', 'DECLARE', 'DCL', '__cpp__', '__cpp', 'LENGTH', ID}
+PROBLEM;
+      ^

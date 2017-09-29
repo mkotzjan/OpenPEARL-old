@@ -1,0 +1,3 @@
+054_fixed_assign_duration.prl:10:6: ERROR : cannot assign DURATION to FIXED(15)
+   f1 := f2;
+      ^

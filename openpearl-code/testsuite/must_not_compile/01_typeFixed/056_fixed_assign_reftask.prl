@@ -1,0 +1,14 @@
+MODULE(m1);
+
+PROBLEM;
+
+p: PROC;
+   DCL f1 FIXED(15);
+   DCL f2 REF TASK;
+
+   ! must fail, since f2 is of type REF TASK
+   f1 := f2;
+
+END;
+
+MODEND;

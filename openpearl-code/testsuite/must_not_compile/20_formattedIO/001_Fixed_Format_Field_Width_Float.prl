@@ -1,0 +1,21 @@
+/****************************************
+This file should not get compiled cause of 
+unvalid fixed format expression for field width
+
+
+****************************************/
+MODULE(field_width_float);
+
+PROBLEM;
+SPC pipe DATION OUT SYSTEM ALPHIC;
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Task1: TASK MAIN;
+     DCL f FIXED;
+
+     PUT f TO pipe_out BY F(1.0),SKIP;
+END;
+MODEND;

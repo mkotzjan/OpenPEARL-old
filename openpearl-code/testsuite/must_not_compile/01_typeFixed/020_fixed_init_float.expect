@@ -1,0 +1,3 @@
+020_fixed_init_float.prl:5:24: ERROR : init element has incompatible type
+DCL f FIXED(15) INIT(3.14);
+                      ^

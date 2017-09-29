@@ -1,0 +1,9 @@
+MODULE(m1);
+PROBLEM;
+
+! legal characters
+   DCL legal1 CHAR(50) INIT('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+   DCL legal2 CHAR(50) INIT('abcdefghijklmnopqrstuvwxyz');
+   DCL legal3 CHAR(50) INIT('1234567890 +-*/_!(),.;:=<>[]'); ! ' and \ are special
+   DCL illegal CHAR(50) INIT('äöüßÄÖÜ');
+MODEND;

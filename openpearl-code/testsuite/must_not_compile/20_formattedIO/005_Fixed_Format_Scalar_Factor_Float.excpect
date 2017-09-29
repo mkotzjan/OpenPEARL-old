@@ -1,0 +1,3 @@
+005_Fixed_Format_Scalar_Factor_Float.prl:19:0: ERROR : too many parameters for format statement
+     PUT f TO pipe_out BY F(2,1,1.0),SKIP;
+                               ^

@@ -1,0 +1,7 @@
+MODULE(m1);
+PROBLEM;
+
+! legal characters
+   DCL legal1 FIXED;
+   DCL illegaäl FIXED;
+MODEND;

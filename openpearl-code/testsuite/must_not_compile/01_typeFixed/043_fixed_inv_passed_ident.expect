@@ -1,0 +1,3 @@
+043_fixed_inv_passed_ident.prl:11:9: ERROR : illegal pass of INV element as IDENT to non INV parameter
+  CALL p(g);  ! illegal, since g would be mututable in a
+         ^
