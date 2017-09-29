@@ -76,10 +76,10 @@ PROBLEM;
 		 DIRECT CYCLIC 
              CREATED(disc);
 
-ttt: TASK;
    DCL table0 DATION INOUT FIXED(15) DIM(10,10,10)
 		DIRECT CYCLIC
              CREATED(disc);
+ttt: TASK;
 
 END;
 MODEND;

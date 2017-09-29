@@ -18,8 +18,8 @@ __cpp__(
 );
 */
 ! make automatic test happy
-T: TASK MAIN;
-      __cpp__( 'pearlrt::Control::setExitCode(0);');
+t1: TASK MAIN;
+      __cpp__( "pearlrt::Control::setExitCode(0);");
 
    x8 := y4 CAT y4;
    x8 := y4 CAT '1234';
@@ -39,15 +39,15 @@ __cpp__(
 */
    IF x4 == y4 THEN
       __cpp__(
-      'pearlrt::Control::setExitCode(1);'
-      'printf("error should not be equal\\n");');
+      "pearlrt::Control::setExitCode(1);"
+      "printf(\"error should not be equal\n\");");
    FIN;
 
    x4 := y4;
    IF x4 /= y4 THEN
       __cpp__(
-      'pearlrt::Control::setExitCode(1);'
-      'printf("error: should be equal\\n");');
+      "pearlrt::Control::setExitCode(1);"
+      "printf(\"error: should be equal\n\");");
    FIN;
 
 END;

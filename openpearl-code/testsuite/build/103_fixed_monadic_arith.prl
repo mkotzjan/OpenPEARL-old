@@ -1,0 +1,22 @@
+MODULE(fixedoperations);
+! test fixed monadic arithmetic operators
+PROBLEM;
+
+T1: TASK MAIN;
+   DCL x FIXED(31);
+   DCL y FLOAT;
+
+   x := 4;
+   y := SQRT x;
+
+   y:=SIN x;
+   y:=COS x;
+   y:=EXP x;
+   y:=LN x;
+   y:=TAN x;
+   y:=ATAN x;
+   y:=TANH x;
+END;
+
+MODEND;
+
