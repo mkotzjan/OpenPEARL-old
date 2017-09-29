@@ -447,6 +447,8 @@ muesste einen Fehler liefern, da
 \end{discuss}
 
 \begin{table} % 7.3
+%%%%%%%%%% modified 29-sept-2017
+%%%%%%%%% these operators operate only on FLOAT
 \begin{center}
 \caption{Monadic arithmetical operators}
 \label{tab_monadic_aritmetic}
@@ -456,10 +458,10 @@ muesste einen Fehler liefern, da
 {\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operator}\\ \hline
 SQRT a
 \index{SQRT@\textbf{SQRT}|textbf}
-           & FIXED(g) or        & FLOAT(g)          & square root of operand \\ \cline{1-1} \cline{4-4}
+           & FLOAT(g) or        & FLOAT(g)          & square root of operand \\ \cline{1-1} \cline{4-4}
 SIN a
 \index{SIN@\textbf{SIN}|textbf}
-            & FLOAT(g)           &                   & sine of operand \\ \cline{1-1} \cline{4-4}
+            &                  &                   & sine of operand \\ \cline{1-1} \cline{4-4}
 COS a
 \index{COS@\textbf{COS}|textbf}
             &                    &                   & cosine of operand \\ \cline{1-1} \cline{4-4}
