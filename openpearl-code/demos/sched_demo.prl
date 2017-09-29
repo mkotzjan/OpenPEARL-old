@@ -28,27 +28,25 @@
 */
 
 MODULE(sched_demo);
-! SYSTEM;
-! termout: StdStream(1);
-__cpp__(
-	'pearlrt::StdOut s_termout;'
-	'pearlrt::Device*  d_termout = &s_termout;'
-);
+SYSTEM;
+termout: StdOut;
 
 
 PROBLEM;
 SPC termout DATION OUT SYSTEM ALPHIC;
 
 
- DCL console DATION OUT ALPHIC DIM(*,80) FORWARD /* GLOBAL */ CREATED(termout);
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD /* GLOBAL */ CREATED(termout);
+DCL common_x FIXED;
 
-/*
-DCL stop_rr_stop BIT(1) INIT('0'B1);
+DCL stop_rr_test BIT(1) INIT('0'B1);
 
 rr_test: PROC;
    DCL end CLOCK;
 
-   end := NOW() + 2 SEC;
+   PUT 'start round robin test. This takes 10 seconds' TO console 
+     BY SKIP, A, SKIP;
+   end := NOW + 2 SEC;
    AT end ACTIVATE RR1;
    AT end ACTIVATE RR2;
    AFTER 10 SEC RESUME;
@@ -57,17 +55,20 @@ END;
 
 rr_test_function: PROC (id FIXED);
   DCL (min,max,sum,dur) DURATION;
-   DCL first(10) DURATION;
-   DCL loopcounter FIXED INIT(1);
+  DCL first(10) DURATION;
+  DCL loopcounter FIXED INIT(1);
+  DCL start CLOCK;
 
    max := 0 SEC;
    min := 0 SEC;
-   WHILE stop_rr_test REPEAT
-      start := NOW();
-      commox_x = id;
-      WHILE common_x EQ id AND stop_rr_test EQ 0 REPEAT END;
+   WHILE NOT stop_rr_test REPEAT
+      start := NOW;
+      common_x = id;
+      WHILE common_x EQ id AND NOT stop_rr_test REPEAT
+         ! just wait until the scheduler performs a task switch
+      END;
       IF NOT stop_rr_test THEN
-          dur := NOW() - start;
+          dur := NOW - start;
           IF (loopcounter EQ 0) THEN
               min := dur;
               max := dur;
@@ -88,24 +89,24 @@ rr_test_function: PROC (id FIXED);
       FIN;
    END;
 
-   IF stop_rr_test > 0 AND loopcounter EQ 0 THEN
+   IF stop_rr_test AND loopcounter EQ 0 THEN
        PUT 'RR',id,': round robin seems to be off' TO console BY A,F(1),A,SKIP;
    ELSE
        PUT 'RR',id,':+++++++++++++++++++++++',
                 'round robin scheduling works' TO console
-           BY A,F(1),A,,SKIP,A,SKIP;
+           BY A,F(1),A,SKIP,A,SKIP;
        IF first(1) > 1 SEC THEN
           PUT '   !!! first duration > 1 sec' TO console BY A, SKIP;
           sum := sum - first(1);
           loopcounter := loopcounter - 1;
        FIN;
-       PUT 'RR',id,' time sline min:=',min TO console
-          BY A,F(1),A,DUR(30,6),SKIP;
-       PUT 'RR',id,' time sline max:=',max TO console
-          BY A,F(1),A,DUR(30,6),SKIP;
+       PUT 'RR',id,' time slice min:=',min TO console
+          BY A,F(1),A,D(30,6),SKIP;
+       PUT 'RR',id,' time slice max:=',max TO console
+          BY A,F(1),A,D(30,6),SKIP;
        sum := sum / loopcounter;
-       PUT 'RR',id,' time sline avg:=',sum TO console
-          BY A,F(1),A,DUR(30,6),SKIP;
+       PUT 'RR',id,' time slice avg:=',sum TO console
+          BY A,F(1),A,D(30,6),SKIP;
    FIN;
    
 END;
@@ -113,23 +114,13 @@ END;
 
 RR1: TASK;
    CALL rr_test_function(1);
-END
+END;
 
 RR2: TASK;
    CALL rr_test_function(2);
-END
-*/
+END;
 
-TASK1: TASK PRIO 2 MAIN;
-! --- declare text constants 
-     __cpp__ (
-	' pearlrt::Character<10> _tc_1("Task1 ..."); '
-     	' pearlrt::Character<16> _tc_2("Task1 works ..."); '
-     	' pearlrt::Character<15> _tc_3("Task1 finished"); '
-     	' pearlrt::Character<30> _tc_4("Task1: preventing Task3"); '
-     	' pearlrt::Character<30> _tc_5("Task1: terminate  Task2"); '
-      );
-
+startTask: TASK PRIO 2 MAIN;
      DCL end CLOCK;
 
      OPEN console BY ANY;
@@ -137,63 +128,46 @@ TASK1: TASK PRIO 2 MAIN;
 
      ACTIVATE TASK2 PRIO 10;
 
-     PUT tc_1 TO console  BY A, SKIP;
+     PUT 'Task 1...' TO console  BY A, SKIP;
 
-     !end = NOW() + 10 SEC;
-     __cpp__('_end = pearlrt::Clock::now() + pearlrt::Duration(10);	');
+     end = NOW + 10 SEC;
 
-     !WHILE NOW() < end REPEAT
-     __cpp__('while( pearlrt::Clock::now().compare(_end) < 0) {');
+     WHILE NOW < end REPEAT
 
-         ! PUT NOW(), 'Task 1 works' TO console BY T(15,6),X(3),A,SKIP;
-         PUT tc_2 TO console BY X(3),A,SKIP;
+         PUT NOW, 'Task 1 works' TO console BY T(15,6),X(3),A,SKIP;
 
          AFTER 2 SEC RESUME;
 
-     ! END;
-     __cpp__('}');
+     END;
 
-     ! PUT 'Task1: preventing Task3' TO console BY A,SKIP;
-     PUT tc_4 TO console BY A,SKIP;
+     PUT 'Task1: preventing Task3' TO console BY A,SKIP;
 
      PREVENT TASK3;
 
-     !PUT 'Task1: terminating Task2' TO console BY A,SKIP;
-     PUT tc_5 TO console BY A,SKIP;
+     PUT 'Task1: terminating Task2' TO console BY A,SKIP;
 
      TERMINATE TASK2;
 
-    ! CALL rr_test;
+     CALL rr_test;
 
 
-     ! PUT 'Task1 finished' TO console BY A,SKIP;
-     PUT tc_3 TO console BY A,SKIP;
+     PUT 'Task1 finished' TO console BY A,SKIP;
 END;
 
 TASK2: TASK PRIO 4;
-! --- declare text constants
-     __cpp__ (' pearlrt::Character<11> _tc_1("Task2 works"); ');
 
    AFTER 5 SEC ALL 3 SEC ACTIVATE TASK3;
 
-   !REPEAT
-    __cpp__ (' while(1) {');
-     !  PUT NOW(),'Task2 works' TO console BY T(15,6),X(15),A,SKIP;
-      PUT tc_1 TO console BY X(15),A,SKIP;
+   REPEAT
+      PUT NOW,'Task2 works' TO console BY T(15,6),X(15),A,SKIP;
 
       AFTER 5 SEC RESUME;
 
-   !END; ! of REPEAT
-   __cpp__('}');
+   END; ! of REPEAT
 END;
 
 TASK3: TASK PRIO 6;
-! --- declare text constants 
-     __cpp__ (' pearlrt::Character<11> _tc_1("Task3 works"); ');
-
-
-   ! PUT NOW(),'3 works' TO console BY T(15,6),X(25),A,SKIP;
-   PUT tc_1 TO console BY X(25),A,SKIP;
+   PUT NOW,'3 works' TO console BY T(15,6),X(25),A,SKIP;
 END;
 
 
