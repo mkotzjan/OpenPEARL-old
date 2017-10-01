@@ -1,9 +1,10 @@
-EN.jpg: EN.pdf
+OpenPearlStructureEN.jpg: OpenPearlStructureEN.pdf
 	convert $< $@
 
-EN.pdf: EN.tex
+OpenPearlStructureEN.pdf: OpenPearlStructureEN.tex
 	pdflatex $<
 
 clean:
-	rm -f EN.pdf EN.log EN.aux
+	rm -f OpenPearlStructureEN.pdf OpenPearlStructureEN.log
+	rm -f OpenPearlStructureEN.jpg OpenPearlStructureEN.aux
 	
