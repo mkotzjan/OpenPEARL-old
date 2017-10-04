@@ -50,7 +50,7 @@ namespace pearlrt {
       } else if (strcmp(pud, "d") == 0) {
          RPiGpio::instance()->useBits(start, width,
                                       RPiGpio::DIGIN, RPiGpio::DOWN);
-      } else if (strcmp(pud, "") == 0) {
+      } else if (strcmp(pud, "n") == 0) {
          RPiGpio::instance()->useBits(start, width,
                                       RPiGpio::DIGIN, RPiGpio::NONE);
       } else {
