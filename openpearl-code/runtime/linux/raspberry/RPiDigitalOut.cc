@@ -53,18 +53,18 @@ namespace pearlrt {
    SystemDationB* RPiDigitalOut::dationOpen(const char * idf, int openParam) {
       if (idf != 0) {
          Log::error("IDF not allowed for RPi digital out device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if ((openParam & (~OUT))  != 0) {
          Log::error("No open parameters allowed for RPi digital"
                     " out device (%x)", openParam);
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("RPiDigitalOut: Dation already open");
-         throw theNotAllowedSignal;
+         throw theOpenFailedSignal;
       }
 
       dationStatus = OPENED;
@@ -75,12 +75,12 @@ namespace pearlrt {
    void RPiDigitalOut::dationClose(int closeParam) {
       if (closeParam != 0) {
          Log::error("No close parameters allowed for RPiDigitalOut device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalOut: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       dationStatus = CLOSED;
@@ -88,7 +88,7 @@ namespace pearlrt {
 
 
    void RPiDigitalOut::dationRead(void* data, size_t size) {
-      throw theNotAllowedSignal;
+      throw theDationParamSignal;
    }
 
    void RPiDigitalOut::dationWrite(void* data, size_t size) {
@@ -100,12 +100,12 @@ namespace pearlrt {
       // Therefore size must be less than 4
       if (size > 4) {
          Log::error("RPiDigitalOut: max 32 bits expected");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalOut: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       // expect BitString<width> as data
@@ -125,7 +125,8 @@ namespace pearlrt {
          break;
 
       default:
-         Log::error("RPiDigitalOut: illegal size (%d)", size);
+         // we must cast to int, since Log does not support %u
+         Log::error("RPiDigitalOut: illegal size (%d)", (int)size);
          throw theInternalDationSignal;
       }
 

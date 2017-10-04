@@ -157,7 +157,10 @@ endif
 
 targets := libOpenPEARLlinux.a linux.xml
 
+$(warning $(CXX_COMMON_TEST_PROGS))
+
 ifeq ($(CONFIG_LINUX_tests),y)
+  include ../common/tests/Files
   include tests/Makefile.inc
   CHECK_FILES += $(GTEST_SRC) $(GTEST_DATION_SRC) $(TEST_SRC)
 endif
@@ -269,6 +272,7 @@ clean:
 	@rm -f .depend
 	@rm -f ../common/tests/*.new
 	@rm -f ../common/tests/*.diff
+	@rm -f ../common/tests/*.o
 	@rm -f ../common/*.new
 	@rm -f ../common/*.diff
 	@rm -f ../common/*.o
@@ -288,6 +292,7 @@ clean:
 	@rm -f ../common/signals.log
 	@rm -f sysincs.h  pearl2.h pearl.h
 	@rm -f cc_bin.inc run_bin.inc
+	@rm -f $(TEST_FILES_2_REMOVE)
 
 phony += checkformat
 checkformat: 
@@ -306,3 +311,6 @@ depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
 -include .depend
 
 .PHONY: $(phony)
+
+
+$(warning $(targets))

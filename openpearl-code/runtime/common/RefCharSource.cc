@@ -35,15 +35,16 @@
 namespace pearlrt {
    RefCharSource::RefCharSource(RefCharacter & s) {
       sourceObj =  & s;
-      readPtr = 0;
+     sourceObj->setCurrent(0);
+      //readPtr = 0;
    }
 
    char RefCharSource::realGetChar(void) {
       char c;
 
       try {
-         c = sourceObj->getCharAt(readPtr);
-         readPtr ++;
+         c = sourceObj->getNextChar();
+//         readPtr ++;
       } catch (CharacterIndexOutOfRangeSignal & e) {
          throw theNoMoreCharactersSignal;
       }
@@ -52,9 +53,21 @@ namespace pearlrt {
    }
 
 
-   void RefCharSource::rewind() {
-      readPtr = 0;
+   void RefCharSource::pos(size_t pos) {
+      //readPtr = pos;
+      sourceObj->setCurrent(pos);
       forgetUnGetChar();
    }
+
+   void RefCharSource::rewind() {
+ //     readPtr = 0;
+      sourceObj->setCurrent(0);
+      forgetUnGetChar();
+   }
+
+   size_t RefCharSource::sop() {
+      return sourceObj->getCurrent();
+   }
+
 }
 

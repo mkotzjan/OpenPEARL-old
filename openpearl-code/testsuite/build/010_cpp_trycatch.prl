@@ -11,16 +11,16 @@ T1: TASK MAIN;
    y := 0;
    z := 0;
    null = 0;
-   __cpp__ (' try {');
-   x := x / y;
-   __cpp__('} catch (FixedDivideByZeroSignal s) { ');
+   __cpp__ (" try {");
+   x := x // y;
+   __cpp__("} catch (FixedDivideByZeroSignal s) { ");
       z := 1;
-   __cpp__('}');
+   __cpp__("}");
    !   PUT 'FAILED' ...
     IF( z == null) THEN
    __cpp__(
-	'     printf("no signal caught\\n"); '
-	'     pearlrt::Control::setExitCode(1); '
+	"     printf(\"no signal caught\\n\"); "
+	"     pearlrt::Control::setExitCode(1); "
      );
     FIN;
 

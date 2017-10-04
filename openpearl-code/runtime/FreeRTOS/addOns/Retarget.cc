@@ -28,6 +28,7 @@
 */
 
 #include "chip.h"
+#include "cmsis.h"
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -154,7 +155,7 @@ extern "C" {
 
    void _exit(int x) {
 
-	   useInterruptFlag = false;
+       useInterruptFlag = false;
       _write(1, (char*)"*** end. ***\n", 13);
       while (1);  // never return
    }
@@ -163,7 +164,7 @@ extern "C" {
    static volatile uint32_t r0, r1, r2, r3, r12, lr, pc, psr;
    static volatile int exceptNumber = 0;
 
-   void prvGetRegistersFromStack(uint32_t* faultStack) {
+   static void prvGetRegistersFromStack(uint32_t* faultStack) {
       r0 = faultStack[0];
       r1 = faultStack[1];
       r2 = faultStack[2];
@@ -173,8 +174,16 @@ extern "C" {
       pc = faultStack[6];
       psr = faultStack[7];
    }
-int handleControlStateReg;
+
+   static int handleControlStateReg;
+
    void lpc17_default_handler(void) __attribute__((naked));
+   void NMI_Handler(void) __attribute__((naked));
+   void HardFault_Handler(void) __attribute__((naked));
+   void MemManage_Handler(void) __attribute__((naked));
+   void BusFault_Handler(void) __attribute__((naked));
+   void UsageFault_Handler(void) __attribute__((naked));
+
    void lpc17_default_handler(void) {
    // NVIC_INT_CTRL_CONSTis 0xe000ed04		\n"
 
@@ -201,16 +210,59 @@ int handleControlStateReg;
       useInterruptFlag = false;
 
 //      printf("*** Default handler (vector index = %d)\n*** halt ***.\n", exceptNumber & 0x3ff);
-      printf("*** Default handler (InterruprControl State Reg = %04X)\n"
-        "   handleControlStatusReg = %04X"
-	"*** halt ***.\n", exceptNumber , handleControlStateReg);
+      printf("*** Default handler (InterruptControl State Reg = %04X)\n"
+        "   handleControlStatusReg = %04X\n"
+        "   vector = %d\n"
+	"*** halt ***.\n", exceptNumber,
+                    handleControlStateReg,
+                    exceptNumber&0x0ff);
    //   printf(" Registers: \n r0: %08x r1: %08x r2: %08x r3: %08x\n"
    //          "r12: %08x lr: %08x pc: %08x psr: %08x\n",
    //          r0, r1, r2, r3, r12, lr, pc, psr);
 
-      while (1);  // never return
+       if ( (exceptNumber & 0x0ff) == 3) {
+          printf("usage fault status: %02X\n", *(int16_t*)0xe000ed2a);
+       }
+       while (1);  // never return
+
    }
 
+   void NMI_Handler(void) {
+       printf("NMI Handler *** halt *** \n");
+       while(1);
+   }
+
+   void HardFault_Handler(void) {
+       printf("*** HardFault Handler ***\n"
+              "  Hard Fault Status:\t\t%08X\n"
+              "  Bus Fault Status:\t\t%02X\n"
+              "  MemManage Fault  Status:\t%02X\n"
+              "  Usage Fault Status:\t\t%04X\n"
+          "*** halt *** \n",
+          SCB->HFSR, 
+       //*(uint32_t*)(0xe000ed2c), // hard fault status register
+       *(uint8_t*)(0xe000ed29), // bus fault status register
+       *(uint8_t*)(0xe000ed28), // memmanage fault status register
+       *(uint16_t*)(0xe000ed2a)); // usage fault status register
+       if (*(uint8_t*)(0xe000ed29) & 0x080) {
+          printf("  Bus Fault at: %08X\n", SCB->BFAR);
+       }
+       while(1);
+   }
+   void MemManage_Handler(void) {
+       printf("MemManage Handler *** halt *** \n");
+       while(1);
+   }
+
+   void BusFault_Handler(void) {
+       printf("BusFault Handler *** halt *** \n");
+       while(1);
+   }
+
+   void UsageFault_Handler(void) {
+       printf("UsageFault Handler *** halt *** \n");
+       while(1);
+   }
 
 
 };

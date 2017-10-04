@@ -60,30 +60,19 @@ namespace pearlrt {
 
       if (idf) {
          Log::error("PCF8574In: no IDF allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("PCF8574In: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("PCF8574In: Dation already open");
-         throw theNotAllowedSignal;
-      }
-
-
-/*      // set configuration register to default (0)
-      // and switch back to default read register
-      try {
-         provider->writeData(addr, 2, defaultValue);
-         provider->writeData(addr, 1, selectTempReg);
-      } catch (WritingFailedSignal s) {
-         Log::error("PCF8574In: Dation not ready");
          throw theOpenFailedSignal;
       }
-*/
+
       dationStatus = OPENED;
       return this;
    }
@@ -92,12 +81,12 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("PCF8574In: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("PCF8574In: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       dationStatus = CLOSED;
@@ -105,7 +94,7 @@ namespace pearlrt {
 
    void PCF8574In::dationWrite(void* data, size_t size) {
          Log::error("PCF8574In: no write supported");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
    }
 
    void PCF8574In::dationRead(void* data, size_t size) {
@@ -116,12 +105,12 @@ namespace pearlrt {
       if (size != sizeof(BitString<8>)) {
          Log::error("PCF8574In: illegal data size (got %d byte data)",
                     (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("PCF8574In: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // write data to application memory

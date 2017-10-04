@@ -48,7 +48,7 @@ namespace pearlrt {
 
       if (addr < 0x48 || addr > 0x4f) {
          Log::error("LM75: illegal addres (%x)", addr);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       this->addr = addr;
@@ -60,17 +60,17 @@ namespace pearlrt {
 
       if (idf) {
          Log::error("LM75: no IDF allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("LM75: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("LM75: Dation already open");
-         throw theNotAllowedSignal;
+         throw theOpenFailedSignal;
       }
 
 
@@ -92,12 +92,12 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("LM75: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("LM75: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       dationStatus = CLOSED;
@@ -105,7 +105,7 @@ namespace pearlrt {
 
    void LM75::dationWrite(void* data, size_t size) {
       Log::error("LM75: no write supported");
-      throw theIllegalParamSignal;
+      throw theInternalDationSignal;
    }
 
    void LM75::dationRead(void* data, size_t size) {
@@ -118,12 +118,12 @@ namespace pearlrt {
       // Therefore size must be 2
       if (size != sizeof(Fixed<15>)) {
          Log::error("LM75: Fixed<15> expected (got %d byte data)", (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("LM75: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // write data to application memory

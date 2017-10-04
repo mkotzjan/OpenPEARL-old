@@ -44,12 +44,12 @@ namespace pearlrt {
    SoftInt::SoftInt(int nbr) {
       if (nbr < 1 || nbr > 32) {
          Log::error("SoftInt: illegal number: %d", nbr);
-         throw theIllegalParamSignal;
+         throw theInternalDatatypeSignal;
       }
 
       if (isSet & (1 << nbr)) {
          Log::error("SoftInt %d used more than once", nbr);
-         throw theIllegalParamSignal;
+         throw theInternalDatatypeSignal;
       }
 
       isSet |= 1 << nbr;

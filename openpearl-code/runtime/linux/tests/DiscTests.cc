@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014 Rainer Mueller
  All rights reserved.
 
@@ -33,9 +33,10 @@
 
 \page Testprograms
 
-\section Dation System Device Disc
-There are some tests to enshure proper operation of the Disc system dation
+\section DiscTests tests/DiscTests.cc
 
+There are some tests to enshure proper operation of the Disc system dation
+The tests  are implemented a gtest unit tests.
 */
 #include <gtest/gtest.h>
 #include "Signals.h"
@@ -44,7 +45,8 @@ There are some tests to enshure proper operation of the Disc system dation
 #include "Fixed.h"
 using namespace std;
 
-#define HOME "/tmp/"
+
+#define HOME "/tmp/"    ///< the location of the files to create
 
 /**
   path tests
@@ -55,13 +57,13 @@ TEST(Disc, path) {
       ASSERT_NO_THROW(pearlrt::Disc disc(HOME, 10));
       ASSERT_THROW(
          pearlrt::Disc disc1("/home", 10),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
       ASSERT_THROW(
          pearlrt::Disc disc2("/etc/motd", 10),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
       ASSERT_THROW(
          pearlrt::Disc disc3("/xxx/", 10),
-         pearlrt::IllegalPathSignal);
+         pearlrt::DationParamSignal);
    }
 }
 
@@ -126,13 +128,13 @@ TEST(Disc, openClose) {
                              pearlrt::Dation::INOUT));
    ASSERT_NO_THROW(
       work->dationClose(pearlrt::Dation::CAN));
-   // no file + NEW + IN --> IllegalPara
+   // no file + NEW + IN --> DationParamSignal
    ASSERT_THROW(
       work = disc.dationOpen("file1.tst",
                              pearlrt::Dation::NEW |
                              pearlrt::Dation::IDF |
                              pearlrt::Dation::IN),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    // no file + NEW + OUT --> ok
    ASSERT_NO_THROW(
       work = disc.dationOpen("file1.tst",
@@ -201,13 +203,13 @@ TEST(Disc, openClose) {
                              pearlrt::Dation::IDF |
                              pearlrt::Dation::INOUT));
    ASSERT_NO_THROW(work->dationClose(pearlrt::Dation::PRM));
-   // file + NEW + IN --> IllegalParams
+   // file + NEW + IN --> DationParamSignal
    ASSERT_THROW(
       work = disc.dationOpen("file1.tst",
                              pearlrt::Dation::NEW |
                              pearlrt::Dation::IDF |
                              pearlrt::Dation::IN),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    // file + NEW + OUT --> OpenFailed
    ASSERT_THROW(
       work = disc.dationOpen("file1.tst",
@@ -234,10 +236,10 @@ TEST(Disc, capacity) {
    pearlrt::SystemDationNB* work[100];
    ASSERT_THROW(
       pearlrt::Disc disc(HOME, 0),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    ASSERT_THROW(
       pearlrt::Disc disc(HOME, -1),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    pearlrt::Disc disc(HOME, 10);
    noSignalGot = true;
 

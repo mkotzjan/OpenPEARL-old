@@ -1,0 +1,93 @@
+/**
+\file
+*/
+
+/**
+\defgroup datatypes PEARL Data Types
+
+\brief the PEARL simple data types.
+
+The simple data types of PEARL are implemented in individual classes.
+The types with individual length are implemented with templated classes.
+
+These classes provide support for the PEARL data types
+
+- Fixed  provides the type FIXED(0..63)
+- Float
+- Character
+- RefCharacter implements REF CHAR
+- Duration
+- Clock
+- BitString provides the type BIT(1..64)
+*/
+
+/**
+\defgroup interrupt PEARL INTERRUPT
+
+\brief These classes provide support for the PEARL INTERRUPT datatype
+*/
+
+
+/**
+\defgroup io_common Classes for the Input and Output Operations
+
+\brief These classes provide a common behavior of the input and
+output statements for all platforms.
+
+This is the API for the I/O operations to be used by the compiler.
+
+- DationPG provides the API for PUT and GET
+- DationRW provides the API for READ and WRITE
+- DationTS provides the API for TAKE and SEND
+- StringDationConvert provides the API for CONVERT
+- DationDim1, DationDim2 and DationDim3 provides the DIM(), DIM(,) and DIM(,,)
+  APIs
+
+The other classes provide methods which are needed in multiple APIs like toX()
+
+*/
+
+/**
+\defgroup io_common_helper support classes for i/o operations
+\ingroup io_common
+
+\brief Internal platform independent classes supporting the I/O processing
+*/
+
+
+/**
+\defgroup io_common_drivers Plattform Independend Drivers
+\brief  Platform Independend Drivers
+\ingroup io_common
+
+
+These drivers are common to all supported target platforms. 
+The following I2C-bus components are supported:
+
+- ADS1115 as single ended ADC
+- PCF8574 and PCF8574A port expanders
+- LM75 temperature sensor
+
+The interface to the platform dependent I2C bus providers is defined in 
+I2CProvider.
+
+*/
+
+
+/**
+\defgroup io_linux Linux specific Classes for the Input and Output Operations
+
+\brief These classes provide the basic input and output support
+on linux systems. 
+
+*/
+
+/**
+\defgroup io_linux_driver Linux I/O drivers
+\ingroup io_linux
+
+\brief These are the provided device drivers
+
+*/
+
+

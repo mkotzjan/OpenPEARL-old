@@ -81,7 +81,9 @@ namespace pearlrt {
       Open the DigitalOut
       \param openParam open parameters if given
       \param idf pointer to IDF-value if given
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+
+      \throws DationParamSignal, if idf is given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       SystemDationB* dationOpen(const char * idf = 0, int openParam = 0);
 
@@ -91,7 +93,7 @@ namespace pearlrt {
       \param closeParam close parameters if given
 
 
-      \throws NotAllowedSignal, if  dation is not opened and rst is not given
+      \throws DationNotOpenSignal, if  dation is not opened and rst is not given
       */
       void dationClose(int closeParam = 0);
 
@@ -112,8 +114,8 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size < 1 or > 2
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws InternalDationSignal, if size < 1 or > 2
+      \throws DationNotOpenSignal, if  dation is not opened
 
       */
       void dationWrite(void * data, size_t size);

@@ -226,7 +226,7 @@ The transmission data must have the following structure:
 
 
 
-\subsection{Creating a new Device}
+\subsection{Creating a new System Device}
 The creation of a new device is very simple:
 \begin{enumerate}
 \item find a suitable device name
@@ -252,10 +252,11 @@ The creation of a new device is very simple:
       Note that dationSeek is not required, if only FORWARD dations
       may be created.
 \item create a suitable XML description file.
-\item insert a configuration item  
+\item If the device depends on special libraries or 
+      system setup, insert a configuration item  
       in the system configuration menu
       and set the default to {\em not available} ('n').
-\item modify the corresponding Makefile toi add the device depending on
+\item modify the corresponding Makefile and add the device depending on
       the configuration item. If additional libraries are needed,
       add them to \texttt{LDPATH}. 
 \item create unit tests for google tests framework in tests/ and add the

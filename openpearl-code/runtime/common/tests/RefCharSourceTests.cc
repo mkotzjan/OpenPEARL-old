@@ -38,8 +38,8 @@
 using namespace std;
 
 TEST(RefCharSourceTests, Operations) {
-   pearlrt::RefCharacter rc;
    pearlrt::Character<10> d(10, (char*)"1234567890");
+   pearlrt::RefCharacter rc(d);
    pearlrt::RefCharSource source(rc);
    char ch;
    rc.setWork(d);

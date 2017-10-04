@@ -43,12 +43,12 @@ namespace pearlrt {
       DationDim(0, r, c, 2, true) {
       if ((r <= zero).getBoolean()) {
          Log::error("DationDim2: rows must be > 0");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if ((c <= zero).getBoolean()) {
          Log::error("DationDim2: cols must be > 0");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
    }
 
@@ -66,7 +66,7 @@ namespace pearlrt {
    void DationDim2::pos(const Fixed<31> r, const Fixed<31> c) {
       if (!(dationParams & Dation::DIRECT)) {
          Log::error("DationDim2: POS needs DIRECT DATION");
-         throw thePositioningForbiddenSignal;
+         throw theInternalDationSignal;
       }
 
       if ((c < zero).getBoolean()) {
@@ -141,7 +141,7 @@ namespace pearlrt {
          if ((getIndex(newRow, newCol) < getIndex()).getBoolean()) {
             Log::error("DationDim2: ADV on FORWARD DATION"
                        " needs non negativ offset");
-            throw theNotAllowedSignal;
+            throw thePositioningFailedSignal;
          }
       }
 
@@ -154,7 +154,7 @@ namespace pearlrt {
 
       if ((dationParams & Dation::FORWARD) && (n < one).getBoolean()) {
          Log::error("DationDim2: skip(n): n must be >0 on FORWARD dation");
-         throw theIllegalParamSignal;
+         throw thePositioningFailedSignal;
       }
 
       result = (cols - col) + (n - one) * cols;

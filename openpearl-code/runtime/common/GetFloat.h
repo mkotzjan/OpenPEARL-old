@@ -49,7 +49,12 @@
 
 namespace pearlrt {
    /**
-      Input processing of Float values.
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+      \brief Input processing of Float values.
    */
    template <int S>
    class GetFloat {
@@ -144,6 +149,7 @@ namespace pearlrt {
          return;
       }
    };
+   /** @} */
 }
 #endif
 

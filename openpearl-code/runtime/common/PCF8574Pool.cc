@@ -84,10 +84,11 @@ namespace pearlrt {
 
       bits = bitMask[width-1] >> (7-start); 
       if (used[found].usedBits & bits) {
-         Log::error("PCF8574: Bits already in use (i2cadr=%x start=%d,width=%d)",
-           used[found].i2cAdr, start, width);
+         Log::error("PCF8574: Bits already in use (i2cadr=%x"
+                    " start=%d,width=%d)",
+                    used[found].i2cAdr, start, width);
           mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       used[found].usedBits |= bits;

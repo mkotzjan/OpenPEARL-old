@@ -1,7 +1,9 @@
 # make vanilla tex install for development
-apt-get install gcc g++ git gdb make flex astyle gawk openjdk-7-jdk
-apt-get install perl graphviz doxygen lib64ncurses5-dev
-#apt-get install texlive texlive-latex-extra texstudio perl-tk xzdec
+apt-get install -y gcc g++ git gdb make flex astyle gawk openjdk-7-jdk
+apt-get install -y perl graphviz doxygen
+apt-get install -y libncurses5-dev    # formerly lib64ncurses5-dev
+apt-get install -y libgtest-dev
+#apt-get install -y texlive texlive-latex-extra texstudio perl-tk xzdec
 cpan App::cpanminus
 cpanm Spreadsheet::Read
 cpanm Spreadsheet::ReadSXC

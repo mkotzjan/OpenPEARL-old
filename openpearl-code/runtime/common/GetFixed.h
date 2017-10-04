@@ -1,7 +1,7 @@
 #ifndef GETFIXED_H_INCLUDED
 #define GETFIXED_H_INCLUDED
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -48,7 +48,12 @@
 
 namespace pearlrt {
    /**
-      Input processing of Fixed values.
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+      \brief Input processing of Fixed values.
    */
    template <int S>
    class GetFixed {
@@ -96,6 +101,7 @@ namespace pearlrt {
          return;
       }
    };
+   /** @} */
 }
 #endif
 

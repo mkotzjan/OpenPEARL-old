@@ -57,30 +57,19 @@ namespace pearlrt {
 
       if (idf) {
          Log::error("ADS1015SE: no IDF allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (params & ~(RST | IN )) {
          Log::error("ADS1015SE: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("ADS1015SE: Dation already open");
-         throw theNotAllowedSignal;
-      }
-
-
-/*      // set configuration register to default (0)
-      // and switch back to default read register
-      try {
-         provider->writeData(addr, 2, defaultValue);
-         provider->writeData(addr, 1, selectTempReg);
-      } catch (WritingFailedSignal s) {
-         Log::error("ADS1015SE: Dation not ready");
          throw theOpenFailedSignal;
       }
-*/
+
       dationStatus = OPENED;
       return this;
    }
@@ -89,12 +78,12 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("ADS1015SE: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       if (params & ~(RST | IN)) {
          Log::error("ADS1015SE: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       dationStatus = CLOSED;
@@ -102,7 +91,7 @@ namespace pearlrt {
 
    void ADS1015SE::dationWrite(void* data, size_t size) {
          Log::error("ADS1015SE: no write supported");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
    }
 
    void ADS1015SE::dationRead(void* data, size_t size) {
@@ -116,12 +105,12 @@ namespace pearlrt {
       if (size != sizeof(Fixed<15>)) {
          Log::error("ADS1015SE: illegal data size (got %d byte data)",
                     (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("ADS1015SE: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       channelSelect[0] = 1; // select config register
@@ -148,7 +137,7 @@ namespace pearlrt {
 
       } catch (WritingFailedSignal s) {
          Log::error("ADS1015SE: Dation not ready");
-         throw theOpenFailedSignal;
+         throw theReadingFailedSignal;
       }
           
       // use shift operator to be independent on byte ordering

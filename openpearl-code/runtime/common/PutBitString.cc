@@ -45,53 +45,8 @@ for B1,B2,B3 and B4-format.
 #include "Signals.h"
 #include "PutBitString.h"
 
-using namespace std;
+//using namespace std;
 namespace pearlrt {
-#ifdef DELETED
-   template<int S> class PutBits;
-   template<> class PutBits<1> {
-      public:
-         static void toBit(Bits<1>::BitType data, int len, int w, int base, Sink &sink);
-   };
-   template<> class PutBits<2> {
-      public:
-         static void toBit(Bits<4>::BitType data, int len, int w, int base, Sink &sink);
-   };
-
-   template<> class PutBits<4> {
-      public:
-         static void toBit(Bits<4>::BitType data, int len, int w, int base, Sink &sink);
-   };
-
-   template<> class PutBits<8> {
-      public:
-         static void toBit(Bits<8>::BitType data, int len, int w, int base, Sink &sink);
-   };
-
-   /**
-   Class containing the output formatting of bit string variables
-   all methods are defined as static.
-
-
-   Sample usage in PEARL:
-   \verbatim
-   DCL x BIT(3) INIT('011'B1);
-   ...
-   PUT x TO console BY B4(1);
-   \endverbatim
-
-   Should compile in C++ to:
-   \verbatim
-   //DCL x BIT(3) INIT('011'B1);
-   pearlrt:BitString<3> x(3);
-   ...
-   //PUT x TO console BY B4(1);
-   // the console object should provide access to the data sink object
-   pearlrt::PutBitString<3>::toB4(x, (Fixed<31>)(w), console.getSink());
-   \endverbatim
-
-   */
-#endif
    static const int dataMask[] = {0x01, 0x03, 0x07, 0x0f};
    static const char hexChar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
                                   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -104,32 +59,6 @@ namespace pearlrt {
         b <<= 24; 
 //printf("as Bit(32): %x len=%d, width=%d base=%d\n", b, len, width, base);
         PutBits<4>::toBit(b, len+24, width, base, sink);
-#ifdef DELETD
-      int mask;
-      int digits;
-      int shiftSize;
-
-      if (width <= 0) {
-         Log::error("toBit: illegal width (%d)", width);
-         throw theBitFormatSignal;
-      }
-
-      digits = (len+base-1)/base;
-      shiftSize = (digits-1)*base+(8-len)/base;
-      mask = dataMask[base-1] << shiftSize;
-     
-     for (int i=0; i<width; i++) {
-        if (digits > 0) {
-           int ch = (bits&mask)>>(shiftSize);  
-//           printf("ch = %x\n", ch);
-           bits <<= base;
-           digits --;
-           sink.putChar(hexChar[ch]); 
-        } else {
-           sink.putChar('0'); 
-        }
-     }
-#endif
    }
 
    void PutBits<2>::toBit(BitString<16>::DataType bits, int len, int width,

@@ -44,17 +44,17 @@ namespace pearlrt {
       DationDim(p, r, c, 3, true) {
       if ((p <= zero).getBoolean()) {
          Log::error("DationDim3: pages must be > 0");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if ((r <= zero).getBoolean()) {
          Log::error("DationDim3: rows must be > 0");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if ((c <= zero).getBoolean()) {
          Log::error("DationDim3: cols must be > 0");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
    }
 
@@ -73,7 +73,7 @@ namespace pearlrt {
                         const Fixed<31> c) {
       if (!(dationParams & Dation::DIRECT)) {
          Log::error("DationDim3: POS needs DIRECT DATION");
-         throw thePositioningForbiddenSignal;
+         throw theInternalDationSignal;
       }
 
       if ((c < zero).getBoolean()) {
@@ -184,7 +184,7 @@ namespace pearlrt {
          if ((getIndex(newPage, newRow, newCol) < getIndex()).getBoolean()) {
             Log::error("DationDim3: ADV on FORWARD DATION"
                        " needs non negativ offset");
-            throw theNotAllowedSignal;
+            throw theInvalidPositioningSignal;
          }
       }
 
@@ -198,7 +198,7 @@ namespace pearlrt {
 
       if (dationParams & Dation::FORWARD && (n < one).getBoolean()) {
          Log::error("DationDim3: skip(n): n must be >0 on FORWARD dation");
-         throw theIllegalParamSignal;
+         throw theInvalidPositioningSignal;
       }
 
       result = (cols - col) + (n - one) * cols;
@@ -210,7 +210,7 @@ namespace pearlrt {
 
       if (dationParams & Dation::FORWARD && (n < one).getBoolean()) {
          Log::error("DationDim3: page(n): n must be >0 on FORWARD dation");
-         throw theIllegalParamSignal;
+         throw theInvalidPositioningSignal;
       }
 
       result = (cols - col) + (rows - row - one) * cols;

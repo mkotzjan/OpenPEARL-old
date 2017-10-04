@@ -29,8 +29,8 @@ typedef enum {
 /* Definitions of physical drive number for each drive */
 // no RAM disk support planned
 //#define DEV_RAM	0	/* Map Ramdisk to physical drive 0 */
-#define DEV_MMC		0	/* Map MMC/SD card to physical drive 1 */
-#define DEV_USB		1	/* Map USB MSD to physical drive 2 */
+#define DEV_SD		0	/* Map MMC/SD card to physical drive 0 */
+#define DEV_USB		1	/* Map USB MSD to physical drive 1 */
 
 typedef DSTATUS (*Disk_status)(BYTE pdrv);
 typedef DSTATUS (*Disk_initialize)(BYTE pdrv);
@@ -70,7 +70,6 @@ DSTATUS disk_status (BYTE pdrv);
 DRESULT disk_read (BYTE pdrv, BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_write (BYTE pdrv, const BYTE* buff, DWORD sector, UINT count);
 DRESULT disk_ioctl (BYTE pdrv, BYTE cmd, void* buff);
-
 
 /* Disk Status Bits (DSTATUS) */
 

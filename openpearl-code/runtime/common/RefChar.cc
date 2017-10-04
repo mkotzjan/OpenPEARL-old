@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A BSD license"]
+ Copyright (c) 2012-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -59,6 +59,16 @@ namespace pearlrt {
       return data[index];
    }
 
+   char RefCharacter::getNextChar() {
+      char result;
+
+      if (current + 1 > max) {
+         throw theCharacterTooLongSignal;
+      }
+      result = data[current];
+      current ++;
+      return result;
+   }
 
    char * RefCharacter::getCstring() {
       if (current + 1 > max) {
@@ -112,5 +122,13 @@ namespace pearlrt {
 
    size_t RefCharacter::getCurrent() {
       return current;
+   }
+
+   void RefCharacter::setCurrent(size_t newCurrent) {
+      if (newCurrent >= max) {
+         throw theCharacterTooLongSignal;
+      }
+      current = newCurrent;
+      return;
    }
 }

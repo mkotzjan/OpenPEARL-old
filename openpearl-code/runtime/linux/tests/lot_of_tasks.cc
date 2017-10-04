@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -34,7 +34,7 @@
 
 \page Testprograms
 
-\section lot_of_tasks
+\section lot_of_tasks tests/lot_of_tasks.cc
 
 This program tests the behavior of the system when a lot of tasks
 is started. This is done using the API directly, since PEARL does not

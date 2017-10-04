@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2012-2016 Marcel Schaible
+ Copyright (c) 2012-2017 Marcel Schaible
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -138,7 +138,7 @@ globalDecl(decls) ::= <<
 
 /*********************** PROBLEM PART ***********************/
 
-ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, temporarySemaphoreArrays,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations) ::= <<
+ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, temporarySemaphoreArrays,temporaryBoltArrays, ArrayDescriptors,ArrayVariableDeclarations,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations) ::= <<
 /////////////////////////////////////////////////////////////////////////////
 // PROBLEM PART
 /////////////////////////////////////////////////////////////////////////////
@@ -193,6 +193,27 @@ ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, tempo
 <BoltDeclarations>
 <endif>
 
+<if(temporaryBoltArrays)>
+/////////////////////////////////////////////////////////////////////////////
+// TEMPORARY BOLT ARRAYS
+/////////////////////////////////////////////////////////////////////////////
+<temporaryBoltArrays>
+<endif>
+
+<if(ArrayDescriptors)>
+/////////////////////////////////////////////////////////////////////////////
+// ARRAY DESCRIPTORS
+/////////////////////////////////////////////////////////////////////////////
+<ArrayDescriptors>
+<endif>
+
+
+<if(ArrayVariableDeclarations)>
+/////////////////////////////////////////////////////////////////////////////
+// ARRAY VARIABLES DECLARATIONS
+/////////////////////////////////////////////////////////////////////////////
+<ArrayVariableDeclarations>
+<endif>
 
 <if(ProcedureDeclarations)>
 /////////////////////////////////////////////////////////////////////////////
@@ -239,12 +260,16 @@ fixed_type(size) ::= <<
 pearlrt::Fixed\<<size>\>
 >>
 
+bit_type(size) ::= <<
+pearlrt::BitString\<<size>\>
+>>
+
 char_type(size) ::= <<
-Character\<<size>\>
+pearlrt::Character\<<size>\>
 >>
 
 float_type(size) ::= <<
-double
+pearlrt::Float\<<size>\>
 >>
 
 time_type(clock_type,duration_type) ::= <<
@@ -258,6 +283,40 @@ pearlrt::Clock
 duration_type(init) ::= <<
 pearlrt::Duration
 >>
+
+TypeReferenceSimpleType(BaseType) ::= <<
+<BaseType> *
+>>
+
+TypeReferenceTask(Task) ::= <<
+pearlrt::Task *
+>>
+
+TypeReferenceProcedure() ::= <<
+/* REF PROC */
+>>
+
+TypeReferenceSema() ::= <<
+/*  REF SEMA */
+>>
+
+TypeReferenceBolt() ::= <<
+/* REF BOLT */
+>>
+
+TypeReferenceInterrupt() ::= <<
+/* REF INTERRUPT */
+>>
+
+TypeReferenceSignal() ::= <<
+/* REF SIGNAL */
+>>
+
+TypeReferenceChar() ::= <<
+/* REF CHAR */
+>>
+
+
 
 /*********************** STATEMENTS ***********************/
 
@@ -294,7 +353,7 @@ PUTStatement(expression,format,destination) ::= <<
 >>
 
 assignment_statement(lhs,rhs) ::= <<
-_<lhs> = <rhs>;
+    <lhs> = <rhs>;
 >>
 
 if_statement(rhs, then_block, else_block) ::= <<
@@ -486,16 +545,24 @@ CatExpression(lhs,rhs) ::= <%
   <lhs>.bitCat(<rhs>)
 %>
 
+ReferenceExpression(code,id,bitstring,operator,functionCall) ::= <%
+<if(id)>&<id><elseif(code)>&<code; wrap><elseif(bitstring)><bitstring><endif>
+<if(operator)><operator><endif>
+<if(functionCall)><functionCall><endif>
+%>
+
+
 FunctionCall(callee,ListOfActualParameters) ::= <%
 <user_procedure(callee)>( me<if(ListOfActualParameters)>, <ListOfActualParameters><endif>)
 %>
 
-literal(integer,float,string,time,duration,bit) ::= <%
+literal(integer,float,string,time,duration,bitstring) ::= <%
 <if(integer)><integer><endif>
 <if(float)><float><endif>
 <if(string)><string><endif>
 <if(time)>pearlrt::Clock(<time>)<endif>
 <if(duration)>pearlrt::Duration(<duration>)<endif>
+<if(bitstring)>(<bitstring>)<endif>
 %>
 
 float(value,precision) ::= <%
@@ -589,6 +656,10 @@ read_write_rst_position(dation,id) ::= <%
 
 read_write_absolute_position_col(dation,expression) ::= <%
 <dation>.col(<expression>);
+%>
+
+read_write_eof_position(dation) ::= <%
+<dation>.eof();
 %>
 
 read_write_adv_position(dation,expression1,expression2,expression3) ::= <%
@@ -825,6 +896,10 @@ put_statement_factor_position_x(element) ::= <%
     toX((pearlrt::Fixed\<31>)(<element>))
 %>
 
+put_statement_factor_position_eof() ::= <%
+    eof()
+%>
+
 put_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
     toF(<element>,(pearlrt::Fixed\<31>)(<fieldwidth>)<if(decimalPositions)>,<decimalPositions><if(scaleFactor)>,<scaleFactor><endif><endif>)
 %>
@@ -898,6 +973,10 @@ get_statement_factor_position_skip(element) ::= <%
 
 get_statement_factor_position_x(element) ::= <%
     fromX((pearlrt::Fixed\<31>)(<element>))
+%>
+
+get_statement_factor_position_eof() ::= <%
+    eof()
 %>
 
 get_statement_fixed_format(element,fieldwidth,decimalPositions,scaleFactor) ::= <%
@@ -990,18 +1069,24 @@ GlobalAttribute() ::= <<
 *** GlobalAttribute ***
 >>
 
-TypeAttribute(SimpleType) ::= <<
-<if(SimpleType)><SimpleType><endif>
+TypeAttribute(Type) ::= <<
+<Type>
 >>
 
-SimpleType(TypeInteger,TypeFloatingPointNumber,TypeBitString,TypeDuration,TypeSemaphore,TypeTime,TypeCharacterString) ::= <%
+SimpleType(TypeInteger,TypeFloatingPointNumber,TypeBitString,TypeDuration,TypeSemaphore,TypeBolt,TypeTime,TypeCharacterString) ::= <%
 <if(TypeInteger)><TypeInteger><endif>
 <if(TypeFloatingPointNumber)><TypeFloatingPointNumber><endif>
 <if(TypeDuration)><TypeDuration><endif>
 <if(TypeBitString)><TypeBitString><endif>
 <if(TypeTime)><TypeTime><endif>
+<if(TypeSemaphore)><TypeSemaphore><endif>
+<if(TypeBolt)><TypeBolt><endif>
 <if(TypeCharacterString)><TypeCharacterString><endif>
 %>
+
+TypeReferenceTaskType() ::= <<
+pearlrt::Task *
+>>
 
 TypeInteger(size) ::= "pearlrt::Fixed\<<size>>"
 
@@ -1086,7 +1171,7 @@ SemaRelease(names,noofsemas) ::= <<
 /* --------------------- BOLT -------------------------- */
 
 bolt_declaration(name,global) ::= <<
-#error "BOLTs are not supported"
+DCLBOLT(_<name>);
 
 >>
 
@@ -1094,23 +1179,25 @@ BoltDeclaration(decl) ::= <%
 <decl>
 %>
 
-BoltReserve(bolts,noofbolts) ::= <%
-#error "RESERVE not supported"
+BoltReserve(names,noofbolts) ::= <%
+    pearlrt::Bolt::reserve( me, <noofbolts>, <names: {name|<name>_}>bolts);
 
 %>
 
-BoltFree(bolts,noofbolts) ::= <%
-#error "FREE not supported"
+BoltFree(names,noofbolts) ::= <%
+    pearlrt::Bolt::free( me, <noofbolts>, <names: {name|<name>_}>bolts);
 
 %>
 
-BoltEnter(bolts,noofbolts) ::= <%
-#error "ENTER not supported"
+BoltEnter(names,noofbolts) ::= <%
+    pearlrt::Bolt::enter( me, <noofbolts>, <names: {name|<name>_}>bolts);
+
 
 %>
 
-BoltLeave(bolts,noofbolts) ::= <%
-#error "LEAVE not supported"
+BoltLeave(names,noofbolts) ::= <%
+    pearlrt::Bolt::leave( me, <noofbolts>, <names: {name|<name>_}>bolts);
+
 
 %>
 
@@ -1232,6 +1319,10 @@ CHARACTERSTOFIXED(operand) ::= <%
 pearlrt::Characters::toFixed(<operand>)
 %>
 
+TASK() ::= <%
+me
+%>
+
 /* --------------------- Temporary Semaphore Arrays -------------------------- */
 
 TemporarySemaphoreArrays(array) ::= <<
@@ -1240,6 +1331,16 @@ TemporarySemaphoreArrays(array) ::= <<
 
 TemporarySemaphoreArray(semaphore) ::= <%
 static pearlrt::Semaphore *<semaphore: {sema|<sema>} ; separator="_">_semas[] = {<semaphore: {sema|&_<sema>} ; separator=",">}; <\n>
+%>
+
+/* --------------------- Temporary Bolt Arrays -------------------------- */
+
+TemporaryBoltArrays(array) ::= <<
+<array: {temp|<temp>}>
+>>
+
+TemporaryBoltArray(bolt) ::= <%
+static pearlrt::Bolt *<bolt: {bo|<bo>} ; separator="_">_bolts[] = {<bolt: {bo|&_<bo>} ; separator=",">}; <\n>
 %>
 
 /* --------------------- DATION -------------------------- */
@@ -1588,4 +1689,74 @@ TOBIT(noOfBits,operand) ::= <%
 
 TOFLOAT(precision,operand) ::= <%
 (pearlrt::Float\<<precision>>(<operand>))
+%>
+
+CONT(operand) ::= <%
+pearlrt::cont(<operand>)
+%>
+
+ArrayVariableDeclarations(declarations) ::= <<
+<declarations: {declaration|<declaration>}>
+>>
+
+ArrayVariableDeclaration(name,type,assignmentProtection,totalNoOfElements,initElements) ::= <%
+<type> data_<name>[<totalNoOfElements>] <if(initElements)> = <initElements><endif>; <\n>
+%>
+
+ArrayDescriptors(descriptors) ::= <<
+<descriptors: {descriptor|<descriptor>} ; separator="\n">
+>>
+
+ArrayDescriptor(name,dimensions,limits) ::= <%
+DCLARRAY(<name>, <dimensions>, <limits>);
+%>
+
+ArrayDimensions(dimensions) ::= <%
+<dimensions: {dimension|<dimension>} ; separator=",">
+%>
+
+ArrayDimension(lowerBoundary,upperBoundary) ::= <%
+<lowerBoundary>,<upperBoundary>
+%>
+
+ArrayLimits(limits) ::= <%
+LIMITS({<limits: {limit|<limit>} ; separator=",">})
+%>
+
+ArrayLimit(lowerBoundary,upperBoundary,noOfElemenstOnNextSubArray) ::= <%
+{<lowerBoundary>,<upperBoundary>,<noOfElemenstOnNextSubArray>}
+%>
+
+ArrayLHS(name,descriptor,indices) ::= <%
+(*(data_<name> + <descriptor>->offset(<indices>)))
+%>
+
+ArrayIndices(indices) ::= <<
+    <indices: {index|<index>} ; separator=",\n">
+>>
+
+ArrayIndex(index) ::= <<
+    pearlrt::Fixed\<31>(<index>)
+>>
+
+ArrayRHS(name,descriptor,indices) ::= <%
+*(data_<name> + <descriptor>->offset(<indices>))
+%>
+
+ArrayInitalisations(initelements)::= <%
+{<initelements: {initelement|<initelement>} ; separator=",">}
+%>
+
+/* --------------------------- CONVERT STATEMENT -------------------------------------------*/
+
+ConvertStatement(convert) ::= <%
+*** CONVERT <convert> ***
+%>
+
+ConvertToStatement(convert) ::= <%
+*** CONVERT TO <convert> ***
+%>
+
+ConvertFromStatement(convert) ::= <%
+*** CONVERT FROM  <convert> ***
 %>

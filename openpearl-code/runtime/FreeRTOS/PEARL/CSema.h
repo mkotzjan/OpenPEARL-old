@@ -38,8 +38,7 @@
 #define CSEMA_INCLUDED
 
 #include "CSemaCommon.h"
-#include "FreeRTOS.h"
-#include "semphr.h"
+#include "FakeTypes.h"
 
 namespace pearlrt {
 
@@ -53,9 +52,9 @@ namespace pearlrt {
    */
    class CSema : public CSemaCommon {
    private:
-      static const UBaseType_t max = 32767;
+      static const FakeUBaseType_t max = 32767;
 
-      SemaphoreHandle_t sem;
+      FakeSemaphoreHandle_t sem;
       const char * id;
 
    public:

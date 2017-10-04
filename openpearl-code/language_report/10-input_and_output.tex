@@ -470,25 +470,17 @@ DIM (number of elements), or\\
 DIM ($^*$)
 \end{itemize}
 
-\begin{discuss}
-Soll  TFU genutzt werden? --- Wenn ja, welche Semantik steckt dahinter?
-Wie wird zwischen nur Zeilen und nur Seiten unterschieden?
-Gibt es hierzu noch konkrete Anwendungen und Geräte?
-Mit den Formatangaben SKIP und PAGE laesst sich das doch auch erreichen!
-
-Dies ist Thema auf der AK-Sitzung im November 2016.
-
-
-
+\begin{modified}
 Furthermore, the typology indicates, how many data elements are
 transmitted {\em at least} upon the execution of {\em one} data
 transmission statement:
 \begin{itemize}
-\item If the attributes TFU and MAX are lacking, single data elements,
+\item If the attribute TFU is lacking, single data elements,
 lines or pages can be transmitted.
-\item Attribute TFU means that only lines or pages are transferable.\\
+\item Attribute \index{TFU@\textbf{TFU}}
+ means that only lines are transferable.\\
 If the actual number of data elements in a data transmission statement
-is less than the number of data elements of a line or page, this line or
+is less than the number of data elements of a line, this line or
 page, respectively, is implicitly padded with spaces (ALPHIC data
 stations) or zeros (BASIC data stations).
 
@@ -500,9 +492,21 @@ Example:
 
 This PUT statement has the effect that the five characters P, E, A, R,
 L are written out in one (new) line by Printer.
+\item TFU may only be used if the number of elements of a record is defined. 
+Obviously, it is not allowed for a typology like DIM(*).
+\item It is possible to use  SKIP additionally to indicate the end of line.
+Multiple SKIP-statements will produce empty lines on output.
+\item On input, a complete line will be processed.  Any data after the last
+read input  element will be discarded. A single SKIP statement at the end 
+of the line is ignored in the format list. Multiple SKIP statements will
+discard input lines.
+\item TFU enshures the correct record structure. Obviously
+{\bf STREAM} is not allowed in combination with TFU.
+\begin{removed}
 \item TFU MAX corresponds to TFU.
+\end{removed}
 \end{itemize}
-\end{discuss}
+\end{modified}
 
 The possible ways of accessing a data station are determined by the
 access attribute:
@@ -813,11 +817,6 @@ Examples:
 \item A task Measurement periodically acquires 14 temperature values
 (Procedure Get\_Temp), processes them, and writes them sequentially in
 blocks with 14 values in a logbook on the disk.
-
-\begin{discuss}
-TFU reminder
-
-\end{discuss}
 
 {\bf PROBLEM};\\
 \x {\bf SPC} Get\_Temp {\bf PROC}(i {\bf FIXED}) {\bf RETURNS} ({\bf FIXED}(15)) {\bf GLOBAL};\\
@@ -1331,14 +1330,14 @@ list format             & all given data types
 In detail, the formats have the following forms and meanings (the
 position statements were explained in \ref{sec_read_write}).
 
-%%%%%% added
-If no FormatOrPosition elements are specified the default format is {\bf LIST} for
-each data element terminated by a {\bf SKIP} positioning statement.
-%%%%%% end added
+\begin{modified}
+If no FormatOrPosition elements are specified the default format is {\bf LIST}
+ for each data element.
+\end{modified}
 
 %%%\begin{accepted}
 % already stated at read/write
-The positioning controls work diffently on {\bf FORWARD} and {\bf DIRECT}
+The positioning controls work differently on {\bf FORWARD} and {\bf DIRECT}
 dations. FORWARD dations does not allow to adjust the real position for read
 and write directly. 
 Thus the positioning discards input data in the GET statement and 
@@ -2063,9 +2062,16 @@ with n = ENTIER(k/3.32) + 2, m = ENTIER (k/3.32) + 3 were
 declared.
 \item {\bf Input}\\
 The input data can have any form permitted for the representation of
-constants. They are separated by a comma or at least two spaces. If no
+constants. 
+\begin{added}
+The same format replacements as on outout are used.
+Only one data element should be read in one input line.
+\end{added} 
+\begin{removed}
+They are separated by a comma or at least two spaces. If no
 constant is between two commas, the corresponding element of the
 variable list remains unchanged.
+\end{removed}
 \end{enumerate}
 
 Examples:

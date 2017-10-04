@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2014 Rainer Mueller
  All rights reserved.
 
@@ -32,11 +32,17 @@
 
 #include <signal.h>
 #include "Interrupt.h"
+/**
+\file
+*/
 
 namespace pearlrt {
-   /**
-   \file
+   /** 
+   \addtogroup interrupt
+   @{
+   */
 
+   /**
    \brief pseudo interrupt source
    */
 
@@ -76,6 +82,7 @@ namespace pearlrt {
       void devDisable();
 
    };
+   /** @} */
 }
 
 #endif

@@ -34,7 +34,7 @@
 
 \page Testprograms
 
-\section api
+\section api tests/api.cc
 
 This program demonstrates how the PEARL run time system may be used.
 It activates two tasks.

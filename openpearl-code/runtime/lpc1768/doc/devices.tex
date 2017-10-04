@@ -169,7 +169,7 @@ index & color  & rgb \\
 0 & black  & 0,0,0\\
 1 & red  & 170,0,0\\
 2 & green & 0, 170, 0 \\
-3 & yellow & 255,255,0 ???\\
+3 & yellow & 255,255,0 \\
 4 & blue & 0,0,170\\
 5 & magenta & 170,0,170\\
 6 & cyan & 0,170,170\\
@@ -203,10 +203,12 @@ may be attached to the system.
 The USB stack of LPCOpen is used.
 The USB stack was modified in order to remove active wait loops.
 The steps of the enumeration is now invoked from the usb-poll task, which
-runs on a cycle time of 10ms. The cycle limits were reduced to wait only one 
+runs on a cycle time of 1ms.
+The cycle limits were reduced to wait only one 
 or two intervals.
 
-The interrupt service routine was moved into the sepaarte module Lpc17xxISRProxy. 
+The interrupt service routine was moved into the separate module
+ Lpc17xxISRProxy. 
 This module invokes the interrupt service routine from LPCOpen via a
  dynamically set function pointer.
 
@@ -234,6 +236,14 @@ depends only on Chan FAT filesystem.
 The Lpc17xxUsbDisk configuration entry
 activates the low level device driver via the LPCOpen USB stack.
 
+\subsection{Lpc17xxSDCard}
+The SD-card support is solved with a generic approach.
+There is a platform independent part (see \ref{sec:SDCardSpi}), which
+needs the board specific support for the SPI-transfers of single 
+bytes and byte arrays, as well as a card detection function.
+The presnece of a card is monitored by the generic part with and 
+any status changes are treated at the next operation on the sd-card.
+
 \subsection{Device Summary}
 Table \ref{lpc17_device_list} contains all avaliable device drivers 
 with additional information for the system overview.
@@ -243,10 +253,10 @@ with additional information for the system overview.
 \hline
 Name             & Int\_Prio & Exception Number(s) & RAM & ROM \\
 \hline
-Lpc17xxRTC       &  5 & 33 \\ 
-Lpc17xxTimer0    &  5 &  17 \\
-Lpc17xxInterrupt & 10 &  37 \\
-Lpc17xxUart      & 10 &  21(UART0), 23(UART2) \\ 
+Lpc17xxRTC       &  5 & 33 & ? & ?\\ 
+Lpc17xxTimer0    &  5 &  17 & ? & ?\\
+Lpc17xxInterrupt & 10 &  37 & ? & ?\\
+Lpc17xxUart      & 10 &  21(UART0), 23(UART2) & ? & ?\\ 
 Lpc17xxUsbKeyboard  & 10 &  40 & 4kB & 8.9 kB \\ 
 \hline
 \end{tabular}

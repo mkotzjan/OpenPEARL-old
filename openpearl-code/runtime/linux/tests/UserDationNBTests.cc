@@ -34,7 +34,7 @@
 
 \page Testprograms
 
-\section Dation SystemDation
+\section UserDationNBTests tests/UserDationNBTests.cc
 Test routines generic non-basic systemdations
 
 There are several unit tests using the google test framework.
@@ -88,14 +88,14 @@ static pearlrt::Device* _myPipe = &myPipe;
 /**
 Test exception creation for 1 dimensional objects (number <=0)
 */
-TEST(UserDation, Dim1) {
+TEST(UserDationNB, Dim1) {
    pearlrt::Log::info("*** Dim1 start ***");
    ASSERT_THROW(
       pearlrt::DationDim1 dim(-1),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    ASSERT_THROW(
       pearlrt::DationDim1 dim(0),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    ASSERT_NO_THROW(
       pearlrt::DationDim1 dim(20));
    pearlrt::Log::info("*** Dim1 end ***");
@@ -110,7 +110,7 @@ test Dation DCL statements
 <li>..
 </ul>
 */
-TEST(UserDation, DCL) {
+TEST(UserDationNB, DCL) {
    pearlrt::Log::info("*** DCL start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -126,7 +126,7 @@ TEST(UserDation, DCL) {
                                 pearlrt::Dation::NOCYCL,
                                 NULL,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    // attribute defaulting
    pearlrt::Log::info("*** attribute defaulting ***");
    ASSERT_NO_THROW(
@@ -144,7 +144,7 @@ TEST(UserDation, DCL) {
                                 pearlrt::Dation::CYCLIC,
                                 &dim,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    ASSERT_NO_THROW(
       pearlrt::DationRW logbuch(disc_,
                                 pearlrt::Dation::INOUT |
@@ -165,14 +165,14 @@ TEST(UserDation, DCL) {
                                 pearlrt::Dation::FORWARD,
                                 &dim,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    // missing positioning
    ASSERT_THROW(
       pearlrt::DationRW logbuch(disc_,
                                 pearlrt::Dation::INOUT,
                                 &dim,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    // multiple direction
    ASSERT_THROW(
       pearlrt::DationRW logbuch(disc_,
@@ -180,7 +180,7 @@ TEST(UserDation, DCL) {
                                 pearlrt::Dation::OUT,
                                 &dim,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    // multiple positioning
    ASSERT_THROW(
       pearlrt::DationRW logbuch(disc_,
@@ -188,7 +188,7 @@ TEST(UserDation, DCL) {
                                 pearlrt::Dation::DIRECT,
                                 &dim,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    // incompatible capabilities (Disc supports FORWARD and DIRECT)
    pearlrt::Log::info("test incomp. caps");
    ASSERT_THROW(
@@ -197,7 +197,7 @@ TEST(UserDation, DCL) {
                                 pearlrt::Dation::FORBACK,
                                 &dim,
                                 pearlrt::Fixed<15>(1)),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    pearlrt::Log::info("*** DCL start ***");
 }
 
@@ -207,7 +207,7 @@ Tests IDF in combinations with OLD,NEW,ANY
 
 Close(CAN) is expected to work
 */
-TEST(UserDation, OPEN) {
+TEST(UserDationNB, OPEN) {
    pearlrt::Log::info("*** OPEN start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _myPipe;
@@ -240,12 +240,12 @@ TEST(UserDation, OPEN) {
          pearlrt::Dation::ANY ,
          &filename,
          (pearlrt::Fixed<15>*)NULL),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    ASSERT_NO_THROW(
       logbuch.dationOpen(
          pearlrt::Dation::ANY | pearlrt::Dation::RST ,
          &filename,&error));
-   ASSERT_EQ(error.x, pearlrt::theIllegalParamSignal.whichRST());
+   ASSERT_EQ(error.x, pearlrt::theInternalDationSignal.whichRST());
    pearlrt::Log::info("*** idf +  no old/new/any  ***");
    ASSERT_NO_THROW(
       logbuch.dationOpen(
@@ -272,7 +272,7 @@ TEST(UserDation, OPEN) {
          pearlrt::Dation::CAN ,
          &filename,
          (pearlrt::Fixed<15>*)NULL),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    pearlrt::Log::info("*** successful open  ***");
    ASSERT_NO_THROW(
       logbuch.dationOpen(
@@ -287,7 +287,7 @@ TEST(UserDation, OPEN) {
    ASSERT_THROW(
       logbuch.dationOpen(pearlrt::Dation::NEW ,
                          (pearlrt::Character<1>*)(NULL), (pearlrt::Fixed<15>*)NULL),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
    ASSERT_NO_THROW(
       logbuch.dationOpen(0 , (pearlrt::Character<1>*)(NULL), (pearlrt::Fixed<15>*)NULL));
    logbuch.dationClose(0, (pearlrt::Fixed<15>*)0);
@@ -298,7 +298,7 @@ TEST(UserDation, OPEN) {
          pearlrt::Dation::IDF ,
          & filename,
          (pearlrt::Fixed<15>*)NULL),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
 
    pearlrt::Log::info("*** OPEN no IDF on Pipe");
    ASSERT_NO_THROW(
@@ -315,7 +315,7 @@ TEST(UserDation, OPEN) {
 /**
 Test CAN + PRM option in OPEN and CLOSE statements
 */
-TEST(UserDation, OpenClose) {
+TEST(UserDationNB, OpenClose) {
    pearlrt::Log::info("*** OpenClose start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -388,7 +388,7 @@ TEST(UserDation, OpenClose) {
    ASSERT_THROW(
       logbuch.dationClose(pearlrt::Dation::CAN |
                           pearlrt::Dation::PRM, (pearlrt::Fixed<15>*)0),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
    logbuch.dationClose(pearlrt::Dation::CAN, (pearlrt::Fixed<15>*)0);
    pearlrt::Log::info("*** OpenClose end ***");
 }
@@ -396,7 +396,7 @@ TEST(UserDation, OpenClose) {
 /**
 test basic positioning operations on DIRECT dation
 */
-TEST(UserDation, PosBasic) {
+TEST(UserDationNB, PosBasic) {
    pearlrt::Log::info("*** PosBasic start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -421,7 +421,7 @@ TEST(UserDation, PosBasic) {
             (pearlrt::Fixed<15>*)NULL));
       ASSERT_THROW(
          logbuch.pos(1),
-         pearlrt::PositioningForbiddenSignal);
+         pearlrt::InternalDationSignal);
       logbuch.dationClose(pearlrt::Dation::CAN, (pearlrt::Fixed<15>*)0);
    }
    pearlrt::Log::info("*** invalid POS on DIRECT ***");
@@ -458,7 +458,7 @@ TEST(UserDation, PosBasic) {
 test positioning on DIRECT DIM(10)
 with CYCIC,NOCYCL and STREAM
 */
-TEST(UserDation, Dim1_20_Pos) {
+TEST(UserDationNB, Dim1_20_Pos) {
    pearlrt::Log::info("*** Dim1Pos DIM(20) start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -543,7 +543,7 @@ TEST(UserDation, Dim1_20_Pos) {
 test positioning on DIRECT DIM()
 with CYCIC,NOCYCL and STREAM
 */
-TEST(UserDation, Dim1_unbound_Pos) {
+TEST(UserDationNB, Dim1_unbound_Pos) {
    pearlrt::Log::info("*** Dim1Pos DIM(*) start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -589,7 +589,7 @@ TEST(UserDation, Dim1_unbound_Pos) {
                                    pearlrt::Dation::CYCLIC,
                                    &dim,
                                    pearlrt::Fixed<15>(1)),
-         pearlrt::IllegalParamSignal);
+         pearlrt::InternalDationSignal);
    }
    pearlrt::Log::info("*** Dim1Pos end ***");
 }
@@ -599,7 +599,7 @@ TEST(UserDation, Dim1_unbound_Pos) {
 test positioning on DIRECT DIM(10,20)
 with CYCIC,NOCYCL and STREAM, NOSTREAM
 */
-TEST(UserDation, Dim2_10x20_Pos) {
+TEST(UserDationNB, Dim2_10x20_Pos) {
    pearlrt::Log::info("*** Dim2Pos DIM(10,20) start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -728,7 +728,7 @@ TEST(UserDation, Dim2_10x20_Pos) {
 test positioning on DIRECT DIM(*,20)
 with CYCIC,NOCYCL and STREAM, NOSTREAM
 */
-TEST(UserDation, Dim2_20_Pos) {
+TEST(UserDationNB, Dim2_20_Pos) {
    pearlrt::Log::info("*** Dim2Pos DIM(*,20) start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -791,7 +791,7 @@ TEST(UserDation, Dim2_20_Pos) {
                                    pearlrt::Dation::CYCLIC,
                                    &dim,
                                    pearlrt::Fixed<15>(1)),
-         pearlrt::IllegalParamSignal);
+         pearlrt::InternalDationSignal);
    }
    pearlrt::Log::info("*** Dim2Pos end ***");
 }
@@ -800,7 +800,7 @@ TEST(UserDation, Dim2_20_Pos) {
 test positioning on DIRECT DIM(5,10,20)
 with CYCIC,NOCYCL and STREAM, NOSTREAM
 */
-TEST(UserDation, Dim3_5x10x20_Pos) {
+TEST(UserDationNB, Dim3_5x10x20_Pos) {
    pearlrt::Log::info("*** Dim3Pos DIM(5,10,20) start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -965,7 +965,7 @@ TEST(UserDation, Dim3_5x10x20_Pos) {
 test positioning on DIRECT DIM(*,10,20)
 with CYCIC,NOCYCL and STREAM, NOSTREAM
 */
-TEST(UserDation, Dim3_10x20_Pos) {
+TEST(UserDationNB, Dim3_10x20_Pos) {
    pearlrt::Log::info("*** Dim3Pos DIM(*,10,20) start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -1048,7 +1048,7 @@ TEST(UserDation, Dim3_10x20_Pos) {
                                    pearlrt::Dation::CYCLIC,
                                    &dim,
                                    pearlrt::Fixed<15>(1)),
-         pearlrt::IllegalParamSignal);
+         pearlrt::InternalDationSignal);
    }
    pearlrt::Log::info("*** Dim3Pos end ***");
 }
@@ -1085,13 +1085,13 @@ TEST(Userdation, RST) {
             pearlrt::Dation::OLD ,
             (pearlrt::Character<1>*)0,  // missing filename
             &rst));
-      ASSERT_EQ(rst.x, pearlrt::theIllegalParamSignal.whichRST());
+      ASSERT_EQ(rst.x, pearlrt::theDationParamSignal.whichRST());
 
       ASSERT_THROW(
          logbuch.dationClose(0, (pearlrt::Fixed<15>*)0),
-         pearlrt::NotAllowedSignal);
+         pearlrt::DationNotOpenSignal);
       logbuch.dationClose(pearlrt::Dation::RST, &rst);
-      ASSERT_EQ(rst.x, pearlrt::theNotAllowedSignal.whichRST());
+      ASSERT_EQ(rst.x, pearlrt::theDationNotOpenSignal.whichRST());
 
       ASSERT_THROW(
          logbuch.dationClose(pearlrt::Dation::RST, &rst5),
@@ -1161,7 +1161,7 @@ TEST(Userdation, RST) {
 test positioning on FORWARD DIM(10,20)
 with CYCIC,NOCYCL and STREAM, NOSTREAM
 */
-TEST(UserDation, Dim3_10x20_PosForward) {
+TEST(UserDationNB, Dim3_10x20_PosForward) {
    pearlrt::Log::info("*** Dim3Pos DIM(*,10,20) FORWARD start ***");
    pearlrt::Character<9> filename("file1.txt");
    extern pearlrt::Device* _disc;
@@ -1191,10 +1191,10 @@ TEST(UserDation, Dim3_10x20_PosForward) {
       ASSERT_NO_THROW(logbuch.adv(1, 4, 9));
       ASSERT_THROW(
          logbuch.sop(&p, &r, &c),
-         pearlrt::PositioningForbiddenSignal);
+         pearlrt::InternalDationSignal);
       ASSERT_THROW(
          logbuch.adv(-1),
-         pearlrt::NotAllowedSignal);
+         pearlrt::InvalidPositioningSignal);
       logbuch.dationClose(0, (pearlrt::Fixed<15>*)0);
    }
 }

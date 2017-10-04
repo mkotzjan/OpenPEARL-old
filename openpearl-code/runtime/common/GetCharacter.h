@@ -1,7 +1,7 @@
 #ifndef GETCHARACTER_H_INCLUDED
 #define GETCHARACTER_H_INCLUDED
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -48,7 +48,13 @@
 
 namespace pearlrt {
    /**
-      Input processing of character values.
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+      \brief Input processing of character values.
+      \tparam S the length of the Character variable
    */
    template <size_t S>
    class GetCharacter {
@@ -90,6 +96,7 @@ namespace pearlrt {
           helper.readCharacterByA(&rc);
       }
    };
+   /* @} */
 }
 #endif
 

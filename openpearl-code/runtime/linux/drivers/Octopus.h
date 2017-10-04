@@ -87,7 +87,7 @@ namespace pearlrt {
       \param width is the number of bits (1..8)
       \param mode marks the kind of usage (DIGIN, DIGOUT, ...)
 
-      \throws IllegalParamSignal if a conflict is detected
+      \throws DationParamSignal if a conflict is detected
       */
       void usePortBits(char port, int start, int width, OctopusMode mode);
 

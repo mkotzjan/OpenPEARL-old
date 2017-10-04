@@ -50,10 +50,13 @@ This module contains the output formatting of FIXED F(w,d,s)-format
 
 using namespace std;
 namespace pearlrt {
+   /**
+   \addtogroup io_common_helper
+   @{
+   */
 
    /**
-   Class containing the output formatting of float variables
-   all methods are defined as static.
+   \brief Class containing the output formatting of float variables.
 
    \tparam S length of the Float type
 
@@ -206,6 +209,8 @@ namespace pearlrt {
 
       The value will be set right adjusted into the output field.
 
+      \todo move implementation into non template version
+
       \param floatValue the data to be formatted
       \param w the width of the output field.
       \param d the number of post decimal point digits.
@@ -247,7 +252,7 @@ namespace pearlrt {
          }
 
          if ( eSize.x != 2 && eSize.x != 3) {
-            Log::info("E: exponent field with illegal (%d)", eSize.x);
+            Log::info("E: exponent field with illegal (%d)", (int)eSize.x);
             throw theExpFormatSignal;
          }
 
@@ -365,6 +370,7 @@ namespace pearlrt {
          sink.putChar(ch);
       }
    };
+   /** @} */
 }
 #endif
 

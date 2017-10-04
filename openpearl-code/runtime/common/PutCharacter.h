@@ -52,35 +52,15 @@ using namespace std;
 namespace pearlrt {
 
    /**
-   Class containing the output formatting of character variables
-   all methods are defined as static.
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+   \brief Class containing the output formatting of character variables
 
 
-   Sample usage in PEARL:
-   \verbatim
-   DCL x CHAR(5) INIT('ABC');
-   ...
-   PUT x TO console BY A(7);
-   PUT x TO console BY A;
-   \endverbatim
-
-   Should compile in C++ to:
-   \verbatim
-   //DCL x CHAR(5) INIT('ABC');
-   pearlrt::Character<5> x("ABC");
-   ...
-   // the console object should provide access to the data sink object
-   //PUT x TO console BY A(7);
-   pearlrt::PutCharacter<5>:toA(x, 7, console.getSink());
-   //PUT x TO console BY A;
-   pearlrt::PutCharacter<5>:toA(x,console.getSink());
-   \endverbatim
-   Producing the output of 'ABC__' (where _ denotes a space) and
-   'ABC'.
-
-   If width is given as 0, no characters are sent to the output.
-
-   If width is < 0, and error is returned.
+   \tparam S the size of the Character variable
    */
    template<size_t S>
    class PutCharacter {
@@ -100,9 +80,6 @@ namespace pearlrt {
 
       The value will be set left adjusted into the output field,
       if w > S.
-
-      \note in difference to the language report, w<0 causes
-            an error behavior, with nothing sent to the output
 
       \param charValue the data to be formatted
       \param w the width of the output field.
@@ -138,6 +115,7 @@ namespace pearlrt {
       }
 
    };
+   /** @} */
 }
 #endif
 

@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2014-2014 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,9 @@
 
 \page Testprograms
 
-\section DationPG
+\section DationPGTests tests/DationPGTests.cc
 
+Test case for gtest for PUT/GET operations
 
 */
 #include <gtest/gtest.h>
@@ -63,7 +64,6 @@ static pearlrt::Device* _disc = &disc;
 /**
   Writing simple text to  testfile and verify by binary read with DationRW
 */
-
 TEST(DationPG, simple_put) {
    pearlrt::Log::info("*** DationPG: simple_put start ***");
    pearlrt::Character<9> filename("put_1.txt");
@@ -128,7 +128,6 @@ TEST(DationPG, simple_put) {
   Writing simple using binary write to testfile
   and verify by GET read with DationPG
 */
-
 TEST(DationPG, simple_get) {
    pearlrt::Log::info("*** DationPG: simple_get start ***");
    pearlrt::Character<9> filename("get_1.txt");
@@ -199,7 +198,6 @@ TEST(DationPG, simple_get) {
 /**
   test signals on CYCLIC and DationPG
 */
-
 TEST(DationPG, cyclicFails) {
    pearlrt::Log::info("*** DationPG: cyclic fails ***");
    pearlrt::SystemDationNB* disc_ =
@@ -212,7 +210,7 @@ TEST(DationPG, cyclicFails) {
                                 pearlrt::Dation::STREAM |
                                 pearlrt::Dation::CYCLIC,
                                 &dim),
-      pearlrt::IllegalParamSignal);
+      pearlrt::InternalDationSignal);
 }
 
 /**
@@ -309,6 +307,9 @@ TEST(DationPG, signal_get) {
    logbuch.dationClose(0, (pearlrt::Fixed<15>*)0);
 }
 
+/**
+test on closed files
+*/
 TEST(DationPG, notOpened) {
    pearlrt::Log::info("*** DationPG: not opened start ***");
    pearlrt::Character<9> filename("put_1.txt");
@@ -334,5 +335,151 @@ TEST(DationPG, notOpened) {
    pearlrt::Character<8> text("PEARL");
    pearlrt::Fixed<31>  x(42);
    ASSERT_THROW(logbuch.beginSequence(NULL),
-      pearlrt::NotAllowedSignal);
+      pearlrt::DationNotOpenSignal);
+}
+
+/**
+test for NOSTREAM overflow detection
+*/
+TEST(DationPG, lineOverflow) {
+   pearlrt::Log::info("*** DationPG: line overflow start ***");
+   pearlrt::Character<9> filename("put_3.txt");
+   pearlrt::SystemDationNB* disc_ =
+      static_cast<pearlrt::SystemDationNB*>(_disc);
+   pearlrt::DationDim1 dim(15);
+   pearlrt::Fixed<15> rstValue;
+   /* -------------------------------------------- */
+   pearlrt::Log::info("      DationPG: line overflow start   ");
+   pearlrt::DationPG logbuch(disc_,
+                             pearlrt::Dation::OUT |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::NOSTREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim);
+   ASSERT_NO_THROW(
+      logbuch.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::ANY ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+   pearlrt::Character<8> text("PEARL");
+   logbuch.beginSequence(NULL);
+   try {
+      logbuch.rst(rstValue);
+      logbuch.toA(text);
+      logbuch.toA(text);
+      logbuch.toA(text);
+   } catch (pearlrt::Signal & s) {
+      if (!logbuch.updateRst(&s)) {
+         logbuch.endSequence();
+         throw;
+      }
+
+      logbuch.endSequence();
+   };
+   ASSERT_EQ(pearlrt::theDationIndexBoundSignal.whichRST(),
+             rstValue.x);
+   printf("rstval=%d\n", rstValue.x);
+
+   logbuch.dationClose(pearlrt::Dation::PRM, (pearlrt::Fixed<15>*)0);
+ 
+#if 0   /* read binary and compare */
+   pearlrt::Character<1> data[12];
+   pearlrt::Character<1> rdata[12];
+   data[0] = pearlrt::toChar('P');
+   data[1] = pearlrt::toChar('E');
+   data[2] = pearlrt::toChar('A');
+   data[3] = pearlrt::toChar('R');
+   data[4] = pearlrt::toChar('L');
+   data[5] = pearlrt::toChar(' ');
+   data[6] = pearlrt::toChar(' ');
+   data[7] = pearlrt::toChar(' ');
+   data[8] = pearlrt::toChar('\n');
+   data[9] = pearlrt::toChar(' ');
+   data[10] = pearlrt::toChar('4');
+   data[11] = pearlrt::toChar('2');
+   pearlrt::DationRW log_bin(disc_,
+                             pearlrt::Dation::IN |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::STREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim,
+                             (pearlrt::Fixed<15>)1);
+   ASSERT_NO_THROW(
+      log_bin.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::OLD ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+   log_bin.dationRead(&rdata, sizeof(rdata));
+   log_bin.dationClose(0, (pearlrt::Fixed<15>*)0);
+   ASSERT_TRUE(
+      ARRAY_EQUAL(12, data, rdata));
+#endif
+}
+
+/**
+test for EOF operation
+*/
+TEST(DationPG, eof) {
+   pearlrt::Log::getInstance()->setLevel(0x0f);
+   pearlrt::Log::info("*** DationPG: eof start ***");
+   pearlrt::Character<9> filename("put_4.txt");
+   pearlrt::SystemDationNB* disc_ =
+      static_cast<pearlrt::SystemDationNB*>(_disc);
+   pearlrt::DationDim2 dim(15);
+   pearlrt::Fixed<15> rstValue;
+   pearlrt::Fixed<15> line;
+   /* -------------------------------------------- */
+   pearlrt::DationPG logbuch(disc_,
+                             pearlrt::Dation::OUT |
+                             pearlrt::Dation::FORWARD |
+                             pearlrt::Dation::NOSTREAM |
+                             pearlrt::Dation::NOCYCL,
+                             &dim);
+   ASSERT_NO_THROW(
+      logbuch.dationOpen(
+         pearlrt::Dation::IDF |
+         pearlrt::Dation::ANY ,
+         & filename,
+         (pearlrt::Fixed<15>*)NULL));
+   pearlrt::Character<8> text("PEARL");
+   for (int i=0; i<4; i++) {
+      logbuch.beginSequence(NULL);
+      try {
+         logbuch.rst(rstValue);
+         logbuch.toF(line,6);
+         line = line + pearlrt::Fixed<15>(1);
+         logbuch.toA(text);
+         logbuch.toSkip(1);
+      } catch (pearlrt::Signal & s) {
+         if (!logbuch.updateRst(&s)) {
+            logbuch.endSequence();
+            throw;
+         }
+
+      }
+      logbuch.endSequence();
+   }
+      line = pearlrt::Fixed<15>(10);
+      logbuch.beginSequence(NULL);
+      try {
+         logbuch.rst(rstValue);
+         logbuch.eof();
+         logbuch.toF(line,6);
+         line = line + pearlrt::Fixed<15>(1);
+         logbuch.toA(text);
+         logbuch.toSkip(1);
+      } catch (pearlrt::Signal & s) {
+         if (!logbuch.updateRst(&s)) {
+            logbuch.endSequence();
+            throw;
+         }
+
+      }
+      logbuch.endSequence();
+      ASSERT_EQ(rstValue.x, 0);
+
+   logbuch.dationClose(pearlrt::Dation::PRM, (pearlrt::Fixed<15>*)0);
+   pearlrt::Log::info("*** DationPG: eof end ***");
 }

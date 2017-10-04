@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2014 Rainer Mueller
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@
 #include "DationDim.h"
 #include "SystemDationNBSink.h"
 #include "SystemDationNBSource.h"
+#include "IOFormats.h"
 #include "PutFixed.h"
 #include "GetFixed.h"
 #include "GetFloat.h"
@@ -59,7 +60,15 @@ namespace pearlrt {
            with the class attribute "ALPHIC"
    */
 
+   /** 
+   \addtogroup io_common
+   @{
+   */
+
    /**
+   \brief READ/WRITE-userdation interface for userdations
+           with the class attribute "ALPHIC".
+
      Defines the methods for the communication of userdations
      (with class attribute "ALPHIC").
      They read/write with the methods PUT/GET (defined by PEARL)
@@ -76,7 +85,7 @@ namespace pearlrt {
       home: Disc("/home/", 5);
 
    PROBLEM;
-      SPC home DATION INOUT ALL;
+      SPC home DATION SYSTEM INOUT ALL;
       DCL table DATION OUT ALPHIC DIM(*,20)
                 FORWARD NOCYCLIC STREAM CREATED(home);
 
@@ -137,7 +146,7 @@ namespace pearlrt {
 
       */
 
-   class DationPG: public UserDationNB {
+   class DationPG: public UserDationNB, public IOFormats {
 
    private:
 
@@ -156,7 +165,7 @@ namespace pearlrt {
       SystemDationNBSource   source;
 
       /** helper method for templated parameters */
-      void doPutChar(int length, RefCharacter * rc);
+      //void doPutChar(int length, RefCharacter * rc);
 
    public:
       /**
@@ -201,8 +210,8 @@ namespace pearlrt {
       \param dationParam specified the dation type (DIRECT,FORWARD,..)
       \throws may throw different exceptions - not defined yet
       */
-
       void dationSeek(const Fixed<31> & p, const int dationParam);
+
       /**
        return a character back to the input source
        \param c the character to be returned
@@ -210,302 +219,14 @@ namespace pearlrt {
       void dationUnGetChar(const char c);
 
       /**
-      output format A
+      check if enough space/data is available for the operation
 
-      \param s string to be printed
-      \tparam S size of the string
+      \param n number of bytes which are wanted to read or write
+
+      \throws DationIndexBoundSignal if the dation has less space
       */
-      template<size_t S>
-      void toA(Character<S> & s) {
-         toA(s, S);
-      };
-
-      /**
-      input format A
-
-      \param s string to be read
-      \tparam S size of the string
-      */
-      template<size_t S>
-      void fromA(Character<S> & s) {
-         fromA(s, S);
-      };
-
-      /**
-      output format A(w)
-
-      \param s string to be printed
-      \param w width of the output field
-      \tparam S size of the string
-      */
-      template<size_t S>
-      void toA(Character<S> & s, Fixed<31> w) {
-         RefCharacter rc;
-         rc.setWork(s);
-         // performs checks and output
-         return doPutChar(w.x, &rc);
-      }
-
-      /**
-      input format A(w)
-
-      \param s string to be read
-      \param w width of the input field
-      \tparam S size of the string
-      */
-
-      template<size_t S>
-      void fromA(Character<S> & s, Fixed<31> w) {
-         GetCharacter<S>::fromA(s, w, source);
-         return;
-      }
-
-
-      /**
-      output format B1(w)
-
-      \param s string to be printed
-      \param w width of the output field
-      \tparam S size of the string
-      */
-      template<int S>
-      void toB1(BitString<S>  s, Fixed<31> w) {
-         PutBitString<S>::toB1(s,w,sink);
-      }
-
-      /**
-      input format B1(w)
-
-      \param s string to be read
-      \param w width of the input field
-      \tparam S size of the string
-      */
-      template<int S>
-      void fromB1(BitString<S> & s, Fixed<31> w) {
-         GetBitString<S>::fromB123(s, w, 1, source);
-         return;
-      }
-
-      /**
-      output format B2(w)
-
-      \param s string to be printed
-      \param w width of the output field
-      \tparam S size of the string
-      */
-      template<int S>
-      void toB2(BitString<S>  s, Fixed<31> w) {
-         PutBitString<S>::toB2(s,w,sink);
-      }
-
-      /**
-      input format B2(w)
-
-      \param s string to be read
-      \param w width of the input field
-      \tparam S size of the string
-      */
-      template<int S>
-      void fromB2(BitString<S> & s, Fixed<31> w) {
-         GetBitString<S>::fromB123(s, w, 2, source);
-         return;
-      }
-
-      /**
-      output format B3(w)
-
-      \param s string to be printed
-      \param w width of the output field
-      \tparam S size of the string
-      */
-      template<int S>
-      void toB3(BitString<S>  s, Fixed<31> w) {
-         PutBitString<S>::toB3(s,w,sink);
-      }
-
-      /**
-      input format B3(w)
-
-      \param s string to be read
-      \param w width of the input field
-      \tparam S size of the string
-      */
-      template<int S>
-      void fromB3(BitString<S> & s, Fixed<31> w) {
-         GetBitString<S>::fromB123(s, w, 3, source);
-         return;
-      }
-
-      /**
-      output format B4(w)
-
-      \param s string to be printed
-      \param w width of the output field
-      \tparam S size of the string
-      */
-      template<int S>
-      void toB4(BitString<S>  s, Fixed<31> w) {
-         PutBitString<S>::toB4(s,w,sink);
-      }
-
-      /**
-      input format B4(w)
-
-      \param s string to be read
-      \param w width of the input field
-      \tparam S size of the string
-      */
-      template<int S>
-      void fromB4(BitString<S> & s, Fixed<31> w) {
-         GetBitString<S>::fromB4(s, w, source);
-         return;
-      }
-
-
-      /**
-       output format F with Fixed
-
-       \param f value to be printed
-       \param w width of the output field
-       \param d number of decimals to be used
-       \tparam  S width of the fixed value type
-       */
-      template<int S>
-      void toF(Fixed<S>  f,
-               const Fixed<31> w,
-               const Fixed<31> d = 0) {
-         PutFixed<S>::toF(f, w, d, sink);
-      };
-
-      /**
-      input format F with FIXED
-
-      \param f value to be read
-      \param w width of the input field
-      \param d number of decimals to be used
-      \tparam  S width of the fixed value type
-      */
-      template<int S>
-      void fromF(Fixed<S> & f,
-                 const Fixed<31> w,
-                 const Fixed<31> d = 0) {
-         GetFixed<S>::fromF(f, w, d, source);
-      };
-
-      /**
-       output format F with FLOAT
-
-       \param f value to be printed
-       \param w width of the output field
-       \param d number of decimals to be used
-       \tparam  S width of the float value type
-       */
-      template<int S>
-      void toF(Float<S>  f,
-               const Fixed<31> w,
-               const Fixed<31> d = 0) {
-         PutFloat<S>::toF(f, w, d, sink);
-      };
-
-      /**
-      input format F with FLOAT
-
-      \param f value to be read
-      \param w width of the input field
-      \param d number of decimals to be used
-      \tparam  S width of the float value type
-      */
-      template<int S>
-      void fromF(Float<S> & f,
-                 const Fixed<31> w,
-                 const Fixed<31> d = 0) {
-         GetFloat<S>::fromF(f, w, d, source);
-      };
-
-
-      /**
-       output format E with FLOAT
-
-       \param f value to be printed
-       \param w width of the output field
-       \param d number of decimals to be used
-       \param s number of significant digits 
-       \param e number of digits in exponent field
-       \tparam  S width of the float value type
-       */
-      template<int S>
-      void toE(Float<S>  f,
-               const Fixed<31> w,
-               const Fixed<31> d,
-               const Fixed<31> s,
-               const Fixed<31> e) {
-         PutFloat<S>::toE(f, w, d, s, e, sink);
-      };
-
-      /**
-      input format E with FLOAT
-
-      \param f value to be read
-      \param w width of the input field
-      \param d number of decimals to be used
-      \param s number of significant digits 
-      \param e number of digits in exponent field
-      \tparam  S width of the fixed value type
-      */
-      template<int S>
-      void fromE(Float<S> & f,
-                 const Fixed<31> w,
-                 const Fixed<31> d,
-                 const Fixed<31> s) {
-         GetFloat<S>::fromE(f, w, d, s, source);
-      };
-
-
-      /**
-       output format T
-
-       \param f value to be printed
-       \param w width of the output field
-       \param d number of decimals to be used
-       */
-      void toT(const Clock f,
-               const Fixed<31> w,
-               const Fixed<31> d = 0);
-
-
-      /**
-      input format T
-
-      \param f value to be read
-      \param w width of the input field
-      \param d number of decimals to be used
-      */
-      void fromT(Clock & f,
-                 const Fixed<31> w,
-                 const Fixed<31> d = 0) ;
-
-      /**
-       output format D
-
-       \param f value to be printed
-       \param w width of the output field
-       \param d number of decimals to be used
-       */
-      void toD(const Duration f,
-               const Fixed<31> w,
-               const Fixed<31> d = 0);
-
-      /**
-       input format D
-
-       \param f value to be read
-       \param w width of the input field
-       \param d number of decimals to be used
-       */
-      void fromD(Duration& f,
-               const Fixed<31> w,
-               const Fixed<31> d = 0);
-
+      void checkCapacity(Fixed<31> n);
    };
+   /** @} */
 }
 #endif

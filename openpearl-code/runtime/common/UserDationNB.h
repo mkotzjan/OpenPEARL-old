@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2014 Rainer Mueller
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -64,9 +64,8 @@ namespace pearlrt {
    protected:
       /**
       The type of the dation is ether ALPHIC or TYPE;
-      UNKNOWN is obsolete.
       */
-      enum DationType {/* UNKNOWN = 0,*/ ALPHIC, TYPE};
+      enum DationType {ALPHIC, TYPE};
 
    private:
       static const Fixed<31> one;
@@ -223,7 +222,6 @@ namespace pearlrt {
       void sop(Fixed<31>* element);
 
       /**
-        row(line) write it to element.
 
         In case of the last position, the return value may be larger
         than the dimension specifies!
@@ -233,7 +231,7 @@ namespace pearlrt {
 
         \param row contains current row after execution
 
-        \throws NotAllowdSignal if dimension of the dation is one
+        \throws InternalDationSignal if dimension of the dation is one
 
         \note throws various exceptions
       */
@@ -253,7 +251,7 @@ namespace pearlrt {
 
         \param page contains current page after execution
 
-        \throws NotAllowesSignal if the dimension of the dation is
+        \throws InternalDationSignal if the dimension of the dation is
                 smaller than three
 
         \note throws various exceptions
@@ -271,7 +269,7 @@ namespace pearlrt {
 
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and c < 0
+        \throw PositioningFailedSignal if dation is FORWARD and c < 1
 
         \param c offset column versus current location
 
@@ -292,7 +290,8 @@ namespace pearlrt {
                violate the column boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and row < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param row offset position of the row versus the current location
         \param c offset column versus current location
@@ -316,7 +315,8 @@ namespace pearlrt {
                violate the row boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and page < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param page offset position of the row versus the current location
         \param row offset position of the row versus the current location
@@ -361,7 +361,7 @@ namespace pearlrt {
 
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and c < 0
+        \throw PositioningFailedSignal if dation is FORWARD and c < 1
 
         \param c offset column versus current location
 
@@ -382,7 +382,8 @@ namespace pearlrt {
                violate the column boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and row < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param row offset position of the row versus the current location
         \param c offset column versus current location
@@ -406,7 +407,8 @@ namespace pearlrt {
                violate the row boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw NotAllowedSignal if dation is FORWARD and page < 1
+        \throw PositioningFailedSignal if dation is FORWARD and 
+               the new position would be backward
 
         \param page offset position of the row versus the current location
         \param row offset position of the row versus the current location
@@ -447,6 +449,11 @@ namespace pearlrt {
       void fromPage(const Fixed<31> n);
 
       /**
+      position to EOF (end of file)
+      */
+      void eof();
+    
+      /**
         internal open function. build path to device, performs
         pre and post Open and creates the FILE descriptor (dev)
 
@@ -465,6 +472,7 @@ namespace pearlrt {
 
       */
       virtual void internalClose() = 0;
+
 
    private:
       /**
@@ -488,14 +496,16 @@ namespace pearlrt {
    protected:
       /** assert dation properties
 
-       \throw NotAllowedSignal if condition is not met
+       \throw InternalDationSignal if dation is not direct
+       \throw DationNotOpenSignal if dation is not opened
       */
 
       void assertOpenDirect();
 
       /** assert dation properties
 
-       \throw NotAllowedSignal if condition is not met
+       \throw DationNotSupportedSignal if dation is nether DIRECT nor FORWARD
+       \throw DationNotOpenSignal if dation is not opened
       */
       void assertOpenDirectOrForward();
    };

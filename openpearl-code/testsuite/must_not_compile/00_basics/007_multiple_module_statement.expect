@@ -1,0 +1,3 @@
+007_multiple_module_statement.prl:3:0: ERROR : Syntax error :mismatched input 'MODULE' expecting {'MODEND', 'SYSTEM', 'PROBLEM', '__cpp__', '__cpp'}
+MODULE(m2);
+     ^

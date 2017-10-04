@@ -120,7 +120,7 @@ namespace pearlrt {
                                      PROT_READ | PROT_WRITE,
                                      MAP_SHARED, mem_fd, 0);
 
-         if ((uint32_t)gpio_map < 0) {
+         if ((void*)gpio_map == MAP_FAILED) {
             Log::error("could not map GPIO registers");
             throw theInternalDationSignal;
          }
@@ -143,7 +143,7 @@ namespace pearlrt {
          if ((availableBits & (1 << gpio)) == 0) {
             Log::error("RPiGpio: bit %d is multiple used or not available",
                        gpio);
-            throw theIllegalParamSignal;
+            throw theDationParamSignal;
          }
 
          availableBits &= ~(1 << gpio);

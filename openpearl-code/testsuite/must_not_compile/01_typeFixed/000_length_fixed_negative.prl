@@ -1,0 +1,7 @@
+MODULE(m1);
+
+PROBLEM;
+LENGTH FIXED (-1);
+
+MODEND;
+

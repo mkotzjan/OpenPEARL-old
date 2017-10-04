@@ -34,8 +34,11 @@
 
 namespace pearlrt {
    /**
-   \file
+   \addtogroup interrupt
+   @{
+   */
 
+   /**
    \brief interrupt type
 
    Interrupts may be used to trigger task activation and continuation.
@@ -163,7 +166,7 @@ namespace pearlrt {
       virtual void devDisable()=0;
 
    };
-
+   /** @} */
 }
 
 #endif

@@ -30,6 +30,7 @@
 #ifndef ARRAY_H_INCLUDED
 #define ARRAY_H_INCLUDED
 
+
 /**
 \file
 
@@ -51,17 +52,6 @@ the number of dimensions. There is no limit for array dimensions.
 #include "Signals.h"
 #include "Log.h"
 
-#if (TARGET == 2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1)
-/** 
-  disable stack checking for the template methods in the applicaton code
-*/
-# define NOSTACKCHECK __attribute__((no_instrument_function))
-#else
-/** 
-  stack checking by instrumentation is not supported by linux gcc
-*/
-# define NOSTACKCHECK /* nothing */
-#endif
 
 // some preprocessor definitions
 
@@ -176,6 +166,5 @@ template <int DIM>
    };
    
 }
-# undef NOSTACKCHECK
 #endif
 

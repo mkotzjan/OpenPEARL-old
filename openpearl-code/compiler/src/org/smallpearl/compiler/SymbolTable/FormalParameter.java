@@ -18,7 +18,7 @@ public class FormalParameter {
     }
 
     public String toString() {
-        return this.name + (this.assignmentProtection ? " INV " : " " ) + this.type;
+        return (this.assignmentProtection ? " INV " : " " ) + this.type;
     }
 
 

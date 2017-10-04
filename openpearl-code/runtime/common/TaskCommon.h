@@ -42,19 +42,22 @@
 namespace pearlrt {
    class TaskCommon;
    class Semaphore;
+   class Bolt;
 
    /** reasons for blocking a task
    */
    enum BlockReason {
       NOTBLOCKED,               ///< task is currently not blocked
-      REQUEST                   ///< task is block due to request
+      REQUEST,                  ///< task is block due to REQUEST
+      ENTER,                    ///< task is block due to ENTER
+      RESERVE                   ///< task is block due to RESERVE
    };
 
    /**
     data structure for blocking request
 
     This structure and the methods block/unblock are needed for the
-    plattform independend Semaphore-class.
+    platform independend Semaphore-class.
    */
    struct BlockData {
       BlockReason reason;	///< reason for blocking
@@ -70,6 +73,14 @@ namespace pearlrt {
             int nsemas;	///< number of semaphores in the REQUEST call
             Semaphore **semas;	///< pointer to the array of semaphores
          } sema;	///< \returns the semaphore component of blocking
+
+         /**
+         blocking due to ENTER or RESERVE operation
+         */
+         struct BlockBolt {
+            int nbolts;	///< number of bolts in the ENTER/RESERVE call
+            Bolt **bolts;	///< pointer to the array of bolts
+         } bolt;	///< \returns the bolt component of blocking
       } u;		///< \returns the union containing all blocking requests
    };
 

@@ -1,0 +1,6 @@
+030_spc_ident_noname.prl:5:20: ERROR : Syntax error :mismatched input ';' expecting '('
+   SPC x FIXED IDENT;
+                    ^
+030_spc_ident_noname.prl:7:0: ERROR : Syntax error :extraneous input 'END' expecting {'MODEND', 'SPECIFY', 'SPC', 'DECLARE', 'DCL', '__cpp__', '__cpp', 'LENGTH', ID}
+END;
+  ^

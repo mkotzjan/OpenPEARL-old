@@ -17,9 +17,9 @@ PROBLEM;
    DCL tab2 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk);
    DCL tab3 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk);
    DCL tabdisk2 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk2);
-   DCL fileName1 CHAR(12) INIT('FILE1.TXT');
-   DCL fileName2 CHAR(12) INIT('FILE2.TXT');
-   DCL fileName3 CHAR(12) INIT('FILE3.TXT');
+   DCL fileName1 CHAR(9) INIT('FILE1.TXT');
+   DCL fileName2 CHAR(9) INIT('FILE2.TXT');
+   DCL fileName3 CHAR(9) INIT('FILE3.TXT');
    DCL tab DATION INOUT FIXED(15) DIM(30,30) DIRECT CREATED(disk);
 
 ttt: TASK MAIN;
@@ -102,7 +102,7 @@ t2: TASK;
    PUT 'end of TASK t2' TO console BY A, SKIP;
 END;
 
-checkerfield: PROC(fn CHAR(12));
+checkerfield: PROC(fn CHAR(9));
    DCL (data,data2) FIXED(15);
    DCL ok BIT(1) INIT('1'B1);
    ! DCL tab DATION INOUT FIXED(15) DIM(30,30) DIRECT CREATED(disk);

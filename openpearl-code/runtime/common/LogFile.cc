@@ -45,12 +45,12 @@ namespace pearlrt {
 
       if (_provider == NULL) {
          Log::error("LogFile: No provider given");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (fileName == NULL) {
          Log::error("LogFile: No file name given");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       provider = _provider;

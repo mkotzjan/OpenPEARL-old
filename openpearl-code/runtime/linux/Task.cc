@@ -52,6 +52,7 @@
 #include "PrioMapper.h"
 #include "BitString.h"
 #include "Semaphore.h"
+#include "Bolt.h"
 
 namespace pearlrt {
 
@@ -130,6 +131,7 @@ namespace pearlrt {
          }
 
          Semaphore::updateWaitQueue(this);
+         Bolt::updateWaitQueue(this);
 
       // no break here! setting the priority is included
       //    in RUNNING/SUSPENDED
@@ -547,6 +549,36 @@ namespace pearlrt {
             for (int j = 0; j < blockParams.why.u.sema.nsemas; j++) {
                Semaphore * s = blockParams.why.u.sema.semas[j] ;
                sprintf(help, " %s(%d)", s->getName(), s->getValue());
+
+               if (strlen(line[i]) + strlen(help) < 80) {
+                  strcat(line[i], help);
+               }
+            }
+
+            break;
+
+         case RESERVE:
+            sprintf(line[i], "RESERVEing %d BOLTs:",
+                    blockParams.why.u.bolt.nbolts);
+
+            for (int j = 0; j < blockParams.why.u.bolt.nbolts; j++) {
+               Bolt * s = blockParams.why.u.bolt.bolts[j];
+               sprintf(help, " %s(%s)", s->getName(), s->getStateName());
+
+               if (strlen(line[i]) + strlen(help) < 80) {
+                  strcat(line[i], help);
+               }
+            }
+
+            break;
+
+         case ENTER:
+            sprintf(line[i], "ENTERing %d BOLTs:",
+                    blockParams.why.u.bolt.nbolts);
+
+            for (int j = 0; j < blockParams.why.u.bolt.nbolts; j++) {
+               Bolt * s = blockParams.why.u.bolt.bolts[j] ;
+               sprintf(help, " %s(%s)", s->getName(), s->getStateName());
 
                if (strlen(line[i]) + strlen(help) < 80) {
                   strcat(line[i], help);

@@ -1,4 +1,5 @@
 #include "ff.h"
+#include "ff_errors.h"
 #include "FatFsVolume.h"
 #include "Mutex.h"
 #include "Log.h"
@@ -29,36 +30,36 @@ namespace pearlrt {
    void FatFsVolume::treatVolumeStatus() {
       // this function is called while the volume is locked!
       FRESULT result;
-
+      FATFS * _fs = (FATFS*)&fs;
 
       if ((status & (IsMounted | WasRemoved)) == (IsMounted | WasRemoved)) {
          // device removed while mounted --> force unmount
-         f_mount(&fs, 0, 1);  // unmount
+         f_mount(_fs, 0, 1);  // unmount
          Log::info("unmounted");
          status &= ~(IsMounted | WasRemoved);
       }
 
       if (status & WasInserted) {
-         result = f_mount(&fs, path, 1);
+         result = f_mount(_fs, path, 1);
 
          if (result != FR_OK) {
-            Log::error("could not mount usb disk >%s< (code=%d)",
-                       path, result);
-         }
-
-         status = IsMounted;
-         char label[24];
-
-         result = f_getlabel(path, label, NULL);
-
-         if (result != FR_OK) {
-            pearlrt::Log::error("could not read volume label");
+            Log::error("could not mount disk >%s< (%s)",
+                       path, f_strerror(result));
          } else {
-            pearlrt::Log::info("volume >%s<", label);
+
+            status = IsMounted;
+            char label[24];
+
+            result = f_getlabel(path, label, NULL);
+
+            if (result != FR_OK) {
+               pearlrt::Log::error("could not read volume label");
+            } else {
+               pearlrt::Log::info("volume >%s<", label);
+            }
+
+            pearlrt::Log::info("disk >%s< is ready.", path);
          }
-
-         pearlrt::Log::info("usb disk is ready.");
-
       }
 
    }

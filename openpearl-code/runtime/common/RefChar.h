@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -43,6 +43,12 @@ This class provides the operations of the data type ref char.
 #include "Character.h"
 
 namespace pearlrt {
+
+   /**
+   \addtogroup datatypes
+   @{
+   */
+   
    /**
    Type REF CHAR
    \brief REF CHAR Type for variable string length
@@ -94,7 +100,7 @@ namespace pearlrt {
       size_t max;     ///< the maximum size (derived from the container)
       size_t current; ///< the current content length
       char * data;    ///< pointer to the data area in the container
-   public:
+ 
       /**
          constructor
       */
@@ -111,7 +117,7 @@ namespace pearlrt {
       template<size_t S>
       RefCharacter(Character<S> & rhs) {
          max = rhs.upb().x;
-         current = max;
+         current = 0; //max;
          data = &rhs.data[0];
       }
 
@@ -130,7 +136,7 @@ namespace pearlrt {
       template<size_t S>
       void setWork(Character<S> & rhs) {
          max = rhs.upb().x;
-         current = max;
+         current = 0; //max;
          data = &rhs.data[0];
       }
 
@@ -144,6 +150,17 @@ namespace pearlrt {
         \throws CharacterIndexOutOfRangeSignal, if the index i out of range
       */
       char getCharAt(size_t index) ;
+
+      /**
+       getNextChar
+
+       retrieve the next data element at the current index
+ 
+       \returns the next character
+       \throws CharacterIndexOutOfRangeSignal, if no more characters
+                are available
+      */
+      char getNextChar();
 
       /**
         getCstring
@@ -200,6 +217,19 @@ namespace pearlrt {
          \returns current size of the content
       */
       size_t getCurrent();
+
+      /**
+         set current content size
+ 
+         this feature is needed for positioning in convert
+
+         \param newpos set the read/write pointer to this offset.
+                The positions starts counting with 0.
+
+         \throws CharacterTooLongSignal, if new position would be
+                                         outside of the string
+      */
+      void setCurrent(size_t newpos);
 
       /**
           add one character
@@ -262,6 +292,7 @@ namespace pearlrt {
          }
       }
    };
+   /** @} */
 }
 
 #endif

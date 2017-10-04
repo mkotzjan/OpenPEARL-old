@@ -43,11 +43,13 @@
 #include "Mutex.h"
 
 #include <stdint.h>
+/**
+\file
+*/
 
 namespace pearlrt {
 
    /**
-   \file
 
    \brief Basic device for an i2c element pcf8574  dation
 
@@ -83,7 +85,7 @@ namespace pearlrt {
 
       \return handle to table concrete PCF8574 chip
 
-      \throws IllegalParamSignal if at least one bit is already in use
+      \throws DationParamSignal if at least one bit is already in use
       \throws InternalDationError if more than 'nbrOfEntries' are defined
 
       */
@@ -95,6 +97,7 @@ namespace pearlrt {
 
       \param handle of the PCF8574 chip
       \param newValue the new output value
+      \param mask the mask of bits to modify
       */
       static void writeOutputValue(int handle, uint8_t newValue, uint8_t mask);
 

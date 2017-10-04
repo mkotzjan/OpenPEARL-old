@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -49,11 +49,15 @@ This module contains the output formatting of FIXED F(w,d,s)-format
 
 using namespace std;
 namespace pearlrt {
-
    /**
-   Class containing the output formatting of fixed variables
-   all methods are defined as static.
+   \addtogroup io_common_helper
+   @{
+   */
+ 
+   /**
+   \brief Class containing the output formatting of fixed variables.
 
+   \tparam S the length of the Fixed variable
    */
    template<int S> class PutFixed {
    private:
@@ -74,8 +78,7 @@ namespace pearlrt {
       decimals denoting the dogits after the decimal point<br>
       The value will be set right adjusted into the output field.
 
-      \note in difference to the language report, a signal is throw
-            if the current value does not fit into the format
+      \todo move implementation into non template version
 
       \param fixedValue the data to be formatted
       \param w the width of the output field.
@@ -193,6 +196,7 @@ namespace pearlrt {
          return;
       }
    };
+   /** @} */
 }
 #endif
 

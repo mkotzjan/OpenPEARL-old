@@ -1,6 +1,6 @@
 /*
  [The "BSD license"]
- Copyright (c) 2012-2014 Marcel Schaible
+ Copyright (c) 2012-2017/mnt/sdb1/home/marcel/repositories/openpearl-code/openpearl-code/compiler/src/SmallPearl.g4 Marcel Schaible
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -325,8 +325,9 @@ globalAttribute :
 //      SimpleType | TypeReference | Identifier§ForType
 ////////////////////////////////////////////////////////////////////////////////
 
-typeAttribute :
-     simpleType
+typeAttribute
+    : simpleType
+    | typeReference
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -370,9 +371,6 @@ integerWithoutPrecision :
 //    IntegerWithoutPrecision [ ( Precision ) ]
 ////////////////////////////////////////////////////////////////////////////////
 
-typeReference :
-    ;
-
 typeFloatingPointNumber :
     'FLOAT' ( '(' IntegerConstant ')' )?
     ;
@@ -404,6 +402,12 @@ identifierDenotation :
 ////////////////////////////////////////////////////////////////////////////////
 
 initialisationAttribute :
+    ( 'INITIAL' | 'INIT' ) '(' initElement ( ',' initElement )* ')'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+arrayInitialisationAttribute :
     ( 'INITIAL' | 'INIT' ) '(' initElement ( ',' initElement )* ')'
     ;
 
@@ -514,7 +518,7 @@ arrayVariableDeclaration :
 
 arrayDenotation :
      ( ID | '(' ID ( ',' ID)* ')' ) dimensionAttribute assignmentProtection? typeAttributeForArray globalAttribute?
-     initialisationAttribute?
+     arrayInitialisationAttribute?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -535,6 +539,73 @@ typeAttributeForArray :
     | type_clock
     | type_bit
     | type_char
+    | typeReference
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// TypeReference ::=
+//   REF
+//   { [ VirtualDimensionList ] [ INV ] { SimpleType | StructuredType }
+//   | [ VirtualDimensionList ] { TypeDation | SEMA | BOLT }
+//   | TypeProcedure | TASK | INTERRUPT | IRPT | SIGNAL
+//   | CHAR( )
+//   }
+////////////////////////////////////////////////////////////////////////////////
+
+typeReference
+    : 'REF' typeReferences
+    ;
+
+typeReferences
+    : typeReferenceSimpleType
+    | typeReferenceStructuredType
+    | typeReferenceDationType
+    | typeReferenceSemaType
+    | typeReferenceBoltType
+    | typeReferenceProcedureType
+    | typeReferenceTaskType
+    | typeReferenceInterruptType
+    | typeReferenceSignalType
+    ;
+
+typeReferenceSimpleType
+    : assignmentProtection? simpleType
+    ;
+
+typeReferenceStructuredType
+    :
+    ;
+
+typeReferenceDationType
+    :
+    ;
+
+typeReferenceSemaType
+    : 'SEMA'
+    ;
+
+typeReferenceBoltType
+    : 'BOLT'
+    ;
+
+typeReferenceProcedureType
+    : ('PROCEDURE' | 'PROC' )  listOfFormalParameters? resultAttribute? globalAttribute?
+    ;
+
+typeReferenceTaskType
+    : 'TASK'
+    ;
+
+typeReferenceInterruptType
+    : ( 'INTERRUPT' | 'IRPT' )
+    ;
+
+typeReferenceSignalType
+    : 'SIGNAL'
+    ;
+
+typeReferenceCharType
+    : 'CHAR' ( '(' expression ')' )?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -617,6 +688,7 @@ passIdentical:
 parameterType :
       simpleType
     | typeDation
+    | typeReference
     ;
 
 
@@ -714,7 +786,7 @@ taskBody:
 ////////////////////////////////////////////////////////////////////////////////
 
 statement:
-      label_statement* ( unlabeled_statement | block_statement | cpp_inline )  ;
+        label_statement* ( unlabeled_statement | block_statement | cpp_inline )  ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -730,6 +802,7 @@ unlabeled_statement:
     | gotoStatement
     | loopStatement
     | exitStatement
+    | convertStatement
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -801,10 +874,25 @@ exitStatement
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// Assignment ::=
+//    ScalarAssignment | StructureAssignment | RefProcAssignment
+////////////////////////////////////////////////////////////////////////////////
 
 assignment_statement
-    : ( ID | stringSelection ) ( ':=' | '=' ) expression ';'
+    : ( dereference? ID indices? | stringSelection ) ( ':=' | '=' ) expression ';'
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+dereference
+    : 'CONT'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// StructureAssignment ::=
+//    Name§Structure 1 { := | = } Expression§Structure 2;
+////////////////////////////////////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////////////////////////
 
 stringSelection
@@ -1043,7 +1131,7 @@ task_preventing
 ////////////////////////////////////////////////////////////////////////////////
 
 taskStart
-    : startCondition? frequency?'ACTIVATE' ID  priority? ';'
+    : startCondition? frequency? 'ACTIVATE' ID  priority? ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1052,7 +1140,7 @@ taskStart
 ////////////////////////////////////////////////////////////////////////////////
 
 priority
-    : ( 'PRIORITY' | 'PRIO' ) IntegerConstant
+    : ( 'PRIORITY' | 'PRIO' ) expression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1061,7 +1149,7 @@ priority
 ////////////////////////////////////////////////////////////////////////////////
 
 frequency
-    : 'ALL' durationConstant ( 'UNTIL' timeConstant |  'DURING' durationConstant )?
+    : 'ALL' expression ( 'UNTIL' expression |  'DURING' expression )?
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1077,9 +1165,9 @@ frequency
 
 startCondition
     :
-      'AFTER'   durationConstant                                # startConditionAFTER
-    | 'AT'      timeConstant                                    # startConditionAT
-    | 'WHEN'    ID  ( 'AFTER' durationConstant)?  frequency?    # startConditionWHEN
+      'AFTER'   expression                                      # startConditionAFTER
+    | 'AT'      expression                                      # startConditionAT
+    | 'WHEN'    ID  ( 'AFTER' expression)?  frequency?          # startConditionWHEN
     ;
 
 
@@ -1341,6 +1429,7 @@ position :
       'RST' ( '(' ID ')' )               # positionRST
     | 'SKIP' ( '(' expression ')' )?     # positionSKIP
     | 'X' ( '(' expression ')' )?        # positionX
+    | 'EOF'                              # positionEOF
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1518,6 +1607,7 @@ readWriteRelativePosition :
     | 'PAGE'  ( '(' expression ')' )?                         # readWriteRelativePositionPAGE
     | 'ADV' '(' ( ( expression ',' )? expression ',' )?
       expression ')'                                          # readWriteRelativePositionADV
+    | 'EOF'                                                   # readWriteRelativePositionEOF
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1569,6 +1659,7 @@ type
     : simple_type
     | type_realtime_object
     | typeTime
+    | typeReference
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1608,6 +1699,46 @@ type_realtime_object
     | 'INTERRUPT'
     | 'SIGNAL'
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+// SystemInterruptDeclaration ::=
+//   Identifier§InterruptSystemName [ ( ListOfConstants ) ] [ Association ] ;
+////////////////////////////////////////////////////////////////////////////////
+
+//systemInterruptDeclaration
+//    : ID [ ( ListOfConstants ) ] [ Association ] ';'
+//    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// InterruptSpecification ::=
+//  { SPECIFY | SPC } OneIdentifierOrList { INTERRUPT | IRPT }
+//  [ GlobalAttribute ];
+////////////////////////////////////////////////////////////////////////////////
+
+//interruptSpecification
+//    : ( 'SPECIFY' | 'SPC' ) OneIdentifierOrList ( 'INTERRUPT' | 'IRPT' )GlobalAttribute? ';'
+//    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ListOfConstants ::=
+//   ConstantParameter [, ConstantParameter ]...
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// ConstantParameter ::=
+//   IntegerWithoutPrecision | BitStringConstant | CharacterStringConstant
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// Association ::=
+//  --- { Identifier§UsernameOfConnectionProvider
+//  | Identifier§ConnectionProviderSystemName [ ( ListOfConstants) ] }
+//  [ - - - { Identifier§UsernameOfConnectionProvider
+//  | Identifier§ConnectionProviderSystemName [ ( ListOfConstants) ] } ]...;
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  DationSpecification ::=
@@ -1746,6 +1877,12 @@ boundaryDenotation
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+
+indices
+    : '(' expression ( ',' expression )* ')'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 //  CompoundType ::=
 //    IO-Structure | Identifier§ForNewTypeFromSimpleTypes
 ////////////////////////////////////////////////////////////////////////////////
@@ -1773,12 +1910,23 @@ ioStructureComponent
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// Ranks of the operators defined in PEARL
+//
+// rank      dyadic operators         evaluation order
+// -------------------------------------------------------------
+//  1        **, FIT, LWB, UPB        from the right to the left
+//  2        *, /, ><, //, REM        from the left to the right
+//  3        +, -, <>, SHIFT          from the left to the right
+//  4        <, >, <=, >=             from the left to the right
+//  5        ==, /=, IS, ISNT         from the left to the right
+//  6        AND                      from the left to the right
+//  7        OR, EXOR                 from the left to the right
+//
+// All monadic standard operators have rank 1.
+////////////////////////////////////////////////////////////////////////////////
 
 expression
     : primaryExpression                                     # baseExpression
-    | op=('*'|'/') expression                               # unaryMultiplicativeExpression
-    | op='-' expression                                     # unarySubtractiveExpression
-    | op='+' expression                                     # unaryAdditiveExpression
     | op='ATAN' expression                                  # atanExpression
     | op='COS' expression                                   # cosExpression
     | op='EXP' expression                                   # expExpression
@@ -1798,29 +1946,33 @@ expression
     | op='ENTIER' expression                                # entierExpression
     | op='ROUND' expression                                 # roundExpression
     | op='CONT' expression                                  # CONTExpression
-    | expression op='AND' expression                        # AndExpression
-    | expression op='OR' expression                         # OrExpression
-    | expression op='EXOR' expression                       # ExorExpression
-    | expression op=('CAT'|'><') expression                 # catExpression
-    | expression op=('CSHIFT'|'<>') expression              # cshiftExpression
-    | expression op='SHIFT' expression                      # shiftExpression
+    | op='NOW'                                              # nowFunction
+    | op='DATE'                                             # dateFunction
+    | op='TASK'                                             # taskFunction
     | expression op='**' <assoc=right> expression           # exponentiationExpression
+    | expression op='FIT' expression                        # fitExpression
+    | op=('*'|'/') expression                               # unaryMultiplicativeExpression
+    | op='-' expression                                     # unarySubtractiveExpression
+    | op='+' expression                                     # unaryAdditiveExpression
     | expression op='*' expression                          # multiplicativeExpression
     | expression op='/' expression                          # divideExpression
     | expression op='//' expression                         # divideIntegerExpression
     | expression op='REM' expression                        # remainderExpression
-    | expression op='FIT' expression                        # fitExpression
+    | expression op=('CAT'|'><') expression                 # catExpression
     | expression op='+' expression                          # additiveExpression
     | expression op='-' expression                          # subtractiveExpression
-    | expression unaryLiteralExpression                     # unarySignedLiteralExpression
-    | expression op=( '=='|'EQ') expression                 # eqRelationalExpression
-    | expression op=( '/='|'NE') expression                 # neRelationalExpression
+    | expression op=('CSHIFT'|'<>') expression              # cshiftExpression
+    | expression op='SHIFT' expression                      # shiftExpression
     | expression op=( '<'|'LT') expression                  # ltRelationalExpression
     | expression op=( '<='|'LE') expression                 # leRelationalExpression
     | expression op=( '>'|'GT') expression                  # gtRelationalExpression
     | expression op=( '>='|'GE') expression                 # geRelationalExpression
-    | op='NOW'                                              # nowFunction
-    | op='DATE'                                             # dateFunction
+    | expression op=( '=='|'EQ') expression                 # eqRelationalExpression
+    | expression op=( '/='|'NE') expression                 # neRelationalExpression
+    | expression op='AND' expression                        # AndExpression
+    | expression op='OR' expression                         # OrExpression
+    | expression op='EXOR' expression                       # ExorExpression
+    | expression unaryLiteralExpression                     # unarySignedLiteralExpression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1870,7 +2022,9 @@ numericLiteralNegative
 primaryExpression
 	: '(' expression ')'
     | ID
-    | ID listOfActualParameters?
+//    | ID indices
+    | ID '(' expression  ( ',' expression )* ')'
+//    | ID listOfActualParameters?
     | literal
     | semaTry
 //    | monadicExplicitTypeConversionOperators
@@ -1884,7 +2038,7 @@ primaryExpression
 //   | { + | - } DurationConstant
 //   | ConstantFIXEDExpression
 ////////////////////////////////////////////////////////////////////////////////
-constanExpression
+constantExpression
     : FloatingPointConstant
     | ( '+' | '-' )? durationConstant
     | constantFixedExpression
@@ -1924,23 +2078,19 @@ constantExpressionFactor
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// ConvertStatement ::=
+//   ConvertToStatement | ConvertFromStatement
+////////////////////////////////////////////////////////////////////////////////
+
+convertStatement
+    : convertToStatement
+    | convertFromStatement
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
 // ConvertToStatement ::=
 //   CONVERT Expression [ , Expression ] ... TO Name§CharacterStringVariable
 //   [ BY FormatOrPositionConvert [ , FormatOrPositionConvert ] ... ] ;
-//
-// ConvertFromStatement ::=
-//    CONVERT Name§Variable [ , Name§Variable ] ... FROM Expression§CharacterString
-//    [ BY FormatOrPositionConvert [ , FormatOrPositionConvert ] ... ] ;
-//
-// FormatOrPositionConvert ::=
-//    [ FormatFactor ] { Format | PositionConvert }
-//    | FormatFactor ( FormatOrPositionConvert [ , FormatOrPositionConvert ]... )
-//
-// PositionConvert ::=
-//   RST ( Name§ErrorVariable-FIXED )
-//   | X [ ( Expression ) ]
-//   | { POS | ADV } ( Expression )
-//   | SOP ( Name§PositionVariable-FIXED )
 ////////////////////////////////////////////////////////////////////////////////
 
 convertToStatement
@@ -1948,12 +2098,81 @@ convertToStatement
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
+// ConvertFromStatement ::=
+//   CONVERT Name§Variable [ , Name§Variable ] ... FROM Expression§CharacterString
+//   [ BY FormatOrPositionConvert [ , FormatOrPositionConvert ] ... ] ;
+////////////////////////////////////////////////////////////////////////////////
+convertFromStatement
+    : 'CONVERT'  ID (',' ID)* 'FROM' expression ( 'BY' formatOrPositionConvert (',' formatOrPositionConvert)* )?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// FormatOrPositionConvert ::=
+//    [ FormatFactor ] { Format | PositionConvert }
+//    | FormatFactor ( FormatOrPositionConvert [ , FormatOrPositionConvert ]... )
+//
+////////////////////////////////////////////////////////////////////////////////
 
 formatOrPositionConvert
     :
-//    [ FormatFactor ] { Format | PositionConvert }
-//    | FormatFactor ( FormatOrPositionConvert [ , FormatOrPositionConvert ]... )
+    formatFactorConvert? ( formatConvert | positionConvert )
+    | formatFactorConvert ( formatOrPositionConvert ( ',' formatOrPositionConvert )* )?
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+// FormatFactor ::=
+//   ( Expression§IntegerGreaterZero ) | IntegerWithoutPrecision§GreaterZero
+////////////////////////////////////////////////////////////////////////////////
+
+formatFactorConvert
+    :
+    '(' expression ')'
+    | integerWithoutPrecision
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// Format ::=
+//   FixedFormat | FloatFormat |
+//   CharacterStringFormat | BitFormat |
+//   TimeFormat | DurationFormat |
+//   ListFormat | RFormat
+////////////////////////////////////////////////////////////////////////////////
+
+formatConvert
+    : fixedFormat
+    | floatFormat
+    | characterStringFormat
+    | bitFormat
+    | timeFormat
+    | durationFormat
+    | listFormat
+    | rFormat
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ListFormat ::=
+//   LIST
+////////////////////////////////////////////////////////////////////////////////
+
+listFormat
+    : 'LIST'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// RFormat ::=
+//   R ( Identifier§Format )
+////////////////////////////////////////////////////////////////////////////////
+
+rFormat
+    : 'R' '(' ID ')'
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// PositionConvert ::=
+//   RST ( Name§ErrorVariable-FIXED )
+//   | X [ ( Expression ) ]
+//   | { POS | ADV } ( Expression )
+//   | SOP ( Name§PositionVariable-FIXED )
 ////////////////////////////////////////////////////////////////////////////////
 
 positionConvert
@@ -1963,6 +2182,12 @@ positionConvert
     | 'ADV' '(' expression ')'                # positionConvertADV
     | 'SOP' '(' ID ')'                        # positionConvertSOP
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+// ConvertFromStatement ::=
+//    CONVERT Name§Variable [ , Name§Variable ] ... FROM Expression§CharacterString
+//    [ BY FormatOrPositionConvert [ , FormatOrPositionConvert ] ... ] ;
+////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2050,21 +2275,83 @@ SCharSequence
 fragment
 SChar
     :   ~['\\\r\n]
-    |   EscapeSequence
+    | ControlCharacterSequence
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 fragment
-EscapeSequence
-    :   SimpleEscapeSequence
+ControlCharacterSequence
+    : '\'\\' ( B4Digit B4Digit)+ '\\\''
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+CppStringLiteral
+    : '"' CppSCharSequence? '"'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 fragment
-SimpleEscapeSequence
+CppSCharSequence
+    :   CppSChar+
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+CppSChar
+    :   ~["\\\r\n]
+    |   CppEscapeSequence
+    |   '\\\n'   // Added line
+    |   '\\\r\n' // Added line
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+CppEscapeSequence
+    :   CppSimpleEscapeSequence
+    |   OctalEscapeSequence
+    |   HexadecimalEscapeSequence
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+CppSimpleEscapeSequence
     :   '\\' ['"?abfnrtv\\]
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+OctalEscapeSequence
+    :   '\\' OctalDigit
+    |   '\\' OctalDigit OctalDigit
+    |   '\\' OctalDigit OctalDigit OctalDigit
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+HexadecimalEscapeSequence
+    :   '\\x' HexadecimalDigit+
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+OctalDigit
+    :   [0-7]
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+fragment
+HexadecimalDigit
+    :   [0-9a-fA-F]
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2259,7 +2546,7 @@ FloatingPointNumberWithoutPrecisionAndExponent
 ////////////////////////////////////////////////////////////////////////////////
 
 cpp_inline
-    : ( '__cpp__' | '__cpp' )  '(' StringLiteral+ ')' ';'
+    : ( '__cpp__' | '__cpp' )  '(' CppStringLiteral+ ')' ';'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

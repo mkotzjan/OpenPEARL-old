@@ -33,7 +33,7 @@
 
 \page Testprograms
 
-\section Dation System Device StdStream
+\section StdStreamTests tests/StdStreamTests.cc
 There are some tests to enshure proper operation of the StdStream system dation
 
 */
@@ -95,7 +95,7 @@ TEST(StdStream, openClose) {
                           pearlrt::Dation::OLD |
                           pearlrt::Dation::IDF |
                           pearlrt::Dation::IN),
-      pearlrt::IllegalParamSignal);
+      pearlrt::DationParamSignal);
 }
 
 /**
@@ -114,7 +114,7 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::STREAM |
                              pearlrt::Dation::NOCYCL,
                              &dim),
-     pearlrt::IllegalParamSignal);
+     pearlrt::InternalDationSignal);
 
    ASSERT_THROW(
       pearlrt::DationPG console(&stdOut,
@@ -123,7 +123,7 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::STREAM |
                              pearlrt::Dation::NOCYCL,
                              &dim),
-     pearlrt::IllegalParamSignal);
+     pearlrt::InternalDationSignal);
 
    ASSERT_THROW(
       pearlrt::DationPG console(&stdOut,
@@ -132,7 +132,7 @@ TEST(StdStream, userDationStdOut) {
                              pearlrt::Dation::STREAM |
                              pearlrt::Dation::NOCYCL,
                              &dim),
-     pearlrt::IllegalParamSignal);
+     pearlrt::InternalDationSignal);
 
    pearlrt::DationPG console(&stdOut,
                              pearlrt::Dation::OUT |
@@ -145,21 +145,21 @@ TEST(StdStream, userDationStdOut) {
       console.dationOpen(
          pearlrt::Dation::IDF ,
          &fn, (pearlrt::Fixed<15>*)0),
-     pearlrt::IllegalParamSignal);
+     pearlrt::DationParamSignal);
    pearlrt::Character<8> text("PEARL");
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::OLD | pearlrt::Dation::IDF,
          &fn, (pearlrt::Fixed<15>*)0),
-     pearlrt::IllegalParamSignal);
+     pearlrt::DationParamSignal);
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::CAN,
          (pearlrt::Character<1>*) 0, //&fn,
          (pearlrt::Fixed<15>*)0),
-     pearlrt::IllegalParamSignal);
+     pearlrt::DationParamSignal);
 }
 
 /**
@@ -178,7 +178,7 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::STREAM |
                              pearlrt::Dation::NOCYCL,
                              &dim),
-     pearlrt::IllegalParamSignal);
+     pearlrt::InternalDationSignal);
 
    ASSERT_THROW(
       pearlrt::DationPG console(&stdIn,
@@ -187,7 +187,7 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::STREAM |
                              pearlrt::Dation::NOCYCL,
                              &dim),
-     pearlrt::IllegalParamSignal);
+     pearlrt::InternalDationSignal);
 
    ASSERT_THROW(
       pearlrt::DationPG console(&stdIn,
@@ -196,7 +196,7 @@ TEST(StdStream, userDationStdIn) {
                              pearlrt::Dation::STREAM |
                              pearlrt::Dation::NOCYCL,
                              &dim),
-     pearlrt::IllegalParamSignal);
+     pearlrt::InternalDationSignal);
 
    pearlrt::DationPG console(&stdIn,
                              pearlrt::Dation::IN |
@@ -209,21 +209,21 @@ TEST(StdStream, userDationStdIn) {
       console.dationOpen(
          pearlrt::Dation::IDF ,
          &fn, (pearlrt::Fixed<15>*)0),
-     pearlrt::IllegalParamSignal);
+     pearlrt::DationParamSignal);
    pearlrt::Character<8> text("PEARL");
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::OLD | pearlrt::Dation::IDF,
          &fn, (pearlrt::Fixed<15>*)0),
-     pearlrt::IllegalParamSignal);
+     pearlrt::DationParamSignal);
 
    ASSERT_THROW(
       console.dationOpen(
          pearlrt::Dation::CAN,
          (pearlrt::Character<1>*) 0, //&fn,
          (pearlrt::Fixed<15>*)0),
-     pearlrt::IllegalParamSignal);
+     pearlrt::DationParamSignal);
 }
 /**
 Put/Get as  visibility test only

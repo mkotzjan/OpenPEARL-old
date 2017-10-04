@@ -34,11 +34,6 @@
 \brief safe FIXED(63) operations   (for internal use)
 
 */
-// this code is based on the great work of
-//   LeBlanc, David. Integer Handling with the C++ SafeInt Class.
-//   http://msdn.microsoft.com/library/default.asp?
-//        url=/library/en-us/dncode/html/secure01142004.asp
-//   (2004).
 
 #include "Fixed63.h"
 #include "Signals.h"
@@ -334,6 +329,7 @@ namespace pearlrt {
             *ret = (UFixed63_t)aHigh * (UFixed63_t)bLow;
          }
       } else {
+         // both operands have an non 0 high part --> this crashes
          throw theArithmeticOverflowSignal;
       }
 
@@ -341,20 +337,29 @@ namespace pearlrt {
          UFixed63_t tmp;
 
          if ((__uint32)(*ret >> 32) != 0) {
+            // the previous result is larger than 32 bit but
+            // we need to multiply with 2^32 --> this will crash
             throw theArithmeticOverflowSignal;
          }
 
+         // multiply with 2^32
          *ret <<= 32;
+        
+         // the add can not crash, since all lower 32 bits are zero 
          tmp = (UFixed63_t)aLow * (UFixed63_t)bLow;
          *ret += tmp;
 
          if (*ret < tmp) {
+            // if this addition results in a smaller value 
+            // we had an overflow! 
             throw theArithmeticOverflowSignal;
          }
 
          return;
       }
 
+      // this is the easy part --- both parameters are
+      // below 2^32 --- no overflow possible
       *ret = (UFixed63_t)aLow * (UFixed63_t)bLow;
    }
 

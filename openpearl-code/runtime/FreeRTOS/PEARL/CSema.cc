@@ -37,8 +37,12 @@
 
 
 #include <string.h>  // strerror
-#include <CSema.h>
-#include <Log.h>
+
+#include "CSema.h"
+#include "Log.h"
+
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 namespace pearlrt {
 

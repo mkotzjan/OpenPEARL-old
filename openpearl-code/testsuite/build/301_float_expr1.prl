@@ -13,22 +13,22 @@ DCL x54 FLOAT(53);
 DCL f31 FIXED(31) INIT(2);
 
 T1: TASK MAIN;
-__cpp__ ('bool ok = 1;');
+__cpp__ ("bool ok = 1;");
   ! basic operations
    z24 := x24 + y24;
-__cpp__('ok &= _z24.x == 6;');
+__cpp__("ok &= _z24.x == 6;");
    z24 := x24 - y24;
-__cpp__('ok &= _z24.x == 2;');
+__cpp__("ok &= _z24.x == 2;");
    z24 := x24 * y24;
-__cpp__('ok &= _z24.x == 8;');
+__cpp__("ok &= _z24.x == 8;");
    z24 := x24 / y24;
-__cpp__('ok &= _z24.x == 4;');
+__cpp__("ok &= _z24.x == 4;");
    z24 := x24 ** f31; 
-__cpp__('ok &= _z24.x == 16;');
+__cpp__("ok &= _z24.x == 16;");
 
    ! simple expressions with ()
    z24 := (x24+y24)*(x24-y24);
-__cpp__('ok &= _z24.x == 36;');
+__cpp__("ok &= _z24.x == 36;");
 
    ! comparison with c-style operators
    bit := x24 < y24;
@@ -58,7 +58,7 @@ __cpp__('ok &= _z24.x == 36;');
    z24 := SQRT(x24); 
    x24 := -4.5;
    z24 := ABS(x24);
-__cpp__('ok &= _z24.x == 4.5;');
+__cpp__("ok &= _z24.x == 4.5;");
 
    ! fit
    x54 := x24 FIT x54;
@@ -68,17 +68,17 @@ __cpp__('ok &= _z24.x == 4.5;');
    ! entier and round
    x24 := -4.4;
    f31 := ENTIER x24;
-__cpp__('ok &= _f31.x == -5;');
+__cpp__("ok &= _f31.x == -5;");
    f31 := ROUND x24;
-__cpp__('ok &= _f31.x == -4;');
+__cpp__("ok &= _f31.x == -4;");
    ! sizeof
 
 
    f31 := SIZEOF x24;
    f31 := SIZEOF(x24);
-__cpp__('ok &= _f31.x == 4;');
+__cpp__("ok &= _f31.x == 4;");
 
-__cpp__('pearlrt::Control::setExitCode(ok);');
+__cpp__("pearlrt::Control::setExitCode(ok);");
 END;
 
 MODEND;

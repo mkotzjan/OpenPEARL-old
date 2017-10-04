@@ -46,6 +46,10 @@
 #include <unistd.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
 
    /**
    \brief generic non-basic systemdation class for stderr
@@ -124,7 +128,7 @@ namespace pearlrt {
                   dation operations.
 
       \throws OpenFailedSignal in case of errors
-      \throws IllegalParamsSignal in case of errors
+      \throws DationParamSignal in case of errors
       */
       StdError* dationOpen(const char * fileName, int openParams);
 
@@ -185,5 +189,6 @@ namespace pearlrt {
       void translateNewLine(bool doNewLineTranslation);
 
    };
+   /** @} */
 }
 #endif

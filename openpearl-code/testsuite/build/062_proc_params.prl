@@ -65,7 +65,7 @@ END;
 proc_008: PROC (p1 FIXED) RETURNS(FIXED(8));
 	AFTER 1 SEC RESUME;   !! access of me-pointer
 	p1 := 8;
-!	p1 := 299;    ! this musr produce a fixed overflow in the return 
+!	p1 := 299;    ! this must produce a fixed overflow in the return
 	RETURN(p1);
 END;
 
@@ -80,7 +80,8 @@ T1: TASK MAIN;
    CALL proc_003(f, f15+1);
    CALL proc_004(f, f15);
    CALL proc_005(f, f15);
-   CALL proc_008(f);
+!   CALL proc_008(f);      ! not ok - dicarding result value
+!   proc_008(f);	   ! not ok - discarding result value
 
 END;
 

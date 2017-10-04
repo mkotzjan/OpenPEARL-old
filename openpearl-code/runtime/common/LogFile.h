@@ -50,10 +50,10 @@ namespace pearlrt {
         /**
         Constructor of the LogFile element
 
-        \param provider, pointer to the connection provider
+        \param provider pointer to the connection provider
         \param filename name of the log file
 
-       \throws IllegalParamSignal, if the file name is invalid, or
+       \throws InternalDationSignal, if the file name is invalid, or
              provider is null
         */
  	 LogFile(SystemDationNB * provider, char const* filename);
@@ -97,7 +97,6 @@ public:
                   dation operations.
 
       \throws OpenFailedSignal in case of errors
-      \throws IllegalParamsSignal in case of errors
       */
       LogFile* dationOpen(const char * fileName, int openParams);
 
@@ -132,7 +131,10 @@ public:
 
        delegate send data to the provider
 
-      \throws depending on the connectiopn provider
+       \param destination adress of the data to be written
+       \param size number of bytes to be written
+
+      \throws ...  depending on the connection provider
       */
       void dationWrite(void * destination, size_t size);
 

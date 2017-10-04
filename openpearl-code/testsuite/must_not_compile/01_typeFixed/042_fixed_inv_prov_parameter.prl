@@ -1,0 +1,15 @@
+MODULE(m1);
+
+PROBLEM;
+
+p: PROC (f INV FIXED);
+   f :=1;   ! illegal, since f is INV
+END;
+
+a: TASK;
+   DCL g FIXED;
+   CALL p(g);
+END;
+
+MODEND;
+

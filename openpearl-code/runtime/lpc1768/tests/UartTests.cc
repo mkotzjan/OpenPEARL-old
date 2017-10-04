@@ -44,25 +44,25 @@ Unit tests for Lpc17xxUart Ctors
 TEST(Lpc17xxUart, ctor) {
    ASSERT_NO_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x0));
    ASSERT_THROW(pearlrt::Lpc17xxUart(1,9600,7,1,'E',0x0),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9650,7,1,'E',0x0),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,9,1,'E',0x0),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,0,'E',0x0),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'W',0x0),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x80000),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x10000),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
    ASSERT_NO_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x10080));
 
 /*
    the heap allocation stops the system in case of exhausted heap
    ASSERT_THROW(pearlrt::Lpc17xxUart(2,9600,7,1,'E',0x1FFFF),
-     pearlrt::IllegalParamSignal );
+     pearlrt::InternalDationSignal );
 */
 }
 
@@ -70,9 +70,9 @@ TEST(Lpc17xxUart, openClose) {
    pearlrt::Lpc17xxUart p2(2,9600,7,1,'E',0x0);
    
    ASSERT_THROW(p2.dationOpen("name", pearlrt::Dation::IDF),
-     pearlrt::IllegalParamSignal );
+     pearlrt::DationParamSignal );
    ASSERT_THROW(p2.dationOpen(NULL, pearlrt::Dation::CAN),
-     pearlrt::IllegalParamSignal );
+     pearlrt::DationParamSignal );
    
    ASSERT_NO_THROW(p2.dationOpen(NULL, 0));
    ASSERT_NO_THROW(p2.dationClose(0));

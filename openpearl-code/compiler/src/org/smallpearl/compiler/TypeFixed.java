@@ -30,6 +30,9 @@
 package org.smallpearl.compiler;
 
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public class TypeFixed extends TypeDefinition {
     private int m_precision;
 
@@ -54,6 +57,24 @@ public class TypeFixed extends TypeDefinition {
 
     public String toString() {
         return this.getName() + "(" + this.m_precision + ")";
+    }
+
+    public ST toST(STGroup group) {
+        ST st = group.getInstanceOf("fixed_type");
+        st.add("size", m_precision);
+        return st;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeFixed)) {
+            return false;
+        }
+
+        TypeFixed that = (TypeFixed) other;
+
+        // Custom equality check here.
+        return this.m_precision == that.m_precision;
     }
 
 }

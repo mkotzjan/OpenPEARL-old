@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.1";
+    static String version = "v0.8.9.11";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -74,6 +74,9 @@ public class Compiler {
             printHelp();
             return;
         }
+
+        SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
+        ConstantPool constantPool = new ConstantPool();
 
         if (!checkAndProcessArguments(args)) {
             return;
@@ -120,56 +123,52 @@ public class Compiler {
                 parser.dumpDFA();
             }
 
-            if (parser.getNumberOfSyntaxErrors() <= 0) {
-                SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor(verbose);
-                symbolTableVisitor.visit(tree);
+            try {
+                if (parser.getNumberOfSyntaxErrors() <= 0) {
+                    symbolTableVisitor.visit(tree);
+
+                    if (dumpSymbolTable) {
+                        symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
+                    }
+
+                    ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose, debug, constantPool);
+                    constantPoolVisitor.visit(tree);
+
+                    ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
+                    expressionTypeVisitor.visit(tree);
+
+                    if (!nosemantic) {
+                        SemanticCheck semanticCheck = new SemanticCheck(lexer.getSourceName(), verbose, debug, tree, symbolTableVisitor, expressionTypeVisitor);
+                    }
+
+                    if (imc) {
+                        SystemPartExport(lexer.getSourceName(), tree);
+                    }
+
+                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor);
+
+                    if (dumpConstantPool) {
+                        constantPool.dump();
+                    }
+                }
+            }
+            catch(Exception ex) {
+                System.err.println(ex.getMessage());
+                System.err.println("Compilation aborted.");
 
                 if (dumpSymbolTable) {
                     symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
                 }
 
-                ConstantPool constantPool = new ConstantPool();
-                ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose,debug, constantPool);
-                constantPoolVisitor.visit(tree);
-
-                ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose,debug,symbolTableVisitor);
-                expressionTypeVisitor.visit(tree);
-
-                if (!nosemantic) {
-                    SemanticCheck semanticCheck = new SemanticCheck(lexer.getSourceName(), verbose, debug, tree, symbolTableVisitor, expressionTypeVisitor);
-                }
-
-                if (imc) {
-                    SystemPartExport(lexer.getSourceName(),tree);
-                }
-
-//                System.exit(0);
-
-//                try {
-                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor);
-/*                }
-                catch(Exception ex) {
-                    System.err.println(ex.getMessage());
-                    System.err.println("Compilation aborted.");
-
-                    if ( stacktrace )  {
-                        System.err.println( getStackTrace(ex));
-                    }
-
-                    System.exit(-1);
-                }
-*/
-//                if (dumpSymbolTable) {
-//                    SymbolTable symtab = SymbolTable.getSymbolTable();
-//                    System.out.println(symtab);
-//                    symtab.getGlobalsDeclarations();
-//                    symtab.getProcedureDeclarations();
-//                }
-
                 if (dumpConstantPool) {
                     constantPool.dump();
                 }
 
+                if ( stacktrace )  {
+                    System.err.println( getStackTrace(ex));
+                }
+
+                System.exit(-1);
             }
 
             noOfErrors = parser.getNumberOfSyntaxErrors();
@@ -287,6 +286,9 @@ public class Compiler {
                 }
                 warninglevel = Integer.parseInt(args[i]);
                 i++;
+            } else {
+                System.out.println("Unknown command line argument:" + arg);
+                return false;
             }
         }
 

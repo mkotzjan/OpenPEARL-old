@@ -1,0 +1,9 @@
+MODULE(m1);
+! legal characters
+! ABCDEFGHIJKLMNOPQRSTUVWXYZ
+! abcdefghijklmnopqrstuvwxyz
+! 1234567890 +-*/_!'(),.;:=<>[]\
+!
+! some illegal Characters
+! äöüßÄÖÜ
+MODEND;

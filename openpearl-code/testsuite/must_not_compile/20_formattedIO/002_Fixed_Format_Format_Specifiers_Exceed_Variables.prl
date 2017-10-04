@@ -1,0 +1,24 @@
+/****************************************
+Compiler Errr for More Format Specifiers then 
+Variables to PUT
+
+****************************************/
+MODULE(field_width_float);
+SYSTEM;
+
+PROBLEM;
+SPC pipe DATION OUT SYSTEM ALPHIC;
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Task1: TASK MAIN;
+     DCL f FIXED(15) INIT(0);
+
+
+     PUT f TO pipe_out BY F(1),F(1);
+
+END;
+MODEND;
+

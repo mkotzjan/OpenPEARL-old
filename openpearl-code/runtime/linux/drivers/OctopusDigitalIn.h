@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2014 Rainer Mueller
  All rights reserved.
 
@@ -45,7 +45,6 @@
 namespace pearlrt {
 
    /**
-   \file
 
    \brief Basic system device for Octopus Digital Input
 
@@ -68,7 +67,7 @@ namespace pearlrt {
       constructor to create the bit group and set the
       bits to output direction
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       \param port is the port character 'A', 'B', ...'E'
       \param start is the starting bit number (7..0)
@@ -89,7 +88,7 @@ namespace pearlrt {
       \param rstValue pointer to error variable if given 
       \tparam S the length of the filename; the parameter idf is not
             requred for this device
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       template<size_t S>
       void dationOpen(int openParam=0,
@@ -98,11 +97,11 @@ namespace pearlrt {
         try {
            if (idf != 0) {
               Log::error("IDF not allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            if (openParam != 0) {
               Log::error("No open parameters allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            internalDationOpen();
         } catch (Signal *s) {
@@ -121,14 +120,14 @@ namespace pearlrt {
       \param rstValue pointer to error variable if given 
 
 
-      \throws NotAllowedSignal, if  dation is not opened and rst is not given
+      \throws CloseFailedSignal, if  dation is not opened and rst is not given
       */
       void dationClose(int closeParam=0,
                        Fixed<31>* rstValue=0) {
         try {
            if (closeParam != 0) {
               Log::error("No close parameters allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            internalDationClose();
         } catch (Signal *s) {
@@ -147,9 +146,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<1..8> value
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -158,7 +157,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws notAllowedSignal, if used at all
+      \throws InternalDationSignal, if used at all
       */
       void dationWrite(void * data, size_t size);
    };

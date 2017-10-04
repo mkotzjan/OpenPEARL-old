@@ -61,6 +61,9 @@ The following formats are supported - all without width specification:
 
 namespace pearlrt {
 
+/**
+message if an error message is too long
+*/
 #define ERRORMESSAGE "\n                     **** above line truncated ****\n"
 
    /**
@@ -139,6 +142,8 @@ namespace pearlrt {
 
       /**
          singleton pattern resolve static initialize problem
+
+         \returns the refernce to this object
       */
       static Log* getInstance();
 

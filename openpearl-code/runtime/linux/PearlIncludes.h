@@ -36,7 +36,7 @@ The compiler does not needed to know all header files of the run time system.
 Only this file mus be included.
 
 */
-
+#include "Ref.h"
 #include "Task.h"
 #include "TaskCommon.h"
 #include "TaskTimer.h"
@@ -61,6 +61,7 @@ Only this file mus be included.
 
 #include "Fixed63.h"
 #include "Character.h"
+#include "CharSlice.h"
 #include "PutCharacter.h"
 #include "GetCharacter.h"
 
@@ -77,6 +78,7 @@ Only this file mus be included.
 #include "SystemDationB.h"
 #include "UserDation.h"
 #include "DationPG.h"
+#include "StringDationConvert.h"
 #include "DationRW.h"
 #include "DationTS.h"
 #include "UserDationNB.h"
@@ -85,6 +87,7 @@ Only this file mus be included.
 #include "DationDim2.h"
 #include "DationDim3.h"
 #include "Semaphore.h"
+#include "Bolt.h"
 
 #include "SystemDationNBSink.h"
 #include "SystemDationNBSource.h"

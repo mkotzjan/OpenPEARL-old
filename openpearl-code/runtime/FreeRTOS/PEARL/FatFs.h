@@ -37,7 +37,8 @@
 \brief FAT filesystem wrapper over Chan's library
 */
 
-#include "ff.h"
+#include "FakeTypes.h"
+
 #include "SystemDationNB.h"
 #include "Mutex.h"
 #include "Character.h"
@@ -49,28 +50,27 @@ namespace pearlrt {
    /**
    \brief generic non-basic systemdation class
 
-   With this class it is possible to generate most of linux
-   system devices with behave like filesystems.
-   PEARL requires that files are created upon a system dation.
-   Historically, files were created on a disc. Windows does this still
-   with e.g. C:
+   Provide access to files on discs. 
+   Differnt discs are distinguished by a volume number, which
+   looks like "0:" at the beginning of a file path string.
 
-   UNIX has the philosophy that everything is a file.
-   Therefore a folder represents something where files may become created.
-
-   The implementation uses the class Disc as container for DiscFile
+   The implementation uses the class FatFs as container for FatFsFile
    objects, which perform the i/o-operations.
 
    One parameter of the Ctor defines the number of open files
-   on one Disc-objects. The DiscFile objects are allocated in a pool,
+   on one FatFs-objects. The FatFsFile objects are allocated in a pool,
    which is created at instantiation of the Disc-object.
+   All files are created in an already existing folder on the volume.
+   It is NOT checked, where the file name in the open statement contains
+   other folder specifications.
+
    At this point of execution the 'new' operation is allowed.
 
    */
 
    class FatFs: public SystemDationNB {
    private:
-      static FatFsVolume * volume[_VOLUMES];
+      static FatFsVolume * volume[FAKE_VOLUMES];
       FatFsVolume        * vol;
 
    public:
@@ -80,13 +80,13 @@ namespace pearlrt {
       */
       class FatFsFile : public SystemDationNB {
       private:
-         FIL fil;
+         FakeFIL fil;
          RefCharacter   rcFn;
          Character<64> completeFileName;
          FatFs * 	myFatFs;
          FatFsFile 	* nextUsedFatFsFile;
-         static FatFsFile * firstUsedFatFsFile[_VOLUMES];
-         static Mutex volumeLock[_VOLUMES];
+         static FatFsFile * firstUsedFatFsFile[FAKE_VOLUMES];
+         static Mutex volumeLock[FAKE_VOLUMES];
 
 
       public:
@@ -179,7 +179,7 @@ namespace pearlrt {
          void dationUnGetChar(const char c);
 
          /**
-         translate newline
+	 translate newline
 
          this is empty since linux uses \n for newline
 
@@ -227,13 +227,14 @@ namespace pearlrt {
       /**
        Constructor to setup the system device
 
-       \param dev path to the directory
+       \param dev path to the directory including the volume specification
+     (e.g. "0:files/" for the folder 'files' on volume "0:")
        \param nbrOfFiles denotes the number of files opened
               at one time on this folder/disc
 
-       \throws IllegalPathSignal, if dev denotes no folder name
-       \throws IllegalPathSignal, if dev does not end with '/'
-       \throws IllegalParamSignal, if the required number of
+       \throws DationParamSignal if dev denotes no folder name
+       \throws DationParamSignal if dev does not end with '/'
+       \throws DationParamSignal if the required number of
                    channels could not be allocated
       */
       FatFs(const char* dev, const int nbrOfFiles);
@@ -268,8 +269,7 @@ namespace pearlrt {
                   dation operations.
 
       \throws OpenFailedSignal in case of errors
-      \throws IllegalParamsSignal in case of errors
-      \throws IllegalPathSignal in case of errors
+      \throws DationParamSignal in case of errors
       */
       FatFsFile* dationOpen(const char * fileName, int openParams);
 
@@ -340,6 +340,23 @@ namespace pearlrt {
       */
       char* getDevicePath();
 
+      /**
+      \brief register a volume (e.g. a device) to the FAT-Filesystem library
+
+      The original code of Elm Chan supposes a switch case construction
+      to select the required i/o driver for all supported the volumes,
+      which are identified by the file path.  
+
+      To safe memory space, the setup in OpenPearl is different.
+      The device drivers register themself at the FAT-Filesystem library via
+      this method.  Thus it it possible to omit device drivers, which are
+      not used in an application.
+
+      \param nbr the volume number (0,1,...)
+      \param v pointer to the volume working storage.
+               The storage itself is allocated (typically static) 
+               in the device drivers module.
+      */
       static void registerVolume(int nbr, FatFsVolume * v);
    };
 }

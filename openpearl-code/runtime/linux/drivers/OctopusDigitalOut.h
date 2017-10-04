@@ -45,7 +45,6 @@
 namespace pearlrt {
 
    /**
-   \file
 
    \brief Basic system device for Octopus Digital Output
 
@@ -93,7 +92,7 @@ namespace pearlrt {
       \param rstValue pointer to error variable if given 
       \tparam S the length of the file name; this is parameter is not
        required for this device
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       template<size_t S>
       void dationOpen(int openParam=0,
@@ -102,11 +101,11 @@ namespace pearlrt {
          try {
            if (idf != 0) {
               Log::error("IDF not allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            }
            if (openParam != 0) {
               Log::error("No open parameters allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            }
            internalDationOpen();
          } catch (Signal *s) {
@@ -125,14 +124,14 @@ namespace pearlrt {
       \param rstValue pointer to error variable if given
 
 
-      \throws NotAllowedSignal, if  dation is not opened and rst is not given
+      \throws CloseFailedSignal, if  dation is not opened and rst is not given
       */
       void dationClose(int closeParam=0,
                        Fixed<31>* rstValue=0) {
         try {
            if (closeParam != 0) {
               Log::error("No close parameters allowed for Octupus device");
-              throw theNotAllowedSignal;
+              throw theDationParamSignal;
            } 
            internalDationClose();
         } catch (Signal *s) {
@@ -151,7 +150,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws notAllowedSignal, if used at all
+      \throws InternalDationSignal, if used at all
       */
 
       void dationRead(void * data, size_t size);
@@ -161,9 +160,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<1..8> value
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpen, if  dation is not opened
 
       */
       void dationWrite(void * data, size_t size);

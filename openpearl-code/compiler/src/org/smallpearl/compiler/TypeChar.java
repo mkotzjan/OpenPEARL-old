@@ -30,6 +30,9 @@
 package org.smallpearl.compiler;
 
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public class TypeChar extends TypeDefinition {
     private int m_size;
 
@@ -49,6 +52,24 @@ public class TypeChar extends TypeDefinition {
 
     public String toString() {
         return this.getName() + "(" + this.m_size + ")";
+    }
+
+    public ST toST(STGroup group) {
+        ST st = group.getInstanceOf("char_type");
+        st.add("size", m_size);
+        return st;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeChar)) {
+            return false;
+        }
+
+        TypeChar that = (TypeChar) other;
+
+        // Custom equality check here.
+        return this.m_size == that.m_size;
     }
 
 }

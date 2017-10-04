@@ -43,10 +43,12 @@
 #include <stdint.h>
 
 namespace pearlrt {
+   /**
+   \addtogroup io_common_drivers
+   @{
+   */
 
    /**
-   \file
-
    \brief Basic system device for an i2c element lm75  basic dation
 
       This device provides a simple input of an fixed(15) value with the
@@ -67,11 +69,14 @@ namespace pearlrt {
       /**
       constructor to create the bit group and set the
       bits to output direction
+     
+      \param provider reference to the i2cbus object
+      \param addr the i2c bus adress
 
-      \throws IllegalParamSignal in case of init failure
+      \throws DationParamSignal in case of init failure
 
       */
-      LM75(I2CProvider * provider, int _addr);
+      LM75(I2CProvider * provider, int addr);
 
       /**
       Open the  dation
@@ -81,7 +86,7 @@ namespace pearlrt {
       \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       LM75* dationOpen(const char* idf = 0, int openParam = 0);
 
@@ -100,9 +105,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<4> value
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -114,7 +119,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws NotAllowedSignal, in any case
+      \throws DationParamSignal, in any case
       */
       void dationWrite(void * data, size_t size);
 
@@ -131,6 +136,7 @@ namespace pearlrt {
       */
       int capabilities();
    };
+   /** @} */
 }
 #endif
 

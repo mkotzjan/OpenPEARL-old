@@ -125,18 +125,19 @@ statements.
 The syntax is.
 
 CPPInsertion ::=\\
-\x {\bf \_\_cpp\_\_} ( CharacterStringConstant ... );
+\x {\bf \_\_cpp\_\_} ( CStringConstant ... );
 
-The CharacterStringConstants are expected in PEARL notation.
-Some characters must be marked with the switch symbol as shown in the table
-below:
+The CStringConstants are expected in C notation.
+All quotations from C apply for these constants.
 
-\begin{tabular}{l|l}
-C & PEARL \\
-\hline
-\verb|\| & \verb|\\| \\
-\verb|'| & \verb|\'|  \\
-\end{tabular}
+Example:
+
+\_\_cpp\_\_(	\\
+\x ''// a simple C++ comment!''	\\
+\x '' char c = 'c';    ''\\
+\x '' printf($\backslash$''this we be sent to stdout$\backslash$n$\backslash$'');  '' \\
+);
+
 %%%\end{added}
 
 \newpage

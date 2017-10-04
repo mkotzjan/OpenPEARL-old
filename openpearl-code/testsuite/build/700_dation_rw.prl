@@ -10,20 +10,44 @@ PROBLEM;
    SPC stdout DATION OUT SYSTEM ALPHIC;
    DCL stdOut DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
 
-ticket126: TASK;
-     DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
+DCL table62 DATION INOUT ALL DIM(*) DIRECT CREATED(disc);
+ticket62: TASK;
      DCL f FIXED(15) INIT(42);
      DCL (f4,f5) FIXED(15) INIT(0,0);
      DCL error FIXED(15);
 
-     OPEN table BY ANY,IDF('file1.txt');
+     OPEN table62 BY ANY,IDF('file1.txt');
 
-     WRITE f4 TO table BY POS(1), POS(2);
-     CLOSE table;
+     WRITE f4 TO table BY POS(3);
+     CLOSE table62;
 END;
 
+DCL table126 DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
+ticket126: TASK;
+     DCL f FIXED(15) INIT(42);
+     DCL (f4,f5) FIXED(15) INIT(0,0);
+     DCL error FIXED(15);
+
+     OPEN table126 BY ANY,IDF('file1.txt');
+
+     WRITE f4 TO table BY POS(1), POS(2);
+     CLOSE table126;
+END;
+
+DCL table216 DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
+ticket216: TASK;
+     DCL f FIXED(15) INIT(42);
+     DCL (f4,f5) FIXED(15) INIT(0,0);
+     DCL error FIXED(15);
+
+     OPEN table216 BY ANY,IDF('file1.txt');
+
+     WRITE f4 TO table BY EOF;
+     CLOSE table216;
+END;
+
+DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
 FileTest1: TASK MAIN;
-     DCL table DATION INOUT FIXED(15) DIM(*) DIRECT CREATED(disc);
      DCL f FIXED(15) INIT(42);
      DCL (f4,f5) FIXED(15) INIT(0,0);
      DCL error FIXED(15);
@@ -48,19 +72,19 @@ FileTest1: TASK MAIN;
      IF (error /= 0) THEN
         PUT 'error: RST-value should be zero (', error ,') ' TO stdOut 
              BY A, F(3), A, SKIP;
-__cpp__('pearlrt::Control::setExitCode(1);');
+__cpp__("pearlrt::Control::setExitCode(1);");
      FIN;
 
      IF (f /= f5) THEN
         PUT 'error: did not read the same value (', f,',', f5,') ' TO stdOut
          BY A,F(6),A,F(6),A, SKIP;
-__cpp__('pearlrt::Control::setExitCode(1);');
+	 __cpp__("pearlrt::Control::setExitCode(1);");
        error = 1;
      FIN;
      IF (f4 /= 0) THEN
        PUT 'error: f4 should be zero (', f4, ') ' TO stdOut 
          BY A, F(6),A,SKIP;
-__cpp__('pearlrt::Control::setExitCode(1);');
+	 __cpp__("pearlrt::Control::setExitCode(1);");
        error = 1;
      FIN;
 

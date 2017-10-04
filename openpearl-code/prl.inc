@@ -91,38 +91,37 @@ if [ "$RUN" = "1" ] ; then
       exit 1
    fi
 else
-if [ "$inp_ext" = "prl" ] ; then
+ if [ "$inp_ext" = "prl" ] ; then
    prlcc=1;
-else if [ "$inp_ext" != "cc" ] ; then
+ else if [ "$inp_ext" != "cc" ] ; then
    echo "cannot treat extension " $inp_ext;
    exit 1;
-   fi;
+ fi;
 fi
 
 #echo "prlcc=" $prlcc
 if [ "$prlcc" = "1" ] ; then 
 #   echo "PRL-> C++"
-#include "compiler/prl_cc.inc"
-rc=$?
-if [ $rc -ne 0 ]
-then
- echo "terminate due to errors in stage 1"
- exit $rc
-fi
-# imc invokation removed untilmodule.xml is available
-#include "imc/imc.inc"
-rc=$?
-if [ $rc -ne 0 ]
-then
- echo "terminate due to errors in stage 1b (imc)"
- exit $rc
-fi
+ #include "compiler/prl_cc.inc"
+ rc=$?
+ if [ $rc -ne 0 ]
+ then
+  echo "terminate due to errors in stage 1"
+  exit $rc
+ fi
 else  if [ "$COMPILEONLY" = "1" ] ; then
    echo " C++ input conflicts with option -c"
    exit 1
    fi
 fi
 if [ "$COMPILEONLY" != "1" ] ; then
+  #include "imc/imc.inc"
+  rc=$?
+  if [ $rc -ne 0 ]
+  then
+   echo "terminate due to errors in stage 1b (imc)"
+   exit $rc
+  fi
   #   echo "C++->BIN"
 #include "runtime/cc_bin.inc"
   if [ $rc -ne 0 ]

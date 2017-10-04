@@ -29,6 +29,9 @@ INCS = .
 CXXSRCS =
 CRCS =
 
+CHAN_FS= ../FreeRTOS/chanFatFs/src
+LPCOPEN_FS= ../cortexM/LPCOpen/software/filesystems
+
 targets := OpenPEARLlpc1768_board.o libOpenPEARLlpc1768.a lpc1768.xml
 
 # -------------------- add CMSIS support to project
@@ -79,10 +82,13 @@ LPCOpen_CSRC += $(LPCOpen)/iocon_17xx_40xx.c
 CXXSRCS += main.cc Log.cc
 CHECK_FILES += main.cc Log.cc
 
+ifeq ($(CONFIG_LPC1768_HY32A),y)
 CSRC += Hy32.cc Hy32LowLevel.cc SmallFont.c BigFont.c
 XMLFILES += Hy32.xml
 CHECK_FILES +=  Hy32.cc Hy32LowLevel.cc \
 	Hy32.h Hy32LowLevel.h
+endif
+
 # ------- add board specific stuff to project
 BOARDSUPPORT := 
 #BOARDSUPPORT += lpc17_uart_retarget.c
@@ -140,27 +146,38 @@ CXXSRCS += Lpc17xxUsb.cc
 CHECK_FILES += Lpc17xxUsb.cc  Lpc17xxUsb.h
 INCS += $(LPCUSB_Base) 
 endif
+
+ifeq ($(CONFIG_HAS_FAT),y)
+   INCS += $(CHAN_FS)
+   LPCOpen_CSRC += $(CHAN_FS)/ff.c
+   LPCOpen_CSRC += $(CHAN_FS)/ff_errors.c
+   LPCOpen_CSRC += $(CHAN_FS)/diskio.c
+endif
+
 ifeq ($(CONFIG_LPC1768_USB_Disk),y)
-LPCUSB_FS= ../cortexM/LPCOpen/software/filesystems
-CHAN_FS= ../FreeRTOS/chanFatFs/src
-LPCOpen_CSRC += $(LPCUSB_Class)/Host/MassStorageClassHost.c
-LPCOpen_CSRC += $(CHAN_FS)/ff.c
-LPCOpen_CSRC += $(CHAN_FS)/diskio.c
-CXXSRCS += Lpc17xxUsbDisk.cc
-CHECK_FILES += Lpc17xxUsbDisk.cc Lpc17xxUsbDisk.h
-XMLFILES += Lpc17xxUsbDisk.xml
-#INCS += $(LPCUSB_FS)/fatfs/src 
-INCS += $(CHAN_FS)
-INCS += $(LPCUSB_Base)/Class/Host 
+   LPCOpen_CSRC += $(LPCUSB_Class)/Host/MassStorageClassHost.c
+   CXXSRCS += Lpc17xxUsbDisk.cc
+   CHECK_FILES += Lpc17xxUsbDisk.cc Lpc17xxUsbDisk.h
+   XMLFILES += Lpc17xxUsbDisk.xml
+   INCS += $(LPCUSB_Base)/Class/Host 
 endif
 
 ifeq ($(CONFIG_LPC1768_USB_Keyboard),y)
-LPCOpen_CSRC += $(LPCUSB_Class)/Host/HIDClassHost.c
-LPCOpen_CSRC += $(LPCUSB_Class)/Common/HIDParser.c
-CXXSRCS += Lpc17xxUsbKeyboard.cc
+   LPCOpen_CSRC += $(LPCUSB_Class)/Host/HIDClassHost.c
+   LPCOpen_CSRC += $(LPCUSB_Class)/Common/HIDParser.c
+   CXXSRCS += Lpc17xxUsbKeyboard.cc
 #CHECK_FILES += Lpc17xxUsbKeyboard.cc Lpc17xxUsbKeyboard.h
-CHECK_FILES += Lpc17xxUsbKeyboard.h
-XMLFILES += Lpc17xxUsbKeyboard.xml
+   CHECK_FILES += Lpc17xxUsbKeyboard.h
+   XMLFILES += Lpc17xxUsbKeyboard.xml
+endif
+
+ifeq ($(CONFIG_LPC1768_SDCARD),y)
+   LPCOpen_CSRC +=  $(LPCOpen)/spi_17xx_40xx.c
+   LPCOpen_CSRC +=  $(LPCOpen)/ssp_17xx_40xx.c
+#   LPCOpen_CSRC +=  $(LPCOpen)/gpdma_17xx_40xx.c
+   CXXSRCS += Lpc17xxSDCard.cc
+   CHECK_FILES += Lpc17xxSDCard.cc Lpc17xxSDCard.h
+   XMLFILES += Lpc17xxSDCard.xml
 endif
 
 #$(warning BOARDSUPPORT = $(BOARDSUPPORT))
@@ -208,7 +225,7 @@ CHECK_FILES := $(sort $(CHECK_FILES))
 #$(warning BOARDSUPPORT_OBJ=$(BOARDSUPPORT_OBJ))
 #$(warning XMLFILES=$(XMLFILES))
 
-all: depend $(targets)
+all: mkFakeTypes depend $(targets)
 
 tests/testStackOverflow.s: tests/testStackOverflow.cc
 	$(CXX) $^ -S $(CXXFLAGS)  $(PURECXXFLAGS)
@@ -227,7 +244,8 @@ libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@$(AR) r libOpenPEARLlpc1768.a $(PLIB_OBJS)
 
 lpc1768.xml: $(XMLFILES)
-	echo $(XMLFILES)
+	@echo "[create] $@"
+	#echo $(XMLFILES)
 	@echo "[build] $@"
 	@echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" > $@
 	@echo "<platform file=\"$@\">" >> $@
@@ -237,7 +255,7 @@ lpc1768.xml: $(XMLFILES)
 
 phony += depend
 depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
-	@echo "[create] .depend"
+	@echo "[create] $@"
 	@$(CXX) -MM $(CFLAGS) $(CPPFLAGS) $(INCS) $^ >.depend
 
 phony += clean
@@ -274,27 +292,28 @@ prepare:
 
 phony += install
 install: all cc_bin run_bin
-	rm -f pearl2.h
-	$(IC) -c $(INCS)  <PearlIncludes.h | $(DWS) >pearl2.h
-	cat sysincs.h pearl2.h >pearl.h
-	rm -f pearl2.h sysincs.h
-	cp libOpenPEARLlpc1768.a $(CONFIG_INSTALL_Target)/lib
-	mkdir -p $(CONFIG_INSTALL_Target)/lib/ldscripts
-	cp OpenPEARLlpc1768.ld $(CONFIG_INSTALL_Target)/lib/ldscripts
-	cp OpenPEARLlpc1768_board.o $(CONFIG_INSTALL_Target)/lib
-	cp lpc1768.xml $(CONFIG_INSTALL_Target)/lib
+	@echo [install]
+	@rm -f pearl2.h
+	@$(IC) -c $(INCS)  <PearlIncludes.h | $(DWS) >pearl2.h
+	@cat sysincs.h pearl2.h >pearl.h
+	@rm -f pearl2.h sysincs.h
+	@cp libOpenPEARLlpc1768.a $(CONFIG_INSTALL_Target)/lib
+	@mkdir -p $(CONFIG_INSTALL_Target)/lib/ldscripts
+	@cp OpenPEARLlpc1768.ld $(CONFIG_INSTALL_Target)/lib/ldscripts
+	@cp OpenPEARLlpc1768_board.o $(CONFIG_INSTALL_Target)/lib
+	@cp lpc1768.xml $(CONFIG_INSTALL_Target)/lib
 
 phony += cc_bin
 cc_bin:
-	# create cc_bin.inc
-	echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc system.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' > cc_bin.inc 
+	@echo "[create] $@"
+	@echo '$(CXX) -DTARGET=2 $(PURECXXFLAGS) $(LFLAGS) $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o -I $(CONFIG_INSTALL_Target)/include $$fn.cc system.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a' > cc_bin.inc 
 
 phony += run_bin
 run_bin:
-	# create run_bin.inc
-	echo "# auto generated " > run_bin.inc
-	echo 'objcopy -O ihex $$fn $$fn.hex' >>run_bin.inc
-	echo 'lpc21isp -control -term -hex $$fn.hex $$INTERFACE 115200 12000' >>run_bin.inc
+	@echo "[create] $@"
+	@echo "# auto generated " > run_bin.inc
+	@echo 'objcopy -O ihex $$fn $$fn.hex' >>run_bin.inc
+	@echo 'lpc21isp -control -term -hex $$fn.hex $$INTERFACE 115200 12000' >>run_bin.inc
 
 # -------------------------------------------------
 # additional rules to enable make to build the autogenerated files
@@ -312,6 +331,17 @@ run_bin:
 phony +=  checkformat
 checkformat:
 	@$(foreach f,$(CHECK_FILES),../codestyle/check.sh $(f);)
+
+phony += mkFakeTypes
+mkFakeTypes: 
+	@echo "[create] $@"
+	@$(CC) $(INCS) -c ../FreeRTOS/addOns/mkFakeTypes.c
+	@mv mkFakeTypes.o ../FreeRTOS/addOns/
+	@(cd ../FreeRTOS/addOns; size -A mkFakeTypes.o >sizes.txt;\
+	 gcc fakeTypes.c -o fakeTypes; ./fakeTypes)
+	@$(CXX) $(INCS) -c ../FreeRTOS/addOns/check_FakeTypes.c
+	@(cd ../FreeRTOS/addOns; \
+	rm -f sizes.txt mkFakeTypes.o check_FakeTypes.o fakeTypes)
 
 -include .depend
 

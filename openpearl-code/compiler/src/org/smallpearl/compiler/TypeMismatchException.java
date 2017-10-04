@@ -35,7 +35,7 @@ public class TypeMismatchException extends RuntimeException {
     }
 
     public TypeMismatchException(String sNumber, int line, int column, String sReason) {
-        super("Error at line " + line + ":" + column + ": Type mismacth: " + sReason);
+        super("Error at line " + line + ":" + column + ": Type mismatch: " + sReason);
     }
 
 }

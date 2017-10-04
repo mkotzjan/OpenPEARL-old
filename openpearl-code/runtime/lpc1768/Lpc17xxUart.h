@@ -99,7 +99,7 @@ namespace pearlrt {
          char * data;
          int nbr;
          int nbrReceived;
-         SemaphoreHandle_t blockSema;
+         FakeSemaphoreHandle_t blockSema;
       } sendCommand, recvCommand;
 
       char bufferedInputChar;	// one char may be buffered even if no
@@ -118,7 +118,7 @@ namespace pearlrt {
       \param stopBits number of stop bits
       \param parity the desired type of parity ('O', 'E', 'N')
 
-      \throws theIllegalParamSignal in case of illegal parameter values
+      \throws theInternalDationSignal in case of illegal parameter values
                                or if the rxbuffer could not be allocated
       */
       Lpc17xxUart(int port, int baudRate, int bitsPerCharacter,

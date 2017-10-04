@@ -1,0 +1,3 @@
+011_fixed_precision_negativ.prl:5:12: ERROR : Syntax error : precision for FIXED must be between 0 and 63
+DCL f FIXED(-1);
+            ^

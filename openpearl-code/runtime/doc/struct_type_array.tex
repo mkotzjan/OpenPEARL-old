@@ -1,6 +1,7 @@
 \chapter{Struct, Type and Arrays}
 
 \section{Struct}
+\label{sec:struct}
 
 PEARL structs may be mapped to C++ structs.
 The C++ operators like \verb|=| (assignment), \verb|.| (dot) and 
@@ -49,7 +50,7 @@ STRUCT & S &s\\
 \hline
 \end{tabular}
 
-\paragraph{Note:} Semaphores and Bols variables are not allowed in structs,
+\paragraph{Note:} Semaphores and Bolts variables are not allowed in structs,
 but the encoding mapping is also used for the inter module checker.
 
 
@@ -208,6 +209,8 @@ The parameters are:
    \item number of elements in next sub array. This value is 1 for the 
      last index. It is the product of all index ranges of all subarrays.
      E.g. a(3,4,5) $\rightarrow$ LIMITS(3,\{1,3,4*5*1\},\{1,4,5*1\},\{1,5,1\}\}
+     \\
+     LIMITS is implemented as a macro.
    \end{enumerate}
 \end{description}
 
@@ -229,6 +232,7 @@ b & array object which stores the pointer of the array descriptor \\
 \subsection{Example}
 
 \begin{PEARLCode}
+DCL testValue FIXED(31); 
 DCL x(10:20) FIXED(31); 
 DCL y(1,10,10:20) FLOAT(24); 
 TYPE MyStruct STRUCT [

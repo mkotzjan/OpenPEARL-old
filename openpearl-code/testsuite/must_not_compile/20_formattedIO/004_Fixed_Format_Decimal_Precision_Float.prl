@@ -1,0 +1,23 @@
+/****************************************
+Compiler Error for Float Value as Paramter d
+Decimal Precision in Fixed Format Put Statement
+
+****************************************/
+MODULE(field_width_float);
+
+PROBLEM;
+SPC pipe DATION OUT SYSTEM ALPHIC;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Task1: TASK MAIN;
+     DCL f FIXED(15) INIT(0);
+
+     PUT f TO pipe_out BY F(2,1.0),SKIP;
+
+END;
+MODEND;
+

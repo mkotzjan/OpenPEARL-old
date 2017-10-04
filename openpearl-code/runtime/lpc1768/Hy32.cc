@@ -48,7 +48,7 @@ namespace pearlrt {
 printf("Hy32-ctor\n");
       if (orientation < 0 || orientation > 3) {
          Log::error("Hy32: illegal orientation: %d", orientation);
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       device = Hy32LowLevel::getInstance(orientation);
@@ -88,7 +88,7 @@ printf("Hy32-ctor\n");
    Hy32* Hy32::dationOpen(const char * idfValue, int openParams) {
       if (openParams & (Dation::IDF | Dation::CAN)) {
          Log::error("Hy32: does not support IDF and CAN");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       mutex.lock();
@@ -115,7 +115,7 @@ printf("Hy32-ctor\n");
       if (closeParams & Dation::CAN) {
          Log::error("Hy32: CAN not supported");
          mutex.unlock();
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       mutex.unlock();
@@ -124,7 +124,7 @@ printf("Hy32-ctor\n");
    void Hy32::dationRead(void * destination, size_t size) {
 
       Log::error("Hy32: read is not supported");
-      throw theIllegalParamSignal;
+      throw theInternalDationSignal;
    }
 
    uint16_t Hy32::xOfCurrentPos() {
@@ -158,7 +158,7 @@ printf("Hy32-ctor\n");
 
       if (nbrOpenUserDations == 0) {
          Log::error("Hy32: not opened");
-         throw theIllegalParamSignal;
+         throw theDationNotOpenSignal;
       }
 
       mutex.lock();

@@ -1,0 +1,3 @@
+032_spc_ident_novariable.prl:5:21: ERROR : unknown identifier 'xx'  
+   SPC x FIXED IDENT(xx);
+                     ^

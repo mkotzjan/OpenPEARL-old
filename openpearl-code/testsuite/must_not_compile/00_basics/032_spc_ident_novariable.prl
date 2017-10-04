@@ -1,0 +1,8 @@
+MODULE(m1);
+
+PROBLEM;
+   ! must fail --  xx not defined
+   SPC x FIXED IDENT(xx);
+
+END;
+MODEND;

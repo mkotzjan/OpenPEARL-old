@@ -33,6 +33,8 @@ import org.smallpearl.compiler.*;
 import org.smallpearl.compiler.SymbolTable.*;
 import org.stringtemplate.v4.ST;
 
+import java.util.List;
+
 public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
     private int m_verbose;
@@ -133,6 +135,20 @@ public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements S
             System.out.println( "Semantic: Check ProcedureCall: visitCallStatement");
         }
 
+        SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
+
+        if (entry instanceof ProcedureEntry) {
+            if (m_debug)
+                System.out.println("Semantic: Check ProcedureCall: found call in expression");
+
+            ProcedureEntry proc = (ProcedureEntry) entry;
+            TypeDefinition resultType = proc.getResultType();
+
+            if ( resultType != null ) {
+                throw new ResultDiscardedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
         if ( ctx.listOfActualParameters() != null ) {
             visitListOfActualParameters(ctx.listOfActualParameters());
         }
@@ -152,28 +168,21 @@ public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements S
                 TypeDefinition resultType = proc.getResultType();
             }
 
-            if ( ctx.listOfActualParameters() != null ) {
-                visitListOfActualParameters(ctx.listOfActualParameters());
+            if ( ctx.expression() != null ) {
+                checkListOfActualParameters(ctx.expression());
             }
-
         }
 
         return null;
     }
 
-    @Override
-    public Void visitListOfActualParameters(SmallPearlParser.ListOfActualParametersContext ctx) {
+    private Void checkListOfActualParameters(List<SmallPearlParser.ExpressionContext> parameters) {
         if (m_debug) {
-            System.out.println( "Semantic: Check ProcedureCall: visitListOfActualParameters");
+            System.out.println( "Semantic: Check ProcedureCall: checkListOfActualParameters");
         }
 
-        if ( ctx.expression() != null ) {
-            for (int i = 0; i < ctx.expression().size(); i++) {
-                // getExpression(ctx.expression(i)));
-            }
-        }
+        // TODO: Check paraneter types
 
         return null;
     }
-
 }

@@ -1,0 +1,9 @@
+MODULE(m1);
+
+PROBLEM;
+LENGTH FIXED(64);
+!!!!! BEGIN
+             ^
+001_length_fixed_too_large.prl:5:12: ERROR : Syntax error : precision for FIXED must be between 0 and 63
+!!!!! END
+MODEND;

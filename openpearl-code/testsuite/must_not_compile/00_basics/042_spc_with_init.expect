@@ -1,0 +1,3 @@
+042_spc_with_init.prl:4:16: ERROR : Syntax error :mismatched input 'INIT' expecting ';'
+   SPC f1 FIXED INIT(1) GLOBAL(b);
+                   ^

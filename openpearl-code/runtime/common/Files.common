@@ -1,6 +1,6 @@
 #/*
 # [A "BSD license"]
-# Copyright (c) 2012-2016 Rainer Mueller
+# Copyright (c) 2012-2017 Rainer Mueller
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@
 
 CXX_COMMON = \
 	Array.cc \
+	Bolt.cc \
 	LogFile.cc\
-	Dation.cc \
 	Log.cc \
 	Clock.cc  \
 	Duration.cc  \
@@ -46,7 +46,9 @@ CXX_COMMON = \
 	ScheduleSignalAction.cc \
 	Fixed63.cc \
 	Prio.cc \
+	CharSlice.cc \
 	Character.cc RefChar.cc \
+        compare.cc \
 	Interrupt.cc \
 	Source.cc \
 	RefCharSink.cc RefCharSource.cc \
@@ -60,8 +62,12 @@ CXX_COMMON = \
 	TaskMonitor.cc \
 	MutexCommon.cc CSemaCommon.cc \
 	Semaphore.cc PriorityQueue.cc \
+	Rst.cc \
+	SystemDationNB.cc \
 	DationRW.cc \
+	IOFormats.cc \
 	DationPG.cc \
+	StringDationConvert.cc \
 	DationTS.cc \
 	UserDationNB.cc UserDation.cc \
 	DationDim.cc  DationDim1.cc \
@@ -92,13 +98,13 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	GetBitString.h \
 	Sink.h RefCharSink.h \
 	Fixed.h PutFixed.h GetFixed.h \
+	Dation.h \
 	Device.h UserDation.h \
 	PutCharacter.h \
 	Float.h \
 	TaskTimerCommon.h \
-	compare.h \
-	SystemDation.h \
-	SystemDationNB.h 
+	Ref.h \
+	SystemDation.h 
 
 
 ifeq ($(CONFIG_CANSUPPORT),y)

@@ -30,6 +30,9 @@
 package org.smallpearl.compiler;
 
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public class TypeFloat extends TypeDefinition {
     private int m_precision;
 
@@ -49,5 +52,23 @@ public class TypeFloat extends TypeDefinition {
 
     public String toString() {
         return this.getName() + "(" + this.m_precision + ")";
+    }
+
+    public ST toST(STGroup group) {
+        ST st = group.getInstanceOf("float_type");
+        st.add("size", m_precision);
+        return st;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeFloat)) {
+            return false;
+        }
+
+        TypeFloat that = (TypeFloat) other;
+
+        // Custom equality check here.
+        return this.m_precision == that.m_precision;
     }
 }

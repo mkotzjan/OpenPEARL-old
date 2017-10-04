@@ -1,0 +1,3 @@
+003_length_fixed_missing1.prl:4:13: ERROR : missing constant for length
+LENGTH FIXED ;
+             ^

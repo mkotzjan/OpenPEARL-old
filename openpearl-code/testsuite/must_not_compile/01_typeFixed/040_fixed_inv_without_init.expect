@@ -1,0 +1,3 @@
+040_fixed_inv_without_init.prl:6:18: ERROR : INV element needs INIT
+  DCL f INV FIXED;
+                 ^

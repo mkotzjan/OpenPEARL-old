@@ -148,7 +148,8 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
         } else if (ctx.FloatingPointConstant() != null) {
             // TODO
         } else if (ctx.StringLiteral() != null) {
-            add(new ConstantCharacterValue(ctx.StringLiteral().toString()));
+            String s = ctx.StringLiteral().toString();
+            add(new ConstantCharacterValue(s));
         }else if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = null;

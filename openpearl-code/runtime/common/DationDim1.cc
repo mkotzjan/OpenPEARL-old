@@ -43,7 +43,7 @@ namespace pearlrt {
    DationDim1::DationDim1(Fixed<31> c) : DationDim(0, 0, c, 1, true) {
       if ((c <= zero).getBoolean()) {
          Log::error("DationDim1: cols must be > 0");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
    }
 
@@ -54,7 +54,7 @@ namespace pearlrt {
    void DationDim1::pos(const Fixed<31>c) {
       if (!(dationParams & Dation::DIRECT)) {
          Log::error("DationDim1: POS needs DIRECT DATION");
-         throw thePositioningForbiddenSignal;
+         throw theInternalDationSignal;
       }
 
       if ((c < zero).getBoolean()) {
@@ -74,14 +74,14 @@ namespace pearlrt {
       if (dationParams & Dation::FORWARD) {
          if ((c < zero).getBoolean()) {
             Log::error("DationDim1: ADV on FORWARD DATION"
-                       " needs nonnegativ value");
-            throw theNotAllowedSignal;
+                       " needs non negativ value");
+            throw thePositioningFailedSignal;
          }
       }
 
       if (dationParams & Dation::FORWARD && (c < zero).getBoolean()) {
          Log::error("negative direction at FORWARD");
-         throw theNotAllowedSignal;
+         throw theInvalidPositioningSignal;
       }
 
       if (dationParams & Dation::CYCLIC) {

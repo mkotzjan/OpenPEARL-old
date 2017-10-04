@@ -31,9 +31,12 @@ package org.smallpearl.compiler;
 
 public class UnknownIdentifierException extends RuntimeException {
 
-    public UnknownIdentifierException(String name, int line, int column) {
-        super("Error at line " + line + ":" + column +
-                ": Unknown Identifier.");
+    public UnknownIdentifierException(String sNumber, int line, int column) {
+        super("Error at line " + line + ":" + column + ": Unknown identifier");
+    }
+
+    public UnknownIdentifierException(String sNumber, int line, int column, String sReason) {
+        super("Error at line " + line + ":" + column + ": Unknown identifier: " + sReason);
     }
 
 }

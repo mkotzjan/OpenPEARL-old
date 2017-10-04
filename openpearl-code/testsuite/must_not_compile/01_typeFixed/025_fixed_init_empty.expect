@@ -1,0 +1,3 @@
+025_fixed_init_empty.prl:5:21: ERROR : empty initializer list
+DCL f FIXED(15) INIT();
+                     ^

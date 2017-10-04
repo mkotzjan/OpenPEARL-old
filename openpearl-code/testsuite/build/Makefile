@@ -16,13 +16,12 @@
 # the result of make doesnotbuild is ok, if no test cases work
  
 DONOTBUILD= 030_signals 031_signalsInduce  \
-	041_if_if \
 	043_switch \
-	400_char_dcl \
+	103_fixed_monadic_arith \
 	401_char_expr1 \
-	090_tasking  \
-	602_clock_expr1	\
-	701_dation_pg 
+	701_dation_pg \
+	706_convert \
+	850_ref_decl
 
 DONOTRUN=000_empty \
 	703_userdation_dcl \

@@ -42,7 +42,17 @@ namespace pearlrt {
    */
 
    /**
-   This class defines a sink which puts all characters in a ref char variable
+   \addtogroup io_common
+   @{
+   */
+
+   /**
+
+   \brief a Sink which operates upon a RefCharacter variable
+
+   This class defines a sink which puts all characters in a ref char variable.
+   The output of a CONVERT ... TO statement is collected by this class.
+   
    */
    class RefCharSink: public Sink {
    private:
@@ -64,7 +74,22 @@ namespace pearlrt {
       \throws CharacterTooLongSignal if the ref char is full
       */
       void putChar(char c);
+
+      /**
+      set the current write position
+     
+      \param newColumn  the new position to continue writing 
+      */
+      void pos(size_t newColumn);
+   
+      /**
+      get the current write position
+     
+      \returns the current position 
+      */
+      size_t sop();
    };
+   /** @} */
 }
 #endif
 

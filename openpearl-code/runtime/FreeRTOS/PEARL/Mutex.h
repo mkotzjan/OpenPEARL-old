@@ -36,8 +36,7 @@
 #ifndef MUTEX_INCLUDED
 #define MUTEX_INCLUDED
 
-#include "FreeRTOS.h" // from FreeRTOS
-#include "semphr.h"   // from FreeRTOS
+#include "FakeTypes.h"
 
 #include "MutexCommon.h"
 
@@ -51,7 +50,7 @@ namespace pearlrt {
    */
    class Mutex : public MutexCommon {
    private:
-      xSemaphoreHandle mutex;
+      FakexSemaphoreHandle mutex;
 
    public:
       /**

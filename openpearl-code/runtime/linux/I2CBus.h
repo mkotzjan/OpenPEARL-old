@@ -33,7 +33,24 @@
 #include "I2CProvider.h"
 #include "Mutex.h"
 
+/**
+\file
+*/
+
+
 namespace pearlrt {
+   /**
+   \addtogroup io_linux_driver
+   @{
+   */
+
+   /**
+   \brief an I2CBusProvider using the linux device node /dev/i2c-x
+
+    long test jsjsjs sds ds
+    jkl asd jl
+  
+   */
    class I2CBus : public I2CProvider {
    private:
       int i2c_file;   // file decriptor for the i2c-connection
@@ -45,7 +62,8 @@ namespace pearlrt {
 
       \param deviceName is the name of the device (e.g. /dev/i2c-1)
 
-      \throws IllegalParamException if the device is not accessible
+      \throws DeviceNotFoundSignal if the device is not accessible
+      \throws DationParamSignal if the device is not accessible
       */
       I2CBus(const char * deviceName);
 
@@ -54,6 +72,8 @@ namespace pearlrt {
       \param adr addres of the i2c device
       \param n maximum number of expected data bytes
       \param data array of data elements
+      \throws InternalDationSignal if the slave adress is not setable
+      \throws ReadingFailedSignal if a read problem was detected
       \returns number of receive data bytes
       */
       int readData(int adr, int n, uint8_t * data);
@@ -64,6 +84,8 @@ namespace pearlrt {
       \param n number of data bytes to be written
       \param data array of data elements
       \returns number of transmitted data bytes
+      \throws InternalDationSignal if the slave adress is not setable
+      \throws WritingFailedSignal if a write problem was detected
       */
       int writeData(int adr, int n, uint8_t * data);
 
@@ -76,9 +98,11 @@ namespace pearlrt {
 
       \param n number of transactions
       \param data array of transactions
+      \throws ReadingFailedSignal if a read problem was detected
       */
       void rdwr(int n, I2CMessage* data);
    };
+   /** @} */
 }
 #endif
 

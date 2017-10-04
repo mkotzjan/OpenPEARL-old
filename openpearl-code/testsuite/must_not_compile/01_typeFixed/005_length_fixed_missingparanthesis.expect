@@ -1,0 +1,6 @@
+005_length_fixed_missingparanthesis.prl:4:13: ERROR : Syntax error :missing '(' at '15'
+LENGTH FIXED 15;
+              ^
+005_length_fixed_missingparanthesis.prl:4:15: ERROR : Syntax error :missing ')' at ';'
+LENGTH FIXED 15;
+               ^

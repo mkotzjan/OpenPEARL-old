@@ -48,12 +48,12 @@ namespace pearlrt {
    void DationDim::setDationParams(const int p) {
       if (!!(p & Dation::CYCLIC) == !!(p & Dation::NOCYCL)) {
          Log::error("DationDim: CYCLIC or NOCYCL required");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       if (!!(p & Dation::STREAM) == !!(p & Dation::NOSTREAM)) {
          Log::error("DationDim: STREAM or NOSTREAM required");
-         throw theIllegalParamSignal;
+         throw theInternalDationSignal;
       }
 
       dationParams = p;
@@ -108,17 +108,17 @@ namespace pearlrt {
       if (dationParams & Dation::CYCLIC) {
          if ((cols < zero).getBoolean()) {
             Log::error("DationDim: CYCLIC set for DIM(*) dation");
-            throw theIllegalParamSignal;
+            throw theInternalDationSignal;
          }
 
          if (dimensions == 2 && (rows < zero).getBoolean()) {
             Log::error("DationDim: CYCLIC set for DIM(*,N) dation");
-            throw theIllegalParamSignal;
+            throw theInternalDationSignal;
          }
 
          if (dimensions == 3 && (pages < zero).getBoolean()) {
             Log::error("DationDim: CYCLIC set for DIM(*,M,N) dation");
-            throw theIllegalParamSignal;
+            throw theInternalDationSignal;
          }
       }
 
@@ -147,7 +147,7 @@ namespace pearlrt {
       if ((c < zero).getBoolean()) {
          Log::error("Dation capacity calulation not allowed on "
                     "unlimited dimensions");
-         throw theNotAllowedSignal;
+         throw theInternalDationSignal;
       }
 
       return c;

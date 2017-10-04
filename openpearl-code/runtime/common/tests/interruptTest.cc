@@ -88,10 +88,10 @@ int success = 1;
 //execute function for working thread 1
 DCLTASK(TASK1, pearlrt::Prio(2), pearlrt::BitString<1>(1)) {
    /*do something*/
-   int caught;
+//   int caught;
    printf("TASK1 laeuft\n");
 
-   caught = 0;
+//   caught = 0;
 
 //   try {
    TASK2.cont(me, pearlrt::Task::PRIO | pearlrt::Task::WHEN,
@@ -116,7 +116,7 @@ DCLTASK(TASK1, pearlrt::Prio(2), pearlrt::BitString<1>(1)) {
 
    TASK2.prevent(me);
 
-   caught = 0;
+   //caught = 0;
 
 //  try {
    TASK2.activate(me, pearlrt::Task::PRIO | pearlrt::Task::WHEN,

@@ -748,7 +748,8 @@ immediately or under various start conditions.
 \put(65, 6){\usebox{\normalstmt}}
 \end{picture}
 \caption{Possibilities to start a task immediately or under 
-various conditions}
+various conditions. The period of the element DURING starts after
+the {\em delayed start} has completed.}
 \label{sched_act}
 \end{figure}
 % Bild. 9-9 einfuegen !!!
@@ -1823,6 +1824,19 @@ Generally, bolt variables can be declared and used as follows:
 Therefore, also arrays of bolt variables can be declared.
 
 Bolt declarations must take place at module level.
+
+\begin{added}
+Possible problem situations:
+
+\begin{description}
+\item[BoltStateSignal] is induced, if an LEAVE or FREE operation
+   is executed and no ENTER or RESERVE operation (respectively) 
+   was executed before.
+\item [BoltEnterOverflowSignal] if more than the range of FIXED(32) enter
+   operations were executed in sequence.
+\end{description}
+
+\end{added}
 
 
 \section{Interrupts and Interrupt Statements}   % 9.4

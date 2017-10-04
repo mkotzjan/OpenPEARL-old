@@ -54,8 +54,8 @@ namespace pearlrt {
          RPiGpio::instance()->useBits(start, width,
                                       RPiGpio::DIGIN, RPiGpio::NONE);
       } else {
-         Log::error("RPiDigitalIn: illegal pub value (%s)", pud);
-         throw theIllegalParamSignal;
+         Log::error("RPiDigitalIn: illegal pull up/down value (%s)", pud);
+         throw theDationParamSignal;
       }
    }
 
@@ -65,18 +65,18 @@ namespace pearlrt {
    SystemDationB* RPiDigitalIn::dationOpen(const char * idf, int openParam) {
       if (idf != 0) {
          Log::error("IDF not allowed for RPi digital out device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if ((openParam & (~IN))  != 0) {
          Log::error("No open parameters allowed for RPi digital "
                     "in device (%x)", openParam);
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("RPiDigitalIn: Dation already open");
-         throw theNotAllowedSignal;
+         throw theOpenFailedSignal;
       }
 
       dationStatus = OPENED;
@@ -87,12 +87,12 @@ namespace pearlrt {
    void RPiDigitalIn::dationClose(int closeParam) {
       if (closeParam != 0) {
          Log::error("No close parameters allowed for RPiDigitalIn device");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalIn: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       dationStatus = CLOSED;
@@ -100,7 +100,7 @@ namespace pearlrt {
 
 
    void RPiDigitalIn::dationWrite(void* data, size_t size) {
-      throw theNotAllowedSignal;
+      throw theInternalDationSignal;
    }
 
    void RPiDigitalIn::dationRead(void* data, size_t size) {
@@ -112,12 +112,12 @@ namespace pearlrt {
       // Therefore size must be less than 4
       if (size > 4) {
          Log::error("RPiDigitalIn: max 32 bits expected");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("RPiDigitalIn: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       // readBits delivers data left adjusted
@@ -137,7 +137,8 @@ namespace pearlrt {
          break;
 
       default:
-         Log::error("RPiDigitalIn: illegal size (%d)", size);
+         // we must cast to int, since Log does not support %u
+         Log::error("RPiDigitalIn: illegal size (%d)", (int)size);
          throw theInternalDationSignal;
       }
 

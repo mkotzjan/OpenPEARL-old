@@ -5,15 +5,19 @@ PROBLEM;
 T1: TASK MAIN;
 
    DCL d DURATION INIT(12.0SEC);
-   DCL c CLOCK INIT(12:00:00.0);
+   DCL c CLOCK INIT(14:20:00.0);
 
    AT c ALL d DURING 4*d ACTIVATE T1;
    AFTER d ALL 5*d UNTIL c+d ACTIVATE T1;
-   AFTER d RESUME T1;
+   PREVENT T1;   ! let's void endless reactications
+   AFTER d RESUME;
 
-   AT c AFTER d CONTINUE;
-   
+   ! the next line is commented out in order to
+   ! reach a soon termination
+   ! AT c CONTINUE;
 
+
+   AFTER d CONTINUE;
 
 END;
 

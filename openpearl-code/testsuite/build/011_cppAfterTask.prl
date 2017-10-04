@@ -7,7 +7,7 @@ t : TASK MAIN;
 END;
 
 __cpp__(
-'void f() {}'
+"void f() {}"
 );
 
 MODEND;

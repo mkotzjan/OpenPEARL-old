@@ -30,6 +30,9 @@
 package org.smallpearl.compiler;
 
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public class TypeDuration extends TypeDefinition {
 
     TypeDuration() {
@@ -38,6 +41,23 @@ public class TypeDuration extends TypeDefinition {
 
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TypeDuration)) {
+            return false;
+        }
+
+        TypeDuration that = (TypeDuration) other;
+
+        // Custom equality check here.
+        return true;
+    }
+
+    public ST toST(STGroup group) {
+        ST st = group.getInstanceOf("duration_type");
+        return st;
     }
 
 }

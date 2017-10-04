@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
  Copyright (c) 2014-2014 Rainer Mueller
  All rights reserved.
@@ -46,6 +46,10 @@
 #include <unistd.h>
 
 namespace pearlrt {
+   /** 
+   \addtogroup io_linux_driver
+   @{
+   */
 
    /**
    \brief generic non-basic systemdation class
@@ -73,6 +77,8 @@ namespace pearlrt {
 
    public:
       /**
+      \brief a file in the folder specified by Disc
+
       A DiscFile represents a file on a Disc. This class is responsible
       for all operations with the  operating system.
       */
@@ -171,6 +177,14 @@ namespace pearlrt {
          */
          void dationUnGetChar(const char c);
 
+         /**
+         set the file location to End Of File and return the byte offset
+         as return value
+
+         \returns byte offset of the eof-location
+         */
+         Fixed<31> dationEof();
+
       /**
       translate newline
   
@@ -216,9 +230,9 @@ namespace pearlrt {
        \param nbrOfFiles denotes the number of files opened
               at one time on this folder/disc
 
-       \throws IllegalPathSignal, if dev denotes no folder name
-       \throws IllegalPathSignal, if dev does not end with '/'
-       \throws IllegalParamSignal, if the required number of
+       \throws DationParamSignal, if dev denotes no folder name
+       \throws DationParamSignal, if dev does not end with '/'
+       \throws DationParamSignal, if the required number of
                    channels could not be allocated
       */
       Disc(const char* dev, const int nbrOfFiles);
@@ -253,8 +267,8 @@ namespace pearlrt {
                   dation operations.
 
       \throws OpenFailedSignal in case of errors
-      \throws IllegalParamsSignal in case of errors
-      \throws IllegalPathSignal in case of errors
+      \throws DationParamSignal in case of errors
+      \throws DationParamSignal in case of errors
       */
       DiscFile* dationOpen(const char * fileName, int openParams);
 
@@ -318,5 +332,6 @@ namespace pearlrt {
       void translateNewLine(bool doNewLineTranslation);
 
    };
+   /** @} */
 }
 #endif

@@ -1,7 +1,7 @@
 #ifndef GETDURATION_H_INCLUDED
 #define GETDURATION_H_INCLUDED
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -48,7 +48,12 @@
 
 namespace pearlrt {
    /**
-      Input processing of duration values.
+   \addtogroup io_common_helper
+   @{
+   */
+
+   /**
+      \brief Input processing of duration values.
    */
    class GetDuration {
    public:
@@ -89,6 +94,7 @@ namespace pearlrt {
                        const Fixed<31> d,
                        Source & source);
    };
+   /** @} */
 }
 #endif
 

@@ -1,0 +1,11 @@
+MODULE(m1);
+
+PROBLEM;
+
+a: TASK;
+  DCL f FIXED(63);
+  f := 123a45;   ! mark of error should be at 'a'
+END;
+
+MODEND;
+

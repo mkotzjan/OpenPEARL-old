@@ -29,6 +29,9 @@
 
 package org.smallpearl.compiler;
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+
 public abstract class TypeDefinition {
     private String m_name;
 
@@ -55,5 +58,9 @@ public abstract class TypeDefinition {
 
     public String toString() {
         return this.getName();
+    }
+
+    public ST toST(STGroup group) {
+        return null;
     }
 }

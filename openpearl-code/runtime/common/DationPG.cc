@@ -1,7 +1,7 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
- Copyright (c) 2014-2014 Rainer Mueller
+ Copyright (c) 2014-2017 Rainer Mueller
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@
 #include "SystemDationNB.h"
 #include "SystemDationNBSink.h"
 #include "SystemDationNBSource.h"
+#include "IOFormats.h"
 #include "Fixed.h"
 #include "PutHelper.h"
 #include "PutClock.h"
@@ -57,9 +58,10 @@ namespace pearlrt {
       : UserDationNB(parent, params, dimensions, UserDationNB::ALPHIC) {
       dationStatus = CLOSED;
 
+#warning "wieso hat DationPG kein CYCLIC support?"
       if (params & CYCLIC) {
          Log::error("DationPG: does not support CYCLIC");
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
    }
 
@@ -69,12 +71,12 @@ namespace pearlrt {
 
       if (!(dationParams & (IN | INOUT))) {
          Log::error("DationPG: dation not opened as input");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & (IN | INOUT))) {
          Log::error("DationPG: device does not support read");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       // get first character from unget buffer
@@ -92,12 +94,12 @@ namespace pearlrt {
 
       if (!(dationParams & (OUT | INOUT))) {
          Log::error("DationPG: Only writing is allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (!(system->capabilities() & (OUT | INOUT))) {
          Log::error("DationPG: device does not support write");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       // send data to sink
@@ -126,37 +128,15 @@ namespace pearlrt {
       if (dationParams & (IN | INOUT)) {
          source.setSystemDationNB((SystemDationNB*)work);
       }
+      setupIOFormats(&sink, &source);
    }
 
    void DationPG::internalClose() {
    }
 
-   void DationPG::doPutChar(int length, RefCharacter * rc) {
-      PutHelper::doPutChar(length, rc, &sink);
+   void DationPG::checkCapacity(Fixed<31> n) {
+      // move the read/write pointer.
+      // this methiod will throw an exception if there is too little space
+      adv(n);
    }
-
-   void DationPG::toT(const Clock f,
-                      const Fixed<31> w,
-                      const Fixed<31> d) {
-      PutClock::toT(f, w, d, sink);
-   }
-
-   void DationPG::fromT(Clock & f,
-                        const Fixed<31> w,
-                        const Fixed<31> d) {
-      GetClock::fromT(f, w, d, source);
-   }
-
-   void DationPG::toD(const Duration f,
-                      const Fixed<31> w,
-                      const Fixed<31> d) {
-      PutDuration::toD(f, w, d, sink);
-   }
-
-   void DationPG::fromD(Duration & f,
-                        const Fixed<31> w,
-                        const Fixed<31> d) {
-      GetDuration::fromD(f, w, d, source);
-   }
-
 }

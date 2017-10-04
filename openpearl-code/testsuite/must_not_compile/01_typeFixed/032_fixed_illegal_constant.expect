@@ -1,0 +1,3 @@
+032_fixed_illegal_constant.prl:7:10: ERROR : Syntax error :extraneous input 'a45' expecting {';', '*', '**', 'FIT', '/', '-', '+', '//', 'REM', 'CAT', '><', 'CSHIFT', '<>', 'SHIFT', '<', 'LT', '<=', 'LE', '>', 'GT', '>=', 'GE', '==', 'EQ', '/=', 'NE', 'AND', 'OR', 'EXOR', IntegerConstant}
+  f := 123a45;
+            ^

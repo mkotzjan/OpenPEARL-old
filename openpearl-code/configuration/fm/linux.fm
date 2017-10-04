@@ -29,17 +29,17 @@ config LINUX_Raspberry_Version_Auto
 	   Usually select this. Choose another version if the automatic detection
  	   does not work with your model, or you do some cross compiling
 
-config LINUX_Raspberry_Verion_V1B
+config LINUX_Raspberry_Version_V1B
 	bool "Version 1 Model B"
 	help
 	   Raspberry pi version 1 model B with 26 pin p1-connector and 2 usb-ports
 
-config LINUX_Raspberry_Verion_V2B
+config LINUX_Raspberry_Version_V2B
 	bool "Version 2 Model B"
 	help
 	   Raspberry pi version 2 model B with 40 pin p1-connector and 4 usb-ports
 
-config LINUX_Raspberry_Verion_V3B
+config LINUX_Raspberry_Version_V3B
 	bool "Version 3 Model B"
 	help
 	   Raspberry pi version 3 model B with 40 pin p1 connector and quad core cpu

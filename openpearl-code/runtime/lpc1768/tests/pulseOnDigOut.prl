@@ -1,0 +1,78 @@
+MODULE(pulseOnDigOut);
+
+SYSTEM;
+  terminal: Lpc17xxUart(0,115200,7,1,'E','0'B1);
+  Lpc17xxClock(3); 
+  bit: Lpc17xxDigitalOut(1,0,1);
+/*
+__cpp__('pearlrt::Lpc17xxUart com2(2,9600,7,1,\'E\', 0x010080);'
+        'pearlrt::Device * d_terminal = &com2;'
+        'pearlrt::Lpc17xxDigitalOut bit(1,0,1);'
+        'pearlrt::Lpc17xxClock dummy(3);'
+       );
+*/
+PROBLEM;
+SPC terminal DATION INOUT SYSTEM ALPHIC;
+SPC bit DATION OUT SYSTEM BASIC BIT(1);
+
+DCL console DATION INOUT ALPHIC DIM(*,80) FORWARD CREATED(terminal);
+DCL outBit DATION OUT BIT(1) CREATED(bit);
+
+DCL delay FIXED(31) INIT(1000);
+__cpp__ (     'pearlrt::Duration _delayms(100.0e-3);');
+t1: TASK MAIN;
+
+  DCL t1 CHAR(40) INIT('enter delay in us F(6) skip');
+  DCL t2 CHAR(40) INIT('pulse generator on P1.0');
+  DCL reply CHAR(20) INIT('new delay:');
+
+  OPEN console;
+!  ACTIVATE puls;
+  ACTIVATE fastestPulses;
+
+  REPEAT
+    PREVENT triggerPulses;
+  __cpp__(
+  ' _triggerPulses.activate(me, pearlrt::Task::ALL, pearlrt::Prio(),'
+  '                        pearlrt::Clock(), pearlrt::Duration(), _delayms);' );
+     PUT  t1 TO console BY A,SKIP;
+     GET delay FROM console BY F(6), SKIP;
+     PUT reply, delay TO console BY A,F(6), SKIP;
+     __cpp__(
+      '   _delayms = pearlrt::Duration(_delay.x*1.0e-6);'
+    );
+  END;
+  CLOSE console;
+END;
+
+triggerPulses: TASK PRIO 9;
+  CONTINUE puls;
+END;
+ 
+puls: TASK PRIO 10;
+    DCL bitValue BIT(1) INIT('1'B1);
+
+    OPEN outBit;
+    REPEAT
+       SUSPEND;
+       SEND bitValue TO outBit ;
+__cpp__( '   bitvalue = bitvalue.bitNot();' );
+    END;
+END;
+
+fastestPulses: TASK PRIO 10;
+__cpp__(
+      'pearlrt::BitString<1> bitvalue(1);'
+      ' ' 
+      'bit.dationOpen(NULL,0);');
+      REPEAT
+__cpp__(
+      '   bit.dationWrite(&bitvalue, sizeof(bitvalue));'
+      '   bitvalue = bitvalue.bitNot();'
+      ' //  _puls.resume(pearlrt::Task::AFTER, pearlrt::Clock(), _delayms);' );
+      ! AFTER delayms RESUME; 
+      END;
+END;
+
+MODEND;
+

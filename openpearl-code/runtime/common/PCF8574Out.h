@@ -45,7 +45,11 @@
 namespace pearlrt {
 
    /**
-   \file
+   \addtogroup io_common_drivers
+   @{
+   */
+
+   /**
 
    \brief Basic system device for an i2c element pcf8574  basic dation
 
@@ -59,18 +63,21 @@ namespace pearlrt {
       int16_t addr;
       int handle;
       uint8_t mask, start;
-//      void internalDationOpen();
-//      void internalDationClose();
 
    public:
       /**
       constructor to create the bit group and set the
       bits to output direction
 
-      \throws IllegalParamSignal in case of init failure
+      \param provider reference to the i2cbus object
+      \param addr the i2c bus adress of the module
+      \param s the starting bit number (7..0) starting with 7 at the MSB
+      \param w the number of bits
+
+      \throws DationParamSignal in case of init failure
 
       */
-      PCF8574Out(I2CProvider * provider, int _addr, int s, int w);
+      PCF8574Out(I2CProvider * provider, int addr, int s, int w);
 
       /**
       Open the  dation
@@ -80,7 +87,7 @@ namespace pearlrt {
       \returns pointer to the SampleDationB object itself as working
                object in the user dation
 
-      \throws NotAllowedSignal, if  dation is not closed and rst is not given
+      \throws OpenFailedSignal, if  dation is not closed and rst is not given
       */
       PCF8574Out* dationOpen(const char* idf = 0, int openParam = 0);
 
@@ -98,9 +105,9 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
+      \throws DationParamSignal, if size != 1, since 1 byte is
                        expected for the Bit<width> value at maximum
-      \throws NotAllowedSignal, if  dation is not opened
+      \throws DationNotOpenSignal, if  dation is not opened
       */
       void dationRead(void * data, size_t size);
 
@@ -109,9 +116,7 @@ namespace pearlrt {
       \param data points to the storage location of the data
       \param size denotes the number of bytes of the output data
 
-      \throws IllegalParamSignal, if size != 1, since 1 byte is
-                       expected for the Bit<width> value at maximum
-      \throws NotAllowedSignal, in any case
+      \throws InternalDationSignal, in any case
       */
       void dationWrite(void * data, size_t size);
 
@@ -128,6 +133,7 @@ namespace pearlrt {
       */
       int capabilities();
    };
+   /** @} */
 }
 #endif
 

@@ -42,17 +42,19 @@
 
  */
 
-
-#include "Task.h"
-#include "TaskMonitor.h"
 #include <string.h>
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "allTaskPriorities.h"
+
+#include "TaskMonitor.h"
 #include "TaskList.h"
 #include "PrioMapper.h"
 #include "Semaphore.h"
 #include "Log.h"
-#include "FreeRTOS.h"
-#include "allTaskPriorities.h"
 #include "service.h"
+#include "Task.h"
 
 namespace pearlrt {
 

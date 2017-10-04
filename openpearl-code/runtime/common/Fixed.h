@@ -1,7 +1,7 @@
 #ifndef FIXED_H_INCLUDED
 #define FIXED_H_INCLUDED
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
  All rights reserved.
 
@@ -51,12 +51,8 @@ the next most integral data type will be used to store the internal value.
 #include "Fixed63.h"
 
 #include "../../configuration/include/autoconf.h"
-#if (TARGET==2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1)
-  // disable stack checking for the template methods in the applicaton code
-# define NOSTACKCHECK __attribute__((no_instrument_function))
-#else
-# define NOSTACKCHECK /* nothing */
-#endif
+#include "stackcheck.h"
+
 
 namespace pearlrt {
 #include "IfThenElseTemplate.h"
@@ -175,6 +171,11 @@ namespace pearlrt {
       */
       typedef int64_t LongerNativeFixedType;  // only needed for consistency
    };
+
+   /**
+   \addtogroup datatypes
+   @{
+   */
 
    /**
     \brief PEARL data type FIXED
@@ -723,6 +724,8 @@ namespace pearlrt {
       }
 
    };
+   /** @} */
+
    /**
    add operation
 
@@ -757,6 +760,7 @@ namespace pearlrt {
    /**
    multiply operation
 
+   \param lhs the first paramater of the multiplication
    \param rhs the second paramater of the multiplication
    \returns product of given parameters
    \throws FixedRangeSignal if the product would exceed the value
@@ -771,6 +775,7 @@ namespace pearlrt {
    /**
    divide operation
 
+   \param lhs the first parameter of the division (divident)
    \param rhs the second parameter of the division (divisor)
    \returns fraction of given parameters 
    \throws FixedRangeSignal if the product would exceed the value

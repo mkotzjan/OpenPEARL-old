@@ -1,5 +1,5 @@
 /*
- [The "BSD license"]
+ [A "BSD license"]
  Copyright (c) 2012-2013 Holger Koelle
  Copyright (c) 2014     Rainer Mueller
  All rights reserved.
@@ -34,7 +34,9 @@
 
 \page Testprograms
 
-\section Dation SystemDationB especially at an Octopus at90 LED-device
+\section OctoputDigitalOutTests tests/OctopusDigitalOutTests.cc
+
+Dation SystemDationB especially at an Octopus at90 LED-device
 
 
 There are several unit tests using the google test framework.

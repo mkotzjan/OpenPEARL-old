@@ -48,17 +48,17 @@ namespace pearlrt {
    SystemDationB* SampleBasicDation::dationOpen(const char * idf, int params) {
       if (idf) {
          Log::error("SampleBasicDation: no IDF allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("SampleBasicDation: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != CLOSED) {
          Log::error("SampleBasicDation: Dation already open");
-         throw theNotAllowedSignal;
+         throw theOpenFailedSignal;
       }
 
       dationStatus = OPENED;
@@ -69,12 +69,12 @@ namespace pearlrt {
 
       if (dationStatus != OPENED) {
          Log::error("SampleBasicDation: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       if (params & ~(RST | IN | OUT | INOUT)) {
          Log::error("SampleBasicDation: only RST allowed");
-         throw theNotAllowedSignal;
+         throw theDationParamSignal;
       }
 
       dationStatus = CLOSED;
@@ -87,12 +87,12 @@ namespace pearlrt {
       // Therefore size must be 2
       if (size != 2) {
          Log::error("SampleBasicDation: 2 byte expected (got %d)", (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("SampleBasicDation: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // write data to application memory
@@ -109,12 +109,12 @@ namespace pearlrt {
       // Therefore size must be 2
       if (size != 2) {
          Log::error("SampleBasicDation: 2 byte expected (got %d)", (int)size);
-         throw theIllegalParamSignal;
+         throw theDationParamSignal;
       }
 
       if (dationStatus != OPENED) {
          Log::error("SampleBasicDation: Dation not open");
-         throw theNotAllowedSignal;
+         throw theDationNotOpenSignal;
       }
 
       // write data to application memory
