@@ -31,6 +31,23 @@ then
    SystemKnown=1
 fi
 
+grep "PRETTY_NAME=\"Debian GNU/Linux 9 (stretch)\"" /etc/os-release >/dev/null
+rc=$?
+if [ $rc -eq 0 ]
+then
+   echo "detected: Debian 9 stretch "
+   AptPackageList+="openjdk-8-jdk"
+   AptPackageList+=" gcc g++ git make gawk"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphwiz doxygen"
+      AptPackageList+=" libgtest-dev"
+   fi
+   SystemKnown=1
+fi
+
 grep "PRETTY_NAME=\"Raspbian GNU/Linux 8 (jessie)\"" /etc/os-release >/dev/null
 rc=$?
 if [ $rc -eq 0 ]
