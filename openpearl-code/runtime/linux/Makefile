@@ -37,6 +37,7 @@ include ../../configuration/.config
 INCLUDES = -I . -I ../common
 CXXFLAGS = -Wall -g  -fstack-protector
 CXXFLAGS += -pthread
+CXXFLAGS+= -O2
 CXXFLAGS += -fno-non-call-exceptions
 CXXFLAGS += $(INCLUDES)
 LDFLAGS = -lpthread -lrt 
@@ -106,6 +107,9 @@ ifeq ($(CONFIG_LINUX_Octopus),y)
 endif
 
 ifeq ($(CONFIG_LINUX_Raspberry),y) 
+   # switch off ps_abi warnings
+   CXXFLAGS+= -Wno-psabi
+
    ifeq ($(CONFIG_LINUX_Raspberry_Version_Auto),y) 
    # set CONFIG_LINUX_Raspberry_Version_V1, ..V3 depending of /proc/cpuinfo
    # raspberry revision numbers are taken from http://www.gtkdb.de/index_36_1831.html

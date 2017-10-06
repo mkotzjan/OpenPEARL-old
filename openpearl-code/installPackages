@@ -79,15 +79,11 @@ then
 
    # set automatic 'y' for cpan/cpanm installation
    export PERL_MM_USE_DEFAULT=1
-   cpan App::cpanminus
-   cpanm Spreadsheet::Read
-   cpanm Spreadsheet::ReadSXC
-
-   # create dummy files in /usr/* as root and make them
-   # mutable by everybody
-   make prepare
+   cpan -T App::cpanminus		# do not test
+   cpanm --notest Spreadsheet::Read
+   cpanm --notest Spreadsheet::ReadSXC
 fi
 
 echo
 echo "please log on as normal user and perform"
-echo "    make install"
+echo "    make defconfig"

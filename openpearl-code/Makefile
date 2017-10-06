@@ -90,6 +90,12 @@ menuconfig:
 	(cd configuration; make menuconfig; cd .. )
 #	(cd configuration; make menuconfig; ./kconfig/conf -s fm/main.fm; cd .. )
 
+.PHONY: defconfig
+defconfig:
+	cp configuration/def.config configuration/.config
+	touch configuration/.config
+	(cd configuration; make include/autoconf.h; cd ..)
+
 #.PHONY: jenkins_prepare
 #jenkins_prepare:
 #	cp configuration/jenkins.config configuration/.config
