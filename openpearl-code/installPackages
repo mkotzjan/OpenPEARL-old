@@ -12,13 +12,14 @@ then
 fi
 
 SystemKnown=0
+AptPackageList=""
 
 grep "PRETTY_NAME=\"Debian GNU/Linux 8 (jessie)\"" /etc/os-release >/dev/null
 rc=$?
 if [ $rc -eq 0 ]
 then
    echo "detected: Debian 8 jessie "
-   AptPackageList="openjdk-7-jdk"
+   AptPackageList+="openjdk-7-jdk"
    AptPackageList+=" gcc g++ git make gawk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
@@ -34,8 +35,8 @@ grep "PRETTY_NAME=\"Raspbian GNU/Linux 8 (jessie)\"" /etc/os-release >/dev/null
 rc=$?
 if [ $rc -eq 0 ]
 then
-   echo "detected: Raspbain 8 jessie "
-   AptPackageList="openjdk-7-jdk"
+   echo "detected: Raspbian 8 jessie "
+   AptPackageList+="openjdk-7-jdk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
@@ -49,8 +50,8 @@ grep "PRETTY_NAME=\"Raspbian GNU/Linux 9 (stretch)\"" /etc/os-release >/dev/null
 rc=$?
 if [ $rc -eq 0 ]
 then
-   echo "detected: Raspbain 9 stretch "
-   AptPackageList="openjdk-8-jdk"
+   echo "detected: Raspbian 9 stretch "
+   #AptPackageList+="openjdk-8-jdk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
