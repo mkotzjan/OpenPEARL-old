@@ -25,7 +25,7 @@ then
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
    then
-      AptPackageList+=" astyle graphwiz doxygen"
+      AptPackageList+=" astyle graphviz doxygen"
       AptPackageList+=" libgtest-dev"
    fi
    SystemKnown=1
@@ -42,7 +42,7 @@ then
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
    then
-      AptPackageList+=" astyle graphwiz doxygen"
+      AptPackageList+=" astyle graphviz doxygen"
       AptPackageList+=" libgtest-dev"
    fi
    SystemKnown=1
@@ -58,7 +58,7 @@ then
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
    then
-      AptPackageList+=" astyle graphwiz doxygen"
+      AptPackageList+=" astyle graphviz doxygen"
    fi
    SystemKnown=1
 fi
@@ -73,7 +73,7 @@ then
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
    then
-      AptPackageList+=" astyle graphwiz doxygen"
+      AptPackageList+=" astyle graphviz doxygen"
    fi
    SystemKnown=1
 fi
