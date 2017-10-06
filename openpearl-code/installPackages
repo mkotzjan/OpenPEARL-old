@@ -5,6 +5,12 @@ then
    exit 1
 fi
 
+Developer=0
+if [ "$1" == "dev" ]
+then
+   Developer=1
+fi
+
 SystemKnown=0
 
 grep "PRETTY_NAME=\"Debian GNU/Linux 8 (jessie)\"" /etc/os-release >/dev/null
@@ -13,11 +19,14 @@ if [ $rc -eq 0 ]
 then
    echo "detected: Debian 8 jessie "
    AptPackageList="openjdk-7-jdk"
-   AptPackageList+="gcc g++ git make gawk"
-   AptPackageList+="flex libncurses5-dev"
-   AptPackageList+="expat libexpat1-dev"
-   AptDevelopers="astyle graphwiz doxygen"
-   AptDevelopers+="libgtest-dev"
+   AptPackageList+=" gcc g++ git make gawk"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphwiz doxygen"
+      AptPackageList+=" libgtest-dev"
+   fi
    SystemKnown=1
 fi
 
@@ -27,9 +36,12 @@ if [ $rc -eq 0 ]
 then
    echo "detected: Raspbain 8 jessie "
    AptPackageList="openjdk-7-jdk"
-   AptPackageList+="flex libncurses5-dev"
-   AptPackageList+="expat libexpat1-dev"
-   AptDevelopers="astyle"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphwiz doxygen"
+   fi
    SystemKnown=1
 fi
 
@@ -39,9 +51,12 @@ if [ $rc -eq 0 ]
 then
    echo "detected: Raspbain 9 stretch "
    AptPackageList="openjdk-8-jdk"
-   AptPackageList+="flex libncurses5-dev"
-   AptPackageList+="expat libexpat1-dev"
-   AptDevelopers="astyle"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphwiz doxygen"
+   fi
    SystemKnown=1
 fi
 
@@ -60,7 +75,7 @@ then
    # common for all platforms
    wget http://www.antlr.org/download/antlr-4.5-complete.jar
    mv antlr-4.5-complete.jar /usr/local/lib/
-   apt-get -q -y install $AptPackageList
+   apt-get -y install $AptPackageList
 
    # set automatic 'y' for cpan/cpanm installation
    export PERL_MM_USE_DEFAULT=1
