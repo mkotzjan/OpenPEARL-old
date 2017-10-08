@@ -68,12 +68,14 @@ rc=$?
 if [ $rc -eq 0 ]
 then
    echo "detected: Raspbian 9 stretch "
-   #AptPackageList+="openjdk-8-jdk"
+   #AptPackageList+="openjdk-8-jdk" # raspbian comes with a javac
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
+      AptPackageList+=" texlive texlive-lang-english texlive-generic-extra"
+      AptPackageList+=" texlive-latex-extra"
    fi
    SystemKnown=1
 fi
