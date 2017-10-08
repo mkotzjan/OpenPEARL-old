@@ -136,13 +136,13 @@ if ( "LaTeX" ~~ @type) {
                               $groupIndex[$i] * 100;
               print $tex "\\begin{tabular}{|p{3.5cm}|p{10cm}|}\n";
 	      print $tex "\\hline\n";
-              print $tex "Number: {\\bf ".$sigNumber."} &".
+              print $tex "Number: \\textbf{".$sigNumber."} &".
                           "Plattform: ". $xls->[$i+2]{cell}[4][$r+1]."\\\\\n";
 	      print $tex "\\hline\n";
-              print $tex "\\multicolumn{2}{|p{13.5cm}|}{Name: {\\bf ".
+              print $tex "\\multicolumn{2}{|p{13.5cm}|}{Name: \\textbf{".
                                     $xls->[$i+2]{cell}[2][$r+1]."}}\\\\\n";
 	      print $tex "\\hline\n";
-              print $tex "\\multicolumn{2}{|p{13.5cm}|}{Message: {\\bf ".
+              print $tex "\\multicolumn{2}{|p{13.5cm}|}{Message: \textbf{".
                           $xls->[$i+2]{cell}[5][$r+1]."}}\\\\\n";
 	      print $tex "\\hline\n";
               print $tex "\\multicolumn{2}{|p{13.5cm}|}{".
