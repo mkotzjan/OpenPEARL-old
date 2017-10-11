@@ -52,7 +52,8 @@ END;
 testFormats: PROC;
    DCL c1 CHAR(20) INIT('123');
    DCL dur DURATION INIT(12.3SEC);
-   DCL clk CLOCK INIT(1HRS 30MIN 2.3SEC);
+!   DCL clk CLOCK INIT(1HRS 30MIN 2.3SEC);  ! << wrong code
+   DCL clk CLOCK INIT (1:30:2.3);
    DCL float FLOAT INIT(12.3); 
    DCL fixed FIXED INIT(12); 
    DCL bit BIT(1) INIT('1'B1);
