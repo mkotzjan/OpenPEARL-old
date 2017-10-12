@@ -40,6 +40,7 @@ the occurrence of an interrupt or upon executing statements for task
 control, for synchronisation and for input and output.
 
 \section{Declaration and Specification of Tasks (TASK)}   % 9.1
+\label{sec_task_dcl}
 \index{TASK@\textbf{TASK}|textbf}
 \index{Task!Declaration}
 \index{Task!Specification}
@@ -232,7 +233,8 @@ Example:
 \subsection{Determining Task Priorities}   % 9.1.3
 
 The (current) priority of a task can be obtained by the predefined
-function PRIO\index{PRIO@\textbf{PRIO}!Prefinied Function}.
+function PRIO\index{PRIO@\textbf{PRIO}}.
+\index{Predefined Functions!\textbf{PRIO}}
  Without stating a parameter, it provides the priority of
 the running task, and with a task name as parameter, it returns the
 priority of that task.
@@ -303,6 +305,7 @@ descheduled.
 
 %%%\subsection{Start Condition}   % 9.2.1
 \subsection{Starting a Task (ACTIVATE)}   % 9.2.1
+\label{sec_task_activate}
 \index{ACTIVATE@\textbf{ACTIVATE}}
 \index{TASK@\textbf{TASK}!Activation}
 
@@ -1420,6 +1423,8 @@ continued.
 
 \subsection{Semaphore Variables (SEMA) and Statements (REQUEST,
 RELEASE, TRY)} % 9.3.1
+\label{sec_semaphores}
+
 % Zeilenumbruch mitten im Wort RELEASE
 \index{Task!Semaphore}
 
@@ -1681,6 +1686,7 @@ Possible problem situations:
 %%%\end{added}
 \subsection{Bolt Variables (BOLT) and Statements (ENTER, LEAVE,
 RESERVE, FREE)} % 9.3.2
+\label{sec_bolt}
 \index{Task!Bolt}
 
 We assume that in different tasks the same data are used for
@@ -1820,12 +1826,17 @@ Generally, bolt variables can be declared and used as follows:
 \index{LEAVE@\textbf{LEAVE}}
 \index{RESERVE@\textbf{RESERVE}}
 \index{FREE@\textbf{FREE}}
+\index{BOLT@\textbf{BOLT}!\textbf{ENTER}}
+\index{BOLT@\textbf{BOLT}!\textbf{LEAVE}}
+\index{BOLT@\textbf{BOLT}!\textbf{RESERVE}}
+\index{BOLT@\textbf{BOLT}!\textbf{FREE}}
 
-Therefore, also arrays of bolt variables can be declared.
+%Therefore, also arrays of bolt variables can be declared.
+Also arrays of bolt variables can be declared.
 
 Bolt declarations must take place at module level.
 
-\begin{added}
+%%%%%\begin{added}
 Possible problem situations:
 
 \begin{description}
@@ -1836,13 +1847,14 @@ Possible problem situations:
    operations were executed in sequence.
 \end{description}
 
-\end{added}
+%%%%%\end{added}
 
 
 \section{Interrupts and Interrupt Statements}   % 9.4
 \label{sec_interrupts}
 \index{Task!Interrupt}
-\index{INTERRUPT@\textbf{INTERRUPT}}
+%\index{INTERRUPT@\textbf{INTERRUPT}}
+\index{INTERRUPT@\textbf{INTERRUPT}!Statement}
 \index{IRPT@\textbf{IRPT}|see {INTERRUPT}}
 
 \subsection{Declarations of Interrupts and Software Interrupts}    % 9.4.1
@@ -1908,6 +1920,7 @@ introduced into the system part under their own system names. The user manual
 gives information about the system name and usage possibilities.
 
 \subsection{Interrupt Statements (TRIGGER, ENABLE, DISABLE)}    % 9.4.2
+\label{sec_task_interrupt}
 
 First, interrupts are disabled by their declarations and have to be
 enabled by an enable statement.

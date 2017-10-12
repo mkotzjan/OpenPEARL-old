@@ -592,8 +592,10 @@ Before a data station may be used for the first time in a data
 transmission statement, it must be opened by the open statement:
 
 \input{OpenStatement.bnf}
-\index{Open@\textbf{OPEN}!BY}
-\index{BY@\textbf{BY}!OPEN}
+\index{OPEN@\textbf{OPEN}!\textbf{BY}}
+\index{OPEN@\textbf{OPEN}!\textbf{IDF}}
+\index{BY@\textbf{BY}!\textbf{OPEN}}
+\index{IDF@\textbf{IDF}}
 
 When executing the open statement, a data station with typology is
 positioned at its beginning.
@@ -613,9 +615,6 @@ open statement.
 %%%\x \{ {\bf CAN $\mid$ PRM} \}
 %%%\end{front}
 \input{OpenParameter.bnf}
-\index{RST@\textbf{RST}!OPEN}
-\index{CAN@\textbf{CAN}!OPEN}
-\index{PRM@\textbf{PRM}!OPEN}
 
 
 %%%\begin{added}
@@ -638,7 +637,7 @@ The value of the specified character variable or the specified character
 string constant is the name of the file to be identified with the data
 station named Name$\S $Dation.
 \item RST (Name$\S $ErrorVariable-FIXED)
-\index{RST@\textbf{RST}!OPEN}\\
+\index{RST@\textbf{RST}!\textbf{OPEN}}\\
 If an error occurs during the OPEN execution, the specified variable is
 assigned an error number unequal to zero; in the error-free case, it is
 set to zero (see \ref{sec_dation_rst}).
@@ -694,7 +693,7 @@ usable again not before the execution of an open statement.
 
 \input{CloseStatement.bnf}
 \index{CLOSE@\textbf{CLOSE}!CloseStatement}
-\index{BY@\textbf{BY}!CLOSE}
+\index{BY@\textbf{BY}!\textbf{CLOSE}}
 
 The settings for closing a data station made in the open statement can
 be overwritten by a close statement:
@@ -704,9 +703,9 @@ be overwritten by a close statement:
 %%%\x {\bf CAN $\mid$ PRM $\mid$ RST} (Name$\S $ErrorVariable-FIXED)
 %%%\end{front}
 \input{CloseParameter.bnf}
-\index{RST@\textbf{RST}!CLOSE}
-\index{CAN@\textbf{CAN}!CLOSE}
-\index{PRM@\textbf{PRM}!CLOSE}
+\index{RST@\textbf{RST}!\textbf{CLOSE}}
+\index{CAN@\textbf{CAN}!\textbf{CLOSE}}
+\index{PRM@\textbf{PRM}!\textbf{CLOSE}}
 
 Generally, the following rules hold:
 \begin{itemize}
@@ -789,8 +788,8 @@ Prot: {\bf TASK};\\
 
 \section{The Read and Write Statements (READ, WRITE)}   % 10.4
 \label{sec_read_write}
-\index{READ@\textbf{READ}}
-\index{WRITE@\textbf{WRITE}}
+%\index{READ@\textbf{READ}}
+%\index{WRITE@\textbf{WRITE}}
 
 The read statement serves for the input, the write statement for the
 output of data without converting the computer internal representation
@@ -846,12 +845,14 @@ The general forms of the read and write statements read:
 
 \input{ReadStatement.bnf}
 \index{READ@\textbf{READ}!ReadStatement}
-\index{FROM@\textbf{FROM}!READ}
-\index{BY@\textbf{BY}!READ}
+\index{FROM@\textbf{FROM}!\textbf{READ}}
+\index{BY@\textbf{BY}!\textbf{READ}}
+\index{RST@\textbf{RST}!\textbf{READ}}
 \input{WriteStatement.bnf}
 \index{WRITE@\textbf{WRITE}!WriteStatement}
-\index{TO@\textbf{TO}!WRITE}
-\index{BY@\textbf{BY}!WRITE}
+\index{TO@\textbf{TO}!\textbf{WRITE}}
+\index{BY@\textbf{BY}!\textbf{WRITE}}
+\index{RST@\textbf{RST}!\textbf{WRITE}}
 
 A slice may be defined as range of the last index of an array.
 \input{Slice.bnf}
@@ -1140,8 +1141,8 @@ the positioning operates on byte level.
 
 \section{The Get and Put Statements (GET, PUT)}    % 10.5
 \label{sec_get_put}
-\index{PUT@\textbf{PUT}}
-\index{GET@\textbf{GET}}
+%\index{PUT@\textbf{PUT}}
+%\index{GET@\textbf{GET}}
 
 The get statement serves for the input, the put statement for the
 output of data with conversion between computer internal and external,
@@ -1217,12 +1218,14 @@ The general forms of the get and put statements read:
 
 \input{GetStatement.bnf}
 \index{GET@\textbf{GET}!GetStatement}
-\index{FROM@\textbf{FROM}!GET}
-\index{BY@\textbf{BY}!GET}
+\index{FROM@\textbf{FROM}!\textbf{GET}}
+\index{BY@\textbf{BY}!\textbf{GET}}
+\index{RST@\textbf{RST}!\textbf{GET}}
 \input{PutStatement.bnf}
 \index{PUT@\textbf{PUT}!PutStatement}
-\index{TO@\textbf{TO}!PUT}
-\index{BY@\textbf{BY}!PUT}
+\index{TO@\textbf{TO}!\textbf{PUT}}
+\index{BY@\textbf{BY}!\textbf{PUT}}
+\index{RST@\textbf{RST}!\textbf{PUT}}
 %%%\begin{front}
 %%%GetStatement ::=\\
 %%%\x {\bf GET} [ \{ Name$\S $Variable $\mid$ Segment \} [ , \{ Name$\S $Variable $\mid$ Segment \} ] $^{...}$ ]\\
@@ -1353,6 +1356,7 @@ in the PUT statements.
 \input{FixedFormat.bnf}
 
 \input{FieldWidth.bnf}
+\index{FORMAT@\textbf{FORMAT}!\textbf{F}}
 \index{FieldWidth!F-Format}
 \index{F@\textbf{F}!FieldWidth}
 
@@ -1515,6 +1519,8 @@ value       &          & FIXED & FLOAT  \\ \hline
 \label{sec_dation_e_format}
 \index{E@\textbf{E}}
 \index{E3@\textbf{E3}|see{E}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{E}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{E3}}
 
 %%%\begin{removed}
 %%%FloatFormat ::=\\
@@ -1664,6 +1670,7 @@ d+1 , no assignment happens and
 %%%\end{front}
 \input{CharacterStringFormat.bnf}
 \index{A@\textbf{A}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{A}}
 
 
 The character formats describe the external representation of character
@@ -1774,6 +1781,7 @@ format
 \label{sec_dation_b_format}
 
 \input{BitFormat.bnf}
+\index{FORMAT@\textbf{FORMAT}!\textbf{B},B1,B2,B3,B4}
 \index{B@\textbf{B}}
 \index{B1@\textbf{B1}|see {B}}
 \index{B2@\textbf{B2}|see {B}}
@@ -1856,6 +1864,7 @@ AB                         & B4(2)  &         10101011
 \index{T@\textbf{T}}
 \index{FieldWidth!T-Format}
 \index{T@\textbf{T}!FieldWidth}
+\index{FORMAT@\textbf{FORMAT}!\textbf{T}}
 
 \index{DecimalPositions!T-Format}
 \index{T@\textbf{T}!DecimalPositions}
@@ -1935,6 +1944,7 @@ value               & format  & output \\ \hline
 \index{D@\textbf{D}}
 \index{FieldWidth!D-Format}
 \index{D@\textbf{D}!FieldWidth}
+\index{FORMAT@\textbf{FORMAT}!\textbf{D}}
 
 \index{DecimalPositions!D-Format}
 \index{D@\textbf{D}!DecimalPositions}
@@ -2041,6 +2051,7 @@ The character \_ means a space.
 \input{ListFormat.bnf}
 \index{L@\textbf{L}}
 \index{LIST@\textbf{LIST}|see {L}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{L}}
 
 The list format serves for the input/output of fixed, float, bit, char,
 clock, and dur quantities.
@@ -2092,7 +2103,7 @@ once. For this, a list with the so-called format declaration is
 introduced.
 
 \input{FormatDeclaration.bnf}
-\index{FORMAT@\textbf{FORMAT}}
+\index{FORMAT@\textbf{FORMAT}!Statement}
 
 Example:
 
@@ -2103,6 +2114,7 @@ stating its identifier:
 
 \input{RFormat.bnf}
 \index{R@\textbf{R}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{R}}
 
 When transmitting data, the R format is replaced by the format position
 list contained in the indicated format declaration.
@@ -2149,13 +2161,13 @@ The general forms of the convert statement are:
 %%%\x {\bf POS} ( Expression ) $\mid$ {\bf SOP} ( Name$\S $PositionVariable-FIXED )
 %%%\end{front}
 \input{ConvertToStatement.bnf}
-\index{BY@\textbf{BY}!CONVERT}
-\index{TO@\textbf{TO}!CONVERT}
+\index{BY@\textbf{BY}!\textbf{CONVERT}}
+\index{TO@\textbf{TO}!\textbf{CONVERT}}
 \input{ConvertFromStatement.bnf}
-\index{FROM@\textbf{FROM}!CONVERT}
+\index{FROM@\textbf{FROM}!\textbf{CONVERT}}
 \input{FormatOrPositionConvert.bnf}
 \input{PositionConvert.bnf}
-\index{RST@\textbf{RST}!CONVERT}
+\index{RST@\textbf{RST}!\textbf{CONVERT}}
 
 All permitted formats have the same meaning as for the PUT and GET
 statements 
@@ -2225,15 +2237,15 @@ respectively. The data station must possess the class attribute BASIC.
 %%%\begin{accepted}
 \input{TakeStatement.bnf}
 \index{TAKE@\textbf{TAKE}}
-\index{BY@\textbf{BY}!TASK}
-\index{FROM@\textbf{FROM}!TASK}
-\index{RST@\textbf{RST}!TAKE}
+\index{BY@\textbf{BY}!\textbf{TAKE}}
+\index{FROM@\textbf{FROM}!\textbf{TAKE}}
+\index{RST@\textbf{RST}!\textbf{TAKE}}
 \input{SendStatement.bnf}
 \index{SEND@\textbf{SEND}}
-\index{BY@\textbf{BY}!SEND}
-\index{TO@\textbf{TO}!SEND}
+\index{BY@\textbf{BY}!\textbf{SEND}}
+\index{TO@\textbf{TO}!\textbf{SEND}}
 \input{RSTFormat.bnf}
-\index{RST@\textbf{RST}!SEND}
+\index{RST@\textbf{RST}!\textbf{SEND}}
 
 %%%TakeStatement ::=\\
 %%%\x {\bf TAKE} [ Name$\S $Variable ] {\bf FROM} Name$\S $Dation\\

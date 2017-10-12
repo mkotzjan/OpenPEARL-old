@@ -76,6 +76,7 @@ of type Sema, Bolt, Interrupt or Signal are considered in
 \ref{sec_input_output}.
 
 \section{Integers (FIXED)}   % 5.2
+\label{sec_type_fixed}
 \index{FIXED@\textbf{FIXED}}
 
 Integers can be written in decimal or dual representation. The decimal
@@ -130,6 +131,7 @@ Example:
 i := 2;
 
 \section{Floating Point Numbers (FLOAT)}  % 5.3
+\label{sec_type_float}
 \index{FLOAT@\textbf{FLOAT}}
 
 Constants for floating point numbers can be represented as a sequence of
@@ -275,6 +277,7 @@ signal BitIndexOutOfRangeSignal is induced.
 %%%\end{added}
 
 \section{Character Strings (CHARACTER)}  % 5.5
+\label{sec_char_strings}
 \index{CHAR@\textbf{CHAR}}
 \index{CHARACTER@\textbf{CHARACTER}|see {CHAR}}
 
@@ -417,6 +420,12 @@ time:=12:30:00;
 \label{sec_type_duration}
 \index{DURATION@\textbf{DURATION}|see {DUR}}
 \index{DUR@\textbf{DUR}}
+\index{DUR@\textbf{DUR}!\textbf{HRS}}
+\index{DUR@\textbf{DUR}!\textbf{MIN}}
+\index{DUR@\textbf{DUR}!\textbf{SEC}}
+\index{HRS@\textbf{HRS}}
+\index{MIN@\textbf{MIN}}
+\index{SEC@\textbf{SEC}}
 
 A duration constant is composed of stating an hour, a minute, and a
 second, however, single pieces of specifications may be lacking. An hour
@@ -1169,6 +1178,7 @@ Example:
 
 
 \section{The Initialisation Attribute (INITIAL)}   % 5.13
+\label{sec_init}
 \index{INIT@\textbf{INIT}}
 \index{INITIAL@\textbf{INITIAL}|see {INIT}}
 

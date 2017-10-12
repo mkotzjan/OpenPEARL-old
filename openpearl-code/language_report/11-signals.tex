@@ -71,6 +71,8 @@ The general form of the specification of signals reads:
 %%%{\bf SIGNAL} [ GlobalAttribute ] ;
 %%%\end{front}
 \input{SignalSpecification.bnf}
+\index{SIGNAL@\textbf{SIGNAL}}
+\index{SIGNAL@\textbf{SIGNAL}!Specification}
 
 %%%%%\begin{added}
 %%%%%
@@ -83,12 +85,14 @@ for wrong usage of functions.
 The declaration of a user defined signal is allowed on module level.
 
 \input{UserSignalDeclaration.bnf}
+\index{SIGNAL@\textbf{SIGNAL}!Declaration}
 
 Valid ranges for the error number are listed in the plattform specific manual.
 
 %%%%%\end{added}
 
 \section{Signal Reactions}
+\label{sec_signal_reactions}
 The reaction planned for the occurrence of a signal is scheduled with
 the following statement:
 
@@ -103,10 +107,16 @@ the following statement:
 
 %%%%%\begin{discuss}
 \input{SchedulingSignalReaction.bnf}
+\index{SIGNAL@\textbf{SIGNAL}!Reaction}
+\index{SIGNAL@\textbf{SIGNAL}!\textbf{ON}}
+\index{ON@\textbf{ON}}
+\index{RST@\textbf{RST}!Signal Reaction}
 %%%%\input{SignalStatement.bnf}
 \input{SignalReaction.bnf}
 \input{SignalFinalStatement.bnf}
 \input{InduceStatement.bnf}
+\index{INDUCE@\textbf{INDUCE}}
+\index{SIGNAL@\textbf{SIGNAL}!\textbf{INDUCE}}
 
 %%%%%\end{discuss}
 

@@ -87,14 +87,18 @@ the predefined function in the whole program.
 %%%\end{added}
 
 \subsection{The Function NOW}    % A 2.1
+\label{sec_function_now}
 
 The function procedure NOW passes back the actual time or system time, resp., 
 as value of type CLOCK. The specification of the function looks like this:\\
 
 {\bf SPC} NOW {\bf PROC RETURNS ( CLOCK ) GLOBAL} ; 
+\index{Predefined Functions!\textbf{NOW}}
+\index{NOW@\textbf{NOW}}
 
 
 \subsection{The Function DATE}    % A 2.2
+\label{sec_function_date}
 
 The actual date can be received by invoking the function procedure DATE.
 The function result is a character string constant of length 10, containing
@@ -102,6 +106,8 @@ the date in the form ``year--month--day''. Here an example for December 5,
 1991: ``1991--12-05''. The function must  be specified like this:\\
 
 {\bf SPC} DATE {\bf PROC RETURNS ( CHAR(10) ) GLOBAL} ;
+\index{Predefined Functions!\textbf{DATE}}
+\index{DATE@\textbf{DATE}}
 
 %%%\begin{added}
 \section{CPP-Insertions}
@@ -755,142 +761,136 @@ Auswirkung auf alte Teile pruefen
 \input{RelativePosition.bnf}
 
 \twocolumn[\section{List of Keywords with Shortforms}   % A 4
-\begin{discuss}
-das muss noch auf index, makeindex und printindex 
-mit Seitennummer
-umgestellt werden.
-13.5 und 13.6 fallen dann zusammen.
-
-\end{discuss}
 The denotation behind the keyword refers to the paragraph where it
 is introduced.\\]
 
 {
-{\bf ACTIVATE} 9.2.2\\
-{\bf AFTER} 9.2.1\\
-{\bf ALL} 9.2.1\\
+{\bf ACTIVATE} \ref{sec_task_activate}\\
+{\bf AFTER} \ref{sec_task_activate}\\
+{\bf ALL} \ref{sec_task_activate}\\
 {\bf ALPHIC} \ref{sec_dation_problem_part}\\
-{\bf ALT} 7.2\\
-{\bf AT} 9.2.1\\
+{\bf ALT} \ref{sec_case}\\
+{\bf AT} \ref{sec_task_activate}\\
 
 {\bf BASIC} \ref{sec_dation_problem_part}\\
-{\bf BEGIN} 4.4 \\
-{\bf BIT} 5.4\\
-{\bf BOLT} 9.3.2\\
-{\bf BY} 7.3, \ref{sec_open_close}\\
+{\bf BEGIN} \ref{sec_block} \\
+{\bf BIT} \ref{sec_bit_strings}\\
+{\bf BOLT} \ref{sec_bolt}\\
+{\bf BY} \ref{sec_repetition}, \ref{sec_open_close}\\
 
-{\bf CALL} 8.2\\
-{\bf CASE} 7.2\\
-{\bf CHARACTER}, {\bf CHAR} 5.5\\
-{\bf CLOCK} 5.7\\
+{\bf CALL} \ref{sec_call}\\
+{\bf CASE} \ref{sec_case}\\
+{\bf CHARACTER}, {\bf CHAR} \ref{sec_char_strings}\\
+{\bf CLOCK} \ref{sec_type_clock}\\
 {\bf CLOSE} \ref{sec_open_close}\\
-{\bf CONT} 5.9\\
-{\bf CONTINUE} 9.2.5\\
+{\bf CONT} \ref{sec_references}\\
+{\bf CONTINUE} \ref{sec_continue}\\
 {\bf CONTROL} \ref{sec_dation_problem_part}\\
 {\bf CONVERT} \ref{sec_dation_problem_part}\\
 {\bf CREATED} \ref{sec_dation_problem_part}\\
 {\bf CYCLIC} \ref{sec_dation_problem_part}\\
  
 {\bf DATION} \ref{sec_dation_problem_part}\\
-{\bf DECLARE}, {\bf DCL} 4.1\\
+{\bf DECLARE}, {\bf DCL} \ref{sec_dcl}\\
 {\bf DIM} \ref{sec_dation_problem_part}\\
 {\bf DIRECT} \ref{sec_dation_problem_part}\\
-{\bf DISABLE} 9.4.2\\
-{\bf DURATION}, {\bf DUR} 5.8\\
-{\bf DURING} 9.2.1\\
+{\bf DISABLE} \ref{sec_task_interrupt}\\
+{\bf DURATION}, {\bf DUR} \ref{sec_type_duration}\\
+{\bf DURING} \ref{sec_task_activate}\\
 
-{\bf ELSE} 7.1\\
-{\bf ENABLE} 9.4.2\\
-{\bf END} 4.4, 8.1, 9.1\\
-{\bf ENTER} 9.3.2\\
-{\bf ENTRY} 8.1\\
-{\bf EXIT} 7.5\\
+{\bf ELSE} \ref{sec_if}\\
+{\bf ENABLE} \ref{sec_task_interrupt}\\
+{\bf END} \ref{sec_block}, \ref{sec_repetition}, \ref{sec_proc_dcl},
+	 \ref{sec_task_dcl}\\
+{\bf ENTER} \ref{sec_bolt}\\
+{\bf ENTRY} \ref{sec_proc_dcl}\\
+{\bf EXIT} \ref{sec_exit}\\
 
-{\bf FIN} 7.1\\
-{\bf FIXED} 5.2\\
-{\bf FLOAT} 5.3\\
-{\bf FOR} 7.3\\
+{\bf FIN} \ref{sec_if}, \ref{sec_case}\\
+{\bf FIXED} \ref{sec_type_fixed}\\
+{\bf FLOAT} \ref{sec_type_float}\\
+{\bf FOR} \ref{sec_repetition}\\
 {\bf FORBACK} \ref{sec_dation_problem_part}\\
-{\bf FORMAT} 10.5.8\\
+{\bf FORMAT} \ref{sec_dation_r_format}\\
 {\bf FORWARD} \ref{sec_dation_problem_part}\\
-{\bf FREE} 9.3.2\\
-{\bf FROM} 7.3, \ref{sec_read_write}\\
+{\bf FREE} \ref{sec_bolt}\\
+{\bf FROM} \ref{sec_repetition}, \ref{sec_read_write}\\
  
 {\bf GET} \ref{sec_get_put}\\
-{\bf GLOBAL} 4.1\\
-{\bf GOTO} 7.4\\
+{\bf GLOBAL} \ref{sec_references_modules}\\
+{\bf GOTO} \ref{sec_goto}\\
  
-{\bf HRS} 5.8\\
+{\bf HRS} \ref{sec_type_duration}\\
  
-{\bf IDENTICAL}, {\bf IDENT} 4.1, 8.1\\
-{\bf IF} 7.1\\                           
+{\bf IDENTICAL}, {\bf IDENT} \ref{sec_spc}, 8.1\\
+{\bf IF} \ref{sec_if}\\                           
 {\bf IN} \ref{sec_dation_problem_part}\\
-{\bf INDUCE} 11\\
-{\bf INITIAL}, {\bf INIT} 5.14\\
+{\bf INDUCE} \ref{sec_signal_reactions}\\
+{\bf INITIAL}, {\bf INIT} \ref{sec_init}\\
 {\bf INOUT} \ref{sec_dation_problem_part}\\
-{\bf INTERRUPT}, {\bf IRPT} 9.4.1\\
-{\bf INV} 5.15\\
+{\bf INTERRUPT}, {\bf IRPT} \ref{sec_interrupt}\\
+{\bf INV} \ref{sec_inv}\\
  
-{\bf LEAVE} 9.3.2\\
-{\bf LENGTH} 5.6\\
+{\bf LEAVE} \ref{sec_bolt}\\
+{\bf LENGTH} \ref{sec_length}\\
  
-{\bf MAIN} 9.1\\
+{\bf MAIN} \ref{sec_task_dcl}\\
 {\bf MAX} \ref{sec_dation_problem_part}\\
-{\bf MIN} 5.8\\
-{\bf MODEND} 4.1\\
-{\bf MODULE} 4.1\\
+{\bf MIN} \ref{sec_type_duration}\\
+{\bf MODEND} \ref{sec_modules}\\
+{\bf MODULE} \ref{sec_modules}\\
  
-{\bf NIL} 5.9\\
+{\bf NIL} \ref{sec_references}\\
 {\bf NOCYCL} \ref{sec_dation_problem_part}\\
 {\bf NOSTREAM} \ref{sec_dation_problem_part}\\
 
-{\bf ON} 11\\
-{\bf OPEN} 10.3\\
-{\bf OPERATOR} 6.2\\
-{\bf OUT} 7.2, \ref{sec_dation_problem_part}\\
+{\bf ON} \ref{sec_signal_reactions}\\
+{\bf OPEN} \ref{sec_open_close}\\
+%%%%% {\bf OPERATOR} 6.2\\    removed due to no OPERATOR support
+{\bf OUT} \ref{sec_case}, \ref{sec_dation_problem_part}\\
  
-{\bf PRECEDENCE} 7.2\\
-{\bf PRESET} 9.3.1\\
-{\bf PREVENT} 9.2.7\\
-{\bf PRIORITY}, {\bf PRIO} 9.1\\
-{\bf PROBLEM} 4.3\\
-{\bf PROCEDURE}, {\bf PROC} 8.1\\
+%%%%% {\bf PRECEDENCE} 7.2\\  removed, due no no OPERATOR support
+{\bf PRESET} \ref{sec_semaphores}\\
+{\bf PREVENT} \ref{sec_prevent}\\
+{\bf PRIORITY}, {\bf PRIO} \ref{sec_task_dcl}\\
+{\bf PROBLEM} \ref{sec_modules}\\
+{\bf PROCEDURE}, {\bf PROC} \ref{sec_proc_dcl}\\
 {\bf PUT} \ref{sec_get_put}\\
 
-{\bf READ} \ref{sec_dation_read_write}\\
-{\bf REF} 5.9\\
-{\bf RELEASE} 9.3.1\\
-{\bf REPEAT} 7.3\\
-{\bf REQUEST} 9.3.1\\
-{\bf RESERVE} 9.3.2\\
-{\bf RESUME} 9.2.6\\
-{\bf RETURN} 8.2\\
-{\bf RETURNS} 8.1\\
+{\bf READ} \ref{sec_read_write}\\
+{\bf REF} \ref{sec_references}\\
+{\bf RELEASE} \ref{sec_semaphores}\\
+{\bf REPEAT} \ref{sec_repetition}\\
+{\bf REQUEST} \ref{sec_semaphores}\\
+{\bf RESERVE} \ref{sec_bolt}\\
+{\bf RESUME} \ref{sec_resume}\\
+{\bf RETURN} \ref{sec_proc_dcl}\\
+{\bf RETURNS} \ref{sec_proc_dcl}\\
  
-{\bf SEC} 5.8\\
-{\bf SEMA} 9.3.1\\
+{\bf SEC} \ref{sec_type_duration}\\
+{\bf SEMA} \ref{sec_semaphores}\\
 {\bf SEND} \ref{sec_dation_take_send}\\
-{\bf SIGNAL} 11\\
-{\bf SPECIFY}, {\bf SPC} 4.1\\
+{\bf SIGNAL} \ref{sec_signals}\\
+{\bf SPECIFY}, {\bf SPC} \ref{sec_spc}\\
 {\bf STREAM} \ref{sec_dation_problem_part}\\
-{\bf STRUCT} 5.11\\
-{\bf SUSPEND} 9.2.4\\
-{\bf SYSTEM} 4.2\\
+{\bf STRUCT} \ref{sec_struct}\\
+{\bf SUSPEND} \ref{sec_suspend}\\
+{\bf SYSTEM} \ref{sec_modules}\\
  
 {\bf TAKE} \ref{sec_dation_take_send}\\
-{\bf TASK} 9.1\\
-{\bf TERMINATE} 9.2.3\\
+{\bf TASK} \ref{sec_task_dcl}\\
+{\bf TERMINATE} \ref{sec_terminate}\\
 {\bf TFU} \ref{sec_dation_problem_part}\\
-{\bf THEN} 7.1\\
-{\bf TO} 7.3, \ref{sec_dation_read_write}\\
-{\bf TRIGGER} 9.4.2\\
-{\bf TYPE} 5.12\\
+{\bf THEN} \ref{sec_if}\\
+{\bf TO} \ref{sec_repetition}, \ref{sec_read_write}\\
+{\bf TRIGGER} \ref{sec_task_interrupt}\\
+{\bf TYPE} \ref{sec_type}\\
  
-{\bf UNTIL} 9.2.1\\
+{\bf UNTIL} \ref{sec_task_activate}\\
  
-{\bf WHEN} 9.2.1\\
-{\bf WHILE} 7.3\\
-{\bf WRITE} \ref{sec_dation_read_write}\\
+{\bf WHEN} \ref{sec_task_activate}\\
+{\bf WHILE} \ref{sec_repetition}\\
+{\bf WRITE} \ref{sec_read_write}\\
 }
 \onecolumn
 
@@ -901,11 +901,11 @@ is introduced.\\]
 
 {
 {\bf A} \ref{sec_dation_a_format}\\
-{\bf ABS} 6.1.1\\
-{\bf ADV} \ref{sec_dation_read_write}\\
-{\bf AND} 6.1.2\\
+{\bf ABS} \ref{sec_monadic_operators}\\
+{\bf ADV} \ref{sec_read_write}\\
+{\bf AND} \ref{sec_dyadic_operators}\\
 {\bf ANY} \ref{sec_dation_open_close}\\
-{\bf ATAN} 6.1.1\\
+{\bf ATAN} \ref{sec_monadic_operators}\\
 
 {\bf B} \ref{sec_dation_b_format}\\
 {\bf B1} \ref{sec_dation_b_format}\\
@@ -914,77 +914,78 @@ is introduced.\\]
 {\bf B4} \ref{sec_dation_b_format}\\
 
 {\bf CAN} \ref{sec_dation_open_close}\\
-{\bf CAT} 6.1.2\\
-{\bf COL} \ref{sed_dation_read_write}\\
-{\bf CONT} 5.9\\
-{\bf COS} 6.1.1\\
-{\bf CSHIFT} 6.1.2\\
+{\bf CAT} \ref{sec_dyadic_operators}\\
+{\bf COL} \ref{sec_read_write}\\
+{\bf CONT} \ref{sec_references}\\
+{\bf COS} \ref{sec_monadic_operators}\\
+{\bf CSHIFT} \ref{sec_dyadic_operators}\\
  
 {\bf D} \ref{sec_dation_d_format}\\
-{\bf DATE} A2.2\\
+{\bf DATE} \ref{sec_function_date}\\
  
 {\bf E} \ref{sec_dation_e_format}\\
-{\bf ENTIER} 6.1.1\\
-{\bf EQ} 6.1.2\\
-{\bf EXOR} 6.1.2\\
-{\bf EXP} 6.1.1\\
+{\bf ENTIER} \ref{sec_monadic_operators}\\
+{\bf EQ} \ref{sec_dyadic_operators}\\
+{\bf EXOR} \ref{sec_dyadic_operators}\\
+{\bf EXP} \ref{sec_monadic_operators}\\
  
 {\bf F} \ref{sec_dation_f_format}\\
-{\bf FIT} 6.1.2\\
+{\bf FIT} \ref{sec_dyadic_operators}\\
  
-{\bf GE} 6.1.2\\
-{\bf GT} 6.1.2\\
+{\bf GE} \ref{sec_dyadic_operators}\\
+{\bf GT} \ref{sec_dyadic_operators}\\
  
 {\bf IDF} \ref{sec_dation_open_close}\\
-{\bf IS} 5.9\\
-{\bf ISNT} 5.9\\
+{\bf IS} \ref{sec_references}, \ref{sec_dyadic_operators}\\
+{\bf ISNT} \ref{sec_refernces}, \ref{sec_dyadic_operators}\\
 
  
-{\bf LE} 6.1.2\\
-{\bf LINE} \ref{sec_dation_read_write}\\
+{\bf LE} \ref{sec_dyadic_operators}\\
+{\bf LINE} \ref{sec_read_write}\\
 {\bf LIST} \ref{sec_dation_listformat}\\
-{\bf LN} 6.1.1\\
-{\bf LT} 6.1.2\\
-{\bf LWB} 6.1.1, 6.1.2\\
+{\bf LN} \ref{sec_monadic_operators}\\
+{\bf LT} \ref{sec_dyadic_operators}\\
+{\bf LWB} \ref{sec_monadic_operators}, \ref{sec_dyadic_operators}\\
  
-{\bf NE} 6.1.2\\
+{\bf NE} \ref{sec_dyadic_operators}\\
 {\bf NEW} \ref{sec_dation_open_close}\\
-{\bf NOT} 6.1.1\\
-{\bf NOW} A2.1\\
+{\bf NOT} \ref{sec_monadic_operators}\\
+{\bf NOW} \ref{sec_function_now}\\
  
-{\bf OLD} 10.3\\
-{\bf OR} 6.1.2\\
+{\bf OLD} \ref{sec_open_close}\\
+{\bf OR} \ref{sec_dyadic_operators}\\
  
-{\bf PAGE} \ref{sec_dation_read_write}\\
-{\bf POS} \ref{sec_dation_read_write}\\
+{\bf PAGE} \ref{sec_read_write}\\
+{\bf POS} \ref{sec_read_write}\\
 {\bf PRM} \ref{sec_dation_open_close}\\
  
 {\bf R} \ref{sec_dation_r_format}\\
-{\bf REM} 6.1.2\\
-{\bf ROUND} 6.1.1\\
-{\bf RST} \ref{sec_dation_open_close}, \ref{sec_dation_rst} \\
+{\bf REM} \ref{sec_dyadic_operators}\\
+{\bf ROUND} \ref{sec_monadic_operators}\\
+{\bf RST} \ref{sec_dation_open_close}, \ref{sec_dation_rst},
+   \ref{sec_signal_reactions} \\
  
-{\bf S} \ref{sec_dation_a_format}\\
-{\bf SHIFT} 6.1\\
-{\bf SIGN} 6.1.1\\
-{\bf SIN} 6.1.1\\
-{\bf SIZEOF} 6.1\\
-{\bf SKIP} \ref{sec_dation_read_write} \\
-{\bf SOP}  \ref{sec_dation_read_write}\\
-{\bf SQRT} 6.1.1\\
+%%%%%{\bf S} \ref{sec_dation_a_format}\\
+{\bf SHIFT} \ref{sec_dyadic_operators}\\
+{\bf SIGN} \ref{sec_monadic_operators}\\
+{\bf SIN} \ref{sec_monadic_operators}\\
+{\bf SIZEOF} \ref{sec_monadic_operators}\\
+{\bf SKIP} \ref{sec_read_write} \\
+{\bf SOP}  \ref{sec_read_write}\\
+{\bf SQRT} \ref{sec_monadic_operators}\\
  
 {\bf T} \ref{sec_dation_t_format}\\
-{\bf TAN} 6.1.1\\
-{\bf TANH} 6.1.1\\
-{\bf TOBIT} 6.1.1\\
-{\bf TOCHAR} 6.1.1\\
-{\bf TOFIXED} 6.1.1\\
-{\bf TOFLOAT} 6.1.1\\
-{\bf TRY} 9.3.1\\
+{\bf TAN} \ref{sec_monadic_operators}\\
+{\bf TANH} \ref{sec_monadic_operators}\\
+{\bf TOBIT} \ref{sec_monadic_operators}\\
+{\bf TOCHAR} \ref{sec_monadic_operators}\\
+{\bf TOFIXED} \ref{sec_monadic_operators}\\
+{\bf TOFLOAT} \ref{sec_monadic_operators}\\
+{\bf TRY} \ref{sec_semaphores}\\
  
-{\bf UPB} 6.1.1, 6.1.2\\
+{\bf UPB} \ref{sec_monadic_operators}, \ref{sec_dyadic_operators}\\
 
-{\bf X} \ref{sec_dation_read_write}
+{\bf X} \ref{sec_read_write}
 }
 
 %\twocolumn[\section{Index}    % A 5
