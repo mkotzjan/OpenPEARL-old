@@ -1,0 +1,16 @@
+MODULE(x);
+SYSTEM;
+stdout: StdOut;
+PROBLEM;
+    SPC stdout DATION OUT SYSTEM ALPHIC;
+
+    DCL out DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
+
+t1: TASK MAIN;
+   OPEN out;
+   PUT 'A','B' TO out BY X(3),A,X(4),A;
+   PUT 'X' TO out BY A, SKIP;
+   CLOSE out;
+END;
+MODEND;
+
