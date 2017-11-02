@@ -787,11 +787,16 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         for (int i = 0; i < m_listOfTemporarySemaphoreArrays.size(); i++) {
             LinkedList<SemaphoreEntry> semaphores = m_listOfTemporarySemaphoreArrays.get(i);
             if ( semaphores.size() == listOfSemaphores.size()) {
-                for (int j = 0; j < semaphores.size(); j++) {
-                    if ( semaphores.get(j).compareTo(listOfSemaphores.get(j)) == 0) {
-                        found = true;
+                int j = 0;
+                for (j = 0; j < semaphores.size(); j++) {
+                    if ( semaphores.get(j).compareTo(listOfSemaphores.get(j)) != 0) {
                         break;
                     }
+                }
+
+                if ( j == semaphores.size()) {
+                    found = true;
+                    break;
                 }
             }
         }
