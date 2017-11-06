@@ -1,0 +1,10 @@
+   <dation name="RPiDigitalOut">
+      <parameters>
+         <FIXED length="31">
+             <FIXEDRANGE>2,27</FIXEDRANGE> 
+         </FIXED>
+         <FIXED length="31" nick="width"> <FIXEDGT>0</FIXEDGT></FIXED>
+      </parameters>
+      <attributes> OUT, SYSTEM, BASIC</attributes>
+      <data>BIT($width)</data>
+   </dation>
