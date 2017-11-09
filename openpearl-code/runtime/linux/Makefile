@@ -116,22 +116,23 @@ ifeq ($(CONFIG_LINUX_Raspberry),y)
    # and http://www.raspberrypi-spy.co.uk/2012/09/checking-your-raspberry-pi-board-version/
    ver := $(shell awk '$$1 == "Revision" {print $$3}' /proc/cpuinfo)
    ifeq ($(ver),000d)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V1B
+      rpiVersion = V1B
    else ifeq ($(ver),000e)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V1B
+      rpiVersion = V1B
    else ifeq ($(ver),000f)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V1B
+      rpiVersion = V1B
    else ifeq ($(ver),a01041)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V2B
+      rpiVersion = V2B
    else ifeq ($(ver),a21041)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V2B
+      rpiVersion = V2B
    else ifeq ($(ver),a02082)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V3B
+      rpiVersion = V3B
    else ifeq ($(ver),a22082)
-      CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_V3B
+      rpiVersion = V3B
    else
       $(error raspberry revision $(ver) not known by auto detection)
    endif 
+   CXXFLAGS += -DCONFIG_LINUX_Raspberry_Version_$(rpiVersion)
 $(warning $(CXXFLAGS))
 
 endif
@@ -141,8 +142,8 @@ ifeq ($(CONFIG_LINUX_RPI_DigIO),y)
    SRCANDH += raspberry/RPiGpio.cc
    SRCANDH += raspberry/RPiDigitalOut.cc
    SRCANDH += raspberry/RPiDigitalIn.cc
-   XML_FILES += raspberry/RPiDigitalOut.xml
-   XML_FILES += raspberry/RPiDigitalIn.xml
+   XML_FILES += raspberry/RPiDigitalOut_$(rpiVersion).xml
+   XML_FILES += raspberry/RPiDigitalIn_$(rpiVersion).xml
 endif
 endif
 
