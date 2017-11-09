@@ -106,7 +106,7 @@ namespace pearlrt {
    }
 
    void characterSafeCopy(char*dest,
-                          char* source, int len) {
+                          const char* source, int len) {
       if (source < dest) {
          // the source string has a smaller adress - the two strings
          // may overlap in case of copy charSlices

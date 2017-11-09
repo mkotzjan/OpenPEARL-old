@@ -86,7 +86,7 @@ namespace pearlrt {
    \param source pointer to the source area
    \param len the number of bytes in the source area
    */
-   void characterSafeCopy(char*dest, char* source, int len) ;
+   void characterSafeCopy(char*dest, const char* source, int len) ;
 
    /**
      \brief data type character
@@ -365,7 +365,7 @@ namespace pearlrt {
          // compare the object to check if they are the same
          // due the the template characteristics we compare the void*
          if ((void*)this != (void*)&rhs) {
-            characterSafeCopy(data, rhs, data, LRHS);
+            characterSafeCopy(data, rhs.data, LRHS);
             characterFillSpaces(data + LRHS, length - LRHS);
          }
 
