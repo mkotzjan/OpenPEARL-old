@@ -541,9 +541,13 @@ ShiftExpression(lhs,rhs) ::= <%
   <lhs>.bitShift(<rhs>)
 %>
 
-CatExpression(lhs,rhs) ::= <%
-  <lhs>.bitCat(<rhs>)
+BitCatExpression(op1,op2) ::= <%
+ <op1>.bitCat(<op2>)
 %>
+
+CharCatExpression(op1,op2) ::= <%
+  <op1>.catChar(<op2>)
+ %>
 
 ReferenceExpression(code,id,bitstring,operator,functionCall) ::= <%
 <if(id)>&<id><elseif(code)>&<code; wrap><elseif(bitstring)><bitstring><endif>
@@ -1759,4 +1763,10 @@ ConvertToStatement(convert) ::= <%
 
 ConvertFromStatement(convert) ::= <%
 *** CONVERT FROM  <convert> ***
+%>
+
+/* --------------------------- STRING SLICE -------------------------------------------*/
+
+StringSlice(lwb,upb,id,size) ::= <%
+*(CharSlice(<user_variable(id)>).getSlice(<lwb>,<upb>).mkCharPtr((pearlrt::Character\<<size>>*)0))
 %>

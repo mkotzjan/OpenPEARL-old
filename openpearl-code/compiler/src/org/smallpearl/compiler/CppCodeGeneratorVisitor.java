@@ -1772,7 +1772,18 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitAssignment_statement(SmallPearlParser.Assignment_statementContext ctx) {
         ST stmt = group.getInstanceOf("assignment_statement");
 
-        SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
+        String id = null;
+
+        if ( ctx.stringSelection() != null ) {
+            if ( ctx.stringSelection().charSelection() != null ) {
+                id = ctx.stringSelection().charSelection().ID().getText();
+            }
+        }
+        else {
+            id = ctx.ID().getText();
+        }
+
+        SymbolTableEntry entry = m_currentSymbolTable.lookup(id);
 
         if ( entry == null ) {
             m_currentSymbolTable.dump(m_currentSymbolTable);
@@ -1853,7 +1864,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     array.add("indices", indices);
                     stmt.add("lhs", array);
                 } else {
-                    stmt.add("lhs", getUserVariable(ctx.ID().getText()));
+                    stmt.add("lhs", getUserVariable(id));
                 }
 
                 stmt.add("rhs", getExpression(ctx.expression()));
@@ -1974,43 +1985,71 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             }
         } else if (ctx.semaTry() != null) {
             expression.add("code", visitSemaTry(ctx.semaTry()));
+        } else if (ctx.stringSlice()!= null) {
+            expression.add("code", visitStringSlice(ctx.stringSlice()));
         } else if (ctx.expression() != null) {
             expression.add("code", "(");
             expression.add("code", visit(ctx.expression(0)));
             expression.add("code", ")");
+        } else if (ctx.stringSlice() != null) {
+            expression.add("code", visitStringSlice(ctx.stringSlice()));
         }
 
         return expression;
     }
 
 
-//    private ST getMonadiciArithmeticOperator(SmallPearlParser.MonadicArithmeticOperatorsContext ctx) {
-//        ST st = group.getInstanceOf("MonadiciArithmeticOperator");
-//        String operator = ctx.getChild(0).getText();
+    @Override
+    public ST visitStringSlice(SmallPearlParser.StringSliceContext ctx) {
+        ST st = group.getInstanceOf("StringSlice");
+
+        if (m_debug) {
+            System.out.println("CppCodeGeneratorVisitor: visitStringSlice");
+        }
+
+        if ( ctx.charSlice() instanceof SmallPearlParser.Case1CharSliceContext) {
+           st = visitCase1CharSlice((SmallPearlParser.Case1CharSliceContext)(ctx.charSlice()));
+        }
+        else if ( ctx.charSlice() instanceof SmallPearlParser.Case2CharSliceContext) {
+            st = visitCase2CharSlice((SmallPearlParser.Case2CharSliceContext)(ctx.charSlice()));
+        }
+        else  if ( ctx.charSlice() instanceof SmallPearlParser.Case3CharSliceContext) {
+            st = visitCase3CharSlice((SmallPearlParser.Case3CharSliceContext)(ctx.charSlice()));
+        }
+        else if ( ctx.charSlice() instanceof SmallPearlParser.Case4CharSliceContext) {
+            st = visitCase4CharSlice((SmallPearlParser.Case4CharSliceContext)(ctx.charSlice()));
+        }
+
+//        if ( ctx.charSlice() != null ) {
+//            st.add("id", ctx.charSlice().ID().getText());
+//            st.add("lwb", getExpression(ctx.charSlice().expression(0)));
 //
-//        if (  operator.equals("SQRT")) {
-//            operator = "sqrt";
-//        } else if (  operator.equals("SIN")) {
-//            operator = "sin";
-//        } else if (  operator.equals("COS")) {
-//            operator = "cos";
-//        } else if (  operator.equals("EXP")) {
-//            operator = "exp";
-//        } else if (  operator.equals("LN")) {
-//            operator = "ln";
-//        } else if (  operator.equals("TAN")) {
-//            operator = "tan";
-//        } else if (  operator.equals("ATAN")) {
-//            operator = "atan";
-//        } else if (  operator.equals("TANH")) {
-//            operator = "tanh";
+//            System.out.println(">>> EXPR="+ctx.charSlice().expression(0).getText());
+//
+//            if ( ctx.charSlice().expression().size() == 1) {
+//                st.add("upb", getExpression(ctx.charSlice().expression(0)));
+//                size = "1";
+//            }
+//            else {
+//                st.add("upb", getExpression(ctx.charSlice().expression(1)));
+//                size = "( (" +
+//                        getExpression(ctx.charSlice().expression(1)).render() +
+//                        ") - (" +
+//                        getExpression(ctx.charSlice().expression(0)).render() +
+//                        ") + 1)";
+//            }
+//
+//            st.add("size", size);
 //        }
+//        else if ( ctx.bitSlice() != null ) {
 //
-//        st.add("operator", operator);
-//        st.add("operand",  visit(ctx.getChild(1)));
-//
-//        return st;
-//    }
+//        }
+//        else {
+//            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+//        }
+
+        return st;
+    }
 
     @Override
     public ST visitAdditiveExpression(SmallPearlParser.AdditiveExpressionContext ctx) {
@@ -2232,12 +2271,28 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     @Override
     public ST visitCatExpression(SmallPearlParser.CatExpressionContext ctx) {
-        ST expr = group.getInstanceOf("CatExpression");
+        ST st;
 
-        expr.add("lhs", visit(ctx.expression(0)));
-        expr.add("rhs", visit(ctx.expression(1)));
+        TypeDefinition resultType = m_expressionTypeVisitor.lookupType(ctx);
+        TypeDefinition op1Type = m_expressionTypeVisitor.lookupType(ctx.expression(0));
+        TypeDefinition op2Type = m_expressionTypeVisitor.lookupType(ctx.expression(1));
 
-        return expr;
+
+        if ( resultType instanceof TypeChar) {
+            st = group.getInstanceOf("CharCatExpression");
+
+        }
+        else if ( resultType instanceof TypeBit) {
+            st = group.getInstanceOf("BitCatExpression");
+        }
+        else {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        st.add("op1", visit(ctx.expression(0)));
+        st.add("op2", visit(ctx.expression(1)));
+
+        return st;
     }
 
     @Override
@@ -4896,4 +4951,63 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         return st;
     }
+
+    @Override
+    public ST visitCase1CharSlice(SmallPearlParser.Case1CharSliceContext ctx) {
+        ST st = group.getInstanceOf("StringSlice");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitCase1CharSlice");
+        }
+
+        st.add("lwb", getExpression(ctx.expression()).render());
+        st.add("upb", getExpression(ctx.expression()).render());
+        st.add("id", ctx.ID().getText());
+        st.add("size",1);
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase2CharSlice(SmallPearlParser.Case2CharSliceContext ctx) {
+        ST st = group.getInstanceOf("StringSlice");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitCase2CharSlice");
+        }
+
+        st.add("lwb", getExpression(ctx.expression(0)).render());
+        st.add("upb", getExpression(ctx.expression(1)).render());
+        st.add("id", ctx.ID().getText());
+        st.add("size",1);
+
+        return st;
+    }
+
+    @Override
+    public ST visitCase3CharSlice(SmallPearlParser.Case3CharSliceContext ctx) {
+        ST st = group.getInstanceOf("StringSlice");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitCase3CharSlice");
+        }
+
+        throw new NotYetImplementedException("Char Slice Case#3", 0, 0);
+
+//        return st;
+    }
+
+    @Override
+    public ST visitCase4CharSlice(SmallPearlParser.Case4CharSliceContext ctx) {
+        ST st = group.getInstanceOf("StringSlice");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitCase4CharSlice");
+        }
+
+        throw new NotYetImplementedException("Char Slice Case4", 0, 0);
+
+        // return st;
+    }
+
 }
