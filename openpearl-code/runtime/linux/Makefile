@@ -142,8 +142,8 @@ ifeq ($(CONFIG_LINUX_RPI_DigIO),y)
    SRCANDH += raspberry/RPiGpio.cc
    SRCANDH += raspberry/RPiDigitalOut.cc
    SRCANDH += raspberry/RPiDigitalIn.cc
-   XML_FILES += raspberry/RPiDigitalOut_$(rpiVersion).xml
-   XML_FILES += raspberry/RPiDigitalIn_$(rpiVersion).xml
+   XML_FILES += raspberry/RPiDigitalOut$(rpiVersion).xml
+   XML_FILES += raspberry/RPiDigitalIn$(rpiVersion).xml
 endif
 endif
 
