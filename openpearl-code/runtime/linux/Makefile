@@ -40,17 +40,17 @@ CXXFLAGS += -pthread
 CXXFLAGS+= -O2
 CXXFLAGS += -fno-non-call-exceptions
 CXXFLAGS += $(INCLUDES)
-LDFLAGS = -lpthread -lrt 
+LDLIBS = -lpthread -lrt 
 CXXFLAGS += -DTARGET=1
 
 #LINK.o = @echo link $<; $(LINK.cc)
-LINK.o = $(LINK.cc)
+LINK.o = $(LINK.cc) $(LDLIBS)
 
 # shortcut for link command, since the implicit link rules of 
 # make produces problems if the dependencies reside in different
 # targets. Thus an explicit rule is added for the targets (especially
 # in the tests/ directory
-LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 # make silent compilations 
 COMPILE.cc = @echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
@@ -316,6 +316,5 @@ depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
 -include .depend
 
 .PHONY: $(phony)
-
 
 $(warning $(targets))
