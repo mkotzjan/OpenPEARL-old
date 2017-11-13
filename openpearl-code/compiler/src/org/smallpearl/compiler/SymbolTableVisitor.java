@@ -29,6 +29,7 @@
 
 package org.smallpearl.compiler;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.semantics.SymbolChecks;
@@ -301,6 +302,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         boolean hasAllocationProtection = false;
 
         ArrayList<String> identifierDenotationList = null;
+        ArrayList<ParserRuleContext> initElementList = null;
 
         m_type = null;
 
@@ -314,11 +316,28 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                     visitTypeAttribute((SmallPearlParser.TypeAttributeContext) c);
                 } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
                     hasGlobalAttribute = true;
+                } else if (c instanceof SmallPearlParser.InitialisationAttributeContext ) {
+                    initElementList = getInitialisationAttribute((SmallPearlParser.InitialisationAttributeContext)c);
                 }
             }
 
+            int j = 0;
             for (int i = 0; i < identifierDenotationList.size(); i++) {
-                VariableEntry variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, ctx);
+                VariableEntry variableEntry = null;
+
+                if ( initElementList != null && initElementList.size() > 0 ) {
+                    if ( j < initElementList.size()) {
+                        System.out.println("#########"+initElementList.get(j));
+                        variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, initElementList.get(j), ctx);
+                        j++;
+                    } else {
+                        variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, initElementList.get(j-1), ctx);
+                        System.out.println("#########"+initElementList.get(j-1));
+                    }
+                } else {
+                    variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, ctx);
+                }
+
                 if (!m_currentSymbolTable.enter(variableEntry)) {
 
                     SymbolTableEntry entry = m_currentSymbolTable.lookupLocal(identifierDenotationList.get(i));
@@ -1096,5 +1115,22 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             m_listOfArrayDescriptors.add( descriptor);
         }
         return null;
+    }
+
+
+    private ArrayList<ParserRuleContext>  getInitialisationAttribute(SmallPearlParser.InitialisationAttributeContext ctx) {
+        ArrayList<ParserRuleContext> initElementList = new ArrayList<ParserRuleContext>();
+
+        if (ctx != null) {
+            for (int i = 0; i < ctx.initElement().size(); i++) {
+                if (ctx.initElement(i).constantExpression() != null) {
+                    initElementList.add(ctx.initElement(i).constantExpression());
+                } else if (ctx.initElement(i).constant() != null) {
+                    initElementList.add(ctx.initElement(i).constant());
+                }
+            }
+        }
+
+        return initElementList;
     }
 }

@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.14";
+    static String version = "v0.8.9.15";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -137,7 +137,7 @@ public class Compiler {
                     ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
                     expressionTypeVisitor.visit(tree);
 
-                    ConstantExpressionTypeVisitor constantExpressionVisitor = new ConstantExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
+                    ConstantExpressionEvaluatorVisitor constantExpressionVisitor = new ConstantExpressionEvaluatorVisitor(verbose, debug, symbolTableVisitor);
                     constantExpressionVisitor.visit(tree);
 
                     if (!nosemantic) {
@@ -148,7 +148,7 @@ public class Compiler {
                         SystemPartExport(lexer.getSourceName(), tree);
                     }
 
-                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor);
+                    CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor, constantExpressionVisitor);
 
                     if (dumpConstantPool) {
                         constantPool.dump();
@@ -298,8 +298,20 @@ public class Compiler {
         return true;
     }
 
-    private static Void CppGenerate(String sourceFileName, ParserRuleContext tree, SymbolTableVisitor symbolTableVisitor, ExpressionTypeVisitor expressionTypeVisitor) {
-        CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor(sourceFileName, groupFile, verbose, debug, symbolTableVisitor, expressionTypeVisitor);
+    private static Void CppGenerate(String sourceFileName,
+                                    ParserRuleContext tree,
+                                    SymbolTableVisitor symbolTableVisitor,
+                                    ExpressionTypeVisitor expressionTypeVisitor,
+                                    ConstantExpressionEvaluatorVisitor constantExpressionEvaluatorVisitor) {
+
+        CppCodeGeneratorVisitor cppCodeGenerator = new CppCodeGeneratorVisitor( sourceFileName,
+                                                                                groupFile,
+                                                                                verbose,
+                                                                                debug,
+                                                                                symbolTableVisitor,
+                                                                                expressionTypeVisitor,
+                                                                                constantExpressionEvaluatorVisitor);
+
         ST code = cppCodeGenerator.visit(tree);
 
         if ( debugSTG ) {

@@ -416,14 +416,16 @@ arrayInitialisationAttribute :
 //      | Identifier§NamedConstant | ConstantExpression ...
 ////////////////////////////////////////////////////////////////////////////////
 
-initElement :
-    expression
+initElement
+    : constant
+    | ID
+    | constantExpression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 variable_init :
-    'INIT' '(' expression ')'
+    'INIT' '(' constantExpression ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2038,6 +2040,7 @@ primaryExpression
 //   | { + | - } DurationConstant
 //   | ConstantFIXEDExpression
 ////////////////////////////////////////////////////////////////////////////////
+
 constantExpression
     : FloatingPointConstant
     | Sign? durationConstant
@@ -2048,19 +2051,48 @@ constantExpression
 // ConstantFIXEDExpression ::=
 //   Term [ { + | - } Term ] ...
 ////////////////////////////////////////////////////////////////////////////////
+
 constantFixedExpression
-    : constantFixedExpressionTerm (op='+' constantFixedExpressionTerm )*
-    | constantFixedExpressionTerm (op='-' constantFixedExpressionTerm )*
+    : constantFixedExpressionTerm ( additiveConstantFixedExpressionTerm | subtractiveConstantFixedExpressionTerm) *
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+additiveConstantFixedExpressionTerm
+    : op='+' constantFixedExpressionTerm
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+subtractiveConstantFixedExpressionTerm
+    : op='-' constantFixedExpressionTerm
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Term ::=
 //   Factor [ {∗ | // | REM } Factor ] ...
 ////////////////////////////////////////////////////////////////////////////////
+
 constantFixedExpressionTerm
-    : constantFixedExpressionFactor ( op='*' constantFixedExpressionFactor )*
-    | constantFixedExpressionFactor ( op='//' constantFixedExpressionFactor )*
-    | constantFixedExpressionFactor ( op='REM' constantFixedExpressionFactor )*
+    : constantFixedExpressionFactor ( multiplicationConstantFixedExpressionTerm | divisionConstantFixedExpressionTerm | remainderConstantFixedExpressionTerm)*
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+multiplicationConstantFixedExpressionTerm
+    : op='*' constantFixedExpressionFactor
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+divisionConstantFixedExpressionTerm
+    : op='//' constantFixedExpressionFactor
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+remainderConstantFixedExpressionTerm
+    : op='REM' constantFixedExpressionFactor
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2077,7 +2109,14 @@ constantFixedExpressionFactor
     : Sign? (   IntegerConstant
               | '(' constantFixedExpression ')'
               | ID )
-      ( 'FIT' constantFixedExpression ) ?
+      constantFixedExpressionFit?
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+constantFixedExpressionFit
+    :
+    'FIT' constantFixedExpression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2202,7 +2241,8 @@ stringSlice
 ////////////////////////////////////////////////////////////////////////////////
 
 bitSlice
-	: ID '.' 'BIT' '(' expression ( ':' expression )? ')'
+	: ID '.' 'BIT' '(' constantFixedExpression ')'                                                  #case1BitSlice
+	| ID '.' 'BIT' '(' constantFixedExpression ( ':' constantFixedExpression ) ')'                  #case2BitSlice
 	;
 
 ////////////////////////////////////////////////////////////////////////////////
