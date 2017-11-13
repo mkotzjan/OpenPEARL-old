@@ -153,8 +153,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             if (expressionResult != null) {
                 m_properties.put(ctx, expressionResult);
             }
+        } else if (ctx.stringSlice() != null) {
+            visit(ctx.stringSlice());
+            ExpressionResult expressionResult= m_properties.get(ctx.stringSlice());
+            if (expressionResult != null) {
+                m_properties.put(ctx, expressionResult);
+            }
         } else if (ctx.expression() != null) {
-            if ( ctx.expression().size() > 1 ) {
+            if (ctx.expression().size() > 1) {
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
 
@@ -165,7 +171,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             }
         }
 
-            return null;
+        return null;
     }
 
     @Override
@@ -1016,8 +1022,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
     // Expression | Type of     |           | Result type | Meaning of operation
     //            | operand     |           |             |
     // -----------+-------------+-----------+-------------+---------------------------------
-    // SQRT op    | FIXED(g) or |           | FLOAT(g)    | square root of operand
-    // SIN op     | FLOAT(g)    |           |             | sine of operand
+    // SQRT op    | FLOAT(g)    |           | FLOAT(g)    | square root of operand
+    // SIN op     |             |           |             | sine of operand
     // COS op     |             |           |             | cosine of operand
     // EXP op     |             |           |             | e^op with e=2.718281828459
     // LN op      |             |           |             | natural logarithm of operand
@@ -1041,12 +1047,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: SqrtExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1073,12 +1074,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: SinExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1105,12 +1101,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: CosExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1137,12 +1128,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: ExpExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1169,12 +1155,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: LnExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1201,12 +1182,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: TanExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1233,12 +1209,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: ATanExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1265,12 +1236,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        if (op.getType() instanceof TypeFixed) {
-            res = new ExpressionResult(new TypeFloat(((TypeFixed) op.getType()).getPrecision()), op.isConstant());
-            m_properties.put(ctx, res);
-            if (m_debug)
-                System.out.println("ExpressionTypeVisitor: TanhExpression: rule#1");
-        } else if (op.getType() instanceof TypeFloat) {
+        if (op.getType() instanceof TypeFloat) {
             res = new ExpressionResult(new TypeFloat(((TypeFloat) op.getType()).getPrecision()), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
@@ -1521,6 +1487,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         } else if (ctx.timeConstant() != null) {
             ExpressionResult expressionResult = new ExpressionResult( new TypeClock(getTime(ctx.timeConstant())),true);
             m_properties.put(ctx, expressionResult);
+        } else if (ctx.StringLiteral() != null) {
+            ExpressionResult expressionResult = new ExpressionResult(new TypeChar(), true);
+            m_properties.put(ctx, expressionResult);
         } else if (ctx.BitStringLiteral() != null) {
             ExpressionResult expressionResult = new ExpressionResult(  new TypeBit(CommonUtils.getBitStringLength(ctx.BitStringLiteral().getText())), true);
             m_properties.put(ctx, expressionResult);
@@ -1528,7 +1497,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             try {
                 Integer precision = Defaults.FIXED_PRECISION;
 
-                if ( ctx.IntegerConstant().size() == 2 ) {
+                if (ctx.IntegerConstant().size() == 2) {
                     precision = Integer.parseInt(ctx.IntegerConstant(1).toString());
                 }
 
@@ -1537,9 +1506,6 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             } catch (NumberFormatException ex) {
                 throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-        } else if (ctx.StringLiteral() != null) {
-            ExpressionResult expressionResult = new ExpressionResult(new TypeChar(), true);
-            m_properties.put(ctx, expressionResult);
         }
         return null;
     }
@@ -1648,11 +1614,30 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
     @Override
     public Void visitAssignment_statement(SmallPearlParser.Assignment_statementContext ctx) {
+        String id = null;
+
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitAssignment_statement");
         }
 
-        SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().getText());
+        if (m_debug) {
+
+            if ( ctx.stringSelection() != null ) {
+                if ( ctx.stringSelection().charSelection() != null ) {
+                    System.out.println(">>>>>>>>>>>>>>> id = " + ctx.stringSelection().charSelection().ID());
+                }
+            }
+        }
+
+        if ( ctx.stringSelection() != null ) {
+            if ( ctx.stringSelection().charSelection() != null ) {
+                id = ctx.stringSelection().charSelection().ID().getText();
+            }
+        } else {
+            id = ctx.ID().getText();
+        }
+
+        SymbolTableEntry entry = m_currentSymbolTable.lookup(id);
         if (!(entry instanceof VariableEntry)) {
             throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
@@ -2272,7 +2257,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             System.out.println("ExpressionTypeVisitor: visitStringSelection");
         }
 
-        throw new NotSupportedFeatureException("visitStringSelection", ctx.start.getLine(), ctx.start.getCharPositionInLine(), "???");
+        return null;
+//        throw new NotSupportedFeatureException("visitStringSelection", ctx.start.getLine(), ctx.start.getCharPositionInLine(), "???");
     }
 
 
@@ -2374,13 +2360,13 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
-            TypeBit type = new TypeBit(((TypeBit)op1.getType()).getPrecision() + ((TypeBit)op2.getType()).getPrecision());
+            TypeBit type = new TypeBit(((TypeBit) op1.getType()).getPrecision() + ((TypeBit) op2.getType()).getPrecision());
             ExpressionResult expressionResult = new ExpressionResult(type);
             m_properties.put(ctx, expressionResult);
-
-            if (m_debug) {
-                System.out.println("ExpressionTypeVisitor: Dyadic Boolean and shift operators");
-            }
+        } else if (op1.getType() instanceof TypeChar && op2.getType() instanceof TypeChar) {
+            TypeChar type = new TypeChar(((TypeChar)op1.getType()).getSize() + ((TypeChar)op2.getType()).getSize());
+            ExpressionResult expressionResult = new ExpressionResult(type);
+            m_properties.put(ctx, expressionResult);
         } else {
             throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
@@ -2516,4 +2502,26 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         return null;
     }
 
+    @Override
+    public Void visitStringSlice(SmallPearlParser.StringSliceContext ctx) {
+        ExpressionResult res;
+
+        if (m_debug) {
+            System.out.println("ExpressionTypeVisitor: visitStringSlice");
+        }
+
+        if ( ctx.bitSlice() != null ) {
+            res = new ExpressionResult(new TypeBit(1));
+        }
+        else if ( ctx.charSlice() != null ) {
+            res = new ExpressionResult(new TypeChar(1));
+        }
+        else {
+            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        m_properties.put(ctx, res);
+
+        return null;
+    }
 }

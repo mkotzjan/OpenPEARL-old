@@ -86,7 +86,19 @@ public class CheckAssignment extends SmallPearlBaseVisitor<Void> implements Smal
             System.out.println("Semantic: visitAssignment_statement");
         }
 
-        SymbolTableEntry lhs = m_currentSymbolTable.lookup(ctx.ID().getText());
+        String id = null;
+
+        if ( ctx.stringSelection() != null ) {
+            if ( ctx.stringSelection().charSelection() != null ) {
+                id = ctx.stringSelection().charSelection().ID().getText();
+            }
+        }
+        else {
+            id = ctx.ID().getText();
+        }
+
+        SymbolTableEntry lhs = m_currentSymbolTable.lookup(id);
+
         TypeDefinition rhs = m_expressionTypeVisitor.lookupType(ctx.expression());
         ExpressionResult rhs1 = m_expressionTypeVisitor.lookup(ctx.expression());
 

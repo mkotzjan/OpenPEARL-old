@@ -387,7 +387,7 @@ namespace pearlrt {
                      would be too long for the bitstring (e.g. start-1+P <= S)
           */
       template <int P> BitString<P>
-      getSlice(const Fixed<15>start, BitString<P> dummy) {
+      getSlice(const Fixed<15>start, BitString<P>* dummy) {
          if (start.x - 1 + P > S || start.x < 1) {
             throw theBitIndexOutOfRangeSignal;
          }

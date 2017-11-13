@@ -909,7 +909,7 @@ bitSelection
 ////////////////////////////////////////////////////////////////////////////////
 
 charSelection
-    : ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ')'
+    : ID '.' ( 'CHAR' | 'CHARACTER' ) '('  expression ( ':' expression )? ')'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2040,7 +2040,7 @@ primaryExpression
 ////////////////////////////////////////////////////////////////////////////////
 constantExpression
     : FloatingPointConstant
-    | ( '+' | '-' )? durationConstant
+    | Sign? durationConstant
     | constantFixedExpression
     ;
 
@@ -2049,15 +2049,18 @@ constantExpression
 //   Term [ { + | - } Term ] ...
 ////////////////////////////////////////////////////////////////////////////////
 constantFixedExpression
-    : constantExpressionTerm ( ( '+' | '-' ) constantExpressionTerm )*
+    : constantFixedExpressionTerm (op='+' constantFixedExpressionTerm )*
+    | constantFixedExpressionTerm (op='-' constantFixedExpressionTerm )*
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Term ::=
 //   Factor [ {∗ | // | REM } Factor ] ...
 ////////////////////////////////////////////////////////////////////////////////
-constantExpressionTerm
-    : constantExpressionFactor ( ( '*' | '//' | 'REM' ) constantExpressionFactor )*
+constantFixedExpressionTerm
+    : constantFixedExpressionFactor ( op='*' constantFixedExpressionFactor )*
+    | constantFixedExpressionFactor ( op='//' constantFixedExpressionFactor )*
+    | constantFixedExpressionFactor ( op='REM' constantFixedExpressionFactor )*
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2070,10 +2073,10 @@ constantExpressionTerm
 // [ FIT ConstantFIXEDExpression ]
 ////////////////////////////////////////////////////////////////////////////////
 
-constantExpressionFactor
-    : ( '+' | '-' )? ( IntegerConstant
-                       | '(' constantFixedExpression ')'
-                       | ID )
+constantFixedExpressionFactor
+    : Sign? (   IntegerConstant
+              | '(' constantFixedExpression ')'
+              | ID )
       ( 'FIT' constantFixedExpression ) ?
     ;
 
@@ -2205,40 +2208,11 @@ bitSlice
 ////////////////////////////////////////////////////////////////////////////////
 
 charSlice
-	: ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ( ':' expression )? ')'
+	: ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ')'                                            #case1CharSlice
+	| ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ':' expression ')'                             #case2CharSlice
+	| ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ':' expression '+' IntegerConstant  ')'        #case3CharSlice
+	| ID '.' ( 'CHAR' | 'CHARACTER' ) '(' expression ':' expression ')'                             #case4CharSlice
 	;
-
-////////////////////////////////////////////////////////////////////////////////
-
-// TODO Bug
-// This statement:   y := SIN( COS 42+1) * EXP(1);
-// compiles to:     _y = pearlrt::Float( (pearlrt::Float(( (pearlrt::Fixed<31>)42) + ((pearlrt::Fixed<31>)1)).cos()
-//                           ) * pearlrt::Float((((pearlrt::Fixed<31>)1))).exp()).sin();
-// which is wrong
-// Seems to be a problem with operator precedence or parenthesis???
-
-// monadicArithmeticOperators
-//     : 'SQRT' expression                 # SQRT
-//     | 'SIN' expression                  # SIN
-//     | 'COS' expression                  # COS
-//     | 'EXP' expression                  # EXP
-//     | 'LN' expression                   # LN
-//     | 'TAN' expression                  # TAN
-//     | 'ATAN' expression                 # ATAN
-//     | 'TANH' expression                 # TANH
-//     ;
-
-////////////////////////////////////////////////////////////////////////////////
-
-//xmonadicExplicitTypeConversionOperators
-//    : 'TOFIXED' expression               # TOFIXED
-//    | 'TOFLOAT' expression               # TOFLOAT
-//    | 'TOBIT'   expression               # TOBIT
-//    | 'TOCHAR'  expression               # TOCHAR
-//    | 'ENTIER'  expression               # ENTIER
-//    | 'ROUND'   expression               # ROUND
-//    | 'CONT'    expression               # CONT
-//    ;
 
 ////////////////////////////////////////////////////////////////////////////////
 

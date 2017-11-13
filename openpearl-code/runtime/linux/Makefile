@@ -39,18 +39,18 @@ CXXFLAGS = -Wall -g  -fstack-protector
 CXXFLAGS += -pthread
 CXXFLAGS+= -O2
 CXXFLAGS += -fno-non-call-exceptions
-CXXFLAGS += $(INCLUDES)
-LDFLAGS = -lpthread -lrt 
+CPPFLAGS += $(INCLUDES)
+LDLIBS = -lpthread -lrt 
 CXXFLAGS += -DTARGET=1
 
 #LINK.o = @echo link $<; $(LINK.cc)
-LINK.o = $(LINK.cc)
+LINK.o = $(LINK.cc) $(LDLIBS)
 
 # shortcut for link command, since the implicit link rules of 
 # make produces problems if the dependencies reside in different
 # targets. Thus an explicit rule is added for the targets (especially
 # in the tests/ directory
-LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 # make silent compilations 
 COMPILE.cc = @echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
@@ -227,7 +227,7 @@ install: all
 	@cp libOpenPEARLlinux.a $(CONFIG_INSTALL_Target)/lib
 	@rm -f pearl2.h sysincs.h
 	# ########
-	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) -I $(CONFIG_INSTALL_Target)/include system.cc $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a $(LDFLAGS)' > cc_bin.inc
+	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) $(LDFLAGS) -I $(CONFIG_INSTALL_Target)/include system.cc $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a $(LDLIBS)' > cc_bin.inc
 	# ##########
 	@echo './$$fn' >run_bin.inc
 	# #########
@@ -316,6 +316,5 @@ depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
 -include .depend
 
 .PHONY: $(phony)
-
 
 $(warning $(targets))

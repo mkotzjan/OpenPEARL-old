@@ -188,9 +188,11 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
                 throw new NumberOfInitializerMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
 
+            // TODO: Check Type compability!
             for (int i = 0; i < identifierDenotationList.size(); i++) {
-                if (initElementList != null)
-                    initElementList.get(i);
+                if (initElementList != null) {
+                    ConstantValue value = initElementList.get(i);
+                }
             }
         }
 

@@ -455,9 +455,18 @@ public class SystemEntry {
 				return null;
 			}
 
-			// insert expression result in the expanded strind
-			Double d = (Double) result;
-			String value = new Integer(d.intValue()).toString();
+			// insert expression result in the expanded string
+                        String value;
+                        if (result.getClass() == Integer.class) {
+                           value=result.toString();
+                        } else {
+			   Error.info("can not handle result type "+
+			              result.getClass().getName());
+                           value = "";
+                        } 
+                            
+			//Double d = (Double) result;
+			//String value = new Integer(d.intValue()).toString();
 			// System.out.println("nakedExpression --> "+value);
 			expanded = expanded.substring(0, exprStart) + value
 					+ expanded.substring(exprEnd + 1);
