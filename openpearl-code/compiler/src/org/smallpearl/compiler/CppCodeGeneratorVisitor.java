@@ -584,7 +584,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     stValue.add("code", getInitElement(ctx.initElement(i).constant()));
                     initElementList.add(stValue);
                 } else if ( ctx.initElement(i).ID() != null ) {
-
+                    throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
             }
         }
@@ -642,13 +642,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 ST stringConstant = group.getInstanceOf("StringConstant");
                 String s = ctx.StringLiteral().toString();
 
-//                if (s.startsWith("'")) {
-//                    s = s.substring(1, s.length());
-//                }
-//
-//                if (s.endsWith("'")) {
-//                    s = s.substring(0, s.length() - 1);
-//                }
+                if (s.startsWith("'")) {
+                    s = s.substring(1, s.length());
+                }
+
+                if (s.endsWith("'")) {
+                    s = s.substring(0, s.length() - 1);
+                }
 
                 s = CommonUtils.unescapePearlString(s);
 
