@@ -39,7 +39,7 @@ CXXFLAGS = -Wall -g  -fstack-protector
 CXXFLAGS += -pthread
 CXXFLAGS+= -O2
 CXXFLAGS += -fno-non-call-exceptions
-CXXFLAGS += $(INCLUDES)
+CPPFLAGS += $(INCLUDES)
 LDLIBS = -lpthread -lrt 
 CXXFLAGS += -DTARGET=1
 
@@ -227,7 +227,7 @@ install: all
 	@cp libOpenPEARLlinux.a $(CONFIG_INSTALL_Target)/lib
 	@rm -f pearl2.h sysincs.h
 	# ########
-	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) -I $(CONFIG_INSTALL_Target)/include system.cc $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a $(LDFLAGS)' > cc_bin.inc
+	@echo '$(CXX) -DTARGET=1 $(CXXFLAGS) $(CFLAGS) $(LDFLAGS) -I $(CONFIG_INSTALL_Target)/include system.cc $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a $(LDLIBS)' > cc_bin.inc
 	# ##########
 	@echo './$$fn' >run_bin.inc
 	# #########
