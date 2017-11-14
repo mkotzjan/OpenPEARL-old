@@ -986,6 +986,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 } else if (c instanceof SmallPearlParser.ProcedureDeclarationContext) {
                     problem_part.add("ProcedureDeclarations", visitProcedureDeclaration((SmallPearlParser.ProcedureDeclarationContext) c));
                     problem_part.add("ProcedureSpecifications", getProcedureSpecification((SmallPearlParser.ProcedureDeclarationContext) c));
+                } else if (c instanceof SmallPearlParser.InterruptSpecificationContext) {
+                    problem_part.add("InterruptSpecifications", visitInterruptSpecification((SmallPearlParser.InterruptSpecificationContext) c));
                 }
             }
         }
@@ -1568,6 +1570,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             statement.add("code", visitSequential_control_statement(ctx.sequential_control_statement()));
         } else if (ctx.realtime_statement() != null) {
             statement.add("code", visitRealtime_statement(ctx.realtime_statement()));
+        } else if (ctx.interrupt_statement() != null) {
+            statement.add("code", visitInterrupt_statement(ctx.interrupt_statement()));
         } else if (ctx.io_statement() != null) {
             statement.add("code", visitIo_statement(ctx.io_statement()));
         } else if (ctx.callStatement() != null) {
@@ -5083,5 +5087,67 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         return st;
     }
 
+
+    @Override
+    public ST visitInterruptSpecification( SmallPearlParser.InterruptSpecificationContext ctx) {
+        ST st = group.getInstanceOf("InterruptSpecifications");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitInterruptSpecification");
+        }
+
+        for ( int i = 0; i < ctx.ID().size(); i++)
+        {
+            ST spec = group.getInstanceOf("InterruptSpecification");
+            spec.add( "id", ctx.ID(i));
+            st.add("specs", spec);
+        }
+        return st;
+    }
+
+    @Override
+    public ST visitInterrupt_statement( SmallPearlParser.Interrupt_statementContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitInterrupt_statement");
+        }
+
+        return visitChildren(ctx);
+    }
+    ;
+    @Override
+    public ST visitEnableStatement( SmallPearlParser.EnableStatementContext ctx) {
+        ST st = group.getInstanceOf("EnableStatement");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitEnableStatement");
+        }
+
+        st.add("id",ctx.ID());
+        return st;
+    }
+
+    @Override
+    public ST visitDisableStatement( SmallPearlParser.DisableStatementContext ctx) {
+        ST st = group.getInstanceOf("DisableStatement");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitDisableStatement");
+        }
+
+        st.add("id",ctx.ID());
+        return st;
+    }
+
+    @Override
+    public ST visitTriggerStatement( SmallPearlParser.TriggerStatementContext ctx) {
+        ST st = group.getInstanceOf("TriggerStatement");
+
+        if (m_verbose > 0) {
+            System.out.println("CppCodeGeneratorVisitor: visitTriggerStatement");
+        }
+
+        st.add("id",ctx.ID());
+        return st;
+    }
 
 }

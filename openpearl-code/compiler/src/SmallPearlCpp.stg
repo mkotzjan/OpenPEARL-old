@@ -138,10 +138,17 @@ globalDecl(decls) ::= <<
 
 /*********************** PROBLEM PART ***********************/
 
-ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, temporarySemaphoreArrays,temporaryBoltArrays, ArrayDescriptors,ArrayVariableDeclarations,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations) ::= <<
+ProblemPart(ScalarVariableDeclarations,SemaDeclarations, BoltDeclarations, temporarySemaphoreArrays,temporaryBoltArrays, ArrayDescriptors,ArrayVariableDeclarations,TaskDeclarations,DationSpecifications,DationDeclarations,ProcedureSpecifications,ProcedureDeclarations,InterruptSpecifications) ::= <<
 /////////////////////////////////////////////////////////////////////////////
 // PROBLEM PART
 /////////////////////////////////////////////////////////////////////////////
+
+<if(InterruptSpecifications)>
+/////////////////////////////////////////////////////////////////////////////
+// INTERRUPT SPECIFICATIONS
+/////////////////////////////////////////////////////////////////////////////
+<InterruptSpecifications>
+<endif>
 
 <if(ProcedureSpecifications)>
 /////////////////////////////////////////////////////////////////////////////
@@ -1775,4 +1782,26 @@ StringSlice(lwb,upb,id,size) ::= <%
 
 BitSlice(id,offset,size) ::= <%
 <user_variable(id)>.getSlice(<offset>,(pearlrt::BitString\<<size>>*) 0)
+%>
+
+/* --------------------------- INTERRUPTS -------------------------------------------*/
+
+InterruptSpecifications(specs) ::= <%
+<specs: {spec|<spec>}>
+%>
+
+InterruptSpecification(id) ::= <%
+extern pearlrt::Interrupt *<user_variable(id)>;<\n>
+%>
+
+EnableStatement(id) ::= <%
+  <user_variable(id)>->enable();
+%>
+
+DisableStatement(id) ::= <%
+  <user_variable(id)>->disable();
+%>
+
+TriggerStatement(id) ::= <%
+  <user_variable(id)>->trigger();
 %>

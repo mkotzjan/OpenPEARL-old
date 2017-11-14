@@ -169,6 +169,7 @@ problem_part:
         | arrayVariableDeclaration
         | semaDeclaration
         | boltDeclaration
+        | interruptSpecification
         | identification
         | dationSpecification
         | dationDeclaration
@@ -1253,7 +1254,6 @@ boltLeave:
      'LEAVE'   ID ( ',' ID)* ';'
      ;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Interrupt-Anweisung ::=
 //   { ENABLE | DISABLE | TRIGGER } Name§Interrupt ;
@@ -1264,6 +1264,8 @@ interrupt_statement :
     | disableStatement
     | triggerStatement
     ;
+
+////////////////////////////////////////////////////////////////////////////////
 
 io_statement:
       open_statement
@@ -1717,9 +1719,9 @@ type_realtime_object
 //  [ GlobalAttribute ];
 ////////////////////////////////////////////////////////////////////////////////
 
-//interruptSpecification
-//    : ( 'SPECIFY' | 'SPC' ) OneIdentifierOrList ( 'INTERRUPT' | 'IRPT' )GlobalAttribute? ';'
-//    ;
+interruptSpecification
+    : ( 'SPECIFY' | 'SPC' ) ID (',' ID)* ( 'INTERRUPT' | 'IRPT' ) globalAttribute? ';'
+    ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // ListOfConstants ::=
@@ -1738,8 +1740,6 @@ type_realtime_object
 //  [ - - - { Identifier§UsernameOfConnectionProvider
 //  | Identifier§ConnectionProviderSystemName [ ( ListOfConstants) ] } ]...;
 ////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
