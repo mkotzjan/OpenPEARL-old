@@ -1,0 +1,47 @@
+! uncomment the line which do not compile
+! to see the error messages
+MODULE(array_use);
+
+SYSTEM;
+   stdOut : StdOut;
+
+PROBLEM;
+
+  SPC stdOut DATION OUT SYSTEM ALPHIC;
+  DCL conPG DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdOut);
+  DCL conRW DATION OUT ALL DIM(*,80) FORWARD CREATED(stdOut);
+
+p1: PROC (x FIXED) ;
+END; 
+
+/* p2 does notcompile */
+!p2: PROC (x() FIXED IDENT) ;
+!END; 
+
+t1: TASK MAIN;
+/* array with given lower bound does not compile */
+!   DCL array(-3:5,-5:10) FIXED;
+   DCL array(5,10) FIXED;   ! this works
+
+   OPEN conPG;
+   OPEN conRW;
+ 
+   PUT array(1,1) TO conPG BY F(6), SKIP;
+   WRITE array(1,1) TO conRW;
+ 
+! slices do not compile
+!   PUT array(1,1:3) TO conPG BY F(6), SKIP;
+!   WRITE array(1,1:3) TO conRW;
+
+   CLOSE conPG;
+   CLOSE conRW;
+
+   CALL p1(array(1,1));
+
+!   CALL p2(array(1,1:3);  ! this does not compile
+
+END;
+
+
+
+MODEND;
