@@ -1,0 +1,24 @@
+MODULE (Init);
+
+PROBLEM;
+
+DCL f1     FIXED(15)     INIT(0);
+DCL c1 INV FIXED         INIT(42);
+
+DCL f2     FIXED         INIT(1+2*3);
+
+LENGTH FIXED(22);
+DCL f3     FIXED         INIT(c1*2);
+
+DCL b1 BIT(8) INIT('11001110'B1);
+
+p1: PROC;
+    DCL f FIXED;
+    f := 2(10) * 65536(20) + -1(4);
+END;
+
+! make automatic test happy
+t: TASK MAIN;
+END;
+
+MODEND;
