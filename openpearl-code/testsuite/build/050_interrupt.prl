@@ -112,6 +112,7 @@ __cpp__(
 
     IF NOT success THEN
        PUT '*** fail ***' TO con BY A, SKIP;
+ __cpp__("pearlrt::Control::setExitCode(1);");
     ELSE
        PUT '*** success ***' TO con BY A, SKIP;
     FIN;

@@ -23,6 +23,9 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	850_ref_decl
 
 DONOTRUN=000_empty \
+	050_interrupt \
+	224_bit_slice \
+	401_char_expr1 \
 	703_userdation_dcl \
 	704_dation_open \
 	705_dation_close
