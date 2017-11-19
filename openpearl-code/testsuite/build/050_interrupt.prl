@@ -1,69 +1,148 @@
 MODULE(irupt);
+/*
+T1 starts the system and controlls the behavior
+  via int1 T2 ist started
+  T2 sets a start marker and waits repeatedly to be continued via int2
+     the repaet loop is terminated by a global flag
+  T1 triggers int2 several times and verifies the continuation count from T2
+
+  T1 activates T3 with delayed start and repeatedly over a duration
+     during this time T1 monitors the activation counter from T3
+*/
 
 SYSTEM;
-ctrlc: UnixSignal(3);
 int1: SoftInt(1);
+int2: SoftInt(2);
+stdOut: StdOut;
 
 PROBLEM;
+SPC stdOut DATION OUT SYSTEM ALPHIC ;
+DCL con DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdOut);
 
 SPC ctrlc INTERRUPT;
 ! extern pearlrt::Interrupt * _ctrlc ;
 SPC int1 INTERRUPT;
+SPC int2 INTERRUPT;
 ! extern pearlrt::Interrupt * _int1 ;
 
+DCL t2_run BIT INIT('0'B1);
+DCL success BIT(1) INIT ('1'B1);
+DCL  t2KeepRunning BIT(1) INIT ('1'B1);
+DCL t2Counter FIXED INIT(0);
+DCL t3Counter FIXED INIT(0);
 
 T1: TASK MAIN;
 
+    OPEN con;
+    ENABLE int1;
+    ENABLE int2;
 
-    ENABLE ctrlc;
-!   _ctrlc->enable();
-
-    WHEN ctrlc ACTIVATE T2 PRIO 10;
+    WHEN int1 ACTIVATE T2 PRIO 10;
 /*
-	T2.activate(me, pearlrt::Task::PRIO | pearlrt::Task::WHEN,
-                  pearlrt::Prio(10),
-                  pearlrt::Clock(),
-                  pearlrt::Duration(),
-                  pearlrt::Duration(),
-                  pearlrt::Clock(),
-                  pearlrt::Duration(),
-                  _ctrlc);
-
-*/
-    WHEN ctrlc AFTER 10 SEC ALL 5 SEC DURING 20 SEC ACTIVATE T3 PRIO 30;
-/*
-	T3.activate(me, pearlrt::Task::PRIO | 
-       pearlrt::Task::AFTER | pearlrt::TASK::ALL | pearlrt::TASK::DURING |
-       pearlrt::Task::WHEN,
-                  pearlrt::Prio(30),
-                  pearlrt::Clock(),
-                  pearlrt::Duration(10.0),
-                  pearlrt::Duration(5.0),
-                  pearlrt::Clock(),
-                  pearlrt::Duration(20.0),
-                  _ctrlc);
-*/
-    WHEN ctrlc RESUME;
-/*
-    me ->resume(pearlrt::Task::WHEN,
-               pearlrt::Clock(), pearlrt::Duration(), _ctrlc);
+__cpp__(
+	"_T2.activate(me, pearlrt::Task::PRIO | pearlrt::Task::WHEN,	"
+        "          pearlrt::Prio(10),					"
+        "          pearlrt::Clock(),					"
+        "          pearlrt::Duration(),					"
+        "          pearlrt::Duration(),					"
+        "          pearlrt::Clock(),					"
+        "          pearlrt::Duration(),					"
+        "          _int1);						"
+);
 */
 
+    TRIGGER int1;
+    AFTER 0.5 SEC RESUME;
+    TO 5 REPEAT 
+       TRIGGER int2;
+       PUT NOW, '*** t1 triggered' TO con BY T(13,1), X, A, SKIP;
+       AFTER .5 SEC RESUME;
+    END;
+    t2KeepRunning := '0'B1;
+    TRIGGER int2;
+    AFTER .5 SEC RESUME;
+    PUT '*** t2 should be terminated now' TO con BY A, SKIP;
+    IF t2Counter NE 6 THEN
+        PUT '*** loops in t2 (should be 6): ', t2Counter 
+        TO con BY A, F(6), SKIP;
+        success = '0'B1;
+    ELSE
+       PUT '*** loops in t2 are ok' TO con BY A,  SKIP;
+    FIN;
+
+    ! remove all schedules for T2
+    PREVENT T2;
+   
+    ! emergency shutdown of T2
+    CONTINUE T2;
+!....................
+
+
+       ! das DURING startet nach der Startverzoegerung!
+       ! T3 Schedule ist nach 5+4.5 sec vorbei, nachdem der Int 
+       ! ausgeloest wurde --> nach 10 s
+    WHEN int1 AFTER 5 SEC ALL 1 SEC DURING 4.5 SEC ACTIVATE T3 PRIO 30;
+/*
+__cpp__(
+	"_T3.activate(me, pearlrt::Task::PRIO | "
+       "    pearlrt::Task::AFTER | pearlrt::Task::ALL | pearlrt::Task::DURING |"
+       "     pearlrt::Task::WHEN,		"
+       "           pearlrt::Prio(30),		"
+       "           pearlrt::Clock(),		"
+       "           pearlrt::Duration(5.0),	"
+       "           pearlrt::Duration(1.0),	"
+       "           pearlrt::Clock(),		"
+       "           pearlrt::Duration(4.5),	"
+       "           _int1);			"
+);
+*/
+    AFTER 0.5 SEC RESUME;
+    PUT NOW, '*** trigger int1 for T3 - T3 should start in 5 sec' TO con
+        BY T(13,1), X, A , SKIP;
+    TRIGGER int1;
+    AFTER 11 SEC RESUME; ! schedule of T3 should be over now
+    IF t3Counter NE 5 THEN
+       PUT '*** expected t3Counter as 5, but it is:', t3Counter TO con
+       BY A, F(6), SKIP;
+       success := '0'B1;
+    ELSE
+       PUT '*** t3Counter is 5 as expected' TO con BY A, SKIP;
+    FIN;
+
+
+    IF NOT success THEN
+       PUT '*** fail ***' TO con BY A, SKIP;
+    ELSE
+       PUT '*** success ***' TO con BY A, SKIP;
+    FIN;
+
+    PREVENT T3;
 
 END;
 
 T2: TASK;
-    ENABLE int1;
-!   _int1->enable();
-    TRIGGER int1;
-!   _int1->trigger();
+    t2_run = '1'B1;
+    WHILE t2KeepRunning REPEAT
+    WHEN int2 CONTINUE;
+/*
+__cpp__(
+	"me->cont(me, pearlrt::Task::WHEN,			"
+        "         pearlrt::Prio(), pearlrt::Clock(),		"
+        "         pearlrt::Duration(), pearlrt::Duration(),	"
+        "         pearlrt::Clock(), pearlrt::Duration(),	"
+        "         _int2);					"
+);
+*/
+       SUSPEND;
+       t2Counter := t2Counter + 1;
+PUT NOW,'T2: counter=', t2Counter TO con BY T(13,1), X, A, F(6), SKIP;
+    END;
+PUT '*** t2 terminated' TO con BY A, SKIP;
 END;
 
 T3: TASK;
-    DISABLE int1;
-!   _int1->disable();
-    TRIGGER int1;
-!   _int1->trigger();
+       t3Counter := t3Counter + 1;
+PUT NOW,'T3: counter=', t3Counter TO con BY T(13,1),X,A, F(6), SKIP;
 END;
 
 MODEND;
