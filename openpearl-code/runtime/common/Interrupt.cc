@@ -63,14 +63,17 @@ namespace pearlrt {
    }
 
    void Interrupt::trigger() {
+      TaskWhenLinks * current;
+
       Log::info("Interrupt: triggered (enable=%d)", isEnabled);
 
       if (isEnabled) {
          TaskCommon::mutexLock();
 
          while (headContinueTaskQueue) {
-            headContinueTaskQueue -> triggeredContinue();
+            current = headContinueTaskQueue;
             headContinueTaskQueue = headContinueTaskQueue->getNextContinue();
+            current -> triggeredContinue();
          }
 
          for (TaskWhenLinks * h = headActivateTaskQueue;
