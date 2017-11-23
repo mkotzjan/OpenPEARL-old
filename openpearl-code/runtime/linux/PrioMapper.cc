@@ -87,4 +87,14 @@ namespace pearlrt {
       return max;
    }
 
+   void PrioMapper::logPriorities() {
+     // mapping
+     // Sched_fifo: 1..99 or min..max
+     // reserved:   1 -> mapped to PEARL priority 255
+     //            99 -> reserved for activities inside the runtime system
+     //            --- 2 priorities  are reserved
+     //  remaining priorities: max-2
+     Log::info("available PEARL priorities: 1,..., %d, 255", max-2);
+   }
+
 }  // end of name space
