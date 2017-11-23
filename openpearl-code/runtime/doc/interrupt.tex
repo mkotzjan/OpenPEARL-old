@@ -85,38 +85,3 @@ _ctrlc->trigger();
 \section{Usage in Task Scheduling}
 See chapter \ref{task}
 
-\section{Software Interrupts}
-For all plattforms the \verb|SoftInt| interrupt source is provided.
-There is no external connection to this interrupt type.
-
-Synopsis: \verb|SoftInt(nbr)|
-
-The parameter \verb|nbr| denotes the software interrupt number. 
-The values from 1 to 32 are allowed. It is forbidden to define more
-than one user identifier for the same number.
-In case of attempting more than one user defined interrupt for 
-a UNIX signal the InternalDataTypeSignal is induced 
-during system initializing phase.
-
-\section{How to Create an Interrupt Source}
-Interrupt sources are always plattform specific.
-In order to create such an interrupt source follow the instructions below:
-\begin{enumerate}
-\item choose a good name for the interrupt source
-\item define the parameters if required
-\item create a class with the same name as the your interrupt 
-  \begin{enumerate}
-  \item  derive your class from Interrupt  
-  \item supply a constructor which fits to the required parameters
-  \item make shure that there is may only one object become created
-        by the user
-  \item do all required operations, which are required to gather 
-        the interrupt afterwards (register in the system, create 
-        worker thread, ...)
-  \end{enumerate}
-\item make shure to call the method \verb|trigger()| from the parent
-      class each time the interrupt in detected.
-\item add the documentation of your interrupt in the plattform specific part
-      of the OpenPEARL documentation
-\end{enumerate}
-
