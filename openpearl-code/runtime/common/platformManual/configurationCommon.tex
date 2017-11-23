@@ -1,0 +1,25 @@
+
+\section{Log --- Logging}
+The configuration element LOG allows the specification of the 
+log output of the OpenPEARL application.
+
+Sample Usage:
+\begin{PEARLCode}
+Log('EW') --- StdErr;
+\end{PEARLCode}
+
+The element LOG needs an output device,
+which recieves text messages without a file name.
+The available system devices are StdErr, StdOut or LogFile.
+
+The Loglevel is defined by the character string. Possible letters are:
+\begin{description}
+\item['E'] error messages from signals, even if they are caught
+\item['W'] warning from the runtime library
+\item['D'] debug messages from the runtime library
+\item['I'] informative messages from the runtime library, like the 
+    list of defined tasks at system start
+\end{description}
+
+The default loglevel is 'EW'.
+

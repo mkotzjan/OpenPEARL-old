@@ -1,0 +1,35 @@
+\section{Software Interrupts}
+For all plattforms the \verb|SoftInt| interrupt source is provided.
+There is no external connection to this interrupt type.
+
+Synopsis: \verb|SoftInt(nbr)|
+
+\begin{description}
+\item[nbr] denotes the software interrupt number. 
+The values from 1 to 32 are allowed. It is forbidden to define more
+than one user identifier for the same number.
+\end{description}
+
+Sample usage:
+
+\begin{PEARLCode}
+...
+SYSTEM;
+  softInt1: SoftInt(1);
+...
+PROBLEM;
+   SPC softInt1 INTERRUPT;
+
+ttt: TASK;
+...
+   WHEN softInt1 RESUME;
+...
+END;
+...
+\end{PEARLCode}
+
+\paragraph{Note:}
+\begin{itemize}
+\item Each soft interrupt may be used in one system entry.
+\end{itemize}
+
