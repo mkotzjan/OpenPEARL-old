@@ -142,7 +142,7 @@ if ( "LaTeX" ~~ @type) {
               print $tex "\\multicolumn{2}{|p{13.5cm}|}{Name: \\textbf{".
                                     $xls->[$i+2]{cell}[2][$r+1]."}}\\\\\n";
 	      print $tex "\\hline\n";
-              print $tex "\\multicolumn{2}{|p{13.5cm}|}{Message: \textbf{".
+              print $tex "\\multicolumn{2}{|p{13.5cm}|}{Message: \\textbf{".
                           $xls->[$i+2]{cell}[5][$r+1]."}}\\\\\n";
 	      print $tex "\\hline\n";
               print $tex "\\multicolumn{2}{|p{13.5cm}|}{".
