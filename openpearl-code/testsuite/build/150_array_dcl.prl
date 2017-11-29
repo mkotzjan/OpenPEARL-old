@@ -1,6 +1,20 @@
 MODULE (array_dcl);
 
 PROBLEM;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! test for data types
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+test_data_types: PROC;
+   DCL fixed15(10) FIXED(15) INIT(1,2,3);
+   DCL BIT3(20) BIT(3) INIT ('000'B1, '001'B1, '010'B1, '011'B, '100'B, '101'B,'111'B1);
+   DCL float24(5) FLOAT(24) INIT(1.0, 2.0,3.0, -1.0);
+   DCL float53(5) FLOAT(53) INIT(1.0, 2.0,3.0, -1.0);
+   !DCL dur(10) DURATION INIT(1HRS, 1 MIN, 1 SEC, -3 SEC);
+   DCL dur(10) DURATION INIT(1HRS, 1 MIN, 1 SEC, 3 SEC);
+   DCL clk(10) CLOCK  ; !INIT(12:00:01 , 01:01:01);
+   DCL char30(10) CHARACTER(30) INIT('A', 'B');
+END;
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 3x3 Matrix multiplication
