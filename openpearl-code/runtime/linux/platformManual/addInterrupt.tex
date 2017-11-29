@@ -1,0 +1,12 @@
+\subsection{Linux specific}
+The behavior of a PEARL interrupt is similar to a Unix signal,
+or an error condition on an external device.
+
+The class UnixSignal may serve as a reference how to create such a
+system element.
+If the PEARL interrupt should be trigegred by other  external events like
+the break condition on the serial line, the corresponding device driver is
+free to define an additional interrupt, which must be derived from the
+interrupt base class (Interrupt)  and invoke the trigger-method on this 
+object.
+

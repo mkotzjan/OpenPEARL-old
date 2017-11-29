@@ -1,0 +1,18 @@
+\section{Application Configuration File}
+
+The application parses at system start the file \texttt{.pearlrc} in
+the current directoy.
+
+This file allows to set several parameters for the execution.
+The documentation is included in the configuration file.
+
+It is possible to set
+\begin{itemize}
+\item the log level. This feature overwrites the setting 
+   from the configuration item in the system part
+\item maximum of allowed cpu time. The default value is 300s for safety reasons 
+   when running in priviledged mode.
+\item the number of cpu cores to use. The default value is 1
+\end{itemize}
+
+

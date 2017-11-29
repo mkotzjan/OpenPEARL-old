@@ -502,6 +502,7 @@ int main() {
       TaskTimer::init(-1);  // setup timer thread
    } else {
       TaskTimer::init(max);  // setup timer thread
+      PrioMapper::getInstance()->logPriorities();
    }
 
 

@@ -1,0 +1,55 @@
+
+\section{UnixSignal}
+Some UNIX signals may be used to trigger the PEARL application from outside.
+These signals may be mapped to PEARL interrupts.
+
+Synopis: \verb|UnixSignal(nbr)|
+
+\begin{description}
+\item [nbr] denotes the linux signal number.
+The following signals are supported:
+
+\begin{tabular}{|l|c|}
+\hline
+Signal & Number \\
+\hline
+SIGHUP & 1 \\
+SIGINT & 2 \\
+SIGQUIT & 3 \\
+SIGTERM & 15 \\
+SIGUSR1 & 16 \\
+SIGUSR2 & 17 \\
+\hline
+\end{tabular}
+\end{description}
+
+Sample usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+  ctrlc: UnixSignal(3);
+PROBLEM;
+   SPC ctrlc INTERRUPT;
+
+   DCL shutdown BIT INIT('0'B1);
+
+running: TASK;
+   WHILE NOT shutdown REPEAT
+      ...
+   END;
+END;
+
+shutdownTask: TASK;
+   ENABLE ctrlc;
+   WHEN ctrlc RESUME;
+   PUT '*** shutdown request received' TO console BY A, SKIP;
+   PUT '*** wait until all tasks terminated themself' TO console BY A, SKIP;
+   shutdown := '1'B1;
+END;
+...
+\end{PEARLCode}
+
+\paragraph{Note:}
+\begin{itemize}
+\item Note that there may be only one user defined name for each UNIX signal.
+\end{itemize}

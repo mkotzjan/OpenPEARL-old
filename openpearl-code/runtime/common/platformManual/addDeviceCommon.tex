@@ -1,0 +1,179 @@
+\section{Interface for User supplied Drivers for Basic Dations}
+For new  system interfaces a C++ class must be supplied to 
+provide the system device.
+
+\subsection{System Dation Name}
+Define the name and parameters for the system dation.
+The new class must be derived from \verb|SystemDationB|.
+The parameters will be passed to the constructor of the class.
+The parameters of type \verb|int| and \verb|char*| are supported
+by the InterModuleChecker. The IMC maps FIXED and BIT-constants 
+to \verb|int| and character constants to \verb|char*|
+
+Basic dations are used in combination with the PEARL statements TAKE and
+SEND.
+
+\subsection{Open}
+A method \verb|dationOpen(int openParam=0, Character<S>* idf=0, Fixed<31>* rstValue)|
+must be provided.
+The method is called when the PEARL program opens the dation.
+The specified open parameters are passed bitwise encoded in \verb|openParams|.
+If IDF- and/or RST-value are specified they are passed as pointers, else
+a null pointer is given.
+The method should make shure that the dation is not opened twice and
+the open parameters are ok.
+
+\paragraph{Note:} The idf parameter is a templated type.
+ Thus the dationOpen-method should be realized as a template method,
+ which delegates the concrete value of the parameter to an
+ internalOpen-method in an appropriate way.
+
+\subsection{Close}
+A method \verb|dationClose(int closeParams=0, Fixed<31>* rstValue)|
+must be provided.
+The method is called when the PEARL program closes the dation.
+The specified close parameters are passed bitwise encoded in \verb|closeParams|.
+If an RST-value is specified it passed as pointer, else
+a null pointer is given.
+The method should make shure that the dation is not closed twice and
+the close parameters are ok.
+
+\subsection{Read}
+A method \verb|dationRead(void * destination, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+input data to the location specified by \verb|destination|.
+The runtime system expects that this method blocks the calling thread,
+if no data are available.
+The method should make shure that only an opened dation may be used.
+If the device requires blocking of the calling PEARL task, it 
+must use a suitable blocking mechanism. In the linux environment,
+the linux device driver does this implicitly. 
+The other environments like FreeRTOS a semaphore should be used.
+
+
+\subsection{Write}
+A method \verb|dationWrite(void * source, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+output data from the location specified by \verb|source|.
+The runtime system expects that this method blocks the calling thread,
+until all data is transfered.
+The method should make shure that only an opened dation may be used.
+
+\subsection{Error Conditions}
+The methods may throw C++ exceptions, which are defines in the signal list.
+Existing signals should be reused as far as possible.
+
+\section{Interface for User supplied Drivers for Non Basic Dations}
+For currently not supported system interfaces a C++ class must be supplied to 
+provide the system device.
+
+\subsection{System Dation Name}
+Define the name and parameters for the system dation.
+The new class must be derived from \verb|SystemDationNB|.
+The parameters will be passed to the constructor of the class.
+
+Non basic dations are used in combination with the PEARL statements READ, WRITE
+or PUT,GET. 
+
+\subsection{Capabilities}
+The input and output routines for non basic dations 
+need information about the capabilities of the
+real device. The method \verb|capabilities()| must return a set of
+capabilities, which are provided by the device. The capabilities are
+defines as \verb|enum| in the \verb|Dation|-class.
+
+The runtime system checks whether the requested operations fit to the 
+device capabilities. The capabilities of the device are defined by this
+method. Multiple capabilities from the list below may be set via bitwise
+or operations.
+
+\begin{description}
+\item[IN] the device may be used as pure input dation
+\item[OUT] the device may be used as pure output dation
+\item[INOUT] the device may be used as dation for random directions
+    input and output
+\item[IDF] the device {\em needs} a file name for the open-statement
+\item[OLD] the device may contain persistent files,
+          which are indented to be read
+\item[NEW] the device allows the creation of files 
+\item[ANY] the device  supports files at all; at least 
+            this attribut should be set if IDF is set
+\item[PRM] the device supports persistent files
+\item[CAN] the device supports the removal of files
+\item[DIRECT] the device supports direct positioning (on given byte adresses)
+\item[FORWARD] the device allows sequential read and write operations
+\item[FORBACK] {\em NOT SUPPORTED} --- the device allows relative positioning
+\end{description}
+Note that the capability
+\begin{itemize}
+\item IDF needs any of the capabilites OLD, NEW, ANY.
+\item OLD needs the capability IN
+\item NEW needs the capability OUT
+\item FORWARD and DIRECT may be both
+\end{itemize}
+
+\subsection{Open}
+A method \verb|dationOpen(const char * idfValue, int openParams)|
+must be provided.
+The method is called when the PEARL program opens the dation.
+The current {\em openParams} must be treated according the language definition.
+
+\subsection{Close}
+A method \verb|dationClose(int closeParams)|
+must be provided.
+The method is called when the PEARL program closes the dation.
+The current {\em closeParams} must be treated according the language 
+definition.
+
+\subsection{Read}
+A method \verb|dationRead(void * destination, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+input data to the location specified by \verb|destination|.
+The runtime system expects that this method blocks the calling thread,
+if no data are available. 
+
+\subsection{Write}
+A method \verb|dationWrite(void * source, size_t size)|
+must be provided. The method shall transfer \verb|size| bytes of
+output data from the location specified by \verb|source|.
+The runtime system expects that this method blocks the calling thread,
+until all data is transfered.
+
+\subsection{Error Conditions}
+The methods may throw C++ exceptions, which are defined in the signal list.
+Existing signals should be reused as far as possible.
+
+\section{Connection Provider}
+OpenPEARL allows the usage of connection of system elements  with other 
+system elements. These connections have a definite type which is defined
+by the connection provider.
+The connection interface should be platform independent in order to reuse
+the connection clients without any changes. 
+There is no restriction about the interface of a connection provider.  
+
+\begin{description}
+\item [required methods] are not defined, since each type of cennection
+   may be different. 
+    The connection provider must provide the methods, which allow the the
+    clients to do their job. 
+\item [setup association] between client  and provider is done by the
+    IMC. The reference to the provider object is passed as first argument
+    to the client object. If the provider must know the client(s),
+    the creater of the client classes is responsible to register the
+    client object at the provider object.
+\end{description}
+
+\paragraph{Notes:}
+\begin{itemize}
+\item The ctor may used parameters of type \verb|int| and \verb|char*|.
+  The InterModuleChecker (IMC) maps PEARL FIXED and BIT-Values to \verb|int|
+  and CHAR(..) constants to \verb|char*|.
+  If other types are required, the IMC must be extended at this point.
+\item A connection provider is instanciated before the main function
+  is entered. In case of trouble, the ctor should exit by throwing a 
+  PEARL signal and writing a log-message using the Log::error()  mathod.
+\item the implentation of a connection provider must be aware, that 
+   the multiple clients may interact with the provider simulaneously.
+   A mutex-locking mechanism should be used to avoid race conditions.
+\end{itemize}
+

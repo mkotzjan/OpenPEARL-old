@@ -1,0 +1,22 @@
+\section{How to Create an Interrupt Source}
+Interrupt sources are always plattform specific.
+In order to create such an interrupt source follow the instructions below:
+\begin{enumerate}
+\item choose a good name for the interrupt source
+\item define the parameters if required
+\item create a class with the same name as the your interrupt 
+  \begin{enumerate}
+  \item  derive your class from Interrupt  
+  \item supply a constructor which fits to the required parameters
+  \item make shure that there is may only one object become created
+        by the user
+  \item do all required operations, which are required to gather 
+        the interrupt afterwards (register in the system, create 
+        worker thread, ...)
+  \end{enumerate}
+\item make shure to call the method \verb|trigger()| from the parent
+      class each time the interrupt in detected.
+\item add the documentation of your interrupt in the plattform specific part
+      of the OpenPEARL documentation
+\end{enumerate}
+
