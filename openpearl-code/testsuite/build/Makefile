@@ -24,7 +24,7 @@ DONOTBUILD= 030_signals 031_signalsInduce  \
 	850_ref_decl
 
 DONOTRUN=000_empty \
-	045_repeat.prl \
+	045_repeat \
 	050_interrupt \
 	224_bit_slice \
 	401_char_expr1 \
