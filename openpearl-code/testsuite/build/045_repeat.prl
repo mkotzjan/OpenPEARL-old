@@ -7,7 +7,7 @@ T1: TASK MAIN;
   DCL f2 FIXED(15) INIT(2);
   DCL f3 FIXED(15) INIT(3);
 
-  FOR i TO 3 REPEAT
+  FOR i TO 0 REPEAT
      f1 := f1 + i;
   END;
   IF f1 ==  6 THEN
@@ -16,6 +16,9 @@ T1: TASK MAIN;
      __cpp__("printf(\"failure\\n\");"
              "pearlrt::Control::setExitCode(1);");
    FIN;
+
+  FOR i TO 100000 REPEAT
+  END;
 
 END;
 
