@@ -1,6 +1,9 @@
 MODULE (array_dcl);
 
 PROBLEM;
+
+DCL muduleArray(10,20) FIXED;
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! test for data types
 !  check the result manually in the c++-code, 
@@ -215,6 +218,26 @@ T1: TASK MAIN;
 
     CALL test_matmul;
 END;
+
+!!!!!!!!!
+!! access module defined array
+!!!!!!!!!
+accessModuleArray: PROC;
+   moduleArray(1,1) := 0;
+END;
+
+/*
+!!!!!!!!!!!!!!
+! Test array operators 
+!!!!!!!!!!!!!!
+arrayOperators: PROC;
+   FOR i FROM 1 LWB moduleArray TO 1 UPB moduleArray REPEAT
+      FOR j TO 2 UPB moduleArray REPEAT
+          moduleArray(i,j) := 10*i+j;
+      END;
+   END;
+END;
+*/
     
 MODEND;
 
