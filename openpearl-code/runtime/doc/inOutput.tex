@@ -9,56 +9,11 @@ User dations are created upon a system dation.
 System part and problem part may be compiled separatelly. Therefore 
 no information from the system part may be used to compile the problem part.
 
-\if0
-\section{Language Problems}
-The language definition lacks some details in the region of the
-interface between system part and problem part as well as the 
-inter module specification declaration interface.
-Any incompatibilities in the interface specifications should result in
-errors during the build process. Detections during runtime should be avoided.
+To avoid matching problems, the compiler produces an XML-file for each 
+module with the import and export interface of the module.
+The tool IMC (inter module checker) verifies the matching and creates the
+C++ code for the system part.
 
-\begin{itemize}
-\item There seems to be no strict signature to distinguish
- in the {\em SPC} statement between system dation and user dation.
-\item BASIC dations do not specify the type of transferred data
-\item the global attribute may be omitted in the specification statement
-  if the system device is defined in the same module
-\item it is not clearified in the language specification, which attributes
-   are required in the specification of a imported user dation.
-\item a new optional class attribute is introdued {\em SYSTEM}, which
-   must be set for system dations
-\item the class attribute {\em BASIC} must be combined with a data type
-    like {\em ALL} or {\em any other specified type}. This allows
-    type checking at {\em TAKE} and {\em SEND}.
-\item there should be no intermixing of system and problem part.  ---
-   The specification of a system device need always a global attribute.
-\item the specification of a user dation need the specification of direction
-   and class attribute.
-\end{itemize}
-
-Example:
-\begin{PEARLCode}
-MODULE (m1);
-SYSTEM;
-   output: StdStream(stdout);
-PROBLEM;
-   SPC output  DATION OUT SYSTEM ALPHIC GLOBAL;
-   DCL console DATION OUT ALPHIC DIM(*,80) FORWARD STREAM NOCYCL CREATED(output) GLOBAL;
-MODEND;
-...
-MODULE (m2);
-PROBLEM;
-   SPC output  DATION OUT SYSTEM ALPHIC GLOBAL;
-   SPC console DATION OUT ALPHIC /* DIM(*,80) FORWARD STREAM NOCYCL CREATED(output) */ GLOBAL;
-MODEND;
-\end{PEARLCode}
-
-Remarks:
-\begin{itemize}
-\item the dation parameters in the comment in the specification
-   are not required 
-\end{itemize}
-\fi
 
 \section{Not Supported Language Elements}
 \begin{description}
@@ -70,7 +25,8 @@ Remarks:
 \end{description}
 
 \section{Declarations in System Part}
-There is currently no rule how to compile the system part into C++.
+The compiler checks the elements for proper grammar and passaes the
+parsed elements into an XML-file with the same name as the source file.
 
 To provide complete code examples the linux target is used here.
 For details of the used system devices please check chapter \ref{x8632devices}.
@@ -82,6 +38,8 @@ SYSTEM;
 PROBLEM;
 MODEND;
 \end{PEARLCode}
+
+The IMC will respond with a code like:
 
 \begin{CppCode}
 static pearlrt::StdStream s_output(1);
@@ -95,7 +53,7 @@ The upcast of the pointer
 to the generic {\em Device*} type enables the compiler to generated 
 suitable code for the problem part.
 
-The concrete device object is set to {\em static} to avoid namespace pollution.
+The concrete device object is set to {\em static} to avoid namespace polution.
 Only the pointer is needed.
 
 \section{Decoration Scheme for Devices}
@@ -290,14 +248,15 @@ DIRECT dations are implemented on e.g. disc files
         dimension in both directions
 \item    CYCLIC realizes a cyclic writing in that way that a
           repositioning to the beginning of the dation is inserted
-          at the end of the dation
-\item    unwritten locations in the dations contain undefined values
+          at the end of the dation, if the system device does not support
+          CYCLIC operation with the same dimension
+%\item    unwritten locations in the dations contain undefined values
 \item    CYCLIC on unbounded dations is ridiculous
 \end{itemize}
 
 \subsection{FORWARD Dation}
-FORWARD and CYCLIC is ridiculous since FORWARD can not rewind.
-FORWARD requires NOCYCL by logic.
+FORWARD and CYCLIC is ridiculous if the system dation is not CYCLIC,
+ since FORWARD can not rewind.
 
 FORWARD dations are typically used on devices like stdin, 
 stdout or TCP/IP-sockets.
@@ -348,6 +307,8 @@ WRITE d TO .. BY SKIP;
 
 \section{Concurrency during I/O}
 \label{ioconcurrency}
+
+\subsection{Concurrency on the same user dation}
 It is never stated but clearly appreciated that i/o-statements from
 different tasks should not intermix within their i/o-operations.
 This behavior is achieved by the {\em beginSequence} and 
@@ -377,6 +338,9 @@ PUT x,y TO console BY F(4), RST(rst), F(5), SKIP;
 \end{PEARLCode}
 
 \begin{CppCode}
+// code scheme. With the introcuction of the IOJobs,
+// the blocking was moved into the userdate operations put(), get(), ...
+//
 Fixed<31> rst;
 Fixed<15> x
 Fixed<15> y;
@@ -404,6 +368,16 @@ If no RST-vale is specfied for this statement, the signal is propagated.
 If the error is produced in the formatting of x, a signal is thrown.
 If the error is produced in the formatting of y, no signal is thrown but rst
 is set.
+
+If the system dation supports multipe io-operations in the same time,
+the locking mechanism of the user dation can be switched off, by implementing
+a method \verb|bool allowMultipleIOOperations()| in the system dation.
+In this case, ths system dation is responsible for proper operation.
+
+\subsection{Concurrency on the same system dation}
+It is possible to create several user dations upon the same system dation.
+If the operation on the sstem dation is not reentrant, the developer must
+enshure by additional mutex variables, that those operations do not operlap.
 
 \section{Open and Close}
 The super class UserDation knows the OPEN and CLOSE operations.
@@ -448,199 +422,46 @@ Remarks:
    If they do not match a PEARL signal is raised
 \end{itemize}
 
-\section{Positioning}
-User dations with specified topology allow
- to position with POS, ADV, SKIP, LIN, COL, ...
+\section{IO-operations}
+The IO-operations are treated by methods  of the user dations.
+These methods receive a list of data elements and a list of format
+elements. These lists will be treated according the semantics of the dation
+type. ALPHIC dation are controlled by the data list and will use
+the format list cyclic, if more data than formats are in the list.
+Non basic dations with a specific data type will treat all positioning
+elements first followed by the treatment of the data elements. 
+The locking mechanisme \ref{ioconcurrency} is realized in these methods.
 
-The following positioning methods are supplied.
-All methods are available for output and input. The versions for 
-output have the prefix \verb|to|, the input version have the prefix \verb|from|.
-To avoid redundancy only the output versions are listed below.
-
-Please note that all parameters are expected as type
-\verb|pearlrt::Fixed<31>|.
-
-\begin{methodMapping}
-POS(x) & toPos(x) & \\
-POS(x,y) & toPos(x,y) & \\
-POS(x,y,z) & toPos(x,y,z) & \\
-SOP(x) & toSop(x) & \\
-SOP(x,y) & toSop(x,y) & \\
-SOP(x,y,z) & toSop(x,y,z) & \\
-ADV(x) & toAdv(x) & \\
-ADV(x,y) & toAdv(x,y) & \\
-ADV(x,y,z) & toAdv(x,y,z) & \\
-X(x) & toX(x) & \\
-SKIP(x) & toSkip(x) & \\
-PAGE(x) & toPage(x) & \\
-LINE(x) & & {\em not supported yet} \\
-COL(x) & & {\em not supported yet} \\
-\end{methodMapping}
-
-Note:
-\begin{itemize}
-\item {\em THIS IS SUBJECT OF DISCUSSION!}
-\item a user dation with type {\em ALL} does not specify the size of 
-   the record. No positioning is allowed on such a FORWARD dation. 
-   The DIRECT attribute will allow to rewind the dation by POS(1),
-\item as alternative one dimension is allowed and the positions are
-    expected to be calculated by the application as byte offsets.
-\end{itemize}   
-
-\section{PUT/GET Operations}
-PUT and GET are allowed on ALPHIC user dations. They are mapped on the
-class {\em DationPG}. 
-The compiler must produce a list of operations according the sequence 
-in the format list.
-This list of statements must be embedded in the try/catch/block described in
-\ref{ioconcurrency}.
-
-In the following table, the parameter denotes the corresponding data element.
-In PUT-statments the prefix \verb|to| is set to the formatting methog,
-in GET-statements the prefix \verb|from| is used.
-To avoid redundancy, only PUT-formatting is listed below.
-
-Please note that all parameters (except the value itself)
- are expected as type
-\verb|pearlrt::Fixed<31>|.
-
-\begin{methodMapping}
-A & toA(x) & \\
-A(w) & toA(x,w) & \\
-F(w) & toF(x,w) & \\
-F(w,d) & toF(x,w,d) & \\
-F(w,d,s) & toF(x,w,d,s) & \\
-E(w) & toE(x,w,0,1,2) & \\
-E(w,d) & toE(x,w,d,1,2) & \\
-E(w,d,s) & toE(x,w,d,s,2) & \\
-E(w) & toE(x,w,0,1,2) & \\
-E3(w) & toE(x,w,0,1,3) & \\
-E(w,d) & toE(x,w,d,1,3) & \\
-E(w,d,s) & toE(x,w,d,s,3) & \\
-D(w) & toD(x,w) &  \\
-D(w,d) & toD(x,w,d) &  \\
-T(w) & toT(x,w) &  \\
-T(w,d) & toT(x,w,d) &  \\
-B(w) & toB1(x,w) &  \\
-B1(w) & toB1(x,w) &  \\
-B3(w) & toB3(x,w) & {\em not implemented yet} \\
-B4(w) & toB4(x,w) &  \\
-LIST &  & {\em should be treated by the compiler} \\
-\end{methodMapping}
-
-\paragraph{Note:} The corresponding method for input is named with 'from' 
-instead of 'to' (e.g. fromF(..) instead of toF(...)).
-
-
-\section{READ/WRITE Operations}
-READ and WRITE are allowed on user dations with a specifig type or of type ALL.
-They are mapped on the class {\em DationRW}. 
-The compiler must produce a list of operations
-\begin{enumerate}
-\item perform all positioning operations first
-\item perform the data transfer in sequence of the given item list
-\end{enumerate}
-This list of statements must be embedded in the try/catch/block described in
-\ref{ioconcurrency}.
-
-For the data transfer two operations are defined. 
-
+For details see the source code documentation of the classes
 \begin{description}
-\item[dationRead]{get a pointer to the data storage and the size of the data}
-\item[dationWrite]{get a pointer to the data storage and the size of the data}
+\item[IODataEntry] the individual data entries
+\item[IODataList] the list of all data entries for one statement
+\item[IOFormatEntry] the individual format entries
+\item[IOFormatList] the list of all format entries for one statement
 \end{description}
 
+All parameters of format elements are expected as type
+\verb|pearlrt::Fixed<31>|.
 
-\begin{PEARLCode}
-DCL (x,y) Fixed(15);
-DCL rst Fixed(31);
-...
-WRITE x,y TO dataFile BY RST(rst), POS(10), ADV(1);
-\end{PEARLCode}
-
+The effective code will be in this case:
 \begin{CppCode}
-Fixed<31> _rst;
-Fixed<15> _x
-Fixed<15> _y;
+Fixed<31> rst;
+Fixed<15> x
+Fixed<15> y;
 
-try {
-   _dataFile.beginSequence(me);
-   _dataFile.rst(_rst);
-   _dataFile.toPos((pearlrt::Fixed<31>)10);
-   _dataFile.toAdv((pearlrt::Fixed<31>)1);
-   _dataFile.DationWrite(&_x, sizeof(_x));
-   _dataFile.DationWrite(&_y, sizeof(_y));
-   _dataFile.endSequence();
-} catch (Signal& s) {
-   if (!_dataFile.updateRst(&s)) {
-      _dataFile.endSequence();
-      throw;
-   }
-   _dataFile.endSequence();
+{
+  // setup io data and format lists in a new block
+  // define variables for expression results in data list and format list
+  ...
+  IODataEntry dataEntries[] = { {...},{...},...};
+  IODataList dataList = {sizeof( dataEntries)/sizeof(dataEntries[0]),
+                         dataEntries};
+  IOFormatEntry formatEntries[] = { {...},{...},...};
+  IOFormatList formatList = {sizeof( formatEntries)/sizeof(formatEntries[0]),
+                         formatEntries};
+  // evaluate expressions in datalist and format list
+  _console.put(me, dataList, formatList);
+  // leave block with put statement
 }
 \end{CppCode}
-
-The try-catch-clause captures all PEARL-signals from the code in the 
-type block. If a RST-value is specified in the format list, the method
-
-Remarks:
-\begin{itemize}
-\item The runtime system checks whether the operation is allowed according
-    the dation type (direction, positioning)
-\item The runtime system passes the raw data to the system device to
-   perform the i/o-operation
-\end{itemize}
-
-\section{TAKE/SEND Operations}
-TAKE and SEND are allowed on userdations of type BASIC.
- They are mapped on the
-class {\em DationTS} operations. 
-
-\begin{methodMapping}
-TAKE & \verb|dationRead(void* dst, size_t size)| & \\
-SEND & \verb|dationWrite(void* dst, size_t size)| & \\
-\end{methodMapping}
-
-The compiler must produce a list of operations according the sequence 
-in the format and data list.
-\begin{enumerate}
-\item insert the rst-setting first
-\item the data transfer 
-\end{enumerate}
-This list of statements must be embedded in the try/catch/block described in
-\ref{ioconcurrency}.
-
-\begin{PEARLCode}
-DCL x Bit(4);
-DCL rst Fixed(31);
-...
-SEND x TO motor BY RST(rst);
-\end{PEARLCode}
-
-\begin{CppCode}
-BitString<4> _x
-Fixed<31> _rst;
-
-try {
-   _motor.beginSequence(me);
-   _motor.rst(_rst);
-   _motor.dationWrite(&_x, sizeof(_x));
-   _motor.endSequence();
-} catch (Signal& s) {
-   if (!_motor.updateRst(&s)) {
-      _motor.endSequence();
-      throw;
-   }
-   _motor.endSequence();
-}
-\end{CppCode}
-
-
-Remarks:
-\begin{itemize}
-\item S and CONTROL are not supported
-\item the laguage specification specifies that there
-   may be only one data element in a TAKE or SEND statement
-\end{itemize}
-
 

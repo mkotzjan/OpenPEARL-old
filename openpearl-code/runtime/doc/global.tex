@@ -1,0 +1,47 @@
+\chapter{Multiple Modules and GLOBAL}
+
+PEARL supports the separation of the application into seperate modules.
+In OpenPEARL, the module name given by the \texttt{MODULE(name)} statement
+defines the namespace in C++.
+In order to avoid conflicts with namespaces in the standard libraries,
+the supplied module name gets a prefix \texttt{pearl\_}.
+All user supplied identifiers reside in the namespace of the module.
+
+The complete runtime library uses the namespace \texttt{pearlrt}.
+
+OpenPEARL needs some other variables for the organisation. 
+They may be in the same namespace, if conflicts are avoided. This is 
+achieved by prefixing all user supplied identifiers with a prefix \texttt{\_}.
+
+\begin{PEARLCode}
+MODULE(moduleA);
+
+PROBLEM;
+   DCL  a FIXED GLOBAL;
+   SPC b FIXED GLOBAL (moduleB);
+...
+! in any PROC
+   a := b;
+...
+\end{PEARLCode}
+
+will produce a C++ code like:
+\begin{CppCode}
+#include "PearlIncludes.h"
+
+namespace pearl_moduleA {
+   pearlrt::Fixed<31> _a;
+}
+namespace pearl_moduleB {
+   extern pearlrt::Fixed<31> _b;
+}
+namespace pearl_moduleA {
+...
+// in any PROC
+   _a := moduleB::_b;
+...
+}
+\end{CppCode}
+
+
+
