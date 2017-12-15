@@ -49,13 +49,15 @@ namespace pearlrt {
       return tm;
    }
 
-/*
-   TaskMonitor::TaskMonitor() {
-      nbrPendingTasks = 0;
-      pid = getpid();  // get current pid; necessary to send signal at the end
-      mutex.name("TaskMonitor");
-   }
-*/
+   /*
+      TaskMonitor::TaskMonitor() {
+         nbrPendingTasks = 0;
+
+         // get current pid; necessary to send signal at the end
+         pid = getpid();
+         mutex.name("TaskMonitor");
+      }
+   */
 
    void TaskMonitor::incPendingTasks() {
       mutex.lock();

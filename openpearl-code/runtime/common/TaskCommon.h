@@ -43,6 +43,7 @@ namespace pearlrt {
    class TaskCommon;
    class Semaphore;
    class Bolt;
+   class SystemDation;
 
    /** reasons for blocking a task
    */
@@ -50,7 +51,8 @@ namespace pearlrt {
       NOTBLOCKED,               ///< task is currently not blocked
       REQUEST,                  ///< task is block due to REQUEST
       ENTER,                    ///< task is block due to ENTER
-      RESERVE                   ///< task is block due to RESERVE
+      RESERVE,                  ///< task is block due to RESERVE
+      IO                        ///< task is blocked due to IO
    };
 
    /**
@@ -81,6 +83,13 @@ namespace pearlrt {
             int nbolts;	///< number of bolts in the ENTER/RESERVE call
             Bolt **bolts;	///< pointer to the array of bolts
          } bolt;	///< \returns the bolt component of blocking
+
+         /**
+         blocking due to IO
+         */
+         struct BlockIO {
+            SystemDation* dation;  /// < pointer to the system dation
+         } io;         /// < \return the io data
       } u;		///< \returns the union containing all blocking requests
    };
 
@@ -96,6 +105,8 @@ namespace pearlrt {
 #include "UserDation.h"
 #include "TaskWhenLinks.h"
 #include "TaskTimerCommon.h"
+#include "BitString.h"
+//#include "SystemDation.h"
 
 namespace pearlrt {
    /**

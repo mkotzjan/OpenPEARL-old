@@ -114,4 +114,14 @@ namespace pearlrt {
 
       work->dationWrite(data, size);
    }
+
+   bool DationTS::allowMultipleIORequests() {
+       return false;
+   }
+
+   void DationTS::beginSequenceHook(TaskCommon * me) {
+   }
+
+   void DationTS::endSequenceHook(void) {
+   }
 }

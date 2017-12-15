@@ -81,13 +81,17 @@ namespace pearlrt {
 
    void TaskCommon::mutexLock() {
 //      Log::debug("MUTEX TASK: LOCKING...cccc= %d", cccc);
+//printf("MUTEX TASK: LOCKING...cccc= %d\n", cccc);
       mutexTasks.request();
       cccc --;
 //      Log::debug("MUTEX TASK: LOCKED   cccc= %d", cccc);
+//printf("MUTEX TASK: LOCKED   cccc= %d\n", cccc);
    }
 
    void TaskCommon::mutexUnlock() {
       cccc ++;
+
+//printf("MUTEX TASK: UNLOCKING...cccc= %d\n", cccc);
 
       if (cccc > 1) {
          Log::error("MUTEX TASK: ....UNLOCKED --> %d\n", cccc);
@@ -99,6 +103,7 @@ namespace pearlrt {
                   }
       */
       mutexTasks.release();
+//printf("MUTEX TASK: UNLOCKED...cccc= %d\n", cccc);
    }
 
    char* TaskCommon::getName() {
@@ -180,10 +185,10 @@ namespace pearlrt {
    }
 
    void TaskCommon::unblock() {
-      if (taskState == SEMA_BLOCKED)  {
-         taskState = RUNNING;
-         blockParams.semaBlock.release();
-      }
+//      if (taskState == SEMA_BLOCKED)  {
+      taskState = RUNNING;
+      blockParams.semaBlock.release();
+//      }
    }
 
    void TaskCommon::getBlockingRequest(BlockData *w) {

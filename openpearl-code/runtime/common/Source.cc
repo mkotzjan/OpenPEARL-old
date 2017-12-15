@@ -27,6 +27,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <stdio.h>
 
 #include "Source.h"
 #include "Signals.h"
@@ -47,6 +48,11 @@ namespace pearlrt {
       try {
          c = realGetChar();
       } catch (Signal & e) {
+         // all dation error 
+         if (e.whichRST() == theDationTFURecordSignal.whichRST()) {
+            throw;
+         }
+         printf("map signal %s to NoMore...\n", e.which());
          throw theNoMoreCharactersSignal;
       }
 

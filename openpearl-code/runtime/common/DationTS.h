@@ -39,7 +39,7 @@
 #include "SystemDationB.h"
 #include "DationDim.h"
 #include "Fixed.h"
-
+#include "TaskCommon.h"
 
 
 
@@ -202,6 +202,34 @@ namespace pearlrt {
         \note throws various exceptions
       */
       void dationWrite(void* data, size_t size);
+
+     /**
+     provide an empty implementation of the hook function which 
+     is required for non basic dations
+     \param me pointer to the calling task
+     */
+     void beginSequenceHook(TaskCommon * me);
+ 
+     /**
+     provide an empty implementation of the hook function which 
+     is required for non basic dations
+     */
+     void endSequenceHook(void);
+
+    /**
+      check, if the dation supports multiple io requests with it own
+      scheduling.
+
+      This is used in the consol device, which allowes the adressing of
+      text input to waiting tasks. The tasks may becom blocked via their
+      semaBlock semaphore until their data arrive or is processed.
+
+      \return true if the dation supports multiple io-operations at thesame time
+      \return false, if onky on operation is allowed at one time. In this
+         case the tasks are added into a priority based wait queue
+      */
+      bool allowMultipleIORequests();
+
    };
    /** @} */
 }
