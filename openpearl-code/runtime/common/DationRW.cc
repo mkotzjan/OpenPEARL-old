@@ -29,7 +29,7 @@
 */
 
 /**
-\file 
+\file
 \brief implementation of Linux specific RW-userdation
 
 */
@@ -51,13 +51,32 @@ namespace pearlrt {
    DationRW::DationRW(SystemDationNB* parent,
                       int params,
                       DationDim * dimensions,
-                      const Fixed<15> stepsize)
-      : UserDationNB(parent, params, dimensions, UserDationNB::TYPE) {
+                      const Fixed<15> stepsize,
+                      void * tfuRecord)
+      : UserDationNB(parent, params, dimensions,
+                     UserDationNB::TYPE) {
+
       stepSize = stepsize;
+
+      if (tfuRecord && params & Dation::STREAM) {
+         Log::error("DationRW: TFU and STREAM conflicts");
+         throw theInternalDationSignal;
+      }
+
+      // setup the tfu buffer object
+      // calculate the record size:
+      //    perform a safe multiplication and take the int value
+      // set the data area
+      // set the padding element
+      tfuBuffer.setupRecord((dim->getColumns() * stepsize).x,
+                            (char*)tfuRecord,
+                            0);
+
       dationStatus = CLOSED;
    }
 
    void DationRW::internalOpen() {
+      tfuBuffer.setSystemDation(work);
    }
 
    void DationRW::internalClose() {
@@ -78,9 +97,11 @@ namespace pearlrt {
 
       if (dationParams & NOCYCL) {
          adv(size / stepSize.x);
-         work->dationRead(data, size);
+         //work->dationRead(data, size);
+         tfuBuffer.read(data, size);
       } else {
          // dimension is limited. This is enshured by the tests in ctor
+         // and CYLIC is set
          Fixed<31> zero(0);
          Fixed<31> cap = dim->getCapacity();
          Fixed<31> remaining = cap - dim->getIndex();
@@ -90,7 +111,8 @@ namespace pearlrt {
          // read first chunk
          if ((nbrOfElements > remaining).getBoolean()) {
             adv(remaining.x);
-            work->dationRead(d, remaining.x * stepSize.x);
+//            work->dationRead(d, remaining.x * stepSize.x);
+            tfuBuffer.read(d, (remaining * stepSize).x);
             d += remaining.x * stepSize.x;
             dationSeek(0, dationParams);
             nbrOfElements = nbrOfElements - remaining;
@@ -100,13 +122,15 @@ namespace pearlrt {
          while ((nbrOfElements > zero).getBoolean()) {
             if ((nbrOfElements > cap).getBoolean()) {
                adv(cap.x);
-               work->dationRead(d, cap.x * stepSize.x);
+               // work->dationRead(d, cap.x * stepSize.x);
+               tfuBuffer.read(d, (cap * stepSize).x);
                d += cap.x * stepSize.x;
                dationSeek(0, dationParams);
                nbrOfElements = nbrOfElements - cap;
             } else {
                adv(nbrOfElements.x);
-               work->dationRead(d, nbrOfElements.x * stepSize.x);
+               //work->dationRead(d, nbrOfElements.x * stepSize.x);
+               tfuBuffer.read(d, (nbrOfElements * stepSize).x);
                d += nbrOfElements.x * stepSize.x;
                nbrOfElements = zero;
             }
@@ -129,7 +153,8 @@ namespace pearlrt {
 
       if (dationParams & NOCYCL) {
          adv(size / stepSize.x);
-         work->dationWrite(data, size);
+         //work->dationWrite(data, size);
+         tfuBuffer.write(data, size);
       } else {
          // dimension is limited. This is enshured by the tests in ctor
          Fixed<31> zero(0);
@@ -141,7 +166,8 @@ namespace pearlrt {
          // write first chunk
          if ((nbrOfElements > remaining).getBoolean()) {
             adv(remaining.x);
-            work->dationWrite(d, remaining.x * stepSize.x);
+            //work->dationWrite(d, remaining.x * stepSize.x);
+            tfuBuffer.write(d, (remaining * stepSize).x);
             d += remaining.x * stepSize.x;
             dationSeek(0, dationParams);
             nbrOfElements = nbrOfElements - remaining;
@@ -151,13 +177,15 @@ namespace pearlrt {
          while ((nbrOfElements > zero).getBoolean()) {
             if ((nbrOfElements > cap).getBoolean()) {
                adv(cap.x);
-               work->dationWrite(d, cap.x * stepSize.x);
+               //work->dationWrite(d, cap.x * stepSize.x);
+               tfuBuffer.write(d, (cap * stepSize).x);
                d += cap.x * stepSize.x;
                dationSeek(0, dationParams);
                nbrOfElements = nbrOfElements - cap;
             } else {
                adv(nbrOfElements.x);
-               work->dationWrite(d, nbrOfElements.x * stepSize.x);
+               //work->dationWrite(d, nbrOfElements.x * stepSize.x);
+               tfuBuffer.write(d, (nbrOfElements * stepSize).x);
                d += nbrOfElements.x * stepSize.x;
                nbrOfElements = zero;
             }
@@ -171,5 +199,83 @@ namespace pearlrt {
 
    void DationRW::dationUnGetChar(const char c) {
       work->dationUnGetChar(c);
+   }
+
+   void DationRW::write(TaskCommon*me,
+                        IODataList * dataList, IOFormatList * formatList) {
+
+      size_t formatItem;
+      size_t dataElement;
+
+      try {
+         beginSequence(me, Dation::OUT);
+
+         // execute formatlist first
+         for (formatItem = 0; formatItem < formatList->nbrOfEntries;
+               formatItem ++) {
+
+            if (formatList->entry[formatItem].format <
+                  IOFormatEntry::IsPositioning) {
+               Log::error("non positioning element in format list");
+               throw theInternalDationSignal;
+            }
+
+            toPositioningFormat(me, &formatList->entry[formatItem]);
+         }
+
+         for (dataElement = 0; dataElement < dataList->nbrOfEntries;
+               dataElement++) {
+            dationWrite(dataList->entry[dataElement].dataPtr.inData,
+                        *dataList->entry[dataElement].numberOfElements);
+         }
+
+         endSequence();
+      } catch (Signal &s) {
+         if (! updateRst(&s)) {
+            endSequence();
+            throw;
+         }
+
+         endSequence();
+      }
+   }
+
+   void DationRW::read(TaskCommon*me,
+                       IODataList * dataList, IOFormatList * formatList) {
+
+      size_t formatItem;
+      size_t dataElement;
+
+      try {
+         beginSequence(me, Dation::IN);
+
+         // execute formatlist first
+         for (formatItem = 0; formatItem < formatList->nbrOfEntries;
+               formatItem ++) {
+
+            if (formatList->entry[formatItem].format <
+                  IOFormatEntry::IsPositioning) {
+               Log::error("non positioning element in format list");
+               throw theInternalDationSignal;
+            }
+
+            fromPositioningFormat(me, &formatList->entry[formatItem]);
+         }
+
+         for (dataElement = 0; dataElement < dataList->nbrOfEntries;
+               dataElement++) {
+            dationRead(dataList->entry[dataElement].dataPtr.inData,
+                       *dataList->entry[dataElement].numberOfElements);
+         }
+
+         endSequence();
+      } catch (Signal &s) {
+         if (! updateRst(&s)) {
+            endSequence();
+            throw;
+         }
+
+         endSequence();
+      }
    }
 }

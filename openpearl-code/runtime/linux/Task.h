@@ -404,6 +404,10 @@ C++ code for the forward declaration of a task
 #define   SPCTASK(t) \
 extern pearlrt::Task t;
 
+#if 0
+#define   SPCTASKGLOBAL(t,ns) \
+extern pearlrt::Task #ns::t;
+#endif
 
 /**
 create to C++  code for the task definition
@@ -445,6 +449,40 @@ static void x ## _entry (pearlrt::Task * me) { 		\
 }							\
 							\
 static void pearlrt::x ## _body (pearlrt::Task * me)
+
+#if 0
+#define DCLTASKGLOBAL(x, prio, ismain,ns) 		\
+}							\
+namespace pearlrt {					\
+   static void x ## _entry (pearlrt::Task * me) ;	\
+   static void x ## _body (pearlrt::Task * me) ;	\
+}							\
+namespace #x {						\
+pearlrt::Task x ( pearlrt::x ## _entry, (char*)#x, 	\
+                       prio, ismain);			\
+}							\
+namespace pearlrt {					\
+static void x ## _entry (pearlrt::Task * me) { 		\
+      me->entry();  					\
+      try {						\
+         x ## _body (me);	 			\
+      } catch (pearlrt::Signal & p) {			\
+         char line[256];                                \
+         printf("++++++++++++++++++++++++++++++\n");	\
+         sprintf(line,"%s:%d Task: %s   terminated due to: %s",\
+             me->getLocationFile(), me->getLocationLine(), \
+             me->getName(), p.which());			\
+         printf("%s\n",line);				\
+         pearlrt::Log::error(line);			\
+         printf("++++++++++++++++++++++++++++++\n");	\
+      }							\
+      me->terminate(me);  				\
+   } 							\
+}							\
+							\
+namespace #x {						\
+static void pearlrt::x ## _body (pearlrt::Task * me)
+#endif
 
 #endif
 

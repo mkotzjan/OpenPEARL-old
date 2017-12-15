@@ -81,19 +81,19 @@ namespace pearlrt {
     Fixed<15> resultOfExpr1;
 
     IODataEntry dataEntries[] = {
-       { /* index 0 */
+       { // index 0
           .datatype={CHAR,2},
           .dataPtr{.outData=&CONST_CHAR_1234}
        },
-       { /* index 1 */
+       { // index 1 
           .datatype={IODataEntry::FIXED,15},
           .dataPtr{.outData=&_x}
        },
-       { /* index 2 */
+       { // index 2 
           .datatype={IODataEntry::CHAR,2},
           .dataPtr{.outData=&CONST_CHAR_4567}
        },
-       { /* index 3 */
+       { // index 3 
           .datatype={IODataEntry::FLOAT,53},
           .dataPtr{.outData=&resultOfExpr1}
        },
@@ -151,27 +151,27 @@ namespace pearlrt {
     Fixed<31> resultOfExpr2;
 
     IOFormatEntry formatEntries[] = {
-       { /* index 0 */
+       { // index 0
           .format=IOFormatEntry::A,
        },
-       { /* index 1 */
+       { // index 1
           .format=IOFormatEntry::Fw,
           .fp1={.outParam=&CONST_FIXED_POS_5_31,
        },
-       { /* index 2 */
+       { // index 2
           .format=IOFormatEntry::X,
           .fp1={.outParam=&resultOfExpr2},
        },
-       { /* index 3 */
+       { // index 3
           .format=IOFormatEntry::Aw,
           .fp1={.outParam=&CONST_FIXED_POS_4_31,
        },
-       { /* index 4 */
+       { // index
           .format=IOFormatEntry::E2wd,
           .fp1={.outParam=&CONST_FIXED_POS_13_31,
           .fp2={.outParam=&CONST_FIXED_POS_6_31,
        },
-       { /* index 5 */
+       { // index 5
           .format=IOFormatEntry::SKIP,
           .fp1={.outParam=&CONST_FIXD_POS_1_31},
        },
@@ -204,12 +204,13 @@ namespace pearlrt {
    \brief specification of a data element inside of an io job.
 
    Example:
-   reading a value into the FLOAT(53) variable 
+   reading a value into the FLOAT(53) variable. 
+   Note that the variable one with type size_t has the value 1.
    \code
    {
       .dataType={IODataEntry::FLOAT,53},
       .dataPtr.in = _x, 
-      .numberOfElements = 1,
+      .numberOfElements = & one,
    }
    \endcode
 
@@ -237,15 +238,6 @@ namespace pearlrt {
           */
 	  InduceData,
 
-          /** a virtual type for the repetition of format elements
-              like in (3)((5)(F(4), X(3)),SKIP) 
-              which represents 3 lines with 5 fixed values and 3 spaces 
-              
-              fp1.intValue must contain the number of enveloped
-                   format elements (this entry is not counted)<br>
-              fp2.intValue must contain the number of repetitions
-          */
-          LoopStart,
       };
 
       /** the number of entries in the complete job
@@ -276,10 +268,14 @@ namespace pearlrt {
       /**
       number of elements
 
-      For array slices, we need the number of data elements of the slice.
+      For array slices in PUT and GET, we need the number of data elements
+      of the slice.
       For scalar values this item must be 1.
+
+      For READ and WRITE, this element contains the number of bytes
+      to transfer.
       */
-      size_t numberOfElements;
+      size_t *numberOfElements;
    };
 
    /**
@@ -393,6 +389,16 @@ namespace pearlrt {
                 depending on the data type */
             LIST,
 
+
+          /** a virtual type for the repetition of format elements
+              like in (3)((5)(F(4), X(3)),SKIP) 
+              which represents 3 lines with 5 fixed values and 3 spaces 
+              
+              fp1.intValue must contain the number of enveloped
+                   format elements (this entry is not counted)<br>
+              fp2.intValue must contain the number of repetitions
+          */
+          LoopStart,
 
             /**
             for treatment of the io-entries we must differ

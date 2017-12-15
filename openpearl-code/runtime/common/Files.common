@@ -45,6 +45,7 @@ CXX_COMMON = \
 	Signals.cc \
 	ScheduleSignalAction.cc \
 	Fixed63.cc \
+	Fixed.cc \
 	Prio.cc \
 	CharSlice.cc \
 	Character.cc RefChar.cc \
@@ -63,6 +64,7 @@ CXX_COMMON = \
 	MutexCommon.cc CSemaCommon.cc \
 	Semaphore.cc PriorityQueue.cc \
 	Rst.cc \
+	SystemDation.cc \
 	SystemDationNB.cc \
 	DationRW.cc \
 	IOFormats.cc \
@@ -70,11 +72,13 @@ CXX_COMMON = \
 	StringDationConvert.cc \
 	DationTS.cc \
 	UserDationNB.cc UserDation.cc \
+	TFUBuffer.cc \
 	DationDim.cc  DationDim1.cc \
 	DationDim2.cc DationDim3.cc \
 	FloatHelper.cc \
 	SoftInt.cc \
 	Control.cc \
+	ConsoleCommon.cc \
 	SampleBasicDation.cc 
 
 ifeq ($(CONFIG_HAS_I2C),y)
@@ -97,14 +101,14 @@ HDR_COMMON = $(CXX_COMMON:%.cc=%.h) \
 	BitString.h \
 	GetBitString.h \
 	Sink.h RefCharSink.h \
-	Fixed.h PutFixed.h GetFixed.h \
+	PutFixed.h GetFixed.h \
 	Dation.h \
 	Device.h UserDation.h \
 	PutCharacter.h \
 	Float.h \
+	IOJob.h \
 	TaskTimerCommon.h \
-	Ref.h \
-	SystemDation.h 
+	Ref.h 
 
 
 ifeq ($(CONFIG_CANSUPPORT),y)

@@ -44,6 +44,8 @@
 #include "GetCharacter.h"
 #include "PutBitString.h"
 #include "GetBitString.h"
+#include "UserDationNB.h"
+#include "IOJob.h"
 
 namespace pearlrt {
 
@@ -64,7 +66,7 @@ namespace pearlrt {
      This class provides the formating routines for DationPG and CONVERT.
      In order to decouple the formating stuff from the low level input and
      output, all methods operate on specialized Source or Sink objects.
-     
+
       */
    class IOFormats {
 
@@ -79,7 +81,7 @@ namespace pearlrt {
         operations
 
         \param _sink pointer to the output data stream
-        \param _source poingter to the input data stream
+        \param _source pointer to the input data stream
       */
       void setupIOFormats(Sink * _sink, Source* _source);
 
@@ -87,7 +89,7 @@ namespace pearlrt {
       Check if enough space/data is available for the operation
 
       This real implementation of this method is called before
-      each i/o format statement to enshure enough space in the 
+      each i/o format statement to enshure enough space in the
       input or output stream. If there is not enough space or data
       an exception must be thrown.
 
@@ -124,23 +126,45 @@ namespace pearlrt {
 
       \param s string to be printed
       \param w width of the output field. This field limits the number of
-               charavters to be written
+               characters to be written
       \tparam S size of the string
       */
       template<size_t S>
-      void toA(Character<S> & s, Fixed<31> w) {
+      void toA(Character<S> &s, Fixed<31> w) {
          checkCapacity(w);
          RefCharacter rc;
          rc.setWork(s);
+
          // performs checks and output
-         return PutHelper::doPutChar(w.x, &rc, sink);
+         PutHelper::doPutChar(w.x, &rc, sink);
       }
+
+      
+      /**
+      output formats A and A(w) for the IOJob interface
+
+      \param s pointer to the data to be printed
+      \param len length of the CHAR-type to be printed
+      \param w width of the output field. This field limits the number of
+               characters to be written
+      */
+      void toA(void *s, size_t len, Fixed<31> w);
+
+      /**
+      input formats A and A(w) for the IOJob interface
+
+      \param s pointer to the data to be printed
+      \param len length of the CHAR-type to be printed
+      \param w width of the output field. This field limits the number of
+               characters to be written
+      */
+      void fromA(void *s, size_t len, Fixed<31> w);
 
       /**
       input format A(w)
 
       \param s string to be read
-      \param w width of the input field. This field limits the number of 
+      \param w width of the input field. This field limits the number of
                characters to be read
       \tparam S size of the string
       */
@@ -279,6 +303,58 @@ namespace pearlrt {
       };
 
       /**
+       output format F with Float with the IOJob interface
+
+       \param f pointer to the FLOAT value to be printed
+       \param len the length of the FLOAT type
+       \param index the current index if we are in an array
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the fixed value type
+       */
+      void toFloatF(void *f, size_t len, size_t index, const Fixed<31> w,
+                    const Fixed<31> d = 0) ;
+
+      /**
+       input format F with Float with the IOJob interface
+
+       \param f pointer to the FLOAT value to be read
+       \param len the length of the FLOAT type
+       \param index the current index if we are in an array
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the fixed value type
+       */
+      void fromFloatF(void *f, size_t len, size_t index, const Fixed<31> w,
+                    const Fixed<31> d = 0) ;
+
+      /**
+       output format F with Fixed with the IOJob interface
+
+       \param f pointer to the FIXED value to be printed
+       \param len the length of the FIXED type
+       \param index the current index if we are in an array
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the fixed value type
+       */
+      void toFixedF(void *f, size_t len, size_t index, const Fixed<31> w,
+                    const Fixed<31> d = 0) ;
+
+      /**
+       input format F with Fixed with the IOJob interface
+
+       \param f pointer to the FIXED value to be read
+       \param len the length of the FIXED type
+       \param index the current index if we are in an array
+       \param w width of the output field
+       \param d number of decimals to be used
+       \tparam  S width of the fixed value type
+       */
+      void fromFixedF(void *f, size_t len, size_t index, const Fixed<31> w,
+                    const Fixed<31> d = 0) ;
+
+      /**
       input format F with FIXED
 
       \param f value to be read
@@ -337,7 +413,7 @@ namespace pearlrt {
        \param f value to be printed
        \param w width of the output field
        \param d number of decimals to be used
-       \param s number of significant digits (number of digits in from of the 
+       \param s number of significant digits (number of digits in from of the
                decimal point)
        \param e number of digits in exponent field
        \tparam  S width of the float value type
@@ -358,7 +434,7 @@ namespace pearlrt {
        \note On output, the E-format element has an additional parameter
              for the number of decimals in the exponent field.
              On input any valid number is accepted.
-      \note the parameters w and s are only used to check 
+      \note the parameters w and s are only used to check
             the valid values - during the input processing they are ignored
 
       \param f value to be read
@@ -421,6 +497,30 @@ namespace pearlrt {
       void fromD(Duration& f,
                  const Fixed<31> w,
                  const Fixed<31> d = 0);
+
+      /**
+       treat one output job entry, which must be a data format element
+
+       \param me pointer to the calling task
+       \param jobEntry  pointer to the current entry
+       \returns 0, if done normally<br>
+                1, if record wasd left
+       */
+      int putDataFormat(TaskCommon * me,
+             IODataEntry * dataEntry, size_t index,
+             IOFormatEntry * format);
+
+      /**
+       treat one input job entry, which must be a data format element
+
+       \param me pointer to the calling task
+       \param jobEntry  pointer to the current entry
+       \returns 0, if done normally<br>
+                1, if record wasd left
+       */
+      int getDataFormat(TaskCommon * me,
+             IODataEntry * dataEntry, size_t index,
+             IOFormatEntry * format);
 
    };
    /** @} */

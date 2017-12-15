@@ -81,6 +81,8 @@ Only this file mus be included.
 #include "StringDationConvert.h"
 #include "DationRW.h"
 #include "DationTS.h"
+#include "TFUBuffer.h"
+#include "TFURecord.h"
 #include "UserDationNB.h"
 #include "DationDim.h"
 #include "DationDim1.h"
@@ -94,10 +96,10 @@ Only this file mus be included.
 
 #include "Control.h"
 
-//#include "StdStream.h"
 #include "StdIn.h"
 #include "StdOut.h"
 #include "StdError.h"
+#include "Console.h"
 #include "Pipe.h"
 #include "Disc.h"
 #include "UnixSignal.h"
@@ -138,3 +140,5 @@ Only this file mus be included.
 #endif
 #endif
 
+#include "TcpIpServer.h"
+#include "IOJob.h"

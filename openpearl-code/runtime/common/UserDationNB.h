@@ -39,6 +39,8 @@
 #include "RefChar.h"
 #include "DationDim.h"
 #include "Log.h"
+#include "TFUBuffer.h"
+#include "IOJob.h"
 
 /**
 \file
@@ -67,15 +69,73 @@ namespace pearlrt {
       */
       enum DationType {ALPHIC, TYPE};
 
+      /** the TFU buffer management
+
+      the buffer storage is allocated by the compiler
+      */
+      TFUBuffer  tfuBuffer;
+
+
    private:
       static const Fixed<31> one;
+      static const Fixed<31> zero;
       const DationType dationType;
+      char paddingElement; // ether ' ' for ALPHIC or 0 for TYPE DATIONs
 
       void fill(const Fixed<31> n, char fillChar);
       void skipX(const Fixed<31> n);
       void skipUntil(const Fixed<31> n, char fillChar);
       void skipAny(const Fixed<31> n);
-   protected:
+      void internalSop(Fixed<31>* page, Fixed<31>* row, Fixed<31>* element);
+      Fixed<31> internalAdv(Fixed<31> p, Fixed<31> r, Fixed<31> c);
+      void doTfuAndSeekStuff();
+
+   public:
+      /**
+      mark the  TFU buffer to be empty
+
+      This method is called at the beginning of a new GET/PUT/READ/WRITE
+      statement and at SKIP or PAGE
+      */
+      void markTFUBufferUsed();
+
+      /**
+      prepare TFU buffer for new input record
+
+      Internally checks, if <ul>
+         <li>a TFU buffer is set
+         <li>the buffer is marked to be empty
+      </ul>
+      A complete record is fetched from the system dation
+      */
+      void getTFUBuffer();
+
+      /**
+      hook method to be called at each beginSequence call
+
+      This is needed by DationRW and DationPG for their TFU support
+      and not for DationTS.
+
+      Internally checks, if <ul>
+         <li>a TFU buffer is set
+         <li>the buffer is marked to be empty
+         <li>the type of the dation to select the padding character
+      </ul>
+      \param me the pointre to the calling task
+      */
+      void beginSequenceHook(TaskCommon * me);
+
+      /**
+      hook method to be called at each endSequence call
+
+      This is needed by DationRW and DationPG for their TFU support
+      and not for DationTS.
+
+      Here it marks the TFU buffer to be empty
+      */
+      void endSequenceHook(void);
+
+
       /**
       return a character back to the input (ether source or device)
       \param c the character to be returned
@@ -160,7 +220,6 @@ namespace pearlrt {
       \param dimensions pointer to dimension object.
              Each userdation need a dimension specification.
       \param dt dation type (ALPHIC or TYPE)
-
       */
       UserDationNB(SystemDationNB* parent,
                    int & dationParams,
@@ -290,7 +349,7 @@ namespace pearlrt {
                violate the column boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw PositioningFailedSignal if dation is FORWARD and 
+        \throw PositioningFailedSignal if dation is FORWARD and
                the new position would be backward
 
         \param row offset position of the row versus the current location
@@ -315,7 +374,7 @@ namespace pearlrt {
                violate the row boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw PositioningFailedSignal if dation is FORWARD and 
+        \throw PositioningFailedSignal if dation is FORWARD and
                the new position would be backward
 
         \param page offset position of the row versus the current location
@@ -382,7 +441,7 @@ namespace pearlrt {
                violate the column boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw PositioningFailedSignal if dation is FORWARD and 
+        \throw PositioningFailedSignal if dation is FORWARD and
                the new position would be backward
 
         \param row offset position of the row versus the current location
@@ -407,7 +466,7 @@ namespace pearlrt {
                violate the row boundaries and NOSTREAM is set
         \throws DationIndexBoundary if the modification would
                violate the boundaries and NOCYCLIC is set
-        \throw PositioningFailedSignal if dation is FORWARD and 
+        \throw PositioningFailedSignal if dation is FORWARD and
                the new position would be backward
 
         \param page offset position of the row versus the current location
@@ -452,7 +511,7 @@ namespace pearlrt {
       position to EOF (end of file)
       */
       void eof();
-    
+
       /**
         internal open function. build path to device, performs
         pre and post Open and creates the FILE descriptor (dev)
@@ -493,6 +552,27 @@ namespace pearlrt {
       */
       void closeSystemDation(int dationParams);
 
+      /**
+        treat one output job entry, which must be a positioning element
+
+        \param me pointer to the calling task
+        \param jobEntry  pointer to the current entry
+        \returns 0, if done normally<br>
+                 1, if record wasd left
+        */
+      int toPositioningFormat(TaskCommon * me, IOFormatEntry * jobFormat);
+
+      /**
+        treat one input job entry, which must be a positioning element
+
+        \param me pointer to the calling task
+        \param jobEntry  pointer to the current entry
+        \returns 0, if done normally<br>
+                 1, if record wasd left
+        */
+      int fromPositioningFormat(TaskCommon * me, IOFormatEntry * jobFormat);
+
+
    protected:
       /** assert dation properties
 
@@ -508,6 +588,8 @@ namespace pearlrt {
        \throw DationNotOpenSignal if dation is not opened
       */
       void assertOpenDirectOrForward();
+
+
    };
 }
 #endif

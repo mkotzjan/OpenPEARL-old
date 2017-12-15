@@ -422,7 +422,8 @@ endSampling:
          } else {
             return -2;
          }
-      }
+      } 
+     
 
       if ((delimiter & DoubleSpace) && retVal == ' ') {
          try {

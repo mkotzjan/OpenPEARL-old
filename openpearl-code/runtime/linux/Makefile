@@ -72,11 +72,15 @@ SRCANDH = \
 	CSema.cc \
 	Pipe.cc Disc.cc \
 	StdIn.cc StdOut.cc StdError.cc \
-	UnixSignal.cc
+	Console.cc \
+	UnixSignal.cc \
+	TcpIpServer.cc
 
 XML_FILES += Pipe.xml Disc.xml
 XML_FILES += StdIn.xml StdOut.xml StdError.xml
+XML_FILES += Console.xml
 XML_FILES += UnixSignal.xml
+XML_FILES += TcpIpServer.xml
 
 
 SRCONLY =os.cc \

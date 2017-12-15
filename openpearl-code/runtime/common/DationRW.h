@@ -178,11 +178,13 @@ namespace pearlrt {
         \param stepsize size (in bytes) of steps for positioning the dation.
                This is the size of the data structure which will be used
                in this dation. The size is calculated in bytes.
+        \param tfubuffer pointer to the TFU buffer, if TFU is set, else NULL
       */
       DationRW(SystemDationNB* parent,
                int dationParams,
                DationDim * dimensions,
-               const Fixed<15> stepsize);
+               const Fixed<15> stepsize,
+               void * tfubuffer = NULL);
 
       /**
         Method for reading from a rw-userdation
@@ -210,6 +212,26 @@ namespace pearlrt {
        \param c the character to be returned
        */
       void dationUnGetChar(const char c);
+
+      /**
+      send data via the IOJob interface
+
+      \param me the pointer to the calling task
+      \param dataList an array of data elements
+      \param formatList an array of positioning formats (incl. RST)
+      */
+      void write(TaskCommon*me,
+                 IODataList * dataList, IOFormatList * formatList);
+
+      /**
+      read data via the IOJob interface
+
+      \param me the pointer to the calling task
+      \param dataList an array of data elements
+      \param formatList an array of positioning formats (incl. RST)
+      */
+      void read(TaskCommon*me,
+                IODataList * dataList, IOFormatList * formatList);
    };
    /** @} */
 }

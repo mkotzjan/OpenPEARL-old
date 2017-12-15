@@ -35,6 +35,7 @@ These tests use google test frame to verify the proper operation of the methode
 implemented in Fixed.h
 */
 
+#include <inttypes.h>  // PRIx64
 #include "gtest.h"
 
 #include "Signals.h"
@@ -445,3 +446,68 @@ TEST(Fixed, Fit) {
    EXPECT_THROW(x31.fit(x15), pearlrt::FixedRangeSignal);
 }
 
+/**
+Unit tests for assignViaVoidPointer
+*/
+TEST(Fixed, AssignViaVoidPtr) {
+    pearlrt::Fixed<0> x0;
+    pearlrt::Fixed<5> x5;
+    pearlrt::Fixed<15> x15;
+    pearlrt::Fixed<16> x16;
+    pearlrt::Fixed<31> x31;
+    pearlrt::Fixed<63> x63;
+
+    ASSERT_NO_THROW(
+      assignIntToFixedViaVoidPointer(&x0,0,0)
+    );
+
+    ASSERT_NO_THROW(
+      assignIntToFixedViaVoidPointer(&x0,0,-1)
+    );
+
+    ASSERT_THROW(
+      assignIntToFixedViaVoidPointer(&x0,0,1),pearlrt::FixedRangeSignal
+    );
+
+    ASSERT_THROW(
+      assignIntToFixedViaVoidPointer(&x5,5,32),pearlrt::FixedRangeSignal
+    );
+
+    ASSERT_THROW(
+      assignIntToFixedViaVoidPointer(&x5,5,-33),pearlrt::FixedRangeSignal
+    );
+
+    ASSERT_THROW(
+      assignIntToFixedViaVoidPointer(&x15,15,32768),pearlrt::FixedRangeSignal
+    );
+
+    ASSERT_THROW(
+      assignIntToFixedViaVoidPointer(&x16,16,65536),pearlrt::FixedRangeSignal
+    );
+
+    ASSERT_THROW(
+      assignIntToFixedViaVoidPointer(&x16,16,-65537),pearlrt::FixedRangeSignal
+    );
+
+    // since int is 32 bit we need no further overflow tests
+    ASSERT_TRUE(sizeof(int)==4);
+
+    // test the values
+    assignIntToFixedViaVoidPointer(&x5,5,3);
+    ASSERT_EQ(x5.x, 3);
+     
+    assignIntToFixedViaVoidPointer(&x15,15,3);
+    ASSERT_EQ(x15.x, 3);
+    assignIntToFixedViaVoidPointer(&x31,31,3);
+    ASSERT_EQ(x31.x, 3);
+    assignIntToFixedViaVoidPointer(&x31,31,0x0000AAAA);
+    ASSERT_EQ(x31.x, 0x0000AAAA);
+     
+    assignIntToFixedViaVoidPointer(&x31,31,0xAAAA0000);
+    ASSERT_EQ(x31.x, 0xAAAA0000);
+    
+    int64_t i64 = 0xFFFFFFFFAAAA0000ull; 
+    assignIntToFixedViaVoidPointer(&x63,63,0xAAAA0000);
+    ASSERT_EQ(x63.x, i64);
+     
+}

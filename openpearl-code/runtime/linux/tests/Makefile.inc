@@ -69,6 +69,7 @@ GTEST_DATION_SRCS += tests/gtest_main.cc tests/myTests.cc  \
   tests/UserDationNBTests.cc\
   tests/StdStreamTests.cc \
   tests/DationRWTests.cc tests/DationPGTests.cc \
+  tests/DationRW_TFU_Tests.cc tests/DationPG_TFU_Tests.cc  \
   tests/StringDationConvertTests.cc
 
 ifeq ($(CONFIG_LINUX_Octopus),y)

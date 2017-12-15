@@ -86,8 +86,10 @@ TEST(DationRW, read_write_FORWARD) {
          (pearlrt::Fixed<15>*)NULL));
    pearlrt::Character<16> text("PEARL");
    pearlrt::Fixed<31>  x(42);
+   logbuch.beginSequence(NULL,pearlrt::Dation::OUT);
    logbuch.dationWrite(&text, sizeof(text));
    logbuch.dationWrite(&x, sizeof(x));
+   logbuch.endSequence();
    logbuch.dationClose(pearlrt::Dation::PRM, (pearlrt::Fixed<15>*) 0);
    ASSERT_NO_THROW(
       logbuch.dationOpen(
@@ -97,8 +99,10 @@ TEST(DationRW, read_write_FORWARD) {
          (pearlrt::Fixed<15>*)NULL));
    pearlrt::Character<16> text1;
    pearlrt::Fixed<31>  x1;
+   logbuch.beginSequence(NULL,pearlrt::Dation::IN);
    logbuch.dationRead(&text1, sizeof(text1));
    logbuch.dationRead(&x1, sizeof(x1));
+   logbuch.endSequence();
    logbuch.dationClose(pearlrt::Dation::CAN, (pearlrt::Fixed<15>*)0 );
    ASSERT_TRUE((text == text1).getBoolean());
    ASSERT_TRUE((x == x1).getBoolean());

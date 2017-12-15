@@ -54,10 +54,10 @@ the next most integral data type will be used to store the internal value.
 #include "stackcheck.h"
 
 
-namespace pearlrt {
 #include "IfThenElseTemplate.h"
 #include "NumberOfBytes.h"
 
+namespace pearlrt {
    template<int S> class FixedTypes;
 
    /**
@@ -194,6 +194,7 @@ namespace pearlrt {
     the result fits into the specified number of bits.
    */
    template<int S> class Fixed {
+   public:
    private:
       /**
        intermediate value, which contains the number of bytes used
@@ -243,15 +244,15 @@ namespace pearlrt {
       */
       NativeType x;
 
-      /** 
+      /**
        the current value of the Fixed as native type.
        The internal type is an int. The length depends on the length
        of Fixed<S>
 
-	\returns the value of the Fixed as native type
-      */
+      \returns the value of the Fixed as native type
+           */
       NativeType get() const NOSTACKCHECK {
-	return x; 
+         return x;
       }
 
    private:
@@ -502,14 +503,14 @@ namespace pearlrt {
       cast operator
 
       convert the Fixed<S> into a Fixed<T>
-      
+
       \returns the value in type Fixed<P>
       \throws FixedRangeSignal in case of exeeding the data range
       */
       template<int P> operator Fixed<P> () const {
          Fixed<P> result(x);
          return result;
-      } 
+      }
 
       /**
       return the abs value of the Fixed
@@ -777,7 +778,7 @@ namespace pearlrt {
 
    \param lhs the first parameter of the division (divident)
    \param rhs the second parameter of the division (divisor)
-   \returns fraction of given parameters 
+   \returns fraction of given parameters
    \throws FixedRangeSignal if the product would exceed the value
            range of the fixed type
    \throws FixedDivideByZeroSignal if the divisor was 0
@@ -801,6 +802,18 @@ namespace pearlrt {
       Fixed < (S > P) ? S : P > l(lhs.x), r(rhs.x);
       return l.modulo(r);
    }
+
+   /**
+   safe assignment of an int value to a Fixed<lengthOfFixed> value
+   via a void pointer
+
+   \param voidPointerToFixed the pointer to the Fixed<..> data
+   \param lengthOfFixed the number of bits of the Fixed<..> data
+   \param valueToAssign the data for the Fixed<..> data
+   \throws FixedRangeSignal, if the valueToAssign violates the Fixed<..> range
+   */
+   void assignIntToFixedViaVoidPointer(
+      void* voidPointerToFixed, size_t lengthOfFixed, int valueToAssign);
 }
 # undef NOSTACKCHECK
 #endif

@@ -50,6 +50,7 @@
 #include "GetCharacter.h"
 #include "PutBitString.h"
 #include "GetBitString.h"
+#include "IOJob.h"
 
 namespace pearlrt {
 
@@ -60,7 +61,7 @@ namespace pearlrt {
            with the class attribute "ALPHIC"
    */
 
-   /** 
+   /**
    \addtogroup io_common
    @{
    */
@@ -164,8 +165,20 @@ namespace pearlrt {
       SystemDationNBSink  sink;
       SystemDationNBSource   source;
 
-      /** helper method for templated parameters */
-      //void doPutChar(int length, RefCharacter * rc);
+#define MAX_LOOP_LEVEL 11
+      struct FormatLoop {
+         int loopLevel;
+
+         struct {
+            size_t lastFormat;
+            size_t startFormat;
+            int loops;
+         } loopControl[MAX_LOOP_LEVEL];
+      };
+
+      size_t getNextFormatElement(IOFormatList * formatList,
+                                  size_t formatItem,
+                                  FormatLoop * loopStatus);
 
    public:
       /**
@@ -175,10 +188,12 @@ namespace pearlrt {
         \param dationParams possible dation parameters like
                IN,INOUT, OUT, STREAM, ..
         \param dimensions a pointer to a dimension object
+        \param tfubuffer pointer to the TFU buffer ist TFU is set, else NULL
       */
       DationPG(SystemDationNB* parent,
                int dationParams,
-               DationDim * dimensions);
+               DationDim * dimensions,
+               void * tfubuffer = NULL);
 
       /**
       Read from the device/file via source.
@@ -226,6 +241,27 @@ namespace pearlrt {
       \throws DationIndexBoundSignal if the dation has less space
       */
       void checkCapacity(Fixed<31> n);
+
+      /**
+      process an io job with put
+
+      \param me pointer to the calling task
+      \param dataEntries is a pointer to the data entries
+      \param formatEntries is a pointer to the format  entries
+      */
+      void put(TaskCommon *me, IODataList *dataEntries,
+               IOFormatList * formatEntries);
+
+      /**
+      process an io job with get
+
+      \param me pointer to the calling task
+      \param dataEntries is a pointer to the data entries
+      \param formatEntries is a pointer to the format  entries
+      */
+      void get(TaskCommon *me, IODataList *dataEntries,
+               IOFormatList * formatEntries);
+
    };
    /** @} */
 }

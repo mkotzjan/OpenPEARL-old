@@ -49,6 +49,120 @@ namespace pearlrt {
       source = _source;
    }
 
+   void IOFormats::toA(void *s, size_t len, Fixed<31> w) {
+      checkCapacity(w);
+      RefCharacter rc;
+      rc.setWork(s, len);
+      PutHelper::doPutChar(w.x, &rc, sink);
+   }
+
+   void IOFormats::fromA(void *s, size_t len, Fixed<31> w) {
+      checkCapacity(w);
+      GetHelper helper(w, source);
+      helper.setDelimiters(GetHelper::EndOfLine);
+
+      RefCharacter rc;
+      rc.setWork(s, len);
+
+      helper.readCharacterByA(&rc);
+   }
+
+   void IOFormats::toFloatF(void *s, size_t index,
+                            size_t len,
+                            const Fixed<31> w,
+                            const Fixed<31> d) {
+      checkCapacity(w);
+
+      if (len == 24) {
+         Float<24> * f = (Float<24>*)s;
+         f += index;
+         PutFloat<24>::toF(*f, w, d, *sink);
+      } else if (len == 53) {
+         Float<53> * f = (Float<53>*)s;
+         f += index;
+         PutFloat<53>::toF(*f, w, d, *sink);
+      } else {
+         Log::error("unsupported length of float F-format (len=%zu)", len);
+         throw theInternalDationSignal;
+      }
+   }
+
+   void IOFormats::fromFloatF(void *s, size_t index,
+                            size_t len,
+                            const Fixed<31> w,
+                            const Fixed<31> d) {
+      checkCapacity(w);
+
+      if (len == 24) {
+         Float<24> * f = (Float<24>*)s;
+         f += index;
+         GetFloat<24>::fromF(*f, w, d, *source);
+      } else if (len == 53) {
+         Float<53> * f = (Float<53>*)s;
+         f += index;
+         GetFloat<53>::fromF(*f, w, d, *source);
+      } else {
+         Log::error("unsupported length of float F-format (len=%zu)", len);
+         throw theInternalDationSignal;
+      }
+   }
+
+   void IOFormats::toFixedF(void *s, size_t index,
+                            size_t len,
+                            const Fixed<31> w,
+                            const Fixed<31> d) {
+      checkCapacity(w);
+
+      if (len <= 7) {
+         Fixed<7> * f = (Fixed<7>*)s;
+         f += index;
+         PutFixed<7>::toF(*f, w, d, *sink);
+      } else if (len <= 15) {
+         Fixed<15> * f = (Fixed<15>*)s;
+         f += index;
+         PutFixed<15>::toF(*f, w, d, *sink);
+      } else if (len <= 31) {
+         Fixed<31> * f = (Fixed<31>*)s;
+         f += index;
+         PutFixed<31>::toF(*f, w, d, *sink);
+      } else if (len <= 63) {
+         Fixed<63> * f = (Fixed<63>*)s;
+         f += index;
+         PutFixed<63>::toF(*f, w, d, *sink);
+      } else {
+         Log::error("unsupported length of fixed F-format (len=%zu)", len);
+         throw theInternalDationSignal;
+      }
+   }
+
+   void IOFormats::fromFixedF(void *s, size_t index,
+                            size_t len,
+                            const Fixed<31> w,
+                            const Fixed<31> d) {
+      checkCapacity(w);
+
+      if (len <= 7) {
+         Fixed<7> * f = (Fixed<7>*)s;
+         f += index;
+         GetFixed<7>::fromF(*f, w, d, *source);
+      } else if (len <= 15) {
+         Fixed<15> * f = (Fixed<15>*)s;
+         f += index;
+         GetFixed<15>::fromF(*f, w, d, *source);
+      } else if (len <= 31) {
+         Fixed<31> * f = (Fixed<31>*)s;
+         f += index;
+         GetFixed<31>::fromF(*f, w, d, *source);
+      } else if (len <= 63) {
+         Fixed<63> * f = (Fixed<63>*)s;
+         f += index;
+         GetFixed<63>::fromF(*f, w, d, *source);
+      } else {
+         Log::error("unsupported length of fixed F-format (len=%zu)", len);
+         throw theInternalDationSignal;
+      }
+   }
+
    void IOFormats::toT(const Clock f,
                        const Fixed<31> w,
                        const Fixed<31> d) {
@@ -77,4 +191,164 @@ namespace pearlrt {
       GetDuration::fromD(f, w, d, *source);
    }
 
+
+   int IOFormats::putDataFormat(TaskCommon * me, IODataEntry * dataEntry,
+           size_t index, IOFormatEntry * fmtEntry) {
+      int returnValue = 0;
+
+      switch (dataEntry->dataType.baseType) {
+         default:
+            printf("unsupported format %d\n", fmtEntry->format);
+            printf("fmt entry: format=%d data=%p type=%d width=%d, datasize=%zu\n",
+                fmtEntry->format,
+                dataEntry->dataPtr.inData,
+                dataEntry->dataType.baseType, 
+                dataEntry->dataType.dataWidth, 
+                *dataEntry->numberOfElements);
+          break;
+
+      case IODataEntry::CHAR:  
+         if (fmtEntry->format == IOFormatEntry::A) {
+            toA(dataEntry->dataPtr.inData,
+                dataEntry->dataType.dataWidth,
+                (Fixed<31>)(dataEntry->dataType.dataWidth));
+         } else if (fmtEntry->format == IOFormatEntry::Aw) {
+           toA(dataEntry->dataPtr.inData,
+               dataEntry->dataType.dataWidth,
+               *fmtEntry->fp1.constF31Ptr);
+         } else {
+            Log::error("type mismatch in A format");
+            throw theDationDatatypeSignal;
+         }
+         break;
+
+      case IODataEntry::FIXED:
+         if (fmtEntry->format == IOFormatEntry::Fw) {
+            toFixedF(dataEntry->dataPtr.inData, index,
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr);
+         } else if ( fmtEntry->format == IOFormatEntry::Fwd) {
+            toFixedF(dataEntry->dataPtr.inData, index,
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr,
+                  *fmtEntry->fp2.constF31Ptr);
+         } else {
+            Log::error("type mismatch in F format");
+            throw theDationDatatypeSignal;
+         }
+         break;
+
+
+      case IODataEntry::FLOAT:
+         if (fmtEntry->format == IOFormatEntry::Fw) {
+            toFloatF(dataEntry->dataPtr.inData, index ,
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr);
+         } else if ( fmtEntry->format == IOFormatEntry::Fwd) {
+            toFloatF(dataEntry->dataPtr.inData, index, 
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr,
+                  *fmtEntry->fp2.constF31Ptr);
+         } else {
+            Log::error("type mismatch in F format");
+            throw theDationDatatypeSignal;
+         }
+         break;
+
+      case IODataEntry::InduceData:
+         Signal::throwSignalByRst(fmtEntry->fp1.intValue);
+         break;
+#if 0
+
+      case IOJob::B1:
+      case IOJob::B2:
+      case IOJob::B3:
+      case IOJob::B4:
+#endif
+      }
+
+      return returnValue;
+
+   }
+
+   int IOFormats::getDataFormat(TaskCommon * me, IODataEntry * dataEntry,
+           size_t index, IOFormatEntry * fmtEntry) {
+      int returnValue = 0;
+
+      switch (dataEntry->dataType.baseType) {
+         default:
+            printf("unsupported format %d\n", fmtEntry->format);
+            printf("fmt entry: format=%d data=%p type=%d width=%d, datasize=%zu\n",
+                fmtEntry->format,
+                dataEntry->dataPtr.inData,
+                dataEntry->dataType.baseType, 
+                dataEntry->dataType.dataWidth, 
+                *dataEntry->numberOfElements);
+          break;
+
+      case IODataEntry::CHAR:  
+         if (fmtEntry->format == IOFormatEntry::A) {
+            fromA(dataEntry->dataPtr.inData,
+                dataEntry->dataType.dataWidth,
+                (Fixed<31>)(dataEntry->dataType.dataWidth));
+         } else if (fmtEntry->format == IOFormatEntry::Aw) {
+           fromA(dataEntry->dataPtr.inData,
+               dataEntry->dataType.dataWidth,
+               *fmtEntry->fp1.constF31Ptr);
+         } else {
+            Log::error("type mismatch in A format");
+            throw theDationDatatypeSignal;
+         }
+         break;
+
+      case IODataEntry::FIXED:
+         if (fmtEntry->format == IOFormatEntry::Fw) {
+            fromFixedF(dataEntry->dataPtr.inData, index,
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr);
+         } else if ( fmtEntry->format == IOFormatEntry::Fwd) {
+            fromFixedF(dataEntry->dataPtr.inData, index,
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr,
+                  *fmtEntry->fp2.constF31Ptr);
+         } else {
+            Log::error("type mismatch in F format");
+            throw theDationDatatypeSignal;
+         }
+         break;
+
+
+      case IODataEntry::FLOAT:
+         if (fmtEntry->format == IOFormatEntry::Fw) {
+            fromFloatF(dataEntry->dataPtr.inData, index ,
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr);
+         } else if ( fmtEntry->format == IOFormatEntry::Fwd) {
+            fromFloatF(dataEntry->dataPtr.inData, index, 
+                  dataEntry->dataType.dataWidth,
+                  *fmtEntry->fp1.constF31Ptr,
+                  *fmtEntry->fp2.constF31Ptr);
+         } else {
+            Log::error("type mismatch in F format");
+            throw theDationDatatypeSignal;
+         }
+         break;
+
+      case IODataEntry::InduceData:
+         Signal::throwSignalByRst(fmtEntry->fp1.intValue);
+         break;
+#if 0
+
+      case IOJob::B1:
+      case IOJob::B2:
+      case IOJob::B3:
+      case IOJob::B4:
+#endif
+      }
+
+      return returnValue;
+
+   }
 }
+
+

@@ -29,7 +29,7 @@
 */
 
 /**
-\file 
+\file
 \brief implementation of  PG-userdation
 
 */
@@ -50,19 +50,26 @@
 #include "PutDuration.h"
 #include "GetDuration.h"
 
+
 namespace pearlrt {
 
    DationPG::DationPG(SystemDationNB* parent,
                       int params,
-                      DationDim * dimensions)
-      : UserDationNB(parent, params, dimensions, UserDationNB::ALPHIC) {
+                      DationDim * dimensions,
+                      void * tfuRecord)
+      : UserDationNB(parent, params, dimensions,
+                     UserDationNB::ALPHIC) {
       dationStatus = CLOSED;
 
 #warning "wieso hat DationPG kein CYCLIC support?"
+
       if (params & CYCLIC) {
          Log::error("DationPG: does not support CYCLIC");
          throw theDationParamSignal;
       }
+
+      stepSize = Fixed<31>(1);
+      tfuBuffer.setupRecord(dim->getColumns().x, (char*)tfuRecord, ' ');
    }
 
    void DationPG::dationRead(void * destination, size_t size) {
@@ -121,14 +128,20 @@ namespace pearlrt {
    }
 
    void DationPG::internalOpen() {
-      if (dationParams & (OUT | INOUT)) {
-         sink.setSystemDationNB((SystemDationNB*)work);
-      }
+      tfuBuffer.setSystemDation((SystemDationNB*)work);
+      /*
+            } else {
+               if (dationParams & (OUT | INOUT)) {
+                  sink.setSystemDationNB((SystemDationNB*)work);
+               }
 
-      if (dationParams & (IN | INOUT)) {
-         source.setSystemDationNB((SystemDationNB*)work);
-      }
-      setupIOFormats(&sink, &source);
+               if (dationParams & (IN | INOUT)) {
+                  source.setSystemDationNB((SystemDationNB*)work);
+               }
+            }
+            setupIOFormats(&sink, &source);
+      */
+      setupIOFormats(&tfuBuffer, &tfuBuffer);
    }
 
    void DationPG::internalClose() {
@@ -136,7 +149,204 @@ namespace pearlrt {
 
    void DationPG::checkCapacity(Fixed<31> n) {
       // move the read/write pointer.
-      // this methiod will throw an exception if there is too little space
+      // this method will throw an exception if there is too little space
       adv(n);
+   }
+
+   size_t DationPG::getNextFormatElement(IOFormatList * formatList,
+                                         size_t formatItem,
+                                         FormatLoop * ls) {
+//printf("getNextFormat(formatList, %zu, loopLevel=%d\n",
+//       formatItem, ls->loopLevel);
+      // test if we are in an loop and last statment was reached
+      if (ls->loopLevel >= 0 &&
+            formatItem == ls->loopControl[ls->loopLevel].lastFormat) {
+
+//printf("end loop: level=%d start=%zu loops =%d last =%zu\n",
+// ls->loopLevel, ls->loopControl[ls->loopLevel].startFormat,
+// ls->loopControl[ls->loopLevel].loops ,
+// ls->loopControl[ls->loopLevel].lastFormat);
+         ls->loopControl[ls->loopLevel].loops--;
+
+         if (ls->loopControl[ls->loopLevel].loops > 0) {
+            // uncompleted inner loop - do at least one more
+            // iteration
+            formatItem = ls->loopControl[ls->loopLevel].startFormat;
+
+            if (formatList->entry[formatItem].format ==
+                  IOFormatEntry::LoopStart) {
+               formatItem = getNextFormatElement(formatList,
+                                                 formatItem - 1,
+                                                 ls);
+            }
+         } else {
+            // current loop level completed -- test next loop
+            // level
+            ls->loopLevel --;
+            formatItem = getNextFormatElement(formatList, formatItem, ls);
+         }
+
+         return formatItem;
+      }
+
+      // found open loop which is not terminated
+//            formatItem ++;
+//            if (formatItem >= formatList->nbrOfEntries) {
+//               formatItem = 0;
+//            }
+//         }
+//         return formatItem;
+//      }
+
+      // take next format from list (restarting on demand)
+      formatItem ++;
+
+      if (formatItem >= formatList->nbrOfEntries) {
+         formatItem = 0;
+      }
+
+      if (formatList->entry[formatItem].format == IOFormatEntry::LoopStart) {
+         ls->loopLevel ++;
+
+         if (ls->loopLevel == MAX_LOOP_LEVEL) {
+            Log::error("too many nested formats");
+            throw theDationFormatRepetitionOverflow;
+         }
+
+         ls->loopControl[ls->loopLevel].startFormat = formatItem + 1;
+         ls->loopControl[ls->loopLevel].lastFormat = formatItem +
+               formatList->entry[formatItem].fp1.intValue;
+         ls->loopControl[ls->loopLevel].loops =
+            formatList->entry[formatItem].fp2.intValue;
+
+//printf("enter loop: level=%d start=%zu loops =%d last =%zu formatItem=%zu\n",
+//                  ls->loopLevel,
+//                  ls->loopControl[ls->loopLevel].startFormat,
+//                  ls->loopControl[ls->loopLevel].loops ,
+//                  ls->loopControl[ls->loopLevel].lastFormat,
+//                  formatItem);
+         formatItem = getNextFormatElement(formatList, formatItem, ls);
+      }
+
+      return formatItem;
+      //}
+   }
+
+
+   void DationPG::put(TaskCommon * me,
+                      IODataList * dataList, IOFormatList * formatList) {
+
+      size_t formatItem = -1;
+      FormatLoop loopStatus;
+
+      loopStatus.loopLevel = -1;
+
+      try {
+         beginSequence(me, Dation::OUT);
+
+         for (size_t dataElement = 0;
+               dataElement < dataList->nbrOfEntries;
+               dataElement++) {
+
+            for (size_t dataIndex = 0;
+                 dataIndex < * (dataList->entry[dataElement].numberOfElements);
+                 dataIndex++) {
+               formatItem = getNextFormatElement(formatList,
+                                                 formatItem,
+                                                 &loopStatus);
+
+               while (formatList->entry[formatItem].format >=
+                      IOFormatEntry::IsPositioning) {
+                  toPositioningFormat(me, &formatList->entry[formatItem]);
+                  formatItem = getNextFormatElement(formatList,
+                                                    formatItem,
+                                                    &loopStatus);
+               }
+
+               putDataFormat(me, &dataList->entry[dataElement], dataIndex,
+                             &formatList->entry[formatItem]);
+            }
+         }
+
+         formatItem ++;
+
+         // treat pending format elements after last data element
+         while (formatItem < formatList->nbrOfEntries) {
+            if (formatList->entry[formatItem].format <=
+                  IOFormatEntry::IsPositioning) {
+               break;
+            }
+
+            toPositioningFormat(me, &formatList->entry[formatItem]);
+            formatItem++;
+         }
+
+         endSequence();
+      } catch (Signal &s) {
+         if (! updateRst(&s)) {
+            endSequence();
+            throw;
+         }
+
+         endSequence();
+      }
+   }
+   void DationPG::get(TaskCommon * me,
+                      IODataList * dataList, IOFormatList * formatList) {
+
+      size_t formatItem = -1;
+      FormatLoop loopStatus;
+
+      loopStatus.loopLevel = -1;
+
+      try {
+         beginSequence(me, Dation::IN);
+
+         for (size_t dataElement = 0;
+               dataElement < dataList->nbrOfEntries;
+               dataElement++) {
+
+            for (size_t dataIndex = 0;
+                 dataIndex < * (dataList->entry[dataElement].numberOfElements);
+                 dataIndex++) {
+               formatItem = getNextFormatElement(formatList,
+                                                 formatItem,
+                                                 &loopStatus);
+
+               while (formatList->entry[formatItem].format >=
+                      IOFormatEntry::IsPositioning) {
+                  fromPositioningFormat(me, &formatList->entry[formatItem]);
+                  formatItem = getNextFormatElement(formatList,
+                                                    formatItem,
+                                                    &loopStatus);
+               }
+
+               getDataFormat(me, &dataList->entry[dataElement], dataIndex,
+                             &formatList->entry[formatItem]);
+            }
+         }
+
+         formatItem ++;
+
+         // treat pending format elements after last data element
+         while (formatItem < formatList->nbrOfEntries) {
+            if (formatList->entry[formatItem].format <=
+                  IOFormatEntry::IsPositioning) {
+               break;
+            }
+
+            fromPositioningFormat(me, &formatList->entry[formatItem]);
+            formatItem++;
+         }
+
+         endSequence();
+      } catch (Signal &s) {
+         if (! updateRst(&s)) {
+            endSequence();
+            throw;
+         }
+
+         endSequence();
+      }
    }
 }
