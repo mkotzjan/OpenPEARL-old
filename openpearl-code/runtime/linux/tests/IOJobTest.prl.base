@@ -1,0 +1,20 @@
+MODULE (ioJobTest);
+
+SYSTEM;
+
+  stdout: StdOut;
+PROBLEM;
+   SPC stdout DATION OUT SYSTEM ALPHIC;
+   DCL so DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
+
+ttt: TASK MAIN;
+
+   DCL x FLOAT(53) INIT(3.1425);
+   OPEN so;
+   PUT 'Hallo', x TO so BY A,F(13,6),SKIP;
+   CLOSE so;
+
+
+END;
+MODEND;
+
