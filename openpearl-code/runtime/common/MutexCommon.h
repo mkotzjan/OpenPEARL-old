@@ -74,6 +74,13 @@ namespace pearlrt {
       void name(const char * s);
 
       /**
+         get the name of the mutex
+         \return the pointer to C-String which is set by name()
+      */
+      const char * getName();
+      
+
+      /**
          lock the mutex variable
 
       */

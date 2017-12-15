@@ -32,6 +32,7 @@
 #define SYSTEMDATION_INCLUDED
 
 #include "Dation.h"
+
 #include <stdio.h>
 
 /**
@@ -81,6 +82,7 @@ namespace pearlrt {
      \note only type DIRECT and FORWARD are realized, yet
    */
    class SystemDation: public Dation {
+
    public:
       /**
       obtain the capabilities of the device
@@ -109,7 +111,19 @@ namespace pearlrt {
       */
       virtual void dationClose(int closeParam) = 0;
 
+      /**
+      check, if the dation supports multiple io requests with it own
+      scheduling.
 
+      This is used in the consol device, which allowes the adressing of
+      text input to waiting tasks. The tasks may becom blocked via their
+      semaBlock semaphore until their data arrive or is processed.
+
+      \return true if the dation supports multiple io-operations at thesame time
+      \return false, if onky on operation is allowed at one time. In this
+         case the tasks are added into a priority based wait queue
+      */
+      virtual bool allowMultipleIORequests();
 
    };
 }

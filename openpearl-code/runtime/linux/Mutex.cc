@@ -69,6 +69,8 @@ namespace pearlrt {
 
    void Mutex::lock() {
       int ret;
+
+//    printf("Mutex::lock(%s)...", id);
 //     if (strstr(IGNORELIST, id) == 0) Log::debug("Mutex::lock(%s)", id);
       ret = pthread_mutex_lock(&mutex);
 
@@ -82,6 +84,7 @@ namespace pearlrt {
 
    void Mutex::unlock() {
       int ret;
+//	printf("... Mutex::unlock(%s)\n", id);
 //      if (strstr(IGNORELIST, id) == 0) Log::debug("Mutex::unlock(%s)", id);
       ret = pthread_mutex_unlock(&mutex);
 

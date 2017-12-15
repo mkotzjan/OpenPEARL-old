@@ -161,15 +161,15 @@ namespace pearlrt {
          */
          void dationUnGetChar(const char c);
 
-      /**
-      translate newline
-  
-      this is empty since linux uses \n for newline
-      
-      \param doNewLineTranslation enbale/disable the translation
-             (has no effect)
-      */
-      void translateNewLine(bool doNewLineTranslation);
+         /**
+         translate newline
+
+         this is empty since linux uses \n for newline
+
+         \param doNewLineTranslation enbale/disable the translation
+                (has no effect)
+         */
+         void translateNewLine(bool doNewLineTranslation);
 
       };
    private:
@@ -322,9 +322,9 @@ namespace pearlrt {
 
       /**
       translate newline
-  
+
       this is emptyi since linux uses \n for newline
-      
+
       \param doNewLineTranslation enbale/disable the translation
              (has no effect)
       */

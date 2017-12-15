@@ -440,22 +440,25 @@ namespace pearlrt {
    }
 
    Fixed<31> Disc::DiscFile::dationEof() {
-       off_t location;
+      off_t location;
 
-       if (fseeko(fp, 0, SEEK_END) != 0) {
-          Log::error("Disc: positioning failed (%s)",
-                     strerror(ferror(fp)));
-          throw thePositioningFailedSignal;
-       }
-       location = ftello(fp);
-       if (location == -1) {
-          Log::error("Disc: read position failed (%s)",
-                     strerror(ferror(fp)));
-          throw thePositioningFailedSignal;
-       }
-       Fixed<31> fileLocation(location);
-       return fileLocation;
-   } 
+      if (fseeko(fp, 0, SEEK_END) != 0) {
+         Log::error("Disc: positioning failed (%s)",
+                    strerror(ferror(fp)));
+         throw thePositioningFailedSignal;
+      }
+
+      location = ftello(fp);
+
+      if (location == -1) {
+         Log::error("Disc: read position failed (%s)",
+                    strerror(ferror(fp)));
+         throw thePositioningFailedSignal;
+      }
+
+      Fixed<31> fileLocation(location);
+      return fileLocation;
+   }
 
    void Disc::DiscFile::translateNewLine(bool doNewLineTranslation) {
       // do nothing

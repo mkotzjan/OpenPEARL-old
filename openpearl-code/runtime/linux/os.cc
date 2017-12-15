@@ -456,9 +456,9 @@ int main() {
 
 
    // setup default log file as ./pearl_log.txt
-   Disc * disc = new Disc("./",1);
+   Disc * disc = new Disc("./", 1);
    LogFile * logfile = new LogFile(disc, "pearl_log.txt");
-   new Log(logfile,(char*)"EWDI"); // all levels enabled
+   new Log(logfile, (char*)"EWDI"); // all levels enabled
 
    scanPearlRc();
 
@@ -546,6 +546,7 @@ int main() {
 
    while (1) {
       char* ret = 0;
+
       if (StdIn::isDefined()) {
          //sleep all the time. if a timer expire, he will be awaked
          sleep(20);

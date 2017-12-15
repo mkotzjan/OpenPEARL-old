@@ -45,7 +45,7 @@ stops the system when no more activity may occur
 
 namespace pearlrt {
 
-static pid_t pid;
+   static pid_t pid;
 
    TaskMonitor::TaskMonitor() {
       nbrPendingTasks = 0;

@@ -230,6 +230,15 @@ namespace pearlrt {
                false, if the upmost dimension is not specified
       */
       bool isBounded();
+
+      /**
+      set position without bound checking to the start of the next record
+
+      This method is necessary when read or write ends at the end of the file
+      dimension with TFU or trailing skip.
+      As long as no further reading/writing occurs this is ok.
+      */
+      void gotoNextRecord();
    };
    /** @} */
 }

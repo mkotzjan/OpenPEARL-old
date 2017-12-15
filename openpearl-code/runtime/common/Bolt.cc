@@ -64,10 +64,17 @@ namespace pearlrt {
 
    char* Bolt::getStateName(void) {
       switch (state) {
-         default:       return((char*)"???");
-         case FREE:     return((char*)"free");
-         case ENTERED:  return((char*)"entered");
-         case RESERVED: return((char*)"reserved");
+      default:
+         return ((char*)"???");
+
+      case FREE:
+         return ((char*)"free");
+
+      case ENTERED:
+         return ((char*)"entered");
+
+      case RESERVED:
+         return ((char*)"reserved");
       }
    }
 
@@ -81,8 +88,8 @@ namespace pearlrt {
       int i;
 
       for (i = 0; i < bd->nbolts; i++) {
-         if (bd->bolts[i]->getState() == RESERVED || 
-             (bd->bolts[i]->getState() == ENTERED && r == RESERVE)) {
+         if (bd->bolts[i]->getState() == RESERVED ||
+               (bd->bolts[i]->getState() == ENTERED && r == RESERVE)) {
             wouldBlock = 1;
          }
 
@@ -97,39 +104,40 @@ namespace pearlrt {
    void Bolt::enter(TaskCommon* me,
                     int nbrOfBolts,
                     Bolt** bolts) {
-        enterOrReserve(me, ENTER, ENTERED, nbrOfBolts, bolts);
+      enterOrReserve(me, ENTER, ENTERED, nbrOfBolts, bolts);
    }
 
    void Bolt::reserve(TaskCommon* me,
-                    int nbrOfBolts,
-                    Bolt** bolts) {
-        enterOrReserve(me, RESERVE , RESERVED, nbrOfBolts, bolts);
+                      int nbrOfBolts,
+                      Bolt** bolts) {
+      enterOrReserve(me, RESERVE , RESERVED, nbrOfBolts, bolts);
    }
 
    uint32_t  Bolt::getNbrOfEnterOperations() {
-       return nbrOfEnterOperations;
+      return nbrOfEnterOperations;
    }
 
    void Bolt::decrementEnter() {
-       nbrOfEnterOperations --;
+      nbrOfEnterOperations --;
    }
 
    void Bolt::incrementEnter() {
-     if (nbrOfEnterOperations == UINT32_MAX) {
-        // this may happen if more 2^32 tasks are waiting -- not
-        // propable in the near future !
-        Log::error("too many ENTER operations on bolt %s", name);
-        TaskCommon::mutexUnlock();
-        throw theInternalTaskSignal;
-     }
-     nbrOfEnterOperations ++;
+      if (nbrOfEnterOperations == UINT32_MAX) {
+         // this may happen if more 2^32 tasks are waiting -- not
+         // propable in the near future !
+         Log::error("too many ENTER operations on bolt %s", name);
+         TaskCommon::mutexUnlock();
+         throw theInternalTaskSignal;
+      }
+
+      nbrOfEnterOperations ++;
    }
 
    void Bolt::enterOrReserve(TaskCommon* me,
-                    BlockReason operation,
-                    int newState,
-                    int nbrOfBolts,
-                    Bolt** bolts) {
+                             BlockReason operation,
+                             int newState,
+                             int nbrOfBolts,
+                             Bolt** bolts) {
       int i;
       int wouldBlock = 0;
       BlockData bd;
@@ -139,19 +147,22 @@ namespace pearlrt {
       bd.u.bolt.bolts = bolts;
 
       TaskCommon::mutexLock();
+
       if (operation == ENTER) {
          Log::info("ENTER from task %s for %d bolts", me->getName(),
-                nbrOfBolts);
+                   nbrOfBolts);
       } else {
          Log::info("RESERVE from task %s for %d bolts", me->getName(),
-                nbrOfBolts);
+                   nbrOfBolts);
       }
+
       me->scheduleCallback(true);
       wouldBlock = check(operation, &(bd.u.bolt));
 
       if (! wouldBlock) {
          for (i = 0; i < nbrOfBolts; i++) {
             bolts[i]->setState(newState);
+
             if (operation == ENTER) {
                bolts[i]->incrementEnter();
             }
@@ -170,19 +181,19 @@ namespace pearlrt {
    void Bolt::leave(TaskCommon* me,
                     int nbrOfBolts,
                     Bolt** bolts) {
-       leaveOrFree(me, ENTERED, nbrOfBolts, bolts);
+      leaveOrFree(me, ENTERED, nbrOfBolts, bolts);
    }
 
    void Bolt::free(TaskCommon* me,
-                    int nbrOfBolts,
-                    Bolt** bolts) {
-       leaveOrFree(me, RESERVED, nbrOfBolts, bolts);
+                   int nbrOfBolts,
+                   Bolt** bolts) {
+      leaveOrFree(me, RESERVED, nbrOfBolts, bolts);
    }
 
    void Bolt::leaveOrFree(TaskCommon* me,
-                    int oldState,
-                    int nbrOfBolts,
-                    Bolt** bolts) {
+                          int oldState,
+                          int nbrOfBolts,
+                          Bolt** bolts) {
       BlockData bd;
       int i;
       int wouldBlock;
@@ -191,53 +202,58 @@ namespace pearlrt {
 
       // start critical region - end after done all possible unblocking
       TaskCommon::mutexLock();
+
       if (oldState == ENTERED) {
          Log::debug("LEAVE from task %s for %d bolts", me->getName(),
-                 nbrOfBolts);
+                    nbrOfBolts);
       } else {
          Log::debug("FREE from task %s for %d bolts", me->getName(),
-                 nbrOfBolts);
+                    nbrOfBolts);
       }
 
       for (i = 0; i < nbrOfBolts; i++) {
          if (bolts[i]->getState() != oldState) {
             Log::error("   bolt: %s has wrong state (%d)",
-                   bolts[i]->getName(),
-                   bolts[i]->getState());
+                       bolts[i]->getName(),
+                       bolts[i]->getState());
             TaskCommon::mutexUnlock();
             throw theBoltStateSignal;
          }
+
          if (bolts[i]->getState() == ENTERED) {
             bolts[i]->decrementEnter();
+
             if (bolts[i]->getNbrOfEnterOperations() == 0) {
                bolts[i]->setState(FREE);
                Log::debug("   bolt: %s is now free",
-                    bolts[i]->getName());
+                          bolts[i]->getName());
             }
          } else {
             // RESERVED
             bolts[i]->setState(FREE);
             Log::debug("   bolt: %s is now free",
-                    bolts[i]->getName());
+                       bolts[i]->getName());
          }
       }
 
       reserveIsWaiting = 0;
+
       // pass 1 - test for task waiting for RESERVE
       for (t = waiters.getHead(); t != 0; t = waiters.getNext(t)) {
          t->getBlockingRequest(&bd);
          wouldBlock = check(bd.reason, &(bd.u.bolt));
 
          if (bd.reason == RESERVE)  {
-            if ( !wouldBlock) {
+            if (!wouldBlock) {
                for (i = 0; i < bd.u.bolt.nbolts; i++) {
                   bd.u.bolt.bolts[i]->setState(RESERVED);
                }
+
                waiters.remove(t);
                t->unblock();
                Log::info("   unblocking: %s", t->getName());
             } else {
-              reserveIsWaiting = 1;
+               reserveIsWaiting = 1;
             }
          }
       }
@@ -249,7 +265,7 @@ namespace pearlrt {
             wouldBlock = check(bd.reason, &(bd.u.bolt));
 
             if (bd.reason == ENTER)  {
-               if ( !wouldBlock) {
+               if (!wouldBlock) {
                   for (i = 0; i < bd.u.bolt.nbolts; i++) {
                      bd.u.bolt.bolts[i]->setState(ENTERED);
                      bd.u.bolt.bolts[i]->incrementEnter();

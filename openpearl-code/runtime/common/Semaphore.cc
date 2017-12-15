@@ -115,7 +115,7 @@ namespace pearlrt {
       } else {
          Log::info("   task: %s going to blocked", me->getName());
          waiters.insert(me);
-         // critival region ends in block()
+         // critical region ends in block()
          me->block(&bd);
       }
    }

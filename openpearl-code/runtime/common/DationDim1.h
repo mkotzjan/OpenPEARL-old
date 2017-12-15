@@ -35,7 +35,7 @@
 #include "DationDim.h"
 
 namespace pearlrt {
-   /** 
+   /**
    \addtogroup io_common
    @{
    */

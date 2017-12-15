@@ -53,7 +53,7 @@ namespace pearlrt {
    application.
 
    Usage in the C++ code (without explicit namespace):
-  
+
    \code
    Fixed<15> x;
    Ref< Fixed<15> > * y;
@@ -63,48 +63,49 @@ namespace pearlrt {
    y = & x;           // assignment to the reference variable
    x = *y + x;   // usage in an expression
    *y = x;       // Usage in an assignment
-   \endcode 
+   \endcode
 
-   \tparam C the class of the referenced variable. This may be any 
+   \tparam C the class of the referenced variable. This may be any
              kind of class.
    */
 
    template<class C> class Ref {
-       private:
-          C * x;   ///< the pointer to the real object
+   private:
+      C * x;   ///< the pointer to the real object
 
-       public:
-          /**
-          ctor for plain REF variable declaration
-          */
-          Ref() {
-            x = NULL;
-          }
- 
-          /**
-          ctor for REF variable declaration with preset
-          \param pValue the variable which should by adressed
-                         by this REF
-          */
-          Ref(C* pValue) : x(pValue){}
-         
-          /**
-          dereferenciation of a REF variable 
-      
-          This may be used in expressions and as target of assignments
+   public:
+      /**
+      ctor for plain REF variable declaration
+      */
+      Ref() {
+         x = NULL;
+      }
 
-          \returns the object as reference type of C++.
-          
-          \throws   RefNotInitializedSignal if the reference is not
-                               initialized
-          */
-          C& operator*() {
-             if (x) {
-                return *x;
-             }
-             Log::error("Ref::use of uninitialized reference");
-             throw theRefNotInitializedSignal; 
-          }
+      /**
+      ctor for REF variable declaration with preset
+      \param pValue the variable which should by adressed
+                     by this REF
+      */
+      Ref(C* pValue) : x(pValue) {}
+
+      /**
+      dereferenciation of a REF variable
+
+      This may be used in expressions and as target of assignments
+
+      \returns the object as reference type of C++.
+
+      \throws   RefNotInitializedSignal if the reference is not
+                           initialized
+      */
+      C& operator*() {
+         if (x) {
+            return *x;
+         }
+
+         Log::error("Ref::use of uninitialized reference");
+         throw theRefNotInitializedSignal;
+      }
    };
    /** @} */
 }

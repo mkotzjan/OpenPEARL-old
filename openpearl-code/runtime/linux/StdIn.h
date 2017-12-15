@@ -35,7 +35,7 @@
 /**
 \file
 
-\brief generic non-basic systemdation class for reading 
+\brief generic non-basic systemdation class for reading
        from standard stream stdin
 */
 
@@ -50,7 +50,7 @@ namespace pearlrt {
    \addtogroup io_linux_driver
    @{
    */
-   
+
    /**
    \brief generic non-basic systemdation class
 
@@ -92,7 +92,7 @@ namespace pearlrt {
       */
       FILE* fp;
 
-      static bool _isDefined; 
+      static bool _isDefined;
 
    public:
 
@@ -180,19 +180,19 @@ namespace pearlrt {
       */
       void dationUnGetChar(const char c);
 
-     /** check if at least one dation of the given type is defined 
+      /** check if at least one dation of the given type is defined
 
-     This is required in the simple console command processor in os.cc
+      This is required in the simple console command processor in os.cc
 
-     \return true, if at least one dation of this type exists
-     */
-     static bool isDefined();
+      \return true, if at least one dation of this type exists
+      */
+      static bool isDefined();
 
       /**
       translate newline
-  
+
       this is empty since linux uses \n for newline
-      
+
       \param doNewLineTranslation enbale/disable the translation
              (has no effect)
       */

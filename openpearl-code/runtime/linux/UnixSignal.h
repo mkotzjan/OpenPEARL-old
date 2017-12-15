@@ -100,7 +100,7 @@ namespace pearlrt {
       enable interrupt in interrupt emitting device
 
       the device shall only trigger the treatment, if the interrupt
-      is enabled by the application. This method is called from the 
+      is enabled by the application. This method is called from the
       enable()-method.
       */
       void devEnable();
@@ -109,7 +109,7 @@ namespace pearlrt {
       disable interrupt in interrupt emitting device
 
       the device shall only trigger the treatment, if the interrupt
-      is enabled by the application. This method is called from the 
+      is enabled by the application. This method is called from the
       disable()-method.
       */
       void devDisable();

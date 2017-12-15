@@ -124,8 +124,8 @@ namespace pearlrt {
 
 
    void StdIn::dationWrite(void * source, size_t size) {
-         Log::error("StdIn: write is not supported");
-         throw theDationNotSupportedSignal;
+      Log::error("StdIn: write is not supported");
+      throw theDationNotSupportedSignal;
    }
 
    void StdIn::dationUnGetChar(const char x) {

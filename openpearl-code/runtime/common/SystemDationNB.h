@@ -33,6 +33,7 @@
 
 #include "SystemDation.h"
 #include "Fixed.h"
+//#include "TaskCommon.h"
 
 /**
 \file
@@ -124,10 +125,24 @@ namespace pearlrt {
       set position on dation/file to end of file
       and return the absolute position  if the dation is SEEKABLE
 
-      \param dationParam specified the dation type (DIRECT,FORWARD,..)
+      \returns the byte offset in the dation, if this is possible
+
       \throws may throw different exceptions - not defined yet
       */      
       virtual Fixed<31> dationEof();
+
+      /**
+      register the calling task as waiting for an IO-operation
+
+      The method is only called if allowMultipleIORequests is set by the 
+      system dation
+
+      \param task the pointer to the calling task
+      \param direction is ether Dation::IN or Dation::OUT
+      */
+//      virtual void registerWaitingTask(TaskCommon * task, int direction);
+      virtual void registerWaitingTask(void * task, int direction);
+
 
    };
 }

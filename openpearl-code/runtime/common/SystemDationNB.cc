@@ -42,7 +42,7 @@
 namespace pearlrt {
 
    void SystemDationNB::dationSeek(const Fixed<31> & p,
-                                    const int dationParam) {
+                                   const int dationParam) {
       Log::error("SystemDationNB: system dation is not seekable");
       throw theInternalDationSignal;
    }
@@ -50,6 +50,11 @@ namespace pearlrt {
    Fixed<31> SystemDationNB::dationEof() {
       Log::error("SystemDationNB: system dation does not support EOF");
       throw theNoEOFDationSignal;
+   }
+
+   void SystemDationNB::registerWaitingTask(void * task, int direction) {
+      Log::error("SystemDationNB: missing overload in concrete system dation");
+      throw theInternalDationSignal;
    }
 
 }

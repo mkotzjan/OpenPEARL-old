@@ -43,6 +43,9 @@ namespace pearlrt {
                         const Fixed<31> c,
                         const int d, const bool b) : pages(p), rows(r),
       cols(c), dimensions(d), boundedDimension(b) {
+      row = 0;
+      col = 0;
+      page = 0;
    }
 
    void DationDim::setDationParams(const int p) {
@@ -155,5 +158,44 @@ namespace pearlrt {
 
    bool DationDim::isBounded() {
       return boundedDimension;
+   }
+
+   void DationDim::gotoNextRecord() {
+      col = 0;
+      row = row + one;;
+
+      if ((row >= rows).getBoolean()) {
+         row = 0;
+         page = page + one;
+      }
+
+      if (dationParams & Dation::CYCLIC) {
+         switch (dimensions) {
+         case 1:
+            row = 0 ;
+            page = 0;
+            break;
+
+         case 2:
+            if ((page > zero).getBoolean()) {
+               page = 0;
+               row = 0;
+            }
+
+            if ((row >= rows).getBoolean()) {
+               row = 0;
+            }
+
+            break;
+
+         case 3:
+            if ((page >= pages).getBoolean()) {
+               row = 0;
+               page = 0;
+            }
+
+            break;
+         }
+      }
    }
 }

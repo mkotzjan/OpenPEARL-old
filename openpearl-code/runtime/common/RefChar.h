@@ -140,6 +140,8 @@ namespace pearlrt {
          data = &rhs.data[0];
       }
 
+      void setWork(void * s, size_t len);
+
       /**
         getCharAt
 

@@ -49,6 +49,12 @@ namespace pearlrt {
       current = 0;
    }
 
+   void RefCharacter::setWork(void * s, size_t len) {
+       data=(char*)s;
+       max = len;
+       current=0;
+   }
+
    char RefCharacter::getCharAt(size_t index) {
       // size-t is unsigned; max -1 become very large if max = 0
       // if index was given wrong (negative) the other clause  works

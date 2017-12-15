@@ -46,7 +46,7 @@
 #include <unistd.h>
 
 namespace pearlrt {
-   /** 
+   /**
    \addtogroup io_linux_driver
    @{
    */
@@ -185,15 +185,15 @@ namespace pearlrt {
          */
          Fixed<31> dationEof();
 
-      /**
-      translate newline
-  
-      this is empty since linux uses \n for newline
-      
-      \param doNewLineTranslation enbale/disable the translation
-             (has no effect)
-      */
-      void translateNewLine(bool doNewLineTranslation);
+         /**
+         translate newline
+
+         this is empty since linux uses \n for newline
+
+         \param doNewLineTranslation enbale/disable the translation
+                (has no effect)
+         */
+         void translateNewLine(bool doNewLineTranslation);
       };
 
    private:
@@ -323,9 +323,9 @@ namespace pearlrt {
 
       /**
       translate newline
-  
+
       this is empty since linux uses \n for newline
-      
+
       \param doNewLineTranslation enbale/disable the translation
              (has no effect)
       */

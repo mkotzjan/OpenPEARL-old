@@ -68,48 +68,45 @@ namespace pearlrt {
       closeSystemDation(dationParams);
    }
 
-   void UserDation::beginSequence(TaskCommon * me) {
+   void UserDation::beginSequence(TaskCommon * me,
+                                  Dation::DationParams direction) {
       // this method is called before any dation operation starts
       // in the application
 
       // verify that the dation is really open
       assertOpen();
 
+
       mutex.lock();
+
       currentTask = me;
       rstValue = NULL;
+      rstVoidPointer = NULL;
 
       if (me) {
          // for testing purpose it it possible to use
          // without a task object
          me->enterIO(this);
       }
+
+      currentDirection = direction;
+
+      // if multiple IO-requests are allowed, the beginSequenceHook
+      // must deal with the task blocking
+      beginSequenceHook(me);
    }
 
    void UserDation::endSequence() {
+
+      endSequenceHook();
+
       if (currentTask) {
          // for testing purpose it it possible to use
          // without a task object
          currentTask->leaveIO();
       }
 
-      mutex.unlock();
    }
-#if 0
-   void UserDation::rst(Fixed<15> & rst) {
-      rstValue = & rst;
-      rst = (Fixed<15>)0;
-   }
-
-   bool UserDation::updateRst(Signal * s) {
-      if (rstValue != NULL) {
-         * rstValue = s->whichRST();
-         return true;
-      }
-
-      return false;
-   }
-#endif
 
    void UserDation::suspend() {
       mutex.unlock();

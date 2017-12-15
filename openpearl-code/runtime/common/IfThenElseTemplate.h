@@ -1,5 +1,6 @@
 #ifndef IFTHENELSETEMPLATE_INCLUDED
 #define IFTHENELSETEMPLATE_INCLUDED
+namespace pearlrt {
    /** helper template for conditions compilation
    depending on the value of the condition, one of two
    given speciliations will be used.
@@ -32,5 +33,6 @@
       */
       typedef ELSE SELECT_CLASS;
    };
+}
 #endif
 

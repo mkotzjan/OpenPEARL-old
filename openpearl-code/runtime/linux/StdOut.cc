@@ -102,8 +102,8 @@ namespace pearlrt {
    }
 
    void StdOut::dationRead(void * destination, size_t size) {
-       Log::error("StdOut: read not supported");
-       throw theDationNotSupportedSignal;
+      Log::error("StdOut: read not supported");
+      throw theDationNotSupportedSignal;
    }
 
 
@@ -123,8 +123,8 @@ namespace pearlrt {
    }
 
    void StdOut::dationUnGetChar(const char x) {
-       Log::error("StdOut: unget not supported");
-       throw theDationNotSupportedSignal;
+      Log::error("StdOut: unget not supported");
+      throw theDationNotSupportedSignal;
    }
 
 

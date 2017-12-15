@@ -43,6 +43,7 @@ the next most integral data type will be used.
 
 */
 
+template<int S> class BitString;
 
 #include <stdio.h>
 #include <stdint.h>

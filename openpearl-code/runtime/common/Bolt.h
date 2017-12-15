@@ -75,12 +75,12 @@ namespace pearlrt {
    private:
       Bolt();                // hide default constructor
       uint state;            // the internal bolt variable state
-      uint32_t nbrOfEnterOperations; 
+      uint32_t nbrOfEnterOperations;
       const char * name;
       static PriorityQueue waiters;
       static int check(BlockReason r, BlockData::BlockReasons::BlockBolt *bd);
 
-      enum BoltStates{FREE=0, ENTERED=1, RESERVED = 2};
+      enum BoltStates {FREE = 0, ENTERED = 1, RESERVED = 2};
 
       /**
          set the  state
@@ -112,8 +112,8 @@ namespace pearlrt {
       \param bolts a list of pointer to the bolt objects
       */
       static void enterOrReserve(TaskCommon* me,
-         BlockReason operation,
-         int newState,  int nbrOfBolts, Bolt** bolts);
+                                 BlockReason operation,
+                                 int newState,  int nbrOfBolts, Bolt** bolts);
 
       /**
       Perform a LEAVE or FREE  of all given bolt.
@@ -129,12 +129,12 @@ namespace pearlrt {
       \throws BoltStateSignal if a bolt variable has a wrong state
       */
       static void leaveOrFree(TaskCommon* me,  int oldState,
-                        int nbrOfBolts, Bolt** bolts);
+                              int nbrOfBolts, Bolt** bolts);
 
       void incrementEnter();
       void decrementEnter();
       uint32_t getNbrOfEnterOperations();
-  
+
    public:
 
       /**

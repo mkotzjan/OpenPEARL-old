@@ -93,9 +93,9 @@ namespace pearlrt {
       */
       int getSystemPrio();
 
-     /** show the remaining PEARL priorities on the log as INFO
-     */
-     void logPriorities();
+      /** show the remaining PEARL priorities on the log as INFO
+      */
+      void logPriorities();
    };
 }
 

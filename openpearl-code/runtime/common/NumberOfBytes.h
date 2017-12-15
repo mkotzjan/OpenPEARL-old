@@ -29,6 +29,7 @@
 
 #ifndef NUMBEROFBYTES_INCLUDE
 #define NUMBEROFBYTES_INCLUDE
+namespace pearlrt {
    /**
      \brief required number of bytes for a fixed variable
 
@@ -46,30 +47,33 @@
          variable according to the given number of bits (without
          sign)
       */
-      enum Len {
-         N0 = (0 < len && len <= 8) ? 1 : 0,
-         N1 = (8 < len && len <= 16) ? 2 : 0,
-         N2 = (16 < len && len <= 32) ? 4 : 0,
-         N3 = (32 < len && len <= 64) ? 8 : 0,
+      enum NumberOfBytesLen {
+         NumberOfBytesN0 = (0 < len && len <= 8) ? 1 : 0,
+         NumberOfBytesN1 = (8 < len && len <= 16) ? 2 : 0,
+         NumberOfBytesN2 = (16 < len && len <= 32) ? 4 : 0,
+         NumberOfBytesN3 = (32 < len && len <= 64) ? 8 : 0,
       };
       /**
          Number of bytes for a fixed variable
       */
-      enum Nbr {resultFixed = N0 + N1 + N2 + N3};
+      enum NumberOfBytesNbr {resultFixed = NumberOfBytesN0 + NumberOfBytesN1 +
+                              NumberOfBytesN2 + NumberOfBytesN3};
 
       /**
          calculation of the required number of bytes for BitStrings
       */
-      enum B {
-         B0 = (0 < len && len <= 8) ? 1 : 0,
-         B1 = (8 < len && len <= 16) ? 2 : 0,
-         B2 = (16 < len && len <= 32) ? 4 : 0,
-         B3 = (32 < len && len <= 64) ? 8 : 0,
+      enum NumberOfBytesB {
+         NumberOfBytesB0 = (0 < len && len <= 8) ? 1 : 0,
+         NumberOfBytesB1 = (8 < len && len <= 16) ? 2 : 0,
+         NumberOfBytesB2 = (16 < len && len <= 32) ? 4 : 0,
+         NumberOfBytesB3 = (32 < len && len <= 64) ? 8 : 0,
       };
       /**
          result value of the calculation
       */
-      enum R {resultBitString = B0 + B1 + B2 + B3};
+      enum R {resultBitString = NumberOfBytesB0 + NumberOfBytesB1 +
+                                NumberOfBytesB2 + NumberOfBytesB3};
    };
+}
 #endif
 

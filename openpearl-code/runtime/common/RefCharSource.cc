@@ -47,7 +47,7 @@ namespace pearlrt {
 //         readPtr ++;
       } catch (CharacterIndexOutOfRangeSignal & e) {
          throw theNoMoreCharactersSignal;
-      }
+      } 
 
       return (c);
    }

@@ -90,7 +90,7 @@ namespace pearlrt {
       File* to use
       */
       FILE* fp;
-      
+
 //      static int declaredDations;
 
    public:
@@ -180,9 +180,9 @@ namespace pearlrt {
 
       /**
       translate newline
-  
+
       this is empty since linux uses \n for newline
-      
+
       \param doNewLineTranslation enbale/disable the translation
              (has no effect)
       */

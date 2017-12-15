@@ -49,6 +49,8 @@ namespace pearlrt {
          Log::error("I2CBus: %s", strerror(errno));
          throw theDeviceNotFoundSignal;
       }
+  
+      mutex.name("I2CBus");
       
       /* there is no ioctl function to modify the transmisssion speed
          thus we cannot modify it dynamically

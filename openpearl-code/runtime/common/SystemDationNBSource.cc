@@ -46,6 +46,7 @@ namespace pearlrt {
       try {
          src->dationRead(&c, 1);
       } catch (Signal & e) {
+         printf("SystemDationNBSource: caught signal \n");
          throw theNoMoreCharactersSignal;
       }
 

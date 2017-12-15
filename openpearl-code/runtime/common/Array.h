@@ -38,7 +38,7 @@
 
 \author R. Mueller
 
-Arrays are treated in PEARL in a special way. They may be passed 
+Arrays are treated in PEARL in a special way. They may be passed
 anonymously to procedures and the procedure does only know
 the number of dimensions. There is no limit for array dimensions.
 
@@ -64,14 +64,14 @@ the number of dimensions. There is no limit for array dimensions.
    declare an array with the identifier name the given number of dimensions
    and the initialisier of the limits structure
 
-   The name of the array will be of type *Array, which points to the 
+   The name of the array will be of type *Array, which points to the
    concrete array descriptor. This enable the language system to pass
-   diffenent arrays to procedures. 
+   diffenent arrays to procedures.
    The access to individual array elements is done in the C++ scope
    by the sum of the array data start and the indexed element offset
    withing the data storage.
 
-   The data storage of the array must be defined by the compiler 
+   The data storage of the array must be defined by the compiler
    as simple C++ array of the desired type.
 */
 #define DCLARRAY(name,dimensions,limits) \
@@ -81,30 +81,30 @@ the number of dimensions. There is no limit for array dimensions.
 
 namespace pearlrt {
 
-/**
-  The array descriptor.
+   /**
+     The array descriptor.
 
-  It contains the informations about the concrete array structure
+     It contains the informations about the concrete array structure
 
-  \tparam DIM number of dimensions of the array
-*/
-template <int DIM>
+     \tparam DIM number of dimensions of the array
+   */
+   template <int DIM>
    struct ArrayDescriptor {
       /** number of dimensions starting with 1  */
       int dim;
       /**
-         The limits for each dimension. 
+         The limits for each dimension.
          For each dimension the lower and upper bound is specified,
          and the number of elements in the sub array.
-      */ 
+      */
       struct Limits {
          /** lower bound in this dimension	*/
-         int low; 
+         int low;
 
          /** upper bound in this dimension	*/
          int high;
          /** number of elements in all subsequent dimensions  */
-         int size; 
+         int size;
       } lim[DIM]; /**< limits for all dimensions */
    };
 
@@ -115,10 +115,10 @@ template <int DIM>
       and the array access methods
    */
    class Array {
-     private: 
+   private:
       ArrayDescriptor<0>* descriptor;
-      Array(){};
-     public:
+      Array() {};
+   public:
       /**
          The ctor for an array. This initializes the array descriptor.
 
@@ -127,13 +127,13 @@ template <int DIM>
          a 'zero'-dimensional array descriptor
 
          \param descr the array descriptor, which is assoiated with this array
-          
+
       */
       Array(ArrayDescriptor<0> * descr) : descriptor(descr) {}
 
       /**
       calculate the offset of the specified element in the data section
-      
+
       \param i the first index
 
       \throws IndexOutOfBoundsSignal if a  current index  value is out
@@ -144,27 +144,27 @@ template <int DIM>
       size_t offset(Fixed<31> i, ...);
 
       /**
-       upper bound of given index 
+       upper bound of given index
 
        \param x index number starting with 1
        \throws IndexOutOfBoundsSignal if a  requested index  value is out
            of the specified dimensions
        \returns upper bound if this array index
       */
-      Fixed<31> upb(Fixed<31> x); 
+      Fixed<31> upb(Fixed<31> x);
 
       /**
-       lower bound of given index 
+       lower bound of given index
 
        \param x index number starting with 1
        \throws IndexOutOfBoundsSignal if a  requested index  value is out
            of the specified dimensions
        \returns lower bound if this array index
       */
-      Fixed<31> lwb(Fixed<31> x); 
-  
+      Fixed<31> lwb(Fixed<31> x);
+
    };
-   
+
 }
 #endif
 

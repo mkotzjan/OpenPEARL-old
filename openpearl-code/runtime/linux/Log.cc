@@ -43,8 +43,9 @@ namespace pearlrt {
       ctorIsActive = true;
       static StdError stdError;
       provider = &stdError;
-      provider->dationOpen(NULL,0);
+      provider->dationOpen(NULL, 0);
       ctorIsActive = false;
+      mutex.name("Log");
    }
 
    void Log::doit(const Character<7>& type,

@@ -47,6 +47,8 @@ namespace pearlrt {
 #include "Signals.h"
 #include "TaskCommon.h"
 #include "RefChar.h"
+#include "Dation.h"
+#include "Log.h"
 
 namespace pearlrt {
    /**
@@ -75,14 +77,30 @@ namespace pearlrt {
      the call of beginSequence().
    */
    class UserDation : public Dation, public Rst {
-   private:
+   protected:
+      /**
+      this mutex enhures that only one PEARL io statement is
+      executed at the same time on the same user dation.
+
+      There may be several user dations created upon the same system
+      dation. This must be treated inside the system dation.
+      */
       Mutex mutex;
-//      Fixed<15> * rstValue;
+
    protected:
       /** pointer to the task, which performs an i/o-operation on this
           dation
       */
       TaskCommon* currentTask;
+
+      /** current transfer direction.
+          This is eather Dation::IN or Dation::OUT
+      */
+      int currentDirection;
+
+      /** the system dation which performs the io processing
+      */
+      SystemDation * systemDation;
 
    public:
       /**
@@ -113,7 +131,7 @@ namespace pearlrt {
 
         \param p open parameters as given
         \param idf file name (used if IDF is set in p)
-       \param rst pointer to rst-variable; required, if RST is set in p
+        \param rst pointer to rst-variable; required, if RST is set in p
 
         \note throws various exceptions if no RST-Variable is set
       */
@@ -128,6 +146,7 @@ namespace pearlrt {
                              " variable given");
                   throw theInternalDationSignal;
                }
+
                *rst = 0; // clear error variable
             }
 
@@ -160,10 +179,10 @@ namespace pearlrt {
          }
       }
 
-    private:
+   private:
       void internalDationClose(const int  p = 0);
 
-    public:
+   public:
       /**
         Implementation of the Close-interface, which is inherited
         from UserDation Basic-class
@@ -187,6 +206,7 @@ namespace pearlrt {
                *rst = 0;  // clear RST value
                intRst  = rst;
             }
+
             internalDationClose(p);
          } catch (Signal &  s) {
             if (intRst != NULL) {
@@ -223,8 +243,11 @@ namespace pearlrt {
       \param me pointer to the task which performs the i/o.
                     May be NULL for testing purpose. Then no suspend and
                     terminate is done during the i/o-operation
+      \param dir indicates the transer direction.
+                 Allowed values are: Dation::IN and Dation::OUT
       */
-      void beginSequence(TaskCommon * me);
+      void beginSequence(TaskCommon * me,
+                         Dation::DationParams dir = Dation::OUT);
 
       /**
       Free the mutex to mark the end of the atomic operation on the dation.
@@ -248,6 +271,25 @@ namespace pearlrt {
        continue doing the io requesting the mutex
       */
       void cont();
+
+   protected:
+      /**
+      hook method to be called at each beginSequence call
+
+      This is needed by DationRW and DationPG for their TFU support
+      and not for DationTS.
+
+      \param me pointer to th current executing task
+      */
+      virtual void beginSequenceHook(TaskCommon* me) = 0;
+
+      /**
+      hook method to be called at each endSequence call
+
+      This is needed by DationRW and DationPG for their TFU support
+      and not for DationTS.
+      */
+      virtual void endSequenceHook(void) = 0;
 
    };
 }

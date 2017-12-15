@@ -71,6 +71,7 @@ namespace pearlrt {
    }
 
    void DationDim1::adv(const Fixed<31> c) {
+
       if (dationParams & Dation::FORWARD) {
          if ((c < zero).getBoolean()) {
             Log::error("DationDim1: ADV on FORWARD DATION"

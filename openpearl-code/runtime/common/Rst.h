@@ -59,13 +59,30 @@ namespace pearlrt {
    class Rst {
    protected:
       /**
-          pointer to error variable.
+      pointer to error variable.
 
-          If this pointer is NULL, no rst variable is set.
-          This attribute is preset with NULL in the start of the i/o
-          operation.
+      If this pointer is NULL, no rst variable is set.
+      This attribute is preset with NULL in the start of the i/o
+      operation.
       */
       Fixed<15> * rstValue;
+
+      /**
+      pointer to the error variable with the IOJob interface
+
+      If this pointer is NULL, no rst variable is set.
+      This attribute is preset with NULL in the start of the i/o
+      operation.
+      */
+      void * rstVoidPointer;
+
+      /**
+      the length of the rst variable.
+      To avoid assignement problems of a too large error number,
+      it is recommended that the error variable is at least of
+      the type FIXED(15). 
+      */
+      size_t rstLength;
 
    public:
       /**
@@ -75,6 +92,16 @@ namespace pearlrt {
                       exception after this call
       */
       void rst(Fixed<15> & rstVar);
+
+      /**
+        set the rst variable via an IOJob
+
+        \param rstVoidPointer pointer the variable,
+                      which should be set is case of
+                      exception after this call
+        \param len the length of the FIXED-variable
+      */
+      void rst(void * rstVoidPointer, size_t len);
 
       /**
          update the RST variable if set
