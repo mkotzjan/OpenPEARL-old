@@ -184,7 +184,7 @@ PEARL example for the system part:
 \x switch:  \> RPiDigitalOut(3,1); \\
 \x motor:   \> RPiDigitalOut(8,4); ! Bit 8-11\\
 \x ic2bus1: \> I2CBus('/dev/i2c-0', 100000);\\
-\x temp:    \> LM75('48'B4); -\,-\,- i2cbus1;\\
+\x temp:    \> LM75('48'B4) -\,-\,- i2cbus1;\\
 \x\\
 ! configuration elements \\
 \x Log('EW') -\,-\,- LogFile('pearl\_log.txt') -\,-\,- folder; \\
@@ -484,6 +484,7 @@ is less than the number of data elements of a line, this line or
 page, respectively, is implicitly padded with spaces (ALPHIC data
 stations) or zeros (BASIC data stations).
 
+
 Example:
 
 {\bf DCL} Printer {\bf DATION OUT ALPHIC DIM}($^*$, 60, 120) {\bf TFU} ...;\\
@@ -507,6 +508,57 @@ discard input lines.
 \end{removed}
 \end{itemize}
 \end{modified}
+
+\begin{added}
+Details about the behavior of TFU:
+\begin{itemize}
+\item If the system dation requires transfer units, this must be specified
+in the system dation specification. 
+\begin{discuss}
+	wie?
+	
+	SPC ... DATION ... TFU(64) ? 
+	Und die 64 wird vom IMC mit der Gr"o"se der 
+	Systemdation abgeglichen?
+	
+	oder wird die Transfergroesse von der Systemdation uebernommen?
+	\end{discuss}
+\item If a user dation is declared with TFU, the record length is defined by
+  \begin{itemize}
+   \item the position of the end-od-record marker (e.g. NL) for ALPHIC dations
+      with assecc attribute FORWARD
+   \item the number of data elements in a line and the size of the data elements for
+      all other non basic  dation types. No end-of-record markers are used.
+  \end{itemize}
+\item If the system dation does not require TFU, the behavior is simulated
+  by the user dation.
+\item If the system dation defines a transfer unit size,
+   the record length of the 
+   user dation must not exceed this length.
+   \begin{discuss}
+   	wie?? siehe oben
+   \end{discuss}
+\item On output: If the record length of the system dation is larger than
+   the record length of the user dation, the remaining elements
+    are padded with zeros or spaces according the dation type.
+\item On input: If the record length of the system dation is larger than
+   the record length of the user dation, the remaining elements must be equal
+   to the padding element.
+   If the input record is shorter, the remaining elements are padded
+   with  zeros or spaces according the dation type.
+\item On output, the TFU buffer is transfered to the device:
+  \begin{itemize}
+   \item at the end of the output statement
+   \item if a positioning statement leaves the current record
+  \end{itemize}
+\item On input, a new TFU record is read from the device:
+  \begin{itemize}
+   \item with the first data input format element in the input statement
+   \item with the first data input format element in the input statement
+   after a positioning statement which leaves the current record
+  \end{itemize}
+\end{itemize}
+\end{added}
 
 The possible ways of accessing a data station are determined by the
 access attribute:
