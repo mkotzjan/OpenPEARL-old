@@ -30,6 +30,8 @@
 #include "SystemDationNB.h"
 #include "TaskCommon.h"
 #include "PriorityQueue.h"
+#ifndef CONSOLECOMMON_INCLUDED
+#define CONSOLECOMMON_INCLUDED
 
 namespace pearlrt {
 
@@ -53,8 +55,8 @@ namespace pearlrt {
       bool inputStarted;
       char inputLine[80];
 
-      int getchar();
-      void putchar(char ch);
+      int getChar(void);
+      void putChar(char ch);
       void putString(const char* string);
       void goLeft(int n);
       void goRight(int n);
@@ -101,3 +103,4 @@ namespace pearlrt {
       void registerWaitingTask(void * task, int direction);
    };
 }
+#endif

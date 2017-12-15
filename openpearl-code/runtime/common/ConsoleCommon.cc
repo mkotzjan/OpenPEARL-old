@@ -57,13 +57,13 @@ namespace pearlrt {
       systemOut = out;
    }
 
-   int ConsoleCommon::getchar() {
+   int ConsoleCommon::getChar(void) {
       char ch;
       systemIn->dationRead(&ch, 1);
       return (ch);
    }
 
-   void ConsoleCommon::putchar(char ch) {
+   void ConsoleCommon::putChar(char ch) {
       systemOut->dationWrite(&ch, 1);
    }
 
@@ -73,14 +73,14 @@ namespace pearlrt {
 
    void ConsoleCommon::goRight(int n) {
       while (n--) {
-         putchar(inputLine[cursorPosition]);
+         putChar(inputLine[cursorPosition]);
          cursorPosition++;
       }
    }
 
    void ConsoleCommon::goLeft(int n) {
       while (n--) {
-         putchar(BS);
+         putChar(BS);
       }
    }
 
@@ -99,15 +99,15 @@ namespace pearlrt {
 
       while (!endOfLineReceived) {
          cursor = 0;       // no cursor position code detected
-         ch = getchar();   // wait passive until character is received
+         ch = getChar();   // wait passive until character is received
          inputStarted = true;
 
          // test for combined character
          if (ch == ESC) {
-            ch = getchar();
+            ch = getChar();
 
             if (ch == BRACKETOPEN) {
-               ch = getchar();
+               ch = getChar();
 
                if (ch == RIGHT) {
                   cursor = RIGHT;
@@ -116,10 +116,10 @@ namespace pearlrt {
                } else if (ch == INSERT) {
                   insertMode = ! insertMode;
 //printf("INSERTnmode = %d\n", insertMode);
-                  ch = getchar(); // discard trailing ~ character
+                  ch = getChar(); // discard trailing ~ character
                   cursor = -1;  // discard ch
                } else if (ch == DELETE) {
-                  ch = getchar(); // discard trailing ~ character
+                  ch = getChar(); // discard trailing ~ character
                   cursor = DELETE;
                } else {
                   // ignore all other
@@ -130,7 +130,7 @@ namespace pearlrt {
 
 //               printf("cursor control: %d ch=%x\n", cursor, ch);
             } else if (ch == 'O') { // ESC O sequences for HOME and END
-               ch = getchar();
+               ch = getChar();
 
                if (ch == HOME) {
                   cursor = HOME;
@@ -152,7 +152,7 @@ namespace pearlrt {
 
          case 0: // normal input
             if (ch == NL) {
-               putchar(ch);
+               putChar(ch);
                // always add NL at the end and the NIL also
                inputLine[nbrEnteredCharacters++] = ch;
                inputLine[nbrEnteredCharacters] = 0;
@@ -171,11 +171,11 @@ namespace pearlrt {
                   cursorPosition --;
 
                   for (i = cursorPosition; i < nbrEnteredCharacters; i++) {
-                     putchar(inputLine[i]);
+                     putChar(inputLine[i]);
                      cursorPosition++;
                   }
 
-                  putchar(SPACE);
+                  putChar(SPACE);
                   goLeft(nbrEnteredCharacters - cursorPosition + 1);
                }
             } else if (ch >= ' ' && ch < 0x7f) {
@@ -188,11 +188,11 @@ namespace pearlrt {
 
                      inputLine[cursorPosition] = ch;
                      nbrEnteredCharacters++;
-                     putchar(ch);
+                     putChar(ch);
                      cursorPosition ++;
 
                      for (i = cursorPosition; i < nbrEnteredCharacters; i++) {
-                        putchar(inputLine[i]);
+                        putChar(inputLine[i]);
                      }
 
                      goLeft(nbrEnteredCharacters - cursorPosition);
@@ -203,11 +203,11 @@ namespace pearlrt {
                         nbrEnteredCharacters++;
                      }
 
-                     putchar(ch);
+                     putChar(ch);
                      cursorPosition ++;
                   }
                } else {
-                  putchar(BEL);
+                  putChar(BEL);
                }
             } else {
                printf("character %x found - not treated  yet\n", ch);
@@ -224,10 +224,10 @@ namespace pearlrt {
                }
 
                for (i = cursorPosition; i < nbrEnteredCharacters; i++) {
-                  putchar(inputLine[i]);
+                  putChar(inputLine[i]);
                }
 
-               putchar(SPACE);
+               putChar(SPACE);
                goLeft(nbrEnteredCharacters - cursorPosition + 1);
             }
 
@@ -247,7 +247,7 @@ namespace pearlrt {
                goLeft(1);
                cursorPosition--;
             } else {
-               putchar(BEL);
+               putChar(BEL);
             }
 
             break;
