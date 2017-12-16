@@ -123,5 +123,6 @@ namespace pearlrt {
    }
 
    void DationTS::endSequenceHook(void) {
+       mutex.unlock();
    }
 }
