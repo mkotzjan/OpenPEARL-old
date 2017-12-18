@@ -72,8 +72,8 @@ END;
 #include <stdio.h>
 using namespace std;
 
-SPCBOLT(_s1);
-SPCBOLT(_s2);
+//SPCBOLT(_s1);
+//SPCBOLT(_s2);
 DCLBOLT(_s1);
 DCLBOLT(_s2);
 
