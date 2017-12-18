@@ -44,7 +44,6 @@ then
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
-      AptPackageList+=" libgtest-dev"
    fi
    SystemKnown=1
 fi
@@ -61,7 +60,6 @@ then
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
-      AptPackageList+=" libgtest-dev"
    fi
    SystemKnown=1
 fi
