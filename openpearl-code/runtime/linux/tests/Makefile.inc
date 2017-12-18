@@ -111,6 +111,9 @@ TEST_FILES_2_REMOVE += $(addpostfix .o,$(targets))
 #$(foreach f,$(CXX_COMMON_TEST_PROGS),$(eval $(call ruleCommonTests,$($(basename($(f)))))))
 #
 
+$(LIBGTEST):
+	(cd ../googletest/make; make)
+
 tests/signalTest: tests/signalTest.o $(PLIB)
 	$(LINK)
 
