@@ -41,6 +41,9 @@
 #PLIB := $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlinux.a
 PLIB := libOpenPEARLlinux.a
 
+LIBGTEST = ../googletest/make/gtest_main.a
+CPPFLAGS += -isystem ../googletest/include/
+
 targets +=  \
 	tests/DataTypeTests \
 	tests/api  tests/lot_of_tasks  \
@@ -69,8 +72,8 @@ GTEST_DATION_SRCS += tests/gtest_main.cc tests/myTests.cc  \
   tests/UserDationNBTests.cc\
   tests/StdStreamTests.cc \
   tests/DationRWTests.cc tests/DationPGTests.cc \
-  tests/DationRW_TFU_Tests.cc tests/DationPG_TFU_Tests.cc  \
   tests/StringDationConvertTests.cc
+#  tests/DationRW_TFU_Tests.cc tests/DationPG_TFU_Tests.cc  \
 
 ifeq ($(CONFIG_LINUX_Octopus),y)
   GTEST_DATION_SRCS += OctopusDigitalOutTest.cc
@@ -117,10 +120,10 @@ tests/api: tests/api.o $(PLIB)
 tests/lot_of_tasks: tests/lot_of_tasks.o $(PLIB)
 	$(LINK)
 
-tests/DataTypeTests: $(GTEST_OBJS) $(PLIB) /usr/local/lib/libgtest.a
+tests/DataTypeTests: $(GTEST_OBJS) $(PLIB) $(LIBGTEST)
 	$(LINK)
 
-tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) /usr/local/lib/libgtest.a
+tests/DationTests: $(GTEST_DATION_OBJS) $(PLIB) $(LIBGTEST)
 	$(LINK)
 
 tests/sematerminate: ../common/tests/sematerminate.o $(PLIB)
