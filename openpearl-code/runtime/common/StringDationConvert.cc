@@ -127,4 +127,279 @@ namespace pearlrt {
    }
 
 
+   int StringDationConvert::toPositioningFormat(TaskCommon * me,
+                                         IOFormatEntry * fmtEntry) {
+      int returnValue = 0;
+
+      switch (fmtEntry->format) {
+      default:
+         Log::error("CONVERT: unsupported format %d\n", fmtEntry->format);
+         throw theInternalDationSignal;
+
+      case IOFormatEntry::X:
+         toX(*fmtEntry->fp1.constF31Ptr);
+         break;
+
+      case IOFormatEntry::ADV1:
+         adv(*fmtEntry->fp1.constF31Ptr);
+         break;
+
+      case IOFormatEntry::POS1:
+         pos(*fmtEntry->fp1.constF31Ptr);
+         break;
+
+      case IOFormatEntry::SOP1:
+         sop(*fmtEntry->fp1.f31Ptr);
+         break;
+
+      case IOFormatEntry::RST:
+         rst(fmtEntry->fp1.voidPtr,
+             fmtEntry->fp2.intValue);
+         break;
+
+      case IOFormatEntry::InduceFormat:
+         Signal::throwSignalByRst(fmtEntry->fp1.intValue);
+         break;
+      }
+
+      return returnValue;
+   }
+
+   int StringDationConvert::fromPositioningFormat(TaskCommon * me,
+                                           IOFormatEntry * fmtEntry) {
+      int returnValue = 0;
+
+      switch (fmtEntry->format) {
+      default:
+         printf("unsupported format %d\n", fmtEntry->format);
+         break;
+
+      case IOFormatEntry::X:
+         fromX(*fmtEntry->fp1.constF31Ptr);
+         break;
+
+      case IOFormatEntry::ADV1:
+         adv(*fmtEntry->fp1.constF31Ptr);
+         break;
+
+      case IOFormatEntry::POS1:
+         pos(*fmtEntry->fp1.constF31Ptr);
+         break;
+
+      case IOFormatEntry::SOP1:
+         sop(*fmtEntry->fp1.f31Ptr);
+         break;
+
+      case IOFormatEntry::RST:
+         rst(fmtEntry->fp1.voidPtr,
+             fmtEntry->fp2.intValue);
+         break;
+
+      case IOFormatEntry::InduceFormat:
+         Signal::throwSignalByRst(fmtEntry->fp1.intValue);
+         break;
+      }
+
+      return returnValue;
+   }
+
+   void StringDationConvert::put(TaskCommon * me,
+                      IODataList * dataList, IOFormatList * formatList) {
+
+      int formatItem = -1;
+      int dataElement;
+
+      // create a loop control structure for the format list treatment
+      LoopControl formatLoop(formatList->nbrOfEntries, true);
+      LoopControl dataLoop(dataList->nbrOfEntries, false);
+
+
+      try {
+
+         // get first data element
+         dataElement = dataLoop.next();
+
+         while (dataElement < (int)dataList->nbrOfEntries) {
+            // test for begin of loop, repeatedly
+            while (dataList->entry[dataElement].dataType.baseType ==
+                   IODataEntry::LoopStart) {
+               dataElement = dataLoop.enter(
+                                dataList->entry[dataElement].dataType.dataWidth,
+                                *dataList->entry[dataElement].numberOfElements,
+                                dataList->entry[dataElement].dataPtr.offsetIncrement);
+            }
+
+            // treat arrays of simple types
+            for (size_t dataIndex = 0;
+                  dataIndex < * (dataList->entry[dataElement].numberOfElements);
+                  dataIndex++) {
+
+               formatItem = formatLoop.next();
+
+               while (formatList->entry[formatItem].format ==
+                      IOFormatEntry::LoopStart) {
+                  formatItem = formatLoop.enter(
+                                  formatList->entry[formatItem].fp1.intValue,
+                                  formatList->entry[formatItem].fp2.intValue);
+               }
+
+               while (formatList->entry[formatItem].format >=
+                      IOFormatEntry::IsPositioning) {
+                  toPositioningFormat(me, &formatList->entry[formatItem]);
+                  formatItem = formatLoop.next();
+
+                  while (formatList->entry[formatItem].format ==
+                         IOFormatEntry::LoopStart) {
+                     formatItem = formatLoop.enter(
+                                     formatList->entry[formatItem].fp1.intValue,
+                                     formatList->entry[formatItem].fp2.intValue);
+                  }
+               }
+
+               putDataFormat(me, &dataList->entry[dataElement],
+                             dataIndex,
+                             dataLoop.getOffset(),
+                             &formatList->entry[formatItem]);
+            }
+
+            // end of array od simple type
+            // take next data element
+            dataElement = dataLoop.next();
+         }
+
+         // treat pending positioning format elements
+         formatItem ++;
+
+         while (formatList->entry[formatItem].format ==
+                IOFormatEntry::LoopStart) {
+            formatItem = formatLoop.enter(
+                            formatList->entry[formatItem].fp1.intValue,
+                            formatList->entry[formatItem].fp2.intValue);
+         }
+
+         // treat pending format elements after last data element
+         while ((size_t)formatItem < formatList->nbrOfEntries) {
+            if (formatList->entry[formatItem].format <=
+                  IOFormatEntry::IsPositioning) {
+               break;
+            }
+
+            toPositioningFormat(me, &formatList->entry[formatItem]);
+            formatItem++;
+
+            while (formatList->entry[formatItem].format ==
+                   IOFormatEntry::LoopStart) {
+               formatItem = formatLoop.enter(
+                               formatList->entry[formatItem].fp1.intValue,
+                               formatList->entry[formatItem].fp2.intValue);
+            }
+         }
+
+      } catch (Signal &s) {
+         if (! updateRst(&s)) {
+            throw;
+         }
+      }
+   }
+
+
+   void StringDationConvert::get(TaskCommon * me,
+                      IODataList * dataList, IOFormatList * formatList) {
+
+      int formatItem = -1;
+      int dataElement;
+
+      // create a loop control structure for the format list treatment
+      LoopControl formatLoop(formatList->nbrOfEntries, true);
+      LoopControl dataLoop(dataList->nbrOfEntries, false);
+
+
+      try {
+
+         // get first data element
+         dataElement = dataLoop.next();
+
+         while (dataElement < (int)dataList->nbrOfEntries) {
+            // test for begin of loop, repeatedly
+            while (dataList->entry[dataElement].dataType.baseType ==
+                   IODataEntry::LoopStart) {
+               dataElement = dataLoop.enter(
+                                dataList->entry[dataElement].dataType.dataWidth,
+                                *dataList->entry[dataElement].numberOfElements,
+                                dataList->entry[dataElement].dataPtr.offsetIncrement);
+            }
+
+            // treat arrays of simple types
+            for (size_t dataIndex = 0;
+                  dataIndex < * (dataList->entry[dataElement].numberOfElements);
+                  dataIndex++) {
+
+               formatItem = formatLoop.next();
+
+               while (formatList->entry[formatItem].format ==
+                      IOFormatEntry::LoopStart) {
+                  formatItem = formatLoop.enter(
+                                  formatList->entry[formatItem].fp1.intValue,
+                                  formatList->entry[formatItem].fp2.intValue);
+               }
+
+               while (formatList->entry[formatItem].format >=
+                      IOFormatEntry::IsPositioning) {
+                  fromPositioningFormat(me, &formatList->entry[formatItem]);
+                  formatItem = formatLoop.next();
+
+                  while (formatList->entry[formatItem].format ==
+                         IOFormatEntry::LoopStart) {
+                     formatItem = formatLoop.enter(
+                                     formatList->entry[formatItem].fp1.intValue,
+                                     formatList->entry[formatItem].fp2.intValue);
+                  }
+               }
+
+               getDataFormat(me, &dataList->entry[dataElement],
+                             dataIndex,
+                             dataLoop.getOffset(),
+                             &formatList->entry[formatItem]);
+            }
+
+            // end of array od simple type
+            // take next data element
+            dataElement = dataLoop.next();
+         }
+
+         // treat pending positioning format elements
+         formatItem ++;
+
+         while (formatList->entry[formatItem].format ==
+                IOFormatEntry::LoopStart) {
+            formatItem = formatLoop.enter(
+                            formatList->entry[formatItem].fp1.intValue,
+                            formatList->entry[formatItem].fp2.intValue);
+         }
+
+         // treat pending format elements after last data element
+         while ((size_t)formatItem < formatList->nbrOfEntries) {
+            if (formatList->entry[formatItem].format <=
+                  IOFormatEntry::IsPositioning) {
+               break;
+            }
+
+            fromPositioningFormat(me, &formatList->entry[formatItem]);
+            formatItem++;
+
+            while (formatList->entry[formatItem].format ==
+                   IOFormatEntry::LoopStart) {
+               formatItem = formatLoop.enter(
+                               formatList->entry[formatItem].fp1.intValue,
+                               formatList->entry[formatItem].fp2.intValue);
+            }
+         }
+
+      } catch (Signal &s) {
+         if (! updateRst(&s)) {
+            throw;
+         }
+
+      }
+   }
 }

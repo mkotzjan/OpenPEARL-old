@@ -59,6 +59,22 @@ namespace pearlrt {
      They read/write with the methods READ/WRITE (defined by PEARL)
      in binary format.
 
+     The i/o-operations are done via a source/sink object which decouples
+     the i/o from the formatting statements.
+
+     The complete operation is treated by a list of data elements and a list
+     of format elements. See IODataList and IOFormatList about details.
+     For expression results intermediate variable must be defined locally and
+     used in the lists. The evaluation of the expressions must be done after
+     creation of the lists and the invocation of the write- or read-method.
+
+     The data list and format list must not contain any loop constructs.
+
+     Bit slices are not supported on input. They would need a temporary
+     bit variable and an assignment after the read statement. But we have no
+     indication, if the read statement was terminated by a catched signal
+     before the bit slice was in order to be read. 
+
 
    PEARL Example RW Dation
 
@@ -77,11 +93,10 @@ namespace pearlrt {
 
       OPEN table BY IDF('tmp1'), ANY;
 
-      FOR j TO 20 REPEAT
-         FOR i TO 10 REPEAT
-             WRITE i*100+j TO logbuch BY POS(1,i,j);
-         END;
-      END;
+      ! ...
+      WRITE i*100+j TO logbuch BY POS(i,j);
+      ! ...
+
       CLOSE table;
 
    END;
@@ -117,20 +132,16 @@ namespace pearlrt {
    Task(start,255,09 {
        pearlrt::Character<5> tmp(5,(char*)"tmp1");
        table.dationOpen(Dation::IDF, &tmp);
-
-       // for loops
-           try {
-              table.beginSequence();
-              table.pos(i,j);
-              table.write (&d, sizeof(d));
-              table.endSequence();
-          } catch (Signal& s) {
-              table.endSequence();
-              if (!table.updateRst(&s)) {
-                  throw;
-              }
-          }
-       // end loops
+    
+       {
+          // declare local variables for expression results
+          // ...
+          // create data and format lists (see IODataList and IOFormatList) 
+          // ...
+          // evaluate expressions in try-catch-blocks and modify
+          // the corresponding list entry in case of a catched signal
+          table.write(me, ioDataList, ioFormatList);
+      }
 
       table.dationClose();
    }
@@ -206,7 +217,20 @@ namespace pearlrt {
       */
       void dationWrite(void* data, size_t size);
 
+      /**
+      set absolut position on dation/file
+
+      This method must be overwritten by systemdations which are SEEKABLE
+
+      The method applies only on DIRECT or FORBACK dations.
+      FORWARD dations will write 0 bytes or discard input on read.
+
+      \param p the target position of the read/write pointer (counted in bytes)
+      \param dationParam specified the dation type (DIRECT,FORWARD,..)
+      \throws may throw different exceptions - not defined yet
+      */
       void dationSeek(const Fixed<31> & p, const int dationParam);
+
       /**
        return a character back to the input device
        \param c the character to be returned

@@ -338,45 +338,36 @@ PUT x,y TO console BY F(4), RST(rst), F(5), SKIP;
 \end{PEARLCode}
 
 \begin{CppCode}
-// code scheme. With the introcuction of the IOJobs,
-// the blocking was moved into the userdate operations put(), get(), ...
-//
 Fixed<31> rst;
 Fixed<15> x
 Fixed<15> y;
 
-try {
-   _console.beginSequence(me);
-   _console.toF(x,(pearlrt::Fixed<31>)4);
-   _console.rst(rst);
-   _console.toF(y,(pearlrt::Fixed<31>)5);
-   _console.toSkip((pearlrt::Fixed<31>)1);
-   _console.endSequence();
-} catch (Signal& s) {
-   if (!_console.updateRst(&s)) {
-      _console.endSequence();
-      throw;
-   }
-   _console.endSequence();
+{
+   // setup data list and format list
+
+   // the blocking was moved into the user dation
+   // operations put(), get(), ...
+   _console.put(me, dataList, formatList);
 }
 \end{CppCode}
 
-The try-catch-clause captures all PEARL-signals from the code in the 
+Inside the put,get,read,write, take and send methods a
+try-catch-clause captures all PEARL-signals from the code in the 
 type block. If a RST-value is specified in the format list, the method
 {\em updateRst} will assign the actual signal code to the RST-variable.
-If no RST-vale is specfied for this statement, the signal is propagated.
+If no RST-vale is specified for this statement, the signal is propagated.
 If the error is produced in the formatting of x, a signal is thrown.
 If the error is produced in the formatting of y, no signal is thrown but rst
 is set.
 
 If the system dation supports multipe io-operations in the same time,
-the locking mechanism of the user dation can be switched off, by implementing
+the locking mechanism of the user dation is switched off, by implementing
 a method \verb|bool allowMultipleIOOperations()| in the system dation.
 In this case, ths system dation is responsible for proper operation.
 
 \subsection{Concurrency on the same system dation}
 It is possible to create several user dations upon the same system dation.
-If the operation on the sstem dation is not reentrant, the developer must
+If the operation on the system dation is not reentrant, the developer must
 enshure by additional mutex variables, that those operations do not operlap.
 
 \section{Open and Close}
