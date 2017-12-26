@@ -54,6 +54,7 @@ LINK = @echo link $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIB
 
 # make silent compilations 
 COMPILE.cc = @echo compile $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+#COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
 # helper commands include composer, deleted white spaces
 IC_DIR = ../includeComposer
@@ -146,8 +147,8 @@ ifeq ($(CONFIG_LINUX_RPI_DigIO),y)
    SRCANDH += raspberry/RPiGpio.cc
    SRCANDH += raspberry/RPiDigitalOut.cc
    SRCANDH += raspberry/RPiDigitalIn.cc
-   XML_FILES += raspberry/RPiDigitalOut$(rpiVersion).xml
-   XML_FILES += raspberry/RPiDigitalIn$(rpiVersion).xml
+   XML_FILES += raspberry/RPiDigitalOut_$(rpiVersion).xml
+   XML_FILES += raspberry/RPiDigitalIn_$(rpiVersion).xml
 endif
 endif
 
@@ -315,7 +316,7 @@ doc:
 phony += depend
 depend: $(ALL_SRCS) ../common/Signals.hh ../common/Signals.hcc
 	@echo update dependencies ...
-	@$(CXX) -MM  $(CXXFLAGS) $(INCLUDES) $(ALL_SRCS) > $(DEPENDFILE)
+	@$(CXX) -MM  $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) $(ALL_SRCS) > $(DEPENDFILE)
 
 -include .depend
 

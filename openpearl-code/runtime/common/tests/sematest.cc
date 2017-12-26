@@ -106,8 +106,8 @@ sequence: 1 1 3 2 2 3 2 1
 #include <stdio.h>
 using namespace std;
 
-SPCSEMA(_s1);
-SPCSEMA(_s2);
+//SPCSEMA(_s1);
+//SPCSEMA(_s2);
 DCLSEMA(_s1, 10);
 DCLSEMA(_s2, 1);
 DCLSEMA(_s3, 5);

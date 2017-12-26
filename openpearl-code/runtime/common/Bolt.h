@@ -251,9 +251,16 @@ namespace pearlrt {
 Macro to import or forward declare a semaphore
 
 \param  x the name of the semaphore
+\param fromModule module, where the bolt is defined
+\param inModule module, this module's name
+
 */
-#define SPCBOLT(x) \
-   extern pearlrt::Bolt x
+#define SPCBOLT(x, fromModule, inModule) 	\
+}						\
+namespace pearl_ ## fromModule {		\
+   extern pearlrt::Bolt x;			\
+}						\
+namespace pearl_ ##  inModule {
 
 /**
 Macro to define a BOLT
@@ -261,6 +268,14 @@ Macro to define a BOLT
 \param x the name of the bolt
 */
 #define DCLBOLT(x) \
+static pearlrt::Bolt x(#x)
+
+/**
+Macro to define a global BOLT
+
+\param x the name of the bolt
+*/
+#define DCLBOLTGLOBAL(x) \
    pearlrt::Bolt x(#x)
 
 #endif

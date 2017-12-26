@@ -74,8 +74,8 @@ Task T1 finished
 #include <stdio.h>
 using namespace std;
 
-SPCSEMA(_s1);
-SPCSEMA(_s2);
+//SPCSEMA(_s1);
+//SPCSEMA(_s2);
 DCLSEMA(_s1, 0);
 DCLSEMA(_s2, 10);
 
