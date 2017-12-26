@@ -413,7 +413,7 @@ Remarks:
    If they do not match a PEARL signal is raised
 \end{itemize}
 
-\section{IO-operations}
+\section{IO Transfer Operations}
 The IO-operations are treated by methods  of the user dations.
 These methods receive a list of data elements and a list of format
 elements. These lists will be treated according the semantics of the dation
@@ -421,7 +421,7 @@ type. ALPHIC dation are controlled by the data list and will use
 the format list cyclic, if more data than formats are in the list.
 Non basic dations with a specific data type will treat all positioning
 elements first followed by the treatment of the data elements. 
-The locking mechanisme \ref{ioconcurrency} is realized in these methods.
+The locking mechanisme \ref{ioconcurrency} is realized inside of these methods.
 
 For details see the source code documentation of the classes
 \begin{description}
@@ -455,4 +455,44 @@ Fixed<15> y;
   // leave block with put statement
 }
 \end{CppCode}
+
+\subsection{Structs}
+Struct components must be rolled out for CONVERT, PUT and GET.
+
+\subsection{Array of Structs}
+An array of struct is passed to the io-system as a loop with the 
+rolled out pointers for the first loop iteration.
+The loop parameters are:
+\begin{description}
+\item[dataType.width] contains the number of items in this loop
+\item[dataPtr.offsetIncrement] contains the size of the struct
+\item[param1.numberOfElements] is a pointer to the number of array
+    elements 
+\end{description}
+
+If a struct contains another array of struct as a compontent, this
+structure is nested up to 11 levels.
+
+
+\subsection{Array slices}
+Arrays and array slices of simple types are passed to the i/o system
+as
+\begin{description}
+\item[.dataPtr] pointer to the first data element
+\item[.param1.numberOfElements] pointer to the number of elements.
+     This may be ether a pointer to a constant,
+      or a pointer to temporary variable, if a limits are
+      calculated at run time.
+\end {description}
+
+\subsection{BIT Slices}
+Bit slices are not possible as struct component and as arrays.
+They are passed as 
+\begin{itemize}
+\item pointer and size of the parent bit string
+\item pointer to the starting bit number (\texttt{size\_t*}) 
+\item pointer to the last bit number (\texttt{size\_t*})
+\end{itemize}
+
+For details check the source code documentation of the file \texttt{IOJob.h}
 
