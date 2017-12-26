@@ -142,39 +142,39 @@ printf("begin of print struct\n");
                 // idx 0 (modified)
                 {.dataType={pearlrt::IODataEntry::BIT,1},
                  .dataPtr={.outData=&myDataList.modified},
-                .numberOfElements = &one
+                 .param1={.numberOfElements = &one}
                 },
                 // idx 1 (LoopStart)
                 {.dataType={pearlrt::IODataEntry::LoopStart, 5},
                  .dataPtr={.offsetIncrement=sizeof(myDataList.person[0])},
-                 .numberOfElements=&five,
+                 .param1={.numberOfElements=&five},
                 },
                 // idx 2 (name)
                 {.dataType={pearlrt::IODataEntry::CHAR,10},
                  .dataPtr={.outData=&myDataList.person[0].name},
-                .numberOfElements = &one
+                 .param1={.numberOfElements = &one}
                 },
                
                 // idx 3 (prename)
                 {.dataType={pearlrt::IODataEntry::CHAR,10},
                  .dataPtr={.outData=&myDataList.person[0].prename},
-                .numberOfElements = &one
+                 .param1={.numberOfElements = &one}
                 },
 
                 // idx 4 (day)
                 {.dataType={pearlrt::IODataEntry::FIXED,15},
                  .dataPtr={.outData=&myDataList.person[0].date[0]},
-                .numberOfElements = &one
+                 .param1={.numberOfElements = &one}
                 },
                 // idx 5 (month)
                 {.dataType={pearlrt::IODataEntry::FIXED,15},
                  .dataPtr={.outData=&myDataList.person[0].date[1]},
-                .numberOfElements = &one
+                 .param1={.numberOfElements = &one}
                 },
                 // idx 6 (year)
                 {.dataType={pearlrt::IODataEntry::FIXED,15},
                  .dataPtr={.outData=&myDataList.person[0].date[2]},
-                .numberOfElements = &one
+                 .param1={.numberOfElements = &one}
                 },
                 
                   
@@ -245,7 +245,7 @@ printf("end of print struct\n");
                {.dataType={pearlrt::IODataEntry::FIXED,31},
                 .dataPtr = {.outData= (data_array1+
                   array1->offset(pearlrt::Fixed<31>(3),pearlrt::Fixed<31>(1)))},
-                .numberOfElements = &resultOfExpr1,
+                .param1={.numberOfElements = &resultOfExpr1},
                }
             };
             pearlrt::IOFormatEntry formatEntries[]= {
@@ -304,15 +304,15 @@ printf("end of print struct\n");
             pearlrt::IODataEntry dataEntries[]= {
                {.dataType={pearlrt::IODataEntry::CHAR,5},
                 .dataPtr = {.outData=&CONSTANT_CHARACTER_5a7707ad_4efa_4d82_a801_951eba9d4126},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
                {.dataType={pearlrt::IODataEntry::FLOAT,53},
                 .dataPtr = {.outData = &_x},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
                {.dataType={pearlrt::IODataEntry::FIXED,15},
                 .dataPtr = {.outData = &resultOfExpr1},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
             };
 
@@ -403,11 +403,11 @@ printf("end of print struct\n");
             {
                {.dataType={pearlrt::IODataEntry::CHAR,5},
                 .dataPtr = {.outData=&CONSTANT_CHARACTER_5a7707ad_4efa_4d82_a801_951eba9d4126},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
                {.dataType={pearlrt::IODataEntry::FIXED,15},
                 .dataPtr = {.outData = &_y},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                }
             };
             IOFormatEntry fmtEntries[]=
@@ -455,7 +455,7 @@ printf("end of print struct\n");
             {
                {.dataType={pearlrt::IODataEntry::FIXED,15},
                 .dataPtr = {.inData = &_z},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                }
             };
             IOFormatEntry fmtEntries[]=

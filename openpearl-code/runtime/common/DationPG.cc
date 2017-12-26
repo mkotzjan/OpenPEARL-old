@@ -177,13 +177,13 @@ namespace pearlrt {
                    IODataEntry::LoopStart) {
                dataElement = dataLoop.enter(
                                 dataList->entry[dataElement].dataType.dataWidth,
-                                *dataList->entry[dataElement].numberOfElements,
+                                *dataList->entry[dataElement].param1.numberOfElements,
                                 dataList->entry[dataElement].dataPtr.offsetIncrement);
             }
 
             // treat arrays of simple types
             for (size_t dataIndex = 0;
-                  dataIndex < * (dataList->entry[dataElement].numberOfElements);
+                  dataIndex < * (dataList->entry[dataElement].param1.numberOfElements);
                   dataIndex++) {
 
                formatItem = formatLoop.next();
@@ -282,13 +282,13 @@ namespace pearlrt {
                    IODataEntry::LoopStart) {
                dataElement = dataLoop.enter(
                                 dataList->entry[dataElement].dataType.dataWidth,
-                                *dataList->entry[dataElement].numberOfElements,
+                                *dataList->entry[dataElement].param1.numberOfElements,
                                 dataList->entry[dataElement].dataPtr.offsetIncrement);
             }
 
             // treat arrays of simple types
             for (size_t dataIndex = 0;
-                  dataIndex < * (dataList->entry[dataElement].numberOfElements);
+                  dataIndex < * (dataList->entry[dataElement].param1.numberOfElements);
                   dataIndex++) {
 
                formatItem = formatLoop.next();

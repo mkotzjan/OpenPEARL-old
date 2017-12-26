@@ -280,7 +280,7 @@ namespace pearlrt {
    \code
    {
       .dataType={IODataEntry::FLOAT,53},
-      .dataPtr.in = _x,
+      .dataPtr.inData = _x,
       .numberOfElements = & one,
    }
    \endcode
@@ -293,12 +293,25 @@ namespace pearlrt {
 
       The type information is completed with the dataWidth element
       for the templated simple data types.
+
       */
       enum IODataType  {
          CHAR, ///< CHAR types
          FLOAT, ///< FLOAT types
          FIXED, ///< FIXED types
          BIT,   ///< BIT types
+         /**
+         a bit slice must be treated differently
+
+         If only one bit is selected, the value of param2.end must be
+         identical to param1.start.
+
+         dataType.dataWidth is the number of bits in the parent bit string<br>
+         dataPtr is the pointer to the parent bit string<br>
+         param1.start is a pointer to the value of the starting bit<br>
+         param2.end is a pointer to the value of the last bit
+         */
+         BITSLICE,
          CLOCK, ///< CLOCK types
          DURATION, ///< DURATION types
          /** a virtual type, which enabled loops on parts
@@ -333,7 +346,7 @@ namespace pearlrt {
          exists in several widths, otherwise may be unitialized<br>
          for loops in data, this element is the number of data items of
          the loop body */
-         unsigned int dataWidth: 16;
+         unsigned int dataWidth: 24;
       } dataType;
 
       /**
@@ -365,7 +378,10 @@ namespace pearlrt {
       For READ and WRITE, this element contains the number of bytes
       to transfer.
       */
-      size_t *numberOfElements;
+      union { size_t *numberOfElements;
+              size_t * start;} param1;
+      union { size_t * end;} param2;
+
    };
 
    /**

@@ -226,7 +226,7 @@ namespace pearlrt {
          for (dataElement = 0; dataElement < dataList->nbrOfEntries;
                dataElement++) {
             dationWrite(dataList->entry[dataElement].dataPtr.inData,
-                        *dataList->entry[dataElement].numberOfElements);
+                        *dataList->entry[dataElement].param1.numberOfElements);
          }
 
          endSequence();
@@ -265,7 +265,7 @@ namespace pearlrt {
          for (dataElement = 0; dataElement < dataList->nbrOfEntries;
                dataElement++) {
             dationRead(dataList->entry[dataElement].dataPtr.inData,
-                       *dataList->entry[dataElement].numberOfElements);
+                       *dataList->entry[dataElement].param1.numberOfElements);
          }
 
          endSequence();
