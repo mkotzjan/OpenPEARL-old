@@ -29,54 +29,72 @@
 
 package org.smallpearl.compiler;
 
-public class ConstantFixedValue extends ConstantValue {
-    private Long m_value;
-    private Integer  m_precision;
+public class ConstantDurationValue extends ConstantValue {
+    private int m_hours = 0;
+    private int m_minutes = 0;
+    private double m_seconds = 0.0;
 
-    ConstantFixedValue(Integer value) {
-        m_value = value.longValue();
-        m_precision = Long.toBinaryString(Math.abs(m_value)).length();
+    ConstantDurationValue(int hours, int minutes, int seconds) {
+        m_hours = hours;
+        m_minutes = minutes;
+        m_seconds = seconds;
     }
 
-    ConstantFixedValue(Integer value, Integer precision) {
-        m_value = value.longValue();
-        m_precision = precision;
+    ConstantDurationValue(int hours, int minutes, double seconds) {
+        m_hours = hours;
+        m_minutes = minutes;
+        m_seconds = seconds;
     }
 
-    ConstantFixedValue(Long value) {
-        m_value = value;
-        m_precision = Long.toBinaryString(Math.abs(m_value)).length();
-    }
+    public int getHours() { return m_hours;};
+    public int getMinutes() { return m_minutes;};
+    public double getSeconds() { return m_seconds;};
 
-    ConstantFixedValue(Long value, Integer precision) {
-        m_value = value;
-        m_precision = precision;
-    }
-
-    public Long getValue() {
-        return m_value;
-    }
-
-    public Integer getPrecision() {
-        return m_precision;
+    public double getValue() {
+        return m_hours * 3600 + m_minutes * 60 + m_seconds;
     }
 
     public String getBaseType() {
-        return "Fixed";
+        return "Duration";
     }
 
     public String toString() {
         String name = "CONST_" + getBaseType().toUpperCase();
-        Long value = Math.abs(m_value);
+        double value = this.getValue();
 
-        if ( m_value < 0 ) {
+        if ( value < 0 ) {
             name += "_N";
         }
-        else if ( m_value >= 0 ) {
+        else if (value >= 0 ) {
             name += "_P";
         }
 
-        name += "_" + value.toString() + "_" + m_precision.toString();
-        return name;
+        name += "_" + m_hours + "_" + m_minutes + "_" + m_seconds;
+        return name.replaceAll("\\.", "_");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // self check
+        if (this == o)
+            return true;
+
+        // null check
+        if (o == null)
+            return false;
+
+        // type check and cast
+        if (getClass() != o.getClass())
+            return false;
+
+        ConstantDurationValue other = (ConstantDurationValue) o;
+
+        // field comparison
+        return this.m_hours == other.m_hours &&
+                this.m_minutes == other.m_minutes &&
+                this.m_seconds == other.m_seconds;
+
     }
 }
+
+

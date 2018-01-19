@@ -30,9 +30,17 @@
 package org.smallpearl.compiler;
 
 public class ConstantBitValue extends ConstantValue {
-    private String m_value;
+    private long m_value;
     private int m_no;
+    private int m_noOfBits;
 
+
+    ConstantBitValue(long value, int noOfBits) {
+        m_noOfBits = noOfBits;
+        m_value = value;
+    }
+
+/*
     ConstantBitValue(String str) {
         if( str.startsWith("'")) {
             str = str.substring(1, str.length());
@@ -42,16 +50,22 @@ public class ConstantBitValue extends ConstantValue {
             str = str.substring(0, str.length() - 1);
         }
 
-        m_value = str;
+        m_noOfBits = str.length();
+        m_value =  str;
         m_no = -1;
     }
+*/
 
     public void setNo(int no) { m_no = no; }
 
-    public int getLength() { return m_value.length(); }
+    public int getLength() { return m_noOfBits; }
+
+    public long getLongValue() {
+        return m_value;
+    }
 
     public String getValue() {
-        return m_value;
+        return "0x" + Long.toHexString(m_value);
     }
 
     public String getBaseType() {
@@ -61,7 +75,7 @@ public class ConstantBitValue extends ConstantValue {
     public String toString() {
 //        String name = "CONSTANT_" + getBaseType().toUpperCase();
 //        name += "_" + m_value.length() + "_" + canonicalize(m_value);
-        String name = "CONSTANT_BITSTRING_" + m_no;
+        String name = "CONST_BITSTRING_" + m_no;
         return name;
     }
 

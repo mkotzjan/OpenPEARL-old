@@ -327,12 +327,10 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
                 if ( initElementList != null && initElementList.size() > 0 ) {
                     if ( j < initElementList.size()) {
-                        System.out.println("#########"+initElementList.get(j));
                         variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, initElementList.get(j), ctx);
                         j++;
                     } else {
                         variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, initElementList.get(j-1), ctx);
-                        System.out.println("#########"+initElementList.get(j-1));
                     }
                 } else {
                     variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, ctx);

@@ -87,12 +87,36 @@ public class ConstantPool {
                     String s1 = ((ConstantBitValue)(value)).getValue();
                     String s2 = ((ConstantBitValue)(constantPool.get(i))).getValue();
 
-                    if ( s1.equals(s2)) {
+                    int l1 = ((ConstantBitValue)(value)).getLength();
+                    int l2 = ((ConstantBitValue)(constantPool.get(i))).getLength();
+
+                    if ( s1.equals(s2) && l1 == l2) {
                         found = true;
                         break;
                     }
                 }
             }
+            else if ( value instanceof ConstantDurationValue) {
+                if (constantPool.get(i) instanceof ConstantDurationValue) {
+                    ConstantDurationValue other = (ConstantDurationValue)constantPool.get(i);
+
+                    if ( value.equals(other) ) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            else if ( value instanceof ConstantClockValue) {
+                if (constantPool.get(i) instanceof ConstantClockValue) {
+                    ConstantClockValue other = (ConstantClockValue)constantPool.get(i);
+
+                    if ( value.equals(other) ) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
         }
 
         if (!found) {
@@ -107,84 +131,43 @@ public class ConstantPool {
         return null;
     }
 
-//    public ConstantValue lookup(String value) {
-//        int i;
-//        boolean found = false;
-//
-//        for (i = 0; i < constantPool.size(); i++) {
-//            if ( value instanceof ConstantFixedValue) {
-//                if (constantPool.get(i) instanceof ConstantFixedValue) {
-//                    Long a = ((ConstantFixedValue)(value)).getValue();
-//                    Long b = ((ConstantFixedValue)(constantPool.get(i))).getValue();
-//
-//                    if ( a.equals(b) ) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            else if ( value instanceof ConstantFloatValue) {
-//                if (constantPool.get(i) instanceof ConstantFloatValue) {
-//                    if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(constantPool.get(i))).getValue()) == 0) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            else if ( value instanceof ConstantCharacterValue) {
-//                if (constantPool.get(i) instanceof ConstantCharacterValue) {
-//                    String s1 = ((ConstantCharacterValue)(value)).getValue();
-//                    String s2 = ((ConstantCharacterValue)(constantPool.get(i))).getValue();
-//
-//                    if ( s1.equals(s2)) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            else if ( value instanceof ConstantBitValue) {
-//                if (constantPool.get(i) instanceof ConstantBitValue) {
-//                    constantBitNo = constantBitNo + 1;
-//                    String s1 = ((ConstantBitValue)(value)).getValue();
-//                    String s2 = ((ConstantBitValue)(constantPool.get(i))).getValue();
-//
-//                    if ( s1.equals(s2)) {
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        if (!found) {
-//            if ( value instanceof ConstantBitValue) {
-//                constantBitNo = constantBitNo + 1;
-//                ((ConstantBitValue) (value)).setNo(constantBitNo);
-//            }
-//
-//            constantPool.add(value);
-//        }
-//
-//        return null;
-//    }
-
-
+    static
     public Void dump(){
         int i;
         System.out.println("");
-        System.out.println("ConstantPool:");
-        System.out.println("  Entries:" + constantPool.size());
+        System.out.println("ConstantPool: (Entries:" + constantPool.size() + ")");
 
         for ( i = 0; i < constantPool.size(); i++) {
-            System.out.print( "    " + constantPool.get(i).toString());
-
             if ( constantPool.get(i) instanceof ConstantCharacterValue ) {
                 ConstantCharacterValue str = (ConstantCharacterValue)constantPool.get(i);
-                System.out.print( " : " + str.getValue());
+                String output = String.format("  %-40s : %s",  constantPool.get(i).toString(), str);
+                System.out.println(output);
             }
-
-            System.out.println();
+            else if ( constantPool.get(i) instanceof ConstantFixedValue ) {
+                ConstantFixedValue v  = (ConstantFixedValue)constantPool.get(i);
+                String output = String.format("  %-40s : %d(%d)",  constantPool.get(i).toString(), v.getValue(),v.getPrecision());
+                System.out.println(output);
+            }
+            else if ( constantPool.get(i) instanceof ConstantBitValue) {
+                ConstantBitValue v  = (ConstantBitValue)constantPool.get(i);
+                String output = String.format("  %-40s : %s(%d)",  constantPool.get(i).toString(), v.getValue(), v.getLength());
+                System.out.println(output);
+            }
+            else if ( constantPool.get(i) instanceof ConstantDurationValue) {
+                ConstantDurationValue v  = (ConstantDurationValue)constantPool.get(i);
+                String output = String.format("  %-40s : %s",  constantPool.get(i).toString(), v.getValue());
+                System.out.println(output);
+            }
+            else if ( constantPool.get(i) instanceof ConstantClockValue) {
+                ConstantClockValue v  = (ConstantClockValue)constantPool.get(i);
+                String output = String.format("  %-40s : %s",  constantPool.get(i).toString(), v.getValue());
+                System.out.println(output);
+            }
+            else if ( constantPool.get(i) instanceof ConstantFloatValue) {
+                ConstantFloatValue v  = (ConstantFloatValue)constantPool.get(i);
+                String output = String.format("  %-40s : %s(%d)",  constantPool.get(i).toString(), v.getValue(), v.getPrecision());
+                System.out.println(output);
+            }
         }
 
         return null;
@@ -199,6 +182,75 @@ public class ConstantPool {
 
                 if ( s.equals(value)) {
                     return (ConstantCharacterValue)(constantPool.get(i));
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static public ConstantBitValue lookupBitValue(long value, int noOfBits) {
+        int i;
+
+        for (i = 0; i < constantPool.size(); i++) {
+            if (constantPool.get(i) instanceof ConstantBitValue) {
+                ConstantBitValue bitConst = ((ConstantBitValue) (constantPool.get(i)));
+                long v1 = bitConst.getLongValue();
+
+                if (v1 == value && bitConst.getLength() == noOfBits) {
+                    return bitConst;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static public ConstantDurationValue lookupDurationValue(int hours, int minutes, double seconds) {
+        int i;
+        ConstantDurationValue other = new ConstantDurationValue(hours,minutes,seconds);
+
+        for (i = 0; i < constantPool.size(); i++) {
+            if (constantPool.get(i) instanceof ConstantDurationValue) {
+                ConstantDurationValue constant = ((ConstantDurationValue) (constantPool.get(i)));
+
+                if (constant.equals(other)) {
+                    return constant;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static public ConstantClockValue lookupClockValue(int hours, int minutes, double seconds) {
+        int i;
+        ConstantClockValue other = new ConstantClockValue(hours,minutes,seconds);
+
+        for (i = 0; i < constantPool.size(); i++) {
+            if (constantPool.get(i) instanceof ConstantClockValue) {
+                ConstantClockValue constant = ((ConstantClockValue) (constantPool.get(i)));
+
+                if (constant.equals(other)) {
+                    return constant;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static public ConstantFloatValue lookupFloatValue(double value, int precision) {
+        int i;
+        ConstantFloatValue other = new ConstantFloatValue(value,precision);
+
+        for (i = 0; i < constantPool.size(); i++) {
+            if (constantPool.get(i) instanceof ConstantFloatValue) {
+                ConstantFloatValue constant = ((ConstantFloatValue) (constantPool.get(i)));
+
+                if ( constant.getValue() == other.getValue() &&
+                     constant.getPrecision() == other.getPrecision()) {
+                    return constant;
                 }
             }
         }

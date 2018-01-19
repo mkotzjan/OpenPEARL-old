@@ -69,8 +69,8 @@ public class VariableEntry extends SymbolTableEntry {
                     constant = ctx.bitStringConstant().getText();
                 } else if (ctx.durationConstant() != null) {
                     constant = ctx.durationConstant().getText();
-                } else if (ctx.FloatingPointConstant() != null) {
-                    constant = ctx.FloatingPointConstant().getText();
+                } else if (ctx.floatingPointConstant() != null) {
+                    constant = ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().getText();
                 } else if (ctx.IntegerConstant() != null) {
                     constant = ctx.IntegerConstant().getText();
                 } else if (ctx.StringLiteral() != null) {

@@ -34,8 +34,7 @@ public class ConstantFloatValue extends ConstantValue {
     private Integer  m_precision;
 
     ConstantFloatValue(Float value) {
-        m_value = value.doubleValue();
-        m_precision = 24;
+        throw new InternalCompilerErrorException("", -1, -1);
     }
 
     ConstantFloatValue(Float value, Integer precision) {
@@ -45,7 +44,7 @@ public class ConstantFloatValue extends ConstantValue {
 
     ConstantFloatValue(Double value) {
         m_value = value;
-        m_precision = 53;
+        m_precision = Defaults.FLOAT_PRECISION;
     }
 
     ConstantFloatValue(Double value, Integer precision) {
@@ -53,7 +52,7 @@ public class ConstantFloatValue extends ConstantValue {
         m_precision = precision;
     }
 
-    public Double getValue() {
+    public double getValue() {
         return m_value;
     }
 
@@ -61,23 +60,45 @@ public class ConstantFloatValue extends ConstantValue {
         return "Float";
     }
 
-    public Integer getPrecision() {
+    public int getPrecision() {
         return m_precision;
     }
 
     public String toString() {
-        String name = "CONSTANT_" + getBaseType().toUpperCase();
+        String name = "CONST_" + getBaseType().toUpperCase();
         Double value = Math.abs(m_value);
 
         if ( m_value < 0.0 ) {
-            name += "_NEG";
+            name += "_N";
         }
         else {
-            name += "_POS";
+            name += "_P";
         }
 
         name += "_" + value.toString().replace('.','_') + "_" + m_precision.toString();
 
         return name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        // self check
+        if (this == o)
+            return true;
+        // null check
+        if (o == null)
+            return false;
+
+        // type check and cast
+        if (getClass() != o.getClass())
+            return false;
+
+        ConstantFloatValue other = (ConstantFloatValue) o;
+
+        // field comparison
+        return this.m_value == other.m_value &&
+                this.m_precision == other.m_precision;
+
+    }
+
 }

@@ -33,6 +33,8 @@ import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.smallpearl.compiler.SymbolTable.ModuleEntry;
+import org.smallpearl.compiler.SymbolTable.SymbolTable;
 import org.stringtemplate.v4.ST;
 import sun.reflect.*;
 
@@ -41,29 +43,38 @@ import java.util.List;
 
 
 public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
-
     private int m_verbose;
     private boolean m_debug;
+    private String m_sourceFileName;
+    private SymbolTableVisitor m_symbolTableVisitor;
+    private SymbolTable m_symboltable;
+    private SymbolTable m_currentSymbolTable;
+    private ModuleEntry m_module;
     private int m_counter = 0;
     private ConstantPool m_constantPool = null;
-
     private ParseTreeProperty<TypeDefinition> m_properties = null;
 
-    public ConstantPoolVisitor(int verbose, boolean debug, ConstantPool constantPool) {
+    public ConstantPoolVisitor( String sourceFileName,
+                                int verbose,
+                                boolean debug,
+                                SymbolTableVisitor symbolTableVisitor,
+                                ConstantPool constantPool) {
 
-        m_verbose = verbose;
+
         m_debug = debug;
+        m_verbose = verbose;
+        m_sourceFileName = sourceFileName;
+        m_symbolTableVisitor = symbolTableVisitor;
+        m_symboltable = symbolTableVisitor.symbolTable;
+        m_currentSymbolTable = m_symboltable;
 
-        if (m_verbose > 0) {
-            System.out.println("Semantic Check: Create ConstantPool");
-        }
-
-        if (m_debug) {
-            System.out.println("Semantic Check: Enabled debugging information");
-        }
 
         m_constantPool = constantPool;
         m_properties = new ParseTreeProperty<TypeDefinition>();
+
+        if (m_verbose > 0) {
+            System.out.println( "Start ConstantPoolVisitor");
+        }
 
         // Add commonly used constants:
         m_constantPool.add(new ConstantFixedValue(0,Defaults.FIXED_PRECISION));
@@ -120,6 +131,17 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
                     }
                 }
             }
+            else if ( value instanceof ConstantDurationValue) {
+                if (m_constantPool.constantPool.get(i) instanceof ConstantDurationValue) {
+                    ConstantDurationValue other = (ConstantDurationValue)value;
+                    ConstantDurationValue constant = ((ConstantDurationValue)(m_constantPool.constantPool.get(i)));
+
+                    if ( constant.equals(other)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
         }
 
         if (!found) {
@@ -140,20 +162,65 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
             System.out.println("ConstantPoolVisitor: visitLiteral");
 
         if (ctx.durationConstant() != null) {
-            // TODO
+            int hours = 0;
+            int minutes = 0;
+            double seconds = 0.0;
+
+            if ( ctx.durationConstant().hours() != null ) {
+                hours = getHours(ctx.durationConstant().hours());
+            }
+
+            if ( ctx.durationConstant().minutes() != null ) {
+                minutes = getMinutes(ctx.durationConstant().minutes());
+            }
+
+            if ( ctx.durationConstant().seconds() !=  null) {
+            seconds = getSeconds(ctx.durationConstant().seconds());
+            }
+
+            m_constantPool.add(new ConstantDurationValue(hours, minutes, seconds));
+        } else if (ctx.timeConstant() != null) {
+            int hours = 0;
+            int minutes = 0;
+            double seconds = 0.0;
+
+            hours = Integer.valueOf(ctx.timeConstant().IntegerConstant(0).toString());
+            minutes = Integer.valueOf(ctx.timeConstant().IntegerConstant(1).toString());
+
+            if (ctx.timeConstant().IntegerConstant(3) != null) {
+                seconds = Double.valueOf(ctx.timeConstant().IntegerConstant(3).toString());
+            } else if (ctx.timeConstant().floatingPointConstant() != null) {
+                seconds = Double.valueOf(ctx.timeConstant().floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+            }
+
+            m_constantPool.add(new ConstantClockValue(hours, minutes, seconds));
         } else if (ctx.BitStringLiteral() != null) {
-            // TODO
-        } else if (ctx.timeConstant()!= null) {
-            // TODO
-        } else if (ctx.FloatingPointConstant() != null) {
-            // TODO
+            long value = CommonUtils.convertBitStringToLong(ctx.BitStringLiteral().getText());
+            int  nb = CommonUtils.getBitStringLength(ctx.BitStringLiteral().getText());
+            m_constantPool.add(new ConstantBitValue(value,nb));
+        } else if (ctx.floatingPointConstant() != null) {
+            try {
+                double value = 0.0;
+                int precision = m_currentSymbolTable.lookupDefaultFloatLength();
+
+
+                //String s = ctx.floatingPointConstant().FloatingPointNumberPrecision().toString();
+
+                value = Double.valueOf(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+
+                m_constantPool.add(new ConstantFloatValue(value,precision));
+
+            } catch (NumberFormatException ex) {
+                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
         } else if (ctx.StringLiteral() != null) {
             String s = ctx.StringLiteral().toString();
             add(new ConstantCharacterValue(s));
-        }else if (ctx.IntegerConstant() != null) {
+        } else if (ctx.IntegerConstant() != null) {
             try {
                 Integer value = null;
-                Integer precision = Defaults.FIXED_PRECISION;
+                Integer precision = m_currentSymbolTable.lookupDefaultFixedLength();
 
                 if ( ctx.IntegerConstant().size() == 1 ) {
                     value = Integer.parseInt(ctx.IntegerConstant(0).toString());
@@ -205,9 +272,9 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
                         }
                     } else if (literal_ctx.StringLiteral() != null) {
                         System.out.println("string:(" + literal_ctx.StringLiteral().toString() + ")");
-                    } else if (literal_ctx.FloatingPointConstant() != null) {
+                    } else if (literal_ctx.floatingPointConstant() != null) {
                         try {
-                            Float value = -1 * Float.parseFloat(literal_ctx.FloatingPointConstant().toString());
+                            Float value = -1 * Float.parseFloat(literal_ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
                             Integer precision = 24;
                             add(new ConstantFloatValue(value));
                         } catch (NumberFormatException ex) {
@@ -223,4 +290,223 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
         }
         return null;
     }
+
+    @Override
+    public Void visitConstant(SmallPearlParser.ConstantContext ctx) {
+        if (m_debug)
+            System.out.println("ConstantPoolVisitor: visitConstant");
+
+        if ( ctx.IntegerConstant() != null ) {
+            try {
+                Integer value = null;
+                Integer precision = Defaults.FIXED_PRECISION;
+
+                value = Integer.parseInt(ctx.IntegerConstant().toString());
+                m_constantPool.add(new ConstantFixedValue(value,precision));
+            } catch (NumberFormatException ex) {
+                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+        else if ( ctx.StringLiteral() != null ) {
+            m_constantPool.add(new ConstantCharacterValue(ctx.StringLiteral().toString()));
+        }
+        else if ( ctx.durationConstant() != null ) {
+            Integer hours = 0;
+            Integer minutes = 0;
+            Double seconds = 0.0;
+
+            if (ctx.durationConstant().hours() != null) {
+                hours = Integer.valueOf(ctx.durationConstant().hours().IntegerConstant().toString());
+            }
+            if (ctx.durationConstant().minutes() != null) {
+                minutes = Integer.valueOf(ctx.durationConstant().minutes().IntegerConstant().toString());
+            }
+            if (ctx.durationConstant().seconds() != null) {
+                if (ctx.durationConstant().seconds().IntegerConstant() != null) {
+                    seconds = Double.valueOf(ctx.durationConstant().seconds().IntegerConstant().toString());
+                } else if (ctx.durationConstant().seconds().floatingPointConstant() != null) {
+                    seconds = Double.valueOf(ctx.durationConstant().seconds().floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+                }
+            }
+
+            ConstantDurationValue durationConst = new ConstantDurationValue(hours, minutes, seconds);
+            m_constantPool.add(durationConst);
+        }
+        else if ( ctx.timeConstant() != null ) {
+            Integer hours = 0;
+            Integer minutes = 0;
+            Double seconds = 0.0;
+
+            hours = Integer.valueOf(ctx.timeConstant().IntegerConstant(0).toString());
+            minutes = Integer.valueOf(ctx.timeConstant().IntegerConstant(1).toString());
+
+            if (ctx.timeConstant().floatingPointConstant() != null) {
+                seconds = Double.valueOf(ctx.timeConstant().floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+            }
+            else if (ctx.timeConstant().IntegerConstant(2) != null) {
+                seconds = Double.valueOf(ctx.timeConstant().IntegerConstant(2).toString());
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            ConstantClockValue clockConst = new ConstantClockValue(hours, minutes, seconds);
+            m_constantPool.add(clockConst);
+        }
+
+        else if ( ctx.floatingPointConstant() != null ) {
+            try {
+                double  value = 0.0;
+                int  precision = Defaults.FLOAT_PRECISION;
+
+                // walk up the AST and get VariableDenotationContext:
+                ParserRuleContext  sctx =  ctx.getParent();
+                while ( sctx != null && !(sctx instanceof SmallPearlParser.VariableDenotationContext)) {
+                    sctx = sctx.getParent();
+                }
+
+                if (sctx != null) {
+                    SmallPearlParser.TypeAttributeContext typeAttributeContext = ((SmallPearlParser.VariableDenotationContext)sctx).typeAttribute();
+                    if ( typeAttributeContext.simpleType() != null ) {
+                        SmallPearlParser.SimpleTypeContext simpleTypeContext = typeAttributeContext.simpleType();
+
+                        if( simpleTypeContext.typeFloatingPointNumber() != null ) {
+                            SmallPearlParser.TypeFloatingPointNumberContext typeFloatingPointNumberContext = simpleTypeContext.typeFloatingPointNumber();
+
+                            if ( typeFloatingPointNumberContext.IntegerConstant() != null) {
+                                precision = Integer.valueOf(typeFloatingPointNumberContext.IntegerConstant().toString());
+                            }
+                        }
+                    }
+
+                }
+                else {
+                    throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+
+                value = Double.parseDouble(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+                m_constantPool.add(new ConstantFloatValue(value,precision));
+            } catch (NumberFormatException ex) {
+                throw new NumberOutOfRangeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+        else if ( ctx.bitStringConstant() != null ) {
+            long value = CommonUtils.convertBitStringToLong(ctx.bitStringConstant().BitStringLiteral().getText());
+            int  nb = CommonUtils.getBitStringLength(ctx.bitStringConstant().BitStringLiteral().getText());
+            System.out.println("ConstantPoolVisitor: visitConstant:bitStringConstant " + ctx.bitStringConstant().BitStringLiteral().getText() + " " + value + " " + nb);
+
+            ConstantBitValue cbv = new ConstantBitValue(value,nb);
+            m_constantPool.add(cbv);
+        }
+
+        return null;
+    }
+
+    private Integer getHours(SmallPearlParser.HoursContext ctx) {
+        Integer hours = 0;
+
+        if (ctx.IntegerConstant() != null) {
+            hours = Integer.parseInt(ctx.IntegerConstant().getText());
+            if (hours < 0) {
+                throw new ValueOutOfBoundsException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        return hours;
+    }
+
+    private Integer getMinutes(SmallPearlParser.MinutesContext ctx) {
+        Integer minutes = 0;
+
+        if (ctx.IntegerConstant() != null) {
+            minutes = Integer.parseInt(ctx.IntegerConstant().getText());
+            if (minutes < 0 || minutes > 59) {
+                throw new ValueOutOfBoundsException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        return minutes;
+    }
+
+    private Double getSeconds(SmallPearlParser.SecondsContext ctx) {
+        Double seconds = 0.0;
+
+        if (ctx.IntegerConstant() != null) {
+            seconds = (double) Integer.parseInt(ctx.IntegerConstant().getText());
+            if (seconds < 0) {
+                throw new ValueOutOfBoundsException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        } else if (ctx.floatingPointConstant() != null) {
+            Integer sign = 1;
+
+            seconds = Double.parseDouble(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().getText());
+
+            if (seconds < 0) {
+                throw new ValueOutOfBoundsException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        return seconds;
+    }
+    @Override
+    public Void visitModule(SmallPearlParser.ModuleContext ctx) {
+        if (m_debug) {
+            System.out.println( "ConstantPoolVisitor: visitModule");
+        }
+
+        org.smallpearl.compiler.SymbolTable.SymbolTableEntry symbolTableEntry = m_currentSymbolTable.lookupLocal(ctx.ID().getText());
+        m_currentSymbolTable = ((ModuleEntry)symbolTableEntry).scope;
+        visitChildren(ctx);
+        m_currentSymbolTable = m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitProcedureDeclaration(SmallPearlParser.ProcedureDeclarationContext ctx) {
+        if (m_debug) {
+            System.out.println( "ConstantPoolVisitor: visitProcedureDeclaration");
+        }
+
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
+        visitChildren(ctx);
+        this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitTaskDeclaration(SmallPearlParser.TaskDeclarationContext ctx) {
+        if (m_debug) {
+            System.out.println( "ConstantPoolVisitor: visitTaskDeclaration");
+        }
+
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
+        visitChildren(ctx);
+        m_currentSymbolTable = m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitBlock_statement(SmallPearlParser.Block_statementContext ctx) {
+        if (m_debug) {
+            System.out.println( "ConstantPoolVisitor: visitBlock_statement");
+        }
+
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
+        visitChildren(ctx);
+        this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitLoopStatement(SmallPearlParser.LoopStatementContext ctx) {
+        if (m_debug) {
+            System.out.println( "ConstantPoolVisitor: visitLoopStatement");
+        }
+
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
+        visitChildren(ctx);
+        this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+        return null;
+    }
+
 }

@@ -2042,7 +2042,7 @@ primaryExpression
 ////////////////////////////////////////////////////////////////////////////////
 
 constantExpression
-    : FloatingPointConstant
+    : floatingPointConstant
     | Sign? durationConstant
     | constantFixedExpression
     ;
@@ -2258,7 +2258,7 @@ charSlice
 
 literal
     : IntegerConstant ( '(' IntegerConstant ')' )?
-    | FloatingPointConstant
+    | floatingPointConstant
     | StringLiteral
     | BitStringLiteral
     | timeConstant
@@ -2435,7 +2435,7 @@ Sign
 ////////////////////////////////////////////////////////////////////////////////
 
 constant :
-      ('+'|'-')? ( IntegerConstant | FloatingPointConstant )
+      ('+'|'-')? ( IntegerConstant | floatingPointConstant )
     | timeConstant
     | durationConstant
     | bitStringConstant
@@ -2485,7 +2485,7 @@ B4Digit
 ////////////////////////////////////////////////////////////////////////////////
 
 timeConstant
-    : IntegerConstant ':' IntegerConstant ':' ( IntegerConstant | FloatingPointConstant )
+    : IntegerConstant ':' IntegerConstant ':' ( IntegerConstant | floatingPointConstant )
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2512,15 +2512,15 @@ minutes
 ////////////////////////////////////////////////////////////////////////////////
 
 seconds
-    : ( IntegerConstant | FloatingPointConstant ) 'SEC'
+    : ( IntegerConstant | floatingPointConstant ) 'SEC'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // FloatingPointNumber ::= FloatingPointNumberWithoutPrecision [ ( Precision ) ]
 ////////////////////////////////////////////////////////////////////////////////
 
-FloatingPointConstant
-    : FloatingPointNumberWithoutPrecision ( '(' IntegerConstant ')' )?
+floatingPointConstant
+    : FloatingPointNumberWithoutPrecision ( '(' FloatingPointNumberPrecision ')' )?
     ;
 
 

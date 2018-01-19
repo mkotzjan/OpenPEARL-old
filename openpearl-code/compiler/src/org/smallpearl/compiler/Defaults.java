@@ -31,7 +31,7 @@ package org.smallpearl.compiler;
 
 public class Defaults  {
     public static final int FIXED_PRECISION  = 31;
-    public static final int FLOAT_PRECISION  = 53;
+    public static final int FLOAT_PRECISION  = 24;
     public static final int BIT_LENGTH       =  1;
     public static final int CHARACTER_LENGTH =  1;
 

@@ -234,7 +234,7 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
                         value = new ConstantFixedValue(v);
 
                     }
-                    else if ( c.FloatingPointConstant() != null ) {
+                    else if ( c.floatingPointConstant() != null ) {
                         System.out.println("****FloatingPointConstant***");
                     }
                     else if ( c.durationConstant() != null ) {

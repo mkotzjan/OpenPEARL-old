@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.15";
+    static String version = "v0.8.9.16";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -131,7 +131,11 @@ public class Compiler {
                         symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
                     }
 
-                    ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(verbose, debug, constantPool);
+                    ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(lexer.getSourceName(),
+                                                                                      verbose,
+                                                                                      debug,
+                                                                                      symbolTableVisitor,
+                                                                                      constantPool);
                     constantPoolVisitor.visit(tree);
 
                     ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
