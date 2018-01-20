@@ -617,23 +617,33 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     @Override
     public Void visitTypeAttributeForArray(SmallPearlParser.TypeAttributeForArrayContext ctx) {
         if ( ctx.type_bit() != null ) {
-            ((TypeArray)m_type).setBaseType(new TypeBit());
+            TypeDefinition tempType = m_type;
+            visitType_bit(ctx.type_bit());
+            ((TypeArray)tempType).setBaseType(m_type);
+            m_type = tempType;
         }
         else if ( ctx.type_char() != null ) {
-            ((TypeArray)m_type).setBaseType(new TypeChar());
+            TypeDefinition tempType = m_type;
+            visitType_char(ctx.type_char());
+            ((TypeArray)tempType).setBaseType(m_type);
+            m_type = tempType;
         }
         else if ( ctx.type_clock() != null ) {
-            ((TypeArray)m_type).setBaseType(new TypeClock());
-        }
+            ((TypeArray)m_type).setBaseType(new TypeClock());        }
         else if ( ctx.type_duration() != null ) {
             ((TypeArray)m_type).setBaseType(new TypeDuration());
         }
         else if ( ctx.type_fixed() != null ) {
+            TypeDefinition tempType = m_type;
             visitType_fixed(ctx.type_fixed());
-            ((TypeArray)m_type).setBaseType(new TypeFixed());
+            ((TypeArray)tempType).setBaseType(m_type);
+            m_type = tempType;
         }
         else if ( ctx.type_float() != null  ) {
-            ((TypeArray)m_type).setBaseType(new TypeFloat());
+            TypeDefinition tempType = m_type;
+            visitType_float(ctx.type_float());
+            ((TypeArray)tempType).setBaseType(m_type);
+            m_type = tempType;
         }
         else if ( ctx.typeReference() != null  ) {
             TypeDefinition tempType = m_type;
@@ -642,6 +652,18 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             m_type = tempType;
         }
 
+        return null;
+    }
+
+    @Override
+    public Void visitType_bit(SmallPearlParser.Type_bitContext ctx) {
+        Integer width = Defaults.BIT_LENGTH;
+
+        if (ctx.IntegerConstant() != null) {
+            width = Integer.parseInt(ctx.IntegerConstant().getText());
+        }
+
+        m_type = new TypeBit(width);
         return null;
     }
 
@@ -656,10 +678,34 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             }
         }
 
-        if ( m_type != null && m_type instanceof TypeArray) {
-            width =90;
+        m_type = new TypeFixed(width);
+        return null;
+    }
+
+    @Override
+    public Void visitType_char(SmallPearlParser.Type_charContext ctx) {
+        Integer width = Defaults.CHARACTER_LENGTH;
+
+        if (ctx.IntegerConstant() != null) {
+            width = Integer.parseInt(ctx.IntegerConstant().getText());
+            if (width < 1 || width > 255) {
+                throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
         }
 
+        m_type = new TypeChar(width);
+        return null;
+    }
+
+    @Override
+    public Void visitType_float(SmallPearlParser.Type_floatContext ctx) {
+        Integer precision = Defaults.FLOAT_PRECISION;
+
+        if (ctx.IntegerConstant() != null) {
+            precision = Integer.parseInt(ctx.IntegerConstant().getText());
+        }
+
+        m_type = new TypeFloat(precision);
         return null;
     }
 

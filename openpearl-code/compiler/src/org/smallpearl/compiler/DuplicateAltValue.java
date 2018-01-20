@@ -29,67 +29,13 @@
 
 package org.smallpearl.compiler;
 
-public class ConstantFloatValue extends ConstantValue {
-    private Double   m_value;
-    private Integer  m_precision;
+public class DuplicateAltValue extends RuntimeException {
 
-    ConstantFloatValue(Float value, Integer precision) {
-        m_value = value.doubleValue();
-        m_precision = precision;
+    public DuplicateAltValue(String sNumber, int line, int column) {
+        super("Error at line " + line + ":" + column + ": Duplicate value for alternative.");
     }
 
-    ConstantFloatValue(Double value, Integer precision) {
-        m_value = value;
-        m_precision = precision;
+    public DuplicateAltValue(String sNumber, int line, int column, String sReason) {
+        super("Error at line " + line + ":" + column + ": Duplicate value for alternative: " + sReason);
     }
-
-    public double getValue() {
-        return m_value;
-    }
-
-    public String getBaseType() {
-        return "Float";
-    }
-
-    public int getPrecision() {
-        return m_precision;
-    }
-
-    public String toString() {
-        String name = "CONST_" + getBaseType().toUpperCase();
-        Double value = Math.abs(m_value);
-
-        if ( m_value < 0.0 ) {
-            name += "_N";
-        }
-        else {
-            name += "_P";
-        }
-
-        name += "_" + value.toString().replace('.','_') + "_" + m_precision.toString();
-
-        return name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        // self check
-        if (this == o)
-            return true;
-        // null check
-        if (o == null)
-            return false;
-
-        // type check and cast
-        if (getClass() != o.getClass())
-            return false;
-
-        ConstantFloatValue other = (ConstantFloatValue) o;
-
-        // field comparison
-        return this.m_value == other.m_value &&
-                this.m_precision == other.m_precision;
-
-    }
-
 }

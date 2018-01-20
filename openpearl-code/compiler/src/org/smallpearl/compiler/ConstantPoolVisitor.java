@@ -82,7 +82,7 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
         m_constantPool.add(new ConstantFixedValue(-1,Defaults.FIXED_PRECISION));
     }
 
-    private Void add(ConstantValue value) {
+    public Void add(ConstantValue value) {
         int i;
         int constantBitNo = 0;
 
@@ -154,6 +154,7 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
         }
 
         return null;
+
     }
 
     @Override
@@ -253,10 +254,19 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
                 if (primary_ctx.getChild(0) instanceof SmallPearlParser.LiteralContext) {
                     SmallPearlParser.LiteralContext literal_ctx = (SmallPearlParser.LiteralContext) (primary_ctx.getChild(0));
 
-                    if (literal_ctx.IntegerConstant() != null) {
+                    if (literal_ctx.floatingPointConstant() != null) {
+                        try {
+                            double value = -1 * Double.parseDouble(literal_ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+                            int precision = m_currentSymbolTable.lookupDefaultFloatLength();
+                            add(new ConstantFloatValue(value,precision));
+                        } catch (NumberFormatException ex) {
+                            throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
+                        }
+                    }
+                    else if (literal_ctx.IntegerConstant() != null) {
                         try {
                             Integer value = null;
-                            Integer precision = Defaults.FIXED_PRECISION;
+                            int precision = m_currentSymbolTable.lookupDefaultFixedLength();
 
                             if ( literal_ctx.IntegerConstant().size() == 1 ) {
                                 value = -1 * Integer.parseInt(literal_ctx.IntegerConstant(0).toString());
@@ -274,9 +284,9 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
                         System.out.println("string:(" + literal_ctx.StringLiteral().toString() + ")");
                     } else if (literal_ctx.floatingPointConstant() != null) {
                         try {
-                            Float value = -1 * Float.parseFloat(literal_ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
-                            Integer precision = 24;
-                            add(new ConstantFloatValue(value));
+                            double value = -1 * Double.parseDouble(literal_ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+                            int precision = m_currentSymbolTable.lookupDefaultFloatLength();
+                            add(new ConstantFloatValue(value,precision));
                         } catch (NumberFormatException ex) {
                             throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
                         }

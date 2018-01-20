@@ -367,6 +367,10 @@ assignment_statement(lhs,rhs) ::= <<
     <lhs> = <rhs>;
 >>
 
+assignmentStatementCharSlice(id,lhs) ::= <<
+    pearlrt::CharSlice(<id>)<lhs>;
+>>
+
 if_statement(rhs, then_block, else_block) ::= <<
 if (<rhs>) {
     <then_block>
@@ -1781,6 +1785,15 @@ ConvertFromStatement(convert) ::= <%
 StringSlice(lwb,upb,id,size) ::= <%
 *(CharSlice(<user_variable(id)>).getSlice(<lwb>,<upb>).mkCharPtr((pearlrt::Character\<<size>>*)0))
 %>
+
+CharSlice(lwb,upb) ::= <<
+    .getSlice(<lwb>,<upb>)<\n>
+>>
+
+
+SetCharSlice(expr) ::= <<
+    .setSlice(<expr>)<\n>
+>>
 
 /* --------------------------- BIT SLICE -------------------------------------------*/
 

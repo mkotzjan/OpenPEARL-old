@@ -29,6 +29,7 @@
 
 package org.smallpearl.compiler;
 
+import com.sun.org.apache.bcel.internal.classfile.ConstantFloat;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -805,9 +806,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if (ctx.IntegerConstant() != null) {
             hours = Integer.parseInt(ctx.IntegerConstant().getText());
-            if (hours < 0) {
-                throw new ValueOutOfBoundsException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
         }
 
         return hours;
@@ -818,9 +816,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
         if (ctx.IntegerConstant() != null) {
             minutes = Integer.parseInt(ctx.IntegerConstant().getText());
-            if (minutes < 0 || minutes > 59) {
-                throw new ValueOutOfBoundsException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-            }
         }
 
         return minutes;
@@ -1817,17 +1812,18 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     @Override
     public ST visitAssignment_statement(SmallPearlParser.Assignment_statementContext ctx) {
-        ST stmt = group.getInstanceOf("assignment_statement");
-
+        ST stmt = null;
         String id = null;
 
-        if ( ctx.stringSelection() != null ) {
+        if ( ctx.ID() != null ) {
+            id = ctx.ID().getText();
+        } else if ( ctx.stringSelection() != null ) {
             if ( ctx.stringSelection().charSelection() != null ) {
                 id = ctx.stringSelection().charSelection().ID().getText();
             }
-        }
-        else {
-            id = ctx.ID().getText();
+            else if ( ctx.stringSelection().bitSelection() != null ) {
+                id = ctx.stringSelection().bitSelection().ID().getText();
+            }
         }
 
         SymbolTableEntry entry = m_currentSymbolTable.lookup(id);
@@ -1838,7 +1834,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         TypeDefinition rhs_type = m_expressionTypeVisitor.lookupType(ctx.expression());
-
 
 //        if ( variable.getType() instanceof TypeReference ) {
 //            TypeReference lhs_type = (TypeReference) variable.getType();
@@ -1875,29 +1870,33 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             TypeDefinition lhs_type = variable.getType();
 
             if ( lhs_type instanceof TypeReference) {
+                ST st = group.getInstanceOf("assignment_statement");
+
                 if ( ctx.dereference() != null ) {
                     ST dereference = group.getInstanceOf("CONT");
                     dereference.add("operand", getUserVariable(ctx.ID().getText()));
-                    stmt.add("lhs", dereference);
-
-                    stmt.add("rhs", getExpression(ctx.expression()));
+                    st.add("lhs", dereference);
+                    st.add("rhs", getExpression(ctx.expression()));
+                    stmt = st;
                 }
                 else {
-                    stmt.add("lhs", getUserVariable(ctx.ID().getText()));
+                    st.add("lhs", getUserVariable(ctx.ID().getText()));
 
                     if ( rhs_type instanceof TypeReference) {
-                        stmt.add("rhs", getExpression(ctx.expression()));
+                        st.add("rhs", getExpression(ctx.expression()));
                     }
                     else if ( rhs_type instanceof TypeTask) {
-                        ST st = group.getInstanceOf("TASK");
-                        stmt.add("rhs", st);
+                        ST stTask = group.getInstanceOf("TASK");
+                        st.add("rhs", stTask);
                     } else {
-                        stmt.add("rhs", getReferenceExpression(ctx.expression()));
+                        st.add("rhs", getReferenceExpression(ctx.expression()));
                     }
+                    stmt=st;
                 }
             }
             else {
                 if ( lhs_type instanceof TypeArray) {
+                    ST st = group.getInstanceOf("assignment_statement");
                     ST array = group.getInstanceOf("ArrayLHS");
 
                     ArrayDescriptor array_descriptor = new ArrayDescriptor(((TypeArray)lhs_type).getNoOfDimensions(),((TypeArray)lhs_type).getDimensions());
@@ -1909,12 +1908,45 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
                     indices.add("indices",visitIndices(ctx.indices()));
                     array.add("indices", indices);
-                    stmt.add("lhs", array);
+                    st.add("lhs", array);
+                    st.add("rhs", getExpression(ctx.expression()));
+                    stmt = st;
                 } else {
-                    stmt.add("lhs", getUserVariable(id));
-                }
+                    if ( ctx.stringSelection() != null ) {
+                        if (ctx.stringSelection().charSelection() != null) {
+                            ST st = group.getInstanceOf("assignmentStatementCharSlice");
 
-                stmt.add("rhs", getExpression(ctx.expression()));
+                            st.add("id", getUserVariable(id));
+
+                            SmallPearlParser.CharSelectionContext c = (SmallPearlParser.CharSelectionContext) ctx.stringSelection().charSelection();
+                            for (int i = 0; i < c.charSelectionSlice().size(); i++) {
+                                ST slice= group.getInstanceOf("CharSlice");
+
+                                slice.add("lwb", getExpression(c.charSelectionSlice(i).expression(0)));
+
+                                if ( c.charSelectionSlice(i).expression().size() == 2 ) {
+                                    slice.add("upb", getExpression(c.charSelectionSlice(i).expression(1)));
+                                } else {
+                                    slice.add("upb", getExpression(c.charSelectionSlice(i).expression(0)));
+                                }
+
+                                st.add("lhs", slice);
+
+                            }
+
+                            ST setCharSlice = group.getInstanceOf("SetCharSlice");
+
+                            setCharSlice.add("expr", getExpression(ctx.expression()));
+                            st.add("lhs",setCharSlice);
+                            stmt = st;
+                        }
+                    } else {
+                        ST st = group.getInstanceOf("assignment_statement");
+                        st.add("lhs", getUserVariable(id));
+                        st.add("rhs", getExpression(ctx.expression()));
+                        stmt = st;
+                    }
+                }
             }
         }
         else {
@@ -2194,10 +2226,20 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 if (primary_ctx.getChild(0) instanceof SmallPearlParser.LiteralContext) {
                     SmallPearlParser.LiteralContext literal_ctx = (SmallPearlParser.LiteralContext) (primary_ctx.getChild(0));
 
-                    if (literal_ctx.IntegerConstant() != null) {
+                    if (literal_ctx.floatingPointConstant() != null) {
                         try {
-                            Integer value = null;
-                            Integer precision = Defaults.FIXED_PRECISION;
+                            double value = -1 * Double.parseDouble(literal_ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+                            int precision = m_currentSymbolTable.lookupDefaultFloatLength();
+                            ConstantFloatValue float_value = new ConstantFloatValue(value,precision);
+                            expr.add("code", float_value);
+                        } catch (NumberFormatException ex) {
+                            throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
+                        }
+                    }
+                    else if (literal_ctx.IntegerConstant() != null) {
+                        try {
+                            int value = 0;
+                            int precision = m_currentSymbolTable.lookupDefaultFixedLength();
 
                             if ( literal_ctx.IntegerConstant().size() == 1 ) {
                                 value = -1 * Integer.parseInt(literal_ctx.IntegerConstant(0).toString());
@@ -4928,6 +4970,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 else {
                     throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
+
                 declaration.add("assignmentProtection", variableEntry.getAssigmentProtection());
                 declaration.add("totalNoOfElements", ((TypeArray)variableEntry.getType()).getTotalNoOfElements());
 
