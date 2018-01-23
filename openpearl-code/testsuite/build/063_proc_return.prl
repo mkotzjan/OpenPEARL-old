@@ -16,4 +16,8 @@ p1: PROC;
    RETURN; 
 END;
 
+! make automatic test happy
+main: TASK MAIN;
+END;
+
 MODEND;
