@@ -1176,7 +1176,7 @@ TaskCoordinationStatement(statement) ::= <<
 >>
 
 SemaTry(names,noofsemas) ::= <%
-    pearlrt::Semaphore::dotry( me, <noofsemas>, <names: {name|<name>_}>semas);
+    pearlrt::Semaphore::dotry( me, <noofsemas>, <names: {name|<name>_}>semas)
 %>
 
 SemaRequest(names,noofsemas) ::= <<
