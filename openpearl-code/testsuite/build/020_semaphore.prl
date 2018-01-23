@@ -36,6 +36,11 @@ task1: TASK MAIN;
 
 !   free := TRY s2,s3;
    free := TRY s1;
+   IF TRY s1 THEN
+      free := '1'B1;
+   ELSE
+      free := '0'B1;
+   FIN;
    free := TRY s2;
    free := TRY s1,s2;
    free := TRY s1,s2,s3;
