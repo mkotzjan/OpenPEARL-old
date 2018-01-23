@@ -168,10 +168,12 @@ namespace pearlrt {
       TaskCommon::mutexUnlock();
    }
 
-   int Semaphore::dotry(TaskCommon* me,  int nbrOfSemas, Semaphore** semas) {
+   BitString<1> Semaphore::dotry(TaskCommon* me,  int nbrOfSemas, Semaphore** semas) {
       int i;
       int wouldBlock = 0;
       BlockData bd;
+      BitString<1> result(1);  // true
+
       bd.reason = REQUEST;
       bd.u.sema.nsemas = nbrOfSemas;
       bd.u.sema.semas = semas;
@@ -189,7 +191,11 @@ namespace pearlrt {
       }
 
       TaskCommon::mutexUnlock();
-      return !wouldBlock;
+      if (wouldBlock) {
+          result.x = 0;   // false
+      }
+      //return !wouldBlock;
+      return result;
    }
 
    void Semaphore::removeFromWaitQueue(TaskCommon * t) {

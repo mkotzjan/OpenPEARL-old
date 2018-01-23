@@ -42,6 +42,7 @@ namespace pearlrt {
 
 #include <stdint.h>
 #include "Mutex.h"
+#include "BitString.h"
 #include "Task.h"   // intermediate BlockData
 #include "TaskCommon.h"
 #include "PriorityQueue.h"
@@ -144,7 +145,7 @@ namespace pearlrt {
       \returns 1, if they were free<br>
               0, else
       */
-      static int dotry(TaskCommon* me,  int nbrOfSemas, Semaphore** semas);
+      static BitString<1> dotry(TaskCommon* me,  int nbrOfSemas, Semaphore** semas);
 
       /**
       perform a release (increment) of all given semaphores.
