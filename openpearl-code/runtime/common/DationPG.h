@@ -79,6 +79,12 @@ namespace pearlrt {
      The i/o-operations are done via a source/sink object which decouples
      the i/o from the formatting statements.
 
+     The complete operation is treated by a list of data elements and a list
+     of format elements. See IODataList and IOFormatList about details.
+     For expression results intermediate variable must be defined locally and
+     used in the lists. The evaluation of the expressions must be done after 
+     creation of the lists and the invocation of the put- or get-method.
+
    PEARL Example PG Dation
 
    \code
@@ -128,17 +134,15 @@ namespace pearlrt {
        pearlrt::Character<5> tmp(5,(char*)"tmp1");
        table.dationOpen(Dation::IDF, &tmp);
 
-       try {
-          table.beginSequence();
-          table,toA(Character<3>("X="));  // << width may be derived from type
-          table.toF(x,3);
-          table.toSkip(1);
-          table.endSequence();
-       } catch (Signal& s) {
-          table.endSequence();
-          if (!table.updateRst(&s)) {
-             throw;
-          }
+       {
+          // define variables for expression results
+          // ..
+          // setup lists for data and formats
+          // @see IODataList and IOFormatList
+          //
+          // evaluate expressions in data and formatlist
+          //
+          table.put(me,datalist, formatList);
        }
 
        table.dationClose();
@@ -164,21 +168,6 @@ namespace pearlrt {
 
       SystemDationNBSink  sink;
       SystemDationNBSource   source;
-
-#define MAX_LOOP_LEVEL 11
-      struct FormatLoop {
-         int loopLevel;
-
-         struct {
-            size_t lastFormat;
-            size_t startFormat;
-            int loops;
-         } loopControl[MAX_LOOP_LEVEL];
-      };
-
-      size_t getNextFormatElement(IOFormatList * formatList,
-                                  size_t formatItem,
-                                  FormatLoop * loopStatus);
 
    public:
       /**

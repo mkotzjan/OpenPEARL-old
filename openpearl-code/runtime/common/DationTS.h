@@ -53,10 +53,13 @@ namespace pearlrt {
    \brief userdation interface for userdations
            with the class attribute BASIC.
 
-     Defines the methods for the communication of userdations
-     (with class attribute BASIC).
-     They read/write with the methods READ/WRITE (defined by PEARL)
-     in binary format.
+    The complete operation is treated by a list of data elements and a list
+     of format elements. See IODataList and IOFormatList about details.
+     For expression results intermediate variable must be defined locally and
+     used in the lists. The evaluation of the expressions must be done after
+     creation of the lists and the invocation of the send- or take-method.
+
+   Struct must not become rolled out.
 
 
    PEARL Example TS Dation
@@ -96,21 +99,33 @@ namespace pearlrt {
    // Userdation table is a DationTS (key datatype specified BASIC),
    //  parent system dation is _motor, direction is OUT (write only),
    DationTS _motor (_smotor,
-                   Dation::OUT, .... RST fehlt hier noch Fixed<15>));
+                   Dation::OUT);
 
    Task(start,255,09 {
        _motor.dationOpen();
 
-       try {
-          _motor.beginSequence();
-          _motor.dationWrite(&d, sizeof(d));
-          _motor.endSequence();
-          } catch (Signal& s) {
-              _motor.endSequence();
-              if (!_motor.updateRst(&s)) {
-                  throw;
-              }
-          }
+       {
+          // setup io lists
+          pearlrt::IODataList dataEntries[]= {
+            {.dataType={pearlrt::IODataEntry::BIT,4}},
+            {.dataPtr{.outPtr=&_x},
+          };
+          pearlrt::IOFormatList formatEntries[]= {
+            {.dataType={pearlrt::IOFormatEntry::RST,4}},
+            {.fp1{.inParam=&_error},
+            {.fp2{.intValue=31},
+          };
+          pearlrt::IODataList dataList= {
+               .nbrOfEntries=sizeof(dataEntries, dataEntries[0]),
+               .entry=dataEntries,
+          };
+          pearlrt::IOFormatList formatList= {
+               .nbrOfEntries=sizeof(formatEntries, formatEntries[0]),
+               .entry=formatEntries,
+          };
+ 
+          _motor.send(me, &dataList, & formatList);
+        }
        _motor.dationClose();
    }
    \endcode

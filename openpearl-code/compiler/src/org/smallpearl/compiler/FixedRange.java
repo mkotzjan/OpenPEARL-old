@@ -29,67 +29,50 @@
 
 package org.smallpearl.compiler;
 
-public class ConstantFloatValue extends ConstantValue {
-    private Double   m_value;
-    private Integer  m_precision;
 
-    ConstantFloatValue(Float value, Integer precision) {
-        m_value = value.doubleValue();
-        m_precision = precision;
+public class FixedRange {
+    private int m_lowerBoundary;
+    private int m_upperBoundary;
+
+    public FixedRange() {
+        this.m_lowerBoundary = 0;
+        this.m_upperBoundary = 0;
     }
 
-    ConstantFloatValue(Double value, Integer precision) {
-        m_value = value;
-        m_precision = precision;
-    }
-
-    public double getValue() {
-        return m_value;
-    }
-
-    public String getBaseType() {
-        return "Float";
-    }
-
-    public int getPrecision() {
-        return m_precision;
+    public FixedRange(int lowerBoundary, int upperBoundary) {
+        this.m_lowerBoundary = lowerBoundary;
+        this.m_upperBoundary = upperBoundary;
     }
 
     public String toString() {
-        String name = "CONST_" + getBaseType().toUpperCase();
-        Double value = Math.abs(m_value);
-
-        if ( m_value < 0.0 ) {
-            name += "_N";
-        }
-        else {
-            name += "_P";
-        }
-
-        name += "_" + value.toString().replace('.','_') + "_" + m_precision.toString();
-
-        return name;
+        return Integer.toString(this.m_lowerBoundary) + ":" + Integer.toString(this.m_upperBoundary);
     }
 
+    public int getNoOfElements() {
+        return m_upperBoundary - m_lowerBoundary + 1;
+    }
+
+    public int getLowerBoundary() { return this.m_lowerBoundary; }
+    public int getUpperBoundary() { return this.m_upperBoundary; }
+
     @Override
-    public boolean equals(Object o) {
-        // self check
-        if (this == o)
-            return true;
-        // null check
-        if (o == null)
+    public boolean equals(Object other) {
+        if (!(other instanceof FixedRange)) {
             return false;
+        }
 
-        // type check and cast
-        if (getClass() != o.getClass())
-            return false;
+        FixedRange that = (FixedRange) other;
 
-        ConstantFloatValue other = (ConstantFloatValue) o;
+        // Custom equality check here.
+        return this.m_lowerBoundary == that.m_lowerBoundary && this.m_upperBoundary == that.m_upperBoundary;
+    }
 
-        // field comparison
-        return this.m_value == other.m_value &&
-                this.m_precision == other.m_precision;
+    public boolean isContained(int value) {
+        return this.m_lowerBoundary <= value && value <= this.m_upperBoundary;
+    }
 
+    public boolean isContained(int lwb, int upb) {
+        return this.m_lowerBoundary <= lwb && lwb <= this.m_upperBoundary || this.m_lowerBoundary <= upb && upb <= this.m_upperBoundary;
     }
 
 }

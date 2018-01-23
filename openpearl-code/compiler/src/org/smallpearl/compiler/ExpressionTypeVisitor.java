@@ -1475,9 +1475,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         if (ctx.durationConstant() != null) {
             ExpressionResult expressionResult = new ExpressionResult(new TypeDuration(), true);
             m_properties.put(ctx, expressionResult);
-        } else if (ctx.FloatingPointConstant() != null) {
+        } else if (ctx.floatingPointConstant() != null) {
             try {
-                Float value = Float.parseFloat(ctx.FloatingPointConstant().toString());
+                double value = Double.parseDouble(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
                 Integer precision = 24;
                 ExpressionResult expressionResult = new ExpressionResult( new TypeFloat(precision),true);
                 m_properties.put(ctx, expressionResult);
@@ -1515,9 +1515,16 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         Integer minutes = 0;
         Double seconds = 0.0;
 
-        hours = (Integer.valueOf(ctx.getChild(0).toString()) % 24);
-        minutes = Integer.valueOf(ctx.getChild(2).toString());
-        seconds = Double.valueOf(ctx.getChild(4).toString());
+        hours = (Integer.valueOf(ctx.IntegerConstant(0).toString()) % 24);
+        minutes = Integer.valueOf(ctx.IntegerConstant(1).toString());
+
+        if (ctx.IntegerConstant().size() == 3) {
+            seconds = Double.valueOf(ctx.IntegerConstant(2).toString());
+        }
+
+        if ( ctx.floatingPointConstant() != null ) {
+            seconds = Double.valueOf(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+        }
 
         if (hours < 0 || minutes < 0 || minutes > 59) {
             throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());

@@ -57,7 +57,7 @@ public class ConstantCharacterValue  extends ConstantValue {
     }
 
     public String toString() {
-        String name = "CONSTANT_" + getBaseType().toUpperCase();
+        String name = "CONST_" + getBaseType().toUpperCase();
         name += "_" + m_uuid;
         return name;
     }

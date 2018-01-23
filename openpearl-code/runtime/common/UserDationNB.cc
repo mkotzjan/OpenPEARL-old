@@ -1062,8 +1062,8 @@ namespace pearlrt {
 
       switch (fmtEntry->format) {
       default:
-         printf("unsupported format %d\n", fmtEntry->format);
-         break;
+         Log::error("Unsupported format %d\n", fmtEntry->format);
+         throw theInternalDationSignal;
 
       case IOFormatEntry::X:
          toX(*fmtEntry->fp1.constF31Ptr);

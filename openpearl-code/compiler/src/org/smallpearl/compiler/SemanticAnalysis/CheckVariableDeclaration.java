@@ -271,11 +271,11 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
             {
                 visitTimeConstant(ctx.timeConstant());
             }
-            else if (ctx.FloatingPointConstant() != null) {
+            else if (ctx.floatingPointConstant() != null) {
                 Double value;
                 Integer sign = 1;
 
-                value = Double.parseDouble(ctx.FloatingPointConstant().getText());
+                value = Double.parseDouble(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().getText());
 
                 if (ctx.getChildCount() > 1)
                 {

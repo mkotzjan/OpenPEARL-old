@@ -52,9 +52,16 @@ namespace pearlrt {
      the i/o from the formatting statements.
 
      In case of violating the string boundaries with an i/o statement,
-     an exception is thrown, without performing the violation i/o statement.
+     an exception is thrown, without performing the violating i/o statement.
      If an RST-value is set, the try-catch-block will update the RST-value
      and exit the CONVERT.
+
+     The complete operation is treated by a list of data elements and a list
+     of format elements. See IODataList and IOFormatList about details.
+     For expression results intermediate variable must be defined locally and
+     used in the lists. The evaluation of the expressions must be done after
+     creation of the lists and the invocation of the put- or get-method.
+
 
    PEARL Example
 
@@ -77,13 +84,11 @@ namespace pearlrt {
                                     // true indicates output
         pearlrt::StringDationConvert strDation(rc, true);
             
-        try {
-           strDation.toA(Character<3>("X="));
-           strDation.toF(x,3);
-        } catch (Signal& s) {
-           if (!strDation.updateRst(&s)) {
-              throw;
-           }
+        {
+           // declare local variables 
+           // setup data and format lists
+           // evaluate local variables
+           strDation.put(me, dataList, formatList);
         }
     } // convert end
 
@@ -92,14 +97,10 @@ namespace pearlrt {
                                    // false indicates input
         pearlrt::StringDationConvert strDation(rc, false);
             
-        try {
-           strDation.fromX(3);
-           strDation.fromF(x,3);
-        } catch (Signal& s) {
-           if (!strDation.updateRst(&s)) {
-              throw;
-           }
-        }
+           // declare local variables 
+           // setup data and format lists
+           // evaluate local variables
+           strDation.get(me, dataList, formatList);
     } // convert end
    \endcode
 
@@ -145,6 +146,26 @@ namespace pearlrt {
       */
       void checkCapacity(Fixed<31> n);
 
+     /**
+        treat one output job entry, which must be a positioning element
+
+        \param me pointer to the calling task
+        \param jobFormat  pointer to the current entry
+        \returns 0, if done normally<br>
+                 1, if record wasd left
+        */
+      int toPositioningFormat(TaskCommon * me, IOFormatEntry * jobFormat);
+
+      /**
+        treat one input job entry, which must be a positioning element
+
+        \param me pointer to the calling task
+        \param jobFormat  pointer to the current entry
+        \returns 0, if done normally<br>
+                 1, if record wasd left
+        */
+      int fromPositioningFormat(TaskCommon * me, IOFormatEntry * jobFormat);
+      
      public:
       /**
       X-format for output
@@ -181,6 +202,25 @@ namespace pearlrt {
       */
       void sop(Fixed<31> &n);
 
+      /**
+      process an io job with put
+
+      \param me pointer to the calling task
+      \param dataEntries is a pointer to the data entries
+      \param formatEntries is a pointer to the format  entries
+      */
+      void put(TaskCommon *me, IODataList *dataEntries,
+               IOFormatList * formatEntries);
+
+      /**
+      process an io job with get
+
+      \param me pointer to the calling task
+      \param dataEntries is a pointer to the data entries
+      \param formatEntries is a pointer to the format  entries
+      */
+      void get(TaskCommon *me, IODataList *dataEntries,
+               IOFormatList * formatEntries);
    };
 
    /** @} */

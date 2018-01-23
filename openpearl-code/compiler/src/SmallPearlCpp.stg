@@ -125,7 +125,11 @@ static /*const*/ pearlrt::<type>\<<length>\>         <name>("<value>");
 >>
 
 ConstantPoolBitEntry(name,type,length,value) ::= <<
-static /*const*/ pearlrt::<type>\<<length>\>         <name>("<value>");
+static /*const*/ pearlrt::<type>\<<length>\>         <name>(<value>);
+>>
+
+ConstantPoolDurationEntry(name,type,value) ::= <<
+static /*const*/ pearlrt::<type>          <name>(<value>);
 >>
 
 /*********************** GLOBAL DECLARATIONS ***********************/
@@ -361,6 +365,10 @@ PUTStatement(expression,format,destination) ::= <<
 
 assignment_statement(lhs,rhs) ::= <<
     <lhs> = <rhs>;
+>>
+
+assignmentStatementCharSlice(id,lhs) ::= <<
+    pearlrt::CharSlice(<id>)<lhs>;
 >>
 
 if_statement(rhs, then_block, else_block) ::= <<
@@ -1530,9 +1538,9 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
     <endif>
 
     <if(to)>
-        while ((((s_value > CONSTANT_FIXED_POS_0_31).getBoolean()) &&
+        while ((((s_value > CONST_FIXED_P_0_31).getBoolean()) &&
                 ((a_value \<= e_value).getBoolean())) ||
-                (((s_value \< CONSTANT_FIXED_POS_0_31).getBoolean()) &&
+                (((s_value \< CONST_FIXED_P_0_31).getBoolean()) &&
                 ((a_value >= e_value).getBoolean())))
         {<\n>
             <if(variable)>
@@ -1548,9 +1556,9 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
 
             me->setLocation(<srcLine>, filename);
 
-            if (((s_value > CONSTANT_FIXED_POS_0_31).getBoolean() &&
+            if (((s_value > CONST_FIXED_P_0_31).getBoolean() &&
                  (a_value \<= (e_value - s_value)).getBoolean()) ||
-                ((s_value \< CONSTANT_FIXED_POS_0_31).getBoolean() &&
+                ((s_value \< CONST_FIXED_P_0_31).getBoolean() &&
                 (a_value >= (e_value - s_value)).getBoolean())) {
                 a_value = a_value + s_value;
             } else {
@@ -1777,6 +1785,15 @@ ConvertFromStatement(convert) ::= <%
 StringSlice(lwb,upb,id,size) ::= <%
 *(CharSlice(<user_variable(id)>).getSlice(<lwb>,<upb>).mkCharPtr((pearlrt::Character\<<size>>*)0))
 %>
+
+CharSlice(lwb,upb) ::= <<
+    .getSlice(<lwb>,<upb>)<\n>
+>>
+
+
+SetCharSlice(expr) ::= <<
+    .setSlice(<expr>)<\n>
+>>
 
 /* --------------------------- BIT SLICE -------------------------------------------*/
 

@@ -70,7 +70,7 @@ public class SemanticCheck {
         new CheckAssignment(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckProcedureCall(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckCondition(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
-        new CheckCase(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
+        new CheckSwitchCase(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckInterrupt(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
         new CheckDeclarationScope(m_sourceFileName, m_verbose, m_debug, m_symbolTableVisitor, m_expressionTypeVisitor).visit(m_parseTree);
 

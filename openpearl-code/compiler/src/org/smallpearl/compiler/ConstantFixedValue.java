@@ -66,14 +66,14 @@ public class ConstantFixedValue extends ConstantValue {
     }
 
     public String toString() {
-        String name = "CONSTANT_" + getBaseType().toUpperCase();
+        String name = "CONST_" + getBaseType().toUpperCase();
         Long value = Math.abs(m_value);
 
         if ( m_value < 0 ) {
-            name += "_NEG";
+            name += "_N";
         }
         else if ( m_value >= 0 ) {
-            name += "_POS";
+            name += "_P";
         }
 
         name += "_" + value.toString() + "_" + m_precision.toString();

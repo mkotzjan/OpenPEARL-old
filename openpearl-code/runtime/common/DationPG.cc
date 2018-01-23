@@ -153,125 +153,84 @@ namespace pearlrt {
       adv(n);
    }
 
-   size_t DationPG::getNextFormatElement(IOFormatList * formatList,
-                                         size_t formatItem,
-                                         FormatLoop * ls) {
-//printf("getNextFormat(formatList, %zu, loopLevel=%d\n",
-//       formatItem, ls->loopLevel);
-      // test if we are in an loop and last statment was reached
-      if (ls->loopLevel >= 0 &&
-            formatItem == ls->loopControl[ls->loopLevel].lastFormat) {
-
-//printf("end loop: level=%d start=%zu loops =%d last =%zu\n",
-// ls->loopLevel, ls->loopControl[ls->loopLevel].startFormat,
-// ls->loopControl[ls->loopLevel].loops ,
-// ls->loopControl[ls->loopLevel].lastFormat);
-         ls->loopControl[ls->loopLevel].loops--;
-
-         if (ls->loopControl[ls->loopLevel].loops > 0) {
-            // uncompleted inner loop - do at least one more
-            // iteration
-            formatItem = ls->loopControl[ls->loopLevel].startFormat;
-
-            if (formatList->entry[formatItem].format ==
-                  IOFormatEntry::LoopStart) {
-               formatItem = getNextFormatElement(formatList,
-                                                 formatItem - 1,
-                                                 ls);
-            }
-         } else {
-            // current loop level completed -- test next loop
-            // level
-            ls->loopLevel --;
-            formatItem = getNextFormatElement(formatList, formatItem, ls);
-         }
-
-         return formatItem;
-      }
-
-      // found open loop which is not terminated
-//            formatItem ++;
-//            if (formatItem >= formatList->nbrOfEntries) {
-//               formatItem = 0;
-//            }
-//         }
-//         return formatItem;
-//      }
-
-      // take next format from list (restarting on demand)
-      formatItem ++;
-
-      if (formatItem >= formatList->nbrOfEntries) {
-         formatItem = 0;
-      }
-
-      if (formatList->entry[formatItem].format == IOFormatEntry::LoopStart) {
-         ls->loopLevel ++;
-
-         if (ls->loopLevel == MAX_LOOP_LEVEL) {
-            Log::error("too many nested formats");
-            throw theDationFormatRepetitionOverflow;
-         }
-
-         ls->loopControl[ls->loopLevel].startFormat = formatItem + 1;
-         ls->loopControl[ls->loopLevel].lastFormat = formatItem +
-               formatList->entry[formatItem].fp1.intValue;
-         ls->loopControl[ls->loopLevel].loops =
-            formatList->entry[formatItem].fp2.intValue;
-
-//printf("enter loop: level=%d start=%zu loops =%d last =%zu formatItem=%zu\n",
-//                  ls->loopLevel,
-//                  ls->loopControl[ls->loopLevel].startFormat,
-//                  ls->loopControl[ls->loopLevel].loops ,
-//                  ls->loopControl[ls->loopLevel].lastFormat,
-//                  formatItem);
-         formatItem = getNextFormatElement(formatList, formatItem, ls);
-      }
-
-      return formatItem;
-      //}
-   }
-
 
    void DationPG::put(TaskCommon * me,
                       IODataList * dataList, IOFormatList * formatList) {
 
-      size_t formatItem = -1;
-      FormatLoop loopStatus;
+      int formatItem = -1;
+      int dataElement;
 
-      loopStatus.loopLevel = -1;
+      // create a loop control structure for the format list treatment
+      LoopControl formatLoop(formatList->nbrOfEntries, true);
+      LoopControl dataLoop(dataList->nbrOfEntries, false);
+
 
       try {
          beginSequence(me, Dation::OUT);
 
-         for (size_t dataElement = 0;
-               dataElement < dataList->nbrOfEntries;
-               dataElement++) {
+         // get first data element
+         dataElement = dataLoop.next();
 
+         while (dataElement < (int)dataList->nbrOfEntries) {
+            // test for begin of loop, repeatedly
+            while (dataList->entry[dataElement].dataType.baseType ==
+                   IODataEntry::LoopStart) {
+               dataElement = dataLoop.enter(
+                                dataList->entry[dataElement].dataType.dataWidth,
+                                *dataList->entry[dataElement].param1.numberOfElements,
+                                dataList->entry[dataElement].dataPtr.offsetIncrement);
+            }
+
+            // treat arrays of simple types
             for (size_t dataIndex = 0;
-                 dataIndex < * (dataList->entry[dataElement].numberOfElements);
-                 dataIndex++) {
-               formatItem = getNextFormatElement(formatList,
-                                                 formatItem,
-                                                 &loopStatus);
+                  dataIndex < * (dataList->entry[dataElement].param1.numberOfElements);
+                  dataIndex++) {
+
+               formatItem = formatLoop.next();
+
+               while (formatList->entry[formatItem].format ==
+                      IOFormatEntry::LoopStart) {
+                  formatItem = formatLoop.enter(
+                                  formatList->entry[formatItem].fp1.intValue,
+                                  formatList->entry[formatItem].fp2.intValue);
+               }
 
                while (formatList->entry[formatItem].format >=
                       IOFormatEntry::IsPositioning) {
                   toPositioningFormat(me, &formatList->entry[formatItem]);
-                  formatItem = getNextFormatElement(formatList,
-                                                    formatItem,
-                                                    &loopStatus);
+                  formatItem = formatLoop.next();
+
+                  while (formatList->entry[formatItem].format ==
+                         IOFormatEntry::LoopStart) {
+                     formatItem = formatLoop.enter(
+                                     formatList->entry[formatItem].fp1.intValue,
+                                     formatList->entry[formatItem].fp2.intValue);
+                  }
                }
 
-               putDataFormat(me, &dataList->entry[dataElement], dataIndex,
+               putDataFormat(me, &dataList->entry[dataElement],
+                             dataIndex,
+                             dataLoop.getOffset(),
                              &formatList->entry[formatItem]);
             }
+
+            // end of array od simple type
+            // take next data element
+            dataElement = dataLoop.next();
          }
 
+         // treat pending positioning format elements
          formatItem ++;
 
+         while (formatList->entry[formatItem].format ==
+                IOFormatEntry::LoopStart) {
+            formatItem = formatLoop.enter(
+                            formatList->entry[formatItem].fp1.intValue,
+                            formatList->entry[formatItem].fp2.intValue);
+         }
+
          // treat pending format elements after last data element
-         while (formatItem < formatList->nbrOfEntries) {
+         while ((size_t)formatItem < formatList->nbrOfEntries) {
             if (formatList->entry[formatItem].format <=
                   IOFormatEntry::IsPositioning) {
                break;
@@ -279,6 +238,13 @@ namespace pearlrt {
 
             toPositioningFormat(me, &formatList->entry[formatItem]);
             formatItem++;
+
+            while (formatList->entry[formatItem].format ==
+                   IOFormatEntry::LoopStart) {
+               formatItem = formatLoop.enter(
+                               formatList->entry[formatItem].fp1.intValue,
+                               formatList->entry[formatItem].fp2.intValue);
+            }
          }
 
          endSequence();
@@ -291,45 +257,85 @@ namespace pearlrt {
          endSequence();
       }
    }
+
+
    void DationPG::get(TaskCommon * me,
                       IODataList * dataList, IOFormatList * formatList) {
 
-      size_t formatItem = -1;
-      FormatLoop loopStatus;
+      int formatItem = -1;
+      int dataElement;
 
-      loopStatus.loopLevel = -1;
+      // create a loop control structure for the format list treatment
+      LoopControl formatLoop(formatList->nbrOfEntries, true);
+      LoopControl dataLoop(dataList->nbrOfEntries, false);
+
 
       try {
          beginSequence(me, Dation::IN);
 
-         for (size_t dataElement = 0;
-               dataElement < dataList->nbrOfEntries;
-               dataElement++) {
+         // get first data element
+         dataElement = dataLoop.next();
 
+         while (dataElement < (int)dataList->nbrOfEntries) {
+            // test for begin of loop, repeatedly
+            while (dataList->entry[dataElement].dataType.baseType ==
+                   IODataEntry::LoopStart) {
+               dataElement = dataLoop.enter(
+                                dataList->entry[dataElement].dataType.dataWidth,
+                                *dataList->entry[dataElement].param1.numberOfElements,
+                                dataList->entry[dataElement].dataPtr.offsetIncrement);
+            }
+
+            // treat arrays of simple types
             for (size_t dataIndex = 0;
-                 dataIndex < * (dataList->entry[dataElement].numberOfElements);
-                 dataIndex++) {
-               formatItem = getNextFormatElement(formatList,
-                                                 formatItem,
-                                                 &loopStatus);
+                  dataIndex < * (dataList->entry[dataElement].param1.numberOfElements);
+                  dataIndex++) {
+
+               formatItem = formatLoop.next();
+
+               while (formatList->entry[formatItem].format ==
+                      IOFormatEntry::LoopStart) {
+                  formatItem = formatLoop.enter(
+                                  formatList->entry[formatItem].fp1.intValue,
+                                  formatList->entry[formatItem].fp2.intValue);
+               }
 
                while (formatList->entry[formatItem].format >=
                       IOFormatEntry::IsPositioning) {
                   fromPositioningFormat(me, &formatList->entry[formatItem]);
-                  formatItem = getNextFormatElement(formatList,
-                                                    formatItem,
-                                                    &loopStatus);
+                  formatItem = formatLoop.next();
+
+                  while (formatList->entry[formatItem].format ==
+                         IOFormatEntry::LoopStart) {
+                     formatItem = formatLoop.enter(
+                                     formatList->entry[formatItem].fp1.intValue,
+                                     formatList->entry[formatItem].fp2.intValue);
+                  }
                }
 
-               getDataFormat(me, &dataList->entry[dataElement], dataIndex,
+               getDataFormat(me, &dataList->entry[dataElement],
+                             dataIndex,
+                             dataLoop.getOffset(),
                              &formatList->entry[formatItem]);
             }
+
+            // end of array od simple type
+            // take next data element
+            dataElement = dataLoop.next();
          }
 
+         // treat pending positioning format elements
          formatItem ++;
 
+         while (formatList->entry[formatItem].format ==
+                IOFormatEntry::LoopStart) {
+            formatItem = formatLoop.enter(
+                            formatList->entry[formatItem].fp1.intValue,
+                            formatList->entry[formatItem].fp2.intValue);
+         }
+
          // treat pending format elements after last data element
-         while (formatItem < formatList->nbrOfEntries) {
+         while ((size_t)formatItem < formatList->nbrOfEntries) {
             if (formatList->entry[formatItem].format <=
                   IOFormatEntry::IsPositioning) {
                break;
@@ -337,6 +343,13 @@ namespace pearlrt {
 
             fromPositioningFormat(me, &formatList->entry[formatItem]);
             formatItem++;
+
+            while (formatList->entry[formatItem].format ==
+                   IOFormatEntry::LoopStart) {
+               formatItem = formatLoop.enter(
+                               formatList->entry[formatItem].fp1.intValue,
+                               formatList->entry[formatItem].fp2.intValue);
+            }
          }
 
          endSequence();

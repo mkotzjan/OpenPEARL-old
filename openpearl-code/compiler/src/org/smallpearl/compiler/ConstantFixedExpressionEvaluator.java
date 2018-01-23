@@ -184,8 +184,8 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
             System.out.println("ConstantFixedExpressionEvaluator: visitConstantFixedExpressionFactor");
         }
 
-        if ( ctx.Sign() != null) {
-            if ( ctx.Sign().getText().equals("-")) {
+        if ( ctx.sign() != null ) {
+            if ( ctx.sign() instanceof SmallPearlParser.SignMinusContext ) {
                 sign = -1;
             }
         }
@@ -234,7 +234,7 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
                         value = new ConstantFixedValue(v);
 
                     }
-                    else if ( c.FloatingPointConstant() != null ) {
+                    else if ( c.floatingPointConstant() != null ) {
                         System.out.println("****FloatingPointConstant***");
                     }
                     else if ( c.durationConstant() != null ) {

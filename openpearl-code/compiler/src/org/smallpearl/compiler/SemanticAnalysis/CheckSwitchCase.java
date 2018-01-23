@@ -33,7 +33,9 @@ import org.smallpearl.compiler.*;
 import org.smallpearl.compiler.SymbolTable.ModuleEntry;
 import org.smallpearl.compiler.SymbolTable.SymbolTable;
 
-public class CheckCase extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
+import java.util.ArrayList;
+
+public class CheckSwitchCase extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
     private int m_verbose;
     private boolean m_debug;
@@ -43,12 +45,13 @@ public class CheckCase extends SmallPearlBaseVisitor<Void> implements SmallPearl
     private SymbolTable m_symboltable;
     private SymbolTable m_currentSymbolTable;
     private ModuleEntry m_module;
+    private ArrayList<FixedRange> m_listOfAlternatives = null;
 
-    public CheckCase(String sourceFileName,
-                     int verbose,
-                     boolean debug,
-                     SymbolTableVisitor symbolTableVisitor,
-                     ExpressionTypeVisitor expressionTypeVisitor) {
+    public CheckSwitchCase(String sourceFileName,
+                           int verbose,
+                           boolean debug,
+                           SymbolTableVisitor symbolTableVisitor,
+                           ExpressionTypeVisitor expressionTypeVisitor) {
 
         m_debug = debug;
         m_verbose = verbose;
@@ -57,6 +60,7 @@ public class CheckCase extends SmallPearlBaseVisitor<Void> implements SmallPearl
         m_expressionTypeVisitor = expressionTypeVisitor;
         m_symboltable = symbolTableVisitor.symbolTable;
         m_currentSymbolTable = m_symboltable;
+        m_listOfAlternatives = new ArrayList<FixedRange>();
 
         if (m_verbose > 0) {
             System.out.println( "    Check Case");
@@ -121,6 +125,36 @@ public class CheckCase extends SmallPearlBaseVisitor<Void> implements SmallPearl
         this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
         visitChildren(ctx);
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitCase_statement(SmallPearlParser.Case_statementContext ctx) {
+        visitChildren(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitCase_statement_selection2_alt(SmallPearlParser.Case_statement_selection2_altContext ctx) {
+        for ( int i = 0; i < ctx.case_list().index_section().size(); i++) {
+            SmallPearlParser.Index_sectionContext index = ctx.case_list().index_section(i);
+
+            if ( index.expression().size() == 1) {
+                for ( int j = 0; j < m_listOfAlternatives.size(); j++) {
+//                    if ( m_listOfAlternatives.get(j).isContained())
+                }
+                m_listOfAlternatives.add(new FixedRange(1,1));
+            }
+            else {
+                m_listOfAlternatives.add(new FixedRange(1,1));
+            }
+
+        }
+
+        for ( int j = 0; j < m_listOfAlternatives.size(); j++) {
+            System.out.println( "CheckCaseSwitch:visitCase_statement_selection2_alt" + m_listOfAlternatives.get(j));
+        }
+
         return null;
     }
 }

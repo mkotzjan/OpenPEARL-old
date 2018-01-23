@@ -556,7 +556,7 @@ namespace pearlrt {
         treat one output job entry, which must be a positioning element
 
         \param me pointer to the calling task
-        \param jobEntry  pointer to the current entry
+        \param jobFormat  pointer to the current entry
         \returns 0, if done normally<br>
                  1, if record wasd left
         */
@@ -566,7 +566,7 @@ namespace pearlrt {
         treat one input job entry, which must be a positioning element
 
         \param me pointer to the calling task
-        \param jobEntry  pointer to the current entry
+        \param jobFormat  pointer to the current entry
         \returns 0, if done normally<br>
                  1, if record wasd left
         */

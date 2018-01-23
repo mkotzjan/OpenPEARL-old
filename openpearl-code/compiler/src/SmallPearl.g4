@@ -41,8 +41,7 @@ grammar SmallPearl;
 
 tokens {
      Letter,
-     Digit,
-     Sign
+     Digit
 }
 
 
@@ -418,8 +417,8 @@ arrayInitialisationAttribute :
 ////////////////////////////////////////////////////////////////////////////////
 
 initElement
-    : constant
-    | ID
+    : ID
+    | constant
     | constantExpression
     ;
 
@@ -912,8 +911,15 @@ bitSelection
 ////////////////////////////////////////////////////////////////////////////////
 
 charSelection
-    : ID '.' ( 'CHAR' | 'CHARACTER' ) '('  expression ( ':' expression )? ')'
+    : ID charSelectionSlice+
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+
+charSelectionSlice
+    : '.' ( 'CHAR' | 'CHARACTER' ) '('  expression ( ':' expression )? ')'
+    ;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1688,10 +1694,24 @@ typeTime
 ////////////////////////////////////////////////////////////////////////////////
 
 type_char : ( 'CHARACTER' | 'CHAR' ) ( '(' IntegerConstant ')' )?;
+
+////////////////////////////////////////////////////////////////////////////////
+
 type_fixed: 'FIXED' ( '(' IntegerConstant ')' )?;
+
+////////////////////////////////////////////////////////////////////////////////
+
 type_float: 'FLOAT' ( '(' IntegerConstant ')' )?;
+
+////////////////////////////////////////////////////////////////////////////////
+
 type_duration: ( 'DURATION' | 'DUR' );
+
+////////////////////////////////////////////////////////////////////////////////
+
 type_clock: 'CLOCK';
+
+////////////////////////////////////////////////////////////////////////////////
 type_bit: 'BIT' ( '(' IntegerConstant ')' )?;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1951,8 +1971,10 @@ expression
     | op='NOW'                                              # nowFunction
     | op='DATE'                                             # dateFunction
     | op='TASK'                                             # taskFunction
-    | expression op='**' <assoc=right> expression           # exponentiationExpression
-    | expression op='FIT' expression                        # fitExpression
+    | <assoc=right> expression op='**'  expression          # exponentiationExpression
+    | <assoc=right> expression op='FIT' expression          # fitExpression
+    | <assoc=right> expression op='LWB' expression          # lwbExpression
+    | <assoc=right> expression op='UPB' expression          # upbExpression
     | op=('*'|'/') expression                               # unaryMultiplicativeExpression
     | op='-' expression                                     # unarySubtractiveExpression
     | op='+' expression                                     # unaryAdditiveExpression
@@ -2042,7 +2064,7 @@ primaryExpression
 ////////////////////////////////////////////////////////////////////////////////
 
 constantExpression
-    : FloatingPointConstant
+    : floatingPointConstant
     | Sign? durationConstant
     | constantFixedExpression
     ;
@@ -2105,8 +2127,13 @@ remainderConstantFixedExpressionTerm
 // [ FIT ConstantFIXEDExpression ]
 ////////////////////////////////////////////////////////////////////////////////
 
+sign
+    : '+'                       #signPlus
+    | '-'                       #signMinus
+    ;
+
 constantFixedExpressionFactor
-    : Sign? (   IntegerConstant
+    : sign? (   IntegerConstant
               | '(' constantFixedExpression ')'
               | ID )
       constantFixedExpressionFit?
@@ -2258,7 +2285,7 @@ charSlice
 
 literal
     : IntegerConstant ( '(' IntegerConstant ')' )?
-    | FloatingPointConstant
+    | floatingPointConstant
     | StringLiteral
     | BitStringLiteral
     | timeConstant
@@ -2420,13 +2447,6 @@ fragment
 Letter : [a-zA-Z] ;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-fragment
-Sign
-    :   '+' | '-'
-    ;
-
-////////////////////////////////////////////////////////////////////////////////
 //  Constant ::= Integer
 //      | FloatingPointNumber | BitStringConstant
 //      | TimeConstant
@@ -2435,7 +2455,7 @@ Sign
 ////////////////////////////////////////////////////////////////////////////////
 
 constant :
-      ('+'|'-')? ( IntegerConstant | FloatingPointConstant )
+      ('+'|'-')? ( IntegerConstant | floatingPointConstant )
     | timeConstant
     | durationConstant
     | bitStringConstant
@@ -2443,6 +2463,7 @@ constant :
     | 'NIL'
     ;
 
+////////////////////////////////////////////////////////////////////////////////
 
 bitStringConstant:
     BitStringLiteral
@@ -2485,7 +2506,7 @@ B4Digit
 ////////////////////////////////////////////////////////////////////////////////
 
 timeConstant
-    : IntegerConstant ':' IntegerConstant ':' ( IntegerConstant | FloatingPointConstant )
+    : IntegerConstant ':' IntegerConstant ':' ( IntegerConstant | floatingPointConstant )
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2495,7 +2516,6 @@ durationConstant
     | minutes seconds?
     | seconds
     ;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2512,15 +2532,15 @@ minutes
 ////////////////////////////////////////////////////////////////////////////////
 
 seconds
-    : ( IntegerConstant | FloatingPointConstant ) 'SEC'
+    : ( IntegerConstant | floatingPointConstant ) 'SEC'
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // FloatingPointNumber ::= FloatingPointNumberWithoutPrecision [ ( Precision ) ]
 ////////////////////////////////////////////////////////////////////////////////
 
-FloatingPointConstant
-    : FloatingPointNumberWithoutPrecision ( '(' IntegerConstant ')' )?
+floatingPointConstant
+    : FloatingPointNumberWithoutPrecision ( '(' FloatingPointNumberPrecision ')' )?
     ;
 
 
@@ -2537,7 +2557,7 @@ FloatingPointNumberPrecision
 ////////////////////////////////////////////////////////////////////////////////
 
 FloatingPointNumberWithoutPrecision
-    : ('+'|'-')? ( Digit+ '.' ( Digit+)? | '.' Digit+ ) Exponent?
+    : ( Digit+ '.' ( Digit+)? | '.' Digit+ ) Exponent?
     | Digit+ Exponent
     ;
 

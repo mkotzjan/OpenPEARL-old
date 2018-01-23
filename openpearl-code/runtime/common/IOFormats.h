@@ -176,6 +176,19 @@ namespace pearlrt {
          return;
       }
 
+      /**
+      output formats Bx and Bx(w) for the IOJob interface, with x=1,2,3,4
+
+      \param s pointer to the data to be printed
+      \param index index, if an array slice is used
+      \param len length of the BIT-type to be printed (1..64)
+      \param base of the output format (1,2,3 or 4)
+      \param w width of the output field. This field limits the number of
+               characters to be written
+      */
+      void toBit(void *s, size_t index,
+                 size_t len, int base,
+                 const Fixed<31> w);
 
       /**
       output format B1(w)
@@ -502,24 +515,32 @@ namespace pearlrt {
        treat one output job entry, which must be a data format element
 
        \param me pointer to the calling task
-       \param jobEntry  pointer to the current entry
+       \param dataEntry  pointer to the current entry
+       \param index current index for array elements of simple types
+       \param loopOffset current offset in loops for structs
+       \param format pointer to the format entry to be used
        \returns 0, if done normally<br>
                 1, if record wasd left
        */
       int putDataFormat(TaskCommon * me,
              IODataEntry * dataEntry, size_t index,
+             size_t loopOffset,
              IOFormatEntry * format);
 
       /**
        treat one input job entry, which must be a data format element
 
        \param me pointer to the calling task
-       \param jobEntry  pointer to the current entry
+       \param dataEntry  pointer to the current entry
+       \param index current index for array elements of simple types
+       \param loopOffset current offset in loops for structs
+       \param format pointer to the format entry to be used
        \returns 0, if done normally<br>
                 1, if record wasd left
        */
       int getDataFormat(TaskCommon * me,
              IODataEntry * dataEntry, size_t index,
+             size_t loopOffset,
              IOFormatEntry * format);
 
    };

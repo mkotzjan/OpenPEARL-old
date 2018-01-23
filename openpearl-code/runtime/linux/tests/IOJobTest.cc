@@ -16,6 +16,8 @@ static /*const*/ pearlrt::Fixed<31>         CONSTANT_FIXED_NEG_1_31(-1);
 static /*const*/ pearlrt::Fixed<31>         CONSTANT_FIXED_POS_13_31(13);
 static /*const*/ pearlrt::Fixed<31>         CONSTANT_FIXED_POS_5_31(5);
 static /*const*/ pearlrt::Fixed<31>         CONSTANT_FIXED_POS_6_31(6);
+static /*const*/ pearlrt::Fixed<31>         CONSTANT_FIXED_POS_7_31(7);
+static /*const*/ pearlrt::Fixed<31>         CONSTANT_FIXED_POS_4_31(4);
 static /*const*/ pearlrt::Character<5>         CONSTANT_CHARACTER_5a7707ad_4efa_4d82_a801_951eba9d4126("Hallo");
 
 /////////////////////////////////////////////////////////////////////////////
@@ -42,7 +44,45 @@ static pearlrt::SystemDationNB* _stdout = static_cast<pearlrt::SystemDationNB*>(
 extern pearlrt::Device *d_stdin;
 static pearlrt::SystemDationNB* _stdin = static_cast<pearlrt::SystemDationNB*>(d_stdin); 
 
+struct MyDataList  {
+   pearlrt::BitString<1> modified;
+   struct MyPerson {
+      pearlrt::Character<10> name;
+      pearlrt::Character<10> prename;
+      pearlrt::Fixed<15> date[3];
+   } person[5];
+};
+MyDataList  myDataList = {
+   (pearlrt::BitString<1>)(1),
+   {
 
+   { (pearlrt::Character<10>)("Meier"),
+     (pearlrt::Character<10>)("Willi"),
+     { (pearlrt::Fixed<15>)(1), (pearlrt::Fixed<15>)(2),
+       (pearlrt::Fixed<15>)(1970)}
+   },
+   { (pearlrt::Character<10>)("Meier"),
+     (pearlrt::Character<10>)("Marie"),
+     { (pearlrt::Fixed<15>)(2), (pearlrt::Fixed<15>)(3),
+       (pearlrt::Fixed<15>)(1971)}
+   },
+   { (pearlrt::Character<10>)("Schmid"),
+     (pearlrt::Character<10>)("Alois"),
+     { (pearlrt::Fixed<15>)(3), (pearlrt::Fixed<15>)(4),
+       (pearlrt::Fixed<15>)(1972)}
+   },
+   { (pearlrt::Character<10>)("Huber"),
+     (pearlrt::Character<10>)("Sepp"),
+     { (pearlrt::Fixed<15>)(4), (pearlrt::Fixed<15>)(5),
+       (pearlrt::Fixed<15>)(1973)}
+   },
+   { (pearlrt::Character<10>)("Meier"),
+     (pearlrt::Character<10>)("Sepp"),
+     { (pearlrt::Fixed<15>)(5), (pearlrt::Fixed<15>)(6),
+       (pearlrt::Fixed<15>)(1974)}
+   }
+   }
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // DATION DECLARATIONS
@@ -93,6 +133,110 @@ DCLTASK(_ttt, (pearlrt::Prio( (pearlrt::Fixed<15>)255)), ((pearlrt::BitString<1>
             );
         }
 
+        // PUT myData TO SO BY B,SKIP,(5)(A,X,A,(3)(X,F(4)),SKIP),SKIP;
+        {
+printf("begin of print struct\n");
+             size_t five=5;
+             size_t  one=1;
+             pearlrt::IODataEntry dataEntries [] = {
+                // idx 0 (modified)
+                {.dataType={pearlrt::IODataEntry::BIT,1},
+                 .dataPtr={.outData=&myDataList.modified},
+                 .param1={.numberOfElements = &one}
+                },
+                // idx 1 (LoopStart)
+                {.dataType={pearlrt::IODataEntry::LoopStart, 5},
+                 .dataPtr={.offsetIncrement=sizeof(myDataList.person[0])},
+                 .param1={.numberOfElements=&five},
+                },
+                // idx 2 (name)
+                {.dataType={pearlrt::IODataEntry::CHAR,10},
+                 .dataPtr={.outData=&myDataList.person[0].name},
+                 .param1={.numberOfElements = &one}
+                },
+               
+                // idx 3 (prename)
+                {.dataType={pearlrt::IODataEntry::CHAR,10},
+                 .dataPtr={.outData=&myDataList.person[0].prename},
+                 .param1={.numberOfElements = &one}
+                },
+
+                // idx 4 (day)
+                {.dataType={pearlrt::IODataEntry::FIXED,15},
+                 .dataPtr={.outData=&myDataList.person[0].date[0]},
+                 .param1={.numberOfElements = &one}
+                },
+                // idx 5 (month)
+                {.dataType={pearlrt::IODataEntry::FIXED,15},
+                 .dataPtr={.outData=&myDataList.person[0].date[1]},
+                 .param1={.numberOfElements = &one}
+                },
+                // idx 6 (year)
+                {.dataType={pearlrt::IODataEntry::FIXED,15},
+                 .dataPtr={.outData=&myDataList.person[0].date[2]},
+                 .param1={.numberOfElements = &one}
+                },
+                
+                  
+             };
+
+            // ... BY B,SKIP,(5)(A,X,A,(3)(X,F(4)),SKIP),SKIP;
+            pearlrt::IOFormatEntry formatEntries[]= {
+               { // idx 0
+                .format=pearlrt::IOFormatEntry::B1,
+               },
+               { // idx 1
+                  .format=pearlrt::IOFormatEntry::SKIP,
+                  .fp1={ .constF31Ptr =&CONSTANT_FIXED_POS_1_31}
+               },
+               { // idx 2 LoopStart
+                .format=pearlrt::IOFormatEntry::LoopStart,
+                .fp1 ={.intValue=7},
+                .fp2 ={.intValue=5},
+               },
+               { // 3
+                .format=pearlrt::IOFormatEntry::A,
+               },
+               { // 4
+                  .format=pearlrt::IOFormatEntry::X,
+                  .fp1={ .constF31Ptr =&CONSTANT_FIXED_POS_1_31}
+               },
+               { // 5
+                .format=pearlrt::IOFormatEntry::A,
+               },
+               { // idx 6 LoopStart
+                .format=pearlrt::IOFormatEntry::LoopStart,
+                .fp1 ={.intValue=2},
+                .fp2 ={.intValue=3},
+               },
+               { // idx 7
+                  .format=pearlrt::IOFormatEntry::X,
+                  .fp1={ .constF31Ptr =&CONSTANT_FIXED_POS_1_31}
+               },
+               { // idx 8
+                  .format=pearlrt::IOFormatEntry::Fw,
+                  .fp1={ .constF31Ptr =&CONSTANT_FIXED_POS_4_31}
+               },
+               { // idx 9
+                  .format=pearlrt::IOFormatEntry::SKIP,
+                  .fp1={ .constF31Ptr =&CONSTANT_FIXED_POS_1_31}
+               },
+               { // idx 10 
+                  .format=pearlrt::IOFormatEntry::SKIP,
+                  .fp1={ .constF31Ptr =&CONSTANT_FIXED_POS_1_31}
+               },
+            };
+            pearlrt::IODataList dataList = {
+                 .nbrOfEntries=sizeof(dataEntries)/sizeof(dataEntries[0]),
+                 .entry=dataEntries};
+            pearlrt::IOFormatList formatList = {
+                 .nbrOfEntries=sizeof(formatEntries)/sizeof(formatEntries[0]),
+                 .entry=formatEntries,
+            };
+            _so.put(me, &dataList, &formatList);
+        }
+printf("end of print struct\n");
+
         // PUT array1(3:1,18) TO so BY (4)((5)(F(6),X(2)),SKIP);
         {
              size_t resultOfExpr1=0;   // we need size_t for the format 
@@ -101,7 +245,7 @@ DCLTASK(_ttt, (pearlrt::Prio( (pearlrt::Fixed<15>)255)), ((pearlrt::BitString<1>
                {.dataType={pearlrt::IODataEntry::FIXED,31},
                 .dataPtr = {.outData= (data_array1+
                   array1->offset(pearlrt::Fixed<31>(3),pearlrt::Fixed<31>(1)))},
-                .numberOfElements = &resultOfExpr1,
+                .param1={.numberOfElements = &resultOfExpr1},
                }
             };
             pearlrt::IOFormatEntry formatEntries[]= {
@@ -160,15 +304,15 @@ DCLTASK(_ttt, (pearlrt::Prio( (pearlrt::Fixed<15>)255)), ((pearlrt::BitString<1>
             pearlrt::IODataEntry dataEntries[]= {
                {.dataType={pearlrt::IODataEntry::CHAR,5},
                 .dataPtr = {.outData=&CONSTANT_CHARACTER_5a7707ad_4efa_4d82_a801_951eba9d4126},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
                {.dataType={pearlrt::IODataEntry::FLOAT,53},
                 .dataPtr = {.outData = &_x},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
                {.dataType={pearlrt::IODataEntry::FIXED,15},
                 .dataPtr = {.outData = &resultOfExpr1},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
             };
 
@@ -259,11 +403,11 @@ DCLTASK(_ttt, (pearlrt::Prio( (pearlrt::Fixed<15>)255)), ((pearlrt::BitString<1>
             {
                {.dataType={pearlrt::IODataEntry::CHAR,5},
                 .dataPtr = {.outData=&CONSTANT_CHARACTER_5a7707ad_4efa_4d82_a801_951eba9d4126},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                },
                {.dataType={pearlrt::IODataEntry::FIXED,15},
                 .dataPtr = {.outData = &_y},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                }
             };
             IOFormatEntry fmtEntries[]=
@@ -311,7 +455,7 @@ DCLTASK(_ttt, (pearlrt::Prio( (pearlrt::Fixed<15>)255)), ((pearlrt::BitString<1>
             {
                {.dataType={pearlrt::IODataEntry::FIXED,15},
                 .dataPtr = {.inData = &_z},
-                .numberOfElements = &one
+                .param1={.numberOfElements = &one}
                }
             };
             IOFormatEntry fmtEntries[]=

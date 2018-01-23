@@ -59,7 +59,7 @@ Other lengths are not supported and will lead to c++-compile errors.
 
 //IncludeCollector::PassThru begin
 #ifndef NAN
-#error "Float.h needs IEEE753 support"
+#error "Float.h needs IEEE754 support"
 #endif
 //IncludeCollector::PassThru end
 
