@@ -1392,6 +1392,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 st.add("code", visitCONTExpression(((SmallPearlParser.CONTExpressionContext) ctx)));
             }
         }
+        else {
+            st = null;
+        }
 
         return st;
     }
@@ -1632,11 +1635,25 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitIf_statement(SmallPearlParser.If_statementContext ctx) {
         ST stmt = group.getInstanceOf("if_statement");
 
-        TypeDefinition x = m_expressionTypeVisitor.lookupType(ctx.expression());
+        TypeDefinition typeDef = m_expressionTypeVisitor.lookupType(ctx.expression());
 
-        ST cast = group.getInstanceOf("CastBitToBoolean");
-        cast.add("name", getExpression(ctx.expression()));
-        stmt.add("rhs", cast);
+//        if ( typeDef instanceof TypeBit ) {
+//            TypeBit typeBit = (TypeBit) typeDef;
+//
+//            if ( typeBit.getPrecision() == 1 ) {
+//                stmt.add("rhs",  getExpression(ctx.expression()));
+//            }
+//            else {
+//                ST cast = group.getInstanceOf("CastBitToBoolean");
+//                cast.add("name", getExpression(ctx.expression()));
+//                stmt.add("rhs", cast);
+//            }
+//        }
+//        else {
+            ST cast = group.getInstanceOf("CastBitToBoolean");
+            cast.add("name", getExpression(ctx.expression()));
+            stmt.add("rhs", cast);
+//        }
 
         if (ctx.then_block() != null) {
             stmt.add("then_block", visitThen_block(ctx.then_block()));
@@ -2476,7 +2493,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitReturnStatement(SmallPearlParser.ReturnStatementContext ctx) {
         ST stmt = group.getInstanceOf("return_statement");
-        stmt.add("expression", getExpression(ctx.expression()));
+        ST returnExpr = getExpression(ctx.expression());
+
+        if ( returnExpr != null ) {
+            stmt.add("expression", returnExpr);
+        }
+
         return stmt;
     }
 

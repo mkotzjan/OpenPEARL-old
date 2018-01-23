@@ -431,7 +431,11 @@ ExitStatement(label) ::= <<
 >>
 
 return_statement(expression) ::= <<
+<if(expression)>
 return (<expression>);
+<else>
+return;
+<endif>
 >>
 
 task_control_statement(code) ::= <<
