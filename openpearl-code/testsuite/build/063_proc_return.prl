@@ -1,0 +1,19 @@
+MODULE(proc_return);
+
+PROBLEM;
+
+p1: PROC;
+   DCL x FIXED INIT(1);
+  
+   IF x > 0 THEN
+      x = x+1;
+      RETURN;
+   ELSE
+     x=10;
+     RETURN;
+   FIN;
+   x= -1;
+   RETURN; 
+END;
+
+MODEND;
