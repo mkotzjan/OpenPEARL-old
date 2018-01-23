@@ -16,9 +16,7 @@
 # the result of make doesnotbuild is ok, if no test cases work
  
 DONOTBUILD= 030_signals 031_signalsInduce  \
-	020_semaphore \
 	043_switch \
-	063_proc_return \
 	103_fixed_monadic_arith \
 	150_array_dcl \
 	400_char_dcl \
