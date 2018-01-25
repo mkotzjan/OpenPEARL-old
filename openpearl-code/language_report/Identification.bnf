@@ -1,4 +1,4 @@
 \htgt{Identification} ::=\\
-\x \{ {\bf SPC $\mid$ SPECIFY}\} \hlink{Identifier} 
-	[ {\bf INV} ] \hlink{Type} \hlink{IdentificationAttribute} ;\\
+\x \{ \kw{SPC} $\mid$ \kw{SPECIFY}\} \hlink{Identifier} 
+	[ \kw{INV} ] \hlink{Type} \hlink{IdentificationAttribute} ;\\
 

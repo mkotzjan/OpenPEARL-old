@@ -25,34 +25,35 @@ with the technical process, PEARL offers the following possibilities:
 
 \begin{itemize}
 \item declaration of tasks, e.g.\\
-      \begin{tabbing}
-      supplies: \= {\bf TASK PRIORITY} 2;\\
-  \> task object (declarations, statements)\\
-  \> {\bf END};\\
-      \end{tabbing}
+\code{supplies:} \kw{TASK PRIORITY} \code{2;}\\
+\code{~~~!   task object (declarations, statements)}\\
+\kw{END};
 \item starting (activation), e.g.\\
-      {\bf ACTIVATE} supplies;
+      \kw{ACTIVATE}\code{ supplies;}
 \item terminating, e.g.\\
-      {\bf TERMINATE} printing;
+      \kw{TERMINATE}\code{ printing;}
 \item suspending, e.g.\\
-      {\bf SUSPEND} statistics;
+      \kw{SUSPEND}\code{ statistics;}
 \item continuing, e.g.\\
-      {\bf CONTINUE} statistics;
+      \kw{CONTINUE}\code{ statistics;}
 \item resuming, e.g.\\
-      {\bf AFTER} 5 SEC {\bf RESUME};
+      \kw{AFTER} \code{5} \kw{SEC RESUME}\code{;}
 \end{itemize}
 
 According to the requests of automation tasks, some of these
 statements can be scheduled for (repeated) execution, e.g. if a time,
 the end of a duration, or a message arrives:
 
-{\bf WHEN} ready {\bf ACTIVATE} supplies;\\
-(meaning: every time when the interrupt ready occurs, the task supplies
+\begin{lstlisting}[frame=off]
+WHEN ready ACTIVATE supplies;
+\end{lstlisting}
+(meaning: every time when the interrupt ready occurs, the task \code{supplies}
 has to be activated)
 
 A temporal periodical start can also be scheduled:
-
-{\bf AT} 12:0:0 {\bf ALL} 1 SEC {\bf UNTIL} 12:15:0 {\bf ACTIVATE} measuring;
+\begin{lstlisting}[frame=off]
+AT 12:0:0 ALL 1 SEC UNTIL 12:15:0 ACTIVATE measuring;
+\end{lstlisting}
 
 Different tasks execute their statements independently of one another,
 provided relevant measures do not prevent that. However, sometimes a
@@ -62,12 +63,12 @@ work faster than the consumer. More complex synchronisation problems
 occur, if e.g. a task has to access to a file exclusively (because
 writing), whereas others can access simultaneously (because reading). In
 order to solve these synchronisation problems, PEARL contains the data
-types SEMA and BOLT 
+types \code{SEMA} and \code{BOLT} 
 with corresponding statements, such as
 
 \begin{itemize}
-\item {\bf REQUEST} conveyor\_belt;        %%%conveyor-belt;
-\item {\bf RELEASE} comminication\_buffer; %%%communication-buffer;
+\item \kw{REQUEST}\code{ conveyor\_belt;}        %%%conveyor-belt;
+\item \kw{RELEASE}\code{ comminication\_buffer;} %%%communication-buffer;
 \end{itemize}
 
 %\begin{removed}
@@ -109,11 +110,12 @@ data transmission are distinguished essentially:
       of process data.
 
       Examples:
-
-      {\bf READ} record {\bf FROM} file {\bf BY} POS (10);\\
-      {\bf WRITE} data-set {\bf TO} logbook;\\
-      {\bf TAKE} measured-value {\bf FROM} TemperatureSensor;\\
-      {\bf SEND} on {\bf TO} motor;
+\begin{lstlisting}
+READ record FROM file BY POS (10);
+WRITE data_set TO logbook;
+TAKE measured_value FROM TemperatureSensor;
+SEND on  TO motor;
+\end{lstlisting}
 
 \item The transmission of data with format control, i.e. with conversion
       between internal format and external representation with those
@@ -124,8 +126,10 @@ data transmission are distinguished essentially:
 
       Examples:
 
-      {\bf PUT} event {\bf TO} printer {\bf BY} F(5);\\
-      {\bf GET} receipt {\bf FROM} terminal;
+\begin{lstlisting}
+PUT event TO printer BY F(5);
+GET receipt FROM terminal;
+\end{lstlisting}
 \end{itemize}
 
 The names of the data stations can be chosen freely. This is reached by the
@@ -173,18 +177,18 @@ their connections, the interrupts and signals.
 Thus, the following
 example means that a button may emit an interrupt when pressed.
 The button is connected to the computer at location specified
-by the system name GpioInterrupt(2).
+by the system name \code{GpioInterrupt(2)}.
 
 The button, i.e. GpioInterrupt 2, is to be called by the freely selectable
-computer independent user name ``start'':
+computer independent user name \code{start}:
 
-start: GpioInterrupt(2);
+\code{start: GpioInterrupt(2);}
 
 Using the user name introduced in the system part, the actual algorithm
 for the solution of the automation task is programmed computer
 independently in the problem part, e.g.:
 
-{\bf WHEN} start {\bf ACTIVATE} measurement\_task;
+\kw{WHEN}\code{ start} \kw{ACTIVATE}\code{ measurement\_task;}
 %%%\end{discuss}
 
 In order to structure the algorithms, (named) blocks, procedures and
@@ -195,24 +199,27 @@ tasks (parallel activities) are available.
 The following data types are available in PEARL:
 
 \begin{itemize}
-\item {\bf FIXED} and {\bf FLOAT} with specifyable precision
-\item {\bf BIT} and {\bf CHARACTER} strings with specifyable length
-\item {\bf CLOCK} and {\bf DURATION} for times and durations
-\item references {\bf (REF)} for indirect addressing
-\item devices and files {\bf (DATION)} for standard and process input and
+\item \kw{FIXED} and \kw{FLOAT} with specifyable precision
+\item \kw{BIT} and \kw{CHARACTER} strings with specifyable length
+\item \kw{CLOCK} and \kw{ DURATION} for times and durations
+\item references (\kw{REF}) for indirect addressing
+\item devices and files (\kw{(DATION}) for standard and process input and
       output
-\item interrupts {\bf (INTERRUPT)} for external interrupts
-\item signals {\bf (SIGNAL)} for internal exceptional situations
-\item semaphores {\bf (SEMA)} and bolt variables {\bf (BOLT)} for
+\item interrupts (\kw{INTERRUPT}) for external interrupts
+\item signals (\kw{SIGNAL}) for internal exceptional situations
+\item semaphores (\kw{SEMA}) and bolt variables (\kw{BOLT}) for
       coordinating the access of tasks to shared object
 \end{itemize}
 
 From this, the user himself can build up more complex data structures
-like arrays, hierarchical structures (STRUCT) and lists; with the help
-of the TYPE definition, they can be declared as new, problem oriented
-data types as well. Furthermore, PEARL allows the introduction of new,
-problem oriented operators for any data structures with the help of the
-OPERATOR definition.
+like arrays, hierarchical structures (\kw{STRUCT}) and lists; with the help
+of the \kw{TYPE} definition, they can be declared as new, problem oriented
+data types as well.
+%%%%%removed
+%%%%% Furthermore, PEARL allows the introduction of new,
+%%%%%problem oriented operators for any data structures with the help of the
+%%%%%OPERATOR definition.
+%%%%%end removed
 
 \section{Control Structures}   % 2.5
 
@@ -221,43 +228,43 @@ The following control structures are available:
 \begin{itemize}
 \item conditional statement\\
 
-      {\bf IF} expression\\
-      {\bf THEN} statement$^{...}$\\
-      {\bf ELSE} statement$^{...}$\\
-      {\bf FIN};
+      \kw{IF} expression\\
+      \kw{THEN} statement$^{...}$\\
+      \kw{ELSE} statement$^{...}$\\
+      \kw{FIN};
 
 \item statement selection\_1\\
 
-      {\bf CASE} expression\\
-      {\bf ALT} (alternative 1) statement$^{...}$\\
-      {\bf ALT} (alternative 2) statement$^{...}$\\
+      \kw{CASE} expression\\
+      \kw{ALT} (alternative 1) statement$^{...}$\\
+      \kw{ALT} (alternative 2) statement$^{...}$\\
       ...\\
-      {\bf OUT} statement${...}$\\
-      {\bf FIN};
+      \kw{OUT} statement${...}$\\
+      \kw{FIN};
 
 \item statement selection\_2\\
 
-      {\bf CASE} Case\_Index\\
-      {\bf ALT} (Case\_List) statement$^{...}$\\
-      {\bf ALT} (Case\_List) statement$^{...}$\\
+      \kw{CASE} Case\_Index\\
+      \kw{ALT} (Case\_List) statement$^{...}$\\
+      \kw{ALT} (Case\_List) statement$^{...}$\\
       ...\\
-      {\bf OUT} statement${...}$\\
-      {\bf FIN};
+      \kw{OUT} statement${...}$\\
+      \kw{FIN};
 
 \item loops\\
 
-      {\bf FOR} ControlVariable {\bf FROM} start {\bf BY} StepLength {\bf TO} end\\
-      {\bf REPEAT}\\
+      \kw{FOR} ControlVariable \kw{FROM} start \kw{BY} StepLength \kw{TO} end\\
+      \kw{REPEAT}\\
       statement$^{...}$\\
-      {\bf END};\\
+      \kw{END};\\
 
-      {\bf WHILE} condition\\
-      {\bf REPEAT}\\
+      \kw{WHILE} condition\\
+      \kw{REPEAT}\\
       statement$^{...}$\\
-      {\bf END};
+      \kw{END};
 
 \item exit statement\\
 
-      {\bf EXIT} block;
+      \kw{EXIT} block;
 \end{itemize}
 

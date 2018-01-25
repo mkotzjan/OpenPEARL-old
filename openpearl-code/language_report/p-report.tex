@@ -11,11 +11,33 @@
 \input{../configuration/include/autoconf.tex}
 
 \usepackage[pdftex,colorlinks,linkcolor=blue]{hyperref}
+\usepackage{courier}
+\usepackage{listings}
+\lstset{emph={MODULE,MODEND,SYSTEM,PROBLEM,%
+DCL,DECLARE,SPC,SPECIFY,IDENT,FIXED,FLOAT,BIT,CLOCK,DURATION,DUR,%
+INTERRUPT,DATION, TASK,PRIO,PRIORITY,MAIN,PROC,PROCEDURE,BEGIN,END,%
+IF,THEN,ELSE,FIN,CASE,ALT,OUT,DEFAULT,%
+FOR,REPEAT, WHILE,UNTIL,DURING,AT,ALL,AFTER,%
+ACTIVATE, TERMINATE, CONTINUE,SUSPEND,PREVENT,REQUEST,RELEASE,
+ENTER, LEAVE,RESERVE,FREE},
+emphstyle={\textbf},
+basicstyle={\ttfamily},
+frame=single,
+}
+\usepackage{multicol}
 %
 % ----- abbreviations for hyperlinks on syntax definitions
 \input{hyperMacros.tex}
 \renewcommand{\htgt}{\htgtOff}  % hypertargets of syntax elements are
 				% only in the appendix
+\newenvironment{grammarframe}%
+{\begin{tcolorbox}[%
+   outer arc=0pt,arc=0pt,%
+   colback=yellow!10!white,
+   colframe=black]
+\parskip\baselineskip
+}
+{\end{tcolorbox}}
 
 \usepackage[skins,breakable]{tcolorbox}
 
@@ -31,6 +53,9 @@
 \parskip\baselineskip
 
 \newcommand{\x}{\hspace*{1cm}}
+
+\newcommand{\kw}[1]{\textbf{\texttt{#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
 
 \def\tekst #1,#2;{\parbox{#1}{\tiny\
                   \begin{center}#2\end{center}}}

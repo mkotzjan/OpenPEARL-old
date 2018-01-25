@@ -9,33 +9,21 @@ system part and/or a problem part.
 
 The general form of a PEARL program reads as follows:
 
-%%%\begin{front}
-%%%PEARL program ::=\\
-%%%\x Module $^{...}$
-%%%\end{front}
 
+\begin{grammarframe}
 \input{Program.bnf}
 \index{Program}
-
-%%%\begin{front}
-%%%Module ::=\\
-%%%\x {\bf MODULE} [ (Identifier\S  OfTheModule) ];\\
-%%%\x \x \{ SystemPart [ ProblemPart ] \} $\mid$ ProblemPart\\
-%%%\x {\bf MODEND};
 
 \input{Module.bnf}
 \index{MODULE@\textbf{MODULE}}
 \index{MODEND@\textbf{MODEND}}
-
-%%%SystemPart ::=\\
-%%%\x {\bf SYSTEM}; [ UserNameDeclaration $^{...}$ ]
-%%%\end{front}
 
 \input{SystemPart.bnf}
 \index{SYSTEM@\textbf{SYSTEM}!System Part}
 
 \input{ProblemPart.bnf}
 \index{PROBLEM@\textbf{PROBLEM}}
+\end{grammarframe}
 
 In the system part, the connections of the projected computer are
 described with the elements of the technical process (sensors,
@@ -69,31 +57,54 @@ declared.
 
 Example:
 
-{\bf MODULE(moduleName)};
+%{\bf MODULE(moduleName)};
+%
+%{\bf SYSTEM};\\
+%\x description of the connections and introduction of names for the
+%peripherals
+%
+%{\bf PROBLEM};\\
+%\x declaration of constants and variables\\
+%\x declaration of interrupts\\
+%\x declaration of data stations
+%
+%\x declaration of a task\\
+%\x \x declaration of local constants and variables\\
+%\x \x statements
+%
+%\x declaration of a procedure\\
+%\x \x declaration of local constants and variables\\
+%%%%%% removed
+%%%%%%\x \x declaration of local procedures\\
+%%%%%% end removed
+%\x \x statements
+%
+%...
+%
+%{\bf MODEND};
+\begin{lstlisting}
+MODULE(moduleName);
 
-{\bf SYSTEM};\\
-\x description of the connections and introduction of names for the
-peripherals
+SYSTEM;
+  ! description of the connections and introduction of names for the
+  ! peripherals
 
-{\bf PROBLEM};\\
-\x declaration of constants and variables\\
-\x declaration of interrupts\\
-\x declaration of data stations
+PROBLEM;
+  ! declaration of constants and variables
+  ! declaration of interrupts
+  ! declaration of data stations
 
-\x declaration of a task\\
-\x \x declaration of local constants and variables\\
-\x \x statements
+  ! declaration of a task
+  !    declaration of local constants and variables
+  !    statements
 
-\x declaration of a procedure\\
-\x \x declaration of local constants and variables\\
-%%%%% removed
-%%%%%\x \x declaration of local procedures\\
-%%%%% end removed
-\x \x statements
-
+  ! declaration of a procedure
+  !    declaration of local constants and variables
+  !    statements
 ...
 
-{\bf MODEND};
+MODEND;
+\end{lstlisting}
 
 Objects are declared at module level, i.e., outside procedures and
 tasks, or in procedures and tasks. Objects declared at module level are
@@ -108,7 +119,7 @@ changed there.
 
 Objects are introduced by {\it declaration} or {\it specification}.
 
-\subsection{Declaration (DCL)}  % 4.2.1
+\subsection{Declaration (\kw{DCL})}  % 4.2.1
 \label{sec_dcl}
 \index{DCL@\textbf{DCL}}
 \index{DECLARATION@\textbf{DECLARATION}|see {DCL}}
@@ -119,34 +130,33 @@ up from now, it can be accessed under the name given in the
 declaration.
 
 At the module level or in a procedure or task, an object may be declared
-only once. If an identifier X is declared as object both at module level
+only once. If an identifier \code{X} is declared as object both at module level
 and in a procedure or task, two objects are introduced: In the
-respective procedure or task, identifier X refers to the object
+respective procedure or task, identifier \code{X} refers to the object
 (locally) declared there, outside the procedure or task it refers to the
 object declared at module level (cf. section \ref{sec_block}, Block Structure).
 
 Example:
 
-\begin{tabbing}
-P:~~ \= DECLARE x FLOAT xxx \=   \kill
+\begin{lstlisting}
+PROBLEM;
+   DECLARE x FLOAT;  ! 1st declaration at module level
+   DECLARE x FIXED;  ! 2nd declaration at module level (wrong)
 
-{\bf PROBLEM}; \>            \> \\
-   \> {\bf DECLARE x FLOAT}; \> ! 1st declaration at module level\\
-   \> {\bf DECLARE x FIXED}; \> ! 2nd declaration at module level (wrong)\\
-   \>                        \> \\
-P: \> {\bf PROCEDURE};       \> \\
-   \> {\bf DECLARE x FIXED}; \> ! declaration in procedure P (permitted)\\
-   \> ...                    \> \\
-   \> x := 3;                \> ! assignment to the local variable x\\
-   \> ...                    \> \\
-   \> {\bf END};             \> ! P \\
-   \>                        \> \\
-   \> x := 5;                \> ! assignment to variable x declared at module level\\
-   \> ...                    \> \\
-   \> {\bf END};             \> ! T \\
-   \>                        \> \\
-... \>                       \>
-\end{tabbing}
+P: PROCEDURE; 
+   DECLARE x FIXED;  ! declaration in procedure P (permitted)
+   ...     
+   x := 3;           ! assignment to the local variable x
+   ...         
+END;                 ! P 
+
+T: TASK;
+   ...         
+   x := 5;           ! assignment to variable x declared at
+                     ! module level
+END;                 ! T 
+... 
+\end{lstlisting}
 
 The different declaration forms are treated with the various objects in
 the subsequent chapters.
@@ -190,7 +200,7 @@ signal                 & x            & --   & --        & -- \\
 \end{tabular}
 \end{table}
 
-\subsection{Specification (SPC) and Identification (SPC IDENT)}  % 4.2.2
+\subsection{Specification (\kw{SPC}) and Identification (\kw{SPC IDENT})}  % 4.2.2
 \label{sec_spc}
 \index{SPC@\textbf{SPC}}
 \index{SPECIFY@\textbf{SPECIFY}|see {SPC}}
@@ -204,29 +214,33 @@ declared objects in general.
 
 Example:
 
-Object c of type FIXED (15) shall get xx as 2nd name --- or formulated
-in a different way: Object x shall be {\it identified} with name xx:
+Object \code{x} of type \code{FIXED (15)} shall get \code{xx} as 2nd name
+ --- or formulated in a different way:
+ Object \code{x} shall be {\it identified} with name \code{xx}:
 
-{\bf PROBLEM};\\
-\x ...\\
-\x {\bf DECLARE x FIXED};\\
-\x ...\\
-\x {\bf SPECIFY xx FIXED IDENT} (x);\\
-\x ...\\
-\x xx := 7; \x ! assignment to object x
-
+\begin{lstlisting}
+PROBLEM;
+...
+DECLARE x FIXED;
+...
+SPECIFY xx FIXED IDENT (x);
+...
+   xx := 7;  ! assignment to object x inside a PROC or TASK
+\end{lstlisting}
 In general, the form of identification reads as follows:
 
 %%%\begin{front}
 %%%Identification ::=\\
 %%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier [ AllocationProtection ] Type IdentificationAttribute ;
 
+\begin{grammarframe}
 \input{Identification.bnf}
 \index{Identification}
 \index{SPC@\textbf{SPC}!Identification}
 
 \input{IdentificationAttribute.bnf}
 \index{IDENT@\textbf{IDENT}!Identification}
+\end{grammarframe}
 
 The given type has to correspond to the type of the named object. More
 details are defined when presenting the various objects.
@@ -238,14 +252,17 @@ Blocks are used to structure task or procedure bodies and to influence
 the scope and the life-span of PEARL objects. A block is a summary of
 declarations and statements:
 
+\begin{grammarframe}
 \input{Block.bnf}
 \index{BEGIN@\textbf{BEGIN}}
 \index{END@\textbf{END}}
+\end{grammarframe}
 
 Blocks are regarded as statements and may thus only occur in tasks and
 procedures, but there even nested. The entry into a block takes
-place when executing BEGIN. A block is left by the corresponding END or
-by a branch to an statement outside the block, e.g., by the exit
+place when executing \code{BEGIN}. A block is left by the corresponding 
+\code{END} or
+by a branch to an statement outside the block, e.g., by the  \code{EXIT}
 statement (cf. 7.5). Jumps into a block are not allowed.
 
 Within the blocks, no procedures may be declared!
@@ -308,36 +325,37 @@ same name.
 
 Example:
 
-% Klammern einfuegen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\begin{lstlisting}
+PROBLEM;
+DCL x FIXED;
+   ...
+SPC xx FIXED IDENT (x);
+T: TASK;
+   ...
+END; ! T
 
-{\bf PROBLEM};\\
-\x {\bf DCL} x {\bf FIXED};\\
-\x ...\\
-\x {\bf SPC} xx {\bf FIXED IDENT} (x);\\
-\x T: {\bf TASK};\\
-\x \x ...\\
-\x \x {\bf END}; ! T\\
-\x P: {\bf PROC};\\
-\x \x {\bf DCL} y {\bf FIXED};\\
-\x \x x := 2;\\
-\x \x {\bf BEGIN}\\
-\x \x \x {\bf DCL} x {\bf FLOAT};\\
-\x \x \x x :=3 ;\\
-\x \x \x ...\\
-\x \x \x {\bf BEGIN}\\
-\x \x \x \x {\bf DCL} x {\bf DUR};\\
-\x \x \x \x ...\\
-\x \x \x {\bf END};\\
-\x \x \x ...\\
-\x \x {\bf END};\\
-\x \x y := x; ! y = 2\\
-\x \x ...\\
-\x \x {\bf END}; ! P\\
-\x ...\\
-{\bf MODEND};
+P: PROC;
+   DCL y  FIXED;
+   x := 2;
+   BEGIN
+     DCL x FLOAT;
+     x :=3 ;
+     ...
+     BEGIN
+       DCL x DUR;
+       ...
+     END;
+     ...
+   END;
+   y := x; ! y = 2
+   ...
+END; ! P
+...
+MODEND;
+\end{lstlisting}
 
-After END, blocks can be provided with identifiers, so that encapsulated
-blocks can be left deliberately with the help of the exit statement
+After \code{END}, blocks can be provided with identifiers, so that encapsulated
+blocks can be left deliberately with the help of the \code{EXIT} statement
 (cf. 7.5).
 
 \section{References between Modules}  % 4.4
@@ -352,19 +370,29 @@ the global attribute at the module level in the other modules. In this
 way, the scope of objects declared at module level can be extended.
 
 Example:
-
-\begin{tabbing}
-\x {\bf DCL} x {\bf FIXED GLOBAL} \hspace{2cm} \= \kill
-
-{\bf MODULE} (a);                  \> {\bf MODULE} (b); \\
-{\bf PROBLEM};                     \> {\bf PROBLEM};\\
-\x ...                             \> \x ...\\
-\x {\bf DCL} x {\bf FIXED GLOBAL}; \> \x {\bf SPC} x {\bf FIXED GLOBAL} (a);\\
-\x ...                             \> \x ...\\
-\x x := 2;                         \> \x x := 3;\\
-\x ...                             \> \x ...\\
-{\bf MODEND};                      \> {\bf MODEND};
-\end{tabbing}
+\begin{multicols}{2}
+\begin{lstlisting}
+MODULE (a);
+PROBLEM;  
+...      
+DCL x FIXED GLOBAL;
+...              
+   x := 2;      
+...           
+MODEND;     
+\end{lstlisting}
+\columnbreak
+\begin{lstlisting}
+MODULE (b); 
+PROBLEM;
+...
+SPC x FIXED GLOBAL (a);
+...                   
+   x := 3;
+... 
+MODEND;
+\end{lstlisting}
+\end{multicols}
 
 All data stations, interrupts and signals given in the system part of a
 certain module are regarded as declared (implicitly) with the global
@@ -385,8 +413,10 @@ attribute.
 
 The general form of the global attribute reads:
 
+\begin{grammarframe}
 \input{GlobalAttribute.bnf}
 \index{GLOBAL@\textbf{GLOBAL}}
+\end{grammarframe}
 
 %%%%\begin{discuss}
 %%%%in der deutschen Fassung des Sprachreports von 1995 ist noch dargelegt,
@@ -402,11 +432,11 @@ The general form of the global attribute reads:
 %%%%\begin{added}
 %%%%The identifer$\S $Module is mandatory in the specification of
 %%%%an element from a different module.
-In declarations Identifier$\S $OfTheModule is forbidden.
+In declarations \code{Identifier}$\S $OfTheModule is forbidden.
 
-In specifications, the Identifer$\S $OfTheModule  may be omitted. 
+In specifications, the \code{Identifer}$\S $OfTheModule  may be omitted. 
 In this case, the identifier of the module is inserted.
-The Identifier$\S $OfTheModule denotes the module name of the corresponding
+The \code{Identifier}$\S $OfTheModule denotes the module name of the corresponding
 declaration.
 The same module name my be used in different source files.
 
@@ -439,28 +469,41 @@ due to different length declarations
 
 Example:
 
-% ??? Einrueckungen im Original unuebersichtlich und unklar
+\begin{multicols}{2}
+\begin{lstlisting}
+MODULE(a);
+PROBLEM; 
+T: TASK PRIO 3 GLOBAL;
+   ! task body
+	
+END; ! T
+        
+P: PROC (A(,) FIXED IDENT)
+   GLOBAL;       
+   ! procedure body
+END; ! P         
+...             
+MODEND;     
 
-%%%%% SPC in rechter Spalte mit , statt ;
-
-\begin{tabbing}
-\x P: {\bf PROC} (A(,) {\bf FIXED IDENT})\=  \kill
-
-{\bf MODULE(a)};                  \> {\bf MODULE(b)};\\
-{\bf PROBLEM};                    \> {\bf PROBLEM};\\
-\x T: {\bf TASK PRIO 3 GLOBAL};   \> \x {\bf SPC} T {\bf TASK GLOBAL}(a),\\
-\x \x \x ! task body              \> \x \x P {\bf ENTRY} ((,) {\bf FIXED IDENT}) \\
-				  \> \x \x \x \x {\bf GLOBAL}(a);\\
-\x {\bf END}; ! T              \> \x INIT: {\bf TASK};\\
-                                  \> \x \x {\bf DCL} TAB (10,20) {\bf FIXED;}\\
-\x P: {\bf PROC} (A(,) {\bf FIXED IDENT}) \> \x \x ...\\
-\x \x \x \x {\bf GLOBAL};         \> \x \x {\bf CALL} P (TAB);\\
-\x \x \x ! procedure body         \> \x \x ... \\
-\x {\bf END}; ! P              \> \x \x {\bf ACTIVATE} T;\\
-\x ...                            \> \x {\bf END}; ! INIT\\
-{\bf MODEND};                     \> \x ...\\
-                                  \> {\bf MODEND};
-\end{tabbing}
+\end{lstlisting}
+\columnbreak
+\begin{lstlisting}
+MODULE(b);
+PROBLEM; 
+SPC T TASK GLOBAL(a),
+    P ENTRY ((,) FIXED IDENT)
+    GLOBAL(a);
+INIT: TASK;
+   DCL TAB (10,20) FIXED;
+   ...
+   CALL P (TAB);
+   ... 
+   ACTIVATE T;
+END; ! INIT
+...
+MODEND;
+\end{lstlisting}
+\end{multicols}
 
 The different forms of specifying global objects are defined when
 presenting the objects.
@@ -469,30 +512,30 @@ presenting the objects.
 \label{sec_program_execution}
 
 After the loading of a PEARL program, the PEARL run time system
-automatically starts all tasks marked by the attribute MAIN according
+automatically starts all tasks marked by the attribute \code{MAIN} according
 to their priority.  
 %%%begin difference
 %%%All tasks provided with MAIN have to be declared in
 %%%the same module.
-OpenPEARL supports tasks with attribute MAIN in multiple modules.
+OpenPEARL supports tasks with attribute \code{MAIN} in multiple modules.
 %%%end difference
 
 Example:
 
-\begin{tabbing}
-{\bf MODULE} (Main); \= \\
-{\bf SYSTEM}; ...    \> \\
-{\bf PROBLEM};       \> \\
-start:               \> {\bf TASK MAIN};\\
-                     \> ! activating and scheduling of other tasks\\
-                     \> {\bf END}; start\\
-                     \> \\
-measuring:           \> {\bf TASK PRIO 1};\\
-                     \> ! task body \\
-                     \> {\bf END}; ! measuring\\
-...                  \> \\
-{\bf MODEND};        \>
-\end{tabbing}
+\begin{lstlisting}
+MODULE (Main); 
+SYSTEM; 
+PROBLEM;
+start: TASK MAIN;
+   ! activating and scheduling of other tasks
+END; start
+             
+measuring: TASK PRIO 1;
+   ! task body 
+END; ! measuring
+...    
+MODEND;
+\end{lstlisting}
 
-After the loading, the task start is started first.
+After the loading, the task \code{start} is started first.
 

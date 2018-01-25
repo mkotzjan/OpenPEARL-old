@@ -5,7 +5,7 @@
 %%%\end{removed}
 %%%
 \htgt{SystemPart} ::= \\
-\x {\bf SYSTEM} ;\\
-\x [  \{ \hlink{UserNameDeclaration}$\S $ForDationInterruptOrSignal
- $\mid$ \hlink{ConfigurationElement} \} $^{...}$ ]\\ 
+\x \kw{SYSTEM} ;\\
+\x [  \{ \code{\hlink{UserNameDeclaration}}$\S $ForDationInterruptOrSignal \\
+\x \x $\mid$ \code{\hlink{ConfigurationElement}} \} $^{...}$ ]\\ 
 

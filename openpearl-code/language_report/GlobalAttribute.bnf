@@ -1,3 +1,2 @@
 \htgt{GlobalAttribute} ::=\\
-%%%\x {\bf GLOBAL} [ ( \hlink{Indicator}$\S $Module ) ]\\
-\x {\bf GLOBAL} [ ( \hlink{Identifier}$\S $OfTheModule ) ]\\
+\x \kw{GLOBAL} [ ( \hlink{Identifier}$\S $OfTheModule ) ]\\
