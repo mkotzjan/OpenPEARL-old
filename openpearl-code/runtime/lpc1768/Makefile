@@ -19,8 +19,6 @@ LINK.o = $(LINK.cc)
 #LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
 
-
-
 IC_DIR = ../includeComposer
 IC = $(IC_DIR)/ic
 DWS = $(IC_DIR)/dws
@@ -236,7 +234,8 @@ startup_lpc1768.o: startup_lpc1768.S
 
 OpenPEARLlpc1768_board.o: $(BOARDSUPPORT_OBJ)
 	@echo "[create] $@"
-	@$(CC) -nostdlib -Xlinker -r $(NOHOST) $(CFLAGS) $(INCS) -o $@ $^
+#	$(CC) -nostdlib -Xlinker -r $(NOHOST) $(CFLAGS) $(INCS) -o $@ $^
+	$(CC) -nostdlib -Xlinker -Ur $(NOHOST)  -o $@ $^
 
 libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@echo "[create] $@"
@@ -272,6 +271,8 @@ clean:
 	@rm -f $(addsuffix .new,$(CHECK_FILES))
 	@rm -rf html
 	@rm -rf latex
+	@rm -f ../common/tests/*.o
+	@rm -f tests/*.o
 
 phony += doc
 doc:
@@ -280,6 +281,7 @@ doc:
 
 phony += prepare
 prepare:
+	@mkdir -p $(CONFIG_INSTALL_Target)/lib/ldscripts
 	@touch $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a
 	@chmod 666 $(CONFIG_INSTALL_Target)/lib/libOpenPEARLlpc1768.a
 	@touch $(CONFIG_INSTALL_Target)/lib/OpenPEARLlpc1768_board.o

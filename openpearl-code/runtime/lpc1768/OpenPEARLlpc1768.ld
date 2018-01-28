@@ -52,7 +52,7 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.isr_vector))
-		*(.text*)
+		*(.text .text.* .gnu.linkonce.t.*)
 
 		KEEP(*(.init))
 		KEEP(*(.fini))
@@ -128,7 +128,7 @@ SECTIONS
 	{
 		__data_start__ = .;
 		*(vtable)
-		*(.data*)
+		*(.data .data.* .gnu.linkonce.d.*)
 
 		. = ALIGN(4);
 		/* preinit data */
@@ -162,7 +162,7 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__bss_start__ = .;
-		*(.bss*)
+		*(.bss .bss.* .gnu.linkonce.b.*)
 		*(COMMON)
 		. = ALIGN(4);
 		__bss_end__ = .;
