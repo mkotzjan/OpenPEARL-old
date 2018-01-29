@@ -1,18 +1,21 @@
 \begin{discuss}
 REF INTERRUPT/IRPT, REF SIGNAL ok?
 
+\begin{tabbing}
+\x \{ \= [ \hlink{VirtualDimensionList} ] [ \kw{INV} ] \kill
 \htgt{TypeReference} ::=\\
-\x {\bf REF} \\
-\x \{ [ \hlink{VirtualDimensionList} ] [ {\bf INV} ] 
+\x \kw{REF} \{ \\
+\> [ \hlink{VirtualDimensionList} ] [ \kw{INV} ] 
 	\{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} \}\\
-\x \x $\mid$ [ \hlink{VirtualDimensionList} ] 
-	\{ \hlink{TypeDation} $\mid$ {\bf SEMA $\mid$ BOLT} \}\\
-\x \x $\mid$ \hlink{TypeProcedure} $\mid$ 
-	{\bf TASK $\mid$ INTERRUPT $\mid$ IRPT $\mid$ SIGNAL}\\
-\x \x 
+\> $\mid$ [ \hlink{VirtualDimensionList} ] 
+	\{ \hlink{TypeDation} $\mid$ \kw{SEMA} $\mid$ \kw{BOLT} \}\\
+\> $\mid$ \hlink{TypeProcedure} $\mid$ 
+	\kw{TASK} $\mid$ \kw{INTERRUPT} $\mid$ \kw{IRPT} $\mid$ \kw{SIGNAL}\\
+\> 
 %%%$\mid$ \hlink{Type-VOID}
- $\mid$ {\bf CHAR}( )\\
+ $\mid$ \kw{CHAR}( )\\
 \x \}
 
+\end{tabbing}
 \end{discuss}
 

@@ -1,3 +1,4 @@
 \htgt{StructureDeclaration} ::=\\
-\x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{StructureDenotation} [ , \hlink{StructureDenotation} ] $^{...}$ ;
+\x \{ \kw{DECLARE} $\mid$ \kw{DCL} \} \hlink{StructureDenotation}\\
+\x [ , \hlink{StructureDenotation} ] $^{...}$ ;
 

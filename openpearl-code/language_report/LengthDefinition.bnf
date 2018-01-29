@@ -5,9 +5,12 @@
 %%%                ( \hlink{Precision} ) ;\\
 %%%\end{removed}
 \begin{tabbing}
-\x {\bf LENGTH} \= \kill
-\htgt{LengthDefinition}::=\\
-\x {\bf LENGTH} \{ \{ {\bf FIXED $\mid$ FLOAT} \} (\hlink{Precision})\\
-              \x \> $\mid$ \{ {\bf BIT $\mid$ CHARACTER $\mid$ CHAR} \} (\hlink{LengthOfString}) \};
-\end{tabbing}
+\x \kw{LENGTH} \{ \= \{ \kw{FIXED} $\mid$ \kw{FLOAT} \} (\hlink{Precision})\kill
 
+\htgt{LengthDefinition}::=\\
+\x \kw{LENGTH} \{ \{ \kw{FIXED} $\mid$ \kw{FLOAT} \}
+          (\hlink{Precision}) $\mid$ \\
+\> 
+\{ \kw{BIT} $\mid$ \kw{CHARACTER} $\mid$ \kw{CHAR} \} 
+          (\hlink{LengthOfString}) \};
+\end{tabbing}

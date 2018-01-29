@@ -1,4 +1,5 @@
 \htgt{InitElement} ::=\\
 \x \hlink{Constant}\\
 \x $\mid$ \hlink{Identifier}$\S $NamedConstant\\
-\x $\mid$ \hlink{ConstantExpression}\\
+\x $\mid$ \hlink{ConstantExpression}
+

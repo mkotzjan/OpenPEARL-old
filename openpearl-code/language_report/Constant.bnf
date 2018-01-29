@@ -1,10 +1,6 @@
-\begin{tabbing}
-\x $\mid$ \= BitStringConstant \= $\mid$ \= \kill
-\htgt{Constant} ::= \> \> \> \\
-          \> \hlink{Integer}   \> $\mid$ \> \hlink{FloatingPointNumber}\\
-\x $\mid$ \> \hlink{BitStringConstant} \> $\mid$ \> \hlink{CharacterStringConstant}\\
-\x $\mid$ \> \hlink{TimeConstant} \> $\mid$ \> \hlink{DurationConstant}\\
-\x $\mid$ {\bf NIL} \\
-
-\end{tabbing}
+\htgt{Constant} ::=\\
+\x \hlink{Integer} $\mid$ \hlink{FloatingPointNumber} \\
+\x $\mid$ \hlink{BitStringConstant}  $\mid$  \hlink{CharacterStringConstant}\\
+\x $\mid$ \hlink{TimeConstant} $\mid$  \hlink{DurationConstant}\\
+\x $\mid$ \kw{NIL}
 

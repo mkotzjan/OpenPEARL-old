@@ -55,7 +55,7 @@ objects declared at module level may be used and --- as far as it is
 possible --- changed, the data exchange with a task can take place via
 data which are declared at module level. Particularly the access of
 several tasks to the same data, however, should carefully be
-synchronised with the means described in 9.3. In the case of the data 
+synchronised with the means described in \ref{sec_task_sync}. In the case of the data 
 exchange by I/O statements, the input/output functions
 already take over the synchronisation.
 
@@ -63,7 +63,7 @@ Example:
 
 A task Protocol deposits protocol texts in the variable Text to be
 delivered to a terminal via the task Output. (The needed synchronisation
-statements are explained in 9.3.)
+statements are explained in \ref{sec_task_sync}.)
 
 \begin{tabbing}
 \x Protocol: \= \kill

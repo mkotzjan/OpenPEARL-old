@@ -1,3 +1,4 @@
 \htgt{ScalarVariableDeclaration} ::=\\
-\x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{ScalarDeclareDataSentence} [ , \hlink{ScalarDeclareDataSentence} ] $^{...}$ ;
+\x \{ \kw{DECLARE} $\mid$ \kw{DCL} \} \hlink{ScalarDeclareDataSentence}\\
+\x  [ , \hlink{ScalarDeclareDataSentence} ] $^{...}$ ;
 

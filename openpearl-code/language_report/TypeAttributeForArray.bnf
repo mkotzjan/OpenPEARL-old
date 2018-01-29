@@ -9,8 +9,8 @@ vgl. TypeReference
 \x $\mid$ \hlink{TypeBitString} $\mid$ \hlink{TypeCharacterString} \\
 \x $\mid$ \hlink{TypeDefinition} 
 %%% added
-\\$\x \mid$ REF \{ \hlink{TypeDation} $\mid$ {\bf SEMA} $\mid$ {\bf BOLT} \\
-\x \x $\mid$ \hlink{TypeProcedure} $\mid$ {\bf TASK} $\mid$ {\bf CHAR()} \\
+\\$\x \mid$ \kw{REF} \{ \hlink{TypeDation} $\mid$ \kw{SEMA} $\mid$ \kw{BOLT} \\
+\x \x $\mid$ \hlink{TypeProcedure} $\mid$ \kw{TASK} $\mid$ \kw{CHAR()} \\
 \x \x ??? INTERRUPT, IPRT,SIGNAL \\
 \x \x \}
 

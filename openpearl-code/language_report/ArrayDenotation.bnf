@@ -1,8 +1,7 @@
 \htgt{ArrayDenotation} ::=\\
-\x \hlink{OneIdentifierOrList} \hlink{DimensionAttribute} 
+\x \hlink{OneIdentifierOrList} \hlink{DimensionAttribute}  \\
 %%%[ \hlink{AssignmentProtection} ] 
-[ {\bf INV} ]
-%%%\hlink{TypeAttribute}\\
-\hlink{TypeAttributeForArray}\\
+\x [ \kw{INV} ]
+ \hlink{TypeAttributeForArray}\\
 \x [ \hlink{GlobalAttribute} ] [ \hlink{InitialisationAttribute} ]
 

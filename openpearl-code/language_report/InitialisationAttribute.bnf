@@ -1,3 +1,4 @@
 \htgt{InitialisationAttribute} ::=\\
-\x \{ {\bf INITIAL $\mid$ INIT} \} ( \hlink{InitElement} 
-	[ , \hlink{InitElement} ] $^{...}$ )\\
+\x \{ \kw{INITIAL} $\mid$ \kw{INIT} \} ( \hlink{InitElement} 
+	[ , \hlink{InitElement} ] $^{...}$ )
+

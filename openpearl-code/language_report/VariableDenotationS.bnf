@@ -2,5 +2,5 @@
 \x 
 %%%\hlink{IdentifierDenotation}
 \hlink{OneIdentifierOrList}
-     [ {\bf INV} ] \hlink{TypeAttribute}\\
+     [ \kw{INV} ] \hlink{TypeAttribute}\\
 \x \{ \hlink{GlobalAttribute} $\mid$ \hlink{IdentificationAttribute} \}

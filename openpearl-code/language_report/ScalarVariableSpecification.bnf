@@ -1,4 +1,5 @@
 \htgt{ScalarVariableSpecification} ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{VariableDenotationS} [ , \hlink{VariableDenotationS} ] $^{...}$;
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{VariableDenotationS} \\
+\x  [ , \hlink{VariableDenotationS} ] $^{...}$;
 
 

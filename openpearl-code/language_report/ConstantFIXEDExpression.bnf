@@ -1,3 +1,3 @@
 \htgt{ConstantFIXEDExpression} ::=\\
-\x \hlink{Term} [ \{ + $\mid$ - \} \hlink{Term} ] $^{...}$\\
+\x \hlink{Term} [ \{ \kw{+} $\mid$ \kw{-} \} \hlink{Term} ] $^{...}$
         
