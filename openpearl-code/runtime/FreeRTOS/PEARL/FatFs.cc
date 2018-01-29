@@ -211,10 +211,9 @@ namespace pearlrt {
          // create temp file name
          struct timeval tv;
          gettimeofday(&tv, NULL);
-         sprintf(fileName, "AutoFile%ld.%06ld", time(NULL), tv.tv_usec);
+         sprintf(fileName, "AutoFile%ld.%06ld", (long)time(NULL), tv.tv_usec);
          fn = fileName;
       }
-
 
       o->dationOpen(fn, openParams);
       o->inUse = true;
