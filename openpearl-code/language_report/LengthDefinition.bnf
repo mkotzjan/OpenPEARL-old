@@ -5,12 +5,13 @@
 %%%                ( \hlink{Precision} ) ;\\
 %%%\end{removed}
 \begin{tabbing}
-\x \kw{LENGTH} \{ \= \{ \kw{FIXED} $\mid$ \kw{FLOAT} \} (\hlink{Precision})\kill
+\x \kw{LENGTH} \{ \= \{ \kw{FIXED} $\mid$ \kw{FLOAT} \} 
+     \kw{(}\hlink{Precision} \kw{)}\kill
 
 \htgt{LengthDefinition}::=\\
 \x \kw{LENGTH} \{ \{ \kw{FIXED} $\mid$ \kw{FLOAT} \}
-          (\hlink{Precision}) $\mid$ \\
+          \kw{(} \hlink{Precision} \kw{)} $\mid$ \\
 \> 
 \{ \kw{BIT} $\mid$ \kw{CHARACTER} $\mid$ \kw{CHAR} \} 
-          (\hlink{LengthOfString}) \};
+          \kw{(} \hlink{LengthOfString} \kw{)} \};
 \end{tabbing}
