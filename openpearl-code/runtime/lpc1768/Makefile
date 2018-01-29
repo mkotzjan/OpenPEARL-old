@@ -235,7 +235,7 @@ startup_lpc1768.o: startup_lpc1768.S
 OpenPEARLlpc1768_board.o: $(BOARDSUPPORT_OBJ)
 	@echo "[create] $@"
 #	$(CC) -nostdlib -Xlinker -r $(NOHOST) $(CFLAGS) $(INCS) -o $@ $^
-	$(CC) -nostdlib -Xlinker -Ur $(NOHOST)  -o $@ $^
+	@$(CC) -nostdlib -Xlinker -Ur $(NOHOST)  -o $@ $^
 
 libOpenPEARLlpc1768.a:  $(PLIB_OBJS)
 	@echo "[create] $@"

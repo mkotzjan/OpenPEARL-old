@@ -504,7 +504,7 @@ TEST(Fixed, AssignViaVoidPtr) {
     ASSERT_EQ(x31.x, 0x0000AAAA);
      
     assignIntToFixedViaVoidPointer(&x31,31,0xAAAA0000);
-    ASSERT_EQ(x31.x, 0xAAAA0000);
+    ASSERT_EQ(x31.x, (int32_t)0xAAAA0000);
     
     int64_t i64 = 0xFFFFFFFFAAAA0000ull; 
     assignIntToFixedViaVoidPointer(&x63,63,0xAAAA0000);

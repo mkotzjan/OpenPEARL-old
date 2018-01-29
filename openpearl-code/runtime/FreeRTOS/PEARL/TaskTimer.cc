@@ -49,7 +49,8 @@
 #include "Log.h"
 #include "Task.h"
 
-struct sigevent {}; //shoehorn for casting
+// with gcc 7.2.1 this causes an error 
+//struct sigevent {}; //shoehorn for casting
 
 namespace pearlrt {
    void TaskTimer::update() {
