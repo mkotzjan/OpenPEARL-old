@@ -1,3 +1,4 @@
 \htgt{BitFormat} ::=\\
-\x \{ {\bf B $\mid$ B1 $\mid$ B2 $\mid$ B3 $\mid$ B4} \} [ ( \hlink{Expression}$\S $NumberCharacters) ]
+\x \{ \kw{B} $\mid$ \kw{B1} $\mid$ \kw{B2} $\mid$ \kw{B3} $\mid$ \kw{B4} \}
+	 [ \kw{(} \hlink{Expression}$\S $NumberCharacters\kw{)} ]
 

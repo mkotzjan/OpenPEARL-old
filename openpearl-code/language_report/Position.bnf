@@ -1,9 +1,4 @@
 \htgt{Position} ::=\\
-%%%\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
-%%%\x $\mid$ \{ {\bf X $\mid$ SKIP $\mid$ PAGE} \} [ ( \hlink{Expression} ) ]\\
-%%%\x $\mid$ \{ {\bf POS $\mid$ ADV} \} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
-%%%\x $\mid$ \{ {\bf COL $\mid$ LINE} \} ( \hlink{Expression} )\\
-%%%\x $\mid$ {\bf SOP} ( \hlink{Name} [ , \hlink{Name} [ , \hlink{Name} ] ]  $/^*$ PositionVariables-FIXED $^*/$ )\\
-\x \hlink{AbsolutePosition} $\mid$ \hlink{RelativePosition} $\mid$ 
-  {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+\x \hlink{AbsolutePosition} $\mid$ \hlink{RelativePosition}\\
+\x  $\mid$ \kw{RST} \kw{(} \hlink{Name}$\S $ErrorVariable-FIXED \kw{)}
 

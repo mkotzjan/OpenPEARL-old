@@ -1,4 +1,4 @@
 \htgt{PriorityAttribute} ::=\\
-\x \{ {\bf PRIORITY $\mid$ PRIO} \}
-	 \hlink{ConstantFIXEDExpression}$\S $GreaterZero\\
+\x \{ \kw{PRIORITY} $\mid$ \kw{PRIO} \}
+	 \hlink{ConstantFIXEDExpression}$\S $GreaterZero
 

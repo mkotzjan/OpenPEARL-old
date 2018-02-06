@@ -1,7 +1,12 @@
 \htgt{DyadicOperator} ::=\\
-\x + $\mid$ - $\mid$ * $\mid$ / $\mid$ // $\mid$ {\bf REM} $\mid$ ** \\
-\x $\mid$ $<$ $\mid$ {\bf LT} $\mid$ $>$ $\mid$ {\bf GT} $\mid$ $<$= $\mid$ {\bf LE} $\mid$ $>$= $\mid$ {\bf GE} $\mid$ == $\mid$ {\bf EQ} $\mid$ /= $\mid$ {\bf NE} \\
-\x $\mid$ {\bf AND $\mid$ OR $\mid$ EXOR} $\mid$ $><$ $\mid$ {\bf CAT} $\mid$ $<>$ $\mid$ {\bf CSHIFT $\mid$ SHIFT $\mid$ LWB $\mid$ UPB \\
-\x $\mid$ IS $\mid$ ISNT $\mid$ FIT}
+\x \kw{+} $\mid$ \kw{-} $\mid$ \kw{*} $\mid$ \kw{/} $\mid$ \kw{//} $\mid$
+    \kw{REM} $\mid$ \kw{**} \\
+\x $\mid$ \kw{$<$} $\mid$ \kw{LT} $\mid$ \kw{$>$} $\mid$ \kw{GT} $\mid$
+    \kw{$<$=} $\mid$ \kw{LE} $\mid$ \kw{$>$=} $\mid$ \kw{GE} $\mid$ \kw{==}
+     $\mid$ \kw{EQ} $\mid$ \kw{/=} $\mid$ \kw{NE} \\
+\x $\mid$ \kw{AND} $\mid$ \kw{OR} $\mid$ \kw{EXOR} $\mid$ 
+    \kw{$><$} $\mid$ \kw{CAT} $\mid$ \kw{$<>$} $\mid$ \kw{CSHIFT}
+     $\mid$ \kw{SHIFT} $\mid$ \kw{LWB} $\mid$ \kw{UPB} \\
+\x $\mid$ \kw{IS} $\mid$ \kw{ISNT} $\mid$ \kw{FIT}
 %%% \x $\mid$ Identifier\S UserDefinedDyadicOperator
 

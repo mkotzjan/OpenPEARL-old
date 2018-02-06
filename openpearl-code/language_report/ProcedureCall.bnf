@@ -1,4 +1,4 @@
 \htgt{ProcedureCall} ::= \\
-\x [ {\bf CALL} ] \hlink{Name}$\S $SubprogramProcedure
-	 [ \hlink{ListOfActualParameters} ] ;\\
+\x [ \kw{CALL} ] \hlink{Name}$\S $SubprogramProcedure
+	 [ \hlink{ListOfActualParameters} ] \kw{;}
 

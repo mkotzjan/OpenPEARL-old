@@ -5,12 +5,12 @@ Dation Grammatik?
 Sollte Typology aufgeteilt werden in eine Fassung fuer DCL und eine Fassung fuer SPC? --- bei SPC kein TFU(Puffergroesse)
 
 \htgt{Typology} ::=\\
-\x {\bf DIM} ( \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \}\\
-\x \x [ , \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \}\\
-\x \x \x [ , \{ $^*$ $\mid$ \hlink{ConstantFIXEDExpression} \} ] ] ) 
-\removedtext{[ {\bf TFU} [ {\bf MAX} ] ]}\\
+\x \kw{DIM} \kw{(} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \}\\
+\x \x [ \kw{,} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \}\\
+\x \x \x [ \kw{,} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \} ] ] \kw{)} 
+[ \kw{TFU} \removedtext{ [ {\bf MAX} ]} ]\\
 \x $\mid$ 
-	{\bf DIM} ( [ , [ , ] ] )
+	\kw{DIM} ( [ \kw{,} [ \kw{,} ] ] )
 	 $/^*$ Virtual dimension declaration 
 	only permitted for SPC $*/$\\
 

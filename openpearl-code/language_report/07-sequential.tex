@@ -17,7 +17,9 @@ Such control statements are
 \item the exit statement
 \end{itemize}
 
+\begin{grammarframe}
 \input{SequentialControlStatement.bnf}
+\end{grammarframe}
 
 %%%\begin{added}
 \section{Empty Statement}
@@ -27,7 +29,9 @@ The empty statement  consists of one semicolon only and has no effects.
 
 The general form of the empty statement reads:
 
+\begin{grammarframe}
 \input{EmptyStatement.bnf}
+\end{grammarframe}
 
 %%%\end{added}
 
@@ -39,12 +43,14 @@ With the help of the conditional statement, it is determined depending
 on the result of an expression with which statement the program
 execution is to continued.
 
+\begin{grammarframe}
 \input{IfStatement.bnf}
 \index{IF@\textbf{IF}}
 \index{THEN@\textbf{THEN}}
 \index{ELSE@\textbf{ELSE}}
 %\index{FIN@\textbf{FIN}}
 \index{FIN@\textbf{FIN}!\textbf{IF}}
+\end{grammarframe}
 
 The result of the expression must be of type BIT(1). If the expression
 provides value '1'B (true), the statements following THEN are evaluated;
@@ -56,13 +62,18 @@ following FIN is evaluated subsequently.
 
 Example:
 
-{\bf IF} gradient $>$ degree\_bound \\
-\x {\bf THEN} alarm;\\
-\x {\bf ELSE IF} gradient $>$ degree\_threshold \\
-\x \x \x {\bf THEN ALL} 1 {\bf SEC ACTIVATE} measurement; ! measure more often\\
-\x \x {\bf FIN};\\
-{\bf FIN};\\
+\begin{lstlisting}
+IF gradient > degreeBound
+THEN
+   alarm;
+ELSE
+   IF gradient > degreeThreshold 
+   THEN 
+      ALL 1 SEC ACTIVATE measurement; ! measure more often
+   FIN;
+FIN;
 ...
+\end{lstlisting}
 
 \section{Statement Selection (CASE)}  % 7.2
 \label{sec_case}
@@ -86,6 +97,7 @@ provided in two (historically caused) forms is suitable: The older form
 allows only integers as distinction criteria; the newer one permits also
 characters. At first, the older form is described:
 
+\begin{grammarframe}
 \input{CaseStatement.bnf}
 \input{CaseStatement1.bnf}
 \index{CASE@\textbf{CASE}}
@@ -95,141 +107,142 @@ characters. At first, the older form is described:
 %\index{FIN@\textbf{FIN}}
 \index{FIN@\textbf{FIN}!\textbf{CASE} Statement}
 \index{OUT@\textbf{OUT}!\textbf{CASE} Statement}
+\end{grammarframe}
 
 The number 1 is assigned to the statement sequence following the first
-ALT (alternative 1), the number 2 to the statement sequence following
-the second ALT (alternative 2), etc.
+\code{ALT} (alternative 1), the number 2 to the statement sequence following
+the second \code{ALT} (alternative 2), etc.
 
 Upon execution of the case statement, the given expression is
-evaluated; it must result in a value of type {\bf FIXED}. If the integer value
+evaluated; it must result in a value of type \code{FIXED}. If the integer value
 is between 1 and the number of given alternatives, the associated
 statement sequence is executed; otherwise the statement sequence
-following OUT (if given) is executed.
+following \code{OUT} (if given) is executed.
 
 If the selected statement sequence does not contain a jump out of the
-statement selection, the statement following FIN is evaluated
+statement selection, the statement following \code{FIN} is evaluated
 subsequently.
 
 Example:
 
 The above problem can be programmed as follows:
 
-\begin{tabbing}
-
-control: \= {\bf TASK} \= order {\bf BIT}(8)) \x \= \kill
-
-supply:  \> {\bf TASK} \> {\bf PRIO} 7;       \> \\
- \> \> \> \\
-control: \> {\bf PROC} \> (No {\bf FIXED},    \> ! device \\
- \>             \> order {\bf BIT}(8)) \> ! order inf.\\
- \> {\bf RETURNS} ({\bf FIXED});   \>  \> \\
- \> ! procedure body for carrying out the control order \> \> \\
- \> {\bf END}; ! control \> \> \\
- \> ... \> \> \\
- \> ! creating an order for the device with index no \> \> \\
- \> \> \> \\
-again:   \> {\bf CASE} \> control (no, order) \> \\
- \> {\bf ALT}   \> ! order carried out \> \\
- \>             \> ; \> \\
- \> {\bf ALT}   \> ! order inf. wrong \> \\
- \>             \> {\bf CALL} error(2); {\bf GOTO} end; \> \\
- \> {\bf ALT}   \> ! device dead \> \\
- \>             \> {\bf ACTIVATE} device\_breakdown {\bf PRIO} 2; \> \\
- \>             \> {\bf CALL} error(3); {\bf GOTO} end; \> \\
- \> {\bf ALT}   \> ! device works incorrectly \> \\
- \>             \> {\bf CALL} device\_check; {\bf GOTO} again; \> \\
- \> {\bf OUT}   \> ! result out of range \> \\
- \>             \> {\bf CALL} error(5); \> \\
- \> {\bf FIN}; \> \> \\
- \> ...         \> \> \\
-end:     \> {\bf END}; \> ! supply \>
-\end{tabbing}
+\begin{lstlisting}
+control: PROC(deviceNumber FIXED,    ! device 
+              order        BIT(8))   ! order information
+         RETURNS (FIXED);  
+  ! procedure body for carrying out the control order
+END; ! control 
+ 
+supply: TASK PRIO 7;
+! creating an order for the device with index no 
+   ... 
+again:  
+   CASE control (no, order)
+   ALT                        ! order carried out 
+      ; 
+   ALT                        ! order inf. wrong 
+      CALL error(2);
+      GOTO end;
+   ALT                        ! device dead
+      ACTIVATE deviceBreakdown PRIO 2;
+      CALL error(3);
+      GOTO end;
+   ALT                        ! device works incorrectly
+      CALL deviceCheck;
+      GOTO again;
+   OUT                        ! result out of range
+      CALL error(5);
+   FIN; 
+  ...         
+end: 
+END; ! supply 
+\end{lstlisting}
 
 %%%In this example, the empty statement is used. It consists of one
 %%%semicolon only and has no effects.
-The keyword ALT must be followed by
+The keyword \code{ALT} must be followed by
 one statement at least; this may also be an empty statement. It has no
 effects and is only of interest in conditional statements and statement
 selections.
 
 In the example, the empty statement results in the immediate execution
-of the statement following FIN in the case of success (``request carried
+of the statement following \code{FIN} in the case of success (``request carried
 out'').
 
 
 The second form of the statement selection has the following form:
 
+\begin{grammarframe}
 \input{CaseStatement2.bnf}
 \index{CASE@\textbf{CASE}}
 \index{CASE@\textbf{CASE}!\textbf{OUT}}
 \index{CASE@\textbf{CASE}!\textbf{FIN}}
 \index{CASE@\textbf{CASE}!\textbf{ALT}}
-
 \input{CaseIndex.bnf}
-
-%%%\begin{front}
-%%%CaseList ::= \\
-%%%\x IndexRange [ , Index-Range ]$^{...}$
-%%%
-%%%IndexRange ::= \\
-%%%\x Constant [ : Constant ]
-%%%\end{front}
-
 \input{CaseList.bnf}
 \input{IndexRange.bnf}
+\end{grammarframe}
 
-All given constants must be of type CaseIndex expression; CHAR(1) or
-FIXED are allowed.
+All given constants must be of type CaseIndex expression; \code{CHAR(1)} or
+\code{FIXED} are allowed.
 
 When executing the StatementSelection2, the CaseIndex is evaluated.
 If the value is contained in one of the given case lists, the associated
 statement sequence is executed; otherwise the statement sequence
-following OUT (if given) is executed.
+following \code{OUT} (if given) is executed.
 
 If the selected statement sequence does not contain a jump out of the
-statement selection, the statement following FIN is evaluated
+statement selection, the statement following \code{FIN} is evaluated
 subsequently.
 
 Examples:
 
-\begin{tabbing}
-{\bf CASE} \= {\bf ALT} ('A':'Z') \= \kill
+\begin{lstlisting}
+DCL  (operator, chr) CHAR(1),
+     (x, y)          FIXED;
+...       
+CASE operator 
+ALT ('+')
+   x := x + y;
+ALT ('-')
+   x := x - y; 
+ALT ('*')
+   x := x * y; 
+ALT ('/')
+   CASE y 
+   ALT (0) CALL error;
+   OUT x := x//y;
+   FIN;
+FIN; 
+    
+CASE chr 
+ALT ('A':'Z')
+   CALL uppercase;
+ALT ('a':'z')
+   CALL lowercase;
+FIN;
 
-{\bf DCL}  \> (Operator, chr)CHAR(1), (x, y) {\bf FIXED}; \> \\
-...        \> \> \\
-{\bf CASE} \> Operator \> \\
-    \> {\bf ALT} ('+')    \> x := x + y; \\
-    \> {\bf ALT} ('-')    \> x := x - y; \\
-    \> {\bf ALT} ('*')    \> x := x * y; \\
-    \> {\bf ALT} ('/')    \> {\bf CASE} y \\
-    \>                    \> {\bf ALT} (0) {\bf CALL} Error;\\
-    \>                    \> {\bf OUT} x := x//y;\\
-    \>                    \> {\bf FIN};\\
-{\bf FIN}; \> \> \\
-    \> \> \\
-{\bf CASE} \> chr \> \\
-    \> {\bf ALT} ('A':'Z') \> {\bf CALL} uppercase;\\
-    \> {\bf ALT} ('a':'z') \> {\bf CALL} lowercase;\\
-{\bf FIN}; \> \> \\
-    \> \> \\
-{\bf CASE} \> chr \> \\
-    \> {\bf ALT} ('A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u') {\bf CALL} Vocal(chr); \> \\
-    \> ... \> \\
-{\bf FIN}; \> \>
-\end{tabbing}
+CASE chr 
+ALT ('A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u')
+   CALL vocal(chr);
+FIN;
+\end{lstlisting}
 
 It is not intended to mix both forms of the statement selection. Thus,
 e.g., the following is not correct:
 
-\begin{tabbing}
-{\bf CASE} \= {\bf ALT} /* 1 */ \= \kill
-
-{\bf CASE} \> ErrNum \> \\
-    \> {\bf ALT} /* 1 */  \> {\bf CALL} ok;\\
-    \> {\bf ALT} (0)      \> {\bf CALL} nothing\_done;\\
-    \> {\bf ALT} (-99:-1) \> {\bf CALL} ErrorMsg (ErrNum);\\
-    \> ... \>
-\end{tabbing}
+\begin{lstlisting}
+CASE errNum 
+ALT /* 1 */ 
+   CALL ok;
+ALT (0) 
+   CALL nothingDone;
+ALT (-99:-1)
+   CALL errorMsg (errNum);
+ ... 
+FIN;
+\end{lstlisting}
 
 The selection must be deterministic.
 
@@ -241,27 +254,18 @@ Jumps into a case statement are forbidden (refer chapter \ref{sec_goto}).
 
 Often, a statement sequence must be executed repeatedly, with only one
 parameter changing. E.g., various devices are to be checked; let
-num\_devices be the number of devices:
+\code{numberOfDevices} be the number of devices:
 
-{\bf FOR} i {\bf FROM} 1 {\bf BY} 1 {\bf TO} num\_devices\\
-{\bf REPEAT}\\
-\x checking of device(i)\\
-{\bf END};
+\begin{lstlisting}
+FOR i FROM 1 BY 1 TO numberOfDevices
+REPEAT
+   ! checking of device(i)
+END;
+\end{lstlisting}
 
 In general, such ``program loops'' are constructed like this:
 
-%%%\begin{front}
-%%%repetition ::= \\
-%%%\x [ {\bf FOR} Identifier\S ControlVariable ] \\
-%%%\x [ {\bf FROM} Expression\S InitialValue ] \\
-%%%\x [ {\bf BY} Expression\S Increment ] \\
-%%%\x [ {\bf TO} Expression\S FinalValue ] \\
-%%%\x [ {\bf WHILE} Expression\S Condition ] \\
-%%%\x {\bf REPEAT} \\
-%%%\x [ Declaration ]$^{...}$ [ Statement ]$^{...}$ \\
-%%%\x {\bf END} [ Identifier\S Loop ] ;
-%%%\end{front}
-%%%\begin{grammar}
+\begin{grammarframe}
 \input{LoopStatement.bnf}
 \index{FOR@\textbf{FOR}}
 \index{FROM@\textbf{FROM}!\textbf{FOR}}
@@ -271,30 +275,33 @@ In general, such ``program loops'' are constructed like this:
 \index{REPEAT@\textbf{REPEAT}}
 \index{END@\textbf{END}!\textbf{FOR}}
 
-%%%\end{grammar}
-The declarations and statements following REPEAT, i.e., the loop body,
+\end{grammarframe}
+The declarations and statements following \code{REPEAT}, i.e., the loop body,
 are run so often as specified by the clauses given in front of them; the
-statement following END is carried out subsequently. However, it is also
+statement following \code{END} is carried out subsequently. However, it is also
 possible to leave the loop body prematurely by a jump statement (cf. \ref{sec_goto})
 or the exit statement (cf. \ref{sec_exit}). Jumps into the loop body are not permitted.
 
 In the loop body, all statements are permitted; thus, particularly
 repetitions can be nested:
 
-{\bf FOR} i {\bf TO} 10\\
-{\bf REPEAT} \\
-\x {\bf FOR} k {\bf TO} 10 \\
-\x {\bf REPEAT} \\
-\x \x c (i,k) := a (i,k) + b(i,k);\\
-\x {\bf END};\\
-{\bf END};
+\begin{lstlisting}
+FOR i TO 10
+REPEAT
+   FOR k TO 10 
+   REPEAT 
+      c (i,k) := a (i,k) + b(i,k);
+   END;
+END;
+\end{lstlisting}
 
-If InitialValue or Increment are missing, they are assumed as 1. If FinalValue is lacking, the loop body can be repeated unrestrictedly.
+If InitialValue or Increment are missing, they are assumed as 1. 
+If FinalValue is lacking, the loop body can be repeated unrestrictedly.
 
 The ControlVariable may neither be declared nor changed; it has
-implicitly type FIXED. The values of the expressions for InitialValue,
-Increment and FinalValue have to be of type FIXED, the value of the
-expression for the Condition must be of type BIT(1).
+implicitly type \code{FIXED}. The values of the expressions for InitialValue,
+Increment and FinalValue have to be of type \code{FIXED}, the value of the
+expression for the Condition must be of type \code{BIT(1)}.
 
 The ControlVariable may not be used in the given expressions, except
 for Expression\S Condition, but in the statements to be repeated.
@@ -311,14 +318,14 @@ The default precision is 31.
 The flow chart depicted in Figure~\ref{schleife} is an equivalent representation of the
 statement
 
-{\bf FOR} Identifier\S ControlVariable \\
-{\bf FROM} Expression\S InitialValue \\
-{\bf BY} Expression\S Increment \\
-{\bf TO} Expression\S FinalValue \\
-{\bf WHILE} Expression\S Condition \\
-{\bf REPEAT} \\
-\x LoopBody \\
-{\bf END};
+\kw{FOR}   Identifier\S ControlVariable \\
+\kw{FROM}  Expression\S InitialValue \\
+\kw{BY}    Expression\S Increment \\
+\kw{TO}    Expression\S FinalValue \\
+\kw{WHILE} Expression\S Condition \\
+\kw{REPEAT}\\
+\x   LoopBody \\
+\kw{END;}
 
 %%%\begin{added}
 Regard that the expression for the increment and the final
@@ -444,9 +451,10 @@ a range exception.
 \label{sec_goto}
 \index{Statement!\textbf{GOTO}}
 
-
+\begin{grammarframe}
 \input{GoToStatement.bnf}
 \index{GOTO@\textbf{GOTO}}
+\end{grammarframe}
 
 This statement has the result that program processing is continued at
 the program position determined by the label identifier.
@@ -458,15 +466,14 @@ in the same procedure or task.
 
 Example:
 
-\begin{tabbing}
-measure: read: \= \kill
-        \> ...\\
-measure: read: \> {\bf READ} value {\bf FROM} device;\\
-        \> ... \\
-        \> {\bf GOTO} read;
-\end{tabbing}
+\begin{lstlisting}
+  ...
+measure: read: READ value FROM device;
+  ... 
+  GOTO read;
+\end{lstlisting}
 
-In general, statements can (several times) be marked with lables; i.e.,
+In general, statements can (several times) be marked with labels; i.e.,
 the label is given immediately before the (possibly already marked)
 statement, separated by a colon.
 
@@ -476,12 +483,14 @@ statement, separated by a colon.
 \index{Statement!Leave block (\textbf{EXIT})}
 
 The exit statement serves to exit blocks and loops deliberately. With
-EXIT, also blocks and loops nested several times can be exited
+\code{EXIT}, also blocks and loops nested several times can be exited
 deliberately, which must have an identifier (the jump target) at the
 corresponding end.
 
+\begin{grammarframe}
 \input{ExitStatement.bnf}
 \index{EXIT@\textbf{EXIT}}
+\end{grammarframe}
 
 If the identifier is missing, program processing is continued with the
 statement following the end of the block or the loop containing the exit
@@ -495,26 +504,26 @@ statement being in an internal block or loop.
 
 Example:
 
-\begin{tabbing}
-\hspace*{7cm} \= \kill
+\begin{lstlisting}
+...
+BEGIN                ! analysis 
+   ... 
+  TO number REPEAT   ! comparison */ 
+     ... 
+     IF measuredValue < boundaryValue 
+     THEN
+        EXIT analysis;
+     ELSE
+         ...
+     FIN;
+     ... 
+   END comparison; 
+... 
+END analysis;
+RETURN (ok);
+... 
+\end{lstlisting}
 
-... \> \\
-{\bf BEGIN} \> /* analysis */ \\
-\x ... \> \\
-\x {\bf TO} number {\bf REPEAT} \> /* comparison */ \\
-\x \x ... \> \\
-\x \x {\bf IF} MeasuredValue $<$ BoundaryValue \> \\
-\x \x {\bf THEN EXIT} analysis; \> \\
-\x \x {\bf ELSE} ... \> \\
-\x \x {\bf FIN}; \> \\
-\x \x ... \> \\
-\x {\bf END} comparison; \> \\
-\x ... \> \\
-{\bf END} analysis; \> \\
-{\bf RETURN} (OK);\> \\
-\x ... \>
-\end{tabbing}
-
-The execution of ``EXIT analysis;'' would immediately be followed by
-``RETURN (OK);''.
+The execution of \code{EXIT analysis;} would immediately be followed by
+\code{RETURN (ok);}.
 

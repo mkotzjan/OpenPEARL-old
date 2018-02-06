@@ -37,35 +37,36 @@ Dies ist Thema auf der AK-Sitzung im November 2016.
 \begin{table}[htb]
 \begin{tabular}{lccccccccc}
 {\bf type}     & \multicolumn{9}{c}{{\bf usage}} \\ 
-               & array & struct. & para- & result & ref.  & dation & INV & GLOBAL & INIT \\ 
+               & array & struct. & para- & result & ref.  & dation & \code{INV} & \code{GLOBAL} & \code{INIT} \\ 
                &       &         & meter & type   & value & class  &     &        &      \\ \hline
-FIXED          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-FLOAT          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-BIT            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-CHAR           & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-CLOCK          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-DUR            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-SEMA           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
-BOLT           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
-IRPT           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
-SIGNAL         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
-DATION         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{FIXED}          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{FLOAT}          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{BIT}            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{CHAR}           & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{CLOCK}          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{DUR}            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{SEMA}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{BOLT}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{IRPT}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{SIGNAL}         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{DATION}         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
 array          & --    &  x      & x     &  --    &  x    &   --   &  x  &    x   &  x   \\
-STRUCT         & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{STRUCT}         & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
 new type       & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
-REF            & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+\code{REF}            & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
 procedure      & --    &  --     & --    &  --    &  x    &   --   &  -- &    x   &  --  \\
-TASK           & --    &  --     & --    &  --    &  x    &   --   &  -- &    x   &  --  \\
-FORMAT         & --    &  --     & --    &  --    &  --   &   --   &  -- &    --  &  --  \\
-REF CHAR ( )   & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
-REF PROC       & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
-REF TASK       & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+\code{TASK}           & --    &  --     & --    &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{FORMAT}         & --    &  --     & --    &  --    &  --   &   --   &  -- &    --  &  --  \\
+\code{REF CHAR ( )}   & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
+\code{REF PROC}       & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
+\code{REF TASK}       & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
 %%% REF STRUCT [ ] & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
 \end{tabular}
 \end{table}
                                                                                  
-Objects of type SEMA, BOLT, IRPT, SIGNAL, DATION or array may only be 
-passed on by means of identification (IDENT) as procedure parameters.
+Objects of type \code{SEMA}, \code{BOLT}, \code{IRPT}, \code{SIGNAL}, \code{DATION}
+ or array may only be 
+passed on by means of identification (\code{IDENT}) as procedure parameters.
 
 \newpage
 \section{Predefined Functions}   % A 2
@@ -90,9 +91,9 @@ the predefined function in the whole program.
 \label{sec_function_now}
 
 The function procedure NOW passes back the actual time or system time, resp., 
-as value of type CLOCK. The specification of the function looks like this:\\
+as value of type \code{CLOCK}. The specification of the function looks like this:\\
 
-{\bf SPC} NOW {\bf PROC RETURNS ( CLOCK ) GLOBAL} ; 
+\kw{SPC}\code{ NOW }\kw{PROC RETURNS ( CLOCK ) GLOBAL}\code{ ;} 
 \index{Predefined Functions!\textbf{NOW}}
 \index{NOW@\textbf{NOW}}
 
@@ -100,12 +101,12 @@ as value of type CLOCK. The specification of the function looks like this:\\
 \subsection{The Function DATE}    % A 2.2
 \label{sec_function_date}
 
-The actual date can be received by invoking the function procedure DATE.
+The actual date can be received by invoking the function procedure \code{DATE}.
 The function result is a character string constant of length 10, containing
 the date in the form ``year--month--day''. Here an example for December 5,
 1991: ``1991--12-05''. The function must  be specified like this:\\
 
-{\bf SPC} DATE {\bf PROC RETURNS ( CHAR(10) ) GLOBAL} ;
+\kw{SPC}\code{ DATE }\kw{PROC RETURNS ( CHAR(10) ) GLOBAL}\code{ ;}
 \index{Predefined Functions!\textbf{DATE}}
 \index{DATE@\textbf{DATE}}
 
@@ -129,20 +130,21 @@ statements.
 \end{discuss}
 
 The syntax is.
-
+\begin{grammarframe}
 CPPInsertion ::=\\
-\x {\bf \_\_cpp\_\_} ( CStringConstant ... );
-
+\x \kw{\_\_cpp\_\_} \kw{(} \hlink{CStringConstant}$^{...}$ \kw{)} \kw{;}
+\end{grammarframe}
 The CStringConstants are expected in C notation.
 All quotations from C apply for these constants.
 
 Example:
-
-\_\_cpp\_\_(	\\
-\x ''// a simple C++ comment!''	\\
-\x '' char c = 'c';    ''\\
-\x '' printf($\backslash$''this we be sent to stdout$\backslash$n$\backslash$'');  '' \\
+\begin{lstlisting}
+__cpp__(	
+    "// a simple C++ comment!"
+    " char c = 'c';   " 
+    " printf(\"this we be sent to stdout\n\");  " 
 );
+\end{lstlisting}
 
 %%%\end{added}
 
@@ -193,7 +195,13 @@ no meta characters and have thus no grouping effect!\\
 
 The symbol PEARL-Program is the initial symbol of the following syntax
 description.
+\begin{discuss}
+die hier eingerahmenten Grammatikelemente teten vorne nicht auf
 
+sind dies widersprüchlich?
+
+korrekt?
+\end{discuss}
 \subsection{Program}    % A 3.1
 
 \input{Program.bnf}
@@ -221,7 +229,7 @@ description.
 
 
 \subsection{Basic Elements}    % A 3.3 
-
+\begin{grammarframe}
 \htgt{Digit} ::=\\
 \x 0 $\mid$ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7 $\mid$ 8 $\mid$ 9\\
 
@@ -230,6 +238,7 @@ description.
 
 \htgt{Identifier} ::=\\
 \x \hlink{Letter} [ \hlink{Letter} $\mid$ \hlink{Digit} $\mid$ \_ ] $^{...}$\\
+\end{grammarframe}
 
 \input{Constant.bnf}
 
@@ -239,6 +248,7 @@ description.
 
 \input{Precision.bnf}
 
+\begin{grammarframe}
 \htgt{FloatingPointNumber} ::=\\
 \x \hlink{FloatingPointNumberWithoutPrecision} [ ( \hlink{Precision} ) ]\\
 
@@ -287,6 +297,7 @@ description.
 \htgt{Seconds} ::=\\
 \x \{ \hlink{IntegerWithoutPrecision} 
 	$\mid$ \hlink{FloatingPointNumberWithoutPrecision} \} {\bf SEC}
+\end{grammarframe}
 
 \input{ConstantExpression.bnf}
 
@@ -302,6 +313,7 @@ description.
 
 \subsubsection{Declaration}    % A 3.4.1
 
+\begin{grammarframe}
 \htgt{Declaration} ::=\\
 \x \hlink{LengthDefinition} \\
 \x $\mid$ \hlink{TypeDefinition}\\
@@ -311,6 +323,7 @@ description.
 \x $\mid$ \hlink{TaskDeclaration}\\
 %%%% added
 \x $\mid$ \hlink{UserSignalDeclaration}\\
+\end{grammarframe}
 
 %%%%%\begin{removed}
 %%%%%\x $\mid$ OperatorDefinition\\
@@ -366,18 +379,22 @@ Doppelte Regel mit DationDeclaration
 \input{DimensionAttribute.bnf}
 
 \input{DimensionBoundaries.bnf}
-        
+ 
+\begin{grammarframe}       
 \htgt{ProblemDataAttribute} ::=\\
 \x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} 
 	$\mid$ \hlink{TypeReference} \}\\
 \x [ \hlink{GlobalAttribute} ] [ \hlink{InitialisationAttribute} ]\\
+\end{grammarframe}       
 
 \input{SimpleType.bnf}
 
+\begin{grammarframe}       
 \htgt{StructuredType} ::=\\
 \x \hlink{TypeStructure} $\mid$ \hlink{Identifier}$\S $ForNewDefinedType\\
 
 % war schon mal da \input{TypeStructure.bnf}
+\end{grammarframe}
 
 \input{StructureComponent.bnf}
 
@@ -408,6 +425,7 @@ Doppelte Regel mit DationDeclaration
 \input{StructureSpecification.bnf}
 \input{StructureDenotationS.bnf}
 
+\begin{grammarframe}
 \htgt{SemaAttribute} ::=\\
 \x {\bf SEMA} [ \hlink{GlobalAttribute} ]\\
 \x [ {\bf PRESET} ( \hlink{ConstantFIXEDExpression}
@@ -415,6 +433,7 @@ Doppelte Regel mit DationDeclaration
 
 \htgt{BoltAttribute} ::=\\
 \x {\bf BOLT} [ \hlink{GlobalAttribute} ]\\
+\end{grammarframe}
 
 \input{GlobalAttribute.bnf}
 
@@ -450,8 +469,10 @@ Doppelte Regel mit DationDeclaration
 
 \input{AccessAttribute.bnf}
 
+\begin{grammarframe}
 \htgt{FormatDeclaration} ::= \\
 \x \hlink{Identifier} : {\bf FORMAT} ( \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ ) ;\\
+\end{grammarframe}
 
 \input{ProcedureDeclaration.bnf}
 
@@ -494,7 +515,7 @@ Auswirkung auf alte Teile pruefen
 \input{VariableDenotationS.bnf}
 \end{discuss}
 
-
+\begin{grammarframe}
 \htgt{Specification} ::=\\
 \x \{ {\bf SPC $\mid$ SPECIFY} \} \hlink{SpecificationDefinition} [ , \hlink{SpecificationDefinition} ] $^{...}$ ;\\
 
@@ -517,6 +538,7 @@ Auswirkung auf alte Teile pruefen
 \x \{ {\bf ENTRY} $\mid$ [ : ] {\bf PROC} \} [ 
 	\hlink{ParameterListForSPC} ] [ \hlink{ResultAttribute} ] \\
 \x \x \hlink{GlobalAttribute}\\
+\end{grammarframe}
 
 %%%\begin{removed}
 %%%\htgt{ParameterListFor-SPC} ::=\\
@@ -533,8 +555,10 @@ Auswirkung auf alte Teile pruefen
 \input{ParameterSpecification.bnf}
 \input{TypeProcedure.bnf}
 
+\begin{grammarframe}
 \htgt{TaskUsageAttribute} ::=\\
 \x {\bf TASK} \hlink{GlobalAttribute}\\
+\end{grammarframe}
 
 \input{Identification.bnf}
 
@@ -571,12 +595,14 @@ Auswirkung auf alte Teile pruefen
 
 \subsection{Statements}    % A 3.4.4
 
+\begin{grammarframe}
 \htgt{Statement} ::=\\
 \x [ \hlink{Identifier}$\S $Label : ] $^{...}$ \hlink{UnlabelledStatement}\\
 
 \htgt{UnlabelledStatement} ::=\\
 \x \hlink{EmptyStatement} $\mid$ \hlink{Assignment} $\mid$ \hlink{Block} $\mid$ \hlink{SequentialControlStatement}\\
 \x $\mid$ \hlink{RealTimeStatement} $\mid$ \hlink{ConvertStatement} $\mid$ \hlink{I/O-Statement}\\
+\end{grammarframe}
 
 \input{EmptyStatement.bnf}
 
@@ -613,6 +639,7 @@ Auswirkung auf alte Teile pruefen
 
 \input{GoToStatement.bnf}
 
+\begin{grammarframe}
 \htgt{RealTimeStatement} ::=\\
 \x \hlink{TaskControlStatement} $\mid$ \hlink{TaskCoordinationStatement}\\
 \x $\mid$ \hlink{InterruptStatement} $\mid$ \hlink{SignalStatement}\\
@@ -621,6 +648,7 @@ Auswirkung auf alte Teile pruefen
 \x \hlink{TaskStarting} $\mid$ \hlink{TaskTerminating}\\             
 \x $\mid$ \hlink{TaskSuspending} $\mid$ \hlink{TaskContinuing}\\   
 \x $\mid$ \hlink{TaskResuming} $\mid$ \hlink{TaskPreventing}\\
+\end{grammarframe}
 
 \input{TaskStarting.bnf}
 
@@ -670,8 +698,10 @@ Auswirkung auf alte Teile pruefen
 \input{InduceStatement.bnf} 
 %%%%%\end{added}
 
+\begin{grammarframe}
 \htgt{ConvertStatement} ::=\\
 \x \hlink{ConvertToStatement} $\mid$ \hlink{ConvertFromStatement}\\
+\end{grammarframe}
 
 \input{ConvertToStatement.bnf}
 
@@ -681,11 +711,13 @@ Auswirkung auf alte Teile pruefen
 
 \input{PositionConvert.bnf}
 
+\begin{grammarframe}
 \htgt{I/O-Statement} ::=\\
 \x \hlink{OpenStatement} $\mid$ \hlink{CloseStatement}\\
 \x $\mid$ \hlink{PutStatement} $\mid$ \hlink{GetStatement}\\
 \x $\mid$ \hlink{WriteStatement} $\mid$ \hlink{ReadStatement}\\
 \x $\mid$ \hlink{SendStatement} $\mid$ \hlink{TakeStatement}\\
+\end{grammarframe}
          
 \input{OpenStatement.bnf}
 
@@ -803,7 +835,7 @@ is introduced.\\]
 {\bf END} \ref{sec_block}, \ref{sec_repetition}, \ref{sec_proc_dcl},
 	 \ref{sec_task_dcl}\\
 {\bf ENTER} \ref{sec_bolt}\\
-{\bf ENTRY} \ref{sec_proc_dcl}\\
+%{\bf ENTRY} \ref{sec_proc_dcl}\\
 {\bf EXIT} \ref{sec_exit}\\
 
 {\bf FIN} \ref{sec_if}, \ref{sec_case}\\

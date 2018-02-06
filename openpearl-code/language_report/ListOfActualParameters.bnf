@@ -1,3 +1,3 @@
 \htgt{ListOfActualParameters} ::= \\
-\x ( \hlink{Expression} [ , \hlink{Expression} ] $^{...}$ )\\
+\x \kw{(} \hlink{Expression} [ , \hlink{Expression} ] $^{...}$ \kw{)}
 

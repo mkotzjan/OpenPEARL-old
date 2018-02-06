@@ -143,18 +143,18 @@ PROBLEM;
    DECLARE x FLOAT;  ! 1st declaration at module level
    DECLARE x FIXED;  ! 2nd declaration at module level (wrong)
 
-P: PROCEDURE; 
-   DECLARE x FIXED;  ! declaration in procedure P (permitted)
+p: PROCEDURE; 
+   DECLARE x FIXED;  ! declaration in procedure p (permitted)
    ...     
    x := 3;           ! assignment to the local variable x
    ...         
-END;                 ! P 
+END;                 ! p
 
-T: TASK;
+t: TASK;
    ...         
    x := 5;           ! assignment to variable x declared at
                      ! module level
-END;                 ! T 
+END;                 ! t 
 ... 
 \end{lstlisting}
 
@@ -330,11 +330,11 @@ PROBLEM;
 DCL x FIXED;
    ...
 SPC xx FIXED IDENT (x);
-T: TASK;
+t: TASK;
    ...
-END; ! T
+END; ! t
 
-P: PROC;
+p: PROC;
    DCL y  FIXED;
    x := 2;
    BEGIN
@@ -349,7 +349,7 @@ P: PROC;
    END;
    y := x; ! y = 2
    ...
-END; ! P
+END; ! p
 ...
 MODEND;
 \end{lstlisting}
@@ -473,15 +473,15 @@ Example:
 \begin{lstlisting}
 MODULE(a);
 PROBLEM; 
-T: TASK PRIO 3 GLOBAL;
+t: TASK PRIO 3 GLOBAL;
    ! task body
 	
-END; ! T
+END; ! t
         
-P: PROC (A(,) FIXED IDENT)
+p: PROC (A(,) FIXED IDENT)
    GLOBAL;       
    ! procedure body
-END; ! P         
+END; ! p         
 ...             
 MODEND;     
 
@@ -490,16 +490,16 @@ MODEND;
 \begin{lstlisting}
 MODULE(b);
 PROBLEM; 
-SPC T TASK GLOBAL(a),
-    P ENTRY ((,) FIXED IDENT)
+SPC t TASK GLOBAL(a),
+    p PROC ((,) FIXED IDENT)
     GLOBAL(a);
-INIT: TASK;
-   DCL TAB (10,20) FIXED;
+init: TASK;
+   DCL tab (10,20) FIXED;
    ...
-   CALL P (TAB);
+   CALL p (tab);
    ... 
-   ACTIVATE T;
-END; ! INIT
+   ACTIVATE t;
+END; ! init
 ...
 MODEND;
 \end{lstlisting}

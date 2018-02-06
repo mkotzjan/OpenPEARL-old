@@ -1,5 +1,7 @@
 \htgt{MonadicOperator} ::=\\
-\x + $\mid$ - {\bf $\mid$ NOT $\mid$ ABS $\mid$ SIGN $\mid$ LWB $\mid$ UPB $\mid$ SIZEOF $\mid$ CONT \\
-\x $\mid$ TOFIXED $\mid$ TOFLOAT $\mid$ TOBIT $\mid$ TOCHAR $\mid$ ENTIER $\mid$ ROUND} 
+\x \kw{+} $\mid$ \kw{-} $\mid$ \kw{NOT} $\mid$ \kw{ABS} $\mid$ \kw{SIGN} $\mid$ 
+  \kw{LWB} $\mid$ \kw{UPB} $\mid$ \kw{SIZEOF} $\mid$ \kw{CONT} \\
+\x $\mid$ \kw{TOFIXED} $\mid$ \kw{TOFLOAT} $\mid$ \kw{TOBIT} $\mid$
+  \kw{TOCHAR} $\mid$ \kw{ENTIER} $\mid$ \kw{ROUND} 
 %%%\x $\mid$ Identifier\S UserDefinedMonadicOperator
 

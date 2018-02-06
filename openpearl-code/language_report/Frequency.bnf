@@ -1,5 +1,5 @@
 \htgt{Frequency} ::=\\
-\x {\bf ALL} \hlink{Expression}$\S $Duration\\
-\x [ \{ {\bf UNTIL} \hlink{Expression}$\S $Time \} 
-	$\mid$ \{ {\bf DURING} \hlink{Expression}$\S $Duration \} ]\\
+\x \kw{ALL} \hlink{Expression}$\S $Duration\\
+\x [ \{ \kw{UNTIL} \hlink{Expression}$\S $Time \} 
+	$\mid$ \{ \kw{DURING} \hlink{Expression}$\S $Duration \} ]
 

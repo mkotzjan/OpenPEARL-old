@@ -1,6 +1,6 @@
 \htgt{TaskDeclaration} ::=\\
-\x \hlink{Identifier} : {\bf TASK} [ \hlink{PriorityAttribute} ] [ {\bf MAIN} ]\\
-\x [ \hlink{GlobalAttribute} ]  ;\\
+\x \hlink{Identifier} : \kw{TASK} [ \hlink{PriorityAttribute} ] [ \kw{MAIN} ]\\
+\x [ \hlink{GlobalAttribute} ]  \kw{;}
 \x \x \hlink{TaskBody}\\
-\x {\bf END} ;\\
+\x \kw{END}\kw{;}\\
 

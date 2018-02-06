@@ -188,7 +188,8 @@ numbers as values) are declared with type attribute \code{FLOAT}.
 
 %%%\removedtext{usual precisions are here 23 and 53, respectively.}
 %%%\begin{added}
-\OpenPEARL{} supports the lengths 24 and 53.
+\OpenPEARL{} supports the lengths 23 and 52 according the IEEE-754 
+standard.
 All operations are monitored for successful operation.
 In case of range violations or
 divide by zero the result is set to INF (infinity) and
@@ -210,9 +211,9 @@ Example:
 
 \begin{lstlisting}
 DCL (x,y,z) ,
-     Koeff FLOAT(53);
+     koeff FLOAT(52);
 ... 
-x:=3.5; y:=1; Koeff:=3.14E-10;
+x:=3.5; y:=1; koeff:=3.14E-10;
 \end{lstlisting}
 
 \section{Bit Strings (BIT)}  % 5.4
@@ -274,11 +275,11 @@ definition (see \ref{sec_length}), or 1 is assumed as length.
 Example:
 
 \begin{lstlisting}
-DCL X_coord BIT(2),
-    Y_coord BIT(8);
+DCL xCoord BIT(2),
+    yCoord BIT(8);
 ...
-X_coord:='01'B;
-Y_coord:= 'A9'B4;
+xCoord:='01'B;
+yCoord:= 'A9'B4;
 \end{lstlisting}
 
 The addressing of parts of bit strings is treated in 
@@ -341,9 +342,9 @@ assumed.
 Examples:
 
 \begin{lstlisting}
-DCL ArticleIdentificator CHAR(6);
+DCL articleIdentificator CHAR(6);
 ...
-ArticleIdentificator:='BCD/27';
+articleIdentificator:='BCD/27';
 \end{lstlisting}
 
 The addressing of parts of character strings is treated in
@@ -376,10 +377,10 @@ Example:
 \begin{lstlisting}
 PROBLEM; 
    LENGTH FIXED(15);
-   LENGTH FLOAT(53);
-   DCL A  FIXED,       /* A is of type FIXED(15) */
-       X  FLOAT,       /* X is of type FLOAT(53) */
-       Y  FLOAT(23);   /* Y is of type FLOAT(23) */
+   LENGTH FLOAT(52);
+   DCL a  FIXED,       /* A is of type FIXED(15) */
+       x  FLOAT,       /* X is of type FLOAT(52) */
+       y  FLOAT(23);   /* Y is of type FLOAT(23) */
     ...
 \end{lstlisting}
 
@@ -628,9 +629,10 @@ otherwise it provides the result \code{'0'B} (\code{'1'B}).
 Example:
 
 \begin{lstlisting}
-DCL NextOrder REF type_order;
+                ! TypeOrder is an application specific TYPE
+DCL nextOrder REF TypeOrder;
 ...
-IF NextOrder IS NIL THEN
+IF nextOrder IS NIL THEN
  ...
 FIN;
 \end{lstlisting}
@@ -645,8 +647,8 @@ pointer objects, so-called variable character string pointers.
 Example: Declarations of variable character string pointers
 
 \begin{lstlisting}
-DCL str_ptr REF CHAR();                 /* pointer declaration */ 
-SPC print f ENTRY (REF CHAR()) GLOBAL;  /* pointer as parameter */
+DCL strPtr REF CHAR();                 /* pointer declaration */ 
+SPC print f PROC (REF CHAR()) GLOBAL;  /* pointer as parameter */
 \end{lstlisting}
 
 A pointer of type \code{REF CHAR ()} contains, besides of the address of a
@@ -661,9 +663,9 @@ Example: Initalisation of a variable character string pointer
 \begin{lstlisting}
 DCL s1      CHAR(20);
 DCL s2      CHAR(100);
-DCL str_ptr REF CHAR}();
-str_ptr:=s1;               /* adr=s1, length=20, max=20 */ 
-str_ptr:=s2;               /* adr=s2, length=100, max=100 */
+DCL strPtr REF CHAR}();
+strPtr:=s1;               /* adr=s1, length=20, max=20 */ 
+strPtr:=s2;               /* adr=s2, length=100, max=100 */
 \end{lstlisting}
 
 Thus, the variable pointer differs at first not from a character string
@@ -676,11 +678,11 @@ maximum length is omitted.
 Example: Assignment to the referenced variable
 
 \begin{lstlisting}
-str_ptr:=s1;                    /* adr=s1, length=20, max=20 */ 
-CONT str_ptr:='OpenPEARL';      /* adr=s1, length=9, max=20 */ 
+strPtr:=s1;                    /* adr=s1, length=20, max=20 */ 
+CONT strPtr:='OpenPEARL';      /* adr=s1, length=9, max=20 */ 
  
-str_ptr:=s2;                    /* adr=s2, length=100, max=100 */
-CONT str_ptr:='HS Furtwangen';  /* adr=s2, length=13, max=100 */
+strPtr:=s2;                    /* adr=s2, length=100, max=100 */
+CONT strPtr:='HS Furtwangen';  /* adr=s2, length=13, max=100 */
 \end{lstlisting}
 
 For the subsequent accesses to the character string via this pointer,
@@ -690,22 +692,22 @@ Example:
 
 \begin{lstlisting}
 DCL s1 CHAR(20);
-DCL s2 CHAR(100);             /* filler */ 
-DCL str_ptr REF CHAR();       /* variable pointer */ 
+DCL s2 CHAR(100);            /* filler */ 
+DCL strPtr REF CHAR();       /* variable pointer */ 
 
-str_ptr:=s2:                  /* adr=s2, length=100, max=100 */ 
-CONT str_ptr:='D78120 ' CAT 'Furtwangen';  /* adr=s2, length=17,
+strPtr:=s2:                  /* adr=s2, length=100, max=100 */ 
+CONT strPtr:='D78120 ' CAT 'Furtwangen';  /* adr=s2, length=17,
                                               max=100 */
-s1 := CONT str_ptr;
+s1 := CONT strPtr;
 \end{lstlisting}
 
 After this assignment, the variable \code{s2} contains the characters
 \code{'D78120 Furtwangen'} in the first 17 positions, the other characters
-were not changed by the assignment. The length index of \code{'str\_ptr'} was
+were not changed by the assignment. The length index of \code{'strPtr'} was
 set to the actual length 17.
 
 
-For the  assignment to \code{s1}, \code{CONT str\_ptr} generates
+For the  assignment to \code{s1}, \code{CONT strPtr} generates
  the character string
 value \code{'D78120 Furtwangen'} (with type \code{CHAR(17)}).
  Due to the assignment
@@ -721,13 +723,13 @@ different length.
 Example: Character string pointer as parameters
 
 \begin{lstlisting}
-SPC print_error ENTRY (REF CHAR()) GLOBAL};
+SPC printError PROC (REF CHAR()) GLOBAL};
 DCL s1 CHAR(20)  INIT('...');
 DCL s2 CHAR(100) INIT('...');
 
 ...
-CALL print_error (s1);
-CALL print_error (s2);
+CALL printError (s1);
+CALL printError (s2);
 \end{lstlisting}
 
 Even character string constants may be passed, if the formal parameter
@@ -736,11 +738,11 @@ was defined with type \code{REF INV CHAR()}.
 Example:
 
 \begin{lstlisting}
-SPC print_message ENTRY (REF INV CHAR()) GLOBAL;
+SPC printMessage PROC (REF INV CHAR()) GLOBAL;
 
 ...
-CALL print_message ('text 1');
-CALL print_message ('longer text 2');
+CALL printMessage ('text 1');
+CALL printMessage ('longer text 2');
 \end{lstlisting}
 
 A variable character string pointer can be used in all expressions
@@ -769,19 +771,19 @@ An embedded controller controls three devices G(1), G(2), and G(3). For
 the output of the bit string '0001'B to the controller, G(1) shall be
 switched on, device G(2) for '0010'B, and device G(3) for '0100'B. Here it
 suggests itself to summarise the three switch-on signals under one
-identifier, e.g., switch\_on, and to address them with indices:
+identifier, e.g., \code{switchOn}, and to address them with indices:
 
 \begin{lstlisting}
-DCL switch_on(1:3) BIT(4),
-    i              FIXED;
+DCL switchOn(1:3) BIT(4),
+    i             FIXED;
 ...
-switch_on(1):='0001'B;
-switch_on(2):='0010'B;
-switch_on(3):='0100'B;
+switchOn(1):='0001'B;
+switchOn(2):='0010'B;
+switchOn(3):='0100'B;
 ...
 /* taking over value of i (index of the device to be switched on)
    from another program part the indicated device may be switched
-   on via the usage of switch_on(i) */
+   on via the usage of switchOn(i) */
 \end{lstlisting}
 
 In general, scalar variables
@@ -797,18 +799,18 @@ and the definition of their positions within the array (the index).
 
 Thus, with the help of
 
-\kw{DCL} \code{Koeff(1:2, 0:3)} \kw{FIXED};
+\kw{DCL} \code{koeff(1:2, 0:3)} \kw{FIXED};
 
 a 2-dimensional array is declared, where the first dimension has the
 lower boundary 1 and the upper boundary 2, i.e., length 2, whereas the
 second dimension has the lower boundary 0 and the upper boundary 3,
-i.e., length 4.  This means that \code{Koeff} consists of the 8 scalar fixed
+i.e., length 4.  This means that \code{koeff} consists of the 8 scalar fixed
 variables
 
-\code{Koeff(1,0)} \x \code{Koeff(1,1)} \x 
-    \code{Koeff(1,2)} \x \code{Koeff(1,3)} \\
-\code{Koeff(2.0)} \x \code{Koeff(2,1)} \x
-    \code{Koeff(2,2)} \x \code{Koeff(2,3)}
+\code{koeff(1,0)} \x \code{koeff(1,1)} \x 
+    \code{koeff(1,2)} \x \code{koeff(1,3)} \\
+\code{koeff(2.0)} \x \code{koeff(2,1)} \x
+    \code{koeff(2,2)} \x \code{koeff(2,3)}
 
 The general form of a array declaration reads as follows:
 
@@ -837,8 +839,8 @@ If the lower boundary is not given, value 1 is assumed for it.
 Examples:
 
 \begin{lstlisting}
-DCL switch_on(3)  BIT(4),
-    Koeff(2, 0:3) FIXED,
+DCL switchOn(3)   BIT(4),
+    koeff(2, 0:3) FIXED,
     message(20)   CHAR(12);
 \end{lstlisting}
 
@@ -851,12 +853,12 @@ Arrays can also be declared mixed with scalar variables in a declaration,
 e.g.:
 
 \begin{lstlisting}
-DCL numb_mess  INV FIXED(15)  INIT(20);
+DCL numberOfMessages  INV FIXED(15)  INIT(20);
  ...
 
-DCL message (numb_mess)        CHAR(12),
+DCL message (numberOfMessages) CHAR(12),
     (i,j,k)                    FIXED,
-    (switch_on, switch_off)(3) BIT(4);
+    (switchOn, switchOff)(3)   BIT(4);
 \end{lstlisting}
 
 The general specification form of an array reads:
@@ -907,17 +909,17 @@ second or third news broadcast of that day
 \end{itemize}
 
 Such data structures can be described in a problem oriented way as
-structures; the above structure ``Contribution'', e.g., is declared as
+structures; the above structure  \code{contribution}, e.g., is declared as
 follows:
 
 \begin{lstlisting}
-DCL Contribution STRUCT 
-       [ (IdentNo, Archive) FIXED,
-         already_broadcast(3) BIT(1),
-         (Start, End) FIXED,
-         OriginalSound BIT(1),
-         TextLength FIXED,
-         Text CHAR(200)
+DCL contribution STRUCT 
+       [ (identNo, archive) FIXED,
+         alreadyBroadcast(3) BIT(1),
+         (start, end) FIXED,
+         originalSound BIT(1),
+         textLength FIXED,
+         text CHAR(200)
        ];
 \end{lstlisting}
 
@@ -937,7 +939,7 @@ Example:
 
 By the statement
 
-\code{Contribution.Start := 1027;}
+\code{contribution.start := 1027;}
 
 value 1027 is assigned to the component \code{Start} of structure 
 \code{Contribution}.
@@ -947,7 +949,7 @@ arrays; as usual, the array elements are then addressed with their
 indexed identifier preceded by the structure identifier, such as in the
 form
 
-\kw{IF} \code{Contribution.already\_broadcast(i)} \kw{THEN}...\kw{FIN}\code{;}
+\kw{IF} \code{contribution.alreadyBroadcast(i)} \kw{THEN}...\kw{FIN}\code{;}
 
 A structure component, however, can also be a structure itself, so that not only
 linear, but also hierarchical data structures can be modeled.
@@ -991,21 +993,22 @@ descriptions each have the structure shown in Figure~\ref{mitarbeiter}.
 \end{figure}
 
 The components Name and Address are structures themselves, namely
-substructures of the main structure Person which can be declared as follows:
+substructures of the main structure \code{person}
+ which can be declared as follows:
 
 
 \begin{lstlisting}
-DCL Person STRUCT  
-       [ Name STRUCT 
-            [ FirstName CHAR(10),
-              SecondName CHAR(15),
+DCL person STRUCT  
+       [ name STRUCT 
+            [ firstName  CHAR(10),
+              secondName CHAR(15),
             ],
-         Address STRUCT 
-            [ str CHAR(15);
-              PostCode FIXED},
-              Town CHAR(15)
+         address STRUCT 
+            [ street   CHAR(15),
+              areaCode FIXED,
+              town     CHAR(15)
             ],
-         Sex CHAR(1)
+         sex CHAR(1)
          ...
        ];
 ...
@@ -1017,7 +1020,7 @@ preceding identifiers of the respective higher level structures.
 The type of a structure is determined by the arrangement of its components
 and their types. Structures of the same type can be combined into arrays:
 
-\kw{DCL} \code{Contribution(20)} \kw{STRUCT}...\code{;}  /* see above */
+\kw{DCL} \code{contribution(20)} \kw{STRUCT}...\code{;}  /* see above */
 
 Thus, any component of a structure is generally addressed with its (if
 needed, indexed) identifier and the (if needed, indexed) identifiers of
@@ -1027,8 +1030,8 @@ each.
 Example:
 
 \begin{lstlisting}
-Person.Name.FirstName := 'OTTO';
-IF Contribution(i).already_broadcast(j) THEN...FIN;
+person.name.firstName := 'OTTO';
+IF contribution(i).alreadyBroadcast(j) THEN...FIN;
 \end{lstlisting}
 
 The general form of the structure declaration reads:
@@ -1072,22 +1075,22 @@ Example:
 PROBLEM;
   ...
   TYPE Message STRUCT
-         [ (IdentNo, Archive) FIXED,
-           already_broadcast(3) BIT(1),
-           (Start, End) FIXED,
-           OriginalSound BIT(1),
-           TextLength FIXED,
-           Text CHAR(200)
+         [ (identNo, archive) FIXED,
+           alreadyBroadcast(3) BIT(1),
+           (start, end) FIXED,
+           originalSound BIT(1),
+           textLength FIXED,
+           text CHAR(200)
          ];
           
-   DCL Content_VTR DATION INOUT Message...;
+   DCL contentVTR DATION INOUT Message ...;
           
-Coord: TASK;
-   DCL Contribution Message;
+coord: TASK;
+   DCL contribution Message;
    ...
-   READ Contribution FROM Content_VTR;
+   READ contribution FROM contentVTR;
    ...
-END; ! Coord
+END; ! coord
 ...     
 \end{lstlisting}
 %%%\item A task controls certain devices; it receives the control orders
@@ -1218,9 +1221,9 @@ Example:
 MODULE (ModuleA);
 PROBLEM;   
              
-TYPE T STRUCT [...];
+TYPE MyType STRUCT [...];
 ...                
-DCL x T GLOBAL;   
+DCL x MyType GLOBAL;   
 ...           
 MODEND;     
 \end{lstlisting}
@@ -1229,16 +1232,17 @@ MODEND;
 MODULE (ModuleB);
 PROBLEM;        
            
-TYPE T STRUCT [...];
+TYPE MyType STRUCT [...];
 ...               
-SPC x GLOBAL(ModuleA);
+SPC x MyType GLOBAL(ModuleA);
 ...                
 MODEND;     
 \end{lstlisting}
 \end{multicols}
 \end{minipage}
 
-
+For clear readablility it is recommended to start type names with a 
+upper case letter followed be lower case letters.
 
 \section{The Initialisation Attribute (INITIAL)}   % 5.13
 \label{sec_init}
@@ -1265,14 +1269,15 @@ Example:
 
 \begin{lstlisting}
 ...
-DCL number_devices  FIXED INIT(12),
-    (UGR, OGR) FIXED INIT(2,15);
+DCL numberOfDevices  FIXED INIT(12),
+    (lowerLimit, upperLimit) FIXED INIT(2,15);
 ...
-   FOR i  FROM 1 TO number_devices
+   FOR i  FROM 1 TO numberOfDevices
    ...
 \end{lstlisting}
 
-Here, the variables \code{number\_devices}, \code{UGR}, and \code{OGR}
+Here, the variables \code{numberOfDevices}, \code{lowerLimit} 
+and \code{upperLimit}
  have the values \code{12}, \code{2} and \code{15},
  i.e., the elements of a declared constant list are assigned in
 the sequence of writing down the declared identifier list.
@@ -1285,23 +1290,23 @@ remaining elements is used repeatedly.
 %%%%% added
 Multidimensional arrays are initialized in the same sequence as in the 
 programming language C. The last index runs first.
-\code{Koeff(1,2)} will be initialized with \code{12} in the following example.
+\code{koeff(1,2)} will be initialized with \code{12} in the following example.
 %%%%% end added
 
 Example:
 
 \begin{lstlisting}
 ...
- DCL Address STRUCT 
-       [ PostNumber  FIXED,
-         Town        CHAR(20),
-         Street      CHAR(20),
-         HouseNumber FIXED
+ DCL address STRUCT 
+       [ araaCode    FIXED,
+         town        CHAR(20),
+         street      CHAR(20),
+         houseNumber FIXED
        ] INIT (78120, 'Furtwangen', 'Robert Gerwig Platz', 1);
 
 DCL colours(3)       CHAR(7) INIT ('black  ', 'white  ', 'red    ');
-DCL all_sixes(6)     FIXED INIT(6);
-DCL  Koeff(1:2, 0:3) FIXED INIT(10,11,12,13,20,21,22,23);
+DCL allSixes(6)      FIXED   INIT(6);
+DCL  koeff(1:2, 0:3) FIXED   INIT(10,11,12,13,20,21,22,23);
 ... 
 \end{lstlisting}
 
@@ -1338,40 +1343,41 @@ Example:
 
 \begin{lstlisting}
 ...
-P: PROC(A (,) INV FIXED IDENT, x FLOAT IDENT);
+p: PROC(a (,) INV FIXED IDENT, x FLOAT IDENT);
     /* procedure body */
-END; ! P
+END; ! p
  
-DCL Tab(10,20) FIXED,
-    Pi  INV FLOAT INITIAL(3.141),
-    R1 REF FLOAT,
-    R2 REF INV FIXED;
+DCL tab(10,20) FIXED,
+    pi  INV FLOAT INITIAL(3.141),
+    r1 REF FLOAT,
+    r2 REF INV FIXED;
 ... 
-SPC pi FLOAT IDENT (Pi);  /* wrong */ 
+SPC aliasForPi FLOAT IDENT (pi);  /* wrong */ 
 ... 
-CALL P (Tab, Pi);         /* wrong */ 
-R1:=Pi;                   /* wrong */
-R2:=Tab(5,7);             /* ok    */
+CALL p (tab, pi);         /* wrong */ 
+r1:=pi;                   /* wrong */
+r2:=tab(5,7);             /* ok    */
 \end{lstlisting}
 
-The specification of \code{pi} is wrong, because assignments to \code{pi} are allowed,
-and thus the assignment protection of \code{Pi} is circumvented.
+The specification of \code{aliasForPi} is wrong, because assignments to
+ \code{aliasForPi} are allowed,
+and thus the assignment protection of \code{pi} is circumvented.
 
-The call of \code{P} is wrong, because the formal parameter \code{x} 
-belonging to \code{Pi}
+The call of \code{p} is wrong, because the formal parameter \code{x} 
+belonging to \code{pi}
 is specified without assignment protection, and thus a (forbidden) value
-change of \code{Pi} could happen in the body of \code{P} 
+change of \code{pi} could happen in the body of \code{p} 
 via an assignment to \code{x}.
 
-In contrast, in the same call, the parameter transmission from \code{Tab}
- to \code{A}
-is correct, because only an assignment protection for \code{Tab} arises which
+In contrast, in the same call, the parameter transmission from \code{tab}
+ to \code{a}
+is correct, because only an assignment protection for \code{tab} arises which
 was not introduced yet.
 
-The assignment \code{R1:=Pi} is not permitted, because otherwise the assignment
-protection for \code{Pi} via (allowed) assignments to \code{CONT R1}
+The assignment \code{r1:=pi} is not permitted, because otherwise the assignment
+protection for \code{pi} via (allowed) assignments to \code{CONT r1}
  could be revoked.
-The assignment \code{R2:=Tab(5,7)}, however, is permitted; a value modification
+The assignment \code{r2:=tab(5,7)}, however, is permitted; a value modification
 of the tabular element via \code{CONT} is not possible.
 
 \subsection{Named Constants (INV Constants)}   % 5.14.1
@@ -1394,14 +1400,14 @@ A surveillance program shall be adapted for various projects with
 different numbers of embedded controllers. The number of message
 buffers and synchronising variables belonging to them 
 (cf. \ref{sec_task_sync}) can be
-adapted easily by changing the constant \code{NumberControls}:
+adapted easily by changing the constant \code{numberControls}:
 
 \begin{lstlisting}
 ...
-DCL NumberControls INV FIXED INIT(11);
+DCL .umberControls INV FIXED INIT(11);
 
-DCL MessageBuffer (NumberControls) CHAR}(100); 
-DCL BufferAccess (NumberControls)  BOLT;
+DCL messageBuffer (numberControls) CHAR(100); 
+DCL BufferAccess (numberControls)  BOLT;
 ...
 \end{lstlisting}
 \end{minipage}
@@ -1457,13 +1463,14 @@ A warning shall be given, if a buffer system is filled up to the last 10
 
 \begin{lstlisting}
 ...
-DCL MaxBuffer      INV FIXED INIT(1000); 
-DCL WarnBoundary   INV FIXED INIT(MaxBuffer - MaxBuffer // 10);
-DCL Buffer (MaxBuffer) FIXED};
-DCL ActualBufferIndex  FIXED INIT(1);
+DCL maxBuffer      INV FIXED INIT(1000); 
+DCL warnBoundary   INV FIXED INIT(maxBuffer - maxBuffer // 10);
+DCL buffer (maxBuffer) FIXED;
+DCL actualBufferIndex  FIXED INIT(1);
 ... 
-ActualBufferIndex := ActualBufferIndex+1;
-IF ActualBufferIndex > WarnBoundary THEN 
+actualBufferIndex := actualBufferIndex+1;
+IF actualBufferIndex > warnBoundary 
+THEN 
    /* output of warning */ 
 FIN;
 ...

@@ -1,4 +1,4 @@
 \htgt{FormalParameter} ::=\\
-\x \hlink{OneIdentifierOrList} [ \hlink{VirtualDimensionList} ] [ {\bf INV} ]\\
-\x \x \hlink{ParameterType} [ {\bf IDENT $\mid$ IDENTICAL} ]\\
+\x \hlink{OneIdentifierOrList} [ \hlink{VirtualDimensionList} ] [ \kw{INV} ]\\
+\x \x \hlink{ParameterType} [ \kw{IDENT} $\mid$ \kw{IDENTICAL} ]
 

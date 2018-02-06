@@ -1,5 +1,5 @@
 \htgt{TaskBody} ::=\\
 \x [\{ \hlink{Declaration} $\mid$
-	 \hlink{Identification} \}$^{...}$]
-	 [\hlink{Statement}$^{...}$]
+	 \hlink{Identification} \}$^{...}$]\\
+\x [\hlink{Statement}$^{...}$]
         

@@ -21,61 +21,68 @@ procedures, all other ones are called subprogram procedures.
 
 Example for a subprogram procedure:
 
-Let the procedure Output convert a position indication of type FIXED
-into a bit string BinPos and pass it to a machine to be positioned and
-marked by number Mach\_No of type FIXED. Let Output be called by
-the task Control.
+Let the procedure \code{output} convert a position indication of type \code{FIXED}
+into a bit string \code{binPos} and pass it to a machine to be positioned and
+marked by number \code{machineNumber} of type \code{FIXED}.
+ Let the procedure \code{output} be called by
+the task \code{control}.
 
-{\bf PROBLEM};\\
-\x Output: {\bf PROC} ((Position, Mach\_No) {\bf FIXED});\\
-\x \x {\bf DCL} BinPos {\bf BIT}(8);\\
-\x \x ! transmission of Position into BinPos\\
-\x \x ! output of BinPos to machine Mach\_No \\
-\x \x {\bf END}; ! declaration of Output
+\begin{lstlisting}
+PROBLEM;
+output: PROC ((position, machineNumber) FIXED);
+   DCL binPos BIT(8);
+  ! transmission of position into binPos
+  ! output of binPos to machine machineNumber
+END; ! declaration of output
 
-\x Control: {\bf TASK};\\
-\x \x {\bf DCL} (Pos, /* actual nominal position */ \\
-\x \x \x         No   /* no of the device */ ) {\bf FIXED};\\
-\x \x ... \\
-\x \x /* assignments to Pos and No */ \\
-\x \x {\bf CALL} Output (Pos, No); \\
-\x \x ... \\
-\x \x {\bf END}; ! declaration of Control \\
-\x ...
+control: TASK;
+   DCL (pos,     /* actual nominal position */ 
+        number   /* no of the device */ ) FIXED;
+   ... 
+   /* assignments to pos and number */ 
+   ...
+   CALL output (pos, number); 
+  ... 
+END; ! declaration of control 
+...
+\end{lstlisting}
 
-Position and Mach\_No are the formal parameters of Output; Pos and No
-are actual parameters. BinPos is a local variable of Output only known
+\code{position} and \code{machineNumber} are the formal parameters of
+ output; \code{pos} and \code{number}
+are actual parameters. \code{binPos} is a local variable of output only known
 within this procedure.
 
 Example for a function procedure:
 
-Due to a schedule Occ\_Plan, procedure Next\_Machine shall determine the
+Due to a schedule \code{occPlan}, procedure \code{nextMachine} shall determine the
 number of the machine to be occupied next among all available machines.
-Occ\_Plan shall not be passed on as parameter. Let the number to be
-returned be of type FIXED. Next\_Machine shall be declared and called
-within the task Supply.
+\code{occPlan} shall not be passed on as parameter. Let the number to be
+returned be of type \code{FIXED}. \code{nextMachine} shall be called
+within the task \code{supply}.
 
-{\bf PROBLEM};\\
-\x {\bf DCL} Occ\_Plan ...; 
+\begin{lstlisting}
+PROBLEM;
+   DCL occPlan ...; 
 
-\x Next\_Machine: {\bf PROCEDURE RETURNS (FIXED)};\\
-\x \x {\bf DCL} No {\bf FIXED}; ! No of the next machine\\
-\x \x ! establishing of No with the help of Occ\_Plan\\
-\x \x ...\\
-\x \x {\bf RETURN} (No);\\
-\x {\bf END} ! Declaration of Next\_Machine
+nextMachine: PROCEDURE RETURNS (FIXED);
+   DCL next FIXED; ! Number of the next machine
+   ! establishing of next with the help of occPlan
+   ...
+   RETURN
+END; ! Declaration of nextMachine
 
-\x Supply: {\bf TASK};\\
-\x \x {\bf DCL} Mach\_No {\bf FIXED};\\
-\x \x ... \\
-\x \x ...
+supply: TASK;
+ DCL machineNumber FIXED;
+ ... 
+ ...
 
-\x \x Mach\_No := Next\_Machine;\\
-\x \x ... \\
-\x {\bf END}; ! Declaration of Supply\\
-\x ...
+machineNumber := nextMachine;
+ ... 
+END; ! Declaration of supply
+...
+\end{lstlisting}
 
-Since the variable Occ\_Plan is declared at module level, it can be used
+Since the variable \code{occPlan} is declared at module level, it can be used
 and, if needed, changed by all procedures and tasks of the module.
 
 \section{Declaration and Specification of Procedures (PROC)}  % 8.1
@@ -87,9 +94,6 @@ prescribed in a procedure declaration, defining a procedure identifier.
 The statements of the procedure can use data
 \begin{itemize}
 \item which are declared at module level
-%%%\begin{removed}
-%%% or in a higher level relativ to the procedure
-%%%\end{removed}
 (see \ref{sec_modules}),
 \item which are specified as formal parameters, i.e., as representatives
 for those expressions or variables, which, upon calling, are passed
@@ -100,31 +104,15 @@ to the procedure as actual parameters, or
 The local declarations and the statements of the procedure form the
 procedure body.
 
-%%%\begin{front}
-%%%ProcedureDeclaration ::= \\
-%%%\x Identifier: \{ {\bf PROCEDURE $\mid$ PROC} \} [ ListOfFormalParameters ]\\
-%%%\x [ ResultAttribute ]\\
-%%%\x [ GlobalAttribute ] ;\\
-%%%\x ProcedureBody\\
-%%%\x {\bf END};
-%%%
-%%%ProcedureBody ::= \\
-%%%\x [ Declaration$^{...}$ ] [ Statement$^{...}$ ]
-%%%\end{front}
+\begin{grammarframe}
 \input{ProcedureDeclaration.bnf}
 \index{PROC@\textbf{PROC}}
-\index{ENTRY@\textbf{ENTRY}|see {PROC}}
 \index{END@\textbf{END}!Procedure}
 \index{PROCEDURE@\textbf{PROCEDURE}|see {PROC}}
 
 \input{ProcedureBody.bnf}
 \input{ListOfFormalParameters.bnf}
 
-%%%\begin{front}
-%%%FormalParameter ::=\\
-%%%\x Identifier\_or\_IdentifierList [ VirtualDimensionList ] [ AssignmentProtection ]\\
-%%%\x ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
-%%%\end{front}
 \input{FormalParameter.bnf}
 
 \input{VirtualDimensionList.bnf}
@@ -140,15 +128,18 @@ procedure body.
 \index{SIGNAL@\textbf{SIGNAL}!Parameter}
 
 \input{ResultType.bnf}
+\end{grammarframe}
 
 The general form of the specification of a procedure reads as follows:
 
+\begin{grammarframe}
 \input{ProcedureSpecification.bnf}
 \index{SPC@\textbf{SPC}!Procedure}
 \input{ListOfParametersForSPC.bnf}
 \input{ParameterSpecification.bnf}
 \index{IDENT@\textbf{IDENT}!Procedure}
 \index{IDENTICAL@\textbf{IDENTICAL}|see {IDENT}}
+\end{grammarframe}
 
 In the procedure specification, the (optionally) definable identifiers of
 parameters are only of documentary importance; however, it is thus
@@ -161,8 +152,10 @@ result attribute. The result type determines the type of the calculated
 result which is returned to the call position. With the help of the
 return statement, this return takes place in the form
 
+\begin{grammarframe}
 \input{ReturnStatement.bnf}
 \index{RETURN@\textbf{RETURN}}
+\end{grammarframe}
 
 Thus, the value of the expression must have the type specified by the
 result attribute.
@@ -174,41 +167,36 @@ this way and no other.
 Execution of a subprogram procedure is terminated by
 \begin{itemize}
 \item executing the return statement in the form\\
-      {\bf RETURN};\\
+      \code{RETURN;}\\
 \item executing the last statement of the procedure body.
 \end{itemize}
 
 The procedure body can contain declarations, e.g., declarations of local
 variables which are only known within the procedure body. 
-%%%\begin{removed}
-%%%However,
-%%%further procedures, so-called nested procedures, may also be declared; the
-%%%occurring aspects of unambiguity of names, also occurring when declaring
-%%%procedures in task bodies, are described in \ref{sec_block} within the context of
-%%%blocks.
-%%%\end{removed}
-%%%\begin{added}
 Procedures may only be declared at module level.
-%%%\end{added}
 
 Due to the call, variables or expressions are associated with the
 specified formal parameters of the procedure as actual parameters. How
 this association takes place (two possibilities), is determined by the
-fact whether the attribute IDENTICAL is given or not. Both ways are
+fact whether the attribute \code{IDENTICAL} is given or not. Both ways are
 explained in chapter \ref{sec_call}, Call of Procedures.
 
 The number n of commas in the virtual dimension list indicates that the
 parameter is an (n+1) dimensional array. Formal array parameters
 (virtual dimension list is present) may only be specified together with
-the IDENTICAL attribute. If, e.g., the one-dimensional array ``A(10)
-FIXED'' shall be passed on to a procedure P with the corresponding
-formal parameter Array, Array is to be specified like this: ``Array()
-FIXED IDENTICAL''.
+the \code{IDENTICAL} attribute. If, e.g., the one-dimensional array 
+``\code{a(10) FIXED}'' shall be passed on to a procedure \code{p}
+ with the corresponding
+formal parameter \code{array}, \code{array} is to be specified like this:
+ ``\code{array() FIXED IDENTICAL}''.
 
 Procedures declared at module level, are translated by the compiler with
 the {\em re-entrancy} capability, so that they can be used
-simultaneously by several tasks (see \ref{sec_parallel_activities}). The recursive call of
-procedures is allowed for all --- even for nested --- procedures.
+simultaneously by several tasks (see \ref{sec_parallel_activities}).
+ The recursive call of
+procedures is allowed for all
+% --- even for nested ---
+procedures.
 However, since for each task only limited memory space for the local
 data of the called procedures (stack) is provided, the programmer
 should avoid (or suitably restrict) recursion in the sense of safe
@@ -221,19 +209,22 @@ programs.
 Subprogram procedures are called with the help of the keyword CALL or
 only with their identifiers:
 
- 
+\begin{grammarframe} 
 \input{ProcedureCall.bnf}
 \index{CALL@\textbf{CALL}}
 
 \input{ListOfActualParameters.bnf}
+\end{grammarframe} 
 
 Example:
 
-{\bf SPC} Output {\bf PROC} (P {\bf FIXED}, N {\bf FIXED}) {\bf GLOBAL};\\
-{\bf DCL} (Pos, No) {\bf FIXED};\\
-...\\
-! Assignments to Pos and No\\
-{\bf CALL} Output (Pos, No);
+\begin{lstlisting}
+SPC output PROC (p FIXED, n FIXED) GLOBAL(moduleOfOutput);
+DCL (pos, nbr)  FIXED;
+...
+! Assignments to pos and nbr
+CALL output (pos, nbr);
+\end{lstlisting}
 
 The call statement results in associating the given actual parameters
 to the formal parameters of the indicated procedure in the order of
@@ -244,32 +235,37 @@ The call of a function procedure does not take place as an independent
 statement, but within expressions upon stating the identifier and the
 actual parameters:
 
+\begin{grammarframe}
 \input{FunctionCall.bnf}
+\end{grammarframe}
 
 Example:
 
-The function procedure Ari shall calculate the arithmetic average of an
-array of n FLOAT variables. This average shall then be printed together
+The function procedure \code{ari} shall calculate the arithmetic average of an
+array of n \code{FLOAT} variables. This average shall then be printed together
 with the text ``Arith.Average''.
 
-Ari: {\bf PROC} (Array() {\bf FLOAT IDENTICAL}) {\bf RETURNS} ({\bf FLOAT});\\
-\x \x {\bf DCL} Sum {\bf FLOAT};\\
-\x \x {\bf DCL} (LowerBound, UpperBound) {\bf FIXED};\\
-\x \x Sum := 0;\\
-\x \x LowerBound := LWB Array; \\
-\x \x UpperBound := UPB Array; \\
-\x \x {\bf FOR} i {\bf FROM} LowerBound {\bf BY} 1 {\bf TO} UpperBound\\
-\x \x {\bf REPEAT}\\
-\x \x \x Sum := Sum + Array(i);\\
-\x \x {\bf END}; ! loop\\
-\x \x {\bf RETURN} (Sum/(UpperBound - LowerBound + 1));\\
-\x {\bf END}; ! Ari
+\begin{lstlisting}
+ari: PROC (array() FLOAT IDENTICAL) RETURNS (FLOAT);
+   DCL sum FLOAT;
+   DCL (lowerBound, upperBound) FIXED;
 
-\x {\bf DCL} MeasuredValue(10) {\bf FLOAT};\\
-\x ...
-\x \x /* Acquisition of the measured values */ \\
-\x {\bf PUT} Ari (MeasuredValue), 'Arith.Average' {\bf TO} Printer {\bf BY} LIST;\\
-\x ...
+   sum := 0;
+   lowerBound := LWB array; 
+   upperBound := UPB array; 
+   FOR i FROM lowerBound BY 1 TO upperBound
+   REPEAT
+      sum := sum + array(i);
+   END; ! loop
+   RETURN (sum/(upperBound - lowerBound + 1));
+END; ! ari
+
+DCL measuredValue(10) FLOAT;
+ ...
+ /* Acquisition of the measured values */ 
+ PUT ari(measuredValue), 'Arith.Average' TO printer BY LIST;
+ ...
+\end{lstlisting}
 
 When evaluating a function call, the given actual parameters are
 associated with the formal parameters of the indicated function
@@ -287,7 +283,8 @@ corresponding to them.
 
 The association of the actual parameters with the formal parameters can
 take place in two ways: If the specification of a formal parameter has
-the attribute IDENTICAL or IDENT, the association takes places with the
+the attribute \code{IDENTICAL} or \code{IDENT},
+the association takes places with the
 help of identification, otherwise by value transmission.
 
 In the case of value transmission (also called {\em call by value}), a
@@ -311,27 +308,28 @@ be passed as actual parameters.
 
 Example:
 
-\begin{tabbing}
-P2: \= \kill
+\begin{lstlisting}
+PROBLEM;
+ 
+p1: PROC (pi FIXED, pj FLOAT IDENT);
+    ... 
+    pi := 3;
+    pj := 5.0;
+END; ! p1
 
-{\bf PROBLEM}; \> \\
-    \> \\
-P1: \> {\bf PROC} (pi {\bf FIXED}, pj {\bf FLOAT IDENT});\\
-    \> ... \\
-    \> pi := 3; pj := 5.0;\\
-    \> {\bf END}; ! P1\\
+p2: PROC ...;
+    DCL (i, j) FIXED, a(100) FLOAT;
+    ... 
+    i := 2;
+    a(i) := 2.5; 
+    CALL p1(i, a(i));
+    ... 
+END; ! p2
+... 
+\end{lstlisting}
 
-P2: \> {\bf PROC} ...;\\
-    \> {\bf DCL} (i, j) {\bf FIXED}, a(100) {\bf FLOAT};\\
-    \> ... \\
-    \> i := 2 ; a(i) := 2.5; \\
-    \> {\bf CALL} P1 (i, a(i));\\
-    \> ... \\
-    \> {\bf END}; ! P2 \\
-... \>
-\end{tabbing}
-
-After the call of P1 in P2 i (still) has the value 2, but a(i) has the
+After the call of \code{p1} in \code{p2} \code{i} (still) has the value 2,
+ but \code{a(i)} has the
 value 5.0.
 
 As the language form of the procedure declaration already shows (see
@@ -345,10 +343,10 @@ As the language form of the procedure declaration already shows (see
 \end{itemize}
 No explicit values are assigned to objects of types
 \begin{itemize}
-\item DATION, SEMA, BOLT, INTERRUPT and SIGNAL.
+\item \code{DATION}, \code{SEMA}, \code{BOLT}, \code{INTERRUPT} and \code{SIGNAL}.
 \end{itemize}
 Such objects may only be passed to a procedure via identification, i.e.,
-the formal parameter may only be defined with the IDENTICAL attribute.
+the formal parameter may only be defined with the \code{IDENTICAL} attribute.
 
 \section{References to Procedures (REF PROC)}  % 8.3
 \label{sec_ref_proc}
@@ -361,23 +359,29 @@ these structures can be combined into new, abstract data structures.
 A declaration of reference variables for procedures contains the
 description of all parameter types, as well as the type of the result.
 
+\begin{grammarframe}
 \input{ProcedureReferenceDeclaration.bnf}
 \index{DCL@\textbf{DCL}!Reference Procedure}
 \index{REF@\textbf{REF}!Procedure}
 \input{TypeProcedure.bnf} 
 \index{Procedure!Reference}
+\end{grammarframe}
 
 The general form of the specification of procedure reference variables
 reads:
 
+\begin{grammarframe}
 \input{ProcedureReferenceSpecification.bnf} 
 \index{SPC@\textbf{SPC}!Reference Procedure}
+\end{grammarframe}
 
 The value assignment to a procedure reference variable takes place with
 the assignment:
 
+\begin{grammarframe}
 \input{RefProcAssignment.bnf}
 \index{Assignment!Reference Procedure}
+\end{grammarframe}
 
 %%%Only procedures declared at module level may be assigned here.
 
@@ -387,26 +391,34 @@ attributes match.
 
 Calling a procedure via a procedure reference variable takes simply
 place by giving the reference variable, followed by a list of the actual
-parameters. For procedures without parameters, CALL, or in the case of
-function procedures, also CONT, can be used.
+parameters. For procedures without parameters, \code{CALL}, or in the case of
+function procedures, also \code{CONT}, can be used.
 
 Examples:
-\begin{enumerate}
-\item {\bf DCL} ProcPointer {\bf REF PROC} (a {\bf FIXED}, b {\bf FIXED}, c {\bf FIXED IDENT});\\
-      add: {\bf PROC} (a {\bf FIXED}, b {\bf FIXED}, c {\bf FIXED IDENT});\\
-      \x   c := a + b;\\
-      \x   {\bf END};\\
-      \x   {\bf DCL} (A, B, C) {\bf FIXED};\\
-      ProcPointer := add;\\
-      ProcPointer (A, B, C);
-\item {\bf DCL} FuncPointer {\bf REF PROC RETURNS(CLOCK)};\\
-      time: {\bf PROC RETURNS(CLOCK)};\\
-      \x    {\bf RETURN}(NOW);\\
-      \x    {\bf END};
+\begin{lstlisting}
+DCL procPointer REF PROC (a FIXED, b FIXED, c FIXED IDENT);
 
-      {\bf DCL}(A, B) {\bf CLOCK};\\
-      FuncPointer := time;\\
-      A := FuncPointer; ~~~~~~~~~~~ ! both statements\\
-      B := {\bf CONT} FuncPointer;~ ! invoke the same function
-\end{enumerate}
+add: PROC (a FIXED, b FIXED, c FIXED IDENT);
+   c := a + b;
+END;
+
+...
+DCL (a, b, c) FIXED;
+procPointer := add;
+procPointer (a, b, c);
+\end{lstlisting}
+
+\begin{lstlisting}
+DCL funcPointer REF PROC RETURNS(CLOCK);
+
+time: PROC RETURNS(CLOCK);
+   RETURN(NOW);
+END;
+
+...
+DCL (a,b) CLOCK};
+funcPointer := time;
+a := funcPointer;      ! both statements
+b := CONT funcPointer; ! invoke the same function
+\end{lstlisting}
 

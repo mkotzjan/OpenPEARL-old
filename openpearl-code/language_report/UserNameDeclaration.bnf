@@ -1,5 +1,5 @@
 \htgt{UserNameDeclaration} ::=\\
-\x \{ \hlink{SystemDationDeclaration}
- $\mid$ \hlink{SystemSignalDeclaration} 
- $\mid$ \hlink{SystemInterruptDeclaration} \} \\
+\x \{ \hlink{SystemDationDeclaration} \\
+\x $\mid$ \hlink{SystemSignalDeclaration}  \\
+\x $\mid$ \hlink{SystemInterruptDeclaration} \} 
 

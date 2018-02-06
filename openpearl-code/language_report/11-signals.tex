@@ -21,8 +21,9 @@ freely selectable user names can be assigned to them.
 %%%%%\x \x [ ( Identifier$\S $ErrorNumber [ , Identifier$\S $ErrorNumber ] $^{...}$ ) ]
 %%%%%\end{removed}
 
+\begin{grammarframe}
 \input{SystemSignalDeclaration.bnf}
-
+\end{grammarframe}
 
 The signals and their associated error numbers possible on a certain
 computer are described in the respective user manual, giving their
@@ -49,19 +50,19 @@ Example:
 %%%\x \x ... \\
 %%%{\bf MODEND};
 %%%\end{removed}
-%%%\begin{added}
-FixedOverflowSignal and DationEOFSignal are system names.
+\code{FixedOverflowSignal} and \code{DationEOFSignal} are system names.
 
-{\bf MODULE}(moduleName);\\
-\x {\bf SYSTEM};\\
-\x \x overflow : FixedOverflowSignal;\\
-\x \x eof : DationEOFSignal;
-\x \x ...\\
-\x {\bf PROBLEM};\\
-\x \x {\bf SPC} ( overflow, eof ) {\bf SIGNAL};\\
-\x \x ... \\
-{\bf MODEND};
-%%%\end{added}
+\begin{lstlisting}
+MODULE(moduleName);
+SYSTEM;
+   overflow : FixedOverflowSignal;
+   eof : DationEOFSignal;
+...
+PROBLEM;
+   SPC ( overflow, eof ) SIGNAL;
+ ... 
+MODEND;
+\end{lstlisting}
 
 The general form of the specification of signals reads:
 
@@ -70,9 +71,11 @@ The general form of the specification of signals reads:
 %%%\x \{ {\bf SPECIFY  $\mid$  SPC} \} Identifier\_or\_IdentifierList 
 %%%{\bf SIGNAL} [ GlobalAttribute ] ;
 %%%\end{front}
+\begin{grammarframe}
 \input{SignalSpecification.bnf}
 \index{SIGNAL@\textbf{SIGNAL}}
 \index{SIGNAL@\textbf{SIGNAL}!Specification}
+\end{grammarframe}
 
 %%%%%\begin{added}
 %%%%%
@@ -84,8 +87,10 @@ In larger software systems it may be useful to define own signals, e.g.
 for wrong usage of functions. 
 The declaration of a user defined signal is allowed on module level.
 
+\begin{grammarframe}
 \input{UserSignalDeclaration.bnf}
 \index{SIGNAL@\textbf{SIGNAL}!Declaration}
+\end{grammarframe}
 
 Valid ranges for the error number are listed in the plattform specific manual.
 
@@ -106,6 +111,7 @@ the following statement:
 %%%%%\end{removed}
 
 %%%%%\begin{discuss}
+\begin{grammarframe}
 \input{SchedulingSignalReaction.bnf}
 \index{SIGNAL@\textbf{SIGNAL}!Reaction}
 \index{SIGNAL@\textbf{SIGNAL}!\textbf{ON}}
@@ -117,6 +123,7 @@ the following statement:
 \input{InduceStatement.bnf}
 \index{INDUCE@\textbf{INDUCE}}
 \index{SIGNAL@\textbf{SIGNAL}!\textbf{INDUCE}}
+\end{grammarframe}
 
 %%%%%\end{discuss}
 
@@ -125,13 +132,13 @@ statement SchedulingSignalReaction are permitted, particularly
 %%%\removedtext{blocks or procedure calls}\addedtext{blocks,  which  end with a SignalFinalStatement}.
 blocks,  which  end with a SignalFinalStatement.
 
-The statement SchedulingSignalReaction is not permitted within BEGIN
-and REPEAT blocks, or as SignalReaction.
+The statement SchedulingSignalReaction is not permitted within \code{BEGIN}
+and \code{REPEAT} blocks, or as SignalReaction.
 
 \begin{itemize}
 \item Validity range of scheduling a signal reaction:\\
 The validity range of scheduling a signal reaction reaches from the
-execution of the corresponding ON statement to the end of the
+execution of the corresponding \code{ON} statement to the end of the
 scheduling task or procedure, respectively.\\
 If another scheduling for the same signal (e.g., in a procedure called
 by the scheduling task) is run, it hides the preceding scheduling until
@@ -143,22 +150,22 @@ If a signal occurs within the validity range of scheduling a signal
 reaction, the procedure (task) in which the signal reaction is scheduled
 is left by 
 %%%\removedtext{an implicit RETURN(TERMINATE)} \addedtext{
-the explicit INDUCE, RETURN or TERMINATE
+the explicit \code{INDUCE}, \code{RETURN} or \code{TERMINATE}
 %%%}
  after having executed the 
 corresponding signal reaction, unless the signal reaction is left by a 
-GOTO statement.
+\code{GOTO} statement.
 \item Validitiy of signal schedulings during the execution of a signal
 reaction:\\
-If a signal reaction is scheduled at procedure level, only those ON
+If a signal reaction is scheduled at procedure level, only those \code{ON}
 schedulings are valid during the execution of this signal reaction which
 were already executed before calling this procedure.\\
-If the signal reaction is scheduled at task level, no ON schedulings are
+If the signal reaction is scheduled at task level, no \code{ON} schedulings are
 valid during the execution of this signal reaction.
 \item Validity of signal schedulings after leaving a signal reaction by
-GOTO:\\
+\code{GOTO}:\\
 If the execution of a signal reaction scheduled at procedure or task
-level is left by GOTO, the signal schedulings which were already
+level is left by \code{GOTO}, the signal schedulings which were already
 executed before triggering the signal, particularly those of the
 triggered signal, are valid again.
 \end{itemize}
@@ -171,10 +178,12 @@ can be simulated analogously to the occurrence of an interrupt:
 %%%\x {\bf INDUCE} Name$\S $Signal [ {\bf RST} ( Expression$\S $ErrorNumber ) ];
 %%%\end{removed}
 %%%\begin{added}
+\begin{grammarframe}
 \input{InduceStatement.bnf}
+\end{grammarframe}
 
 
-The variant of the {\bf INDUCE} statement without a specified signal is 
+The variant of the \code{INDUCE} statement without a specified signal is 
 only allowed inside a signal reaction. This will trigger the signal handler
 of the superior function or task with the identical signal.
 %%%\end{added}
@@ -188,35 +197,38 @@ task).
 
 Example:
 
-The procedure Analysis shall sequentially analyse a logbook created
-in the course of a day; the single data elements of the LogBook are of
-type Event.
+The procedure \code{analysis} shall sequentially analyse a logbook created
+in the course of a day; the single data elements of the \code{logBook} are of
+type \code{Event}
 
-...\\
-{\bf PROBLEM};\\
-\x {\bf SPC} eof {\bf SIGNAL},\\
-\x \x Tape {\bf DATION INOUT SYSTEM ALL};\\
-\x {\bf TYPE} Event ...;\\
-\x {\bf DCL} LogBook {\bf DATION IN} Event {\bf DIM}($^*$) {\bf FORWARD CREATED}(tape);
+\begin{lstlisting}
+...
+PROBLEM;
+   SPC eof SIGNAL,
+       tape  DATION INOUT SYSTEM ALL;
+   TYPE Event ...;
+   DCL logBook DATION IN Event DIM(*) FORWARD CREATED(tape);
 
-Analysis: {\bf PROC};\\
-\x {\bf DCL} Input Event;\\
-\x ...\\
-\x {\bf OPEN} LogBook;\\
-\x {\bf ON} eof:\\
-\x \x {\bf BEGIN}\\
-\x \x \x {\bf CLOSE} LogBook;\\
-\x \x {\bf END}; ! ON eof\\
-\x ...\\
-\x {\bf REPEAT}\\
-\x \x {\bf READ} Input {\bf FROM} LogBook;\\
-\x \x ...\\
-\x {\bf END};\\
-\x {\bf END}; ! Analysis
+analysis: PROC;
+   DCL input Event;
+   ...
+   OPEN logBook;
+   ON eof:
+      BEGIN
+      CLOSE logBook;
+      RETURN;
+   END; ! ON eof
+   ...
+   REPEAT
+      READ input FROM logBook;
+      ...
+   END;
+END; ! analysis
+\end{lstlisting}
 
 For testing, the statement
 
-{\bf INDUCE} eof;
+\kw{INDUCE}\code{ eof;}
 
 could be executed sporadically instead of the read statement.
 
@@ -235,7 +247,7 @@ By stating a variable after RST in the signal scheduling, the programmer
 gets access to the error number (error cause). In this case, the signal
 SignalName can be induced for the error with the number ErrorNumber by
 
-{\bf INDUCE} SignalName {\bf RST} ( ErrorNumber ) ;
+\kw{INDUCE} SignalName \kw{RST} \kw{(} ErrorNumber \kw{)} \kw{;}
 
 %%%%%\begin{modified}
 %%%%%Im letzten Satz des vorherigen Abschnitts muss "'In this case"' gestrichen 
@@ -253,38 +265,41 @@ system number of another signal.
 
 Example:
 
-The signal TaskSignal shall be simulated with the 
+The signal \code{taskSignal} shall be simulated with the 
 superseeded error number ``1010`` and not superseeded error number
 The causing task shall react by writing out the error
 number on the console:
 
-{\bf PROBLEM};\\
-\x {\bf SPC} TaskSignal {\bf SIGNAL};  ! assume signal number as 1234\\
-\x {\bf DCL} ErrorNummer {\bf FIXED};
+\begin{lstlisting}
+PROBLEM};\\
+ SPC taskSignal SIGNAL;  ! assume signal number as 1234
+ DCL errorNummer FIXED;
 
-Regulator: {\bf TASK PRIO} 20;\\
-restart:\\
-\x {\bf ON} TaskSignal {\bf RST} (ErrorNumber):\\
-\x \x BEGIN \\
-\x \x \x {\bf PUT} ErrorNumber {\bf TO} Console;\\
-\x \x \x GOTO restart;\\
-\x \x END;  ! of error handler \\
-\x \x ...\\
-\x {\bf CALL} Test;\\
-\x \x ...\\
-\x {\bf END}; ! Regulator
+regulator: TASK PRIO 20;
+restart:
+   ON TaskSignal RST (errorNumber):
+   BEGIN 
+      PUT errorNumber TO console;
+      GOTO restart;
+   END;  ! of error handler 
+   ...
+   CALL test;
+   ...
+END; ! regulator
 
-Start: {\bf TASK MAIN};\\
-\x {\bf ALL} ... {\bf ACTIVATE} Regulator;\\  
-\x {\bf END}; ! Start
+start: TASK MAIN;
+   ALL ...  ACTIVATE regulator;
+END; ! start
 
-Test: {\bf PROC};\\
-\x {\bf IF} ... {\bf THEN} \\
-\x \x {\bf INDUCE} TaskSignal; ! prints 1234\\
-\x \x...\\
-\x {\bf ELSE} \\
-\x\x {\bf INDUCE} TaskSignal {\bf RST} (1010); ! prints 1010\\
-\x \x...\\
-\x {\bf FIN;} \\
-\x {\bf END}; ! Test
+test: PROC;
+   IF ... 
+   THEN
+      ...
+      INDUCE taskSignal; ! prints 1234
+   ELSE
+      ...
+      INDUCE taskSignal RST (1010); ! prints 1010
+   FIN;
+END; ! test
+\end{lstlisting}
 

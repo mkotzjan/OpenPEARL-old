@@ -1,7 +1,7 @@
 \htgt{CaseStatement2} ::=\\
-\x {\bf CASE} \hlink{CaseIndex}\\
-\x \x \{ {\bf ALT} ( \hlink{CaseList} ) 
+\x \kw{CASE} \hlink{CaseIndex}\\
+\x \{ \kw{ALT} ( \hlink{CaseList} ) 
 	 \hlink{Statement} $^{...}$  \} $^{...}$\\
-\x \x [ {\bf OUT}  \hlink{Statement} $^{...}$  ]\\
-\x {\bf FIN} ;\\
+\x [ \kw{OUT}  \hlink{Statement} $^{...}$  ]\\
+\x \kw{FIN} \kw{;}
 

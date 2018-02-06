@@ -1,12 +1,12 @@
 \htgt{Operand} ::= \\
 \x \hlink{Constant} $\mid$ \hlink{Name} $\mid$ 
-	\hlink{FunctionCall} 
+	\hlink{FunctionCall} \\
 %%%$\mid$ \hlink{ConditionalExpression}
-$\mid$ \hlink{Dereferentiation} $\mid$ 
-	\hlink{StringSelection} $\mid$ ( \hlink{Expression} ) 
+\x $\mid$ \hlink{Dereferentiation} $\mid$ 
+	\hlink{StringSelection} $\mid$  \kw{(} \hlink{Expression} \kw{)} 
 %%%	$\mid$ ( \hlink{Assignment} ) 
 \\
-\x $\mid$ {\bf PRIO} [ ( \hlink{Name}$\S $Task ) ] 
-	$\mid$ {\bf TASK} [ ( \hlink{Name}$\S $Task ) ] 
-	$\mid$ {\bf TRY} \hlink{Name}$\S $Sema\\
+\x $\mid$ \kw{PRIO} [ \kw{(} \hlink{Name}$\S $Task \kw{)} ] 
+	$\mid$ \kw{TASK} [ \kw{(} \hlink{Name}$\S $Task \kw{)} ] 
+	$\mid$ \kw{TRY} \hlink{Name}$\S $Sema
 

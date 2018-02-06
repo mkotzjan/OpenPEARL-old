@@ -7,5 +7,5 @@
 \htgt{SystemPart} ::= \\
 \x \kw{SYSTEM} ;\\
 \x [  \{ \code{\hlink{UserNameDeclaration}}$\S $ForDationInterruptOrSignal \\
-\x \x $\mid$ \code{\hlink{ConfigurationElement}} \} $^{...}$ ]\\ 
+\x $\mid$ \code{\hlink{ConfigurationElement}} \} $^{...}$ ]\\ 
 

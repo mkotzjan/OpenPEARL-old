@@ -7,9 +7,9 @@
 %%%\x \x {\bf BOLT} \{ \hlink{GlobalAttribute} $\mid$ \hlink{IdentificationAttribute} \} ;
 
 \htgt{BoltSpecification} ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{OneIdentifierOrList} 
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList} 
 [ \hlink{VirtualDimensionList} ]\\
-\x \x {\bf BOLT} [ \hlink{GlobalAttribute} ] [ \hlink{IdentificationAttribute} ] ;
+\x \kw{BOLT} [ \hlink{GlobalAttribute} ] [ \hlink{IdentificationAttribute} ] \kw{;}
 
 %%%\end{discuss}
 

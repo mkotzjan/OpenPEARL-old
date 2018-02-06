@@ -1,4 +1,4 @@
 \htgt{TypeProcedure} ::=\\
-\x \{ {\bf PROC} $\mid$ {\bf PROCEDURE} \} [ \hlink{ParameterListForSPC} ]
+\x \{ \kw{PROC} $\mid$ \kw{PROCEDURE} \} [ \hlink{ParameterListForSPC} ]
 	 [ \hlink{ResultAttribute} ] 
 

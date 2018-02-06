@@ -1,11 +1,3 @@
-%%%\begin{discuss}
-%%%CompoundType zur Vereinheitlichung in IOCompoundType umbenannt
-
 \htgt{TypeOfTransmissionData} ::=\\
-%%%\x {\bf ALL} $\mid$ \hlink{SimpleType} $\mid$
-%%%	 \hlink{Indicator}$\S $ForRedeclaredType $\mid$
-%%%	 \hlink{TypeStructure}\\
-%%%\x $/^*$ A Structure as transfer type may not contain any reference variable $*/$\\
-\x {\bf ALL} $\mid$ \hlink{SimpleType} $\mid$ \hlink{IOCompoundType}
+\x \kw{ALL} $\mid$ \hlink{SimpleType} $\mid$ \hlink{IOCompoundType}
 
-%%%\end{discuss}

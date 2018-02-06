@@ -1,4 +1,4 @@
 \htgt{TaskStarting} ::=\\
-\x [ \hlink{StartCondition} ] {\bf ACTIVATE} \hlink{Name}$\S $Task
-	 [ \hlink{PriorityExpression} ] ;\\
+\x [ \hlink{StartCondition} ] \kw{ACTIVATE} \hlink{Name}$\S $Task
+	 [ \hlink{PriorityExpression} ] \kw{;}
 

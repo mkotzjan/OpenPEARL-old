@@ -1,4 +1,4 @@
 \htgt{SystemDationDeclaration} ::=\\
-\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $DationSystemName [ ( \hlink{ListOfConstants} ) ] \\
-\x \x [\hlink{Association}] ;\\
+\x \hlink{Identifier}$\S $UserName: \hlink{Identifier}$\S $DationSystemName \\
+\x \x [ \kw{(} \hlink{ListOfConstants} \kw{)} ] [\hlink{Association}] \kw{;}
 

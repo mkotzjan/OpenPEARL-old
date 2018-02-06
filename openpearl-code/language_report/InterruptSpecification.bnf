@@ -1,4 +1,5 @@
 \htgt{InterruptSpecification} ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{OneIdentifierOrList} \{ {\bf INTERRUPT $\mid$ IRPT} \}\\
-\x [ \hlink{GlobalAttribute} ];
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList} 
+   \{ \kw{INTERRUPT} $\mid$  \kw{IRPT} \}\\
+\x [ \hlink{GlobalAttribute} ] \kw{;}
 

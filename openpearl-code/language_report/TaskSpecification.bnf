@@ -1,4 +1,4 @@
 \htgt{TaskSpecification} ::=\\
-\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{Identifier}$\S $Task {\bf TASK}
-  \hlink{GlobalAttribute};
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{Identifier}$\S $Task \kw{TASK}
+  \hlink{GlobalAttribute} \kw{;}
 

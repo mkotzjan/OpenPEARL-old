@@ -1,3 +1,3 @@
 \htgt{ListFormat} ::=\\
-\x {\bf LIST}
+\x \kw{LIST}
 
