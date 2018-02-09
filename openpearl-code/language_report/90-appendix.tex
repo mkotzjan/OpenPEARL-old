@@ -23,17 +23,16 @@ objects of this type may
 \item be provided with the initialisation attribute.
 \end{itemize}
 
-\begin{discuss}
-IRPT als Parameter oder REF value zulaessig?
+%%%\begin{discuss}
+%%%IRPT als Parameter oder REF value zulaessig?
+%%%
+%%%bei SIGNALs geht nur GLOBAL; die restlichen 'x' raus?
+%%%
+%%%REF STRUCT[] entfernt
+%%%
+%%%Dies ist Thema auf der AK-Sitzung im November 2016.
+%%%\end{discuss}
 
-bei SIGNALs geht nur GLOBAL; die restlichen 'x' raus?
-
-REF STRUCT[] entfernt
-
-Dies ist Thema auf der AK-Sitzung im November 2016.
-
-
-\end{discuss}
 \begin{table}[htb]
 \begin{tabular}{lccccccccc}
 {\bf type}     & \multicolumn{9}{c}{{\bf usage}} \\ 
@@ -47,8 +46,8 @@ Dies ist Thema auf der AK-Sitzung im November 2016.
 \code{DUR}            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
 \code{SEMA}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
 \code{BOLT}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
-\code{IRPT}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
-\code{SIGNAL}         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{IRPT}           & --     &  --     & --     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{SIGNAL}         & --     &  --     & --     &  --    &  x    &   --   &  -- &    x   &  --  \\
 \code{DATION}         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
 array          & --    &  x      & x     &  --    &  x    &   --   &  x  &    x   &  x   \\
 \code{STRUCT}         & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
@@ -117,17 +116,9 @@ Step 1 translates \OpenPEARL{} into C++.
 Step 2 translates C++ into the plattform specific machine code.
 
 It is possible to insert C++ statements into the generated C++ 
-code. The position of the insertion is
-\begin{discuss}
-\begin{itemize}
-\item in system part: {\em not defined yet}
-\item on module level in the problem part 
-   it is not clearly defined, since the first compilation
-   steps adds some information for administration in between.
-\item in tasks and procedures just between the output of the surrounding
+code in tasks and procedures. The position of the insertion is
+just between the output of the surrounding
 statements.
-\end{itemize}
-\end{discuss}
 
 The syntax is.
 \begin{grammarframe}
@@ -229,16 +220,9 @@ korrekt?
 
 
 \subsection{Basic Elements}    % A 3.3 
-\begin{grammarframe}
-\htgt{Digit} ::=\\
-\x 0 $\mid$ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7 $\mid$ 8 $\mid$ 9\\
-
-\htgt{Letter} ::= \\
-\x A $\mid$ B $\mid$ C $\mid$ ... $\mid$ Z $\mid$ a $\mid$ b $\mid$ c $\mid$ ... $\mid$ z\\
-
-\htgt{Identifier} ::=\\
-\x \hlink{Letter} [ \hlink{Letter} $\mid$ \hlink{Digit} $\mid$ \_ ] $^{...}$\\
-\end{grammarframe}
+\input{Digit.bnf} 
+\input{Letter.bnf}
+\input{Identifier.bnf}
 
 \input{Constant.bnf}
 
@@ -274,7 +258,8 @@ korrekt?
 \x ' \{ \hlink{CharacterBesidesApostrophe} $\mid$ '' $\mid$ \hlink{ControlCharacterSequence} \} $^{...}$ '\\
 
 \htgt{CharacterBesidesApostrophe} ::=\\
-\x \hlink{Digit} $\mid$ \hlink{Letter} $\mid$ \x $\mid$ \_ $\mid$ + $\mid$ - $\mid$ $^*$ $\mid$ / $\mid$ $\backslash$ $\mid$ ( $\mid$ ) $\mid$ {\bf [} $\mid$ {\bf ]} $\mid$ : $\mid$ . $\mid$ ; $\mid$ , $\mid$ = $\mid$ $<$ $\mid$ $>$ $\mid$ !\\
+\x \hlink{Digit} $\mid$ \hlink{Letter} \\
+\x $\mid$ \_ $\mid$ + $\mid$ - $\mid$ $^*$ $\mid$ / $\mid$ $\backslash$ $\mid$ ( $\mid$ ) $\mid$ {\bf [} $\mid$ {\bf ]} $\mid$ : $\mid$ . $\mid$ ; $\mid$ , $\mid$ = $\mid$ $<$ $\mid$ $>$ $\mid$ !\\
 \x $\mid$ $/^*$ more printable characters of the machine character set $*/$ \\
 
 \htgt{ControlCharacterSequence} ::= \\
@@ -289,14 +274,14 @@ korrekt?
 \x $\mid$ \hlink{Seconds}\\
 
 \htgt{Hours} ::=\\
-\x \hlink{IntegerWithoutPrecision} {\bf HRS}\\
+\x \hlink{IntegerWithoutPrecision} \kw{HRS}
 
 \htgt{Minutes} ::=\\
-\x \hlink{IntegerWithoutPrecision} {\bf MIN}\\
+\x \hlink{IntegerWithoutPrecision} \kw{MIN}
 
 \htgt{Seconds} ::=\\
 \x \{ \hlink{IntegerWithoutPrecision} 
-	$\mid$ \hlink{FloatingPointNumberWithoutPrecision} \} {\bf SEC}
+	$\mid$ \hlink{FloatingPointNumberWithoutPrecision} \} \kw{SEC}
 \end{grammarframe}
 
 \input{ConstantExpression.bnf}
@@ -370,7 +355,8 @@ Doppelte Regel mit DationDeclaration
 \htgt{DationAttribute} ::=\\
 \x \hlink{TypeDation}\\
 \x [ \hlink{GlobalAttribute} ]\\
-\x {\bf CREATED} ( \hlink{Identifier}$\S $UserNameForSytemDation )\\
+\x \kw{CREATED} \kw{(} \hlink{Identifier}$\S $UserNameForSytemDation \kw{)}
+
 \end{discuss}
 
 
@@ -382,7 +368,7 @@ Doppelte Regel mit DationDeclaration
  
 \begin{grammarframe}       
 \htgt{ProblemDataAttribute} ::=\\
-\x [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} 
+\x [ \kw{INV} ] \{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} 
 	$\mid$ \hlink{TypeReference} \}\\
 \x [ \hlink{GlobalAttribute} ] [ \hlink{InitialisationAttribute} ]\\
 \end{grammarframe}       
@@ -427,12 +413,12 @@ Doppelte Regel mit DationDeclaration
 
 \begin{grammarframe}
 \htgt{SemaAttribute} ::=\\
-\x {\bf SEMA} [ \hlink{GlobalAttribute} ]\\
-\x [ {\bf PRESET} ( \hlink{ConstantFIXEDExpression}
-	[ , \hlink{ConstantFIXEDExpression} ] $^{...}$ ) ]\\
+\x \kw{SEMA} [ \hlink{GlobalAttribute} ]\\
+\x [ \kw{PRESET} ( \hlink{ConstantFIXEDExpression}\\
+\x \x [ , \hlink{ConstantFIXEDExpression} ] $^{...}$ ) ]\\
 
 \htgt{BoltAttribute} ::=\\
-\x {\bf BOLT} [ \hlink{GlobalAttribute} ]\\
+\x \kw{BOLT} [ \hlink{GlobalAttribute} ]\\
 \end{grammarframe}
 
 \input{GlobalAttribute.bnf}
@@ -466,13 +452,12 @@ Doppelte Regel mit DationDeclaration
 \input{IOStructureComponent.bnf}
 
 \input{Typology.bnf}
+\input{TypologyDeclaration.bnf}
+\input{TypologySpecification.bnf}
 
 \input{AccessAttribute.bnf}
 
-\begin{grammarframe}
-\htgt{FormatDeclaration} ::= \\
-\x \hlink{Identifier} : {\bf FORMAT} ( \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ ) ;\\
-\end{grammarframe}
+\input{FormatDeclaration.bnf}
 
 \input{ProcedureDeclaration.bnf}
 
@@ -517,7 +502,8 @@ Auswirkung auf alte Teile pruefen
 
 \begin{grammarframe}
 \htgt{Specification} ::=\\
-\x \{ {\bf SPC $\mid$ SPECIFY} \} \hlink{SpecificationDefinition} [ , \hlink{SpecificationDefinition} ] $^{...}$ ;\\
+\x \{ \kw{SPC} $\mid$ \kw{SPECIFY} \} \hlink{SpecificationDefinition}\\
+\x \x  [ , \hlink{SpecificationDefinition} ] $^{...}$ \kw{;}
 
 \htgt{SpecificationDefinition} ::=\\
 \x \hlink{OneIdentifierOrList}\\
@@ -525,19 +511,19 @@ Auswirkung auf alte Teile pruefen
 
 \htgt{SpecificationAttribute} ::=\\
 \x [ \hlink{VirtualDimensionList} ] \\
-\x \{ [ {\bf INV} ] \{ \hlink{SimpleType} $\mid$ 
+\x \{ [ \kw{INV} ] \{ \hlink{SimpleType} $\mid$ 
 	\hlink{StructuredType} $\mid$
 	\hlink{TypeReference} \} \\
-\x \x $\mid$ {\bf SEMA $\mid$ BOLT $\mid$ 
-	INTERRUPT $\mid$ IRPT $\mid$ SIGNAL} 
+\x \x $\mid$ \kw{SEMA} $\mid$ \kw{BOLT} $\mid$ 
+	\kw{INTERRUPT} $\mid$ \kw{IRPT} $\mid$ \kw{SIGNAL} 
 	$\mid$ \hlink{TypeDation}\\
 \x \}\\
 \x [ \hlink{GlobalAttribute} ]\\
 
 \htgt{ProcedureUsageAttribute} ::=\\
-\x \{ {\bf ENTRY} $\mid$ [ : ] {\bf PROC} \} [ 
-	\hlink{ParameterListForSPC} ] [ \hlink{ResultAttribute} ] \\
-\x \x \hlink{GlobalAttribute}\\
+\x \kw{PROC} [ 
+	\hlink{ParameterListForSPC} ] [ \hlink{ResultAttribute} ] 
+ \hlink{GlobalAttribute}
 \end{grammarframe}
 
 %%%\begin{removed}
@@ -557,7 +543,7 @@ Auswirkung auf alte Teile pruefen
 
 \begin{grammarframe}
 \htgt{TaskUsageAttribute} ::=\\
-\x {\bf TASK} \hlink{GlobalAttribute}\\
+\x \kw{TASK} \hlink{GlobalAttribute}
 \end{grammarframe}
 
 \input{Identification.bnf}
@@ -698,10 +684,7 @@ Auswirkung auf alte Teile pruefen
 \input{InduceStatement.bnf} 
 %%%%%\end{added}
 
-\begin{grammarframe}
-\htgt{ConvertStatement} ::=\\
-\x \hlink{ConvertToStatement} $\mid$ \hlink{ConvertFromStatement}\\
-\end{grammarframe}
+\input{ConvertStatement.bnf}
 
 \input{ConvertToStatement.bnf}
 

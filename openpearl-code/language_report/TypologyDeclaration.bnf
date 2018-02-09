@@ -1,0 +1,6 @@
+\htgt{TypologyDeclaration} ::=\\
+\x \kw{DIM} \kw{(} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \}\\
+\x \x [ \kw{,} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \}\\
+\x \x [ \kw{,} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \} ] ] \kw{)} \\
+\x [ \kw{TFU} ]
+

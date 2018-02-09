@@ -328,6 +328,8 @@ pages must be denoted in the structure attribute:
 
 \begin{grammarframe}
 \input{Typology.bnf}
+\input{TypologyDeclaration.bnf}
+\input{TypologySpecification.bnf}
 \index{DIM@\textbf{DIM}}
 \end{grammarframe}
 
@@ -374,11 +376,12 @@ transmission statement:
 \begin{itemize}
 \item If the attribute \code{TFU} is lacking, single data elements,
 lines or pages can be transmitted.
-\item Attribute \index{TFU@\textbf{TFU}}
- means that only lines are transferable.\\
+\item The \code{TFU} attribute \index{TFU@\textbf{TFU}}
+ means that only lines are transferable.
 If the actual number of data elements in a data transmission statement
-is less than the number of data elements of a line, this line or
-page, respectively, is implicitly padded with spaces (\code{ALPHIC} data
+is less than the number of data elements of a line, this line
+%%% or page, respectively,
+ is implicitly padded with spaces (\code{ALPHIC} data
 stations) or zeros (\code{BASIC} data stations).
 
 
@@ -386,7 +389,7 @@ Example:
 
 \kw{DCL}\code{ printer }\kw{DATION OUT ALPHIC DIM}\code{(*, 60, 120) }\kw{TFU}\code{ ... ;}\\
 \code{...} \\
-\kw{PUT}{\code 'PEARL' }\kw{TO}\code{ printer;}
+\kw{PUT}{ \code 'PEARL' }\kw{TO}\code{ printer;}
 
 This \code{PUT} statement has the effect that the five characters P, E, A, R,
 L are written out in one (new) line by \code{printer}.
@@ -409,51 +412,39 @@ discard input lines.
 \begin{added}
 Details about the behavior of \code{TFU}:
 \begin{itemize}
-\item If the system dation requires transfer units, this must be specified
-in the system dation specification. 
-\begin{discuss}
-	wie?
-	
-	SPC ... DATION ... TFU(64) ? 
-	Und die 64 wird vom IMC mit der Gr"o"se der 
-	Systemdation abgeglichen?
-	
-	oder wird die Transfergroesse von der Systemdation uebernommen?
-	\end{discuss}
-\item If a user dation is declared with TFU, the record length is defined by
+\item If the system dation requires transfer units, the sice is specified
+   in the system dation definition. The record length of the user dation must not
+   exceed this length. 
+\item If the system dation does not require \code{TFU}, the behavior is simulated
+  by the user dation.
+\item If a user dation is declared with \code{TFU}, the record length is defined by
   \begin{itemize}
    \item the position of the end-of-record marker (e.g. NL) for ALPHIC dations
       with access attribute FORWARD
    \item the number of data elements in a line and the size of the data elements for
       all other non basic  dation types. No end-of-record markers are used.
   \end{itemize}
-\item If the system dation does not require TFU, the behavior is simulated
-  by the user dation.
-\item If the system dation defines a transfer unit size,
-   the record length of the 
-   user dation must not exceed this length.
-   \begin{discuss}
-   	wie?? siehe oben
-   \end{discuss}
-\item On output: If the record length of the system dation is larger than
+\item On output:
+  \begin{itemize}
+  \item  If the record length of the system dation is larger than
    the record length of the user dation, the remaining elements
     are padded with zeros or spaces according the dation type.
-\item On input: If the record length of the system dation is larger than
-   the record length of the user dation, the remaining elements must be equal
-   to the padding element.
-   If the input record is shorter, the remaining elements are padded
-   with  zeros or spaces according the dation type.
-\item On output, the TFU buffer is transfered to the device:
+  \item The \code{TFU} buffer is transfered to the device:
   \begin{itemize}
    \item at the end of the output statement
    \item if a positioning statement leaves the current record
   \end{itemize}
-\item On input, a new TFU record is read from the device:
-  \begin{itemize}
-   \item with the first data input format element in the input statement
-   \item with the first data input format element in the input statement
-   after a positioning statement which leaves the current record
   \end{itemize}
+\item On input:
+  \begin{itemize}
+  \item If the record length of the system dation is larger than
+   the record length of the user dation, the remaining elements must be equal
+   to the padding element.
+   If the input record is shorter, the remaining elements are ignored.
+\item A new TFU record is read from the device,
+   the first data input format element in the input statement
+   after a positioning statement which leaves the current record is treated.
+\end{itemize}
 \end{itemize}
 \end{added}
 
@@ -501,7 +492,7 @@ Let the table elements be floating point numbers; the access takes place
 to elements directly and only reading.
 
 \begin{lstlisting}
-MODULE(modulename);\\
+MODULE(modulename);
 
 SYSTEM;
 disc: Disc('/home', 10);
@@ -1904,7 +1895,7 @@ declared.
 The input data can have any form permitted for the representation of
 constants. 
 \begin{added}
-The same format replacements as on outout are used.
+The same format replacements as on output are used.
 Only one data element should be read in one input line.
 \end{added} 
 \begin{removed}
@@ -1977,6 +1968,7 @@ respectively, instead of a data station.
 The general forms of the convert statement are:
 
 \begin{grammarframe}
+\input{ConvertStatement.bnf}
 \input{ConvertToStatement.bnf}
 \index{BY@\textbf{BY}!\textbf{CONVERT}}
 \index{TO@\textbf{TO}!\textbf{CONVERT}}

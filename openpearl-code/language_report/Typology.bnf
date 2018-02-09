@@ -1,18 +1,13 @@
-\begin{discuss}
-TFU als E/A-Puffergroesse definieren?
-Gehoert dann TFU zu Typology oder als separater Eintrag in die 
-Dation Grammatik? 
-Sollte Typology aufgeteilt werden in eine Fassung fuer DCL und eine Fassung fuer SPC? --- bei SPC kein TFU(Puffergroesse)
+%%%\begin{discuss}
+%%%TFU als E/A-Puffergroesse definieren?
+%%%Gehoert dann TFU zu Typology oder als separater Eintrag in die 
+%%%Dation Grammatik? 
+%%%Sollte Typology aufgeteilt werden in eine Fassung fuer DCL und eine Fassung fuer SPC? --- bei SPC kein TFU(Puffergroesse)
+%%%% 8.2.2018 Typology aufgeteilt in Dcl and Spc 
+
 
 \htgt{Typology} ::=\\
-\x \kw{DIM} \kw{(} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \}\\
-\x \x [ \kw{,} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \}\\
-\x \x \x [ \kw{,} \{ \kw{*} $\mid$ \hlink{ConstantFIXEDExpression}\S GreaterZero \} ] ] \kw{)} 
-[ \kw{TFU} \removedtext{ [ {\bf MAX} ]} ]\\
-\x $\mid$ 
-	\kw{DIM} ( [ \kw{,} [ \kw{,} ] ] )
-	 $/^*$ Virtual dimension declaration 
-	only permitted for SPC $*/$\\
+\x \hlink{TypologyDeclaration} $\mid$ \hlink{TypologySpecification} 
 
-\end{discuss}
+%%%\end{discuss}
 

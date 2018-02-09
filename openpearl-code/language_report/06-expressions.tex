@@ -374,7 +374,7 @@ DCL (x, y)  FLOAT,
 x := 3;           
 b := '1001'B     
 y := -x;          /* y has value -3 */
-b := NOT b;       /* b has value '0110'B */\\
+b := NOT b;       /* b has value '0110'B */
 \end{lstlisting}
 
 In general, in an assignment, the type of the variable given to the left
@@ -438,10 +438,11 @@ conversion of the type of objects.
 Examples (Table \ref{tab_monadic_type}):
 
 \begin{lstlisting}
-DCL a FIXED(31),
-    x FLOAT(23),
+DCL a  FIXED(31),
+    x  FLOAT(23),
     a1 FIXED(31),
-    (b, c) BIT(15);
+    b  BIT(15),
+    c  BIT(32);
 ...
 a1 := ENTIER x//2;    /* corresponds to a := (ENTIER x)//2; */ 
 a1 := ENTIER (x/2.0);  /* with float division */
@@ -453,12 +454,7 @@ a1 := ROUND 3.4;      /* delivers 3 */
 a1 := ROUND 3.5;      /* delivers 4 */ 
 a1 := ROUND -3.4;     /* delivers -3 */ 
 a1 := ROUND -3.5;     /* delivers -4 */
-c :=  TOBIT a AND b;  /* error: (TOBIT a) has type BIT(32);
-                                b is extended to BIT(32)
-                                the right hand side expression
-                                has type BIT(32);
-                                assignment to smaller type;
-                                is prohibited */
+c :=  TOBIT a AND b;
 a :=  ROUND x + TOFIXED b;
 \end{lstlisting}
 \FloatBarrier
@@ -838,7 +834,8 @@ max(lg1, lg2)'':
 \begin{lstlisting}
 TYPE StringCheck FIXED;
 DCL (less, equal, greater) INV FIXED INIT}(-1, 0, 1);
-stringComparison: PROC((string1, string2) REF INV CHAR(lg3)) RETURNS(StringCheck);
+stringComparison: PROC((string1, string2) REF INV CHAR(lg3))
+                  RETURNS(StringCheck);
    FOR i TO lg3  REPEAT
       IF TOFIXED string1.CHAR(i) < TOFIXED string2.CHAR}(i)
       THEN 
@@ -883,6 +880,12 @@ op1 \kw{UPB} op2
 \end{table}
 
 \FloatBarrier
+The first operand of \code{UPB} and  \code{LWB} starts counting at 1 for the first index.
+If the given index is outside of the definition of the array the 
+\code{ArrayIndexOutOfBoundsSignal} 
+is induced in \OpenPEARL.
+
+
 Example (for usage of LWB and UPB):
 
 \begin{lstlisting}

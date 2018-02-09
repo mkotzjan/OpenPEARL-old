@@ -1,21 +1,19 @@
-\begin{discuss}
-REF INTERRUPT/IRPT, REF SIGNAL ok?
+%%%%\begin{discuss}
+%%%%REF INTERRUPT/IRPT, REF SIGNAL ok?
+%%%% 8-2-2018: Discussion result: There seams to beno problem 
+%%%%           to support references to interrupts and signals
 
-\begin{tabbing}
-\x \{ \= [ \hlink{VirtualDimensionList} ] [ \kw{INV} ] \kill
 \htgt{TypeReference} ::=\\
 \x \kw{REF} \{ \\
-\> [ \hlink{VirtualDimensionList} ] [ \kw{INV} ] 
+\x [ \hlink{VirtualDimensionList} ] [ \kw{INV} ] 
 	\{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} \}\\
-\> $\mid$ [ \hlink{VirtualDimensionList} ] 
+\x $\mid$ [ \hlink{VirtualDimensionList} ] 
 	\{ \hlink{TypeDation} $\mid$ \kw{SEMA} $\mid$ \kw{BOLT} \}\\
-\> $\mid$ \hlink{TypeProcedure} $\mid$ 
+\x $\mid$ \hlink{TypeProcedure} $\mid$ 
 	\kw{TASK} $\mid$ \kw{INTERRUPT} $\mid$ \kw{IRPT} $\mid$ \kw{SIGNAL}\\
-\> 
 %%%$\mid$ \hlink{Type-VOID}
- $\mid$ \kw{CHAR}( )\\
+\x $\mid$ \kw{CHAR}( )\\
 \x \}
 
-\end{tabbing}
-\end{discuss}
+%%%%\end{discuss}
 
