@@ -168,6 +168,57 @@ This version does not support:
   The remaining priorities are: 1-97 and 255
 \end{itemize}
 
+\section{Tuning Information}
+\begin{itemize}
+\item The current version uses only one processor core.
+     There is an option to use other cores but this is not tested yet.
+\item There is no memory locking used.
+     This would increase the execution speed but effect the overall
+     behavior of the linux machine.
+\item The optimizer switches of the c-compiler are not optimized.
+   The debugging option is still set!
+\item The stack size for the tasks may be controlled with the
+   \texttt{ulimit -s xx} command of the command shell (bash).
+\end{itemize}
+
+\section{Execution Times}
+The execution speed of some operations are derived from the system clock.
+The resolution of the system clock depend on the hardware and the 
+presence of other processes.
+The time stamps were taken with the \texttt{NOW} builtin function.
+
+During the measurement, no network connection was established and no
+other tasks are active. The usual background activity of the linux
+systems was present.
+
+For details about the measurements please consult the corresponding
+source code.
+
+\subsection{Execution Timing on Raspberry Pi 3b}
+
+\subsection{Execution Timing on a Desktop Linux System}
+The excecution speed depends on many hardware parameters. 
+The following data are taken from my development machine, which consists of
+......
+\begin{tabular}{|p{5cm}|l|r|}
+\hline
+Parameter & Test Program & Result \\
+\hline
+Task Activation & benchmarks/TaskActivation & ....\\
+\hline
+Semaphore Operations &  & \\
+REQUEST-RELEASE non blocking & & \\
+RELEASE-waiter CONTINUATION & & \\
+
+\hline
+Simple Type Operations & ... & \\
+\hline
+Matrix Multiplication & .... & ...\\
+\hline
+\end{tabular}
+
+
+
 \chapter{Supported Devices}
 \import{../../common/platformManual/}{devicesCommon.tex}
 \import{./}{devices.tex}
