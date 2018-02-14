@@ -31,13 +31,10 @@
 package org.smallpearl.compiler.SymbolTable;
 
 import org.smallpearl.compiler.Defaults;
-import org.smallpearl.compiler.InternalCompilerErrorException;
 import org.smallpearl.compiler.TypeFixed;
 import org.smallpearl.compiler.TypeFloat;
 import org.smallpearl.compiler.TypeBit;
-import org.smallpearl.compiler.TypeChar;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -192,7 +189,7 @@ public class SymbolTable {
         }
     }
 
-    public void dump(SymbolTable st) {
+    public void dump() {
         System.out.println("");
         System.out.println("Symboltable:");
         System.out.println(toString());
@@ -317,7 +314,7 @@ public class SymbolTable {
                 }
             }
         } else {
-            return Defaults.FIXED_PRECISION;
+            return Defaults.FIXED_LENGTH;
         }
 
         return -1;
@@ -354,6 +351,24 @@ public class SymbolTable {
             }
         } else {
             return Defaults.CHARACTER_LENGTH;
+        }
+
+        return -1;
+    }
+
+    public int lookupDefaultBitLength() {
+        SymbolTableEntry entry = this.lookup("~LENGTH_BIT~");
+
+        if ( entry != null ) {
+            if ( entry instanceof LengthEntry) {
+                LengthEntry e = (LengthEntry) entry;
+                if (e.getType() instanceof TypeBit ) {
+                    TypeBit typ = (TypeBit) e.getType();
+                    return typ.getPrecision();
+                }
+            }
+        } else {
+            return Defaults.BIT_LENGTH;
         }
 
         return -1;

@@ -32,9 +32,7 @@ package org.smallpearl.compiler;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
-import org.antlr.v4.semantics.SymbolChecks;
 import org.smallpearl.compiler.SymbolTable.*;
-import org.stringtemplate.v4.ST;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -337,7 +335,6 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                 }
 
                 if (!m_currentSymbolTable.enter(variableEntry)) {
-
                     SymbolTableEntry entry = m_currentSymbolTable.lookupLocal(identifierDenotationList.get(i));
                     if ( entry != null ) {
                         if ( entry instanceof VariableEntry) {
@@ -495,7 +492,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         if (ctx.IntegerConstant() != null) {
             precision = Integer.parseInt(ctx.IntegerConstant().getText());
 
-            if (precision != 24 && precision != 53) {
+            if (precision != Defaults.FLOAT_SHORT_PRECISION && precision != Defaults.FLOAT_LONG_PRECISION) {
                 throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         }
@@ -669,7 +666,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitType_fixed(SmallPearlParser.Type_fixedContext ctx) {
-        Integer width = Defaults.FIXED_PRECISION;
+        Integer width = Defaults.FIXED_LENGTH;
 
         if (ctx.IntegerConstant() != null) {
             width = Integer.parseInt(ctx.IntegerConstant().getText());

@@ -239,12 +239,12 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
     private ConstantValue getInitElement(SmallPearlParser.ConstantContext ctx) {
         if (ctx != null)
         {
-            if (ctx.IntegerConstant() != null)
+            if (ctx.fixedConstant() != null)
             {
                 Integer value;
                 Integer sign = 1;
 
-                value = Integer.parseInt(ctx.IntegerConstant().getText());
+                value = Integer.parseInt(ctx.fixedConstant().IntegerConstant().getText());
 
                 if (ctx.getChildCount() > 1)
                 {

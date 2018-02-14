@@ -29,8 +29,6 @@
 
 package org.smallpearl.compiler;
 
-import com.sun.org.apache.bcel.internal.classfile.ConstantFloat;
-import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
@@ -57,6 +55,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     private SymbolTable m_symboltable;
     private SymbolTable m_currentSymbolTable;
     private ModuleEntry m_module;
+    private Integer m_currFixedLength = null;
 
     public enum Type {BIT, CHAR, FIXED}
 
@@ -451,13 +450,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitType_float(SmallPearlParser.Type_floatContext ctx) {
         ST float_type = group.getInstanceOf("float_type");
-        Integer width = Defaults.FLOAT_PRECISION;
+        int precision = m_currentSymbolTable.lookupDefaultFloatLength();
 
         if (ctx.IntegerConstant() != null) {
-            width = Integer.parseInt(ctx.IntegerConstant().getText());
+            precision = Integer.parseInt(ctx.IntegerConstant().getText());
         }
 
-        float_type.add("size", width);
+        float_type.add("size", precision);
         return float_type;
     }
 
@@ -638,12 +637,13 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         ST constant = group.getInstanceOf("Constant");
 
         if (ctx != null) {
-            if (ctx.IntegerConstant() != null) {
+            if (ctx.fixedConstant() != null) {
                 ST integerConstant = group.getInstanceOf("IntegerConstant");
-                Integer value;
-                Integer sign = 1;
+                int value;
+                int sign = 1;
+                int precision = Defaults.FIXED_LENGTH;
 
-                value = Integer.parseInt(ctx.IntegerConstant().getText());
+                value = Integer.parseInt(ctx.fixedConstant().IntegerConstant().getText());
 
                 if (ctx.getChildCount() > 1) {
                     if (ctx.getChild(0).getText().equals("-")) {
@@ -651,11 +651,51 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                     }
                 }
 
-                if (Integer.toBinaryString(Math.abs(value)).length() < 31) {
-                    integerConstant.add("value", value.toString());
-                } else {
-                    integerConstant.add("value", value.toString() + "LL");
+                if (ctx.fixedConstant().fixedNumberPrecision() != null ) {
+                    precision = Integer.parseInt(ctx.fixedConstant().fixedNumberPrecision().IntegerConstant().toString());
                 }
+                else {
+                    // walk up the AST and get VariableDenotationContext:
+                    ParserRuleContext sctx = ctx.getParent();
+                    while (sctx != null && !(sctx instanceof SmallPearlParser.VariableDenotationContext)) {
+                        sctx = sctx.getParent();
+                    }
+
+                    if (sctx != null) {
+                        SmallPearlParser.TypeAttributeContext typeAttributeContext = ((SmallPearlParser.VariableDenotationContext) sctx).typeAttribute();
+                        if (typeAttributeContext.simpleType() != null) {
+                            SmallPearlParser.SimpleTypeContext simpleTypeContext = typeAttributeContext.simpleType();
+
+                            if (simpleTypeContext.typeInteger() != null) {
+                                SmallPearlParser.TypeIntegerContext typeIntegerContext = simpleTypeContext.typeInteger();
+
+                                if (typeIntegerContext.mprecision() != null) {
+                                    precision = Integer.parseInt(typeIntegerContext.mprecision().integerWithoutPrecision().IntegerConstant().toString());
+                                }
+                            }
+                        }
+
+                    } else {
+                        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    }
+                }
+
+                ConstantFixedValue fixedConst = ConstantPool.lookupFixedValue(value,precision);
+
+                if ( fixedConst != null ) {
+                    integerConstant.add("value", fixedConst.toString());
+                }
+                else {
+                    throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                }
+
+/*
+                if (Integer.toBinaryString(Math.abs(value)).length() < 31) {
+                    integerConstant.add("value", value);
+                } else {
+                    integerConstant.add("value", value + "LL");
+                }
+*/
 
                 constant.add("IntegerConstant", integerConstant);
             } else if (ctx.durationConstant() != null) {
@@ -906,7 +946,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     @Override
     public ST visitTypeInteger(SmallPearlParser.TypeIntegerContext ctx) {
         ST st = group.getInstanceOf("TypeInteger");
-        Integer size = Defaults.FIXED_PRECISION;
+        int size = m_currentSymbolTable.lookupDefaultFixedLength();
 
         if (ctx != null) {
             for (ParseTree c : ctx.children) {
@@ -925,7 +965,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
     public ST visitTypeBitString(SmallPearlParser.TypeBitStringContext ctx) {
         ST st = group.getInstanceOf("TypeBitString");
 
-        Integer length = Defaults.BIT_LENGTH;
+        int length = m_currentSymbolTable.lookupDefaultBitLength();
 
         if (ctx.IntegerConstant() != null) {
             length = Integer.parseInt(ctx.IntegerConstant().getText());
@@ -966,7 +1006,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (ctx.IntegerConstant() != null) {
             precision = Integer.parseInt(ctx.IntegerConstant().getText());
 
-            if (precision != 24 && precision != 53) {
+            if (precision != Defaults.FLOAT_SHORT_PRECISION && precision != Defaults.FLOAT_LONG_PRECISION) {
                 throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         }
@@ -974,17 +1014,6 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         st.add("precision", precision);
 
         return st;
-    }
-
-    private ST variable_init(SmallPearlParser.Variable_initContext ctx) {
-        ST vinit = group.getInstanceOf("variable_init");
-
-        if (ctx.constantExpression() != null) {
-            ConstantValue value = m_constantExpressionEvaluatorVisitor.lookup((ctx.constantExpression()));
-            vinit.add("value", value);
-        }
-
-        return vinit;
     }
 
     @Override
@@ -1846,7 +1875,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         SymbolTableEntry entry = m_currentSymbolTable.lookup(id);
 
         if ( entry == null ) {
-            m_currentSymbolTable.dump(m_currentSymbolTable);
+            m_currentSymbolTable.dump();
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -1885,6 +1914,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         if (entry instanceof VariableEntry) {
             VariableEntry variable = (VariableEntry)entry;
             TypeDefinition lhs_type = variable.getType();
+
+            if ( lhs_type instanceof TypeFixed) {
+                TypeFixed typ = (TypeFixed)(lhs_type);
+                m_currFixedLength = typ.getPrecision();
+            }
+            else {
+                m_currFixedLength  = null;
+            }
+
 
             if ( lhs_type instanceof TypeReference) {
                 ST st = group.getInstanceOf("assignment_statement");
@@ -1970,8 +2008,11 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
+        m_currFixedLength = null;
+
         return stmt;
     }
+
 
     @Override
     public ST visitIndices(SmallPearlParser.IndicesContext ctx ) {
@@ -2253,21 +2294,24 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                             throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
                         }
                     }
-                    else if (literal_ctx.IntegerConstant() != null) {
+                    else if (literal_ctx.fixedConstant() != null) {
                         try {
                             int value = 0;
                             int precision = m_currentSymbolTable.lookupDefaultFixedLength();
 
-                            if ( literal_ctx.IntegerConstant().size() == 1 ) {
-                                value = -1 * Integer.parseInt(literal_ctx.IntegerConstant(0).toString());
-                            }
-                            else if ( literal_ctx.IntegerConstant().size() == 2 ) {
-                                value = -1 * Integer.parseInt(literal_ctx.IntegerConstant(0).toString());
-                                precision = Integer.parseInt(literal_ctx.IntegerConstant(1).toString());
+                            if ( literal_ctx.fixedConstant().fixedNumberPrecision() != null) {
+                                precision = Integer.parseInt(literal_ctx.fixedConstant().fixedNumberPrecision().IntegerConstant().toString());
                             }
 
-                            ConstantFixedValue fixed_value = new ConstantFixedValue(value, precision);
-                            expr.add("code", fixed_value);
+                            String s = literal_ctx.fixedConstant().IntegerConstant().toString();
+                            value = -1 * Integer.parseInt(literal_ctx.fixedConstant().IntegerConstant().toString());
+
+                            if (m_map_to_const) {
+                                ConstantFixedValue fixed_value = new ConstantFixedValue(value, precision);
+                                expr.add("code", fixed_value);
+                            } else {
+                                expr.add("code", value);
+                            }
                         } catch (NumberFormatException ex) {
                             throw new NumberOutOfRangeException(ctx.getText(), literal_ctx.start.getLine(), literal_ctx.start.getCharPositionInLine());
                         }
@@ -2462,18 +2506,22 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             } else {
                 throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
-        } else if (ctx.IntegerConstant() != null) {
+        } else if (ctx.fixedConstant() != null) {
             try {
-                Integer value = null;
-                Integer precision = Defaults.FIXED_PRECISION;
+                int value;
+                int precision = m_currentSymbolTable.lookupDefaultFixedLength();
 
-                if ( ctx.IntegerConstant().size() == 1 ) {
-                    value = Integer.parseInt(ctx.IntegerConstant(0).toString());
+                if ( ctx.fixedConstant().fixedNumberPrecision() != null) {
+                    precision = Integer.parseInt(ctx.fixedConstant().fixedNumberPrecision().IntegerConstant().toString());
+                } else {
+                    if (m_currFixedLength != null ) {
+                        precision = m_currFixedLength;
+                    }
                 }
-                else if ( ctx.IntegerConstant().size() == 2 ) {
-                    value = Integer.parseInt(ctx.IntegerConstant(0).toString());
-                    precision = Integer.parseInt(ctx.IntegerConstant(1).toString());
-                }
+
+                String s = ctx.fixedConstant().IntegerConstant().toString();
+
+                value = Integer.parseInt(ctx.fixedConstant().IntegerConstant().toString());
 
                 if (m_map_to_const) {
                     ConstantFixedValue fixed_value = new ConstantFixedValue(value,precision);
@@ -3549,7 +3597,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                 e.add("element", getExpression(c.expression()));
             }
             else {
-                e.add("element", "CONST_FIXED_P_1_" + Defaults.FIXED_PRECISION);
+                e.add("element", "CONST_FIXED_P_1_" + Defaults.FIXED_LENGTH);
             }
 
             st.add("format", e);
@@ -4614,13 +4662,24 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         }
 
         if ( ctx.loopStatement_from() != null) {
+            boolean old_map_to_const = m_map_to_const;
+
             fromType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_from().expression());
+
+            m_map_to_const = false;
             st.add("from", getExpression(ctx.loopStatement_from().expression()));
+            m_map_to_const = old_map_to_const;
         }
 
         if ( ctx.loopStatement_to() != null) {
+            boolean old_map_to_const = m_map_to_const;
+
             toType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_to().expression());
+
+            m_map_to_const = false;
             st.add( "to", getExpression(ctx.loopStatement_to().expression()));
+            m_map_to_const = old_map_to_const;
+
             loopCounterNeeded = true;
         }
 
@@ -4643,9 +4702,15 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         st.add("rangePrecision",rangePrecision);
 
         if ( ctx.loopStatement_by() != null) {
+            boolean old_map_to_const = m_map_to_const;
+
             byType = m_expressionTypeVisitor.lookupType(ctx.loopStatement_by().expression());
+
+            m_map_to_const = false;
             st.add("by", getExpression(ctx.loopStatement_by().expression()));
             st.add("byPrecision", rangePrecision);
+            m_map_to_const = old_map_to_const;
+
             loopCounterNeeded = true;
         }
 

@@ -56,7 +56,7 @@ public class ConstantPool {
                     ConstantFixedValue a = (ConstantFixedValue)(value);
                     ConstantFixedValue b = (ConstantFixedValue)(constantPool.get(i));
 
-                    if ( a.getValue().equals(b.getValue()) && a.getPrecision().equals(b.getPrecision())) {
+                    if ( a.getValue() == b.getValue() && a.getPrecision() == b.getPrecision()) {
                         found = true;
                         break;
                     }
@@ -250,6 +250,24 @@ public class ConstantPool {
 
                 if ( constant.getValue() == other.getValue() &&
                      constant.getPrecision() == other.getPrecision()) {
+                    return constant;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static public ConstantFixedValue lookupFixedValue(long value, int length) {
+        int i;
+        ConstantFixedValue other = new ConstantFixedValue(value,length);
+
+        for (i = 0; i < constantPool.size(); i++) {
+            if (constantPool.get(i) instanceof ConstantFixedValue) {
+                ConstantFixedValue constant = ((ConstantFixedValue) (constantPool.get(i)));
+
+                if ( constant.getValue() == other.getValue() &&
+                        constant.getPrecision() == other.getPrecision()) {
                     return constant;
                 }
             }

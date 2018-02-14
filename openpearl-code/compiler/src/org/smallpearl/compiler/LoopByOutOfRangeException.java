@@ -29,52 +29,11 @@
 
 package org.smallpearl.compiler;
 
+public class LoopByOutOfRangeException extends RuntimeException {
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
+    public LoopByOutOfRangeException(String sNumber, int line, int column) {
+        super("Error at line " + line + ":" + column +
+                ": Loop BY out of range " );
 
-public class TypeFixed extends TypeDefinition {
-    private int m_precision;
-
-    TypeFixed() {
-        super("FIXED");
-        this.m_precision = Defaults.FIXED_LENGTH;
     }
-
-    TypeFixed(int precision) {
-        super("FIXED");
-        this.m_precision = precision;
-    }
-
-    public Integer getPrecision() {
-        return m_precision;
-    }
-
-    public Void setPrecision(int precision) {
-        m_precision = precision;
-        return null;
-    }
-
-    public String toString() {
-        return this.getName() + "(" + this.m_precision + ")";
-    }
-
-    public ST toST(STGroup group) {
-        ST st = group.getInstanceOf("fixed_type");
-        st.add("size", m_precision);
-        return st;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof TypeFixed)) {
-            return false;
-        }
-
-        TypeFixed that = (TypeFixed) other;
-
-        // Custom equality check here.
-        return this.m_precision == that.m_precision;
-    }
-
 }

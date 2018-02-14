@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class Compiler {
-    static String version = "v0.8.9.17";
+    static String version = "v0.8.9.19";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();
@@ -128,21 +128,31 @@ public class Compiler {
                     symbolTableVisitor.visit(tree);
 
                     if (dumpSymbolTable) {
-                        symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
+                        symbolTableVisitor.symbolTable.dump();
                     }
+
+                    ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
+                    expressionTypeVisitor.visit(tree);
 
                     ConstantPoolVisitor constantPoolVisitor = new ConstantPoolVisitor(lexer.getSourceName(),
                                                                                       verbose,
                                                                                       debug,
                                                                                       symbolTableVisitor,
-                                                                                      constantPool);
+                                                                                      constantPool,
+                                                                                      expressionTypeVisitor);
                     constantPoolVisitor.visit(tree);
 
-                    ExpressionTypeVisitor expressionTypeVisitor = new ExpressionTypeVisitor(verbose, debug, symbolTableVisitor);
+                    ConstantExpressionEvaluatorVisitor constantExpressionVisitor = new ConstantExpressionEvaluatorVisitor(verbose, debug, symbolTableVisitor, constantPoolVisitor);
+                    constantExpressionVisitor.visit(tree);
+
+                    FixUpSymbolTableVisitor fixUpSymbolTableVisitor = new FixUpSymbolTableVisitor(verbose,debug,symbolTableVisitor,expressionTypeVisitor,constantPoolVisitor);
+                    fixUpSymbolTableVisitor.visit(tree);
+
                     expressionTypeVisitor.visit(tree);
 
-                    ConstantExpressionEvaluatorVisitor constantExpressionVisitor = new ConstantExpressionEvaluatorVisitor(verbose, debug, symbolTableVisitor);
-                    constantExpressionVisitor.visit(tree);
+                    if (dumpConstantPool) {
+                        constantPool.dump();
+                    }
 
                     if (!nosemantic) {
                         SemanticCheck semanticCheck = new SemanticCheck(lexer.getSourceName(), verbose, debug, tree, symbolTableVisitor, expressionTypeVisitor);
@@ -154,9 +164,6 @@ public class Compiler {
 
                     CppGenerate(lexer.getSourceName(), tree, symbolTableVisitor, expressionTypeVisitor, constantExpressionVisitor);
 
-                    if (dumpConstantPool) {
-                        constantPool.dump();
-                    }
                 }
             }
             catch(Exception ex) {
@@ -164,7 +171,7 @@ public class Compiler {
                 System.err.println("Compilation aborted.");
 
                 if (dumpSymbolTable) {
-                    symbolTableVisitor.symbolTable.dump(symbolTableVisitor.symbolTable);
+                    symbolTableVisitor.symbolTable.dump();
                 }
 
                 if (dumpConstantPool) {

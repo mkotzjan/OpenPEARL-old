@@ -29,7 +29,6 @@
 
 package org.smallpearl.compiler;
 
-import com.sun.org.apache.xpath.internal.operations.Variable;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.smallpearl.compiler.SymbolTable.*;
@@ -45,6 +44,8 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
     private org.smallpearl.compiler.SymbolTable.SymbolTable m_currentSymbolTable;
     private org.smallpearl.compiler.SymbolTable.ModuleEntry m_module;
     private ParseTreeProperty<ExpressionResult> m_properties = null;
+    private Integer m_currFixedLength = null;
+    private boolean m_calculateRealFixedLength;
 
     public ExpressionTypeVisitor(int verbose, boolean debug, SymbolTableVisitor symbolTableVisitor) {
 
@@ -71,6 +72,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         m_module = listOfModules.get(0);
         m_currentSymbolTable = m_module.scope;
         m_properties = new ParseTreeProperty<ExpressionResult>();
+        m_calculateRealFixedLength = false;
     }
 
     public TypeDefinition lookupType(ParserRuleContext ctx) {
@@ -987,7 +989,9 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         if (op1 == null) {
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
+
         visit(ctx.expression(1));
+
         op2 = m_properties.get(ctx.expression(1));
 
         if (op2 == null) {
@@ -1284,7 +1288,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         if (op.getType() instanceof TypeBit) {
-            res = new ExpressionResult(new TypeFixed(((TypeBit) op.getType()).getPrecision()), op.isConstant());
+            res = new ExpressionResult(new TypeFixed(((TypeBit) op.getType()).getPrecision() - 1), op.isConstant());
             m_properties.put(ctx, res);
             if (m_debug)
                 System.out.println("ExpressionTypeVisitor: TOFIXED: rule#1");
@@ -1493,14 +1497,28 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         } else if (ctx.BitStringLiteral() != null) {
             ExpressionResult expressionResult = new ExpressionResult(  new TypeBit(CommonUtils.getBitStringLength(ctx.BitStringLiteral().getText())), true);
             m_properties.put(ctx, expressionResult);
-        } else if (ctx.IntegerConstant() != null) {
+        } else if (ctx.fixedConstant() != null) {
             try {
-                Integer precision = Defaults.FIXED_PRECISION;
+                int precision = m_currentSymbolTable.lookupDefaultFixedLength();
 
-                if (ctx.IntegerConstant().size() == 2) {
-                    precision = Integer.parseInt(ctx.IntegerConstant(1).toString());
+                if ( ctx.fixedConstant().fixedNumberPrecision() != null) {
+                    precision = Integer.parseInt(ctx.fixedConstant().fixedNumberPrecision().IntegerConstant().toString());
                 }
 
+                if (m_currFixedLength != null ) {
+                    precision = m_currFixedLength;
+                }
+
+                if ( m_calculateRealFixedLength) {
+                    long value = Long.parseLong(ctx.fixedConstant().IntegerConstant().getText());
+
+                    precision = Long.toBinaryString(Math.abs(value)).length();
+                    if ( value <  0) {
+                        precision++;
+                    }
+                }
+
+                System.out.println( "ExpressionTypeVisitor:visitLiteral:Fixed: ctx="+ctx.toStringTree()+" precision="+precision);
                 ExpressionResult expressionResult = new ExpressionResult(new TypeFixed(precision), true);
                 m_properties.put(ctx, expressionResult);
             } catch (NumberFormatException ex) {
@@ -1541,7 +1559,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
 //        this.m_currentSymbolTable = this.symbolTable.newLevel(moduleEntry);
-
+        this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
         visitChildren(ctx);
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
         return null;
@@ -1614,8 +1632,49 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         }
 
         this.m_currentSymbolTable = m_symbolTableVisitor.getSymbolTablePerContext(ctx);
+
         visitChildren(ctx);
+
         this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+        return null;
+    }
+
+    @Override
+    public Void visitLoopStatement_from(SmallPearlParser.LoopStatement_fromContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("ExpressionTypeVisitor: visitLoopStatement_From");
+        }
+
+        m_calculateRealFixedLength = true;
+        visitChildren(ctx);
+        m_calculateRealFixedLength = false;
+
+        return null;
+    }
+
+    @Override
+    public Void visitLoopStatement_to(SmallPearlParser.LoopStatement_toContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("ExpressionTypeVisitor: visitLoopStatement_to");
+        }
+
+        m_calculateRealFixedLength = true;
+        visitChildren(ctx);
+        m_calculateRealFixedLength = false;
+
+        return null;
+    }
+
+    @Override
+    public Void visitLoopStatement_by(SmallPearlParser.LoopStatement_byContext ctx) {
+        if (m_verbose > 0) {
+            System.out.println("ExpressionTypeVisitor: visitLoopStatement_By");
+        }
+
+        m_calculateRealFixedLength = true;
+        visitChildren(ctx);
+        m_calculateRealFixedLength = false;
+
         return null;
     }
 
@@ -1625,15 +1684,6 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitAssignment_statement");
-        }
-
-        if (m_debug) {
-
-            if ( ctx.stringSelection() != null ) {
-                if ( ctx.stringSelection().charSelection() != null ) {
-                    System.out.println(">>>>>>>>>>>>>>> id = " + ctx.stringSelection().charSelection().ID());
-                }
-            }
         }
 
         if ( ctx.stringSelection() != null ) {
@@ -1649,8 +1699,16 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
+        VariableEntry var = (VariableEntry)entry;
+        if ( var.getType() instanceof TypeFixed) {
+            TypeFixed typ = (TypeFixed)(var.getType());
+            m_currFixedLength = typ.getPrecision();
+        }
+
         SmallPearlParser.ExpressionContext expr = ctx.expression();
         visitChildren(ctx);
+
+        m_currFixedLength = null;
 
         return null;
     }
@@ -1674,7 +1732,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
             System.out.println("ExpressionTypeVisitor: visitSizeofExpression");
         }
 
-        TypeFixed type = new TypeFixed(Defaults.FIXED_PRECISION);
+        TypeFixed type = new TypeFixed(Defaults.FIXED_LENGTH);
         ExpressionResult expressionResult = new ExpressionResult(type);
         m_properties.put(ctx, expressionResult);
 
@@ -2531,4 +2589,53 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
 
         return null;
     }
+
+    @Override
+    public Void visitConstantFixedExpressionFit(SmallPearlParser.ConstantFixedExpressionFitContext ctx) {
+        ExpressionResult op1;
+        ExpressionResult op2;
+
+        if (m_verbose > 0) {
+            System.out.println("ExpressionTypeVisitor: visitConstantFixedExpressionFit");
+        }
+
+//        visit(ctx.expression(0));
+//        op1 = m_properties.get(ctx.expression(0));
+//
+//        if (op1 == null) {
+//            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+//        }
+//
+//        visit(ctx.expression(1));
+//        op2 = m_properties.get(ctx.expression(1));
+//
+//        if (op2 == null) {
+//            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+//        }
+//
+//        if (op1.getType() instanceof TypeBit && op2.getType() instanceof TypeBit) {
+//            TypeBit type = new TypeBit( Math.max( ((TypeBit)op1.getType()).getPrecision(),((TypeBit)op2.getType()).getPrecision()));
+//            ExpressionResult expressionResult = new ExpressionResult(type);
+//            m_properties.put(ctx, expressionResult);
+//        }
+//        else {
+//            throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+//        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitInitElement(SmallPearlParser.InitElementContext ctx) {
+        visitChildren(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitConstantExpression(SmallPearlParser.ConstantExpressionContext ctx) {
+        visitChildren(ctx);
+        return null;
+    }
+
+
 }
