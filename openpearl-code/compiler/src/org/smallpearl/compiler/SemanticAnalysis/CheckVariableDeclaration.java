@@ -64,8 +64,6 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
         m_symboltable = symbolTableVisitor.symbolTable;
         m_currentSymbolTable = m_symboltable;
 
-        m_debug = true;
-
         if (m_verbose > 0) {
             System.out.println( "    Check Variable Declaration");
         }

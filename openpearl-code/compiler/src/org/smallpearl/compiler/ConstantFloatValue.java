@@ -55,6 +55,10 @@ public class ConstantFloatValue extends ConstantValue {
         return m_precision;
     }
 
+    public void setPrecision(int precision) {
+        m_precision = precision;
+    }
+
     public String toString() {
         String name = "CONST_" + getBaseType().toUpperCase();
         Double value = Math.abs(m_value);

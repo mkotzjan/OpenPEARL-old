@@ -77,6 +77,10 @@ public class ConstantFixedValue extends ConstantValue {
         return m_precision;
     }
 
+    public void setPrecision(int precision) {
+        m_precision = precision;
+    }
+
     public String getBaseType() {
         return "Fixed";
     }

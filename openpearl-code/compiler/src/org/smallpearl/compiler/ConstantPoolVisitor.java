@@ -299,6 +299,7 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
         return null;
     }
 
+/*
     @Override
     public Void visitConstant(SmallPearlParser.ConstantContext ctx) {
         if (m_debug)
@@ -458,6 +459,7 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
 
         return null;
     }
+*/
 
     private Integer getHours(SmallPearlParser.HoursContext ctx) {
         Integer hours = 0;

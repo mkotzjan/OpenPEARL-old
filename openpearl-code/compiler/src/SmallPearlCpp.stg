@@ -132,6 +132,10 @@ ConstantPoolDurationEntry(name,type,value) ::= <<
 static /*const*/ pearlrt::<type>          <name>(<value>);
 >>
 
+ConstantPoolClockEntry(name,type,value) ::= <<
+static /*const*/ pearlrt::<type>          <name>(<value>);
+>>
+
 /*********************** GLOBAL DECLARATIONS ***********************/
 
 globalDecl(decls) ::= <<

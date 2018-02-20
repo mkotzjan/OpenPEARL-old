@@ -196,42 +196,55 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
                     throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
 
-                if ( variableEntry.getConstantCtx() instanceof SmallPearlParser.ConstantExpressionContext) {
-                    SmallPearlParser.ConstantExpressionContext c = (SmallPearlParser.ConstantExpressionContext)variableEntry.getConstantCtx();
+                if ( variableEntry.getInitializer() != null ) {
 
-                    ConstantValue v = m_constantExpressionEvaluatorVisitor.lookup(c);
-
-                    if ( v instanceof ConstantFixedValue) {
-                        value = (ConstantFixedValue)v;
+                    if ( variableEntry.getInitializer().getConstant() instanceof ConstantFixedValue ) {
+                        value = (ConstantFixedValue)variableEntry.getInitializer().getConstant();
                     }
                     else {
                         throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                     }
-                }
-                else if ( variableEntry.getConstantCtx() instanceof SmallPearlParser.ConstantContext) {
-                    SmallPearlParser.ConstantContext c = (SmallPearlParser.ConstantContext)variableEntry.getConstantCtx();
 
-                    if ( c.StringLiteral() != null) {
-                        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-                    }
+/*
+                    if ( variableEntry.getInitializer().getContext() instanceof SmallPearlParser.ConstantExpressionContext) {
+                        SmallPearlParser.ConstantExpressionContext c = (SmallPearlParser.ConstantExpressionContext)variableEntry.getInitializer().getContext();
 
-                    else if ( c.fixedConstant() != null ) {
-                        int v = Integer.parseInt(c.fixedConstant().IntegerConstant().getText());
-                        value = new ConstantFixedValue(v);
+                        ConstantValue v = m_constantExpressionEvaluatorVisitor.lookup(c);
 
+                        if ( v instanceof ConstantFixedValue) {
+                            value = (ConstantFixedValue)v;
+                        }
+                        else {
+                            throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
                     }
-                    else if ( c.floatingPointConstant() != null ) {
-                        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                    else if ( variableEntry.getInitializer().getContext()instanceof SmallPearlParser.ConstantContext) {
+                        SmallPearlParser.ConstantContext c = (SmallPearlParser.ConstantContext)variableEntry.getInitializer().getContext();
+
+                        if ( c.StringLiteral() != null) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+
+                        else if ( c.fixedConstant() != null ) {
+                            int v = Integer.parseInt(c.fixedConstant().IntegerConstant().getText());
+                            value = new ConstantFixedValue(v);
+
+                        }
+                        else if ( c.floatingPointConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+                        else if ( c.durationConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+                        else if ( c.bitStringConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+                        else if ( c.timeConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
                     }
-                    else if ( c.durationConstant() != null ) {
-                        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-                    }
-                    else if ( c.bitStringConstant() != null ) {
-                        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-                    }
-                    else if ( c.timeConstant() != null ) {
-                        throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
-                    }
+*/
+
                 }
             }
         }
@@ -246,7 +259,10 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
             int l = (int) length.getPrecision();
             ConstantFixedValue fittedValue = new ConstantFixedValue(value.getValue(),l);
             value = fittedValue;
-            m_constantPoolVisitor.add(fittedValue);
+
+            if ( m_constantPoolVisitor != null ) {
+                m_constantPoolVisitor.add(fittedValue);
+            }
         }
 
         if ( m_debug) {

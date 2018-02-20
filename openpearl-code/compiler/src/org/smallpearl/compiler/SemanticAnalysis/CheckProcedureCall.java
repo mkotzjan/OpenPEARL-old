@@ -60,9 +60,6 @@ public class CheckProcedureCall extends SmallPearlBaseVisitor<Void> implements S
         m_symboltable = symbolTableVisitor.symbolTable;
         m_currentSymbolTable = m_symboltable;
 
-        m_verbose = 1;
-        m_debug = true;
-
         if (m_verbose > 0) {
             System.out.println( "    Check ProcedureCalls");
         }

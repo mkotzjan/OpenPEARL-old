@@ -65,8 +65,13 @@ public class ConstantPool {
             else if ( value instanceof ConstantFloatValue) {
                 if (constantPool.get(i) instanceof ConstantFloatValue) {
                     if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(constantPool.get(i))).getValue()) == 0) {
-                        found = true;
-                        break;
+                        ConstantFloatValue a = (ConstantFloatValue)value;
+                        ConstantFloatValue b = (ConstantFloatValue)(constantPool.get(i));
+
+                        if ( Double.compare(a.getValue(),b.getValue()) == 0 && a.getPrecision() == b.getPrecision()) {
+                            found = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -126,6 +131,10 @@ public class ConstantPool {
             }
 
             constantPool.add(value);
+        } else {
+            if ( value instanceof ConstantBitValue) {
+                ((ConstantBitValue) (value)).setNo(constantBitNo);
+            }
         }
 
         return null;

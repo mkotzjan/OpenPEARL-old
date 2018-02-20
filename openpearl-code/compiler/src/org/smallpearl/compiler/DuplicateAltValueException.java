@@ -29,13 +29,13 @@
 
 package org.smallpearl.compiler;
 
-public class DuplicateAltValue extends RuntimeException {
+public class DuplicateAltValueException extends RuntimeException {
 
-    public DuplicateAltValue(String sNumber, int line, int column) {
+    public DuplicateAltValueException(String sNumber, int line, int column) {
         super("Error at line " + line + ":" + column + ": Duplicate value for alternative.");
     }
 
-    public DuplicateAltValue(String sNumber, int line, int column, String sReason) {
+    public DuplicateAltValueException(String sNumber, int line, int column, String sReason) {
         super("Error at line " + line + ":" + column + ": Duplicate value for alternative: " + sReason);
     }
 }
