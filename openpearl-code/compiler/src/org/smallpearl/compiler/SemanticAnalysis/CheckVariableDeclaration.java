@@ -64,8 +64,6 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
         m_symboltable = symbolTableVisitor.symbolTable;
         m_currentSymbolTable = m_symboltable;
 
-        m_debug = true;
-
         if (m_verbose > 0) {
             System.out.println( "    Check Variable Declaration");
         }
@@ -239,12 +237,12 @@ public class CheckVariableDeclaration extends SmallPearlBaseVisitor<Void> implem
     private ConstantValue getInitElement(SmallPearlParser.ConstantContext ctx) {
         if (ctx != null)
         {
-            if (ctx.IntegerConstant() != null)
+            if (ctx.fixedConstant() != null)
             {
                 Integer value;
                 Integer sign = 1;
 
-                value = Integer.parseInt(ctx.IntegerConstant().getText());
+                value = Integer.parseInt(ctx.fixedConstant().IntegerConstant().getText());
 
                 if (ctx.getChildCount() > 1)
                 {

@@ -65,7 +65,7 @@ public class ConstantBitValue extends ConstantValue {
     }
 
     public String getValue() {
-        return "0x" + Long.toHexString(m_value);
+        return formatBitStringConstant(m_value,m_noOfBits);
     }
 
     public String getBaseType() {
@@ -103,4 +103,52 @@ public class ConstantBitValue extends ConstantValue {
 
         return res;
     }
+
+    public String formatBitStringConstant(Long l, int numberOfBits) {
+        String bitStringConstant;
+
+        String b = Long.toBinaryString(l);
+        String bres = "";
+
+        int l1 = b.length();
+
+        if (numberOfBits < b.length())
+
+        {
+            bres = "";
+            for (int i = 0; i < numberOfBits; i++) {
+                bres = bres + b.charAt(i);
+            }
+            Long r = Long.parseLong(bres, 2);
+            if (Long.toBinaryString(Math.abs(r)).length() < 15) {
+                bitStringConstant = "0x" + Long.toHexString(r).toString();
+            } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                bitStringConstant = "0x" + Long.toHexString(r).toString() + "UL";
+            } else {
+                bitStringConstant = "0x" + Long.toHexString(r).toString() + "ULL";
+            }
+        } else if (numberOfBits > b.length()) {
+            bres = b;
+            Long r = Long.parseLong(bres, 2);
+            if (Long.toBinaryString(Math.abs(r)).length() < 15) {
+                bitStringConstant = "0x" + Long.toHexString(r).toString();
+            } else if (Long.toBinaryString(Math.abs(r)).length() < 31) {
+                bitStringConstant = "0x" + Long.toHexString(r).toString() + "UL";
+            } else {
+                bitStringConstant = "0x" + Long.toHexString(r).toString() + "ULL";
+            }
+        } else
+        {
+            if (Long.toBinaryString(Math.abs(l)).length() < 15) {
+                bitStringConstant = "0x" + Long.toHexString(l).toString();
+            } else if (Long.toBinaryString(Math.abs(l)).length() < 31) {
+                bitStringConstant = "0x" + Long.toHexString(l).toString() + "UL";
+            } else {
+                bitStringConstant = "0x" + Long.toHexString(l).toString() + "ULL";
+            }
+        }
+
+        return bitStringConstant;
+    }
+
 }

@@ -42,16 +42,19 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
     private String m_sourceFileName;
     private SymbolTable m_currentSymbolTable;
     private ConstantExpressionEvaluatorVisitor  m_constantExpressionEvaluatorVisitor;
+    private ConstantPoolVisitor m_constantPoolVisitor;
 
     public ConstantFixedExpressionEvaluator(int verbose,
                                             boolean debug,
                                             SymbolTable symbolTable,
-                                            ConstantExpressionEvaluatorVisitor constantExpressionEvaluatorVisitor) {
+                                            ConstantExpressionEvaluatorVisitor constantExpressionEvaluatorVisitor,
+                                            ConstantPoolVisitor constantPoolVisitor) {
 
         m_debug = debug;
         m_verbose = verbose;
         m_currentSymbolTable = symbolTable;
         m_constantExpressionEvaluatorVisitor = constantExpressionEvaluatorVisitor;
+        m_constantPoolVisitor = constantPoolVisitor;
 
         if (m_verbose > 0) {
             System.out.println( "    ConstantFixedExpressionEvaluator");
@@ -151,30 +154,6 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
         return value;
     }
 
-/*
-////////////////////////////////////////////////////////////////////////////////
-// Factor ::=
-//   [+ | -] {  Integer
-//             | ( ConstantFIXEDExpression )
-//             | TOFIXED { CharacterStringConstant§OfLength1 | BitStringConstant }
-//             | Identifier§NamedFIXEDConstant
-//           }
-// [ FIT ConstantFIXEDExpression ]
-////////////////////////////////////////////////////////////////////////////////
-
-    constantFixedExpressionFactor
-        : Sign? (   IntegerConstant
-        | '(' constantFixedExpression ')'
-            | ID )
-    constantFixedExpressionFit?
-    ;
-
-    constantFixedExpressionFit
-        :
-                'FIT' constantFixedExpression
-    ;
-*/
-
     @Override
     public ConstantFixedValue visitConstantFixedExpressionFactor(SmallPearlParser.ConstantFixedExpressionFactorContext ctx) {
         ConstantFixedValue value = null;
@@ -190,9 +169,15 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
             }
         }
 
-        if ( ctx.IntegerConstant() != null) {
-            int r = sign * Integer.parseInt(ctx.IntegerConstant().toString());
-            value = new ConstantFixedValue(r);
+        if ( ctx.fixedConstant() != null) {
+            int curval = sign * Integer.parseInt(ctx.fixedConstant().IntegerConstant().toString());
+            int curlen =   m_currentSymbolTable.lookupDefaultFixedLength();
+
+            if ( ctx.fixedConstant().fixedNumberPrecision() != null ) {
+                curlen = Integer.parseInt(ctx.fixedConstant().fixedNumberPrecision().IntegerConstant().toString());
+            }
+
+            value = new ConstantFixedValue(curval,curlen);
         }
         else if ( ctx.ID() != null ) {
             SymbolTableEntry entry = m_currentSymbolTable.lookup(ctx.ID().toString());
@@ -211,41 +196,55 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
                     throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                 }
 
-                System.out.println("****:"+variableEntry.getConstantCtx());
+                if ( variableEntry.getInitializer() != null ) {
 
-                if ( variableEntry.getConstantCtx() instanceof SmallPearlParser.ConstantExpressionContext) {
-                    SmallPearlParser.ConstantExpressionContext c = (SmallPearlParser.ConstantExpressionContext)variableEntry.getConstantCtx();
-
-                    ConstantValue v = m_constantExpressionEvaluatorVisitor.lookup(c);
-
-                    if ( v instanceof ConstantFixedValue) {
-                        value = (ConstantFixedValue)v;
+                    if ( variableEntry.getInitializer().getConstant() instanceof ConstantFixedValue ) {
+                        value = (ConstantFixedValue)variableEntry.getInitializer().getConstant();
                     }
-                }
-                else if ( variableEntry.getConstantCtx() instanceof SmallPearlParser.ConstantContext) {
-                    SmallPearlParser.ConstantContext c = (SmallPearlParser.ConstantContext)variableEntry.getConstantCtx();
-
-                    if ( c.StringLiteral() != null) {
-                        System.out.println("****StringLiteral***");
+                    else {
+                        throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
                     }
 
-                    else if ( c.IntegerConstant() != null ) {
-                        int v = Integer.parseInt(c.IntegerConstant().getText());
-                        value = new ConstantFixedValue(v);
+/*
+                    if ( variableEntry.getInitializer().getContext() instanceof SmallPearlParser.ConstantExpressionContext) {
+                        SmallPearlParser.ConstantExpressionContext c = (SmallPearlParser.ConstantExpressionContext)variableEntry.getInitializer().getContext();
 
+                        ConstantValue v = m_constantExpressionEvaluatorVisitor.lookup(c);
+
+                        if ( v instanceof ConstantFixedValue) {
+                            value = (ConstantFixedValue)v;
+                        }
+                        else {
+                            throw  new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
                     }
-                    else if ( c.floatingPointConstant() != null ) {
-                        System.out.println("****FloatingPointConstant***");
+                    else if ( variableEntry.getInitializer().getContext()instanceof SmallPearlParser.ConstantContext) {
+                        SmallPearlParser.ConstantContext c = (SmallPearlParser.ConstantContext)variableEntry.getInitializer().getContext();
+
+                        if ( c.StringLiteral() != null) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+
+                        else if ( c.fixedConstant() != null ) {
+                            int v = Integer.parseInt(c.fixedConstant().IntegerConstant().getText());
+                            value = new ConstantFixedValue(v);
+
+                        }
+                        else if ( c.floatingPointConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+                        else if ( c.durationConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+                        else if ( c.bitStringConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
+                        else if ( c.timeConstant() != null ) {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
                     }
-                    else if ( c.durationConstant() != null ) {
-                        System.out.println("****durationConstant***");
-                    }
-                    else if ( c.bitStringConstant() != null ) {
-                        System.out.println("****bitStringConstant***");
-                    }
-                    else if ( c.timeConstant() != null ) {
-                        System.out.println("****timeConstant***");
-                    }
+*/
+
                 }
             }
         }
@@ -254,40 +253,40 @@ public  class ConstantFixedExpressionEvaluator extends SmallPearlBaseVisitor<Con
         }
 
         if ( ctx.constantFixedExpressionFit() != null ) {
-            throw new NotYetImplementedException("Constant Expression Operator 'FIT'", 0, 0);
+            ConstantFixedValue length;
+            length = visitConstantFixedExpressionFit( ctx.constantFixedExpressionFit());
+
+            int l = (int) length.getPrecision();
+            ConstantFixedValue fittedValue = new ConstantFixedValue(value.getValue(),l);
+            value = fittedValue;
+
+            if ( m_constantPoolVisitor != null ) {
+                m_constantPoolVisitor.add(fittedValue);
+            }
         }
 
-        System.out.println("ConstantExpressionEvaluatorVisitor: value="+value);
-
+        if ( m_debug) {
+            System.out.println("ConstantFixedExpressionEvaluatorVisitor: value=" + value);
+        }
+        
         return value;
     }
 
-/**
- constantFixedExpressionFit
- :
-         'FIT' constantFixedExpression
-    ;
-**/
+    @Override
+    public ConstantFixedValue visitConstantFixedExpressionFit(SmallPearlParser.ConstantFixedExpressionFitContext ctx) {
+        ConstantFixedValue value = null;
+        int sign = 1;
 
-/**
-////////////////////////////////////////////////////////////////////////////////
-// ConstantFIXEDExpression ::=
-//   Term [ { + | - } Term ] ...
-////////////////////////////////////////////////////////////////////////////////
-    constantFixedExpression
-        : constantFixedExpressionTerm (op='+' constantFixedExpressionTerm )*
-            | constantFixedExpressionTerm (op='-' constantFixedExpressionTerm )*
-    ;
-**/
-/**
-////////////////////////////////////////////////////////////////////////////////
-// Term ::=
-//   Factor [ {∗ | // | REM } Factor ] ...
-////////////////////////////////////////////////////////////////////////////////
-    constantFixedExpressionTerm
-        : constantFixedExpressionFactor ( op='*' constantFixedExpressionFactor )*
-            | constantFixedExpressionFactor ( op='//' constantFixedExpressionFactor )*
-            | constantFixedExpressionFactor ( op='REM' constantFixedExpressionFactor )*
-    ;
-**/
+        if (m_debug) {
+            System.out.println("ConstantFixedExpressionEvaluator: visitConstantFixedExpressionFit");
+        }
+
+        value = visitConstantFixedExpression(ctx.constantFixedExpression());
+
+        if ( m_debug) {
+            System.out.println("ConstantFixedExpressionEvaluatorVisitor: value=" + value);
+        }
+
+        return value;
+    }
 }

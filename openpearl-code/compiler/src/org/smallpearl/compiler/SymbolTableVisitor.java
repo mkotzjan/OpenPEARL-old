@@ -32,10 +32,7 @@ package org.smallpearl.compiler;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
-import org.antlr.v4.semantics.SymbolChecks;
 import org.smallpearl.compiler.SymbolTable.*;
-import org.stringtemplate.v4.ST;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Collections;
@@ -44,6 +41,7 @@ import java.util.Collections;
 public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements SmallPearlVisitor<Void> {
 
     private int m_verbose;
+    private boolean m_debug;
 
     public SymbolTable symbolTable;
     private SymbolTableEntry m_currentEntry;
@@ -54,9 +52,11 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     private TypeDefinition m_type;
     private ParseTreeProperty<SymbolTable> m_symboltablePerContext = null;
+    private ConstantPool m_constantPool = null;
 
-    public SymbolTableVisitor(int verbose) {
+    public SymbolTableVisitor(int verbose, ConstantPool constantPool) {
 
+        m_debug = false;
         m_verbose = verbose;
 
         if (m_verbose > 0) {
@@ -67,7 +67,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         this.m_listOfTemporarySemaphoreArrays = new LinkedList<LinkedList<SemaphoreEntry>>();
         this.m_listOfTemporaryBoltArrays = new LinkedList<LinkedList<BoltEntry>>();
         this.m_listOfArrayDescriptors = new LinkedList<ArrayDescriptor>();
-        this.m_symboltablePerContext =  new ParseTreeProperty<SymbolTable>();
+        this.m_symboltablePerContext = new ParseTreeProperty<SymbolTable>();
+        this.m_constantPool = constantPool;
     }
 
     @Override
@@ -78,7 +79,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         org.smallpearl.compiler.SymbolTable.ModuleEntry moduleEntry = new org.smallpearl.compiler.SymbolTable.ModuleEntry(ctx.ID().getText(), ctx, null);
         this.m_currentSymbolTable = this.symbolTable.newLevel(moduleEntry);
-        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
+        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable);
 
         if (ctx != null) {
             for (ParseTree c : ctx.children) {
@@ -135,7 +136,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         }
 
         SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
-        if ( entry != null ) {
+        if (entry != null) {
             throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -146,7 +147,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         TaskEntry taskEntry = new TaskEntry(ctx.ID().getText(), priority, isMain, isGlobal, ctx, this.m_currentSymbolTable);
         this.m_currentSymbolTable = this.m_currentSymbolTable.newLevel(taskEntry);
-        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
+        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable);
 
         visitChildren(ctx);
 
@@ -166,20 +167,18 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         for (ParseTree c : ctx.children) {
             if (c instanceof SmallPearlParser.ResultAttributeContext) {
-                resultType = new ExpressionResult(getResultAttribute((SmallPearlParser.ResultAttributeContext)c));
-            } else
-            if (c instanceof SmallPearlParser.GlobalAttributeContext) {
+                resultType = new ExpressionResult(getResultAttribute((SmallPearlParser.ResultAttributeContext) c));
+            } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
                 SmallPearlParser.GlobalAttributeContext globalCtx = (SmallPearlParser.GlobalAttributeContext) c;
                 globalId = ctx.ID().getText();
-            } else
-            if (c instanceof SmallPearlParser.ListOfFormalParametersContext) {
-                SmallPearlParser.ListOfFormalParametersContext listOfFormalParametersContext = (SmallPearlParser.ListOfFormalParametersContext)c;
+            } else if (c instanceof SmallPearlParser.ListOfFormalParametersContext) {
+                SmallPearlParser.ListOfFormalParametersContext listOfFormalParametersContext = (SmallPearlParser.ListOfFormalParametersContext) c;
                 formalParameters = getListOfFormalParameters((SmallPearlParser.ListOfFormalParametersContext) c);
             }
         }
 
         SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
-        if ( entry != null ) {
+        if (entry != null) {
             throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
@@ -187,14 +186,14 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         this.m_currentSymbolTable = this.m_currentSymbolTable.newLevel(procedureEntry);
 
         /* Enter formal parameter into the local symboltable of this procedure */
-        if ( formalParameters != null && formalParameters.size() > 0 ) {
+        if (formalParameters != null && formalParameters.size() > 0) {
             for (FormalParameter formalParameter : formalParameters) {
-                VariableEntry param = new VariableEntry(formalParameter.name, formalParameter.type, formalParameter.assignmentProtection, null);
+                VariableEntry param = new VariableEntry(formalParameter.name, formalParameter.type, formalParameter.assignmentProtection, null, null);
                 this.m_currentSymbolTable.enter(param);
             }
         }
 
-        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
+        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable);
 
         visitChildren(ctx);
 
@@ -207,19 +206,19 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         return m_type;
     }
 
-    private  LinkedList<FormalParameter> getListOfFormalParameters(SmallPearlParser.ListOfFormalParametersContext ctx) {
-        LinkedList<FormalParameter> listOfFormalParameters = new  LinkedList<FormalParameter>();
+    private LinkedList<FormalParameter> getListOfFormalParameters(SmallPearlParser.ListOfFormalParametersContext ctx) {
+        LinkedList<FormalParameter> listOfFormalParameters = new LinkedList<FormalParameter>();
 
         if (ctx != null) {
             for (int i = 0; i < ctx.formalParameter().size(); i++) {
-                getFormalParameter(listOfFormalParameters , ctx.formalParameter(i));
+                getFormalParameter(listOfFormalParameters, ctx.formalParameter(i));
             }
         }
 
         return listOfFormalParameters;
     }
 
-    private Void getFormalParameter(LinkedList<FormalParameter> listOfFormalParameters , SmallPearlParser.FormalParameterContext ctx) {
+    private Void getFormalParameter(LinkedList<FormalParameter> listOfFormalParameters, SmallPearlParser.FormalParameterContext ctx) {
         if (ctx != null) {
             for (int i = 0; i < ctx.ID().size(); i++) {
                 FormalParameter formalParameter = null;
@@ -229,16 +228,16 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
                 name = ctx.ID(i).getText();
 
-                if ( ctx.assignmentProtection() != null ) {
+                if (ctx.assignmentProtection() != null) {
                     assignmentProtection = true;
                 }
 
-                if ( ctx.passIdentical() != null ) {
+                if (ctx.passIdentical() != null) {
                     passIdentical = true;
                 }
 
                 getParameterType(ctx.parameterType());
-                listOfFormalParameters.add(new FormalParameter(name,m_type,assignmentProtection));
+                listOfFormalParameters.add(new FormalParameter(name, m_type, assignmentProtection));
             }
         }
 
@@ -263,17 +262,16 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             System.out.println("SymbolTableVisitor: visitBlock_statement");
         }
 
-        if ( ctx.ID() != null ) {
+        if (ctx.ID() != null) {
             blockLabel = ctx.ID().toString();
-        }
-        else {
+        } else {
             blockLabel = "?anonymous?";
         }
 
         BlockEntry blockEntry = new BlockEntry(blockLabel, ctx, m_currentSymbolTable);
 
         m_currentSymbolTable = m_currentSymbolTable.newLevel(blockEntry);
-        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
+        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable);
 
         visitChildren(ctx);
 
@@ -302,7 +300,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         boolean hasAllocationProtection = false;
 
         ArrayList<String> identifierDenotationList = null;
-        ArrayList<ParserRuleContext> initElementList = null;
+        ArrayList<Initializer> initElementList = null;
 
         m_type = null;
 
@@ -316,32 +314,39 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                     visitTypeAttribute((SmallPearlParser.TypeAttributeContext) c);
                 } else if (c instanceof SmallPearlParser.GlobalAttributeContext) {
                     hasGlobalAttribute = true;
-                } else if (c instanceof SmallPearlParser.InitialisationAttributeContext ) {
-                    initElementList = getInitialisationAttribute((SmallPearlParser.InitialisationAttributeContext)c);
+                } else if (c instanceof SmallPearlParser.InitialisationAttributeContext) {
+                    initElementList = getInitialisationAttribute((SmallPearlParser.InitialisationAttributeContext) c);
                 }
+            }
+
+            if (initElementList != null && identifierDenotationList.size() != initElementList.size()) {
+                throw new NumberOfInitializerMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
 
             int j = 0;
             for (int i = 0; i < identifierDenotationList.size(); i++) {
                 VariableEntry variableEntry = null;
 
-                if ( initElementList != null && initElementList.size() > 0 ) {
-                    if ( j < initElementList.size()) {
-                        variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, initElementList.get(j), ctx);
+                if (initElementList != null && initElementList.size() > 0) {
+                    if (j < initElementList.size()) {
+                        Initializer initializer = initElementList.get(j);
+                        fixPrecision(ctx,m_type,initializer);
+                        variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, ctx, initElementList.get(j));
                         j++;
                     } else {
-                        variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, initElementList.get(j-1), ctx);
+                        Initializer initializer = initElementList.get(j - 1);
+                        fixPrecision(ctx,m_type,initializer);
+                        variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, ctx, initElementList.get(j - 1));
                     }
                 } else {
-                    variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, ctx);
+                    variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type, hasAllocationProtection, ctx, null);
                 }
 
                 if (!m_currentSymbolTable.enter(variableEntry)) {
-
                     SymbolTableEntry entry = m_currentSymbolTable.lookupLocal(identifierDenotationList.get(i));
-                    if ( entry != null ) {
-                        if ( entry instanceof VariableEntry) {
-                            if (((VariableEntry)entry).getLoopControlVariable() ) {
+                    if (entry != null) {
+                        if (entry instanceof VariableEntry) {
+                            if (((VariableEntry) entry).getLoopControlVariable()) {
                                 throw new SemanticError(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine(), "Loop control variable cannot be declared");
                             }
                         }
@@ -353,6 +358,40 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         }
 
         return null;
+    }
+
+
+    private void fixPrecision(ParserRuleContext ctx, TypeDefinition type, Initializer initializer) {
+        if( type instanceof TypeFixed)
+        {
+            TypeFixed typ = (TypeFixed)type;
+
+            if ( initializer.getConstant() instanceof ConstantFixedValue) {
+                ConstantFixedValue value = (ConstantFixedValue) initializer.getConstant();
+                value.setPrecision(typ.getPrecision());
+            }
+            else {
+                throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        } else if( type instanceof TypeFloat)
+
+        {
+            TypeFloat typ = (TypeFloat) type;
+
+            if ( initializer.getConstant() instanceof ConstantFloatValue) {
+                ConstantFloatValue value = (ConstantFloatValue) initializer.getConstant();
+                value.setPrecision(typ.getPrecision());
+            }
+            else if ( initializer.getConstant() instanceof ConstantFixedValue) {
+                ConstantFixedValue fixedValue = (ConstantFixedValue) initializer.getConstant();
+                ConstantFloatValue floatValue = new ConstantFloatValue((double)fixedValue.getValue(), typ.getPrecision());
+                m_constantPool.add(floatValue);
+                initializer.setConstant(floatValue);
+            }
+            else {
+                throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
     }
 
     @Override
@@ -456,7 +495,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitTypeBitString(SmallPearlParser.TypeBitStringContext ctx) {
-        Integer length = 1;
+        int length = Defaults.BIT_LENGTH;
 
         if (ctx.IntegerConstant() != null) {
             length = Integer.parseInt(ctx.IntegerConstant().getText());
@@ -472,7 +511,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitTypeCharacterString(SmallPearlParser.TypeCharacterStringContext ctx) {
-        Integer size = 1;
+        int size = Defaults.CHARACTER_LENGTH;
 
         if (ctx.IntegerConstant() != null) {
             size = Integer.parseInt(ctx.IntegerConstant().getText());
@@ -489,13 +528,14 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitTypeFloatingPointNumber(SmallPearlParser.TypeFloatingPointNumberContext ctx) {
-        Integer precision = 53;
+        int precision = Defaults.FLOAT_PRECISION;
 
+        precision = m_currentSymbolTable.lookupDefaultFloatLength();
 
         if (ctx.IntegerConstant() != null) {
             precision = Integer.parseInt(ctx.IntegerConstant().getText());
 
-            if (precision != 24 && precision != 53) {
+            if (precision != Defaults.FLOAT_SHORT_PRECISION && precision != Defaults.FLOAT_LONG_PRECISION) {
                 throw new NotSupportedTypeException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         }
@@ -582,7 +622,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
             addArrayDescriptor(new ArrayDescriptor(((TypeArray)m_type).getNoOfDimensions(),((TypeArray)m_type).getDimensions()));
 
             for (int i = 0; i < identifierDenotationList.size(); i++) {
-                VariableEntry variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type,hasAssigmentProtection,null);
+                VariableEntry variableEntry = new VariableEntry(identifierDenotationList.get(i), m_type,hasAssigmentProtection,null,null);
                 if (!m_currentSymbolTable.enter(variableEntry)) {
                     System.out.println("ERR: Double definition of " + identifierDenotationList.get(i));
                 }
@@ -669,7 +709,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
     @Override
     public Void visitType_fixed(SmallPearlParser.Type_fixedContext ctx) {
-        Integer width = Defaults.FIXED_PRECISION;
+        Integer width = Defaults.FIXED_LENGTH;
 
         if (ctx.IntegerConstant() != null) {
             width = Integer.parseInt(ctx.IntegerConstant().getText());
@@ -918,7 +958,7 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable );
 
         if ( ctx.loopStatement_for() != null) {
-            VariableEntry controlVariable = new VariableEntry(ctx.loopStatement_for().ID().getText(), new TypeFixed(31), true, null);
+            VariableEntry controlVariable = new VariableEntry(ctx.loopStatement_for().ID().getText(), new TypeFixed(31), true, null, null);
             controlVariable.setLoopControlVariable();
             m_currentSymbolTable.enter(controlVariable);
         }
@@ -944,9 +984,6 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         if ( ctx.loopStatement_end().ID() != null) {
             blockLabel = ctx.loopStatement_end().ID().getText();
         }
-
-
-//        visitChildren(ctx);
 
         m_currentSymbolTable = m_currentSymbolTable.ascend();
         return null;
@@ -1125,11 +1162,21 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         if ( ctx.lengthDefinitionType() instanceof SmallPearlParser.LengthDefinitionFixedTypeContext) {
             TypeFixed typ = new TypeFixed( Integer.valueOf((ctx.IntegerConstant().toString())));
+
+            if ( typ.getPrecision() < Defaults.FIXED_MIN_LENGTH || typ.getPrecision() > Defaults.FIXED_MAX_LENGTH ) {
+                throw new PrecisionNotSupportedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
             LengthEntry entry = new LengthEntry(typ,ctx);
             m_currentSymbolTable.enterOrReplace(entry);
         }
         else if ( ctx.lengthDefinitionType() instanceof SmallPearlParser.LengthDefinitionFloatTypeContext) {
             TypeFloat typ = new TypeFloat( Integer.valueOf((ctx.IntegerConstant().toString())));
+
+            if ( typ.getPrecision() != Defaults.FLOAT_SHORT_PRECISION && typ.getPrecision() != Defaults.FLOAT_LONG_PRECISION) {
+                throw new PrecisionNotSupportedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
             LengthEntry entry = new LengthEntry(typ,ctx);
             m_currentSymbolTable.enterOrReplace(entry);
         }
@@ -1162,19 +1209,161 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
     }
 
 
-    private ArrayList<ParserRuleContext>  getInitialisationAttribute(SmallPearlParser.InitialisationAttributeContext ctx) {
-        ArrayList<ParserRuleContext> initElementList = new ArrayList<ParserRuleContext>();
+    private ArrayList<Initializer>  getInitialisationAttribute(SmallPearlParser.InitialisationAttributeContext ctx) {
+        ArrayList<Initializer> initElementList = new ArrayList<>();
 
         if (ctx != null) {
             for (int i = 0; i < ctx.initElement().size(); i++) {
-                if (ctx.initElement(i).constantExpression() != null) {
-                    initElementList.add(ctx.initElement(i).constantExpression());
-                } else if (ctx.initElement(i).constant() != null) {
-                    initElementList.add(ctx.initElement(i).constant());
-                }
+                ConstantValue  constant = getInitElement(ctx.initElement(i));
+                Initializer initializer = new Initializer(ctx.initElement(i),constant);
+                initElementList.add(initializer);
             }
         }
 
         return initElementList;
+    }
+
+    private ConstantValue getInitElement(SmallPearlParser.InitElementContext ctx) {
+        ConstantValue constant = null;
+
+        if (ctx.constantExpression() != null) {
+            constant = getConstantExpression(ctx.constantExpression());
+        } else if (ctx.constant() != null) {
+            constant = getConstant(ctx.constant());
+        } else if (ctx.ID() != null) {
+            String s = ctx.ID().toString();
+            SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
+
+            if ( entry == null ) {
+                throw new UnknownIdentifierException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),(ctx.ID().toString()));
+            }
+
+            if ( entry instanceof VariableEntry) {
+                VariableEntry var = (VariableEntry)entry;
+
+                if ( var.getAssigmentProtection()) {
+                    constant = var.getInitializer().getConstant();
+                }
+                else {
+                    throw new TypeMismatchException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine(),(ctx.ID().toString()));
+                }
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+        }
+
+        m_constantPool.add(constant);
+        return constant;
+    }
+
+    private ConstantValue getConstant(SmallPearlParser.ConstantContext ctx) {
+        ConstantValue constant = null;
+        int sign = 1;
+
+        if ( ctx.sign() != null ) {
+            if ( ctx.sign() instanceof SmallPearlParser.SignMinusContext ) {
+                sign = -1;
+            }
+        }
+
+        if ( ctx.fixedConstant() != null) {
+            int curval = sign * Integer.parseInt(ctx.fixedConstant().IntegerConstant().toString());
+            int curlen =   m_currentSymbolTable.lookupDefaultFixedLength();
+
+            if ( ctx.fixedConstant().fixedNumberPrecision() != null ) {
+                curlen = Integer.parseInt(ctx.fixedConstant().fixedNumberPrecision().IntegerConstant().toString());
+            } else if ( m_type instanceof TypeFixed) {
+                curlen = ((TypeFixed)m_type).getPrecision();
+            } else if ( m_type instanceof TypeFloat) {
+                    curlen = ((TypeFloat)m_type).getPrecision();
+            } else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            constant = new ConstantFixedValue(curval,curlen);
+        }
+        else if ( ctx.floatingPointConstant() != null) {
+            double curval = sign * Double.parseDouble(ctx.floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+            int curlen =   m_currentSymbolTable.lookupDefaultFloatLength();
+
+            if ( ctx.floatingPointConstant().FloatingPointNumberPrecision() != null ) {
+                curlen = Integer.parseInt(ctx.floatingPointConstant().FloatingPointNumberPrecision().toString());
+            }else if ( m_type instanceof TypeFloat) {
+                curlen = ((TypeFloat)m_type).getPrecision();
+            } else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            constant = new ConstantFloatValue(curval,curlen);
+        }
+        else if ( ctx.durationConstant() != null) {
+            Integer hours = 0;
+            Integer minutes = 0;
+            Double seconds = 0.0;
+
+            if (ctx.durationConstant().hours() != null) {
+                hours = Integer.valueOf(ctx.durationConstant().hours().IntegerConstant().toString());
+            }
+            if (ctx.durationConstant().minutes() != null) {
+                minutes = Integer.valueOf(ctx.durationConstant().minutes().IntegerConstant().toString());
+            }
+            if (ctx.durationConstant().seconds() != null) {
+                if (ctx.durationConstant().seconds().IntegerConstant() != null) {
+                    seconds = Double.valueOf(ctx.durationConstant().seconds().IntegerConstant().toString());
+                } else if (ctx.durationConstant().seconds().floatingPointConstant() != null) {
+                    seconds = Double.valueOf(ctx.durationConstant().seconds().floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+                }
+            }
+
+            if ( m_type instanceof TypeDuration) {
+                constant = new ConstantDurationValue(hours, minutes, seconds);
+            }
+            else if ( m_type instanceof TypeClock) {
+                constant = new ConstantClockValue(hours, minutes, seconds);
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+        }
+        else if ( ctx.bitStringConstant() != null) {
+            long value = CommonUtils.convertBitStringToLong(ctx.bitStringConstant().BitStringLiteral().getText());
+            int  nb = CommonUtils.getBitStringLength(ctx.bitStringConstant().BitStringLiteral().getText());
+            constant = new ConstantBitValue(value,nb);
+        }
+        else if ( ctx.timeConstant() != null) {
+            Integer hours = 0;
+            Integer minutes = 0;
+            Double seconds = 0.0;
+
+            hours = Integer.valueOf(ctx.timeConstant().IntegerConstant(0).toString());
+            minutes = Integer.valueOf(ctx.timeConstant().IntegerConstant(1).toString());
+
+            if (ctx.timeConstant().floatingPointConstant() != null) {
+                seconds = Double.valueOf(ctx.timeConstant().floatingPointConstant().FloatingPointNumberWithoutPrecision().toString());
+            }
+            else if (ctx.timeConstant().IntegerConstant(2) != null) {
+                seconds = Double.valueOf(ctx.timeConstant().IntegerConstant(2).toString());
+            }
+            else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
+
+            constant = new ConstantClockValue(hours, minutes, seconds);
+        }
+        else if ( ctx.StringLiteral() != null) {
+            constant = new ConstantCharacterValue(ctx.StringLiteral().toString());
+        }
+
+        return constant;
+    }
+
+
+    private ConstantValue getConstantExpression(SmallPearlParser.ConstantExpressionContext ctx) {
+        ConstantFixedExpressionEvaluator evaluator = new ConstantFixedExpressionEvaluator(m_verbose, m_debug, m_currentSymbolTable,null, null);
+        ConstantValue constant = evaluator.visit(ctx.constantFixedExpression());
+
+        return constant;
     }
 }

@@ -56,7 +56,7 @@ public class ConstantPool {
                     ConstantFixedValue a = (ConstantFixedValue)(value);
                     ConstantFixedValue b = (ConstantFixedValue)(constantPool.get(i));
 
-                    if ( a.getValue().equals(b.getValue()) && a.getPrecision().equals(b.getPrecision())) {
+                    if ( a.getValue() == b.getValue() && a.getPrecision() == b.getPrecision()) {
                         found = true;
                         break;
                     }
@@ -65,8 +65,13 @@ public class ConstantPool {
             else if ( value instanceof ConstantFloatValue) {
                 if (constantPool.get(i) instanceof ConstantFloatValue) {
                     if ( Double.compare( ((ConstantFloatValue)(value)).getValue(), ((ConstantFloatValue)(constantPool.get(i))).getValue()) == 0) {
-                        found = true;
-                        break;
+                        ConstantFloatValue a = (ConstantFloatValue)value;
+                        ConstantFloatValue b = (ConstantFloatValue)(constantPool.get(i));
+
+                        if ( Double.compare(a.getValue(),b.getValue()) == 0 && a.getPrecision() == b.getPrecision()) {
+                            found = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -126,6 +131,10 @@ public class ConstantPool {
             }
 
             constantPool.add(value);
+        } else {
+            if ( value instanceof ConstantBitValue) {
+                ((ConstantBitValue) (value)).setNo(constantBitNo);
+            }
         }
 
         return null;
@@ -250,6 +259,24 @@ public class ConstantPool {
 
                 if ( constant.getValue() == other.getValue() &&
                      constant.getPrecision() == other.getPrecision()) {
+                    return constant;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    static public ConstantFixedValue lookupFixedValue(long value, int length) {
+        int i;
+        ConstantFixedValue other = new ConstantFixedValue(value,length);
+
+        for (i = 0; i < constantPool.size(); i++) {
+            if (constantPool.get(i) instanceof ConstantFixedValue) {
+                ConstantFixedValue constant = ((ConstantFixedValue) (constantPool.get(i)));
+
+                if ( constant.getValue() == other.getValue() &&
+                        constant.getPrecision() == other.getPrecision()) {
                     return constant;
                 }
             }

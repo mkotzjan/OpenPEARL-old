@@ -183,7 +183,7 @@ public class SystemPartExporter extends SmallPearlBaseVisitor<ST> implements Sma
                 ST type = group.getInstanceOf("Type_Bit");
                 type.add("name", param);
                 parameter.add("type", type);
-            } else if (ctx.literal(i).IntegerConstant() != null) {
+            } else if (ctx.literal(i).fixedConstant() != null) {
                 ST type = group.getInstanceOf("Type_Fixed");
                 type.add("name", param);
                 parameter.add("type", type);

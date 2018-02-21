@@ -132,6 +132,10 @@ ConstantPoolDurationEntry(name,type,value) ::= <<
 static /*const*/ pearlrt::<type>          <name>(<value>);
 >>
 
+ConstantPoolClockEntry(name,type,value) ::= <<
+static /*const*/ pearlrt::<type>          <name>(<value>);
+>>
+
 /*********************** GLOBAL DECLARATIONS ***********************/
 
 globalDecl(decls) ::= <<
@@ -1518,7 +1522,7 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
     a_value = <from>;
     <else>
     <if(GenerateLoopCounter)>
-    pearlrt::Fixed\<15> a_value(1);
+    pearlrt::Fixed\<<rangePrecision>\> a_value(CONST_FIXED_P_1_<rangePrecision>);
     <endif>
     <endif>
 
@@ -1532,7 +1536,7 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
     s_value = <by>;
     <else>
     <if(GenerateLoopCounter)>
-    pearlrt::Fixed\<15> s_value(1);
+    pearlrt::Fixed\<<rangePrecision>\> s_value(CONST_FIXED_P_1_<rangePrecision>);
     <endif>
     <endif>
 
@@ -1542,9 +1546,9 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
     <endif>
 
     <if(to)>
-        while ((((s_value > CONST_FIXED_P_0_31).getBoolean()) &&
+        while ((((s_value > CONST_FIXED_P_0_<rangePrecision>).getBoolean()) &&
                 ((a_value \<= e_value).getBoolean())) ||
-                (((s_value \< CONST_FIXED_P_0_31).getBoolean()) &&
+                (((s_value \< CONST_FIXED_P_0_<rangePrecision>).getBoolean()) &&
                 ((a_value >= e_value).getBoolean())))
         {<\n>
             <if(variable)>
@@ -1560,9 +1564,9 @@ LoopStatement(srcLine,variable,GenerateLoopCounter,rangePrecision,from,fromPreci
 
             me->setLocation(<srcLine>, filename);
 
-            if (((s_value > CONST_FIXED_P_0_31).getBoolean() &&
+            if (((s_value > CONST_FIXED_P_0_<rangePrecision>).getBoolean() &&
                  (a_value \<= (e_value - s_value)).getBoolean()) ||
-                ((s_value \< CONST_FIXED_P_0_31).getBoolean() &&
+                ((s_value \< CONST_FIXED_P_0_<rangePrecision>).getBoolean() &&
                 (a_value >= (e_value - s_value)).getBoolean())) {
                 a_value = a_value + s_value;
             } else {

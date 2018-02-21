@@ -30,8 +30,8 @@
 package org.smallpearl.compiler;
 
 public class ConstantFixedValue extends ConstantValue {
-    private Long m_value;
-    private Integer  m_precision;
+    private long m_value;
+    private int  m_precision;
 
     ConstantFixedValue(Integer value) {
         m_value = value.longValue();
@@ -39,6 +39,11 @@ public class ConstantFixedValue extends ConstantValue {
     }
 
     ConstantFixedValue(Integer value, Integer precision) {
+        m_value = value.longValue();
+        m_precision = precision;
+    }
+
+    ConstantFixedValue(Integer value, int precision) {
         m_value = value.longValue();
         m_precision = precision;
     }
@@ -53,12 +58,27 @@ public class ConstantFixedValue extends ConstantValue {
         m_precision = precision;
     }
 
-    public Long getValue() {
+    ConstantFixedValue(Long value, int precision) {
+        m_value = value;
+        m_precision = precision;
+    }
+
+    ConstantFixedValue(long value, int precision) {
+        m_value = value;
+        m_precision = precision;
+    }
+
+
+    public long getValue() {
         return m_value;
     }
 
-    public Integer getPrecision() {
+    public int getPrecision() {
         return m_precision;
+    }
+
+    public void setPrecision(int precision) {
+        m_precision = precision;
     }
 
     public String getBaseType() {
@@ -67,7 +87,7 @@ public class ConstantFixedValue extends ConstantValue {
 
     public String toString() {
         String name = "CONST_" + getBaseType().toUpperCase();
-        Long value = Math.abs(m_value);
+        long value = Math.abs(m_value);
 
         if ( m_value < 0 ) {
             name += "_N";
@@ -76,7 +96,7 @@ public class ConstantFixedValue extends ConstantValue {
             name += "_P";
         }
 
-        name += "_" + value.toString() + "_" + m_precision.toString();
+        name += "_" + value + "_" + m_precision;
         return name;
     }
 }

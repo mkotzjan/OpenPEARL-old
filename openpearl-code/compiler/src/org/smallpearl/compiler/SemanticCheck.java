@@ -60,8 +60,6 @@ public class SemanticCheck {
         m_symboltable = symbolTableVisitor.symbolTable;
         m_parseTree = tree;
 
-        m_verbose= 1;
-
         if (m_verbose > 0) {
             System.out.println( "Performing semantic check");
         }

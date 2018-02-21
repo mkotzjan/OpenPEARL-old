@@ -38,7 +38,7 @@ public class TypeFixed extends TypeDefinition {
 
     TypeFixed() {
         super("FIXED");
-        this.m_precision = Defaults.FIXED_PRECISION;
+        this.m_precision = Defaults.FIXED_LENGTH;
     }
 
     TypeFixed(int precision) {
