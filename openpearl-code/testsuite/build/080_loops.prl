@@ -19,7 +19,7 @@ T1: TASK MAIN;
   END;
 
   FOR i FROM start TO 10 WHILE local_var < 10 REPEAT
-     local_var := local_var + i;
+     local_var := local_var + i FIT local_var;
   END;
 
   FOR i REPEAT

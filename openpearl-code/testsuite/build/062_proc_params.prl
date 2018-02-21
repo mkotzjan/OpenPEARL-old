@@ -22,7 +22,7 @@ END;
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 proc_003: PROC ( p1 FIXED, p2 FIXED(15) );
    p1 := p1 +1;      		!! access of parameters
-   p2 := p1;      		!! access of parameters
+   p2 := p1 FIT p2;    		!! access of parameters
 END;
 
 
@@ -31,7 +31,7 @@ END;
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 proc_004: PROC ( p1 FIXED, p2 FIXED(15) IDENT );
    p1 := p1 +1;      		!! access of parameters
-   p2 := p1;      		!! access of parameters
+   p2 := p1 FIT p2;             !! access of parameters
 END;
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
