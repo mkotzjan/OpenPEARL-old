@@ -1,0 +1,3 @@
+\htgt{TypeFloat} ::=\\
+\x \kw{FLOAT} [ \kw{(} \hlink{Precision} \kw{)} ]
+

@@ -1,0 +1,4 @@
+\htgt{SemaStatement} ::=\\
+\x \{ \kw{REQUEST} $\mid$ \kw{RELEASE} \} 
+	\hlink{OneIdentifierOrList}\S Sema \kw{;}
+

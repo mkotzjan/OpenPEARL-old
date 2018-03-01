@@ -1,0 +1,266 @@
+\section{System devices}
+\label{x8632devices}
+
+System devices are defined by entries in the system part.
+In case of problems during creation of the system device entry, the
+usual exception mechanism does not work, since these objects are created
+statically. Please check the log file for details.
+
+\subsection{Disc}
+The system device \verb|Disc| allows the access of files in the system.
+
+Synopsis: \verb|Disc(path, nbr)|
+
+\begin{description}
+\item [path] specifies the system path of the directory which should contain
+    the files defined by the {\em IDF} parameter in the {\em OPEN} statement
+\item[nbr] specifies the number of concurrent opened files with this dation
+     specified by {\em CREATED(...)} in the {\em OPEN} statement
+\end{description}
+
+Supported attributes: FORWARD, DIRECT, IN, OUT, INOUT
+
+Multiple dations may by defined on the same path.
+
+\subsection{Standard Streams: StdIn, StdOut, StdError}
+The system devices \verb|StdIn|,
+\verb|StdOut| an \verb|StdError| allows the access of UNIX standard streams
+like stdin, stdout and stderr.
+
+\begin{tabular}{ll}
+Synopsis: & \verb|StdIn| \\
+          & \verb|StdOut| \\
+          & \verb|StdError| \\
+\end{tabular}
+
+Supported attributes: FORWARD, IN, OUT --- IN and OUT depend on the
+particular stream.
+
+Only one system device shall be defined per standard stream to avoid
+intermixing of input and output.
+
+\subsection{Pipe}
+The system dation {\em Pipe} is useful for testing and interaction with
+other applications. The dation provides access to named pipes.
+The linux pipe blocks write attempts, if no reading file descriptor
+is opend on the pipe. 
+A dummy open with read may be achieved with the option OPEN1.
+
+Synopsis: \verb|Pipe(path, nbr, params)|
+
+\begin{description}
+\item [path] is a C-string, which specifies the system path of the fifo file
+    of the named pipe
+\item[nbr] specifies the number (as int) of concurrent opened files with this dation
+     specified by {\em CREATED(...)} in the {\em OPEN} statement
+\item [params] is a string value for detailed control of the behavior
+     at creation and termination. The parameters are searched in the string
+     case sensitive. The sequence of the parameters is artificial.
+   \begin{description}
+     \item[OLD] the entry in the file system must exist before starting
+     \item[NEW] the entry in the file system must not exist at starting
+     \item[ANY] the entry may exist or will be created else; an existing
+                file syste entry must by of type FIFO (default).
+     \item[OPEN1] specifies that one file descriptor should be opened 
+                automatically.
+     \item[CAN] the file system entry shall be deleted at the end of the 
+                application
+     \item[PRM] the file system entry shall remain at the end of the
+                application (default)
+   \end{description} 
+   The permissions are set to \verb|ugo=rwx| for new file system entries.
+\end{description}
+
+Supported attributes: FORWARD, IN, OUT
+
+The declaration of multiple pipe devices upon the same system file shall
+be avoided.
+ 
+\subsection{OctopusDigitalOut, OctopusDigitalIn}
+The device OctopusDigitalOut provides an access to digital input and 
+output bits
+on the so called OCTOPUS-Board of Embedded Projects.
+The Octopus board provides 6 ports with 8 bits each. Each bit may be
+used as input or output.
+
+\begin{tabular}{ll}
+Synopsis:& \verb|OctopusDigitalOut(port, start, width)|\\
+        & \verb|OctopusDigitalIn(port, start, width)|\\
+\end{tabular}
+
+\begin{description}
+\item [port] specifies the port letter. Valid characters are 'A', 'B', .. 'F'
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     are 7,6,... 0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..8.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by reading or writing a BIT(width)-value to the
+opened system dation. 
+Writing other data than BIT-types  may cause a signal, if the size of the
+data is larger than 1 byte. If the size is 1 byte, unpredictable results may
+occur.
+
+It is checked that a i/o-bit is not used by different declarations within
+one application.
+  
+\subsection{RPiDigitalOut, RPiDigitalIn}
+The device RPiDigitalOut provides an access to digital input and output bits
+on the GPIO-bits of the raspberry pi.
+
+\begin{tabular}{ll}
+Synopsis: & \verb|RPiDigitalOut(start, width)| \\
+          & \verb|RPiDigitalIn(start, width, pud)| \\
+\end{tabular}
+
+\begin{description}
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     depend on the model of the raspberry pi. The starting number if
+     the leftmost gpio bit number (large value)
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers depend on the model of the raspberry pi.
+\item [pud] Pull-up / pull-down configuration.
+    Valid values are 'u' for pull up, 'd' for pull down and 
+    '' for no pull-up/pull-down resistor. This option is only
+    available for digital inputs.
+\end{description}
+
+The access to the dation is done by writing a BIT(width)-value to the
+opened system dation. 
+Writing other data than BIT-types  may cause a signal, if the size of the
+data does not match the width parameter. 
+
+It is checked that a i/o-bit is not used by different declarations within
+one application.
+
+Supported bits:
+
+\begin{tabular}{|l|l|}
+\hline
+Model & Bits \\
+\hline
+1B & 2,3,4,7,8,9,10,11,17,18,22,23,24,25,27,28,29,30,31 \\
+\hline
+2B,3B & 2-27 (except 14 and 15) \\
+\hline
+\end{tabular}  
+
+\paragraph{Note:} 
+\begin{itemize}
+\item the Broadcom gpio block supports the access to the bits only 
+via set and clear registers. Thus the writing of a BIT(x) value with x $>$ 1
+need two sequential operations to clear and set the output bits, which lead
+to a short period of an intermediate value. E.g. '10' shall be changed to '01'. Bit 1 will be cleared leading to the output value '00' and bit 2 
+is set afterwards leading to '01'.
+
+\item Bits 14 and 15 are used by the kernel for the 
+  system console during system start.
+\item Other bits become not available, if i2c- or spi-dations are used
+  in the PEARL application.  If the i2c and/or spi is enabled in the
+  raspberry configuration but not used in the PEARL application,
+  the usage of the corresponding bits 
+  as gpios may cause unpredictable results.
+\item the current user needs priviledges to access the system device 
+  \verb|/dev/gpiomem|.
+\end{itemize}
+ 
+\subsection{I2CBus}
+Linux supports normal access to an i2c bus via a device node,
+ if i2c is available. 
+The corresponding device file are named like \texttt{/dev/i2c-0}.
+The i2c subsystem of linux provides test features for the availability
+to the so called {\em repeated start} feature (see I2C\_FUNCS\_I2C)
+
+\begin{tabular}{ll}
+Synopsis: & \verb|I2CBus(deviceName)|\\ 
+\end{tabular}
+
+\begin{description}
+\item[deviceName] specifies the name to the device file (e.g. "/dev/i2c-0")
+\end{description}
+
+\paragraph{Note:}
+The I2C bus speed must be set at system level depending on the 
+i2c device module.
+
+
+\subsection{PEAK CAN Bus Interface}
+The CAN bus interface from the company PEAK provides the access via a character 
+device node (e.q. \texttt{/dev/pcan32} and via SocketCAN.
+The socket CAN infrastructure allows no change of the communicatipon setting
+like bitrate for normal users --- the character device from PEAK provides
+such features.
+
+After installation of the PCAN device driver on the system as character 
+device, the corresponding device nodes and libraries are installed 
+in the system (e.g. \verb|/dev/pcan32|).
+
+
+\begin{tabular}{ll}
+Synopsis: & \verb|PCan(deviceName, speed)|\\ 
+\end{tabular}
+
+\begin{description}
+\item[deviceName] specifies the name to the device file (e.g. "/dev/pcan32")
+\item[bus speed] specifies the bus speed. 
+Only the values 125k, 250k, 500k and 1M bps are supported by 
+the OpenPEARL driver.
+\end{description}
+
+The transmission data must have the following structure:
+
+\begin{verbatim}
+   class Can2AMessage {
+
+   public:
+     Fixed<11> identifier;
+     BitString<1> rtrRequest;
+     Fixed<4> dataLength;
+     BitString<8> data[8];
+
+   };
+\end{verbatim}
+
+
+
+
+\subsection{Creating a new System Device}
+The creation of a new device is very simple:
+\begin{enumerate}
+\item find a suitable device name
+\item pass the parameters needed for construction of the device as
+      parameters
+\item add a target rule for the device in the Makefile
+\item create a C++ class with the name of the device and add this class
+      in the Makefile
+\item derive the C++ class from SystemDationB or SystemDationNB depending
+      on the dation type. SystemDationB is the parent for process dations.
+      SystemDationNB is parent for dations for formatted and unformatted
+      i/o with PUT,GET,READ and WRITE
+\item provide {\em capabilities} in the ctor in that way that the allowed
+      capabilities are listed
+\item if more than on dation may be opened in a concurrent way on the new
+      device, you should provide a pool mechanisme like in Disc.
+      If the new device allows only one opened dation at one time, you 
+      should omit the pool.
+\item provide the dationOpen, dationClose, dationRead, dationWrite 
+      and dationSeek methods. Check the actual given parameters on
+      validity and create Log-entries and throw exceptions in case
+      of bad parameters.
+      Note that dationSeek is not required, if only FORWARD dations
+      may be created.
+\item create a suitable XML description file.
+\item If the device depends on special libraries or 
+      system setup, insert a configuration item  
+      in the system configuration menu
+      and set the default to {\em not available} ('n').
+\item modify the corresponding Makefile and add the device depending on
+      the configuration item. If additional libraries are needed,
+      add them to \texttt{LDPATH}. 
+\item create unit tests for google tests framework in tests/ and add the
+      tests in tests/Makefile
+\item run the tests and check for proper operation of the new device
+\end{enumerate}
+

@@ -1,0 +1,3 @@
+\htgt{TaskSuspending} ::=\\
+\x \kw{SUSPEND} [ \hlink{Name}$\S $Task ] \kw{;}
+

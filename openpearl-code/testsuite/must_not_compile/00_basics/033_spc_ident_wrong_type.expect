@@ -1,0 +1,3 @@
+033_spc_ident_wrong_type.prl:5:21: ERROR : cannot IDENT a FIXED with type FLOAT
+   SPC x FIXED IDENT(xx);
+                     ^

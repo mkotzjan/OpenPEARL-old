@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<platform file="linux.xml">
+   <dation name="Pipe">
+      <parameters>
+        <CHAR length="32767"> <NotEmpty/> </CHAR>
+        <FIXED length="31"> <FIXEDRANGE>1,9999</FIXEDRANGE> </FIXED>
+        <CHAR length="32767">
+           <ConsistsOf>'OLD','NEW','ANY','OPEN1','CAN','PRM'</ConsistsOf>
+        </CHAR>
+      </parameters>
+      <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALL</data>
+   </dation>
+   <dation name="Disc">
+      <parameters>
+        <CHAR length="32767"> <NotEmpty/> </CHAR>
+        <FIXED length="31"> <FIXEDGT>0</FIXEDGT> </FIXED>
+      </parameters>
+      <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALL</data>
+   </dation>
+   <dation name="StdIn">
+      <parameters> </parameters>
+      <attributes>FORWARD, IN, SYSTEM</attributes>
+      <data>ALPHIC</data>
+   </dation>
+   <dation name="StdOut">
+      <parameters> </parameters>
+      <attributes>FORWARD, OUT, SYSTEM</attributes>
+      <data>ALPHIC</data>
+      <associationProvider>
+         <associationType name="AlphicOutProvider"/>
+      </associationProvider>
+   </dation>
+   <dation name="StdError">
+      <parameters> </parameters>
+      <attributes>FORWARD, OUT, SYSTEM</attributes>
+      <data>ALPHIC</data>
+   </dation>
+   <dation name="Console">
+      <parameters> </parameters>
+      <attributes>FORWARD, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALPHIC</data>
+   </dation>
+   <interrupt name="UnixSignal">
+      <parameters>
+         <FIXED length="31">
+            <VALUES>1,2,3,15,16,17</VALUES>
+         </FIXED>
+      </parameters>
+   </interrupt>
+   <configuration name="Log" instances="1" >
+      <parameters>
+         <CHAR length="4">
+           <NotEmpty/>
+         </CHAR>
+      </parameters>
+      <needAssociation name="AlphicOutProvider"/>
+   </configuration>
+   <connection name="LogFile">
+      <parameters>
+         <CHAR length="32767">
+            <NotEmpty/>
+         </CHAR>
+      </parameters>
+      <associationProvider>
+         <associationType name="AlphicOutProvider"/>
+      </associationProvider>
+      <needAssociation name="NamedAlphicOutProvider"/>
+   </connection>
+   <dation name="SampleBasicDation">
+      <parameters>
+      </parameters>
+      <attributes> BASIC, SYSTEM, IN, OUT, INOUT</attributes>
+      <data>FIXED(15)</data>
+   </dation>
+   <interrupt name="SoftInt">
+      <parameters>
+         <FIXED length="31">
+            <FIXEDRANGE>1,31</FIXEDRANGE>
+         </FIXED>
+      </parameters>
+   </interrupt>
+<!-- Signals.xml : auto generated (Tue Jan  9 16:27:55 2018) -->
+   <signal name="InternalSignal"/>
+   <signal name="InternalTaskSignal"/>
+   <signal name="InternalSignalsSignal"/>
+   <signal name="InternalDationSignal"/>
+   <signal name="InternalDatatypeSignal"/>
+   <signal name="TaskSignal"/>
+   <signal name="PrioOutOfRangeSignal"/>
+   <signal name="TaskRunningSignal"/>
+   <signal name="TaskSuspendedSignal"/>
+   <signal name="TaskTerminatedSignal"/>
+   <signal name="IllegalSchedulingSignal"/>
+   <signal name="PriorityNotMapableSignal"/>
+   <signal name="ArithmeticSignal"/>
+   <signal name="FixedRangeSignal"/>
+   <signal name="FixedDivideByZeroSignal"/>
+   <signal name="ArithmeticOverflowSignal"/>
+   <signal name="ArithmeticUnderflowSignal"/>
+   <signal name="ArithmeticDivideByZeroSignal"/>
+   <signal name="SemaOverflowSignal"/>
+   <signal name="BoltStateSignal"/>
+   <signal name="DurationDivideByZeroSignal"/>
+   <signal name="DurationRangeSignal"/>
+   <signal name="FloatIsNaNSignal"/>
+   <signal name="FloatIsINFSignal"/>
+   <signal name="BitIndexOutOfRangeSignal"/>
+   <signal name="CharacterTooLongSignal"/>
+   <signal name="CharacterIndexOutOfRangeSignal"/>
+   <signal name="DationSignal"/>
+   <signal name="DationParamSignal"/>
+   <signal name="DationNotOpenSignal"/>
+   <signal name="OpenFailedSignal"/>
+   <signal name="CloseFailedSignal"/>
+   <signal name="PositioningFailedSignal"/>
+   <signal name="InvalidPositioningSignal"/>
+   <signal name="ReadingFailedSignal"/>
+   <signal name="WritingFailedSignal"/>
+   <signal name="DationIndexBoundSignal"/>
+   <signal name="DationNotSupportedSignal"/>
+   <signal name="DationEOFSignal"/>
+   <signal name="NoEOFDationSignal"/>
+   <signal name="DationTFURecordSignal"/>
+   <signal name="DationDatatypeSignal"/>
+   <signal name="DationFormatRepetitionValue"/>
+   <signal name="DationFormatRepetitionOverflow"/>
+   <signal name="ArrayIndexOutOfBoundsSignal"/>
+   <signal name="RefNotInitializedSignal"/>
+   <signal name="DeviceNotFoundSignal"/>
+   <signal name="FormatSignal"/>
+   <signal name="NoMoreCharactersSignal"/>
+   <signal name="DurationFormatSignal"/>
+   <signal name="ClockFormatSignal"/>
+   <signal name="FixedFormatSignal"/>
+   <signal name="CharacterFormatSignal"/>
+   <signal name="BitFormatSignal"/>
+   <signal name="ClockValueSignal"/>
+   <signal name="FixedValueSignal"/>
+   <signal name="BitValueSignal"/>
+   <signal name="DurationValueSignal"/>
+   <signal name="ExpFormatSignal"/>
+   <signal name="ExpValueSignal"/>
+</platform>

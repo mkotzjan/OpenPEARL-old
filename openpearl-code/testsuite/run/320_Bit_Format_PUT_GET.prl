@@ -1,0 +1,135 @@
+/****************************************
+Testing for a simple Put and Get Statement 
+on a pipe as dation. Putting and getting 
+of BIT strings 
+****************************************/
+
+
+
+MODULE(Bit_Format_Simple_Put_Get);
+SYSTEM;
+   pipe: Pipe( '/tmp/pipe', 2, 'OPEN1');
+   stdout: StdOut;
+
+PROBLEM;
+SPC pipe DATION IN SYSTEM ALL GLOBAL;
+SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;
+
+DCL termout DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(stdout);
+
+DCL errors FIXED INIT(0);
+
+check_streq: PROC (t1 CHAR(10), t2 CHAR(10));
+   PUT 'actual: ', t1, ' expected: ', t2 TO termout BY A,A,A,A,X;
+   IF t1 EQ t2 THEN
+      PUT 'ok' TO termout BY A, SKIP;
+   ELSE 
+      PUT 'fail' TO termout BY A, SKIP;
+      errors := errors + 1;
+   FIN;
+END;
+
+check_bit16eq: PROC (t1 BIT(16), t2 BIT(16));
+   PUT 'B1:actual: ', t1, ' B1:expected: ', t2 TO termout BY A,B4(4),A,B4(4),X;
+   IF t1 EQ t2 THEN
+      PUT 'ok (B16)' TO termout BY A, SKIP;
+   ELSE 
+      PUT 'fail (B16)' TO termout BY A, SKIP;
+      errors := errors + 1;
+   FIN;
+END;
+
+
+Test1: TASK MAIN;
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+     
+     OPEN pipe_in;
+     OPEN pipe_out;
+     OPEN termout;
+
+     BEGIN
+        DCL b0 BIT(1) INIT('0'B1);
+        DCL (text, expect) CHAR(10);
+        PUT b0 TO pipe_out BY  B1(1), SKIP;
+        GET text FROM pipe_in BY A, SKIP;
+        expect := '0         ';
+        check_streq(text,expect);
+     END;
+
+     BEGIN
+        DCL b0 BIT(1) INIT('1'B1);
+        DCL (text, expect) CHAR(10);
+        PUT b0 TO pipe_out BY  B1(1), SKIP;
+        GET text FROM pipe_in BY A, SKIP;
+        expect := '1         ';
+        check_streq(text,expect);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(1) INIT ('0'B1, '1'B1);
+        PUT '1' TO pipe_out BY A,SKIP;
+        GET b0 FROM pipe_in BY  B1(1), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(1) INIT ('0'B1, '1'B1);
+        PUT '0' TO pipe_out BY A,SKIP;
+        GET b1 FROM pipe_in BY  B1(1), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(16) INIT ('0'B4, 'B000'B4);
+        PUT '1011' TO pipe_out BY A,SKIP;
+        GET b0 FROM pipe_in BY  B1(4), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(16) INIT ('0'B4, 'A000'B4);
+        PUT '1010' TO pipe_out BY A,SKIP;
+        GET b0 FROM pipe_in BY  B1(4), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(16) INIT ('0'B4, 'A000'B4);
+        PUT '101' TO pipe_out BY A,SKIP;
+        GET b0 FROM pipe_in BY  B1(4), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(16) INIT ('0'B4, '55AA'B4);
+        PUT '55AA' TO pipe_out BY A,SKIP;
+        GET b0 FROM pipe_in BY  B4(4), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     BEGIN
+        DCL (b0,b1) BIT(16) INIT ('0'B1, '5AA0'B4);
+        PUT '5AA' TO pipe_out BY A,SKIP;
+        GET b0 FROM pipe_in BY  B4(4), SKIP;
+        check_bit16eq(b0, b1);
+     END;
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+     /* ------------------- */
+     PUT errors, ' errors detected' TO termout BY F(6), A, SKIP;
+     CLOSE termout;
+
+END;
+MODEND;
+

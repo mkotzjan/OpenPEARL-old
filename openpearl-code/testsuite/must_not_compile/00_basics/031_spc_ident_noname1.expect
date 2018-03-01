@@ -1,0 +1,6 @@
+031_spc_ident_noname1.prl:5:21: ERROR : Syntax error :missing ID at ')'
+   SPC x FIXED IDENT();
+                     ^
+031_spc_ident_noname1.prl:7:0: ERROR : Syntax error :extraneous input 'END' expecting {'MODEND', 'SPECIFY', 'SPC', 'DECLARE', 'DCL', '__cpp__', '__cpp', 'LENGTH', ID}
+END;
+  ^

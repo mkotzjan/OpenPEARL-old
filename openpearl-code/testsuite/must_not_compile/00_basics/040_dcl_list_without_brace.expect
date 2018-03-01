@@ -1,0 +1,3 @@
+040_dcl_list_without_brace.prl:4:9: ERROR : Syntax error : expect type
+   DCL f1,f2 FIXED;
+         ^

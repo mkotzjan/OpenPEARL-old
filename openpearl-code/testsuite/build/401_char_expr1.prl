@@ -1,0 +1,74 @@
+MODULE(char_dcl);
+SYSTEM;
+   stdout: StdOut;
+
+
+PROBLEM;
+SPC stdout DATION OUT SYSTEM ALPHIC;
+DCL con DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
+
+DCL c CHAR;
+DCL x4a CHARACTER(4);
+DCL x4 CHAR(4);
+DCL y4 CHAR(4) INIT('ABCD');
+DCL x8 CHAR(8); 
+DCL success BIT(1) INIT('1'B1);
+
+! make automatic test happy
+t1: TASK MAIN;
+      __cpp__( "pearlrt::Control::setExitCode(0);");
+   OPEN con;
+
+   x8 := y4 CAT y4;
+   IF x8 NE 'ABCDABCD' THEN
+     PUT  'error#1  x8=>',x8,'<' TO con BY A,A,A,SKIP;
+     success = '0'B1;
+   FIN;
+
+   x8 := y4 CAT '1234';
+   IF x8 NE 'ABCD1234' THEN
+     PUT  'error#2  x8=>',x8,'<' TO con BY A,A,A,SKIP;
+     success = '0'B1;
+   FIN;
+
+   x8 := y4 >< y4;
+   IF x8 NE 'ABCDABCD' THEN
+     PUT  'error#3  x8=>',x8,'<' TO con BY A,A,A,SKIP;
+     success = '0'B1;
+   FIN;
+
+   c:= x8.CHAR(1);
+   IF c NE 'A' THEN
+     PUT  'error#4  c=>',c,'<' TO con BY A,A,A,SKIP;
+     success = '0'B1;
+   FIN;
+
+   x4 := x8.CHAR(2:4);
+   IF c NE 'ABC ' THEN
+     PUT  'error#5  x4=>',x4,'<' TO con BY A,A,A,SKIP;
+     success = '0'B1;
+   FIN;
+
+
+   x4 := y4;
+   IF x4 /= y4 THEN
+     PUT  'error#6  x4/=y4 with x4=>',x4,'< y4=>', y4, '<' 
+       TO con BY A,A,A,A,A,SKIP;
+      success = '0'B1;
+   FIN;
+
+   x4.CHAR(1) = 'A';
+   IF x4 /= 'A  D' THEN
+     PUT  'error#7   x4=>',x4, '<' 
+       TO con BY A,A,A,SKIP;
+      success = '0'B1;
+   FIN;
+
+
+   IF NOT success THEN
+      __cpp__(
+      "pearlrt::Control::setExitCode(1);"
+      );
+   FIN;
+END;
+MODEND;

@@ -1,0 +1,3 @@
+006_no_problem_statement.prl:2:0: ERROR : Syntax error :mismatched input 'DCL' expecting {'MODEND', 'SYSTEM', 'PROBLEM', '__cpp__', '__cpp'}
+DCL f FIXED;
+  ^

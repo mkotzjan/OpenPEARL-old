@@ -1,0 +1,10 @@
+menu "Compiler"
+config COMPILER_ANTLR
+	string "Location of your ANTLR installation"
+	default "/usr/local/lib/antlr-4.5-complete.jar"
+	help
+	ANTLR is required for the compilation. The installation path may
+	vary according the system operators strategy. 
+	The ANTLR version may vary also.
+endmenu
+

@@ -1,0 +1,17 @@
+MODULE(clockexpr1);
+! declare and initialize clock variables at module and task level
+PROBLEM;
+   DCL x CLOCK;
+   DCL x1 CLOCK;
+   DCL x2 CLOCK;
+   DCL diff DURATION;
+T1: TASK MAIN;
+   x := 00:00:00;
+   x1 := 00:00:01.1234;
+   diff := x1 - x;
+   x2 := 25:00:00;
+   x := 12:30:45.25 + 1 HRS 15 MIN 45 SEC;
+   x := NOW;
+   x := NOW + diff;
+END;
+MODEND;

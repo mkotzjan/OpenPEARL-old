@@ -1,0 +1,9 @@
+%%%%%\begin{removed}
+%%%%%wurde ersetzt durch SchedulingSignalReaction
+%%%%%
+\htgt{SignalStatement} ::=\\
+\x {\bf ON} \hlink{Name}$\S $Signal 
+	[ {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED ) ] :\\
+\x \x \hlink{SignalReaction} ;
+
+%%%%%\end{removed}

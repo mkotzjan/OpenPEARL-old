@@ -1,0 +1,78 @@
+MODULE(bitinit);
+! test for compilation of bit deklarations and operations
+! for each statement the expected result is given an __cpp__-insertion
+! as soon as the compiler is capable to to the translation,
+! the comment should be moved to the result line
+
+PROBLEM;
+
+   ! deklarations
+    DCL b BIT INIT('0'B1);
+    DCL b1 BIT(1) INIT('1'B1);
+    DCL b2 BIT(2) INIT('01'B1);
+    DCL b2a BIT(2) INIT('10'B1);
+    DCL b2b BIT(2) INIT('1'B1);
+    DCL b15 BIT(15) INIT('000111100001111'B1);
+    DCL b32 BIT(32) INIT('12345678'B4);
+    DCL b33 BIT(33) INIT('01234567012'B3);
+    DCL b64 BIT(64) INIT('0123456789ABCDEF'B4);
+
+   /* expected code 
+   __cpp__("pearlrt::BitString<1>  _b(0);		");
+   __cpp__("pearlrt::BitString<1>  _b1(1);		");
+   __cpp__("pearlrt::BitString<2>  _b2(1);		");
+   __cpp__("pearlrt::BitString<15> _b15(0x0f0f);	");
+   __cpp__("pearlrt::BitString<32> _b32(0x12345678ULL);	");
+   __cpp__("pearlrt::BitString<33> _b32(0x0a72EE0AULL);	");
+   __cpp__("pearlrt::BitString<64> _b64(0x0123456789ABCDEFULL);	");
+*/
+
+
+T1: TASK MAIN;
+   __cpp__ (
+        "if (sizeof(_b) == sizeof(_b1)) printf(\"BIT == BIT(1): ok\\n\");  "
+        "if (sizeof(_b) != sizeof(_b1)) {      "
+        "       printf(\"BIT should be BIT(1)\\n\");"
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+        "if (sizeof(_b1) == 1) printf(\"sizeof(BIT(1): ok\\n\");  "
+        "if (sizeof(_b1) != 1) {"
+        "       printf(\"sizeof(BIT(1): fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+        "if (sizeof(_b2) == 1) printf(\"sizeof(BIT(2): ok\\n\");  "
+        "if (sizeof(_b2) != 1) {"
+        "       printf(\"sizeof(BIT(2): fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+        "if (sizeof(_b15) == 2) printf(\"sizeof(BIT(15): ok\\n\");  "
+        "if (sizeof(_b15) != 2) {"
+        "       printf(\"sizeof(BIT(15): fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+        "if (sizeof(_b32) == 4) printf(\"sizeof(BIT(32): ok\\n\");  "
+        "if (sizeof(_b32) != 4) {"
+        "       printf(\"sizeof(BIT(32): fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+        "if (sizeof(_b33) == 8) printf(\"sizeof(BIT(33): ok\\n\");  "
+        "if (sizeof(_b33) != 8) {"
+        "       printf(\"sizeof(BIT(33): fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+        "if (sizeof(_b64) == 8) printf(\"sizeof(BIT(64): ok\\n\");  "
+        "if (sizeof(_b64) != 8) {"
+        "       printf(\"sizeof(BIT(64): fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "
+        "} "
+	);
+        IF b2a NE b2b THEN
+        __cpp__(
+        "       printf(\"BIT(2) INIT (\'10\'B1) NE \'1\'B1: fail\\n\");       "
+        "       pearlrt::Control::setExitCode(1);       "        );
+        FIN
+;
+END;
+
+MODEND;
+

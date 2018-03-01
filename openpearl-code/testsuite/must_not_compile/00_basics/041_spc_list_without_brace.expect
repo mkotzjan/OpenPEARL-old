@@ -1,0 +1,3 @@
+041_spc_list_without_brace.prl:4:9: ERROR : Syntax error : expect type
+   SPC f1,f2 FIXED GLOBAL(b);
+         ^

@@ -1,0 +1,27 @@
+menu "Installation Settings"
+config INSTALL_Target
+	string "Installation Location"
+	default "/usr/local"
+	help
+	The language system will be copied to the given location.
+	The compile and build script will go into the subdirectory 'bin'.
+        The libraries will go into 'lib'.
+        The header files will go into 'include'. 
+
+config INSTALL_FLASHINTERFACE
+	depends on LPC1768
+	string "Name of Interface for serial flashing"
+	default "/dev/ttyUSB0"
+	help
+	If more than one tty<->usb-adapter is used, the device name 
+	/dev/ttyUSB0 is no longer guaranteed for the device node name.
+	In this case you should set a symlink-rule in your udev-rules
+        to make a symlink depending on the serial number of the 
+	tty<->usb-adapter like:
+	
+	SUBSYSTEMS=="usb", ATTRS{idVendor]=="0403", ...
+	   ATTRS{serial}=="A6008isW", SYMLINK+=ttyUart0
+
+	
+endmenu
+

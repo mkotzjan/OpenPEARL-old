@@ -1,0 +1,541 @@
+\chapter{Program Structure}   % 4
+
+\section{Modules}  % 4.1
+\label{sec_modules}
+
+A PEARL program is constructed of one or several parts, so-called
+modules, which are translated independently. Each module consists of a
+system part and/or a problem part.
+
+The general form of a PEARL program reads as follows:
+
+
+\begin{grammarframe}
+\input{Program.bnf}
+\index{Program}
+
+\input{Module.bnf}
+\index{MODULE@\textbf{MODULE}}
+\index{MODEND@\textbf{MODEND}}
+
+\input{SystemPart.bnf}
+\index{SYSTEM@\textbf{SYSTEM}!System Part}
+
+\input{ProblemPart.bnf}
+\index{PROBLEM@\textbf{PROBLEM}}
+\end{grammarframe}
+
+In the system part, the connections of the projected computer are
+described with the elements of the technical process (sensors,
+actuators, etc.) and the standard peripherals (keyboard, monitor,
+printer, disks, tapes, etc.). The programmer can assign freely
+selectable names to the entries of the interrupt controller and the
+peripherals addressed in the I/O statements (in the problem part) to
+refer to these (computer independent) names in the problem part.
+
+In the problem part, the algorithm for solving the given automation
+problem is described. For this, the programmer declares the following
+objects:
+
+\begin{itemize}
+\item variables and constants for integers, floating point numbers, bit
+strings, character strings, durations, times, references
+\item labels
+\item procedures for frequently occurring partial evaluations
+\item tasks for the temporarily parallel execution of tasks
+\item blocks for structuring procedures and tasks
+\item interrupts
+\item signals
+\item synchronisation variables (Sema and Bolt variables) as well as
+\item data stations and formats for input/output
+\end{itemize}
+
+The required statements are given in the procedures and tasks,
+together with other ``local'' declarations which are only needed there.
+In general, objects may not be used (in statements) until they are
+declared.
+
+Example:
+
+%{\bf MODULE(moduleName)};
+%
+%{\bf SYSTEM};\\
+%\x description of the connections and introduction of names for the
+%peripherals
+%
+%{\bf PROBLEM};\\
+%\x declaration of constants and variables\\
+%\x declaration of interrupts\\
+%\x declaration of data stations
+%
+%\x declaration of a task\\
+%\x \x declaration of local constants and variables\\
+%\x \x statements
+%
+%\x declaration of a procedure\\
+%\x \x declaration of local constants and variables\\
+%%%%%% removed
+%%%%%%\x \x declaration of local procedures\\
+%%%%%% end removed
+%\x \x statements
+%
+%...
+%
+%{\bf MODEND};
+\begin{lstlisting}
+MODULE(moduleName);
+
+SYSTEM;
+  ! description of the connections and introduction of names for the
+  ! peripherals
+
+PROBLEM;
+  ! declaration of constants and variables
+  ! declaration of interrupts
+  ! declaration of data stations
+
+  ! declaration of a task
+  !    declaration of local constants and variables
+  !    statements
+
+  ! declaration of a procedure
+  !    declaration of local constants and variables
+  !    statements
+...
+
+MODEND;
+\end{lstlisting}
+
+Objects are declared at module level, i.e., outside procedures and
+tasks, or in procedures and tasks. Objects declared at module level are
+known in the entire module and can be used or, if needed, changed by
+each task and procedure of the module, when mentioning the identifier.
+A declared object in the task or procedure is only known in the
+respective task or procedure and can only be used or, if needed,
+changed there.
+
+\section{Declarations and Specifications} %  4.2
+\label{sec_dcl_and_spc}
+
+Objects are introduced by {\it declaration} or {\it specification}.
+
+\subsection{Declaration (\kw{DCL})}  % 4.2.1
+\label{sec_dcl}
+\index{DCL@\textbf{DCL}}
+\index{DECLARATION@\textbf{DECLARATION}|see {DCL}}
+
+The declaration serves to introduce an object and its name, i.e., when
+evaluating the declaration, memory space for the object is allocated, and
+up from now, it can be accessed under the name given in the
+declaration.
+
+At the module level or in a procedure or task, an object may be declared
+only once. If an identifier \code{X} is declared as object both at module level
+and in a procedure or task, two objects are introduced: In the
+respective procedure or task, identifier \code{X} refers to the object
+(locally) declared there, outside the procedure or task it refers to the
+object declared at module level (cf. section \ref{sec_block}, Block Structure).
+
+Example:
+
+\begin{lstlisting}
+PROBLEM;
+   DECLARE x FLOAT;  ! 1st declaration at module level
+   DECLARE x FIXED;  ! 2nd declaration at module level (wrong)
+
+p: PROCEDURE; 
+   DECLARE x FIXED;  ! declaration in procedure p (permitted)
+   ...     
+   x := 3;           ! assignment to the local variable x
+   ...         
+END;                 ! p
+
+t: TASK;
+   ...         
+   x := 5;           ! assignment to variable x declared at
+                     ! module level
+END;                 ! t 
+... 
+\end{lstlisting}
+
+The different declaration forms are treated with the various objects in
+the subsequent chapters.
+
+In procedures and tasks,
+\begin{itemize}
+\item tasks
+%%%% added
+\item procedures
+%%%% end added
+\item interrupts
+\item signals
+\item synchronising variables
+\item data stations, as well as
+\item formats
+\end{itemize}
+must not be declared or specified.
+
+Table~\ref{objekte} shows where which objects may be declared or
+specified.
+
+\begin{table}
+\caption{Permissibility of declarations\label{objekte}}
+\vspace{5mm}
+
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+                       & \multicolumn{4}{|c|}{declaration possible on} \\
+object                 & module level & task level & procedure level & block level \\ \hline
+variable, constant     & x            & x    & x         & x  \\
+label                  & --           & x    & x         & x  \\
+%%%%%procedure              & x            & x    & x         & -- \\
+procedure              & x            & --    & --         & -- \\
+task                   & x            & --   & --        & -- \\
+block                  & --           & x    & x         & x  \\
+Sema, Bolt variable    & x            & --   & --        & -- \\
+data station, format   & x            & --   & --        & -- \\
+type                   & x            & x    & x         & x \\
+signal                 & x            & --   & --        & -- \\ 
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Specification (\kw{SPC}) and Identification (\kw{SPC IDENT})}  % 4.2.2
+\label{sec_spc}
+\index{SPC@\textbf{SPC}}
+\index{SPECIFY@\textbf{SPECIFY}|see {SPC}}
+
+With a specification, an already declared object is
+referred to.  This is meaningful for objects which are declared in a
+module, and which shall be used in other modules (cf. \ref{sec_references_module},
+ References
+between Modules), but also for introducing additional names for already
+declared objects in general.
+
+Example:
+
+Object \code{x} of type \code{FIXED (15)} shall get \code{xx} as 2nd name
+ --- or formulated in a different way:
+ Object \code{x} shall be {\it identified} with name \code{xx}:
+
+\begin{lstlisting}
+PROBLEM;
+...
+DECLARE x FIXED;
+...
+SPECIFY xx FIXED IDENT (x);
+...
+   xx := 7;  ! assignment to object x inside a PROC or TASK
+\end{lstlisting}
+In general, the form of identification reads as follows:
+
+%%%\begin{front}
+%%%Identification ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} Identifier [ AllocationProtection ] Type IdentificationAttribute ;
+
+\begin{grammarframe}
+\input{Identification.bnf}
+\index{Identification}
+\index{SPC@\textbf{SPC}!Identification}
+
+\input{IdentificationAttribute.bnf}
+\index{IDENT@\textbf{IDENT}!Identification}
+\end{grammarframe}
+
+The given type has to correspond to the type of the named object. More
+details are defined when presenting the various objects.
+
+\section{Block Structure, Validity of Objects}   % 4.3
+\label{sec_block}
+
+Blocks are used to structure task or procedure bodies and to influence
+the scope and the life-span of PEARL objects. A block is a summary of
+declarations and statements:
+
+\begin{grammarframe}
+\input{Block.bnf}
+\index{BEGIN@\textbf{BEGIN}}
+\index{END@\textbf{END}}
+\end{grammarframe}
+
+Blocks are regarded as statements and may thus only occur in tasks and
+procedures, but there even nested. The entry into a block takes
+place when executing \code{BEGIN}. A block is left by the corresponding 
+\code{END} or
+by a branch to an statement outside the block, e.g., by the  \code{EXIT}
+statement (cf. 7.5). Jumps into a block are not allowed.
+
+Within the blocks, no procedures may be declared!
+
+Memory space is not allocated to the (local) objects declared in a block
+until the block is entered; it is abandoned when leaving the block. Like
+tasks, procedures and repetitions, blocks can introduce and remove
+objects dynamically and thus provide the opportunity to use the
+available memory space repeatedly.
+
+Thus, some rules for the life-span and the scope range of these objects
+have to be established:
+
+The life-span of an object is the (processing) time between the
+evaluation of its declaration and the execution of the end of the block
+(or of the repetition, procedure, task or module), where the declaration
+takes place.
+
+% Klammern einfuegen !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+%%%\begin{discuss}
+%%%Das Systemgeraet PRINTER macht heutzutage wohl keinen Sinn mehr.
+%%%Was soll damit dann passieren? Wie sollte so etwas in Linux aussehen?
+%%%Wie soll so etwas bei Linux gehen? Drcukjob bei Programmende - aber das 
+%%%endet ja nicht unbedingt ...
+%%%\end{discuss}
+%%%
+%%%{\bf MODULE};\\
+%%%\x {\bf SYSTEM};\\
+%%%\x \x printer: STDPRINT;\\
+%%%\x {\bf PROBLEM};\\
+%%%\x \x {\bf SPC} printer {\bf DATION} ... ;\\
+%%%\x \x T: {\bf TASK};\\
+%%%\x \x \x {\bf DCL} a {\bf FIXED};\\
+%%%\x \x \x {\bf BEGIN}\\
+%%%\x \x \x \x ...\\
+%%%\x \x \x \x {\bf DCL} x {\bf FLOAT};\\
+%%%\x \x \x \x ...\\
+%%%\x \x \x {\bf END};\\
+%%%\x \x \x ...\\
+%%%\x \x \x {\bf END}; ! T\\
+%%%\x \x ...\\
+%%%{\bf MODEND};
+
+The scope of an object are all parts of the program where the object can
+be used. The following rules are to be obeyed:
+\begin{itemize}
+\item An object declared at module level is usable at the module level
+and in all tasks and procedures of this module (however, see 
+\ref{sec_references_module}), even
+in all encapsulated procedures, blocks and repetitions with the
+following exception: The scope range is restricted, if in one of the
+tasks or procedures another object is declared under the same name.
+\item An object declared in a task, procedure, repetition or block is
+usable in this task, procedure, repetition or block and all
+encapsulated procedures, repetitions and blocks with the following
+exception: The scope is restricted, if in one of the encapsulated
+procedures, repetitions or tasks another object is declared under the
+same name.
+\end{itemize}
+
+Example:
+
+\begin{lstlisting}
+PROBLEM;
+DCL x FIXED;
+   ...
+SPC xx FIXED IDENT (x);
+t: TASK;
+   ...
+END; ! t
+
+p: PROC;
+   DCL y  FIXED;
+   x := 2;
+   BEGIN
+     DCL x FLOAT;
+     x :=3 ;
+     ...
+     BEGIN
+       DCL x DUR;
+       ...
+     END;
+     ...
+   END;
+   y := x; ! y = 2
+   ...
+END; ! p
+...
+MODEND;
+\end{lstlisting}
+
+After \code{END}, blocks can be provided with identifiers, so that encapsulated
+blocks can be left deliberately with the help of the \code{EXIT} statement
+(cf. 7.5).
+
+\section{References between Modules}  % 4.4
+\label{sec_references_module}
+
+If a PEARL program consists of several modules, it can be necessary to
+use objects declared in a module and occupying memory space there (data,
+procedures, etc.) in other modules as well. For this reason, these
+(global) objects are declared with the global attribute at module level
+in the module where they are to occupy memory space, and specified with
+the global attribute at the module level in the other modules. In this
+way, the scope of objects declared at module level can be extended.
+
+Example:
+\begin{multicols}{2}
+\begin{lstlisting}
+MODULE (a);
+PROBLEM;  
+...      
+DCL x FIXED GLOBAL;
+...              
+   x := 2;      
+...           
+MODEND;     
+\end{lstlisting}
+\columnbreak
+\begin{lstlisting}
+MODULE (b); 
+PROBLEM;
+...
+SPC x FIXED GLOBAL (a);
+...                   
+   x := 3;
+... 
+MODEND;
+\end{lstlisting}
+\end{multicols}
+
+All data stations, interrupts and signals given in the system part of a
+certain module are regarded as declared (implicitly) with the global
+attribute.
+%%%%%\begin{discuss}
+%%%%%Diese Sonderbehandlung ist schwer nachvollziehbar. 
+%%%%%Systemnamen sind immer GLOBAL. Daher sollte GLOBAL immer 
+%%%%%bei deren SPC-Anweisungen angegeben sein.
+%%%%%
+%%%%%Dies ist Thema in der AK-Sitzung im November 2016.
+%%%%%
+%%%%%\begin{removed}
+%%%%%Thus, they are only specified in the problem parts of the
+%%%%%program; here the global attribute can be omitted in the problem part of
+%%%%%the same module, in all other modules it must be defined.
+%%%%%\end{removed}
+%%%%%\end{discuss}
+
+The general form of the global attribute reads:
+
+\begin{grammarframe}
+\input{GlobalAttribute.bnf}
+\index{GLOBAL@\textbf{GLOBAL}}
+\end{grammarframe}
+
+%%%%\begin{discuss}
+%%%%in der deutschen Fassung des Sprachreports von 1995 ist noch dargelegt,
+%%%%dass Identifier(Module) nur dokumentatorischen Character hat.
+%%%%In dieser Fassung ist diese Anmerkung entfallen.
+%%%%
+%%%%Dies ist Thema in der AK-Sitzung im November 2016.
+%%%%
+%%%%Klaerungsmoeglichkeit 1:\\
+%%%%Identifer(Module) entfaellt in der Sprachdefinition
+%%%%
+%%%%Klaerungsmoeglichkeit 2: Modulangabe ist notwendig\\
+%%%%\begin{added}
+%%%%The identifer$\S $Module is mandatory in the specification of
+%%%%an element from a different module.
+In declarations \code{Identifier}$\S $OfTheModule is forbidden.
+
+In specifications, the \code{Identifer}$\S $OfTheModule  may be omitted. 
+In this case, the identifier of the module is inserted.
+The \code{Identifier}$\S $OfTheModule denotes the module name of the corresponding
+declaration.
+The same module name my be used in different source files.
+
+Identifiers, which are defined in modules with different names, are distinct.
+%%%%\end{added}  
+%%%%\end{discuss}
+
+%%%%%\begin{discuss}
+%%%%%Formulierung bezueglich Laengenangabe ist schwer  verst"andlich.
+
+%%%%%\begin{removed}
+%%%%%When specifying an object, all attributes have to be taken over from its
+%%%%%declaration, except for a given priority, precision or length. In the
+%%%%%latter exceptional case, the precision or length defined in the
+%%%%%corresponding length declaration is applied for the range of the program
+%%%%%where the specification is valid.
+%%%%%\end{removed}
+
+%%%%%Vorschlag:\\
+%%%%%\begin{added}
+When specifying an object, all attributes have to be taken over from its
+declaration, except for a given priority. 
+The effective precision or length 
+must fit exactly. Maybe the literal specification and declaration differ 
+due to different length declarations
+ in the corresponding section of the program.
+%%%%%\end{added} 
+
+%%%%%\end{discuss}
+
+Example:
+
+\begin{multicols}{2}
+\begin{lstlisting}
+MODULE(a);
+PROBLEM; 
+t: TASK PRIO 3 GLOBAL;
+   ! task body
+	
+END; ! t
+        
+p: PROC (A(,) FIXED IDENT)
+   GLOBAL;       
+   ! procedure body
+END; ! p         
+...             
+MODEND;     
+
+\end{lstlisting}
+\columnbreak
+\begin{lstlisting}
+MODULE(b);
+PROBLEM; 
+SPC t TASK GLOBAL(a),
+    p PROC ((,) FIXED IDENT)
+    GLOBAL(a);
+init: TASK;
+   DCL tab (10,20) FIXED;
+   ...
+   CALL p (tab);
+   ... 
+   ACTIVATE t;
+END; ! init
+...
+MODEND;
+\end{lstlisting}
+\end{multicols}
+
+The different forms of specifying global objects are defined when
+presenting the objects.
+
+\section{Execution of a Program}   % 4.5
+\label{sec_program_execution}
+
+After the loading of a PEARL program, the PEARL run time system
+automatically starts all tasks marked by the attribute \code{MAIN} according
+to their priority.  
+%%%begin difference
+%%%All tasks provided with MAIN have to be declared in
+%%%the same module.
+OpenPEARL supports tasks with attribute \code{MAIN} in multiple modules.
+%%%end difference
+
+Example:
+
+\begin{lstlisting}
+MODULE (Main); 
+SYSTEM; 
+PROBLEM;
+start: TASK MAIN;
+   ! activating and scheduling of other tasks
+END; start
+             
+measuring: TASK PRIO 1;
+   ! task body 
+END; ! measuring
+...    
+MODEND;
+\end{lstlisting}
+
+After the loading, the task \code{start} is started first.
+

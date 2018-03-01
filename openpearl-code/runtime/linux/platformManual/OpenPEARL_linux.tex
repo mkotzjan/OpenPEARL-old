@@ -1,0 +1,243 @@
+\documentclass[10pt]{scrbook}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,shapes.geometric}
+
+\geometry{a4paper}
+\setlength{\parindent}{0pt}
+
+%\DeclareCaptionFont{white}{\color{white}}
+%DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}
+\DeclareCaptionFormat{listing}{\colorbox{black!15}
+  {\parbox{5cm}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,
+%labelfont=white,textfont=white, 
+singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+\begin{document}
+\title{OpenPEARL - Platform Manual for Linux Systems}
+\author{R. M\"uller}
+
+\lstnewenvironment{CppCode} {
+    \lstset{numbers=left,
+            title={C++},
+            frame=tlrb,
+	    breaklines = true,
+	    belowcaptionskip=4pt
+    }
+}%
+{}%
+
+\lstnewenvironment{PEARLCode} {
+    \lstset{numbers=left,
+            title={PEARL},
+            frame=tlrb,
+	    breaklines = true,
+	    belowcaptionskip=4pt
+    }
+}%
+{}%
+
+\pagestyle{myheadings}
+\markboth {OpenPEARL Platform Manual Linux}
+          {OpenPEARL Platform Manual Linux}
+
+\maketitle
+
+\tableofcontents
+
+%\input{log.tex}
+%\input{interrupt.tex}
+%\input{inOutput.tex}
+
+\chapter{Installation}
+The installation must be done via the git repository of the OpenPEARL project.
+There are several software packages required on your linux PC. 
+The repository contains an install script (\verb|installPackages|),
+which identifies your
+linux distribution by content of the file \verb|/etc/os-release|.
+
+For details of the additional packages study the installation script.
+
+\paragraph{Prerequisites}
+\begin{itemize}
+\item you have access to your linux system as user and root
+\item you have an internet connection
+\item you have a git client installed
+\end{itemize}
+
+\paragraph{Perform the following steps:}
+\begin{enumerate}
+\item login as normal user
+\item create a working directory for the installation. \\
+   e.g. /home/userx/OpenPEARL\\
+    \verb|mkdir /home/userx/OpenPEARL|
+\item set you current working directory to this point \\
+    \verb|cd /home/userx/OpenPEARL|
+\item obtain a read only copy the repository\\
+    \verb|git clone git://git.code.sf.net/p/openpearl/code .|\\
+    regard the point at the end of the command
+\item set the working directory to the top of the real content
+     in your working copy 
+     (we are sorry about this unnecessary directory level): \\
+    \verb|cd openpearl-code|
+\item get administration priviledges\\
+    \verb|sudo| or \verb|su|
+\item run the script:\\
+    \verb|./installPackages|\\
+    and wait for completion of the installation.
+    This takes about 6 minutes at an RaspberryPi 3B
+\item still as administrator, execute\\
+    \verb|make defconfig|\\
+    \verb|make prepare|\\
+    \verb|make install|\\
+    this takes about 20 minutes at a Rspberry Pi 3B
+\end{enumerate}
+
+\paragraph{Verify Installation:}
+Work as normal user.
+
+
+\begin{enumerate}
+\item \verb|cd /home/userx/OpenPEARL/openpearl-code/demos|
+\item build some of the provided demonstration programs\\
+   \verb|prl <demo>.prl|\\
+   where \verb|<demo>| is Hello or sched\_demo
+\item run the demonstration programm with \\
+   \verb|./Hello| or \verb|./sched_demo|.\\
+   The programs should pront some messages and terminate themself.
+\end{enumerate}
+
+
+\chapter{Configuration}
+\section{Available Options}
+\begin{itemize}
+\item Target platform: standard linux PC or Raspberry Pi
+\item additional device support like PEAK CAN-adapter, I2C-devices,...
+\end{itemize}
+For details see the {\em HELP} pages in the \verb|make menuconfig| 
+entries.
+
+\section{Rebuild of the OpenPEARL Environment}
+The tuning the installation must be done as administrator:
+\begin{enumerate}
+\item \verb|cd /home/userx/OpenPEARL/openpearl-code|
+\item change the option upon your demands:\\
+      \verb|make menuconfig| 
+\item \verb|make install|
+\end{enumerate}
+
+\section{Configuration Option for the individual Application}
+\import{../../common/platformManual/}{configurationCommon.tex}
+\import{./}{log.tex}
+\import{./}{pearlrc.tex}
+
+\chapter{Release Information}
+\section{Supported Language Elements}
+The OpenPEARL project aims to support all language elements  as
+described in the language report.
+
+This version does not support:
+\begin{itemize}
+\item STRUCT
+\item TYPE
+\item TFU  
+\item ...??? fehlt noch was
+\item Semantic analysis for good diagnostic error messages.
+     In case of problems error messages from the c++ compiler may appear. 
+\item semantic analysis for program quality analysis (e.g. unused variables)
+\end{itemize}
+
+\section{Restrictions for privileged and unprivileded users}
+\begin{itemize}
+\item The priority based scheduler of the linux system is not
+   accessible for normal users. Thus application will operate for 
+   normal users with
+   the usual completely fair scheduler. The priority values are 
+   not regarded in the scheduling.
+\item If the application is run with root priviledges, the socalled 
+  round-robin scheduler is used. This provides only 100 priority values.
+  For administrative reasons, some priorities are clipped by the OpenPEARL
+  system.
+  The remaining priorities are: 1-97 and 255
+\end{itemize}
+
+\section{Tuning Information}
+\begin{itemize}
+\item The current version uses only one processor core.
+     There is an option to use other cores but this is not tested yet.
+\item There is no memory locking used.
+     This would increase the execution speed but effect the overall
+     behavior of the linux machine.
+\item The optimizer switches of the c-compiler are not optimized.
+   The debugging option is still set!
+\item The stack size for the tasks may be controlled with the
+   \texttt{ulimit -s xx} command of the command shell (bash).
+\end{itemize}
+
+\section{Execution Times}
+The execution speed of some operations are derived from the system clock.
+The resolution of the system clock depend on the hardware and the 
+presence of other processes.
+The time stamps were taken with the \texttt{NOW} builtin function.
+
+During the measurement, no network connection was established and no
+other tasks are active. The usual background activity of the linux
+systems was present.
+
+For details about the measurements please consult the corresponding
+source code.
+
+\subsection{Execution Timing on Raspberry Pi 3b}
+
+\subsection{Execution Timing on a Desktop Linux System}
+The excecution speed depends on many hardware parameters. 
+The following data are taken from my development machine, which consists of
+......
+\begin{tabular}{|p{5cm}|l|r|}
+\hline
+Parameter & Test Program & Result \\
+\hline
+Task Activation & benchmarks/TaskActivation & ....\\
+\hline
+Semaphore Operations &  & \\
+REQUEST-RELEASE non blocking & & \\
+RELEASE-waiter CONTINUATION & & \\
+
+\hline
+Simple Type Operations & ... & \\
+\hline
+Matrix Multiplication & .... & ...\\
+\hline
+\end{tabular}
+
+
+
+\chapter{Supported Devices}
+\import{../../common/platformManual/}{devicesCommon.tex}
+\import{./}{devices.tex}
+
+\chapter{Supported Interrupt Sources}
+\import{../../common/platformManual/}{interruptCommon.tex}
+\import{./}{interrupts.tex}
+
+\chapter{Available PEARL Signals}
+The OpenPEARL signals are organized in some groups.
+
+\import{../../common/}{signallist.tex}
+
+
+\chapter{How-To Add new System Elements}
+\import{../../common/platformManual/}{addDeviceCommon.tex}
+\import{./}{addDevice.tex}
+\import{../../common/platformManual/}{addInterruptCommon.tex}
+\import{./}{addInterrupt.tex}
+\import{../../common/platformManual/}{addSignalCommon.tex}
+\end{document}
+

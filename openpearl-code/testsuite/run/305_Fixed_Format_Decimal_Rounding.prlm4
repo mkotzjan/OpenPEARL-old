@@ -1,0 +1,100 @@
+/****************************************
+Testing the Rounding of Put Statement with 
+Float Variables. 
+Rounding should be according to the DIN 
+specification where 5 always triggers rounding
+to the next bigger number
+****************************************/
+
+
+
+MODULE(Fixed_Format_Decimal_Rounding);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_exception.m4h})
+include({m4_testing.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Test1: TASK MAIN;
+     DCL result_float FLOAT(53) INIT(0.0);
+     DCL (float_out, float_in) FLOAT(24) INIT(0.0,0.0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+
+     
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+     float_out := 5.1;                                      
+     result_float := 5.0;
+     PUT float_out TO pipe_out BY F(3,0), SKIP;             ! Put Float Number 5.1 with no Decimal Point, triggers rounding
+     GET float_in FROM pipe_in BY F(1), SKIP;               ! result should be 5, which equals 5.0
+     EXPECT_EQ({float_in}, {result_float});
+    
+     float_out := 5.4;
+     result_float := 5.0;
+     PUT float_out TO pipe_out BY F(3,0), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+     float_out := 5.5;
+     result_float := 6.0;
+     PUT float_out TO pipe_out BY F(3,0), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+     float_out := 5.6;
+     result_float := 6.0;
+     PUT float_out TO pipe_out BY F(3,0), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+     float_out := 1.41;
+     result_float := 1.4;
+     PUT float_out TO pipe_out BY F(4,1), SKIP;
+     GET float_in FROM pipe_in BY F(4), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+     float_out := 1.44;
+     result_float := 1.4;
+     PUT float_out TO pipe_out BY F(4,1), SKIP;
+     GET float_in FROM pipe_in BY F(4), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+     float_out := 1.45;
+     result_float := 1.5;
+     PUT float_out TO pipe_out BY F(4,1), SKIP;
+     GET float_in FROM pipe_in BY F(4), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+     float_out := 1.46;
+     result_float := 1.5;
+     PUT float_out TO pipe_out BY F(4,1), SKIP;
+     GET float_in FROM pipe_in BY F(4), SKIP;
+     EXPECT_EQ({float_in}, {result_float});
+
+
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+
+
+include({m4_check_header.m4h})
+END;
+MODEND;
+

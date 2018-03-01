@@ -1,0 +1,86 @@
+/*#############################################################################
+PROGRAM
+
+The same result like 701_oneSemaphore_samePrio.prl,
+
+with the difference that the Task Writer_1 have a higher Prio as Writer_2. 
+Therefore, there is exactly one task switch between Writer_1 and Writer_2.
+#############################################################################*/
+
+MODULE(semaphoreOne);
+
+PROBLEM;
+    DCL (in_the_buffer, out_the_buffer, S1) SEMA;
+    DCL (xVar, varLoopTask1, varLoopTask2, varLoopMain) FIXED(31) INIT(0,0,0,0);
+
+    Output: TASK PRIO 2 MAIN;
+
+        DCL xVarTemp FIXED(15) INIT(0);
+        DCL xVarTemp2 FIXED(15) INIT(0);
+        DCL varTaskChange FIXED (31) INIT (-1);
+
+        ACTIVATE Writer_1;
+        ACTIVATE Writer_2;
+      
+        REQUEST S1;
+        REQUEST S1;
+        
+        RELEASE in_the_buffer;
+
+        __cpp__(
+
+        'while (_varLoopMain.x < 2000) { ');
+
+            REQUEST out_the_buffer;
+                xVarTemp := xVar;
+            RELEASE in_the_buffer;
+        
+            __cpp__(
+            'if (_xVarTemp.x != _xVarTemp2.x) { ');
+                varTaskChange := varTaskChange + 1;
+                xVarTemp2 := xVarTemp;
+             __cpp__(
+            '}');
+            varLoopMain := varLoopMain + 1;
+        __cpp__(
+        '}');
+
+        
+        __cpp__(
+        'if (_varLoopTask1.x == 1000 && _varLoopTask2.x == 1000 && ( (_varTaskChange.x) == 1) ) {'
+        '   pearlrt::Control::setExitCode(0); '
+        '   printf("*** SUCCESS ***  \\n"); '
+        '}else {'
+        '   pearlrt::Control::setExitCode(1); '
+        '   printf ("*** FAILED *** \\n"); } ');
+
+    END;
+
+    Writer_1: TASK PRIO 3;
+       RELEASE S1; 
+       __cpp__(
+       'while (_varLoopTask1.x < 1000) { ');
+                
+            REQUEST in_the_buffer;
+                 xVar := 11;
+                varLoopTask1 := varLoopTask1 + 1;
+            RELEASE out_the_buffer;
+       
+        __cpp__('}');
+
+    END;
+    
+    Writer_2: TASK PRIO 4;
+        RELEASE S1;
+    
+        __cpp__(
+        'while (_varLoopTask2.x < 1000) { ');
+
+            REQUEST in_the_buffer;
+                xVar := 12;
+                varLoopTask2 := varLoopTask2 + 1;
+            RELEASE out_the_buffer;
+        __cpp__('}');
+
+    END;
+MODEND;       

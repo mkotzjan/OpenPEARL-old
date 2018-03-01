@@ -1,0 +1,24 @@
+MODULE (fixed_type);
+
+PROBLEM;
+
+T1: TASK MAIN;
+    ! The declaration of a FIXED variable needs the following c++-code: FIXED<15> x
+    DCL x FIXED(15);
+
+    ! in case of preset values: FIXED<15> x(1)
+    DCL y FIXED(15) INIT (1);
+
+    ! In case of Fixed-values larger than Fixed<31>, the constant must be marked als long long: FIXED63> z(123456789LL)
+    DCL z FIXED(63) INIT(1234567890);
+
+    ! If no length is given in the pearl code, a default length should be used - in the decade of 32-bit micro controllers: Fixed<31>
+    ! If no global attribute is given, the storage prefix 'static'
+    ! should be used outside of TASK and PROC blocks.
+    ! The SPC .. GLOBAL should be translated to 'extern'.
+   DCL x0 FIXED(0);
+
+END;
+    
+MODEND;
+

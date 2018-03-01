@@ -1,0 +1,498 @@
+/*
+ [The "BSD license"]
+ Copyright (c) 2012-2013 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#ifndef TASK_INCLUDED
+#define TASK_INCLUDED
+
+/**
+\file
+
+\brief tasking functionality with posix threads
+
+*/
+
+
+#include <stdio.h>
+#include <pthread.h>
+
+#include "BitString.h"
+#include "PrioMapper.h"
+#include "Prio.h"
+#include "CSema.h"
+#include "Clock.h"
+#include "Duration.h"
+#include "Interrupt.h"
+#include "Log.h"
+#include "Fixed.h"
+#include "TaskCommon.h"
+
+namespace pearlrt {
+
+   /**
+   \brief wrapper object to map PEARL tasks on posix threads
+
+   This class provides all necessary operations for the compiler to realize the
+   tasking functionality required by the PEARL language.
+
+   Each object contains a mutex work thread safe (mutexTask).
+
+   The user code of each task is capsulated in a function [task name]_body.
+   This body code is called from a wrapper function named [task name]_entry.
+   This wrapper function, which is realized in task.h by a C-define,
+   enshures the existence of the exeption handler and the propper
+   initialization for thread cancellation.
+
+   Task suspending is solved by locking a locked posix semaphor variable
+   (SemaResume).
+   Continuation of a suspended task is just a unlock on this semaphor.
+   For suspending another task, the task provides a signal handler, which
+   locks this semaphor.
+
+   \note The type REF TASK should be handled inside the compiler
+
+   */
+   class Task : public TaskCommon {
+
+   private:
+      static int _useNormalScheduler;
+      Task();
+
+
+   public:
+      /**
+      pointer to a task function defined for easier coding
+      */
+      typedef void (*TaskEntry)(Task *);
+
+   private:
+
+      void (*entryPoint)(Task * me); //< C function containing the code
+
+      /** Semaphor for Thread resume (inits by default to 0)   */
+      //CSema semaResume;
+      int pipeResume[2];
+
+      pthread_t threadPid; //thread id
+      pthread_attr_t attr;  // pthread scheduling parameters
+      struct sched_param param; // -"-
+
+      /* scheduled activate and continue */
+      struct Schedule {
+         int counts;        //number of timer periods to repeat the action
+         timer_t timer;     // the timer
+         Fixed<15> prio;    // prio for new action
+      };
+      Schedule sched_activate, oncontinue;
+
+      struct {
+         timer_t timer;	 //timer  for resume time
+         bool pending;    // flag, for status display
+      } onresume;
+      void stopOnResumeTimer();
+
+      void normalActivate(Fixed<15> prio);
+
+      /** setup the timer and make some log entries for schedule activate
+          and continue
+      */
+      void setupTimer(Schedule *s,
+                      int condition, const Fixed<15> prio,
+                      Duration all, Duration after,
+                      Duration during, Clock at, Clock until,
+                      const char* operation);
+
+      /** update the schule parameters in signal handler and stop
+          the timer at the end of the scheduling period
+      */
+      int updateTimer(Schedule *s);
+
+   public:
+      /**
+      suspend the task
+      */
+      void suspendMySelf();
+  
+      /**
+      suspend the task
+      */
+      void internalSuspendMySelf(bool isAlreadyLocked);
+
+
+      /**
+      terminate the own thread
+      */
+      void terminateMySelf();
+
+      /**
+      terminate the thread of this object as an action from another task
+      */
+      void terminateFromOtherTask();
+
+      /**
+      setup a new task
+
+      <ol>
+      <li> Initialize all attributes required by the tasking system.
+      <li> setup the posix timers
+      <li> setup thread attributes
+      <li> register the task in the TaskList object
+      </ol>
+
+      \param entry a pointer to the task body function
+      \param n a pointer to the task name
+      \param prio the priority (in PEARL meaning)
+      \param isMain 1, if the task should be started automatically
+              at system start <br>0 else
+
+      \throws InternalTaskSignal if system ressources are not available
+      */
+      Task(void (*entry)(Task*), char * n, Prio prio,
+           BitString<1> isMain);
+
+      /**
+         suspend a task
+
+         The pthread library does not support thread suspending.
+         To realize the same behavior, the thread requests a semaphor.
+         The continuation is performed by releasing this semaphor variable.
+
+         If the calling thread is different from the tasks thread,
+         a signal (SIGRTMN) is sent to the tasks thread.
+         The signal handler is executed in the context of the thread,
+         which should be suspended - it just requests the semaphor.
+
+
+         The colors indicate the thread context of the execution.
+         \dot
+           digraph G1 {
+             rankdir=LR;
+             node[shape="rect"];
+             subgraph cluster_caller {
+                label = "<<Task>>\ncaller";
+                anyProc[style="filled", color="blue"];
+             }
+
+             subgraph cluster_thistask {
+                label = "<<Task>>\ntask to suspend";
+                suspend[style="filled", color=blue];
+                suspendhandler->suspend[label="call"];
+             }
+             subgraph cluster_os {
+                label = "operating system";
+                signal;
+             }
+             anyProc -> suspend[
+                  color="blue", fontcolor="blue", label="call"];
+             suspend->signal[
+                  color="blue", fontcolor="blue", label="send signal"];
+
+             signal->suspendhandler[label="invoke"];
+
+         }
+
+         \enddot
+
+      If the task is not in running state, no operation is performed.
+
+      */
+      void suspendFromOtherTask();
+
+      /**
+         scheduled continue of a task
+
+         According the given condition, a timer is armed. The timer
+         triggers a signal handler, which performs the continue-actions
+         as scheduled with the given parameters.
+
+         \note when is not supported
+
+           \param prio the new PEARL priority of the task, if given <br>
+                  if not given, the current priority remains unchanged
+           \param condition pattern of parameters for scheduled activation
+      	(see  enum TaskScheduling)
+           \param at the time the task should be continued.
+      	In case the current time is larger than the
+               given time, the action will occur the next day
+           \param after the duration which must pass before the action occurs
+           \param all the duration between two continuations
+           \param until the time which defines the last continuation
+                  of the task.
+      	In case the current time
+               	is larger than the given time it will be interpreted
+      	as the next day
+           \param during the time while the actions may occur
+           \param when the (external) interrupt which starts the schedule
+
+           \throws InternalTaskSignal if the required system ressources
+                 are unavalibale
+      */
+      void scheduledContinue(const int condition,
+                             const Fixed<15>& prio,
+                             const Clock& at, const Duration& after,
+                             const Duration& all, const Clock& until,
+                             const Duration& during,
+                             const Interrupt& when);
+
+      /**
+        self continuation of the task
+
+        the method returns after setting the new priority
+
+        \param prio the new PEARL priority of the task
+      */
+      void continueMySelf(const Fixed<15>& prio);
+
+      /**
+        continuation of the task by another task
+
+        \param prio the new priority of the task, if given
+
+        \note The method must deal with the current task states!
+
+        \note the mutexTask is locked
+
+      */
+      void continueFromOtherTask(Fixed<15> prio = (Fixed<15>)0);
+
+      /**
+          Perform the dynamic part of task initialising
+
+          This method is called automatically in the DCLTASK macro
+      */
+      void entry();
+
+      /**
+          scheduled activate for a task
+
+          perform all required internal operations before starting
+          a new posix thread
+
+          \param prio the new PEARL priority of the task
+          \param condition pattern of parameters for scheduled activation
+      (see  enum TaskScheduling)
+          \param at the time the task should start.
+      In case the current time is larger than the
+              given time, the activation will occur the next day
+          \param after the duration which must pass befor activation occurs
+          \param all the duration between two activations
+          \param until the time which defines the last activation of the task.
+      In case the current time
+              	is larger than the given time it will be interpreted
+      as the next day
+          \param during the time while the activations may occur
+          \param when the (external) interrupt which start the schedule
+
+          \throws InternalTaskSignal if the required system ressources
+                are unavalibale
+          \throws TaskRunningSignal if the tasks thread is already active
+      */
+      void scheduledActivate(const int condition,
+                             const Fixed<15>& prio,
+                             const Clock& at, const Duration& after,
+                             const Duration& all, const Clock& until,
+                             const Duration& during,
+                             const Interrupt& when);
+
+      /**
+      immediate  activation of the task
+
+      \param prio the priority of the task
+
+      \todo{add configuration parameter for thread stacksize
+
+      The stack size of a thread limits the number of possible threads.
+      By default each thread gets 8MB of stack.
+      This leads to a limit of approximatelly 300 threads at one time.
+      If this value is set to a smaller value, the thread limit increases.
+
+      As interim solution the stacksize ist set to PTHREAD\_STACK\_MIN.
+      For the final implementation this parameter should be set via
+      a configuration parameter.
+
+      */
+      void directActivate(const Fixed<15>& prio);
+   private:
+      void internalDirectActivate(const Fixed<15>& prio,
+                                  const bool decNumberPendingTasks);
+   public:
+      /**
+        isMySelf
+
+        check if the calling task is the same as the task of this object
+
+        \returns true, if it is the same task
+
+      */
+      bool isMySelf();
+
+
+      /**
+         Perform a scheduled RESUME
+
+         \param condition a bit map with the resume condition
+             (see enum TaskScheduling)
+         \param at the time for the continuation
+         \param after the requested delay befor continuation
+         \param when the (external) Interrupt which should be awaited
+      */
+      void resume(int condition, Clock at = 0.0, Duration after = 0.0,
+                  Interrupt when = Interrupt());
+
+      /**
+         remove all scheduled action for the task
+
+         <ul>
+         <li>reset all internal scheduling parameters to the reset state
+         <li>stop timer
+         </ul>
+
+      */
+      void prevent();
+
+      /**
+         retrieve the tasks thread id
+
+         The thread id changed at each activation. Linux
+         guarantees no monotonic behavior.
+
+         \returns the posix thread id (pid), if activated<br>
+                  or 0 if terminated
+      */
+      pthread_t getPid();
+
+      /**
+         retrieve the tasks entry
+
+         required internally for run time task identification
+
+         \return the function pointer of the posix thread function
+      */
+      TaskEntry getEntry();
+
+
+      /**
+         Handler to be called after a scheduled activation of a task
+         is detected
+
+         It updates the internal data and enshures to cancel further
+         activation calls in
+         case the final activation is reached
+      */
+      void activateHandler();
+
+      /**
+         perform the resume
+      */
+      void resumeHandler();
+
+      /**
+         Handler to be called after a scheduled continuation
+         of a task is detected
+
+         It updates the internal data and enshures to cancel further
+         activation calls in case the final cycle is reached
+      */
+      void continueHandler();
+
+      /**
+         switch to normal scheduling
+
+         In case of starting the system without root priviledges,
+         there is currently no possibility
+         to use the realtime scheduler of linux.
+         For many applications normal scheduling policy
+         is sufficient. This is set by this method.
+      */
+      static void useNormalScheduler();
+
+      /**
+        deliver detailed information about this task
+
+
+        \param lines array of buffers for the information ( type char [3][80] )
+        \returns number of information lines
+      */
+      int detailedTaskState(char * lines[3]);
+   };
+
+}
+
+/**
+C++ code for the forward declaration of a task
+
+\param t the name of the task without any additions
+*/
+#define   SPCTASK(t) \
+extern pearlrt::Task t;
+
+
+/**
+create to C++  code for the task definition
+
+this macros also creates the task-body function with the
+default exception handler
+
+Target systems without standard output must redefine these macros
+in a conventient way in there task-specification file
+
+\param x the name of the task
+\param prio the tasks priority (must be set to 255 if not given)
+\param ismain 1, if the task is of type MAIN,<br> 0,else
+*/
+#define DCLTASK(x, prio, ismain) 			\
+namespace pearlrt {					\
+   static void x ## _entry (pearlrt::Task * me) ;		\
+   static void x ## _body (pearlrt::Task * me) ;		\
+}							\
+pearlrt::Task x ( pearlrt::x ## _entry, (char*)#x, \
+                       prio, ismain);	\
+namespace pearlrt {					\
+static void x ## _entry (pearlrt::Task * me) { 		\
+      me->entry();  					\
+      try {						\
+         x ## _body (me);	 			\
+      } catch (pearlrt::Signal & p) {			\
+         char line[256];                                \
+         printf("++++++++++++++++++++++++++++++\n");	\
+         sprintf(line,"%s:%d Task: %s   terminated due to: %s",\
+             me->getLocationFile(), me->getLocationLine(), \
+             me->getName(), p.which());			\
+         printf("%s\n",line);				\
+         pearlrt::Log::error(line);			\
+         printf("++++++++++++++++++++++++++++++\n");	\
+      }							\
+      me->terminate();  				\
+   } 							\
+}							\
+							\
+static void pearlrt::x ## _body (pearlrt::Task * me)
+
+#endif
+
+

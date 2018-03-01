@@ -1,0 +1,5 @@
+\htgt{RefProcAssignment} ::=\\
+\x \hlink{Name}\S RefProcVariable \{ \kw{:=} $\mid$ \kw{=} \}  \\
+\x \{ \hlink{Identifier}\S Procedure $\mid$ \hlink{Name}\S RefProcVariable \}
+  \kw{;}
+

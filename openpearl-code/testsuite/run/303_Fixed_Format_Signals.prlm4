@@ -1,0 +1,82 @@
+/****************************************
+Testing for Signals thrown by PUT and GET
+Specification or ErrorReason added at the 
+top of every test division. 
+
+Earlier Tests included float for parameter
+values but the compiler should recognize that 
+as unvalid fixed expression.
+
+****************************************/
+MODULE(fixed_format_signals);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_exception.m4h})
+include({m4_testing.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Test1: TASK MAIN;
+     DCL (fixed_out,fixed_in) FIXED(15) INIT(0,0);
+     DCL result_fixed FIXED(63) INIT (0);
+     DCL result_float FLOAT(53) INIT(0.0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+
+     
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+     fixed_out := 1;
+
+/************ FieldWidth ::= Expression§WithPositiveIntegerAsValue ***********/
+
+     EXPECT_NOTHROW({PUT fixed_out TO pipe_out BY F(1);});
+     EXPECT_THROW({PUT fixed_out TO pipe_out BY F(0);});
+     EXPECT_THROW({PUT fixed_out TO pipe_out BY F(-1);}); 
+
+/************ DecimalPositions ::= Expression§WithNonNegativeIntegerAsValue *********/
+
+     EXPECT_NOTHROW({PUT fixed_out TO pipe_out BY F(1,0);});
+     EXPECT_NOTHROW({PUT fixed_out TO pipe_out BY F(2,1);});
+     EXPECT_THROW({PUT fixed_out TO pipe_out BY F(2,-1);});
+     EXPECT_THROW({PUT fixed_out TO pipe_out BY F(2,-2);});
+
+/************ ScaleFactor ::= Expression§WithIntegerAsValue **********/
+
+     EXPECT_NOTHROW({PUT fixed_out TO pipe_out BY F(1,0,0);});
+     EXPECT_NOTHROW({PUT fixed_out TO pipe_out BY F(1,0,1);});
+     EXPECT_NOTHROW({PUT fixed_out TO pipe_out BY F(1,0,-1);});
+   
+/************ Decimal Point Number Bigger than Field Width ***********/
+
+    EXPECT_THROW({PUT fixed_out TO pipe_out BY F(1,2);});
+
+/************ Input Field Width is 0 ********************/
+
+    EXPECT_THROW({GET fixed_in FROM pipe_in BY F(0);}); 
+
+
+
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+include({m4_check_header.m4h})
+
+END;
+MODEND;
+

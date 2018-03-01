@@ -1,0 +1,4 @@
+\htgt{Name} ::=\\
+\x \hlink{Identifier} [ ( \hlink{Index} [ , 
+	\hlink{Index} ] $^{...}$ ) ] [ . \hlink{Name} ]
+

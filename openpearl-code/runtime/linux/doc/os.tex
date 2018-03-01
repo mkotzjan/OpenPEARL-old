@@ -1,0 +1,69 @@
+\section{System Overview}
+
+PEARL tasks on a PEARL application are mapped the pthreads in a single
+process.  The thread scheduling is done by the system scheduler of the 
+linux system. If the apllication runs with normal user priviledges, the
+completly fair scheduler (CFS) is used and PEARL priorities are not
+regarded at task scheduling. In run with root priviledges, the 
+\texttt{SCHED\_FIFO} scheduler is used, which provides the 
+PEARL-specific preemtive priority scheduling with the lack of some 
+priority levels.
+
+The timing functions are taken from the native itimer system.
+The clock resolution is defined by the settings in the linux system.
+
+\subsection{Tasks}
+The tasks are realized as static objects of type Task.
+The tasks ctor adds itself into a list which contains all tasks.
+This list is used for lookup reasons. 
+The macros \texttt{DCLTASK} and \texttt{SPCTASK} are provided in 
+\texttt{Task.h}. They map the PEARL-tasks to the class \texttt{Task}.
+
+\subsection{System Initialisation}
+The PEARL application is started from the main, which is located in 
+\verb|os.cc| ({\em Operation System}).
+
+The system startup contains several steps:
+\begin{description}
+\item[read runtime configuration file] from the current directory or ---
+   if not found in the user home directory.
+   The configuration file is named \texttt{.pearlrc}.
+   It is possible to modify the log level, maximum cpu time and number of 
+   used cores. 
+   For details see the description in the file (\ref{pearlrc}).
+\item[setup CPU affinity] to the first CPU, regardless of the
+   total number of available CPUs. This is done to get a more simple
+   system behavior to verify the scheduling behavior.
+\item[setup the task scheduler] to \verb|SCHED_FIFO| which provides
+   the same behavior as PEARL requires. Tasks with the same priority
+   are run with round-robin, tasks with differnt priority are run with
+   preemptive priority scheduling.
+   This operation needs root-priviledges. If the PEARL application is 
+   started with normal user priviledges, this is detected and the 
+   Linux {\em completely fair scheduler} is used.
+\item[setup of run time limit] to 180 seconds. This is a fail safe
+   operation to end the application automatically in case to run away
+   high priority task. Pending on the Linux keernel configuration,
+   it would be possible that no shell input like CTRL-C is will
+   be done, when the complete CPU-power is consumed by a free running thread.
+\item[start of a thread] to do all timer operations. This thread 
+   receives the real-time signals for the scheduled tasking operations.
+
+   The signal data
+   structure deliver the task, which shall get the requested operation.
+   \begin{description}
+    \item[SIGRTMIN] for scheduled suspend (obsolete)
+    \item[SIGRTMIN+1] for scheduled activations
+    \item[SIGRTMIN+3] for scheduled continue
+    \end{description}
+\item[setup no more tasks handler] to end the PEARL application.
+   In desktop environments, the application should return to the 
+   command prompt if no more activity is possible.
+   The {\em TaskMonitor} maintains a counter of pending and active 
+   tasks. If this counter reaches $0$, the signal SIGRTMIN+4 is emitted.
+   The corresponding signal handler performs a shutdown of the application.
+\item[start of main-tasks] will activate all tasks with the attribute
+     \verb|MAIN| in sequence according their priority.
+\end{description}
+
+

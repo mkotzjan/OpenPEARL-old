@@ -1,0 +1,12 @@
+__cpp__(
+  'static pearlrt::StdStream s_terminal(1);'
+  'pearlrt::Device *d_terminal = &s_terminal;'
+  'static pearlrt::StdStream s_keyb(0);'
+  'pearlrt::Device *d_keyb = &s_keyb;'
+);
+__cpp__(
+  'pearlrt::SystemDationNB* _terminal = '
+  'static_cast<pearlrt::SystemDationNB*>(d_terminal);'
+  'pearlrt::SystemDationNB* _keyb = '
+  'static_cast<pearlrt::SystemDationNB*>(d_keyb);'
+);

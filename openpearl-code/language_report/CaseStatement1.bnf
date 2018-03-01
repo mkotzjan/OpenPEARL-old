@@ -1,0 +1,6 @@
+\htgt{CaseStatement1} ::=\\
+\x \kw{CASE} \hlink{Expression}$\S $WithIntegerAsValue\\
+\x \{ \kw{ALT}  \hlink{Statement} $^{...}$  \} $^{...}$\\
+\x [ \kw{OUT}  \hlink{Statement} $^{...}$  ]\\
+\x \kw{FIN} \kw{;}
+

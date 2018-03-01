@@ -1,0 +1,3 @@
+\htgt{ResultAttribute} ::=\\
+\x \kw{RETURNS (} \hlink{ResultType} \kw{)} 
+

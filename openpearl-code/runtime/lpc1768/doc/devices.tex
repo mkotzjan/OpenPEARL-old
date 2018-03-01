@@ -1,0 +1,269 @@
+\section{Devices}
+
+\subsection{Lpc17xxDigitalIn}
+The device Lpc17xxDigitalIn provides digital input bits on all
+GPIO bits of the LPC1768. It is {\em NOT} checked, whether the 
+required bits are in use by other devices.
+
+The LPC1768 provides 5 GPIO ports, numbered from 0 to 4.
+Each port has a maximum of 32 bits.
+It is stated in the user manual, that a lot of bits are not
+available.
+
+Synopsis: \verb|Lpc17xxDigitalIn(port, start, width)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,1,2,3,4
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     are 31..0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..32.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by reading a BIT(width)-value from the
+opened system dation.
+Writing other data than BIT-types  may cause a signal, if the size of the
+data does not match the required size according the width.
+
+\subsection{Lpc17xxDigitalOut}
+The device Lpc17xxDigitalOut provides digital output bits on all
+GPIO bits of the LPC1768. It is {\em NOT} checked, whether the 
+required bits are in use by other devices.
+
+The LPC1768 provides 5 GPIO ports, numbered from 0 to 4.
+Each port has a maximum of 32 bits.
+It is stated in the user manual, that a lot of bits are not
+available.
+
+Synopsis: \verb|Lpc17xxDigitalOut(port, start, width)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,1,2,3,4
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     are 31..0
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers are 1..32.
+     The group must fit into one port.
+\end{description}
+
+The access to the dation is done by writing a BIT(width)-value to the
+opened system dation.
+Writing other data than BIT-types  may cause a signal, if the size of the
+data does not match the required size according the width.
+
+\subsection{Lpc17xxInterrupt}
+The device Lpc17xxInterrupt provides interrupt sources from GPIO inputs.
+The LPC1768 can produce interrupts on both edges of the GPIO ports 0 and 2.
+The Lpc17xxInterrupt device produces interrupts {\em only on the falling edge}. 
+
+Synopsis: \verb|Lpc17xxInterrupt(port, bit)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,2
+\item[bit] specifies the number of the  bit to monitor.
+ Valid numbers are 31..0. 
+\end{description}
+
+Note: The LPC1768 does monitor only bits
+0-11 and 15-30 on port 0 and 0-13 on port 2.
+
+The landtiger board has Key1 on P2.11 and SW2 an P2.10.
+For usage of SW2 the jumper JP5 must be closed (which is the
+usual position if working with lpc21isp download).
+
+
+\subsection{Lpc17xxUart}
+The device Lpc17xxUart provides access to the serial ports of the LPC1768.
+Since the LandTiger board provide access only to uart0 and uart2, which
+both lack of hardware control lines, no hardware handshake is provided 
+in the driver.
+The device provides the possibility of line editing as well as raw data
+transfer.
+The used terminal must support backspace for line edit functions!
+
+Synopsis: \verb|Lpc17xxUart(port, baud, bits, stopbits, parity, mode)|
+
+\begin{description}
+\item [port] specifies the port number. Valid numbers are 0,2
+\item[baud] specifies the baud rate. The usual baud rates from 300 up to 115200 are supported.
+\item[bits] the number of bits per character (5-8 are ok)
+\item[stopbits] the number of stopbits
+\item[parity] parity 'O', 'E', or 'N'
+\item[mode] provides additional switches
+   \begin{description}
+   \item[Bit 0-15] Input buffer size --- required for line edit function
+   \item [Bit 16] 1=line editing enabled; needs an input buffer size > 0
+   \item [Bit 17] 1=xon/xoff; 0=no protocol
+   \end{description}
+   Examples:
+   \begin{itemize}
+   \item  0x3 xon/xoff protocol and line editing
+   \item  0x0 raw data transfer
+   \end{itemize}
+\end{description}
+ 
+Note: If local edit is selected, the device may be used only in 
+half duplex mode. The input buffer is needed.
+All received characters are stored in the input buffer, which is 
+realized as a non blocking ring buffer. If the buffer is full, a  '?'
+(question mark) is displayed and the character is discarded. Backspace 
+must be used to remove the last character.
+On reception of carriage return (0x0d), the input buffer is returned to 
+the application.
+
+Note: The function \verb|printf| ends up in the function \verb|_write()|, which
+is implemented in e.q. \verb|lpc17_uart_retarget.c|. The implementation
+in \verb|lpc17_uart_retarget.c| works with simple polling on the line status
+register. This behavior does not cooperate von \verb|Lpc17xxUart(0,...)|
+
+
+\subsection{Hy32}
+The LCD graphics display supports a resolution of 320x240 Pixel with
+a color resolution of 5 bit (red and blue) 6 bit (green).
+
+The display may be used in all 4 orientations. The device supports
+text positioning and output with two fonts. The positioning is done with
+a subset of vt100 esc-sequences.
+The device supports no scrolling, since only vertical scroll is supported 
+by hardware.
+
+The following codes are supported. Note that CSI stand for
+control sequence initiator, which is an ESC-character abd and opening square 
+brace (\verb|"\033["| in C-notation):
+\begin{description}
+\item[{\em CSI}  {\em li};{\em col} H] 
+    Set position. {\em li} and {\em col} are the line
+    number and column number starting at 1 each. Both elements may contain
+    1 or 2 digits (without leading space). Example \verb|\033[01;01H|
+ is cursor home
+\item[{\em CSI}  {\em n} J]  clear screen\\
+n=0: fill screen from current cursor location to the end of the 
+    screen with the current background color
+\\
+n=1: fill screen from current cursor location to the beginning of the 
+    screen with the current background color
+\\
+n=2: fill entire screen with the current background color
+\item[{\em CSI}  {\em n} m] {\em set Grafic Rendition}
+    \begin{description}
+    \item[n=10] select normal font (here: small font)
+    \item[n=11] select alternate font (here: big font)
+    \item[n=30-37] set foreground color according table below (n=30+index)
+    \item[n=40-47] set background color according table below (n=40+index)
+    \end{description}
+\end{description}
+
+Note that the calculation of the text position is done according the 
+selected font(-size). If the font size is changed the new font geometry 
+is used to calculate the pixel adress. The vertical spacing between two lines
+is set to 2.
+
+Note that clearing the display does no affect the cursor location, 
+font selection and color setting.
+
+\begin{tabular}{|l|l|c|}
+\hline
+index & color  & rgb \\
+\hline
+0 & black  & 0,0,0\\
+1 & red  & 170,0,0\\
+2 & green & 0, 170, 0 \\
+3 & yellow & 255,255,0 \\
+4 & blue & 0,0,170\\
+5 & magenta & 170,0,170\\
+6 & cyan & 0,170,170\\
+7 &white & 255,255,255\\
+\hline
+\end{tabular}
+
+Screen capacity:
+
+\begin{tabular}{|l|l|l|l|}
+\hline
+Orientation & Font & Lines & Columns \\
+\hline
+ 0 & small & 22 & 30  \\
+   & big   & 14 & 15 \\
+\hline
+1 & small & 17 & 40 \\
+  & big &   13 & 20 \\
+\hline
+ 2 & small & 22 & 30  \\
+   & big   & 14 & 15 \\
+\hline
+3 & small & 17 & 40 \\
+  & big &   13 & 20 \\
+\hline
+\end{tabular}
+
+\subsection{USB Support on LPC1768}
+There is no hub support on microcontroller systems. Therefore only one USB device
+may be attached to the system.
+The USB stack of LPCOpen is used.
+The USB stack was modified in order to remove active wait loops.
+The steps of the enumeration is now invoked from the usb-poll task, which
+runs on a cycle time of 1ms.
+The cycle limits were reduced to wait only one 
+or two intervals.
+
+The interrupt service routine was moved into the separate module
+ Lpc17xxISRProxy. 
+This module invokes the interrupt service routine from LPCOpen via a
+ dynamically set function pointer.
+
+The common part to all USB devices is located in the module Lpc17xxUsb. 
+A callback mechanism is used to finalize the setup of the device enumeration,
+the notification of disconnection and the body of the usb poll task. The poll task
+itself is located in the Lpx17xxUsb module.
+The detection of new devices is treated in the module Lpc17xxUsb. New devices are logged 
+with info-level.
+
+\paragraph{Licencing}
+The LPCOpen USB stack may only be used in conjunction of a microcontroller from NXP.
+This is fullfilled by default, since the LPCOpen functions work only with NXP
+controllers.
+
+\subsection{Lpc17xxUsbKeyboard}
+This driver supports a keyboard with german key layout.
+Only the codes of the 7-bit-US-ASCII code are treated - all other
+keys are dead.
+
+\subsection{Lpc17xxUsbDisk}
+This driver provides a disk functionality via the USB-stack.
+The OpenPEARL device is choosen by the FatFS system entry, which 
+depends only on Chan FAT filesystem.
+The Lpc17xxUsbDisk configuration entry
+activates the low level device driver via the LPCOpen USB stack.
+
+\subsection{Lpc17xxSDCard}
+The SD-card support is solved with a generic approach.
+There is a platform independent part (see \ref{sec:SDCardSpi}), which
+needs the board specific support for the SPI-transfers of single 
+bytes and byte arrays, as well as a card detection function.
+The presnece of a card is monitored by the generic part with and 
+any status changes are treated at the next operation on the sd-card.
+
+\subsection{Device Summary}
+Table \ref{lpc17_device_list} contains all avaliable device drivers 
+with additional information for the system overview.
+
+\begin{table}
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+Name             & Int\_Prio & Exception Number(s) & RAM & ROM \\
+\hline
+Lpc17xxRTC       &  5 & 33 & ? & ?\\ 
+Lpc17xxTimer0    &  5 &  17 & ? & ?\\
+Lpc17xxInterrupt & 10 &  37 & ? & ?\\
+Lpc17xxUart      & 10 &  21(UART0), 23(UART2) & ? & ?\\ 
+Lpc17xxUsbKeyboard  & 10 &  40 & 4kB & 8.9 kB \\ 
+\hline
+\end{tabular}
+\caption{Device Drivers with interrupt usage.}
+\label{lpc17_device_list}
+\end{table}
+
+The interrupt execution is preemptive, with lower priority first and 
+sequential within same priority starting with lower exception number first.
+

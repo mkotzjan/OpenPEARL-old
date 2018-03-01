@@ -1,0 +1,6 @@
+%%%\begin{added}
+\htgt{ListOfConstants} ::=\\
+\x \hlink{ConstantParameter} 
+	[, \hlink{ConstantParameter} ] $^{...}$ 
+%%%\end{added}
+

@@ -1,0 +1,11 @@
+\htgt{LoopStatement} ::=\\
+\x [ \kw{FOR} \hlink{Identifier}$\S $ControlVariable ]\\
+\x [ \kw{FROM} \hlink{Expression}$\S $InitialValue ]\\
+\x [ \kw{BY} \hlink{Expression}$\S $StepLength ]\\
+\x [ \kw{TO} \hlink{Expression}$\S $EndValue ]\\
+\x [ \kw{WHILE} \hlink{Expression}$\S $Condition ]\\
+\x \kw{REPEAT}\\
+\x \x [\{ \hlink{Declaration} $\mid$ \hlink{Identification} \}$^{...}$ ]\\ 
+\x \x [ \hlink{Statement} $^{...}$ ] \\
+\x \kw{END} [ \hlink{Identifier}$\S $Loop ] \kw{;}
+        

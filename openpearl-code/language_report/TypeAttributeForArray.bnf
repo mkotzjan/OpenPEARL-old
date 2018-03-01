@@ -1,0 +1,20 @@
+%%%\begin{discuss}
+%%%REF INTERRUPT/IRPT und SIGNAL erlaubt???
+%%%vgl. TypeReference
+%%%% discussion result 8.2.2018: there seams to be no problem to
+%%%%                             support references to INTERRUPTS and SIGNAL
+
+\htgt{TypeAttributeForArray} ::=\\
+\x \hlink{SimpleType} $\mid$ \hlink{TypeStructure} \\
+%%\x \htgt{TypeInteger} $\mid$ \hlink{TypeFloat} \\
+%\x $\mid$ \hlink{TypeDuration} $\mid$ \hlink{TypeClock} \\
+%\x $\mid$ \hlink{TypeBitString} $\mid$ \hlink{TypeCharacterString} \\
+\x $\mid$ \hlink{TypeDefinition} 
+%%% added
+\\$\x \mid$ \kw{REF} \{ \hlink{TypeDation} $\mid$ \kw{SEMA} $\mid$ \kw{BOLT} \\
+\x \x $\mid$ \hlink{TypeProcedure} $\mid$ \kw{TASK} $\mid$ \kw{CHAR()} \\
+\x \x $\mid$ \kw{INTERRUPT} $\mid$ \kw{IPRT} $\mid$ \kw{SIGNAL} \\
+\x \x \}
+
+%%%\end{discuss}
+

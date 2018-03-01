@@ -1,0 +1,86 @@
+MODULE(userdation_open);
+! use open with all possible attributes
+SYSTEM;
+! Disc defines a folder on the file system. The second parameters
+! denotes the maximum number of simultaneous open files
+disc: Disc('/tmp/' ,10);
+output: StdOut;
+
+/* expected C++ code from system part  
+__cpp__(
+     ' // system decl'
+     'static pearlrt::Disc s_disc("/tmp/", 10);'
+     'pearlrt::Device * d_disc = & s_disc;'
+     'static pearlrt::StdOut s_output;'
+     'pearlrt::Device * d_output = &s_output;'
+);
+*/
+/* expected C++ code from SPC in problem part
+__cpp__(
+     ' // problem  decl in system part'
+    'extern pearlrt::Device *d_disc;'
+    'static pearlrt::SystemDationNB *_disc = '
+    '      static_cast<pearlrt::SystemDationNB*>(d_disc);'
+    'extern pearlrt::Device *d_output;'
+    'static pearlrt::SystemDationNB *_output = '
+    '      static_cast<pearlrt::SystemDationNB*>(d_output);'
+);
+  */
+
+PROBLEM;
+   SPC disc DATION INOUT SYSTEM ALL;
+   SPC output DATION OUT SYSTEM ALPHIC GLOBAL;
+   DCL tableAlphicForward2u DATION OUT ALPHIC DIM(*,10) FORWARD
+             CREATED(disc);
+   DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(output);
+
+ttt: TASK;
+   DCL f FIXED(31);   ! RST-value
+   DCL f15 FIXED(31);   ! RST-value
+
+   OPEN termout;
+   OPEN tableAlphicForward2u BY OLD;
+   OPEN tableAlphicForward2u BY NEW;
+   OPEN tableAlphicForward2u BY ANY;
+   OPEN tableAlphicForward2u BY OLD, IDF('test.dat');
+   OPEN tableAlphicForward2u BY NEW, IDF('test.dat');
+   OPEN tableAlphicForward2u BY ANY, IDF('test.dat');
+   OPEN tableAlphicForward2u BY OLD, CAN;
+   OPEN tableAlphicForward2u BY NEW, CAN;
+   OPEN tableAlphicForward2u BY ANY, CAN;
+   OPEN tableAlphicForward2u BY OLD, CAN, IDF('test.dat');
+   OPEN tableAlphicForward2u BY NEW, CAN, IDF('test.dat');
+   OPEN tableAlphicForward2u BY ANY, CAN, IDF('test.dat');
+   OPEN tableAlphicForward2u BY OLD, PRM;
+   OPEN tableAlphicForward2u BY NEW, PRM;
+   OPEN tableAlphicForward2u BY ANY, PRM;
+   OPEN tableAlphicForward2u BY OLD, PRM, IDF('test.dat');
+   OPEN tableAlphicForward2u BY NEW, PRM, IDF('test.dat');
+   OPEN tableAlphicForward2u BY ANY, PRM, IDF('test.dat');
+   OPEN tableAlphicForward2u BY OLD, RST(f);
+   OPEN tableAlphicForward2u BY NEW, RST(f);
+   OPEN tableAlphicForward2u BY ANY, RST(f);
+   OPEN tableAlphicForward2u BY OLD, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY NEW, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY ANY, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY OLD, CAN, RST(f);
+   OPEN tableAlphicForward2u BY NEW, CAN, RST(f);
+   OPEN tableAlphicForward2u BY ANY, CAN, RST(f);
+   OPEN tableAlphicForward2u BY ANY, CAN, RST(f15);
+   OPEN tableAlphicForward2u BY OLD, CAN, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY NEW, CAN, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY ANY, CAN, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY OLD, PRM, RST(f);
+   OPEN tableAlphicForward2u BY NEW, PRM, RST(f);
+   OPEN tableAlphicForward2u BY ANY, PRM, RST(f);
+   OPEN tableAlphicForward2u BY OLD, PRM, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY NEW, PRM, IDF('test.dat'), RST(f);
+   OPEN tableAlphicForward2u BY ANY, PRM, IDF('test.dat');
+
+   ! changed sequence of parameters
+   OPEN tableAlphicForward2u BY PRM, IDF('test.dat'), RST(f), OLD;
+   OPEN tableAlphicForward2u BY IDF('test.dat'), RST(f), OLD, PRM;
+   OPEN tableAlphicForward2u BY RST(f), OLD, PRM, IDF('test.dat');
+END;
+MODEND;
+

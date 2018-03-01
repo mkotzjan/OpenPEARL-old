@@ -1,0 +1,13 @@
+   <dation name="LM75">
+      <parameters>
+         <BIT length="8">
+            <VALUES>
+            '48'B4, '49'B4, '4A'B4, '4B'B4,
+            '4C'B4, '4D'B4 , '4E'B4, '4F'B4
+            </VALUES>
+         </BIT>
+      </parameters>
+      <attributes>SYSTEM, BASIC, IN</attributes>
+      <data>FIXED(15)</data>
+      <needAssociation name="I2CBusProvider" />
+   </dation>

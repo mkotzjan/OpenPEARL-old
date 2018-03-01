@@ -1,0 +1,6 @@
+\htgt{ScalarDeclareDataSentence} ::=\\
+%%%\x IdentifierDenotation
+\x  \hlink{OneIdentifierOrList}
+    [ \kw{INV} ] \hlink{TypeAttribute} [ \hlink{GlobalAttribute} ]\\
+\x [ \hlink{InitialisationAttribute} ]
+

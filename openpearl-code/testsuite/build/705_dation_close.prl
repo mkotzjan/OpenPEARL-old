@@ -1,0 +1,41 @@
+MODULE(userdation_close);
+! use close with all possible attributes
+SYSTEM;
+! Disc defines a folder on the file system. The second parameters
+! denotes the maximum number of simultaneous open files
+disc: Disc('/tmp/' ,10);
+
+/* expected C++ code  
+__cpp__(
+     ' // system decl'
+     'static pearlrt::Disc s_disc("/tmp/", 10);'
+     'pearlrt::Device * d_disc = & s_disc;'
+);
+
+/* expected c++ code form SPC in problem part 
+__cpp__(
+     ' // problem  decl in system part'
+    'extern pearlrt::Device *d_disc;'
+    'static pearlrt::SystemDationNB *_disc = '
+    '      static_cast<pearlrt::SystemDationNB*>(d_disc);'
+);
+  */
+
+PROBLEM;
+   SPC disc DATION INOUT SYSTEM  ALL;
+   DCL tableAlphicForward2u DATION OUT ALPHIC DIM(*,10) FORWARD
+             CREATED(disc);
+
+ttt: TASK;
+   DCL f FIXED(31);   ! RST-value
+
+   CLOSE tableAlphicForward2u;
+   CLOSE tableAlphicForward2u BY CAN;
+   CLOSE tableAlphicForward2u BY PRM;
+   CLOSE tableAlphicForward2u BY CAN, RST(f);
+   CLOSE tableAlphicForward2u BY PRM, RST(f);
+   CLOSE tableAlphicForward2u BY RST(f), CAN;
+   CLOSE tableAlphicForward2u BY RST(f), PRM;
+END;
+MODEND;
+

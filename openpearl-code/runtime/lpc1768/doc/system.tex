@@ -1,0 +1,95 @@
+\section{Memory Layout}
+The LPC1768 provides two RAM memory regions of 32kB each.
+The first region contains the \texttt{.data}-segment and the 
+\texttt{.bss}-segment of non OpenPEARL-application tasks.
+
+The second region contains the stacks and tcbs of the OpenPEARL application 
+tasks and the FreeRTOS heap. This is solved via the gcc-extention
+\texttt{\_\_attribute\_\_((section ("PEARL\_APPLICATION")))}
+in the task definition in \texttt{GenericTask.h}.
+The linker script gathers these elements into the second memory region.
+
+This partitioning allows an easy distribution of the data into the two
+RAM regions. There were no considerations about speed. The second memory
+block seems to be slower in access than the first memory region.
+ 
+\section{Principle of the Time Base}
+The LPC1768 is a Cortex-M processor. FreeRTOS uses the systick timer 
+for the sytem tick interrupt. 
+\begin{description}
+\item[FreeRTOS/addOns/CortexMclock.cc] provides a more precise value to
+ the current time than on tick.
+This is done
+by the calulation of the fraction, which is passed in the current tick.
+This calulation is based on the Cortex-M specific systick registers
+{\em SYSTICK\_CURRENT\_VALUE\_REG} and {\em SYSTICK\_LOAD\_REG}.
+\item[lpc1768/Lpc17xxRTC.cc] provides a system time base, which is 
+initialized with the RTC value at system start.
+\item[lpc1768/Lpc17xxTimer0.cc] provides a system time base, which works 
+with the TIMER0.
+\end{description}
+
+\section{System Time Base Selection}
+Lpc17xxClock provides a pseudo device in order
+   to specify the time base for the PEARL application individually. E.g.
+
+\begin{verbatim}
+SYSTEM;
+  myClock: Lpc17xxClock(1);  ! start with the time in the RTC
+\end{verbatim}
+
+The following modes are avaliable:
+\begin{description}
+\item[Lpc17xxClock(0)] the default time base. It starts at 1.1.1970 0:00
+   and works with the systick based relative ticks with a resolution of 1 ms.
+\item[Lpc17xxClock(1)] is similar to Lpc17xxClock(1), but it provides
+   interpolated time values  for the \texttt{NOW}-function 
+   from the registers of the systick timer.
+\item[Lpc17xxClock(2)] differs from \texttt{Lpc17xxClock(1)} by the fact 
+    that the initial date and time is taken from the RTC.
+    In case that the RTC does not contain a useful value, the RTC
+    is initialized with the default date of 1.1.2016 0:0:0.
+    If the RTC does not start, the programs exits.
+\item[Lpc17xxClock(3)] operates with a separate timer. This method
+    provides a clock resolution of $10 \mu s$. The initial time is taken
+    from the RTC like described in \texttt{Lpc17xxClock(2)}.
+\item[Lpc17xxClock(4)] is similar to \texttt{Lpc17xxClock(3)}. 
+    The difference is a synchronisation to the 1 seconds tick of the RTC.
+    This causes small drifts in frequency but there is no gap in time 
+    between resets. The synchronisation starts after 2 seconda.
+    It takes approximatelly  5 seconds to enshure a time difference of
+     less that $10\mu s$.
+\end{description}
+
+The preferred clocks are 
+\begin{itemize}
+\item \texttt{Lpc17xxClock(3)} for closed loop control systems
+\item \texttt{Lpc17xxClock(4)} for open loop control systems
+\end{itemize} 
+
+
+\section{Power-On-Self-Test (POST)}
+This module provides some information about the system usage.
+
+Tests for e.g. memory are not implemented yet.
+
+The POST may be selected via a pseudo device in the systempart of the 
+OpenPEARL application.
+
+\begin{description}
+\item[Post(0)] invokes the POST module to display the POST status
+\item[Post(1)] in addition to Post(0), the module wait for user input
+   to e.q. set the RTC
+\end{description}
+
+
+\section{class PrioMapper}
+The class PrioMapper performs a 1 by 1 mapping of PEARL priorities to FreeRTOS
+priorities. For background operations, some additional priorities are reserved.
+
+The background threads are for e.g.  the system thread or spooler threads
+for i/o operations.
+
+The priorities of these threads are stored as defines in the file
+\texttt{allTaskPriorities.h}
+ 

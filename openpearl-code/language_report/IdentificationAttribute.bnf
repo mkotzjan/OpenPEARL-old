@@ -1,0 +1,3 @@
+\htgt{IdentificationAttribute} ::= \\
+\x \kw{IDENT} ( \hlink{Name}$\S $Object )\\
+

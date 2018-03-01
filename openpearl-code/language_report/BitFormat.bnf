@@ -1,0 +1,4 @@
+\htgt{BitFormat} ::=\\
+\x \{ \kw{B} $\mid$ \kw{B1} $\mid$ \kw{B2} $\mid$ \kw{B3} $\mid$ \kw{B4} \}
+	 [ \kw{(} \hlink{Expression}$\S $NumberCharacters\kw{)} ]
+

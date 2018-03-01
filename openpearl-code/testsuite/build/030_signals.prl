@@ -1,0 +1,72 @@
+MODULE(signals);
+SYSTEM;
+   overfl: FixedOverFlowSignal;    
+   div0:   FixedDivideByZeroSignal;
+   arith:  ArithmeticSignal;
+
+ PROBLEM;
+   SPC overfl SIGNAL;
+   SPC div0   SIGNAL;
+   SPC arith  SIGNAL;
+   XX: PROC (p FIXED) 
+      DCL k FIXED(15);
+
+      k := 2;
+
+restart: 
+      ! signal action #1
+      ON overfl BEGIN
+         PUT 'PROC X: Arithmetic error (returning)' TO console BY A, SKIP;
+      END;
+
+      ! signal action #2
+      IF p = 1 THEN
+         ON overfl BEGIN
+            PUT 'PROC X: Overflow occured (terminating)' TO console BY A, SKIP;
+            TERMINATE;     
+         END;
+      FIN;
+      
+      IF  p > 5 THEN
+      ! signal action #3
+        ON overfl BEGIN
+           PUT 'PROC X: Overflow occured (returning)' TO console BY A, SKIP;
+        END;
+      FIN;
+
+      ! signal action #4
+      ON div0 BEGIN 
+          PUT 'Divide by zero (restarting)' TO console BY A, SKIP;
+          IF ( p =  6) THEN
+             goto exit;
+          ELSE
+             p := 6;
+             goto restart;
+          FIN;
+      END;
+      
+      IF p = 11 THEN
+          k := 10 / (k-k);  ! force 'div by 0'
+      FIN;
+
+      FOR i TO 100 REPEAT
+        k := k * k;
+      END;
+exit:
+  END;
+
+  TASK1: TASK MAIN;
+      FIXED(15) f;
+
+      f = 0;
+      x(f);
+      f = 11;
+      x(f);
+      f = 10;
+      x(f);
+      f = 1;
+      x(f);
+   END;
+END;
+
+

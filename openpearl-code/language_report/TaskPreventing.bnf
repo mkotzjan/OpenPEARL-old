@@ -1,0 +1,3 @@
+\htgt{TaskPreventing} ::=\\
+\x {\bf PREVENT} [ \hlink{Name}$\S $Task ] ;\\
+

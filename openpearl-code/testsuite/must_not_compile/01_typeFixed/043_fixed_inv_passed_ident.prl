@@ -1,0 +1,15 @@
+MODULE(m1);
+PROBLEM;
+
+p: PROC(f FIXED IDENT);
+   f := 1;
+END;
+
+a: TASK;
+  DCL g INV FIXED INIT(1);
+
+  CALL p(g);  ! illegal, since g would be mututable in a
+
+END;
+
+MODEND;

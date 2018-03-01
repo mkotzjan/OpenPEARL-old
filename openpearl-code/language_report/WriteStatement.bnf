@@ -1,0 +1,7 @@
+\htgt{WriteStatement} ::=\\
+\x \kw{WRITE} [ \{ \hlink{Expression} $\mid$ \hlink{Slice} \} 
+	[ \kw{,} \{ \hlink{Expression} $\mid$ \hlink{Slice} \} ] $^{...}$ ]\\
+\x \kw{TO} \hlink{Name}$\S $Dation 
+ 	[ \kw{BY} \hlink{Position} 
+	[ \kw{,} \hlink{Position} ] $^{...}$ ] \kw{;}
+      

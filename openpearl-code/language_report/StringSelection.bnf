@@ -1,0 +1,8 @@
+\htgt{StringSelection} ::=\\
+\x \hlink{Name}$\S $String . \{ \kw{BIT} $\mid$ \kw{CHAR} $\mid$
+    \kw{CHARACTER} \}\\
+%%%\x ( \{ \hlink{Constant-FIXED-Expression} [ : \hlink{Constant-FIXED-Expression} ]\\
+%%%\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} + \hlink{Constant-FIXED-Expression} ]\\
+%%%\x \x $\mid$ \hlink{Expression} [ : \hlink{Expression} ] \} )\\
+\x \x \kw{(} \hlink{Expression}\S Start [ \kw{:} \hlink{Expression}\S End ] \kw{)}
+

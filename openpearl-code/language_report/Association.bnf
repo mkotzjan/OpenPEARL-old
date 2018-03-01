@@ -1,0 +1,12 @@
+
+\htgt{Association} ::=\\
+\x  \kw{---} 
+       \{ \hlink{Identifier}$\S $UsernameOfConnectionProvider \\
+\x  $\mid$ \hlink{Identifier}$\S $ConnectionProviderSystemName
+         [ \kw{(} \hlink{ListOfConstants} \kw{)} ] \} \\
+\x      [ \kw{---}
+     \{ \hlink{Identifier}$\S $UsernameOfConnectionProvider \\
+\x   $\mid$ \hlink{Identifier}$\S $ConnectionProviderSystemName
+         [ \kw{(} \hlink{ListOfConstants} \kw{)} ] \}  ] $^{...}$ \\
+\x \kw{;}
+

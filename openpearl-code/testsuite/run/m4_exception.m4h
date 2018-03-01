@@ -1,0 +1,17 @@
+dnl
+define({EXPECT_THROW}, dnl
+        { __cpp__('try??<'); dnl
+        $1 dnl
+        check = check + 1; dnl
+        __cpp__('??> catch (pearlrt::Signal sig) ??<'); dnl
+        __cpp__('pearlrt::Log::error("%s:%d {EXPECT_THROW}: SUCESS, SignalRST:%d, SignalText:%s", "__file__", __line__, sig.whichRST(), sig.which());??>')}) dnl
+dnl
+define({EXPECT_NOTHROW}, dnl
+        { __cpp__('try??<'); dnl
+        $1 dnl
+        __cpp__('??> catch (pearlrt::Signal sig) ??<'); dnl
+        __cpp__('++_check.x;'); dnl
+        __cpp__('pearlrt::Log::error("%s:%d {EXPECT_NOTHROW}: FAILED, SignalRST:%d, SignalText:%s", "__file__", __line__, sig.whichRST(), sig.which());??>')}) dnl
+dnl
+
+

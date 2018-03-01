@@ -1,0 +1,6 @@
+\htgt{SignalFinalStatement} ::= \\
+\x \hlink{ReturnStatement}$\mid$ \\
+\x \hlink{GoToStatement}$\mid$ \\
+\x \hlink{InduceStatement} $\mid$ \\
+\x \kw{TERMINATE} \kw{;}
+

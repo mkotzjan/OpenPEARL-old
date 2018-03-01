@@ -1,0 +1,18 @@
+MODULE(logTest);
+SYSTEM;
+   stdout: StdOut;
+   Log('EWDI') --- stdout;
+!   lm75: LM75('12'B4) --- i2cbus;
+
+PROBLEM;
+   SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;
+   DCL term DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
+
+T1: TASK MAIN;
+   OPEN term;
+   PUT 'Hallo' TO term BY A, SKIP;
+   CLOSE term;
+END;
+
+MODEND;
+

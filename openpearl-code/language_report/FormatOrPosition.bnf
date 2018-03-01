@@ -1,0 +1,5 @@
+\htgt{FormatOrPosition} ::=\\
+\x [ \hlink{FormatFactor} ] \{ \hlink{Format} $\mid$ \hlink{Position} \}\\
+\x $\mid$ \hlink{FormatFactor} ( \hlink{FormatOrPosition} [ , \hlink{FormatOrPosition} ] $^{...}$ )\\
+     
+ 

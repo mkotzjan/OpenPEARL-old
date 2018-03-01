@@ -1,0 +1,13 @@
+MODULE(fixedinit);
+
+PROBLEM;
+
+   DCL x FIXED(31) INIT(1);
+   DCL x1 FIXED(31) INIT(-1);
+   DCL xx FIXED(63) INIT(1234567890);
+   DCL xxx FIXED(31) INIT(-1);
+   DCL xxxx FIXED(63) INIT(-1234567890);
+! define dummy task to produce a return code of 0
+T1: TASK MAIN;
+END;
+MODEND;

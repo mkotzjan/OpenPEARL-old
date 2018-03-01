@@ -1,0 +1,4 @@
+\htgt{Term} ::= \\
+\x \hlink{Factor} [ \{ \kw{*} $\mid$ \kw{//} 
+	$\mid$ \kw{REM} \} \hlink{Factor} ] $^{...}$
+

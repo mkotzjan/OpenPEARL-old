@@ -1,0 +1,3 @@
+003_no_module_name.prl:1:6: ERROR : Syntax error :no viable alternative at input ';'
+MODULE;
+      ^

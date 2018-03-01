@@ -1,0 +1,112 @@
+/************************************
+Testing the fixed type with monadic operators
+
+************************************/
+
+
+
+
+
+MODULE(Fixed_Operators_Monadic);
+changequote(`{',`}')
+include({m4_testing.m4h})
+
+SYSTEM;
+
+PROBLEM;
+
+Test1: TASK MAIN;
+    DCL check FIXED(15) INIT(0);
+    DCL (f1,f2,f3) FIXED(31) INIT(0,0,0);
+    DCL zero FIXED(31) INIT(0); 
+    
+    f1:= 1;
+    f2:= +f1;
+    f3:= f2 - 1;
+    
+    EXPECT_EQ({f3}, {zero});
+    
+    f2:= -f1;
+    f3:= f2 + 1;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= -1;
+    f2:= ABS f1;
+    f3:= f2 - 1;
+    
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 1;
+    f2:= ABS f1;
+    f3:= f2 - 1;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 1;
+    f2:= SIGN f1;
+    f3:= f2 - 1;
+    
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 0;
+    f2:= SIGN f1;
+    f3:= f2;
+
+    EXPECT_EQ({f3}, {zero});
+    
+    f1:= -1;
+    f2:= SIGN f1;
+    f3:= f2 + 1;
+    
+    EXPECT_EQ({f3}, {zero});
+
+    f2:= ENTIER(2.0);
+    f3:= f2 - 2;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f2:= ENTIER(1.9);
+    f3:= f2 - 1;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f2:= ENTIER(1.1);
+    f3:= f2 - 1;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f2:= ROUND(1.4);;
+    f3:= f2 - 1;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f2:= ROUND(1.5);
+    f3:= f2 - 2;
+
+    EXPECT_EQ({f3}, {zero});
+
+    f2:= ROUND(1.6);
+    f3:= f2 - 2;
+
+    EXPECT_EQ({f3}, {zero});
+
+/**************************************
+    verify the variable check
+    check = 0  -> SUCCESS
+    check /= 0 -> FAILED
+***************************************/
+
+
+    IF check == 0 THEN
+        __cpp__('printf ("*** SUCCESS *** \\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf ("*** FAILED *** \\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+
+
+END;
+MODEND;
+

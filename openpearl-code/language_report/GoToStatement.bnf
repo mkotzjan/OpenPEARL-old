@@ -1,0 +1,3 @@
+\htgt{GoToStatement} ::= \\
+\x \kw{GOTO} \hlink{Identifier}$\S $Label \kw{;}
+

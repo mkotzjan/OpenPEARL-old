@@ -1,0 +1,3 @@
+\htgt{ReturnStatement} ::= \\
+\x \kw{RETURN} [ \kw{(} \hlink{Expression} \kw{)} ] \kw{;}
+

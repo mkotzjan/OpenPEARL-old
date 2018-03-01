@@ -1,0 +1,3 @@
+\htgt{Letter} ::=\\
+\x A $\mid$ B $\mid$ ... $\mid$ Z $\mid$ a $\mid$ b $\mid$ ... $\mid$ z
+

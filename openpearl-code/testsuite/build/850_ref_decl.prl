@@ -1,0 +1,186 @@
+MODULE(ref_decl);
+
+PROBLEM;
+
+DCL
+    (k,l)         FIXED,
+    x             FLOAT,
+    r         REF FIXED,
+    (rk1,rk2) REF FIXED,     /* fixed reference variable */
+    rx        REF FLOAT;     /* float reference variable */
+
+DCL t         CLOCK;
+
+/*==========================================================================*/
+
+p1 : PROC;
+   rk1 := k;                    /* rk1 points at k */
+
+   __cpp__ (
+        "if (_rk1 == &_k) {                         "
+        "   printf(\"rk1 point to k: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"rk1 should point to k\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
+	);
+
+   rk1 := l;                    /* rk1 points at l */
+
+   __cpp__ (
+        "if (_rk1 == &_l) {                         "
+        "   printf(\"rk1 point to l: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"rk1 should point to l\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
+	);
+
+   rk2 := rk1;                  /* rk2 points at l, pointer assignment */
+
+   __cpp__ (
+        "if (_rk1 == _rk2) {                        "
+        "   printf(\"rk1 point to rk2: ok\n\");      "  
+        "} else {                                   "
+        "   printf(\"rk1 should point to rk2\n\");   "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
+	);
+
+   rx  := x;                    /* rx points at x */
+
+   __cpp__ (
+        "if (_rx == &_x) {                         "
+        "   printf(\"rx point to x: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"rx should point to x\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
+	);
+
+!   rx  := k;                    /* wrong, type unequal */
+!   rx  := rk1;                  /* wrong, type unequal */
+   l   := 2;
+   k   := CONT rk1;             /* k obtains value 2 */
+
+   __cpp__ (
+        "if ((_k == pearlrt::Fixed<2>(2)).getBoolean()) {            "
+        "   printf(\"k equal 2: ok\n\");        "
+        "} else {                                   "
+        "   printf(\"k should be equal to 2\n\");     "
+        "   pearlrt::Control::setExitCode(1);       "
+        "} "
+	);
+
+!   k   := CONT rx;              /* wrong, type unequal */
+!   rk2 := 3;                    /* wrong, 3 is no variable */
+
+   CONT rk2 := 3;               /* l obtains value 3 */
+
+  __cpp__ (
+       "if ((_l == pearlrt::Fixed<31>(3)).getBoolean()) {                         "
+       "   printf(\"l equal 3: ok\n\");        "
+       "} else {                                   "
+       "   printf(\"l should be equal to 3\n\");     "
+       "   pearlrt::Control::setExitCode(1);       "
+       "} "
+  );
+
+   CONT rk2 := k;               /* l obtains value 2 */
+
+  __cpp__ (
+       "if ((_l == pearlrt::Fixed<31>(2)).getBoolean()) {  "
+       "   printf(\"l equal 2: ok\n\");        "
+       "} else {                                   "
+       "   printf(\"l should be equal to 2\n\");     "
+       "   pearlrt::Control::setExitCode(1);       "
+       "} "
+  );
+
+END;
+
+/*==========================================================================*/
+
+p2: PROC(fixed_ptr REF FIXED);
+END;
+
+/*==========================================================================*/
+
+
+p3: PROC(fixed FIXED, fixed_ptr REF FIXED) RETURNS (REF FLOAT);
+    DCL local_ptr REF FLOAT;
+    DCL local_float FLOAT INIT(3.1415926);
+
+    ! error -- returning uninitialized pointer !
+    RETURN(local_ptr);
+END;
+
+/*==========================================================================*/
+
+p4: PROC RETURNS (REF FLOAT);
+    DCL local_ptr REF FLOAT;
+    DCL local_float FLOAT INIT(3.1415926);
+
+    local_ptr := local_float;
+    ! error -- returning pointer to stack variable!
+    RETURN(local_ptr);
+END;
+
+/*==========================================================================*/
+
+p5: PROC;
+    DCL fixed_ptr     REF FIXED;
+    DCL fixed8_ptr    REF FIXED(8);
+    DCL float_ptr     REF FLOAT;
+    DCL float24_prt   REF FLOAT(24);
+
+    DCL task_ptr      REF TASK;
+
+!    DCL proc_ptr      REF PROC (p REF FIXED);
+!    DCL signal_ptr    REF SIGNAL;
+!    DCL bolt_ptr      REF BOLT;
+!    DCL char1_ptr     REF CHAR;
+!    DCL char10_ptr    REF CHAR(10);
+!    DCL interrupt_ptr REF INTERRUPT;
+
+END;
+
+/*==========================================================================*/
+
+p6: PROC;
+!    DCL Consumer(3) INV REF TASK GLOBAL INIT (Consumer1, Consumer2, Consumer3);
+
+END;
+
+/*==========================================================================*/
+
+Consumer1: TASK;
+END;
+
+Consumer2: TASK;
+END;
+
+Consumer3: TASK;
+END;
+
+
+/*==========================================================================*/
+
+p7: PROC;
+    DCL me  REF TASK;
+
+    me := TASK;
+
+END;
+
+/*==========================================================================*/
+
+maintask: TASK  MAIN;
+!   t := NOW;
+    p1;
+    p5;
+    p6;
+END;
+
+MODEND;
+

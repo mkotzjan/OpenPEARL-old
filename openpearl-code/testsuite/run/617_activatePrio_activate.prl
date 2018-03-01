@@ -1,0 +1,59 @@
+/* ############################################################################
+PROGRAM
+
+The main task activate task 3 and task 2 with the prio 3 and go sleep for 2 sec.
+The task2 works at first, beacuse the have the better prio as task 3 and so 
+on they write as first in the buffer and increment the write variable.
+Then come task3 write in the buffer on position 1 and increment the write variable.
+After the 2 sec the main task come back and activate the both tasks. 
+But the task 2 must have the prio 5 and the main task go sleep for 2 sec.
+The Task3 have now the better prio and write at first in the buffer on 
+position 2 and then task2 at postion 3.
+The main task come back check the array and set the exit code.
+###############################################################################
+RESULT
+
+At the first position in the array must stay the value 2, at the second 3,
+at the third 3 and at the fourth position the value 2.
+##############################################################################*/
+
+MODULE(activate);
+
+PROBLEM;
+
+__cpp__('int buffer [4] = {0};');
+DCL write FIXED (15) INIT(0);
+
+Main : TASK PRIO 2 MAIN;
+
+    ACTIVATE Task3;
+    ACTIVATE Task2 PRIO 3;
+
+    AFTER 2 SEC RESUME;  
+  
+    ACTIVATE Task3;
+    ACTIVATE Task2;
+
+    AFTER 2 SEC RESUME;
+
+    __cpp__(
+    'if ( (buffer[0] == buffer [3]) && (buffer[1] == buffer[2]) ) {'
+    '   printf("*** SUCCESS *** \\n");'
+    '   pearlrt::Control::setExitCode(0);'
+    '}else {'
+    '   printf("*** FAILED ***\\n Try it as Superuser \\n");'
+    '   pearlrt::Control::setExitCode(1);'
+    '}');
+END;
+
+Task2 : TASK PRIO 5;
+        __cpp__('buffer[_write.x] = 2;');
+        write := write + 1;
+END;
+
+Task3 : TASK PRIO 4;
+    __cpp__('buffer[_write.x] = 3;');
+    write := write + 1;
+END;
+
+MODEND;

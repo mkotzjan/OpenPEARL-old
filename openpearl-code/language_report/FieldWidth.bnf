@@ -1,0 +1,3 @@
+\htgt{FieldWidth} ::=\\
+\x \hlink{Expression}$\S $WithPositiveIntegerAsValue
+

@@ -1,0 +1,41 @@
+MODULE(dationpg);
+! declare a PG-dation on a disc file and do some operations
+SYSTEM;
+! Disc defines a folder on the file system. The second parameters
+! denotes the maximum number of simultaneous open files
+disc: Disc('/tmp/' ,10);
+stdout: StdOut;
+
+/*  */
+PROBLEM;
+
+   SPC disc DATION INOUT SYSTEM  ALL;
+   SPC stdout DATION OUT SYSTEM  ALPHIC;
+
+   DCL table DATION INOUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  NOSTREAM 
+             CREATED(disc);
+   DCL so DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  NOSTREAM 
+             CREATED(stdout);
+
+FileTest1: TASK MAIN;
+     DCL (a,b,c) FIXED(15) INIT (1,2,3);
+     DCL line CHAR(70);
+
+     OPEN so; 
+     OPEN table BY ANY, IDF('file1.txt');
+!
+! ok
+!     PUT 'a',a,'b',b,'c',c TO table BY  A,F(3),X,A,F(3),X,A,F(3), SKIP;
+     PUT 'a',a,'b',b,'c',c TO table BY  (3)(A,F(3),X), SKIP;
+     CLOSE table;
+     OPEN table BY OLD, IDF('file1.txt');
+     GET line FROM table BY  A, SKIP;
+     CLOSE table;
+     PUT line TO so BY A, SKIP;
+
+END;
+
+MODEND;
+

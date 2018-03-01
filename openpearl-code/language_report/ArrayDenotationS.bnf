@@ -1,0 +1,6 @@
+\htgt{ArrayDenotationS} ::=\\
+\x \hlink{OneIdentifierOrList} \hlink{VirtualDimensionList}\\
+\x  [ \kw{INV} ] \hlink{TypeAttributeForArray} \\
+\x \{ \hlink{GlobalAttribute} $\mid$
+  \hlink{IdentificationAttribute} \}
+

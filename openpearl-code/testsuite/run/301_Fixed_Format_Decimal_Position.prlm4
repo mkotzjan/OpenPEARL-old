@@ -1,0 +1,73 @@
+/****************************************
+Testing PUT and GET statement with Fixed Format
+Decimal Position. Decimal Position d has no effect
+when GET finds decimal value. The actual decimal point 
+of the number is used instead.
+When used with float numbers PUT should create
+rounded numbers depending on d.
+When used with fixed numbers PUT should create
+a decimal point and the given amount of zeros behind it. 
+****************************************/
+
+
+
+MODULE(Fixed_Format_Decimal_Position);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_exception.m4h})
+include({m4_testing.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+
+Test1: TASK MAIN;
+     DCL (fixed_out,fixed_in) FIXED(15) INIT(0,0);
+     DCL (float_out,float_in) FLOAT (53) INIT(0.0,0.0);
+     DCL result_fixed FIXED(63) INIT (0);
+     DCL result_float FLOAT(53) INIT(0.0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+
+     
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+
+     fixed_out := 1;
+     PUT fixed_out TO pipe_out BY F(3,1), SKIP;
+     GET fixed_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({fixed_out},{fixed_in});
+
+     result_float := 1.2;
+     float_out := 1.23;
+     PUT float_out TO pipe_out BY F(3,1), SKIP;
+     GET float_in FROM pipe_in BY F(3), SKIP;
+     EXPECT_EQ({float_in},{result_float});
+
+     float_out := 1.23;
+     PUT float_out TO pipe_out BY F(4,2), SKIP;
+     GET float_in FROM pipe_in BY F(4,1), SKIP;
+     EXPECT_EQ({float_out},{float_in});
+     
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+include({m4_check_header.m4h})
+
+END;
+MODEND;
+

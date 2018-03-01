@@ -1,0 +1,28 @@
+MODULE(repeat);
+PROBLEM;
+
+T1: TASK MAIN;
+
+  DCL f1 FIXED(15) INIT(0);
+  DCL f2 FIXED(15) INIT(2);
+  DCL f3 FIXED(15) INIT(3);
+
+  IF f1 < f2 THEN
+     GOTO ok;
+  ELSE
+     GOTO fail;
+  FIN;
+
+fail:
+    __cpp__("printf(\"failure\\n\");"
+            "pearlrt::Control::setExitCode(1);");
+   TERMINATE;
+
+ok:
+   __cpp__("printf(\"success\\n\");");
+
+END;
+
+MODEND;
+
+

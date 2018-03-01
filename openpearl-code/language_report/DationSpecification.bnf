@@ -1,0 +1,5 @@
+\htgt{DationSpecification} ::= \\
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList} 
+  \hlink{TypeDationSystem} \\
+\x [ \hlink{GlobalAttribute} ] \kw{;}
+

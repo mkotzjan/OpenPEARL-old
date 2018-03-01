@@ -1,0 +1,17 @@
+%%%\begin{removed}
+%%%\htgt{LengthDefinition} ::=\\
+%%%\x {\bf LENGTH} \{ {\bf FIXED $\mid$ FLOAT
+%%%                    $\mid$ BIT $\mid$ CHARACTER $\mid$ CHAR} \}
+%%%                ( \hlink{Precision} ) ;\\
+%%%\end{removed}
+\begin{tabbing}
+\x \kw{LENGTH} \{ \= \{ \kw{FIXED} $\mid$ \kw{FLOAT} \} 
+     \kw{(}\hlink{Precision} \kw{)}\kill
+
+\htgt{LengthDefinition}::=\\
+\x \kw{LENGTH} \{ \{ \kw{FIXED} $\mid$ \kw{FLOAT} \}
+          \kw{(} \hlink{Precision} \kw{)} $\mid$ \\
+\> 
+\{ \kw{BIT} $\mid$ \kw{CHARACTER} $\mid$ \kw{CHAR} \} 
+          \kw{(} \hlink{LengthOfString} \kw{)} \};
+\end{tabbing}

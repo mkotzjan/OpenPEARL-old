@@ -1,0 +1,46 @@
+MODULE(block_statement);
+
+PROBLEM;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+T1: TASK MAIN;
+  DCL local_var FIXED;
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  BEGIN
+    DECLARE block_var FIXED;
+
+    IF block_var > 1
+    THEN
+        local_var = 1;
+    FIN;
+  END;
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  BEGIN
+    DECLARE block_var FIXED;
+
+    IF block_var > 1
+    THEN
+        local_var = 1;
+    FIN;
+  END BLOCKID;
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  BEGIN
+    DECLARE block_var FIXED;
+    DCL     local_var FIXED; ! This variable declaration shadows the one in the outer scope
+
+    IF block_var > 1
+    THEN
+        local_var = 1;
+    FIN;
+  END;
+
+END;
+
+MODEND;

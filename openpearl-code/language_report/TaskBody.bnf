@@ -1,0 +1,5 @@
+\htgt{TaskBody} ::=\\
+\x [\{ \hlink{Declaration} $\mid$
+	 \hlink{Identification} \}$^{...}$]\\
+\x [\hlink{Statement}$^{...}$]
+        

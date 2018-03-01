@@ -1,0 +1,56 @@
+\chapter{Usage}
+
+\section{Invocation}
+The inter module checker is invoked with
+\begin{verbatim}
+imc -b <target> -o <output> pearlModules...
+\end{verbatim}
+
+The option -b is  recommended. The given parameter defines the
+platform definition XML file, which is expected ether in the current 
+working directory (first)
+or in installation directory of OpenPEARL.
+
+The option -o defaults to system.cc in the current working directory.
+
+The list of pearl modules is passed without extension. Pathnames are 
+possible.
+
+
+\section{Tests}
+\subsection{Tests for System Part}
+The following tests are performed for system part elements:
+\begin{itemize}
+\item all defined username need a predefined system name.
+\item the number and type of actual parameters must fit to the 
+      predefined system element
+\item the value of the actual parameters are checked, if the predefined
+   elements limits the parameter range
+\item each used association must be supported by the specified provider
+\item actual parameters of association providers must fit in type and value
+   to the formal parameters, like username definitions
+\item the number of association clients must agree with the supported
+    number of clients
+\item the number of instances of a system element does not excess the 
+   allowed number of instances
+\end{itemize}
+
+\subsection{Tests for Problem Part}
+The following tests are performed for problem part elements:
+\begin{itemize}
+\item each specified system dation, signal and interrupt must fit
+  to the definition is the system part.
+\end{itemize}
+
+\subsection{Not implemented yet}
+Not supported up to now:
+\begin{itemize}
+\item problem part global declarations and their specifications
+\end{itemize}I
+
+\section{Output}
+The tool creates a C++ file for the system part if no errors are
+detected. 
+This file must be passed to the g++ compiler and linked with all 
+other object modules.
+

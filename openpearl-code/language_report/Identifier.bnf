@@ -1,0 +1,3 @@
+\htgt{Identifier} ::=\\
+\x \hlink{Letter} [ \hlink{Letter} $\mid$ \hlink{Digit} $\mid$ \_ ] $^{...}$
+

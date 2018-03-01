@@ -1,0 +1,3 @@
+\htgt{TypeCharacterString} ::=\\
+\x \{ \kw{CHARACTER} $\mid$ \kw{CHAR} \} [ \kw{(} \hlink{LengthOfString} \kw{)} ]
+

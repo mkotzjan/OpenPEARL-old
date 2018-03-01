@@ -1,0 +1,4 @@
+\htgt{InduceStatement} ::=\\
+\x \kw{INDUCE} [ \hlink{Name}$\S $Signal 
+	[ \kw{RST} \kw{(} \hlink{Expression}$\S $ErrorNumber-FIXED \kw{)} ] ] \kw{;}
+

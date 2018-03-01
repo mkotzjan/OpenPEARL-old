@@ -1,0 +1,34 @@
+LogLevel    0x0c   (1=debug, 2=info, 4=warn, 8=error)
+! -------------------------------------
+! PEARL runtime configuration file (.pearlrc)
+! this file is searched in the current directory (first)
+! and the current users home directory (second)
+!
+! The following case sensitive parameters may be set:
+!   LogLevel  (hex)
+!     the parameter is a hexadecimal number which is bitwise encoded.
+!     0x01: with debug-messages
+!     0x02: with info-messages
+!     0x04: with warning-messages
+!     0x08: with error-messages
+!     default: 0x0c (warn+error)
+!     NOTE: enabling debug messages will involve the runtime behavior
+!           dramatically
+!
+!  MaxCpuTime (dec)
+!     define the maximum cpu time allowed for the application.
+!     The time is given in seconds
+!     The value (-1) defines eternal execution
+!     Default value is 300
+!
+! Cores (dec)
+!     defines the number of used cores for the application.
+!     If less cores are available than specified in this command
+!     the maximum of possible cores is used.
+!     Default value: 1
+!  
+! -------------------------------------
+!LogLevel    0x0e   (1=debug, 2=info, 4=warn, 8=error)
+!MaxCpuTime 300
+!Cores      1
+

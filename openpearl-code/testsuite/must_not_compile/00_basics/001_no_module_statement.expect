@@ -1,0 +1,3 @@
+001_no_module_statement.prl:1:7: ERROR : Syntax error :mismatched input 'PROBLEM' expecting 'MODULE'
+PROBLEM;
+      ^

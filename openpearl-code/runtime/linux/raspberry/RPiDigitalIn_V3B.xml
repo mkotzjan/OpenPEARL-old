@@ -1,0 +1,11 @@
+   <dation name="RPiDigitalIn">
+      <parameters>
+         <FIXED length="31">
+             <FIXEDRANGE>2,27</FIXEDRANGE> 
+         </FIXED>
+         <FIXED length="31" nick="width"> <FIXEDGT>0</FIXEDGT></FIXED>
+         <CHAR length="1"><VALUES>'u','d','n'</VALUES></CHAR>
+      </parameters>
+      <attributes> IN, SYSTEM, BASIC</attributes>
+      <data>BIT($width)</data>
+   </dation>

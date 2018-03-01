@@ -1,0 +1,51 @@
+MODULE(fixedoperations);
+! test for fixed operations
+! this is only coded for FIXED(31) at the first step
+! no operations across the data type is included!
+!  --> no comparison
+!  --> no TOBIT, TOCHAR 
+
+PROBLEM;
+
+T1: TASK MAIN;
+   DCL x31 FIXED(31);
+   DCL y31 FIXED(31);
+   DCL z31 FIXED(31);
+   DCL x15 FIXED(15);
+
+   ! assignment
+   x31 := 1;
+   x31 := -2;
+
+   y31 := x31;
+
+   ! monadic operations
+   y31 := + x31;
+   y31 := - x31;
+
+   y31 := ABS(x31);
+   !__cpp__ (' _y31 = _x31.abs(); ');
+   y31 := SIGN(x31);
+   !__cpp__ (' _y31 = _x31.sign(); ');
+   y31 := SIZEOF(x31);
+   !__cpp__ (' _y31 = _x31.size(); ');
+
+   ! dyadic opertions 
+   z31 := x31 + y31;
+   z31 := x31 - y31;
+   z31 := x31 * y31;
+   z31 := x31 // y31;
+   !  __cpp__('_z31 = _x31 / _y31;');   
+   z31 := x31 REM y31;
+   !__cpp__('_z31 = _x31 % _y31;');   
+   z31 := x31 ** y31;
+  ! __cpp__('_z31 = _x31.pow(_y31);');   
+
+   ! FIT
+   x15 := (x31 FIT x15);
+   !__cpp__('_x15 = _x31.fit(_x15);');   
+
+END;
+
+MODEND;
+

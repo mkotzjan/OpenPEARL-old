@@ -1,0 +1,26 @@
+MODULE(bitstring);
+! test for compilation of bit deklaraions and operations
+! for each statement the expected result is given an __cpp__-insertion
+! as soon as the compiler is capable to to the translation,
+! the comment should be moved to the result line
+
+PROBLEM;
+T1: TASK MAIN;
+    DCL b1i64 BIT(64)    INIT(
+      '1111000011110000111100001111000011110000111100001111000011110000'B1);
+    __cpp__("pearlrt::BitString<64> b1i64(0xf0f0f0f0f0f0f0f0ULL);	");
+
+    DCL b4i64 BIT(64)    INIT('F0F0F0F0F0F0F0F0'B4);
+    __cpp__("pearlrt::BitString<64> b4i64(0xf0f0f0f0f0f0f0f0LL);	");
+
+END;
+
+MODEND;
+
+/*
+
+0xf0f0f0f0f0f0f0f0
+  F0F0F0F0F0F0F0F0'B4);
+    __cpp__("pearlrt::BitString<64> b4i64(0xf0f0f0f0f0f0f0f0LL);	");
+
+*/

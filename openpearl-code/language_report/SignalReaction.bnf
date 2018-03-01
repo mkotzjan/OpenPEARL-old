@@ -1,0 +1,4 @@
+\htgt{SignalReaction} ::=\\
+\x \hlink{SignalFinalStatement} $\mid$ \\
+\x \hlink{Block}$\S $terminatedWithSignalFinalStatement ;
+

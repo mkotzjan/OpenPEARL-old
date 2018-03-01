@@ -1,0 +1,3 @@
+\htgt{TypeDuration} ::=\\
+\x \kw{DURATION} $\mid$ \kw{DUR}
+

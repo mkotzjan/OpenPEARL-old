@@ -1,0 +1,5 @@
+\htgt{FixedFormat} ::=\\
+\x \kw{F} \kw{(}\hlink{FieldWidth} [ \kw{,} \hlink{DecimalPositions}
+	%%% \removedtext{[ , ScaleFactor ]}
+	 ] \kw{)}
+

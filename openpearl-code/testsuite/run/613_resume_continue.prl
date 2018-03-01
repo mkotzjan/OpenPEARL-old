@@ -1,0 +1,52 @@
+/*#############################################################################
+PROGRAM
+
+The main task activate task 2 and then the main task sleep for 1 sec.
+The Task2 go sleep for 2 sec and the main task come after the 1 sec back,
+continue task2 which currently still for a second suspend and 
+go sleep for 0.5 sec. The command AFTER 2 SEC RESUME in task2 is 
+then inoperative. The Task2 go to the end and the mainTask come back and 
+check the value form x and set the exit code.
+###############################################################################
+RESULT
+
+The variable x must have the value one.
+#############################################################################*/
+
+MODULE(resume_continue);
+
+PROBLEM;
+
+DCL x FIXED(15) INIT(0);
+
+Main : TASK PRIO 2 MAIN;
+
+    ACTIVATE Task2;
+
+    AFTER 1 SEC RESUME;
+
+    CONTINUE Task2;
+
+    AFTER 0.5 SEC RESUME;
+
+    __cpp__(
+    'if (_x.x == 1) {'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf ("*** SUCCESS *** \\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf ("*** FAILED *** \\n" ); '
+    '} ');    
+
+END;
+
+Task2 : TASK PRIO 3;
+
+    AFTER 2 SEC RESUME;
+   
+    x := x + 1;
+
+END;
+
+
+MODEND;

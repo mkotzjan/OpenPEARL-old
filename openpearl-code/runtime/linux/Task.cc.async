@@ -1,0 +1,862 @@
+/*
+ [The "BSD license"]
+ Copyright (c) 2012-2013 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/**
+
+\brief tasking
+
+\author R. Mueller
+
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+#include <bits/local_lim.h> // PTHREAD_STACK_MIN
+#include <sched.h>
+#include <errno.h>
+#include <signal.h>
+#include <unistd.h>
+
+#include "Task.h"
+#include "Log.h"
+#include "TaskList.h"
+#include "TaskMonitor.h"
+#include "Interrupt.h"
+#include "PrioMapper.h"
+#include "BitString.h"
+#include "Semaphore.h"
+
+namespace pearlrt {
+bool sigactive=false;
+   /**
+   the default constructor is not intended to be used
+   */
+   Task::Task() {
+      Log::error("task %s: illegal call to default constructor of Task::",
+                 name);
+   }
+
+   // tasks are created statically - no mutex protection needed
+   Task::Task(void (*entry)(Task *),
+              char * n,
+              Prio prio, BitString<1> isMain) {
+      struct sigevent sev, sev2, sev3;
+      int ret;
+      taskState = TERMINATED;;       //set taskState
+      entryPoint = entry;   //set thread execute function
+
+      if (prio.get().x != 0) {
+         defaultPrio = prio.get();     //set priority
+      } else {
+         defaultPrio.x = 255;
+      }
+
+      currentPrio = defaultPrio;
+      name = n;
+      this->isMain = isMain.x ? 1 : 0;
+      mutexTask.name(name);
+      sourceLine = -1;
+      fileName = (char*)"source file name not set";
+      //create activate timer for SIGRTMIN+1 if expired
+      //setting prefs for activate timer
+      sev.sigev_notify = SIGEV_SIGNAL;
+      sev.sigev_signo = SIGRTMIN + 1;
+      sev.sigev_value.sival_ptr = this;
+
+      if (timer_create(CLOCK_REALTIME, &sev, &sched_activate.timer) == -1) {
+         Log::error("task %s: could not create ACTIVATE timer", name);
+         throw theInternalTaskSignal;
+      }
+
+      //setting prefs for resume timer
+      //create onresume timer for SIGRTMIN+2 if expired
+      sev2.sigev_notify = SIGEV_SIGNAL;
+      sev2.sigev_signo = SIGRTMIN + 2;
+      sev2.sigev_value.sival_ptr = this;
+
+      if (timer_create(CLOCK_REALTIME, &sev2, &onresume.timer) == -1) {
+         Log::error("task %s: could not create RESUME timer", name);
+         throw theInternalTaskSignal;
+      }
+
+      //setting prefs for continue timer
+      //create oncontinue timer for SIGRTMIN+3 if expired
+      sev3.sigev_notify = SIGEV_SIGNAL;
+      sev3.sigev_signo = SIGRTMIN + 3;
+      sev3.sigev_value.sival_ptr = this;
+
+      if (timer_create(CLOCK_REALTIME, &sev3, &oncontinue.timer) == -1) {
+         Log::error("task %s: could not create CONTINUE timer", name);
+         throw theInternalTaskSignal;
+      }
+
+      //set all conditions to none
+      sched_activate.counts = 0;
+      sched_activate.prio = 0;
+      onresume.pending = false;
+      oncontinue.counts = 0;
+      oncontinue.prio = 0;
+
+      if (pthread_attr_init(&attr) != 0) {
+         Log::error("task %s: error initializing pthread_attr", name);
+         throw theInternalTaskSignal;
+      }
+
+      if (pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN) < 0) {
+         Log::error("task %s: error setting pthread_attr_stacksize", name);
+         throw theInternalTaskSignal;
+      }
+
+      //no inheritance of the main thread priority
+      if (pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED) != 0) {
+         Log::error("task %s: error setting pthread inheritance attributes",
+                    name);
+         throw theInternalTaskSignal;
+      }
+
+      ret = pipe(pipeResume);
+
+      if (ret) {
+         Log::error("task %s: error creating pipeResume (%s)",
+                    name, strerror(errno));
+         throw theInternalTaskSignal;
+      }
+
+      TaskList::Instance().add(this);
+   }
+
+   bool Task::isMySelf() {
+      return (threadPid == pthread_self());
+   }
+
+   void Task::suspendFromOtherTask() {
+      switch (taskState) {
+      case SEMA_BLOCKED:
+         taskState = SEMA_SUSPENDED_BLOCKED;
+         Semaphore::removeFromWaitQueue(this);
+         break;
+      case IO_BLOCKED:
+         Log::error("IO_BLOCKED not supported yet");
+         throw theInternalTaskSignal;
+      case RUNNING:
+         Log::debug("task %s: sending suspend signal to thread", name);
+
+         if (pthread_kill(threadPid, SIGRTMIN) != 0) {
+            Log::error("task %s: sending suspend signal to thread failed",
+                       name);
+         }
+////printf("pthread kill done\n");
+
+         Log::info("suspendFromOtherTask: wait for completion missing");
+         break;
+      default:
+         Log::error("suspendFromOtherTask taskState %d not treated",
+                    taskState);
+         throw theInternalTaskSignal;
+      }
+   }
+
+   void Task::suspendMySelf() {
+////printf("suspendMyself(%s)\n", name);
+       internalSuspendMySelf(true);
+   }
+
+   void Task::internalSuspendMySelf(bool isAlreadyLocked) {
+      char dummy;
+
+      if (!isAlreadyLocked) {
+          mutexTask.lock();
+      }
+      taskState = Task::SUSPENDED;
+      Log::info("task %s: suspended (self) ", name);
+      mutexTask.unlock();
+      
+Log::debug("suspendMySelf (%s): wait for continue data", name);
+      read(pipeResume[0], &dummy, 1);
+      // mutexTask as locked again from sending thread
+
+Log::debug("suspendMySelf:: %s got data %c", name, dummy);
+
+      switch (dummy) {
+      case 't' :
+         terminateMySelf();
+         break;
+      case 'c' :
+         taskState = Task::RUNNING;
+         Log::info("task %s: continue from suspend done", name);
+         mutexTask.unlock();
+         break;
+      case 'w':
+         for (int i=0; i<10; i++) {
+         printf("%d: wait ... wait ... wait to become killed\n",i);
+         } 
+         break;
+      default:
+         Log::error("task %s: resume: received unknown continue (%c)",
+                    name, dummy);
+         break;
+      }
+
+   }
+
+
+   void Task::scheduledContinue(const int condition,
+                                const Fixed<15>& prio,
+                                const Clock& at,
+                                const Duration& after,
+                                const Duration& all,
+                                const Clock& until,
+                                const Duration& during,
+                                const Interrupt& when) {
+      // if already pending --> just replace the schedule
+      // setup timer
+      setupTimer(&oncontinue, condition, prio,
+                 all, after, during, at, until, "continue");
+   }
+
+   void Task::continueMySelf(const Fixed<15>& prio) {
+      if (! _useNormalScheduler) {
+         param.sched_priority =
+            PrioMapper::getInstance()->fromPearl(prio);
+
+         //setting up the new priority
+         if (pthread_attr_setschedparam(&attr, &param) != 0) {
+            mutexTask.unlock();
+            Log::error(
+               "task %s: error on setting new priority in continue",
+               name);
+            throw theInternalTaskSignal;
+         }
+      }
+
+      currentPrio = prio;
+   }
+
+   void Task::continueFromOtherTask(const Fixed<15> prio) {
+      if (prio.x == 0) {
+         Log::info("task %s: continueFromOtherTask", name);
+      } else {
+         Log::info("task %s: continueFromOtherTask with prio %d",
+                   name,
+                   prio.x);
+      }
+
+      switch (taskState) {
+      default:
+         Log::error("task %s: continueFromOtherTask untreated tastState %d",
+                    name, taskState);
+         throw theInternalTaskSignal;
+      case SEMA_BLOCKED:
+      case RUNNING:
+
+         if (prio.x != 0) {
+            // setup new priority
+            continueMySelf(prio);
+         }
+
+         break;
+      case SUSPENDED:
+
+         if (prio.x != 0) {
+            // setup new priority
+            continueMySelf(prio);
+         }
+
+         //semaResume.release();
+         char dummy = 'c';
+         write(pipeResume[1], &dummy, 1);
+         Log::info("task %s: continueFromOtherTask waiting for pipe"
+                   " read is missing", name);
+         // wait until target task runs
+      }
+   }
+
+   static void suspendhandler(int sig) {
+      sigactive = true;
+      Task * t = TaskList::Instance().getTaskSelf();
+      Log::info("task %s: received signal to suspend", t->getName());
+////printf("suspendhandler(%s)\n", t->getName());
+      t->internalSuspendMySelf(false);
+      sigactive = false;
+   }
+
+   void Task::entry() {
+      //block timer signals, they should only delivered to main thread
+      sigset_t set;
+      struct sigaction susp;
+      mutexTask.lock();
+      onresume.pending = false;
+      sigemptyset(&set);
+      sigaddset(&set, SIGRTMIN + 1);
+      sigaddset(&set, SIGRTMIN + 2);
+      sigaddset(&set, SIGRTMIN + 3);
+      pthread_sigmask(SIG_BLOCK, &set, NULL);
+      susp.sa_flags = SA_RESTART;
+      susp.sa_handler = suspendhandler;
+      sigemptyset(&set);
+      sigaddset(&set, SIGRTMIN);
+      pthread_sigmask(SIG_UNBLOCK, &set, NULL);
+
+      //register signalhandler for suspend
+      if (sigaction(SIGRTMIN, &susp, (struct sigaction *)0) != 0) {
+         Log::error("task %s: error setting suspend signal handler", name);
+         throw theInternalTaskSignal;
+      }
+
+      // store own pid
+      threadPid = pthread_self();
+      taskState = Task::RUNNING;
+      mutexTask.unlock();
+   }
+
+   void Task::directActivate(const Fixed<15>& prio) {
+      internalDirectActivate(prio, (sched_activate.counts == 0));
+   }
+
+   void Task::internalDirectActivate(const Fixed<15>& prio,
+                                     const bool decNumberOfPendingTasks) {
+      int ret;
+
+      //set up the new scheduling policies for preemptive priority
+      if (!_useNormalScheduler) {
+         // the possibility of setting SCHED_RR is detected at
+         // system start. Therefore this attribute is not set
+         // statically in the constructor.
+         if (pthread_attr_setschedpolicy(&attr, SCHED_RR) != 0) {
+            Log::error("task %s: error setting SCHED_RR scheduler", name);
+            throw theInternalTaskSignal;
+         }
+
+         param.sched_priority =
+            PrioMapper::getInstance()->fromPearl(prio);
+
+         if (pthread_attr_setschedparam(&attr, &param) != 0) {
+            Log::error("task %s: error on setting priority", name);
+            throw theInternalTaskSignal;
+         }
+      }
+      ret = 0;
+      ret = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
+      if (ret != 0) {
+         Log::error("task %s: error on setting cancellation type", name);
+         throw theInternalTaskSignal;
+      }
+
+      if (decNumberOfPendingTasks) {
+         TaskMonitor::Instance().incPendingTasks();
+      }
+
+      //create the thread
+      if (pthread_create(&threadPid, &attr,
+                         (void * (*)(void*))entryPoint,
+                         (void*)this) != 0) {
+         Log::error("task %s: could not create thread (%s))",
+                    name, strerror(errno));
+         throw theInternalTaskSignal;
+      }
+
+//      pthread_detach(threadPid);  // test to get rid of "terminate without.."
+      return;
+   }
+
+
+   void Task::setupTimer(Schedule *s,
+                         int condition, const Fixed<15> prio,
+                         Duration all, Duration after,
+                         Duration during, Clock at, Clock until,
+                         const char* operation) {
+      struct itimerspec its;
+
+      if (condition & PRIO) {
+         s->prio = prio;
+      } else {
+         s->prio = defaultPrio;
+      }
+
+      // calculate start delay
+      if (condition & Task::AFTER) {
+         s->counts = 1;
+      } else {
+         after = Duration(0.0);  // start immedially
+         s->counts = 0;
+      }
+
+      if (condition & Task::AT) {
+         after = at - Clock::now();
+         s->counts = 1;
+      }
+
+      its.it_value.tv_sec = after.getSec();
+      its.it_value.tv_nsec = after.getUsec() * 1000;
+      // calculate repetition counter for the schedule
+      its.it_interval.tv_sec = 0;
+      its.it_interval.tv_nsec = 0;
+
+      // calculate repetition counts
+      if (condition & Task::ALL) {
+         if (condition & Task::UNTIL) {
+            during = until - Clock::now();
+            s->counts = during / all + 1;
+         } else if (condition & Task::DURING) {
+            s->counts = during / all + 1;
+            Log::info(
+               "task %s: scheduled %s after=%.3f s all %.3f s %d times",
+               name, operation,
+               its.it_value.tv_sec + its.it_value.tv_nsec / 1e9 ,
+               its.it_interval.tv_sec + its.it_interval.tv_nsec / 1e9,
+               s->counts);
+         } else {
+            s->counts = -1;
+            Log::info(
+               "task %s: scheduled %s after=%.3f s all %.3f s eternally",
+               name, operation,
+               its.it_value.tv_sec + its.it_value.tv_nsec / 1e9 ,
+               its.it_interval.tv_sec + its.it_interval.tv_nsec / 1e9);
+         }
+
+         its.it_interval.tv_sec = all.getSec();
+         its.it_interval.tv_nsec = all.getUsec() * 1000;
+      }
+
+      if ((condition & (Task:: AT | Task::ALL | Task::AFTER |
+                        Task::UNTIL | Task::DURING)) != 0) {
+         // timed activate
+         if (timer_settime(s->timer, 0, &its, NULL) == -1) {
+            Log::error("task %s: error setting schedule timer", name);
+            throw theInternalTaskSignal;
+         }
+      }
+   }
+
+   void Task::scheduledActivate(int condition,
+                                const Fixed<15>& prio,
+                                const Clock& at,
+                                const Duration& after,
+                                const Duration& all,
+                                const Clock& until,
+                                const Duration& during,
+                                const Interrupt& when) {
+      if (sched_activate.counts == 0 && taskState == TERMINATED) {
+         /* was not pending and not activated */
+         TaskMonitor::Instance().incPendingTasks();
+      }
+
+      // setup timer
+      setupTimer(&sched_activate, condition, prio,
+                 all, after, during, at, until, "activate");
+      return;
+   }
+
+   int Task::detailedTaskState(char * line[3]) {
+      int i = 0;
+      char help[20];
+      mutexTask.lock();
+
+      if (sched_activate.counts != 0) {
+         struct itimerspec its;
+         float next, rept;
+         timer_gettime(sched_activate.timer, &its);
+         next = its.it_value.tv_sec + its.it_value.tv_nsec / 1.e9;
+         rept = its.it_interval.tv_sec + its.it_interval.tv_nsec / 1.e9;
+
+         if (sched_activate.counts > 0) {
+            sprintf(line[i],
+                    "ACT next %.1f sec : all %.1f sec : %d times remaining",
+                    next, rept, sched_activate.counts);
+         } else {
+            sprintf(line[i],
+                    "ACT next %.1f sec : all %.1f sec : eternally",
+                    next, rept);
+         }
+
+         i++;
+      }
+
+      if (onresume.pending) {
+         struct itimerspec its;
+         float remaining;
+         timer_gettime(onresume.timer, &its);
+         remaining = its.it_value.tv_sec + its.it_value.tv_nsec / 1.e9;
+         sprintf(line[i], "AFTER RESUME: remaining %.1f sec", remaining);
+         i++;
+      }
+
+      if (taskState == SEMA_BLOCKED) {
+         switch (blockParams.why.reason) {
+         case REQUEST:
+            sprintf(line[i], "REQUESTing %d SEMAs:",
+                    blockParams.why.u.sema.nsemas);
+
+            for (int j = 0; j < blockParams.why.u.sema.nsemas; j++) {
+               Semaphore * s = blockParams.why.u.sema.semas[j] ;
+               sprintf(help, " %s(%d)", s->getName(), s->getValue());
+
+               if (strlen(line[i]) + strlen(help) < 80) {
+                  strcat(line[i], help);
+               }
+            }
+
+            break;
+         default:
+            sprintf(line[i], "unknown blocking reason(%d)",
+                    blockParams.why.reason);
+            break;
+         }
+
+         i++;
+      }
+
+      mutexTask.unlock();
+      return i;
+   }
+
+// returns 1, if timer stop error
+//         0, if ok
+   int Task::updateTimer(Schedule * s) {
+      struct itimerspec its;
+
+      //check for endcondition during
+      if (s->counts < 0) {
+         // do it eternally
+      } else {
+         s->counts --;
+
+         if (s->counts == 0) {
+            // became zero --> stop timer
+            its.it_value.tv_sec = 0;
+            its.it_value.tv_nsec = 0;
+            its.it_interval.tv_sec = 0;
+            its.it_interval.tv_nsec = 0;
+
+            if (timer_settime(s->timer, 0, &its, NULL) == -1) {
+               return (1);
+            }
+         }
+      }
+
+      return 0;
+   }
+
+   void Task::activateHandler() {
+      mutexTask.lock();
+
+      if (updateTimer(&sched_activate)) {
+         Log::error(
+            "task %s: scheduled activate: error cancelling timer",
+            name);
+         mutexTask.unlock();
+         throw theInternalTaskSignal;
+      }
+
+      if (taskState == Task::TERMINATED) {
+         Log::info("task %s: scheduled activate: starts", name);
+         internalDirectActivate(sched_activate.prio, false);
+      } else {
+         Log::warn("task %s: scheduled activate: skipped", name);
+      }
+
+      mutexTask.unlock();
+   }
+
+   void Task::continueHandler() {
+      mutexTask.lock();
+
+      //check for endcondition during
+      if (updateTimer(&oncontinue)) {
+         Log::error(
+            "task %s: scheduled continue: error cancelling timer",
+            name);
+         mutexTask.unlock();
+         throw theInternalTaskSignal;
+      }
+
+      if (taskState == Task::SUSPENDED ||
+            taskState == Task::SEMA_SUSPENDED_BLOCKED ||
+            taskState == Task::RUNNING) {
+         Log::info("task %s: scheduled continue: done", name);
+         mutexTask.unlock();
+         cont(PRIO, Prio(oncontinue.prio));
+      } else {
+         Log::warn("task %s: scheduled continue: skipped", name);
+         mutexTask.unlock();
+      }
+   }
+
+
+   void Task::stopOnResumeTimer() {
+      if (onresume.pending) {
+         struct itimerspec its;
+         its.it_value.tv_sec = 0;
+         its.it_value.tv_nsec = 0;
+         its.it_interval.tv_sec = 0;
+         its.it_interval.tv_nsec = 0;
+
+         //kill the timer
+         if (timer_settime(onresume.timer, 0, &its, NULL) == -1) {
+            Log::error(
+               "task %s: stopOnResumeTimer: error cancelling resume timer",
+               name);
+            Log::error(strerror(errno));
+            mutexTask.unlock();
+            throw theInternalTaskSignal;
+         }
+
+         onresume.pending = false;
+      }
+   }
+
+   void Task::terminateFromOtherTask() {
+      char dummy;
+      int ret;
+      bool decPendingTasks = true;
+Log::debug("Task::terminateFromOtherTask for %s state=%d sigactive=%d",
+       name, taskState,sigactive);
+
+      switch (taskState) {
+      case SUSPENDED:
+         if (sigactive) {
+            dummy = 'w';
+            write(pipeResume[1], &dummy, 1);
+         }
+         // no break here!
+      case RUNNING:
+      case SEMA_BLOCKED:
+         stopOnResumeTimer();
+         Log::debug("task %s: terminateFromOtherTask: do pthread_cancel",
+                    name);
+         ret = pthread_cancel(threadPid);
+
+         if (ret != 0) {
+            Log::error("task %s: error in pthread_cancel (%s)",
+                       name, strerror(ret));
+            throw theInternalTaskSignal;
+         }
+
+         Log::debug("task %s: terminateFromOtherTask: do pthread_join", name);
+         ret = pthread_join(threadPid, NULL);
+
+         if (ret != 0) {
+            Log::error("task %s: error in pthread_join (%s)",
+                       name, strerror(ret));
+            throw theInternalTaskSignal;
+         }
+         Log::debug("task %s: terminateFromOtherTask: do pthread_join done",
+            name);
+
+         decPendingTasks = true;
+         taskState = TERMINATED;
+         break;
+//      case SUSPENDED:
+         Log::debug("task %s: terminateRemote suspended task", name);
+         // semaResume.release();
+//         dummy = 't';
+//         write(pipeResume[1], &dummy, 1);
+////printf("wait for join of thread %lx\n", threadPid);
+
+//         mutexTask.unlock();
+         ret = pthread_join(threadPid, NULL);
+////printf("join done\n");
+         mutexTask.lock();  // set lock again 
+         if (ret != 0) {
+            Log::error("task %s: error in pthread_join (%s)",
+                       name, strerror(ret));
+            throw theInternalTaskSignal;
+         }
+
+         decPendingTasks = false;
+         break;
+      case SEMA_SUSPENDED_BLOCKED:
+         Log::debug("task %s: terminateRemote susp_blocked task", name);
+         // semaResume.release();
+         dummy = 't';
+         write(pipeResume[1], &dummy, 1);
+         blockParams.semaBlock.release();  // unblock
+         taskState = Task::RUNNING;
+         decPendingTasks = false;
+         break;
+//      case SEMA_BLOCKED:
+         Log::debug("task %s: terminateRemote blocked task", name);
+         blockParams.semaBlock.release();
+         taskState = Task::RUNNING;
+         decPendingTasks = false;
+         break;
+      default:
+         Log::error("task %s: unhandled taskState (%d) at TERMINATE",
+                    name, taskState);
+         mutexTask.unlock();
+         throw theInternalTaskSignal;
+      }
+
+      threadPid = 0;
+
+      /* still pending ? */
+      if (decPendingTasks) {
+//         mutexTask.unlock();
+         TaskMonitor::Instance().decPendingTasks();
+      } else {
+//         mutexTask.unlock();
+      }
+
+      Log::info("task %s: terminateRemote: done", name);
+   }
+
+   void Task::terminateMySelf() {
+printf("terminateMySelf(%s)\n", name);
+      Log::info("task %s: terminateMySelf: start", name);
+      taskState = Task::TERMINATED;
+//   int xxx = pthread_detach(threadPid);
+//printf("detaching ... %d (%s)\n", xxx,strerror(xxx));
+      threadPid = 0; // invalidate threadid
+      stopOnResumeTimer();
+
+      /* still pending ? */
+      if (sched_activate.counts == 0) {
+         mutexTask.unlock();
+         TaskMonitor::Instance().decPendingTasks();
+      } else {
+         mutexTask.unlock();
+      }
+////printf("task %s terminates\n", name);
+      Log::info("task %s: terminates", name);
+      pthread_exit(0);
+   }
+
+
+   void Task::resume(int condition,
+                     Clock at,
+                     Duration after,
+                     Interrupt when) {
+      struct itimerspec its;
+
+      if (condition == 0) {
+         return;
+      }
+
+      if (condition != Task::AT && condition != Task::AFTER) {
+         Log::error("task %s: resume nether AR nor AFTER", name);
+         throw theInternalTaskSignal;
+      } else if (condition == Task::AT) {
+         after =  at - Clock::now();
+      }
+
+      mutexTask.lock();
+      its.it_value.tv_sec = after.getSec();
+      its.it_value.tv_nsec = after.getUsec() * 1000;
+      its.it_interval.tv_sec = 0;
+      its.it_interval.tv_nsec = 0;
+
+      //set the timer
+      if (timer_settime(onresume.timer, 0, &its, NULL) == -1) {
+         Log::error("task %s: error setting resume timer (%s)",
+                    name, strerror(errno));
+         mutexTask.unlock();
+         throw theInternalTaskSignal;
+      }
+
+      onresume.pending = true;
+      taskState = Task::SUSPENDED;
+      //lock the mutex of the thread to suspend him until timer is expired
+      mutexTask.unlock();
+      Log::debug("task %s: resume: going to suspended", name);
+      //semaResume.request();
+      char dummy;
+      read(pipeResume[0], &dummy, 1);
+      Log::debug("task %s: resume: received continue (%c)", name, dummy);
+
+      switch (dummy) {
+      case 't' :
+         terminateMySelf();
+         break;
+      case 'c' :
+         break;
+      default:
+         Log::error("task %s: resume: received unknown continue (%c)",
+                    name, dummy);
+         break;
+      }
+   }
+
+   void Task::resumeHandler() {
+      mutexTask.lock();
+      onresume.pending = false;
+      taskState = Task::RUNNING;
+      mutexTask.unlock();
+      // semaResume.release();
+      char dummy = 'c';
+      Log::debug("task %s: resume: going to running", name);
+      write(pipeResume[1], &dummy, 1);
+   }
+
+   void Task::prevent() {
+      struct itimerspec its;
+      Log::info("task %s: prevent start", name);
+      mutexTask.lock();
+      // cancel activate timer
+      its.it_value.tv_sec = 0;
+      its.it_value.tv_nsec = 0;
+      its.it_interval.tv_sec = 0;
+      its.it_interval.tv_nsec = 0;
+      sched_activate.counts = 0;
+
+      if (timer_settime(sched_activate.timer, 0, &its, NULL) == -1) {
+         Log::error("task %s: error cancelling activate schedule timer",
+                    name);
+         mutexTask.unlock();
+         throw theInternalTaskSignal;
+      }
+
+      Log::info("task %s: prevent done", name);
+
+      /* still running ? */
+      if (taskState == TERMINATED) {
+         mutexTask.unlock();
+         TaskMonitor::Instance().decPendingTasks();
+      } else {
+         mutexTask.unlock();
+      }
+   }
+
+
+
+   int Task::_useNormalScheduler = 0;
+
+   void Task::useNormalScheduler() {
+      _useNormalScheduler = 1;
+   }
+
+   pthread_t Task::getPid() {
+      return threadPid;
+   }
+
+   Task::TaskEntry Task::getEntry() {
+      return entryPoint;
+   }
+
+}

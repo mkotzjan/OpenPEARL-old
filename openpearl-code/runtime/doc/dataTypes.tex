@@ -1,0 +1,583 @@
+\chapter{Simple Data Types}
+PEARL defines the data types FIXED, FLOAT, BIT, CHARACTER, REF CHARACTER,
+DURATION and CLOCK.
+
+Specific for PEARL is the signal mechanism. It is expected that
+each operation induces a signal (in C++ exception) if the operator
+does no finish successfully. C++ does not provide this feature.
+
+For each data type a separate class provides the required operations.
+FIXED, FLOAT, BIT and CHARACTER may be defined in PEARL with a length
+attribute. This is mapped to C++-templates.
+
+For details about ctor parameters and member functions please check the
+doxygen documentation, which can be created for a specific plattform
+by \verb|make doc| in the corresponding directory.
+
+The classes for the simple data types are named as:
+
+\begin{tabular}{|l|l|l|}
+\hline\\
+PEARL name & class name & remarks\\
+\hline
+FIXED & Fixed & templated with the length\\
+FLOAT & Float & templated with the length\\
+BIT & BitString & templated with the length\\
+CHAR & Character & templated with the length\\
+REF CHAR & RefCharacter & \\
+DURATION & Duration & \\
+CLOCK & Clock & \\
+\hline
+\end{tabular}
+
+\if0
+\section{Fixed}
+The class {\em Fixed63} provides save operations on fixed values 
+with 63 bits plus sign. This development of this class was influenced by
+the header SafeInt.hxx, which is provided with the MSPL license.
+This class is used internally for the implementation of fixed values
+with individual lengths.
+
+The application specific versions of  the type fixed are realized with the 
+C++ template mechanism in {\em Fixed.h},
+ requiring the number of mantissa bits as template parameter. 
+All lengths from 1 to 63 are suported.
+The operations are mapped to the usual C++-operators.  
+For PEARL-specific operations member functions are supplied.
+
+All operations, which produce numerical {\em overflow}, {\em underflow}
+ or {\em divide by zero}  throw an exception.
+
+\begin{classSummary}
+ Class & \verb|Fixed<int S>| \\
+ Specification & Fixed.h \\
+ Implementation & - \\
+ \verb|size(Fixed<7>)| &   1 byte \\
+ \verb|size(Fixed<15>)| & 2 bytes \\
+ \verb|size(Fixed<31>)| & 4 bytes \\
+ \verb|size(Fixed<63>)| & 8 byte  \\
+\end{classSummary}
+
+
+\begin{methodMapping}
+  \verb|+| (monadic)      &        & to be treated by the compiler \\
+  \verb|-| (monadic)    & \verb|operator-()| &  \\
+ \verb|ABS|            & \verb|absVal()|  &  \\
+ \verb|SIGN|           & \verb|sign()|  & \\
+ \verb|TOBIT|          & \verb|BitString| &
+                    realized as Ctor in BitString 
+                     with the component '.x' of the FIXED variable \\
+ \verb|TOCHAR|         & \verb|toChar()|  & realized in Character.h \\
+  \verb|+| (dyadic)     & \verb|operator+(rhs)| & \\
+  \verb|-| (dyadic)     & \verb|operator-(rhs)| & \\
+  \verb|*| (dyadic)     & \verb|operator*(rhs)| & \\
+  \verb|//| (dyadic)   & \verb|operator/(rhs)| & \\
+  \verb|REM| (dyadic)   & \verb|operator%(rhs)| & \\
+  \verb|**| (dyadic)    & \verb|pow(rhs)|    & rhs is the exponent \\
+  \verb|<|          & \verb|operator<(rhs)|  & \\
+  \verb|>|           & \verb|operator>(rhs)|  & \\
+  \verb|<=|         & \verb|operator<=(rhs)| & \\      
+  \verb|>=|         & \verb|operator>=(rhs)| & \\   
+  \verb|==|         & \verb|operator==(rhs)| &   \\
+  \verb|/=|        & \verb|operator!=(rhs)|  &   \\
+  FIT               & \verb|fit(rhs)|    & rhs defines target size \\
+\end{methodMapping}
+
+\paragraph{Remarks:}
+\begin{itemize}
+\item If no preset value is specified, the variable is initialized with 0.
+\item There is no default length in the runtime system.
+\item C++ literals correspond usually to 32 bit integers. 
+If we need longer constants the postfix \verb|LL| must be added by
+the compiler to enforce 64-bit integers.
+\end{itemize}
+
+\begin{PEARLCode}
+DCL x FIXED(31) INIT(15); 
+DCL y FIXED(33) INIT(16); 
+DCL z FIXED INIT(17); 
+DCL z1 FIXED;
+DCL longFixed Fixed(53) INIT(123456789012); 
+z := x + y;
+x := z FIT x;
+x := z ** y;
+\end{PEARLCode}
+
+
+\begin{CppCode}
+Fixed<31> x(15);
+Fixed<33> y(16);
+Fixed<31> z(17);
+Fixed<31> z1;
+Fixed<53> longFixed(123456789012LL); 
+z = x + y;
+x = z.fit(x);
+x = z.pow(y);
+\end{CppCode}
+
+
+\section{Float}
+
+The type FLOAT is provided by templates with the lengths 24 and 53 bit
+mantissa precission, both with the hidden one presentation.
+These lengths are defined by the IEEE754 
+standard types single and double.
+
+New float variables are initialized with {\em NaN}, which is defined
+as \verb|NAN| in the {\em math.h} GNU-library if IEEE754 is
+available on the current system. This preset avoids problems with 
+uninitialized float values in calculations.
+
+Each operation (except assignment and comparison) contain checks
+for unexpected results. A result of {\em NaN} or {\em INF} causes the signals
+{\em FloatIsNaNSignal} or {\em FloatIsINFSignal} to be emitted.
+
+The operations are mapped to the usual C++-operators.  
+For PEARL-specific operations member functions are supplied.
+
+\begin{classSummary}
+ Class & \verb|Float<24>| and \verb|Float<53>|\\
+ Specification & Float.h \\
+ Implementation & - \\
+ \verb|size(Float<24>)| &   4 byte \\
+ \verb|size(Float<53>)| & 8 bytes \\
+\end{classSummary}
+
+
+\begin{methodMapping}
+  \verb|+| (monadic)      &        & to be treated by the compiler \\
+  \verb|-| (monadic)    & \verb|operator-()| &  \\
+ \verb|ABS|            & \verb|abs()|  &   \\
+ \verb|SIGN|           & \verb|sign()|   &  \\
+ \verb|ENTIER|          & \verb|entier()| & \\
+ \verb|ROUND|          & \verb|round()| & \\
+  \verb|+| (dyadic)     & \verb|operator+(rhs)| & rhs may be Fixed or Float\\
+  \verb|-| (dyadic)     & \verb|operator-(rhs)| & rhs may be Fixed or Float\\
+  \verb|*| (dyadic)     & \verb|operator*(rhs)| & rhs may be Fixed or Float\\
+  \verb|/| (dyadic)   & \verb|operator/(rhs)| & rhs may be Fixed or Float\\
+  \verb|**| (dyadic)    & \verb|pow(rhs)|    &
+                rhs is the exponent with type \verb|Fixed<S>| \\
+  \verb|<|          & \verb|operator<(rhs)|  & rhs may be Fixed or Float\\
+  \verb|>|           & \verb|operator>(rhs)|  & rhs may be Fixed or Float \\
+  \verb|<=|         & \verb|operator<=(rhs)| & rhs may be Fixed or Float \\     
+  \verb|>=|         & \verb|operator>=(rhs)| & rhs may be Fixed or Float \\   
+  \verb|==|         & \verb|operator==(rhs)| & rhs may be Fixed or Float \\
+  \verb|/=|        & \verb|operator!=(rhs)|  & rhs may be Fixed or Float   \\
+  FIT               & \verb|fit(rhs)|    & rhs defines target size \\
+SIN			& \verb|sin()|	& rhs must be Float \\ 
+COS			& \verb|cos()|	& rhs must be Float \\ 
+TAN			& \verb|tan()|	& rhs must be Float \\ 
+ATAN			& \verb|atan()|	& rhs must be Float \\ 
+TANH			& \verb|tanh()|	& rhs must be Float \\ 
+EXP			& \verb|exp()|	& rhs must be Float \\ 
+LN			& \verb|ln()|	& rhs must be Float \\ 
+SQRT			& \verb|sqrt()|	& rhs must be Float \\ 
+\end{methodMapping}
+
+\paragraph{Remarks:}
+\begin{itemize}
+\item There is no default length in the runtime system.
+\item C++ literals are passed as {\em double} to ctor.
+\item mixed operations with Fixed and Float are treated b non member methods
+\item sin, cos, ... with fixed is not supported yet; this must be 
+   treated by the compiler with the semantic analysis by automatic
+   type conversion towards Float.
+\item entier and round behavior must be compared with existing implementations; 
+    this implementation behaves like:
+    
+    \begin{tabular}{c||c|c|c|c|c|c}
+     x &         10.5 & 10.4 & 10.0 & -10.0 & -10.4 & -10.5 \\
+     \hline
+     entier(x) & 10 & 10& 10& -10& -11 & -11 \\
+     \hline
+     round(x) & 11& 10& 10& -10& -10& -11 \\
+   \end{tabular} 
+\end{itemize}
+
+\begin{PEARLCode}
+DCL x FLOAT(24) INIT(1.5); 
+DCL y FLOAT(53) INIT(1.6); 
+DCL z FLOAT INIT(1.7); 
+DCL z1 FIXED(31);
+y := x + y;
+x := z FIT x;
+x := z ** y;
+z := SIN(y);
+z := SIN(x+y);
+\end{PEARLCode}
+
+
+\begin{CppCode}
+Float<24> x(1.5);
+Float<53> y(1.6);
+Float<53> z(1.7);
+Float<31> z1;
+y = x + y;
+x = z.fit(x);
+x = z.pow(y);
+z = y.sin();
+z = (x+y).sin();
+\end{CppCode}
+
+
+\section{Bit}
+The type BIT is supported by the templated class {\em BitString}.
+The name was choosen to make clear that there may be  more than one bit
+in variable of this type.
+The internal data type is used according the length of the BitString. 
+The smallest possible native data size is used (1,2,4 or 8 bytes).
+
+The supported sizes are 1 to 64.
+
+The alignment of the bits inside the BitString is left adjusted. 
+This means that the most significant bits are used. This was choosen due to 
+the definition of operations of BitStrings with differnt lengths.
+
+Member functions are supplied for the PEARL operations. 
+
+Bit constants define their length intrinsic. All given digits are 
+considered to be part of the bit constant. E.g.
+
+\begin{tabular}{|r|c|}
+\hline
+BIT constant & Type \\
+\hline
+'1'B & BIT(1) \\
+'1'B2 & BIT(2) \\
+'1'B3 & BIT(3) \\
+'1'B4 & BIT(4) \\
+'01'B4 & BIT(8) \\
+\hline
+\end{tabular}
+
+\begin{classSummary}
+ Class & \verb|BitString<int len>| \\
+ Specification & BitString.h \\
+ Implementation & - \\
+ \verb|size(BitString<8>|) & 1 byte \\
+ \verb|size(BitString<16>|) & 2 bytes \\
+ \verb|size(BitString<32>)| & 4 bytes \\
+ \verb|size(BitString<64>)| & 8 byte  \\
+\end{classSummary}
+
+\begin{methodMapping}
+  \verb|NOT|       & \verb|bitNot()| &  \\
+  \verb|TOFIXED|   & \verb|toFixed()| &  \\
+  \verb|==|        & \verb|operator==(rhs)|   &  \\
+  \verb|/=|        & \verb|operator!=(rhs)|   & \\
+  \verb|AND|       & \verb|bitAnd(rhs)|   & \\
+  \verb|OR|       & \verb|bitOr(rhs)|   & \\
+  \verb|EXOR|     & \verb|bitXor(rhs)|    & \\
+  \verb|><| (CAT) & \verb|bitCat(rhs)|    & \\
+  \verb|<>| (CSHIFT) & \verb|bitCshift(rhs)| & \\
+  \verb|SHIFT|       & \verb|bitShift(rhs)|  & \\
+  \verb|.BIT(x)|     & \verb|getBit(...)|  & 
+				{\em on right hand side of the expression}\\
+  \verb|.BIT(x)|    & \verb|setBit(...)|  & 
+				{\em on left hand side of the expression}\\
+  \verb|.BIT(x,y)|  & \verb|getSlice(...)| & 
+				{\em on right hand side of the expression}\\
+  \verb|.BIT(x,y)|   & \verb|setSlice(...)| & 
+				{\em on left hand side of the expression}\\
+\end{methodMapping}
+
+The slice operations \verb|.BIT(...)| may be used in PEARL 
+on the left hand side and the right hand side of the expression.
+ 
+
+\paragraph{Remarks:}
+\begin{itemize}
+\item The preset value is passed to the ctor as integer type. The
+   radix evaluation must be done by the compiler.
+\item The passed integer is shifted internally by the number of not used 
+   bits in the used native data type to the left side. This results
+   in the proper interal alignment.
+\item If no preset value is specified, the variable is initialized with 0.
+\item There is no default length in the runtime system.
+\item the method names like {\em bitAnd} were choosen since {\em and} 
+is a reserved keyword in C for computer systems without \& character
+\item C++ literals correspond usually to 32 bit integers. 
+If we need longer constants the postfix \verb|LL| must be added by
+the compiler to enforce 64-bit integers.
+\item The initialising constant is of type int and right adjusted!
+\item {\em getSlice} and {\em setSlice} take the start index and a 
+    {\em BitString} defining the length and/or value as parameter.
+\end{itemize}
+
+Sample Code:
+\begin{PEARLCode}
+DCL x BIT(4) INIT ('1'B4);
+DCL y BIT(4);
+DCL z BIT(3);
+DCL c BIT(8);
+DCL f FIXED(3) INIT(2);
+y := '01'B1;  // implicit conversion BIT(2) -> BIT(4)
+y := x CSHIFT 1;
+z := y AND x;
+c := x CAT y;
+y := TOBIT f;
+f := TOFIXED y;
+z.BIT(2,2)  := c.BIT(1,2);
+\end{PEARLCode}
+
+\begin{CppCode}
+BitString<4> x4(1);
+BitString<4> y;
+Fixed<3> f(2);
+y = (pearlrt::BitString<2>)(1);
+y = x.bitCshift(1);
+z = y.bitAnd(x);
+c = x.bitCat(y);
+y = BitString<4>(f.x);
+f = y.toFixed();
+z.setSlice(2,c.getSlice(1,BitString<2>dummy));
+\end{CppCode}
+
+\section{CHARACTER}
+The data type CHARACTER in PEARL has a definite and fixed length.
+The templated class {\em Character} provides the storage allocation
+and necessary methods for this data type.
+All operations check for range overflows and throw exceptions in case of
+range violation.
+
+The language report states at one location that the length is of type FIXED(15).
+Therefore the supported lengths are 1 to 32787.
+
+The preset of a character variable may be set as C-string constant.
+
+\begin{classSummary}
+ Class & \verb|Character<size_t len>| \\
+ Specification & Character.h  \\
+ Implementation  &  Character.cc \\
+ size   &  1 byte per Character \\
+ max length & 32767  \\
+\end{classSummary}
+
+\begin{methodMapping}
+  \verb|UPB|      & \verb|upb()|    &  {\em returns size\_t}\\
+  \verb|TOFIXED| & \verb|toFixed()| &     \\ 
+  \verb|<|       & \verb|operator<()| &  \\
+  \verb|>|       & \verb|operator>()| &  \\
+  \verb|<=|      & \verb|operator<=()| & \\
+  \verb|>=|      & \verb|operator>=()| & \\
+  \verb|==|      & \verb|operator==()| & \\
+  \verb|/=|      & \verb|operator!=()| & \\
+  \verb|><| (CAT) & \verb|catChar()| & {\em see note below} \\
+  \verb|.CHAR(x)| & \verb|setCharAt(..)|&  
+				on left hand side in expression
+				{\em see note below}\\
+  \verb|.CHAR(x)| & \verb|getCharAt(..)| & 
+				on right hand side in expression
+				{\em see note below}\\
+  \verb|.CHAR(x,y)| & \verb|setCharSlice()| & 
+				on left hand side in expression
+				{\em see note below}\\
+  \verb|.CHAR(x,y)| & \verb|getCharSlice()| &
+				on right hand side in expression
+				{\em see note below}\\
+\end{methodMapping}
+The slice operations \verb|.CHAR(...)| may be used in PEARL 
+on the left hand side and the right hand side of the expression.
+
+Remarks:
+\begin{itemize}
+\item The slice operations are defined with a different interface than 
+   BitString. This was choosen to avoid character copies.
+\item the setSliceChar and getSliceChar methods take as $4^{th}$ element
+a Character value defining the retrieved/new data
+ from/for the container Char-value
+\end{itemize}
+
+\begin{PEARLCode}
+DCL x CHARACTER(5) INIT ('PEARL');
+DCL y CHARACTER(4);
+y := x.CHAR(2,5);
+x.CHAR(2,5) := y;
+\end{PEARLCode}
+\begin{CppCode}
+Character<5> x("PEARL");
+Character<4> y;
+getSliceChar(x, 2, 5, y);
+setSliceChar(x, 2, 5, y);
+\end{CppCode}
+
+
+\section{REF CHARACTER}
+The type REF CHARACTER allows character string with variable length.
+A REF CHARACTER needs a normal CHARACTER variable as working storage.
+It contains an additional value to maintain the current used length.
+
+The class {\em RefCharacter} provides the necessary operations.
+
+\begin{classSummary}
+Class & RefCharacter  \\
+ Specification & RefChar.h  \\
+ Implementation & RefChar.cc \\
+ size   &  12 byte \\
+\end{classSummary}
+
+\begin{methodMapping}
+  \verb|:=|     & \verb|setWork()|    & REF CHAR := CHAR(x) \\
+  \verb|CONT|   & \verb|\verb|store()|    & CHAR := CONT REF CHAR(x) \\
+\end{methodMapping}
+
+The content based operations like comparison are done upon the
+CHARACTER-type.
+
+
+\begin{PEARLCode}
+DCL wrk CHARACTER(100);
+DCL result CHARACTER(50);
+DCL rc REF CHAR();
+rc := wrk;
+CONT rc := 'Hallo';
+CONT rc := CONT rc CAT ' Welt.';
+result := CONT rc;
+\end{PEARLCode}
+
+\begin{CppCode}
+Character<100> wrk;
+Character<50> result;
+RefCharacter rc;
+rc.setWork(wrk);
+rc.clear();
+Character<5> hello((char*)"Hallo");
+rc.add(hello);
+Character<6> welt((char*)" Welt.");
+rc.add(welt);
+rc.store(result);
+\end{CppCode}
+
+\section{DURATION}
+The values of type DURATION are managed by the class {\em Duration}.
+The values are stored in a 64 bit integer ({\em Fixed63}).
+The base unit is $1 \mu s$.
+The range of 64 bit allows durations up to $\approx 100 days$.
+
+All calculations on durations are done within the full possible range.
+Thus values larger than 24 hours may occur.
+Even negativ values are possible.
+
+The mapping of duration values to the C++ types is done via the type
+\verb|double| giving the duration in seconds.
+
+Operations are defined as required by the language to mix DURATION, CLOCK, 
+   FIXED and FLOAT.
+
+\paragraph{Notes:}
+\begin{itemize}
+\item The division Duration / Duration delivers a \verb|Float<24>|, 
+   which may be assigned to larger Float type
+\item The division Duration/Float is realized as template for 
+   all Float-lengths 
+\end{itemize}
+
+\begin{classSummary}
+ Class & Duration \\
+ Specification & Duration.h \\
+ Implementation & Duration.cc \\
+ size   &  8 bytes \\
+\end{classSummary}
+
+
+\begin{methodMapping}
+  \verb|+| (monadic)  &        & to be treated by the compiler \\
+  \verb|-| (monadic)  & \verb|operator-()|  & \\
+  \verb|ABS|          & \verb|abs()|  & \\
+  \verb|SIGN|         & \verb|sign()|  & \\
+  \verb|+| (dyadic)   & \verb|operator+(rhs)| & duration+duration \\
+  \verb|-| (dyadic)   & \verb|operator-(rhs)| & duration-duration \\
+  \verb|*| (dyadic)   & \verb|operator*(rhs)| & duration*\verb|Float<S>| \\
+  \verb|/| (dyadic)   & \verb|operator/(rhs)| & duration/duration returns
+        \verb|Float<24>| \\
+  \verb|/| (dyadic)   & \verb|operator/(rhs)| & duration/\verb|Float<S>| \\
+  \verb|<|            & \verb|operator<(rhs)|& \\
+  \verb|>|            & \verb|operator>(rhs)| &  \\
+  \verb|<=|           & \verb|operator<=(rhs)|& \\
+  \verb|>=|           & \verb|operator>=(rhs)| & \\
+  \verb|==|           & \verb|operator==(rhs)| & \\
+  \verb|/=|           & \verb|operator!=(rhs)| & \\
+\end{methodMapping}
+
+\begin{PEARLCode}
+DCL minute DURATION INIT(1 MIN);
+DCL d1 DURATION INIT(1 HRS 3 MIN 3.1415 SEC);
+DCL d2 DURATION INIT(0.001415 SEC);
+d2 := d1 + minute;
+d2 := d1 + minute / 60.0;
+\end{PEARLCode}
+\begin{CppCode}
+Duration minute(60.0);
+Duration d1(3783.1415);
+Duration d2(0.001415);
+d2 = d1 + minute;
+d2 = d1 + minute / (Float<24>)(60);
+\end{CppCode}
+
+\section{CLOCK}
+The values of type CLOCK are managed by the class {\em Clock}.
+The values are stored in a 64 bit integer ({\em Fixed63}).
+The base unit is $1 \mu s$.
+
+All calculations on clock values are done within the
+period of 1 day.
+
+The mapping of duration values to the C++ types is done via the type
+\verb|double| giving the duration in seconds.
+
+Operations are defined as required by the language to mix DURATION and CLOCK. 
+
+The specification requires a procedure \verb|NOW| which delivers the current
+time as \verb|CLOCK|-value. This routine is plattform specific.
+
+
+\begin{classSummary}
+ Class & Clock  \\
+ Specification & Clock.h  \\
+ Implementation &  Clock.cc \\
+ size   &  8 byte \\
+\end{classSummary}
+
+
+\begin{methodMapping}
+  \verb|+| (dyadic) & \verb|operator+(rhs)| & Clock + Duration \\
+  \verb|-| (dyadic) & \verb|operator-(rhs)| & Clock-Duration and Clock-Clock \\
+  \verb|<|          & \verb|operator<(rhs)| &
+                    {\em returns bool } \\
+  \verb|>|          & \verb|operator>(rhs)| & 
+                    {\em returns bool } \\
+  \verb|<=|         & \verb|operator<=(rhs)| &
+                    {\em returns bool } \\
+  \verb|>=|         & \verb|operator>=(rhs)| &
+                    {\em returns bool } \\
+  \verb|==|         & \verb|operator==(rhs)| & 
+                    {\em returns bool } \\
+  \verb|/=|         & \verb|operator!=(rhs)| & 
+                    {\em returns bool } \\
+  \verb|NOW|        & \verb|Clock::now()| & this method is plattform specific\\
+\end{methodMapping}
+
+Remarks:
+\begin{itemize}
+\item the arithmetic operations are defined for also for
+   mixed Duration and Clock parameters
+\end{itemize}
+
+
+\begin{PEARLCode}
+DCL start CLOCK(11:30);
+DCL current CLOCK;
+DCL diff DURATION;
+current := NOW;
+diff := current - start;
+\end{PEARLCode}
+
+\begin{CppCode}
+Clock start(41400.0);
+Clock current;
+Duration diff;
+current = now();
+diff = current - start;
+\end{CppCode}
+\fi
+

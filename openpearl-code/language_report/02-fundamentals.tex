@@ -1,0 +1,270 @@
+\chapter{Fundamental Features of PEARL}   % 2
+
+\section{Multitasking Characteristics} % 2.1
+
+
+A data processing program for on-line control or on-line analysis of a
+technical process must be able to react as soon as possible to
+spontaneous requests of the process or temporal events. Thus, in most
+cases it is not sufficient to arrange and to carry out the individual
+programming steps sequentially, i.e. in temporally unchangeable order.
+The more or less complex automation problem has rather to be split up into
+problem related parts with varying urgency, and the program
+structure has to be adapted to this problem structure. Upon this,
+independent program components for problem parts are created that can be
+worked on sequentially within other components (e.g. procedures);
+but also independent program components for problem parts arise that
+have immediately to be executed in parallel to all other components because
+of a temporally not necessarily fixed stimulus (e.g. a fault indication
+from the process). Such a program component is called
+task; in order to fix their urgency, tasks can be provided with
+priorities.
+
+For the declaration and the working together of tasks with each other and
+with the technical process, PEARL offers the following possibilities:
+
+\begin{itemize}
+\item declaration of tasks, e.g.\\
+\code{supplies:} \kw{TASK PRIORITY} \code{2;}\\
+\code{~~~!   task object (declarations, statements)}\\
+\kw{END};
+\item starting (activation), e.g.\\
+      \kw{ACTIVATE}\code{ supplies;}
+\item terminating, e.g.\\
+      \kw{TERMINATE}\code{ printing;}
+\item suspending, e.g.\\
+      \kw{SUSPEND}\code{ statistics;}
+\item continuing, e.g.\\
+      \kw{CONTINUE}\code{ statistics;}
+\item resuming, e.g.\\
+      \kw{AFTER} \code{5} \kw{SEC RESUME}\code{;}
+\end{itemize}
+
+According to the requests of automation tasks, some of these
+statements can be scheduled for (repeated) execution, e.g. if a time,
+the end of a duration, or a message arrives:
+
+\begin{lstlisting}[frame=off]
+WHEN ready ACTIVATE supplies;
+\end{lstlisting}
+(meaning: every time when the interrupt ready occurs, the task \code{supplies}
+has to be activated)
+
+A temporal periodical start can also be scheduled:
+\begin{lstlisting}[frame=off]
+AT 12:0:0 ALL 1 SEC UNTIL 12:15:0 ACTIVATE measuring;
+\end{lstlisting}
+
+Different tasks execute their statements independently of one another,
+provided relevant measures do not prevent that. However, sometimes a
+synchronisation of two or more tasks is necessary, e.g. if a task
+produces data and stores them into a buffer. Here the producer must not
+work faster than the consumer. More complex synchronisation problems
+occur, if e.g. a task has to access to a file exclusively (because
+writing), whereas others can access simultaneously (because reading). In
+order to solve these synchronisation problems, PEARL contains the data
+types \code{SEMA} and \code{BOLT} 
+with corresponding statements, such as
+
+\begin{itemize}
+\item \kw{REQUEST}\code{ conveyorBelt;}        %%%conveyor-belt;
+\item \kw{RELEASE}\code{ communicationBuffer;} %%%communication-buffer;
+\end{itemize}
+
+%\begin{removed}
+%It is fundamental that these multitasking statements are {\it computer
+%independent}, i.e. PEARL programs can run on iRMX, OS/2, UNIX or VAX/VMS
+%systems without any changes.
+%\end{removed}
+
+%\begin{added}
+It is fundamental that these multitasking statements are {\it computer 
+plattform independent}, i.e. \OpenPEARL{} programs can run on Linux and 
+Microcontrollers enhanced with FreeRTOS without any changes.
+%\end{added}
+
+In addition to this, there is the great advantage that the PEARL
+programmer can program his multitasking statements in a {\it problem
+oriented way} with high comfort without becoming deeply involved in the
+peculiarities of the various operating systems --- e.g. in the handling
+of fork and message queue mechanisms of Unix. The conversion of problem
+oriented multitasking statements of PEARL into the mechanisms of
+multitasking operating systems is taken over by the PEARL compiler.
+
+\section{Possibilities of Input and Output}   % 2.2
+
+The transmission of data to or from devices of the standard peripherals (printer, hard disk etc.) 
+or process peripherals (sensors, 
+actuators, etc.), respectively, as well as the control of files take place in PEARL with 
+the help of computer independent statements.
+
+Devices and files are summarised by the term data station. Two kinds of
+data transmission are distinguished essentially:
+
+\begin{itemize}
+\item The transmission of data without format control, i.e. without
+      conversion into an external representation:
+
+      This kind of data transmission is used for file communication that
+      allows for sequential and direct access as well as for the transmission
+      of process data.
+
+      Examples:
+\begin{lstlisting}
+READ record FROM file BY POS (10);
+WRITE data_set TO logbook;
+TAKE measured_value FROM temperatureSensor;
+SEND on  TO motor;
+\end{lstlisting}
+
+\item The transmission of data with format control, i.e. with conversion
+      between internal format and external representation with those
+      possibilities available at the data station:
+
+      This means e.g. the representation in the characters of a character set
+      of the data station.
+
+      Examples:
+
+\begin{lstlisting}
+PUT event TO printer BY F(5);
+GET receipt FROM terminal;
+\end{lstlisting}
+\end{itemize}
+
+The names of the data stations can be chosen freely. This is reached by the
+partitioning of a PEARL program into computer dependent and mostly
+computer independent parts.
+
+In order to address special devices, the compiler offers a driver
+interface, to which the PEARL programmer himself can connect device
+drivers.
+
+\section{Program Structure}   % 2.3
+
+Program systems for the solution of complex automation tasks should be
+structured in a modular way. PEARL meets this requirement, because a
+PEARL program consists of one or several separately compilable
+modules.
+
+Connections between modules are possible by means of so-called global
+objects (e.g. variables, procedures, tasks).
+
+In order to be able to program the statements for data transmission
+and to schedule the reactions to the events from the technical process
+(interrupts) or of the computer hardware (signals) computer
+independently, a module is usually structured into a system part and a
+problem part.
+
+In the system part, the used hardware configuration is described.
+Particularly freely chosen names can here be assigned to the devices and
+their connections, the interrupts and signals. 
+
+%\begin{removed}
+%Thus, the following
+%example means that a valve is connected to the connector 3 of a digital
+%output unit called by the computer specific system name DIGOUT (1). The
+%valve, i.e. connector 3, is to be called by the freely selectable
+%computer independent user name ``valve'':
+%
+%valve: DIGOUT (1) * 3;
+%\end{removed}
+
+%%%\begin{discuss}
+%%%wir nutzen Userdations auf fuer die ProzessE/A. Das wäre aber hier 
+%%%zu frueh... daher nun ein Interrupt
+
+Thus, the following
+example means that a button may emit an interrupt when pressed.
+The button is connected to the computer at location specified
+by the system name \code{GpioInterrupt(2)}.
+
+The button, i.e. GpioInterrupt 2, is to be called by the freely selectable
+computer independent user name \code{start}:
+
+\code{start: GpioInterrupt(2);}
+
+Using the user name introduced in the system part, the actual algorithm
+for the solution of the automation task is programmed computer
+independently in the problem part, e.g.:
+
+\kw{WHEN}\code{ start} \kw{ACTIVATE}\code{ measurement\_task;}
+%%%\end{discuss}
+
+In order to structure the algorithms, (named) blocks, procedures and
+tasks (parallel activities) are available.
+
+\section{Data Types}   % 2.4
+
+The following data types are available in PEARL:
+
+\begin{itemize}
+\item \kw{FIXED} and \kw{FLOAT} with specifyable precision
+\item \kw{BIT} and \kw{CHARACTER} strings with specifyable length
+\item \kw{CLOCK} and \kw{ DURATION} for times and durations
+\item references (\kw{REF}) for indirect addressing
+\item devices and files (\kw{(DATION}) for standard and process input and
+      output
+\item interrupts (\kw{INTERRUPT}) for external interrupts
+\item signals (\kw{SIGNAL}) for internal exceptional situations
+\item semaphores (\kw{SEMA}) and bolt variables (\kw{BOLT}) for
+      coordinating the access of tasks to shared object
+\end{itemize}
+
+From this, the user himself can build up more complex data structures
+like arrays, hierarchical structures (\kw{STRUCT}) and lists; with the help
+of the \kw{TYPE} definition, they can be declared as new, problem oriented
+data types as well.
+%%%%%removed
+%%%%% Furthermore, PEARL allows the introduction of new,
+%%%%%problem oriented operators for any data structures with the help of the
+%%%%%OPERATOR definition.
+%%%%%end removed
+
+\section{Control Structures}   % 2.5
+
+The following control structures are available:
+
+\begin{itemize}
+\item conditional statement\\
+
+      \kw{IF} expression\\
+      \kw{THEN} statement$^{...}$\\
+      \kw{ELSE} statement$^{...}$\\
+      \kw{FIN};
+
+\item statement selection\_1\\
+
+      \kw{CASE} expression\\
+      \kw{ALT} (alternative 1) statement$^{...}$\\
+      \kw{ALT} (alternative 2) statement$^{...}$\\
+      ...\\
+      \kw{OUT} statement${...}$\\
+      \kw{FIN};
+
+\item statement selection\_2\\
+
+      \kw{CASE} Case\_Index\\
+      \kw{ALT} (Case\_List) statement$^{...}$\\
+      \kw{ALT} (Case\_List) statement$^{...}$\\
+      ...\\
+      \kw{OUT} statement${...}$\\
+      \kw{FIN};
+
+\item loops\\
+
+      \kw{FOR} ControlVariable \kw{FROM} start \kw{BY} StepLength \kw{TO} end\\
+      \kw{REPEAT}\\
+      statement$^{...}$\\
+      \kw{END};\\
+
+      \kw{WHILE} condition\\
+      \kw{REPEAT}\\
+      statement$^{...}$\\
+      \kw{END};
+
+\item exit statement\\
+
+      \kw{EXIT} block;
+\end{itemize}
+

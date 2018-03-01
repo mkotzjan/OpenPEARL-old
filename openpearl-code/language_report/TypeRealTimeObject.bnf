@@ -1,0 +1,4 @@
+\htgt{TypeRealTimeObject} ::=\\   
+\x \kw{SEMA} $\mid$  \kw{BOLT} $\mid$ 
+	\kw{INTERRUPT} $\mid$ \kw{IRPT} $\mid$ \kw{SIGNAL}   
+

@@ -1,0 +1,3 @@
+OpParameter ::=\\
+\x \hlink{Identifier} [ \hlink{VirtualDimensionList} ] \hlink{ParameterType} [ {\bf IDENT $\mid$ IDENTICAL} ] \\
+

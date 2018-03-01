@@ -1,0 +1,5 @@
+\htgt{RelativePosition} ::=\\
+\x \{ \kw{X} $\mid$ \kw{SKIP} $\mid$ \kw{PAGE} \} [ \kw{(}\hlink{Expression}\kw{)} ] \\
+\x $\mid$ \kw{ADV} \kw{(} [ [ \hlink{Expression} \kw{,} ] \hlink{Expression} \kw{,} ] \hlink{Expression} \kw{)} \\
+\x $\mid$ \kw{EOF}
+

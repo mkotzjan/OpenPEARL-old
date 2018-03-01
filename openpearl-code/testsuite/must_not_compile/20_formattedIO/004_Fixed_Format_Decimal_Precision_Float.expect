@@ -1,0 +1,3 @@
+004_Fixed_Format_Decimal_Precision_Float.prl:19:0: ERROR : type mismatch: precision must be FIXED 
+     PUT f TO pipe_out BY F(2,1.0),SKIP;
+                               ^

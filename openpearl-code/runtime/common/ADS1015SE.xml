@@ -1,0 +1,14 @@
+   <dation name="ADS1015SE">
+      <parameters>
+         <BIT length="8">
+            <VALUES>
+            '48'B4, '49'B4, '4A'B4, '4B'B4
+            </VALUES>
+         </BIT>
+         <FIXED length="15"><FIXEDRANGE>0,3</FIXEDRANGE></FIXED>
+         <FIXED length="15"><FIXEDRANGE>0,5</FIXEDRANGE></FIXED>
+      </parameters>
+      <attributes>SYSTEM, BASIC, IN</attributes>
+      <data>FIXED(15)</data>
+      <needAssociation name="I2CBusProvider" />
+   </dation>

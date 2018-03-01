@@ -1,0 +1,299 @@
+project nil "OpenPEARL Compiler" "1.0" 2015-06-05 +280d {
+}
+shift s40 "Part time shift" {
+  workinghours wed, thu, fri off
+}
+resource dev "Developers" {
+  resource marcel "Marcel Schaible" {
+  }
+}
+resource dev_semanticanalysis "Students" {
+}
+task openpearl "OpenPEARL Compiler" {
+  task software "Software Development" {
+    purge allocate
+    allocate dev
+    task feature_block "Block (Keyword: BEGIN and END)" {
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_repetition "Repetition (Keyword: FOR and REPEAT)" {
+      depends !feature_block
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_label "Label" {
+      depends !feature_repetition
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_goto "GOTO Statement (depends on Label)" {
+      depends !feature_label
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_procedure "Procedure (Keyword: PROC, RETURN and CALL)" {
+      depends !feature_goto
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_exit "EXIT Statement (depends on Label and block)" {
+      depends !feature_procedure
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_semantic_analysis "Integration of Semantic Analysis" {
+      depends !feature_exit
+      purge allocate
+      allocate dev
+      effort 80.0h
+    }
+    task feature_symboltable "Symboltable handling" {
+      depends !feature_semantic_analysis
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task feature_expressions "Expressions" {
+      depends !feature_symboltable
+      purge allocate
+      allocate dev
+      task feature_type_checks "Type checks" {
+        purge allocate
+        allocate dev
+        effort 8.0h
+      }
+      task feature_operator_precendence "Operator precedence" {
+        depends !feature_type_checks
+        purge allocate
+        allocate dev
+        effort 8.0h
+      }
+    }
+    task feature_void_datatype "VOID Datatype" {
+      depends !feature_expressions
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_interrupt_and_triggers "INTERRUPT and TRIGGER" {
+      depends !feature_void_datatype
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_signals "SIGNAL" {
+      depends !feature_interrupt_and_triggers
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_system_part "SYSTEM Part" {
+      depends !feature_signals
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+  }
+  task software_development "Software Development (not planned yet)" {
+    purge allocate
+    allocate dev
+    task feature_type "Type Definition (Keyword: TYPE)" {
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task statement "Statement Selection (Keyword: CASE)" {
+      depends !feature_type
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_ref_proc "References to procedures (REF PROC)" {
+      depends !statement
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_references "References (Keywords: REF and CONT)" {
+      depends !feature_ref_proc
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_struct "Structures (Keyword: STRUCT)" {
+      depends !feature_references
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_array "Datatype Array" {
+      depends !feature_struct
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_by_type "\"BY TYPE\" Operator" {
+      depends !feature_array
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_convert "CONVERT Statement" {
+      depends !feature_by_type
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_bolt "BOLT" {
+      depends !feature_convert
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task feature_global "GLOBAL" {
+      depends !feature_bolt
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task renaming "Renaming of Java package" {
+      depends !feature_global
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task handling "Handling of generated constants" {
+      depends !renaming
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+  }
+  task bug "Bug Fixing" {
+    purge allocate
+    allocate dev
+    task ticket_56 "Ticket#56	TAKE/​SEND does not compile" {
+      purge allocate
+      allocate dev
+      effort 24.0h
+    }
+    task ticket_61 "Ticket#61	SymbolTable:Type information" {
+      depends !ticket_56
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task ticket_83 "Ticket#83	BIT INIT and BIT Operations do not compile" {
+      depends !ticket_61
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task ticket_109 "Ticket#109	treatment of operator SIZEOF" {
+      depends !ticket_83
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task ticket_110 "Ticket#110	Treatment of Character Expressions" {
+      depends !ticket_109
+      purge allocate
+      allocate dev
+      effort 40.0h
+    }
+    task ticket_119 "Ticket#119	Fixed divison fixed result float" {
+      depends !ticket_110
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_120 "Ticket#120	float constant 24 or 53" {
+      depends !ticket_119
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_122 "Ticket#122	INTERRUPT does not compile" {
+      depends !ticket_120
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_126 "Ticket#126	READ/​WRITE with two (or more) absolute positioning statements" {
+      depends !ticket_122
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_127 "Ticket#127	Signal handler must be finished with GOTO,RETURN, TERMINATE or INDUCE" {
+      depends !ticket_126
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_129 "Ticket#129	Renaming of the compiler package from SmallPearl into OpenPEARL" {
+      depends !ticket_127
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_137 "Ticket#137	integrate new DATION Grammer" {
+      depends !ticket_129
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_140 "Ticket#140	minimum type for Fixed in RST-Format" {
+      depends !ticket_137
+      purge allocate
+      allocate dev
+      effort 8.0h
+    }
+    task ticket_144 "Ticket#144	Compiler must create Fixed parameters in I/​O-Statement" {
+      depends !ticket_140
+      milestone
+    }
+  }
+  task project "Project start" {
+    milestone
+  }
+}
+textreport report "Plan" {
+  formats html
+  header '== openpearl-compiler-roadmap =='
+
+  center -8<-
+    [#Plan Plan] | [#Resource_Allocation Resource Allocation]
+    ----
+    === Plan ===
+    <[report id="plan"]>
+    ----
+    === Resource Allocation ===
+    <[report id="resourceGraph"]>
+  ->8-
+}
+
+# A traditional Gantt chart with a project overview.
+taskreport plan "" {
+  headline "Project Plan"
+  columns bsi, name, start, end, effort, chart
+  loadunit shortauto
+  hideresource 1
+}
+
+# A graph showing resource allocation. It identifies whether each
+# resource is under- or over-allocated for.
+resourcereport resourceGraph "" {
+  headline "Resource Allocation Graph"
+  columns no, name, effort, weekly
+  loadunit shortauto
+  hidetask ~(isleaf() & isleaf_())
+  sorttasks plan.start.up
+}

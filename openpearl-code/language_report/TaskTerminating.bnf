@@ -1,0 +1,3 @@
+\htgt{TaskTerminating} ::=\\
+\x \kw{TERMINATE} [ \hlink{Name}$\S $Task ] \kw{;} 
+

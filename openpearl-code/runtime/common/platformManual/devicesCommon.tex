@@ -1,0 +1,218 @@
+\section{LogFile}
+Provides the capability to specify the log file name.
+The LogFile needs another system device, which provides the access to a 
+disc.
+
+Synopsis: \texttt{LogFile(filename)}
+
+\begin{description}
+\item[filename]  is the name of the fil, which collects all log messages
+   from the application.
+\end{description}
+
+\paragraph{Note:} The configuration element LogFile needs a disc type device
+  the for the access to the phyical storage.
+ 
+
+Sample Usage:
+\begin{PEARLCode}
+disc: Disc('/tmp/' ,10); ! linux specific disc definition
+Log('EW') --- LogFile('pearl.log') --- disc;
+\end{PEARLCode}
+
+\section{I2c-Device: LM75}
+The sensor delivers the current temperature via an I2C-bus interface.
+
+Synopsis: \texttt{LM75(address)}
+
+\begin{description}
+\item[address] is the I2C adress of the sensor on the I2C bus.
+   Valid adresses are: 48'B4, '49'B4, '4A'B4, '4B'B4,
+            '4C'B4, '4D'B4 , '4E'B4, '4F'B4
+\end{description}
+
+\paragraph{Note:}\ 
+\begin{itemize}
+\item the temperatur is returned in thenth of degree centigrade as a 
+    FIXED(15) value
+\item The chip needs some time to update the temperature value. A gap of
+   $\approx 40\mu s$ should be kept by the application between two read cycles.
+\item The LM75 device needs an I2C-bus device to operate
+\end{itemize}
+
+
+Sample Usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+   ! linux specific i2c bus interface definition
+   ic2bus1: I2CBUS('/dev/i2c-0');
+
+   ! connect the sensor to the I2C bus
+   temp: LM75('48'B4) --- i2cbus1;
+...
+PROBLEM;
+   SPC temperatur DATION IN SYSTEM BASIC FIXED(15);
+   DCL uTemperatur DATION IN BASIC FIXED(15) CREATED(temperatur);
+...
+t1: TASK;
+   DCL tValue FIXED(15);
+...
+   OPEN uTemperatur;
+   TAKE tValue FROM uTemperatur;
+   PUT tvalue/10,'.',tValue REM 10 TO console BY F(3),A,F(1), SKIP;
+...
+   CLOSE uTemperatur;
+END;
+...
+\end{PEARLCode}
+
+\section{I2c-Device: PCF8574}
+This device acts as port expander with 8 bit numbered from 7
+for the most significant bit down to 0.
+The decive operates via an I2C bus. 
+Individual bits may be ether as input or as output.
+Input and output are treated in different system elements.
+
+Synopsis: PCF8574In(address, start, width) \\
+\ \ \ \ PCF8574Out(address, start, width)
+
+The access of these devices must be done with BIT-types of the same size
+as denoted by width.
+
+\begin{description}
+\item[address] is the I2C adress of the sensor on the I2C bus.
+   Valid adresses are: '20'B4, '21'B4, '22'B4, '23'B4,
+            '24'B4, '25'B4 , '26'B4, '27'B4,
+            '38'B4, '39'B4, '3A'B4, '3B'B4, '3C'B4, '3D'B4 '3E'B4, '3F'B4
+\item[start] is the starting bit number, starting at the most signifigant bit 
+    number. 
+\item[width] the number of consecutive bits to use
+      towards the least significant direction
+\end{description}
+
+\paragraph{Notes:}\ 
+\begin{itemize}
+\item The PCF8574In device is read only
+\item The PCF8574Out device is write only
+\item Example: PCF8574In(5,4) will use bits 5,4,3 and 2 
+\end{itemize}
+
+\begin{PEARLCode}
+...
+SYSTEM;
+   ! linux specific i2c bus interface definition
+   ic2bus1: I2CBUS('/dev/i2c-0');
+
+   ! connect the led to bit 7 of the port expander
+   ! via the I2C bus
+   led: PCF8574Out('21'B4,7,1) --- i2cbus1;
+
+   ! connect a switch to bit 6 of the port expander
+   ! via the I2C bus
+   switch: PCF8574In('21'B4,6,1) --- i2cbus1;
+
+   ! connect a stepper motor to bit 3,2,1,0 of the port expander
+   ! via the I2C bus
+   stepper: PCF8574Out('21'B4,7,1) --- i2cbus1;
+
+PROBLEM;
+   SPC led DATION OUT SYSTEM BASIC BIT(1);
+   DCL uLed DATION OUT BASIC BIT(1) CREATED (led);
+
+   SPC switch DATION IN SYSTEM BASIC BIT(1);
+   DCL uSwitch DATION IN BASIC BIT(1) CREATED (switch);
+
+   SPC stepper DATION OUT SYSTEM BASIC BIT(4);
+   DCL uStepper DATION OUT BASIC BIT(4) CREATED (stepper);
+
+t1: TASK;
+   DCL currentSetting BIT(1);
+
+   OPEN uLed;
+   OPEN uSwitch;
+   OPEN uStepper;
+   SEND '1'B1 TO uLed;  ! switch on
+   SEND '0'B1 TO uLed;  ! switch off
+
+   TAKE currentSetting FROM uSwitch;
+   SEND currentSetting TO uLed;  ! echo the switch position
+
+   SEND '1010'B1 TO uStepper;
+ 
+   CLOSE uLed;
+   CLOSE uSwitch;
+   CLOSE uStepper;
+...
+END;
+...
+\end{PEARLCode}
+
+\section{I2c-Device: ADS1015SE}
+The sensor provides four single ended analog inputs via an I2C bus.
+The device  has a programmable gain unit, with modifies the sesibility
+of the external voltage by a muliplication by a selecteable factor.
+
+Synopsis: \texttt{ADS1015SE(address, channal, gain)}
+
+The device returns a FIXED(15) value reflecting the external voltage as ratio
+of the $\frac{returned value}{32767}*U_{ref}$.
+The reference voltage $U_{ref}$ is usually the supply voltage of 3.3V or 5V.
+
+\begin{description}
+\item[address] is the I2C adress of the sensor on the I2C bus.
+   Valid adresses are: '48'B4, '49'B4, '4A'B4, '4B'B4
+\item[channel] is the number of the selected input channel. 
+   Valid values are 0,1,2,3
+\item[gain] is the selected gain.
+   The result of the multiplication must not exceed the supply voltage.
+
+  \begin{tabular}{l|l}
+   gain & factor\\
+   \hline 
+   0 & 2/3 \\
+   1 & 1 \\
+   2 & 2 \\
+   3 & 4 \\
+   4 & 8 \\
+   8 & 16 \\
+   \end{tabular} 
+
+\end{description}
+
+\paragraph{Notes:} \ 
+\begin{itemize}
+\item The driver supports also the ADS1012 device.
+\item The device is read only
+\end{itemize}
+
+Sample Usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+   ! linux specific i2c bus interface definition
+   ic2bus1: I2CBUS('/dev/i2c-0');
+
+   ! connect the sensor to the I2C bus at 
+   ! address 48 (hexadecimal)
+   ! select channel 0 and internal gain of 1
+   voltage1: ADS1015SE('48'B4,0,1) --- i2cbus1;
+
+PROBLEM;
+   SPC voltage1 DATION IN SYSTEM BASIC FIXED(15);
+   DCL u1 DATION IN BASIC FIXED(15) CREATED(voltage1);
+
+t1: TASK;
+   DCL uFixed FIXED(15);
+   DCL u FLOAT;
+ 
+   OPEN u1;
+   TAKE uFixed FROM u1;
+   u := TOFLOAT(uFixed)/32767.0 * 3.3;
+   PUT 'voltage:', u, 'V' TO console BY A,X,F(5,3),A,SKIP;
+   CLOSE u1;
+END;
+...
+\end{PEARLCode}
+
+

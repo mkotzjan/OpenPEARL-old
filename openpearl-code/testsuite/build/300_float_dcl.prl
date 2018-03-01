@@ -1,0 +1,30 @@
+MODULE(float_dcl);
+
+PROBLEM;
+DCL x24 FLOAT(24);
+DCL y24 FLOAT(24) INIT(1.234);
+DCL x53 FLOAT(53);
+DCL y53 FLOAT(53) INIT(1.234);
+!DCL z53 FLOAT(53) INIT(1.234*6);  ! expressions in init: won't fix
+DCL z53 FLOAT(53) INIT(7.2);
+
+DCL (f1_24,f2_24) FLOAT(24) INIT(1.1,1.2);
+DCL (f1_53,f2_53) FLOAT(53) INIT(2.1,2.2);
+
+/*
+should compile into:
+__cpp__(
+    'pearlrt::Float<24>  x24;'
+    'pearlrt::Float<24>  y24(1.234);'
+    'pearlrt::Float<53>  x53;'
+    'pearlrt::Float<53>  y53(1.234);'
+    'pearlrt::Float<24>  f1_24(1.1);'
+    'pearlrt::Float<24>  f2_24(1.2);'
+    'pearlrt::Float<53>  f1_53(2.1);'
+    'pearlrt::Float<53>  f1_53(2.2);'
+);
+*/
+! make automatic test happy
+t: TASK MAIN;
+END;
+MODEND;

@@ -1,0 +1,32 @@
+\chapter{Documentation}
+
+\section{Architecture}
+
+\begin{description}
+\item[Pass 1:]
+The tool reads the specified xml files as DOM-trees into memory.
+In case of read errors, the java default exception handling
+gives information about the mistake in the input files.
+
+\item [Pass 2:]
+Scan the system part for each module and add the detected system elements
+into the container \verb|SystemElements|. Forward declarations are 
+recorded together with the expectation. 
+Errors are created on unknown system elements, wrong number or values
+of parameters. Mismatch of  associations types.
+Duplicate user names are detected and reported as error.
+
+\item[Pass 3:]
+The problem part elements are checked to fit to the system definitions.
+Unused defined system elements are reported as warning.
+
+\item[Pass 4:]
+The C++ source code is created.
+
+\end{description}
+
+The process stops after each pass, if there were errors detected.
+
+\section{Source Code}
+The source code consists of several classes, whic are documented with JavaDoc.
+

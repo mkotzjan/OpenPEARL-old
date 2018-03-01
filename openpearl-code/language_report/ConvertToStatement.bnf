@@ -1,0 +1,7 @@
+\htgt{ConvertToStatement} ::= \\
+\x \kw{CONVERT} \hlink{Expression} 
+	[ \kw{,} \hlink{Expression} ] $^{...}$ \\
+\x \kw{TO} \hlink{Name}$\S $CharacterStringVariable\\
+\x [ \kw{BY} \hlink{FormatOrPositionConvert} 
+	[ \kw{,} \hlink{FormatOrPositionConvert} ] $^{...}$ ] \kw{;}
+

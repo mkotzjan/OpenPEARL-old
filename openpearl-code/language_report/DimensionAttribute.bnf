@@ -1,0 +1,3 @@
+\htgt{DimensionAttribute} ::=\\
+\x ( \hlink{DimensionBoundaries} [ , \hlink{DimensionBoundaries} ] $^{...}$ )
+

@@ -1,0 +1,335 @@
+/*#########################################################
+PROGRAM
+This program tests the Comparison Operators from FLOAT.
+It combine: 
+	FLOAT 24 with FLOAT 24 
+	FLOAT 53 with FLOAT 53
+	FLOAT 24 with FLOAT 53
+	FLOAT 25/53 with FIXED 31
+
+The Comparison Operators are:
+	<, LE, >, GT, <=, LE, >=, GE, ==, EQ, /=, NE
+
+############################################################ 
+RESULT
+It gives 60 IF statements with different combinations.
+When the comparison is correct, the variable check
+is increment. 
+After the last comparison, the variable musst be 60.
+###########################################################*/ 
+
+MODULE(float_operator_three);
+
+PROBLEM;
+    
+
+Main : TASK MAIN;
+	DCL check FIXED(15) INIT(0);
+	DCL (a,b,c,d) FIXED(31) INIT(1,2,3,4);
+
+	DCL (a24,b24,c24,d24) FLOAT(24) INIT(1.125,1.25,22.5,1.125);
+	DCL (e24,f24,g24,h24) FLOAT(24) INIT(1.0,2.0,3.0,4.0);
+
+	DCL (a53,b53,c53,d53) FLOAT(53) INIT(1.125,1.25,22.5,1.125);
+	DCL (e53,f53,g53,h53) FLOAT(53) INIT(1.0,2.0,3.0,4.0);
+
+/*###########################
+	LT GT LE GE EQ NE
+###########################*/
+
+	/*### FLOAT 24 ###*/
+	IF a24 < b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 LT b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b24 > a24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b24 GT a24 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a24 <= d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 <= b24 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a24 LE d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 LE b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF c24 >= b24 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a24 >= d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF c24 GE b24 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a24 GE d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 == d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 EQ d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 /= c24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b24 NE c24 THEN
+		check := check + 1;
+	FIN;
+
+	/*### FLOAT 53 ###*/
+	IF a53 < b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 LT b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF b53 > a53 THEN
+		check := check + 1;
+	FIN;
+
+	IF b53 GT a53 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a53 <= d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 <= b53 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a53 LE d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 LE b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF c53 >= b53 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a53 >= d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF c53 GE b53 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a53 GE d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 == d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 EQ d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 /= c53 THEN
+		check := check + 1;
+	FIN;
+
+	IF b53 NE c53 THEN
+		check := check + 1;
+	FIN;
+
+	/*### FLOAT 24 combine FLOAT 53 ###*/
+
+	IF a53 < b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 LT b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF b53 > a24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b24 GT a53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 <= d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 <= b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 LE d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 LE b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF c24 >= b53 THEN
+		check := check + 1;
+	FIN;
+	
+	IF a53 >= d24 THEN
+		check := check + 1;
+	FIN;	
+
+	IF c24 GE b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 GE d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 == d24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 EQ d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 /= c53 THEN
+		check := check + 1;
+	FIN;
+
+	IF b53 NE c24 THEN
+		check := check + 1;
+	FIN;
+
+	/*### FLOAT 24, FLOAT 53 combine FIXED ###*/
+
+	IF a < a53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a LT a24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b > b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b GT b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a53 <= b THEN
+		check := check + 1;
+	FIN;
+
+	IF a <= b53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 LE b THEN
+		check := check + 1;
+	FIN;
+
+	IF a LE b24 THEN
+		check := check + 1;
+	FIN;
+
+	IF c24 >= d THEN
+		check := check + 1;
+	FIN;
+	
+	IF d >= d24 THEN
+		check := check + 1;
+	FIN;	
+
+	IF c53 GE d THEN
+		check := check + 1;
+	FIN;
+
+	IF d GE d53 THEN
+		check := check + 1;
+	FIN;
+
+	IF a == e24 THEN
+		check := check + 1;
+	FIN;
+
+	IF b EQ f53 THEN
+		check := check + 1;
+	FIN;
+
+	IF e24 == a THEN
+		check := check + 1;
+	FIN;
+
+	IF f53 EQ b THEN
+		check := check + 1;
+	FIN;
+
+	IF a24 /= c THEN
+		check := check + 1;
+	FIN;
+
+	IF c NE c24 THEN
+		check := check + 1;
+	FIN;
+
+	IF a /= g53 THEN
+		check := check + 1;
+	FIN;
+
+	IF h53 NE c THEN
+		check := check + 1;
+	FIN;
+
+	!__cpp__('printf("check : %d \\n", _check.x);');
+
+/*#####################################
+    verify the variable check
+    check == 0  -> SUCCESS
+#####################################*/
+
+    IF check == 68 THEN
+        __cpp__('printf ("*** SUCCESS *** \\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf ("*** FAILED *** \\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+
+END;
+
+MODEND;

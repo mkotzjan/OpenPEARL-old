@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<platform file="testPlatform.xml">
+      <signal name="FixedRangeSignal"/>
+      <signal name="FixedDivideByZeroSignal"/>
+      <signal name="FloatIsNaNSignal"/>
+      <interrupt name="UnixSignal">
+         <parameters>
+            <FIXED length="31">
+               <VALUES>1,2,3,15,16,17</VALUES>
+            </FIXED>
+         </parameters>
+      </interrupt>
+      <dation name="Disc">
+         <parameters>
+            <CHAR length="32767"/>	<!-- beliebiger String -->
+            <FIXED length="31">
+               <FIXEDRANGE>1,9999</FIXEDRANGE>
+            </FIXED>
+         </parameters>
+         <attributes>FORWARD, DIRECT, IN, OUT, INOUT, SYSTEM</attributes>
+         <data>ALL</data>
+         <associationProvider>
+            <associationType name="NamedAlphicOutProvider" />
+         </associationProvider>
+      </dation>
+      <dation name="StdIn" instances="1">
+         <parameters>
+         </parameters>
+         <attributes>
+            FORWARD, IN	, SYSTEM
+         </attributes>
+         <DATA>ALPHIC</DATA>
+      </dation>
+      <dation name="StdOut" instances="1">
+         <parameters>
+         </parameters>
+	 <attributes>
+            FORWARD, OUT, SYSTEM
+         </attributes>
+         <data>ALPHIC</data>
+         <associationProvider>
+            <associationType name="AlphicOutProvider" />
+         </associationProvider>
+      </dation>
+      <connection name="I2CBus">
+         <parameters>
+            <CHAR length="32767">
+               <NotEmpty />
+            </CHAR>
+            <FIXED length="31">	<!-- max int32_t -->
+               <FIXEDGT>0</FIXEDGT>
+            </FIXED>
+         </parameters>
+         <associationProvider>
+            <associationType name="I2CBusProvider" />
+         </associationProvider>
+      </connection>
+      <dation name="LM75">
+         <parameters>
+            <BIT length="8">
+               <VALUES>'48'B4, '49'B4, '4A'B4, '4B'B4,
+                       '4C'B4, '4D'B4 , '4E'B4, '4F'B4</VALUES>
+            </BIT>
+         </parameters>
+	 <attributes>
+            BASIC, SYSTEM, IN
+         </attributes>
+         <data>FIXED(15)</data>
+         <needAssociation name="I2CBusProvider"/>
+      </dation>
+      <dation name="Pcf8574">
+         <parameters>
+            <BIT length="8">
+               <VALUES>'20'B4, '21'B4, '22'B4, '23'B4,
+                       '24'B4, '25'B4 , '26'B4, '27'B4,
+                       '38'B4, '39'B4 , '3A'B4, '3B'B4,
+                       '3C'B4, '3D'B4 , '3E'B4, '3F'B4
+               </VALUES>
+            </BIT>
+            <FIXED length="7" nick="start">
+               <FIXEDRANGE>0,7</FIXEDRANGE>
+            </FIXED>
+            <FIXED length="7" nick="width">
+               <FIXEDRANGE>1,[$start+1]</FIXEDRANGE>
+            </FIXED>
+         </parameters>
+	 <attributes>
+            BASIC, SYSTEM, IN, OUT
+         </attributes>
+         <data>BIT($width)</data>
+         <needAssociation name="I2CBusProvider"/>
+      </dation>
+
+  <configuration name="Log" instances="1">
+    <parameters>
+      <CHAR length="4">
+         <NotEmpty/>
+      </CHAR>
+    </parameters>
+    <needAssociation name="AlphicOutProvider"/>
+  </configuration>
+
+   <connection name="LogFile">
+      <parameters>
+         <CHAR length="32767">
+            <NotEmpty/>
+         </CHAR>
+      </parameters>
+      <associationProvider>
+         <associationType name="AlphicOutProvider"/>
+      </associationProvider>
+      <needAssociation name="NamedAlphicOutProvider"/>
+   </connection>
+</platform>
+

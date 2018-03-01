@@ -1,0 +1,58 @@
+/****************************************
+Testing for a simple Put and Get Statement 
+on a pipe as dation. Putting and getting 
+of two simple Fixed Numbers. 
+****************************************/
+
+
+
+MODULE(Fixed_Format_Simple_Put_Get);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_exception.m4h})
+include({m4_testing.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Test1: TASK MAIN;
+     DCL (fo1,fo2,fi1,fi2) FIXED(15) INIT(0,0,0,0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+     
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+     fo1 := 1; 
+     PUT fo1 TO pipe_out BY  X(3), F(3), SKIP;
+     GET fi1 FROM pipe_in BY X(3), F(3), SKIP;
+     EXPECT_EQ({fo1},{fi1});
+
+     fo2 := 2;
+     PUT fo1,fo2 TO pipe_out BY  X(3), F(3), SKIP;
+     GET fi1,fi2 FROM pipe_in BY X(3), F(3), SKIP;
+     EXPECT_EQ({fo1},{fi1});
+     EXPECT_EQ({fo2},{fi2});
+
+
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+include({m4_check_header.m4h})
+
+END;
+MODEND;
+

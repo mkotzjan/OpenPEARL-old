@@ -1,0 +1,364 @@
+\section{Disc}
+The system device \verb|Disc| allows the access of files in the system.
+
+Synopsis: \verb|Disc(path, nbr)|
+
+\begin{description}
+\item [path] specifies the system path of the directory which should contain
+    the files defined by the {\em IDF} parameter in the {\em OPEN} statement
+\item[nbr] specifies the number of concurrent opened files with this dation
+     specified by {\em CREATED(...)} in the userd taion declaraction.
+\end{description}
+
+Supported attributes: FORWARD, DIRECT, IN, OUT, INOUT
+
+Multiple dations may by declared on the same path.
+
+
+Sample Usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+   disc: Disc('/tmp/' ,10); ! linux specific disc definition
+
+PROBLEM;
+   SPC disc DATION INOUT SYSTEM ALL;
+   !
+   ! define several user dation upon the same system dation
+   DCL logBook DATION OUT ALPHIC FORWARD DIM(*,80)
+                      STREAM NOCYCL CREATED(disc);
+   DCL dataBase DATION INOUT FIXED DIRECT DIM(10,10) 
+                      NOSTREAM NOCYCL CREATED(disc);
+...
+ttt: TASK;
+   DCL record FIXED(10);
+
+   OPEN logBook BY IDF('log.txt'), ANY;
+   PUT NOW,'Tast ttt started' TO logBook BY T(13,1),X,A,SKIP;
+...
+   OPEN dataBase BY IDF('table.dat'),OLD;
+   ! read 10 FIXED values
+   READ record FROM dataBase BY POS(2,1);
+   record(1) := record(1) + 1;
+   ! update first value in 2nd line
+   WRITE record(1) TO dataBase BY POS(2,1);
+...
+   CLOSE dataBase;
+   CLOSE logBook;
+...
+END;
+...
+\end{PEARLCode}
+
+\section{Standard Streams: StdIn, StdOut, StdError}
+The system devices \verb|StdIn|,
+\verb|StdOut| an \verb|StdError| allows the access of UNIX standard streams
+stdin, stdout and stderr.
+
+\begin{tabular}{ll}
+Synopsis: & \verb|StdIn| \\
+          & \verb|StdOut| \\
+          & \verb|StdError| \\
+\end{tabular}
+
+Sample usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+  stdout: StdOut;
+
+PROBLEM;
+   SPC stdout DATION OUT SYSTEM ALPHIC;
+   DCL con    DATION OUT ALPHIC DIM(*,80) CREATED(stdout);
+
+ttt: TASK;
+   PUT 'hallo' TO con BY A, SKIP;
+...
+END;
+...
+\end{PEARLCode}
+
+\paragraph{Note:}\ 
+\begin{itemize}
+\item Supported attributes: FORWARD, IN, OUT --- IN and OUT depend on the
+particular stream.
+\item Only one system device shall be defined per standard stream to avoid
+intermixing of input and output.
+\end{itemize}
+
+\section{Pipe}
+The system dation {\em Pipe} is useful for testing and interaction with
+other applications. The dation provides access to named pipes.
+The linux pipe blocks write attempts, if no reading file descriptor
+is opend on the pipe. 
+A dummy open with read may be achieved with the option OPEN1.
+
+Synopsis: \verb|Pipe(path, nbr, params)|
+
+\begin{description}
+\item [path] is a character string,
+     which specifies the system path of the fifo file
+    of the named pipe
+\item[nbr] specifies the number (as int) of concurrent opened files with this dation
+     specified by {\em CREATED(...)} in the userdation declaration
+\item [params] is a string value for detailed control of the behavior
+     at creation and termination. The parameters are searched in the string
+     case sensitive. The sequence of the parameters is artificial.
+   \begin{description}
+     \item[OLD] the entry in the file system must exist before starting
+     \item[NEW] the entry in the file system must not exist at starting
+     \item[ANY] the entry may exist or will be created else; an existing
+                file syste entry must by of type FIFO (default).
+     \item[OPEN1] specifies that one file descriptor should be opened 
+                automatically.
+     \item[CAN] the file system entry shall be deleted at the end of the 
+                application
+     \item[PRM] the file system entry shall remain at the end of the
+                application (default)
+   \end{description} 
+   The permissions are set to \verb|ugo=rwx| for new file system entries.
+\end{description}
+
+Sample usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+   pipe: Pipe('/tmp/pipefile', 2, 'OPEN1 ANY CAN');
+...
+PROBLEM;
+   SPC pipe DATION INOUT SYSTEM ALL;
+   DCL writeFormatted DATION OUT ALPHIC FORWARD DIM(*,80) CREATED(pipe);
+   DCL readInternal   DATION IN  CHAR   FORWARD DIM(*,80) CREATED(pipe);
+
+producer: TASK;
+   DCL floatVal FLOAT INIT(3.1415);
+
+   OPEN writeFormatted;
+   PUT  floatVal TO writeFormatted BY F(6,3), SKIP;
+...
+END;
+
+consumer: TASK;
+   DCL line CHAR(80);
+   OPEN readInternal;
+   READ line FROM readInternal;
+   IF line ==' 3.142' THEN
+      PUT 'ok' TO console BY A, SKIP;
+   ELSE
+      PUT 'wrong format' TO console BY A, SKIP;
+   FIN;
+...
+END;
+...
+\end{PEARLCode}
+
+\paragraph{Notes:} \
+\begin{itemize}
+\item Supported attributes: FORWARD, IN, OUT
+\item The declaration of multiple pipe devices upon the same system file shall
+\item The current user needs read/write permissions on the file system entry
+   denoted by \texttt{path}.
+be avoided.
+\end{itemize}
+
+\section{RPiDigitalOut, RPiDigitalIn}
+On Raspberry Pi systems the general purpose input and output bits (GPIO)
+may be used as digital inputs and putputs.
+
+The devices RPiDigitalIn and  RPiDigitalOut provides 
+an access to digital input and output bits
+on the GPIO-bits of the raspberry pi.
+
+\begin{tabular}{ll}
+Synopsis: & \verb|RPiDigitalOut(start, width)| \\
+          & \verb|RPiDigitalIn(start, width, pud)| \\
+\end{tabular}
+
+\begin{description}
+\item[start] specifies the number of leftmost bit of the group. Valid numbers
+     depend on the model of the raspberry pi. The starting number if
+     the leftmost gpio bit number (large value)
+\item [width] specifies the number of bits which are grouped together.
+     Valid numbers depend on the model of the raspberry pi.
+\item [pud] Pull-up / pull-down configuration.
+    Valid values are 'u' for pull up, 'd' for pull down and 
+    'n' for no pull-up/pull-down resistor. This option is only
+    available for digital inputs. The value of the pullk up/down resistor is
+    approx. $50 k \Omega$
+\end{description}
+
+The access to the dation is done by writing a BIT(width)-value to the
+opened dation. 
+Writing other data than BIT-types  may cause a signal, if the size of the
+data does not match the width parameter. 
+
+
+Supported bits:
+
+\begin{tabular}{|l|l|}
+\hline
+Model & Bits \\
+\hline
+1B & 2,3,4,7,8,9,10,11,17,18,22,23,24,25,27,28,29,30,31 \\
+\hline
+2B,3B & 2-27 (except 14, 15) \\
+\hline
+\end{tabular}  
+
+Sample usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+  led1 : RPiDigitalOut(8,1);
+
+  ! enable the pull-up resistor and connect the switch between 
+  ! GPIO bit 9 and GND
+  switch: RPiDigitalIn(9,1,'u');
+
+PROBLEM;
+   SPC led1 DATION OUT SYSTEM BASIC BIT(1);
+   DCL uLed DATION OUT BASIC BIT(1) CREATED(led1);
+
+   SPC switch1 DATION IN SYSTEM BASIC BIT(1);
+   DCL uSwitch DATION IN BASIC BIT(1) CREATED(switch1);
+...
+ttt: TASK;
+   DCL b BIT(1);
+
+   OPEN uLed;
+   OPEN uSwitch;
+   TAKE b FROM uSwitch;
+   IF b THEN
+      PUT 'switch is open' TO console BY A, SKIP;
+   ELSE
+      PUT 'switch is set short' TO console BY A, SKIP;
+   FIN;
+   SEND b TO uLed;  ! echo switch status
+...
+END;
+...
+\end{PEARLCode}
+
+\paragraph{Note:}  
+\begin{itemize}
+\item It is checked that a i/o-bit is not used by different declarations within
+one application.
+\item the Broadcom gpio block supports the access to the bits only 
+via set and clear registers. Thus the writing of a BIT(x) value with x $>$ 1
+need two sequential operations to clear and set the output bits, which lead
+to a short period of an intermediate value. E.g. '10' shall be changed to '01'. Bit 1 will be cleared leading to the output value '00' and bit 2 
+is set afterwards leading to '01'.
+
+\item Bits 14 and 15 are used by the kernel for the 
+  system serial console during system start. If this does not matter,
+  they can be used at runtime.
+\item Other bits become not available, if 
+  the i2c and/or spi is enabled in the
+  raspberry configuration.
+\item the current user needs to access the system device 
+  \verb|/dev/gpiomem|. This may be achieved by running as root, or setting
+  the permissions for \verb|/dev/gpiomem| accordingly.
+\end{itemize}
+ 
+\section{I2CBus}
+Linux supports normal access to an i2c bus via a device node,
+ if i2c support is configured and the corresponding devices are installed.
+The corresponding device file are named like \texttt{/dev/i2c-0}.
+
+This system entry may not be used in the problem part. This element
+provides the access to an I2C bus for the supported I2C devices like 
+PCF8574 or LM75.
+
+\begin{tabular}{ll}
+Synopsis: & \verb|I2CBus(deviceName)|\\ 
+\end{tabular}
+
+\begin{description}
+\item[deviceName] specifies the name to the device file (e.g. '/dev/i2c-0')
+\end{description}
+
+Sample usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+   led1: PCF8475Out('21'B4, 5,1) --- I2CBus('/dev/i2c-0');
+
+   i2cbus2: I2CBus('/dev/i2c-1');
+   in1: PCF8475In('21'B4,7,1) --- i2cbus2;
+   in2: PCF8475In('21'B4,6,1) --- i2cbus2;
+   in3: PCF8475In('21'B4,5,1) --- i2cbus2;
+   t1: LM75('48'B4) --- i2cbus2;
+   t2: LM75('49'B4) --- i2cbus2;
+...
+\end{PEARLCode}
+
+\paragraph{Note:}
+\begin{itemize}
+\item The I2C bus speed must be set at system level depending on the 
+i2c device module.
+\item if more than one i2c device is used on the same bus, a symbolic
+   links must be used in the system part
+%Some I2C-devices need the {\em repeated start} feature 
+%of the I2C specification.
+%This feature is not supported by all i2c bus drivers. The presence is
+%checked.
+\end{itemize}
+
+\section{PEAK CAN Bus Interface}
+The CAN bus interface from the company PEAK provides the access via a character 
+device node (e.q. \texttt{/dev/pcan32} and via SocketCAN.
+The socket CAN infrastructure allows no change of the communication setting
+like bitrate for normal users --- the character device from PEAK provides
+such features. 
+
+After installation of the PCAN device driver on the system as character 
+device, the corresponding device nodes and libraries are installed 
+in the system (e.g. \verb|/dev/pcan32|). Refere to the installation guide 
+from PEAK about the installation procedure.
+
+
+\begin{tabular}{ll}
+Synopsis: & \verb|PCan(deviceName, speed)|\\ 
+\end{tabular}
+
+\begin{description}
+\item[deviceName] specifies the name to the device file (e.g. '/dev/pcan32')
+\item[bus speed] specifies the bus speed. 
+Only the values 125000, 250000, 500000 and 1000000 bps are supported by 
+the OpenPEARL driver.
+\end{description}
+
+The transmission data must have the following structure:
+
+\begin{verbatim}
+   STRUCT [
+     identifier FIXED(11);  ! the message id (0..1023) 
+     rtrRequest BIT(1);     ! '1'B if a RTR frame transmission is requested
+     dataLength FIXED(4);   ! 0..8 as number of bytes to read or write
+     data(8)    BIT(8);     ! the storage of the read/written data bytes
+   ];
+\end{verbatim}
+
+Sample usage:
+\begin{PEARLCode}
+...
+SYSTEM;
+   can: PCAN('/dev/pcan32', 10000000);
+
+PROBLEM;
+   TYPE ... 
+   SPC can DATION INOUT SYSTEM ALL;
+   DCL uCan DATION INOUT canMessage FORWARD DIM(*) CREATED(can);
+
+ttt: TASK;
+   DCL cm canMessage;
+   OPEN uCan;
+   TAKE cm FROM uCan;
+   PUT 'received message id', cm.id TO console BY A, F(4), SKIP;
+...
+   SEND cm TO uCan;
+...
+END;
+...
+\end{PEARLCode}
+

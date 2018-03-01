@@ -1,0 +1,231 @@
+\chapter{Introduction}
+
+This document describes the overview of the runtime system
+of OpenPEARL for all platforms.
+The compiler API is described.
+Internal methods are documented as far as need for comprehension.
+Details on methods and parameters are 
+described in the source code based documentation with doxygen.
+
+\section{Structure of Files}
+The project targets different platform. 
+This is reflected in the directory structure inside the runtime system.
+
+The structure is kept flat. The top level of runtime directories
+just contains folders for the diffent platforms and the platform
+independent part. Files, which are special to a specific platform
+are stored in parallel folders which are named according the content.
+\begin{description}
+\item[common] contains the platform independent parts.
+   The file \verb|Files.common| contains lists which are used in the
+  platform specific  \verb|Makefile|
+\item[linux] contains the linux specific parts, as well as the common
+   linux device drivers. 
+\item[FreeRTOS] contains the FreeRTOS specific parts
+  \begin{description}
+  \item[FreeRTOS] contains FreeRTOS V8.1.2
+  \item [PEARL] contains the FreeRTOS specific classes of the runtime system
+  \item[addOns] contains modules, which extend ether the c-library, or
+                FreeRTOS
+  \end{description}
+\item[cortex-M] contains files for the target system on base of theARM-Cortex-M
+   processor
+   \begin{description}
+   \item[CMSIS] contains the Cortex-M-System-Interface routines
+   \item[LPCOpen] contains the access libriaries for NXP-processors and
+              gcc compiler
+   \end{description}
+\item[lpc1768] constains the processor and board specific
+   files for the FreeRTOS port for the Landtiger target board.
+\item[includeComposer] contains helper an application to generate 
+   one include file for the complete runtime system
+\item[codeStyle] contains source code formating check routines
+\end{description}
+
+Some modules have a platform independent part and a platform
+depended part. The naming is usually done in that way that the 
+platform independent part is named as e.q. {\em TaskCommon} and the 
+platform depended part is names eq. {\em Task}. This provides a simple
+interface towards the compiler, since the compiler just instanciates
+an object of type {\em Task}.
+
+\section{Build System}
+\label{sec:buildsystem}
+The build system for the complete OpenPEARL system is based on the 
+configuarion tools of the Linux system and make.
+Only \texttt{make menuconfig} is tested.
+
+On top level, there are two commands required
+\begin{enumerate}
+\item \texttt{make menuconfig}
+\item \texttt{make install}
+\end{enumerate}
+
+The configuration part provides for the different parts of the system
+some configuration files in the folder \texttt{./configuration/fm/}.
+The configuration tool generates include files for \texttt{make} and
+\texttt{C/C++}.
+
+The top level makefile delegates the job to the main parts
+ (compiler, runtime sytem).
+
+The runtime system delegates the build process to specific makefiles 
+for each target system. A result, there are
+\begin{itemize}
+\item a include files (\texttt{PearlIncludes.h} for all target systems
+\item platform specific libraries and linker files for each target system
+\item one compile/linkrun command (\texttt{prl})
+\end{itemize}
+The install directory may be specified in the configuration tool.
+
+The target specific makefile work similar to the linux kernel make file.
+The contributing directories are included bei makefile extensions and
+path substitutions.
+
+In order to distinguish the different targets in the common header include
+file, each target system is assigned with an unique number.
+
+\begin{table}[bpht]
+\begin{tabular}{|r|c|l|}
+\hline
+number & short form & target system \\
+\hline
+1 & linux &  Linux, even Rasperry Pi\\
+2 & lpc1768 & LPC1768 Landtiger board \\
+\hline
+\end{tabular}
+\caption{Mapping of Target System on an  Id}
+\label{tab:targetId}
+\end{table}
+
+\subsection{Minimal Porting Guide for a new Linux derivate}
+Linux systems are very similar on the sourcecode level. Differences are
+at the presence of devices and especially for maker scene systems at 
+the i/o-capabilities.
+
+It should be possible to manage these differences with the 
+configuration menu (see chapter \ref{sec:buildsystem})
+
+Use the Raspberry Pi as reference to  add a new derivate. 
+Define the required menu items and use them in the Makefile in the 
+linux part of the runtime build.
+
+\subsection{Minimal Porting Guide for a new FreRTOS based Microcontroller}
+A different microcontroller adds completely new devices and may be different
+compilers to the build system. That the reason why there is mor to do.
+
+\begin{enumerate}
+\item add a new target system id to table \ref{tab:targetId} and 
+      invent a shortform for this target
+\item create a suitable directory under \verb|runtime/| - use the same name
+   as the short form description
+\item add this target into \verb|runtime/Makefile| 
+\item provide in the platform specific directory the files for
+      build (\verb|cc_bin.inc|) and download/run (\verb|run_bin.inc|)
+\item use the files from the lpc1768 platform as reference for your
+      platform. The minimal support must provide 
+      \begin{itemize}
+      \item main.cc
+      \item console support via e.g. an UART. This part is divided
+            into a low level part (see \verb|Lpc17xxUartInternal|), 
+            the dation support (see \verb|Lpc17xxUart|)
+            and print-support (\verb|SystemConsole.cc|).
+      \item adopt Makefile for your required files
+      \item adopt makefile.conf for compiler and linker settings
+      \item adopt PearlIncludes.h. It must list the common and specific 
+            header files for this new platform
+      \item adopt the startup routine (see \verb|startup_lpc1768.S|)
+      \item adopt the linker script (see \verb|OpenPEARLlpc1768.ld|)
+      \end{itemize}
+\item check the FreeRTOSConfig.h setting for your device
+\item in case you need some files unchanged, please move them into a 
+      directory which is used by all targets. If the source depends on
+      FreeRTOS, place the folder under FreeRTOS, if it depends on 
+      Cortex-M, move it under cortexM. In other cases find a good place for
+      it.
+\end{enumerate}
+
+\section{Companion Tools}
+\subsection{Include Composer}
+There are a lot of header files in the runtime system. 
+The headers may include other headers again.
+To allow an easy deployment the tool {\em include composer} 
+was build using lex and yacc. It reads one header file {\em PearlIncludes.h}
+and creates one header which contains all definitions from the headers
+included bei PearlInclude.h. The system includes are treated in that way
+that they appear only once in the resulting header file.
+
+\begin{itemize}
+\item The tool treats the preprocessor statements 
+ifdef, ifndef, else, endif, define undef.
+\item The system includes (path separator \verb|<..>|) are collected
+and dumped in order to speed up the compilation process of the 
+pearl system.
+\item ifdef/ifndef statemente are evaluated. Only really required code
+   is passed to standard ouput stream.
+\item Limits may be changed in the source code: 
+   \begin{itemize}
+   \item length of defined identifier: 59 characters
+   \item number of defines identifier: 200
+   \item include depth: 10
+   \item IF depth: 20
+   \item include file name length: 29
+   \end{itemize}
+\item The user includes (path separator \verb|"..."|) are treated
+\end{itemize}
+ 
+
+\subsection{Delete White Space Lines}
+This tool removes multiple lines, which contain only white space characters
+and reduces them to one line.
+
+%\section{Code Generation}
+%There are some point to be considered at code generation.
+%\begin{itemize}
+%\item to avoid name conflicts, the identifiers from the PEARL code
+%   are prepended with a prefix  (underscore)
+%\item the runtime system is placed in the namespace \verb|pearlrt|.
+%\item the compiler output code is in no namespace
+%\end{itemize}
+%
+%\textbf{
+%In this document the namespace qualifiers  and name decorators 
+%are omitted in many places for better readability.
+%}
+%
+%Signal handling and device definitions need the definition of 
+%different components, which are related to one user define pearl 
+%element.
+%The corresponding chapters define a decoration scheme. If suitable
+%for the compiler othe schemes are possible. 
+
+
+\section{Internal Helper Classes}
+\begin{description}
+\item[CSemaCommon]  provides the interface definition for counting semphores
+\item[MutexCommon] provides the interface definition for mutexes
+\item[IfThenElseTemplate] provides conditional compilation
+\item[NumberOfBytes] provides templates for size of data computations
+\end{description}
+The documentation of runtime internal classes is not subject of this document.
+Please refer to the doxygen output.
+
+\section{Code Portability}
+The code of the runtime system is according C++ standard.
+
+The following extensions provided by gcc are used:
+\begin{description}
+\item[labels as values] is used in the signal handling. 
+   If this featureis not available, the compiler must produce a switch 
+   statement instead of the {\em computed goto} to resolve
+   the current goto target.
+\item[\_\_attribute\_\_(format)] is used in the log facility to check
+   proper argument matching according the printf-semantic.
+   This option may be removed without problems, as long as the logging
+   calls are correct.
+\item[\_\_attribute\_\_(used)] is used in the FreeRTOS port to bypass linkage
+   problems which appear with FreeRTOS and LTO (Link Time Optimization)
+\item[\_\_attribute\_\_((section("...")))] is used to control the
+   memory usage for the microcontroller.
+\end{description}
+   

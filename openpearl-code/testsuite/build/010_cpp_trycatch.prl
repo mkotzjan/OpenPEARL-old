@@ -1,0 +1,29 @@
+MODULE(taskdata);
+
+PROBLEM;
+T1: TASK MAIN;
+   DCL x FIXED(15);
+   DCL y FIXED(15);
+   DCL z FIXED(15);
+   DCL null FIXED(15);
+
+   x := 1;
+   y := 0;
+   z := 0;
+   null = 0;
+   __cpp__ (" try {");
+   x := x // y;
+   __cpp__("} catch (FixedDivideByZeroSignal s) { ");
+      z := 1;
+   __cpp__("}");
+   !   PUT 'FAILED' ...
+    IF( z == null) THEN
+   __cpp__(
+	"     printf(\"no signal caught\\n\"); "
+	"     pearlrt::Control::setExitCode(1); "
+     );
+    FIN;
+
+END;
+
+MODEND;

@@ -1,0 +1,48 @@
+MODULE(proc);
+PROBLEM;
+
+sum1: PROC ( (a,b) FIXED(15) ) RETURNS(FIXED(15)); 
+  DCL result FIXED(15);
+
+  result := a + b;
+  result := sum2(a,b);
+  RETURN (result);
+END;
+ 
+T1: TASK MAIN;
+
+  DCL f1 FIXED(15) INIT(1);
+  DCL f2 FIXED(15) INIT(2);
+  DCL f3 FIXED(15) INIT(0);
+
+  f3 := sum1(f1, f2);
+  IF f3 ==  3 THEN
+     __cpp__("printf(\"success\\n\");");
+   ELSE
+     __cpp__("printf(\"failure\\n\");"
+             "pearlrt::Control::setExitCode(1);");
+   FIN;
+
+  f3 := sum2(f1, f2);
+  IF f3 ==  3 THEN
+     __cpp__("printf(\"success\\n\");");
+   ELSE
+     __cpp__("printf(\"failure\\n\");"
+             "pearlrt::Control::setExitCode(1);");
+   FIN;
+
+
+END;
+
+DCL dummy FIXED;
+
+sum2: PROC(a FIXED(15), b FIXED(15)) RETURNS(FIXED(15)); 
+  DCL result FIXED(15);
+
+  result := a + b;
+  RETURN (result);
+END;
+ 
+MODEND;
+
+

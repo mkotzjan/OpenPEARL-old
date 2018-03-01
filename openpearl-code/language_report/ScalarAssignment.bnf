@@ -1,0 +1,3 @@
+\htgt{ScalarAssignment} ::=\\
+\x \hlink{Name}\S ScalarVariable \{ \kw{:=} $\mid$ \kw{=} \} \hlink{Expression};
+

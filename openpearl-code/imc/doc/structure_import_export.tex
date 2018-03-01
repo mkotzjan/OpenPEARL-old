@@ -1,0 +1,263 @@
+\chapter{Structure of Module Import and Export Definition}
+
+The compiler creates an xml-file per PEARL-module containing the
+\begin{itemize}
+\item system part information
+\item problem part specifications and declarations
+\end{itemize}
+
+\section{XML-Document Structure}
+The compiler has no knowledges about the nature of a system name.
+Thus the system part is translated as it is --- only syntactical errors
+are recognized. 
+The document has the root tag \verb|<module>|, which hat the attribute
+\verb|file| with the value source file name.  
+All system elements are in the xml-subtree \verb|<system>|.
+All problem part elements with attribute GLOBAL are located
+in the xml-subtree \verb|problem|.
+
+\begin{XMLCode}
+<?xml version="1.0" encoding="UTF-8" ?>
+<module file="demo.prl">
+<system>
+   <username .... >
+   ....
+   </username>
+   <configuration .... >
+   ....
+   </configuration>
+</system>
+<problem>
+  <spc .../>
+  <dcl .../>
+  ...
+</problem>
+</module>
+\end{XMLCode}
+
+\section{System Part Elements}
+\subsection{User Names \texttt{<username>}}
+If a system element defines a user name the \verb|<username>| tag is 
+used. Each user name is accompanied by an system name with the tag 
+\verb|<sysname>|, which may have parameters.
+The sysname-tag may contain a list of associations, thus there may by a tree
+of \verb|<association>| tags.
+The user name tag contains the attribute \verb|line| with the value of the 
+source code line number.
+
+\subsection{System Name \texttt{<sysname>}}
+\label{sec_system_names}
+The system name tag contains the attribute \verb|name| containing the 
+name of the system element.
+
+\subsection{Parameters \texttt{<parameters>}}
+The parameters are located in the \verb|<parameters>|-subtree.
+The imc tool supports constants of type FIXED, CHAR and BIT.
+The compiler detects  the type of the parameter
+from the literal and passes the literal as content to the corresponding
+\verb|<FIXED>|-, \verb|<CHAR>|- or \verb|<BIT>|-tag.
+
+\subsection{Associations \texttt{<associations>}}
+An association may be ether a system name (with parameters) or a user name.
+The  \verb|<association>|-tag contains the attribute \verb|name| with the 
+given name as value. If parameters are specified for the association,
+they are passed as \verb|<parameters>|-subtree in the same way as decribed 
+in section \label{sec_system_names}.
+
+There is no check in the compilation phase necessary,
+whether a name is a system name
+or a user supplied name.
+
+
+\subsection{Configuration Item}
+Configuration elements in the system part are located in the
+\verb|<configuration>|-element. 
+The only difference to the \verb|<username>|-tag is the absence of the 
+\verb|name|-attribute. Parameters and associations apply identical.
+
+\subsection{Example for System Part Elements and their Specifications}
+\begin{PEARLCode}
+MODULE(demo);
+
+SYSTEM;
+lm75: LM75('48'B4) --- I2CBus('/dev/i2c-0', 100000);
+
+lm75a : LM75('49'B4) --- i2cbus1;
+i2cbus1: I2CBus('/dev/i2c-1', 100000);
+
+sig1: FixedRangeSignal;
+int1: UnixSignal(15);
+
+disc: Disc('/tmp/folder1', 10);
+
+stdOut: StdOut;
+
+Log('EW') --- StdOut;
+
+PROBLEM,
+SPC sig1 SIGNAL GLOBAL;
+SPC int1 INTERRUPT GLOBAL;
+SPC disc DATION OUT DIRECT SYSTEM ALL GLOBAL;
+SPC stdOut DATION OUT SYSTEM ALPHIC GLOBAL;
+SPC lm75 DATION IN SYSTEM FIXED(15) GLOBAL;
+
+MODEND;
+\end{PEARLCode}
+
+\begin{XMLCode}
+<?xml version="1.0" encoding="UTF-8" ?>
+<module file="demo.prl">
+<system>
+   <username name="lm75" line="4">
+      <sysname name="LM75">
+      <parameters>
+         <BIT>'48'B4</BIT>
+      </parameters>
+      <association name="I2CBus">
+         <parameters>
+            <CHAR>'/dev/i2c-0'</CHAR>
+            <FIXED>100000</FIXED>
+         </parameters>
+      </association>
+   </sysname>
+</username>
+
+<username name="lm75a" line="6">
+   <sysname name="LM75">
+      <parameters>
+         <BIT>'49'B4</BIT>
+      </parameters>
+      <association name="i2cbus1">
+      </association>
+   </sysname>
+</username>
+
+<username name="i2cbus1" line="7">
+   <sysname name="I2CBus">
+      <parameters>
+         <CHAR>'/dev/i2c-1'</CHAR>
+         <FIXED>100000</FIXED>
+      </parameters>
+   </sysname>
+</username>
+
+<username name="sig1" line="9">
+   <sysname name="FixedRangeSignal"/>
+</username>
+
+<username name="int1" line="10">
+   <sysname name="UnixSignal">
+      <parameters>
+         <FIXED>15</FIXED>
+      </parameters>
+   </sysname>
+</username>
+
+<username name="disc" line="12">
+   <sysname name="Disc">
+      <parameters>
+         <CHAR>'/tmp/folder1'</CHAR>
+         <FIXED>10</FIXED>
+      </parameters>
+   </sysname>
+</username>
+
+<username name="stdOut" line="14">
+   <sysname name="StdOut">
+   </sysname>
+</username> 
+
+<configuration line="16">
+   <sysname name="Log">
+      <parameters>
+         <CHAR>'EW'</CHAR>
+      </parameters>
+      <association name="StdOut">
+      </association>
+   </sysname>
+</configuration>
+</system>
+<problem>
+<spc type="signal" name="sig1" line="19"/>
+<spc type="interrupt" name="int1" line="20" />
+<spc type="dation" name="disc" line="21">
+   <attributes> OUT,SYSTEM, DIRECT </attributes>
+   <data>ALL</data>
+</spc>
+<spc type="dation" name="stdOut" line="22">
+      <attributes> OUT, SYSTEM </attributes>
+      <data>ALPHIC</data>
+</spc>
+<spc type="dation" name="lm75" line="23">
+      <attributes> IN, SYSTEM </attributes>
+      <data>A15</data>
+</spc>
+</problem>
+</module>
+\end{XMLCode}
+\section{Problem Part Elements}
+\subsection{Specification of System Part Elements}
+The PEARL source code defined the type of a system name to be ether a DATION, 
+INTERRUPT or SIGNAL. According detected type, the compiler 
+adds a xml-tag \verb|<spc>|-tag with attributes \verb|type| anf \verb|line|
+containing the value \verb|"dation"|, \verb|"interrupt"| or \verb|"signal"|,
+ respectively.
+While interrupts and signals have no parameters, dations need more
+specifications. The attributes are stores as comma separated list in the
+\verb|<attributes>|-subelement, the transmission data is given as value
+of the <data>-tag. For details aboutencoding of the type information
+see chapter \ref{encoding}. 
+
+\subsection{Declaration of Problem Part Elements}
+
+Additional type information for the \verb|type| attribute are introduced.
+The additional type values are identical to the  encoding rules of
+structures and structure elements  as described in \cite{runtime}.
+
+This treats all elements except dations. They are described similar to the
+system part.
+
+
+\subsection{Specification of Problem Part Elements}
+The specification of global  elements in the problem part are described 
+in the same as their declaration.
+
+\subsection{Example for Specification and Declarations in Problem Part}
+
+\begin{PEARLCode}
+PROBLEM;
+   DCL x FIXED(7) GLOBAL;
+   SPC y FIXED(17) GLOBAL;
+   DCL d12 DATION OUT STRUCT [a FIXED(7), b FLOAT(53)]
+     DIM(10,20)  GLOBAL CREATED(aSystemDation);
+   DCL s1 SEMA PRESET(10) GLOBAL;
+\end{PEARLCode}
+
+\begin{XMLCode}
+...
+<problem>
+  <dcl type="A7" name="x" line=".."/>
+  <spc type="A15" name="y" line=".."/>
+  <dcl type="dation" name="d12" line="10">
+    <attributes>OUT DIM(10,20)</attributes>
+    <data>S5A7B57</data>
+  </dcl>
+  <dcl type="I" name="s1" line="..."/>
+</problem>
+\end{XMLCode}
+
+
+\section{Encoding of Transfer Data Types and STRUCTs}
+\label{encoding}
+The encoding of transfer data is like described in the runtime documentation
+\cite{runtime}. The primitive data types and their length are encoded 
+by a letter and an integer constant. E.g A7 is a FIXED(7). The encoding rules
+for struct and arrays hold. Special values are ALL and ALPHIC.
+
+\begin{description}
+\item[ALL] fits to all data types
+\item[ALPHIC] in problem part fits to ALPHIC, CHAR and ALL in system devices
+\end{description}
+
+This mapping is also used for problem part global elements, except for dations,
+which need more information to be checked.

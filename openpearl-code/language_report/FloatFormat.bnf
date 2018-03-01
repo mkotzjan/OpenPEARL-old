@@ -1,0 +1,4 @@
+\htgt{FloatFormat} ::=\\
+\x \kw{E}[\kw{3}] \kw{(}\hlink{FieldWidth} [ \kw{,} \hlink{DecimalPositions}
+	 [ \kw{,} \hlink{Significance} ] ] \kw{)}
+

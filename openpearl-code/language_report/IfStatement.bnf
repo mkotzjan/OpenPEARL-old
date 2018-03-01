@@ -1,0 +1,6 @@
+\htgt{IfStatement} ::=\\
+\x \kw{IF} \hlink{Expression}$\S $OfType-BIT(1)\\
+\x \kw{THEN} \hlink{Statement} $^{...}$ \\ 
+\x [ \kw{ELSE} \hlink{Statement} $^{...}$  ]\\
+\x \kw{FIN} ;\\
+

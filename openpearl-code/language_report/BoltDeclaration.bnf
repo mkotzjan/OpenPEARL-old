@@ -1,0 +1,5 @@
+\htgt{BoltDeclaration} ::=\\
+\x \{ \kw{DECLARE} $\mid$ \kw{DCL} \} \hlink{OneIdentifierOrList} 
+[ \hlink{DimensionAttribute} ] \kw{BOLT}\\
+\x [ \hlink{GlobalAttribute} ] \kw{;}
+

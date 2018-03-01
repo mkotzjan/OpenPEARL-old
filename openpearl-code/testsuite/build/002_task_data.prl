@@ -1,0 +1,29 @@
+MODULE(onetask);
+
+PROBLEM;
+next_maschine : PROC;
+   DCL x16 FIXED;
+END;
+
+T1: TASK MAIN;
+   DCL x FIXED;
+   DCL x1 FIXED;
+   DCL x2 FIXED;
+   DCL x3 FIXED;
+   DCL x4 FIXED;
+   DCL x5 FIXED;
+   DCL x6 FIXED;
+
+
+!  __cpp__ ( "pearlrt::Fixed<15>  _x;");
+   __cpp__("try { ");
+   ! as long as FIXED is translated to Fixed<1> the next statement
+   ! produces an exception
+   x := 10;
+   __cpp__ (
+	"} catch (FixedRangeSignal s) { "
+	"   pearlrt::Control::setExitCode(1); "
+        " } " );
+END;
+
+MODEND;

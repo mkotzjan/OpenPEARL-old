@@ -1,0 +1,27 @@
+MODULE(repeat);
+PROBLEM;
+
+T1: TASK MAIN;
+
+  DCL f1 FIXED(15) INIT(0);
+  DCL f2 FIXED(15) INIT(2);
+  DCL f3 FIXED(15) INIT(3);
+
+  FOR i TO 0 REPEAT
+     f1 := f1 + i;
+  END;
+  IF f1 ==  6 THEN
+     __cpp__("printf(\"success\\n\");");
+   ELSE
+     __cpp__("printf(\"failure\\n\");"
+             "pearlrt::Control::setExitCode(1);");
+   FIN;
+
+  FOR i TO 100000 REPEAT
+  END;
+
+END;
+
+MODEND;
+
+

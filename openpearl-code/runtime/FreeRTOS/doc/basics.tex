@@ -1,0 +1,566 @@
+\section{System Overview}
+FreeRTOS is used as scheduler. This system was selected, because
+\begin{itemize}
+\item it provides preemptive priority scheduling
+\item it is avaliable on nearly every micro controller system
+\item it is available in source code
+\item it is distributed with a free licence type
+\end{itemize}
+
+PEARL tasks are mapped on FreeRTOS tasks. The required macros
+are provided by \texttt{GenericTask.h}.
+
+The FreeRTOS system has the following disadvantages:
+\begin{enumerate}
+\item task control blocks and task stack are allocated on the system
+   heap on task creation. This may lead to memory fragmentation
+\item ... and more ?? ... 
+\end{enumerate}
+
+Item 1 is treated by a modification of FreeRTOS with static TCB and stack
+and an user supplied heap manager, with implements a pool allocation pattern.
+
+\section{System Architecture}
+There are some problems with the linker and \texttt{weak} symbols.
+The effect is that \texttt{weak} symbols are not overwritten, if
+a corresponding strong symbol resides in a library.
+\texttt{weak} symbols are usually used in the interrupt vector table.
+This leads to
+\begin{enumerate}
+\item an object file which contains the interrupt service handlers like
+   reset-handler, timer and other device service routines
+\item a runtime library with the remaining object files
+\end{enumerate}
+
+\subsection{System Initialization}
+The system initialization is described in the target specific part.
+
+\subsection{Linkage}
+The gcc linker option LTO is used to remove unused functions and data. 
+The individual test and application programs are linked together with 
+the static library.
+
+\section{Unit Tests}
+The linux trunk of the project, which is the main trunk, uses the
+goole test framework to run unit tests on nearly all internal classes.
+The complete gtest framework is too large to be run on the microcontroller.
+
+A simple test framework, which supports the same syntax as gtest is provided
+to run the unit tests on the target system.
+The implementation resides in the files\footnote{ugtest stands for $\mu$gtest}
+
+ \verb|ugtests/simpleTests.h| and 
+ \verb|ugtests/simpleTests.cc| 
+
+The following elements of gtest are provided:
+\begin{description}
+\item[TEST] defines a unit test
+\item[EXPECT\_EQ] tests, whether the two given parameters are equal, 
+   assuming an operator== exists.
+\item[EXPECT\_STREQ] tests, whether the two given parameters are equal c string 
+\item[EXPECT\_TRUE] tests, whether the  given parameter is non zero. 
+\item[EXPECT\_FALSE] tests, whether the  given parameter is zero. 
+\item[EXPECT\_THROW] tests, whether the first given expression throws
+   an exception of the type as given as  second parameter.
+\item[ASSERT\_...] is defined for all listed EXPECT-versions. 
+\end{description}
+
+\section{Service Task}
+There is a high priority task, which perform service jobs from 
+other tasks.
+The priority of the service task is above all PEARL application
+tasks.
+This is similar to jobs in an conventionel operating
+system. 
+
+The service task receives the jobs via a FreeRTOS message queue. 
+The queue entries consist of a struct like:
+\begin{verbatim}
+typedef struct { 
+  void (*job)(void*param);
+  void * param;
+} ServiceJob;
+\end{verbatim}
+The first entry is a pointer to a function, which receives the second entry
+as parameter.
+
+This service task is used by the
+\begin{description}
+\item[timer facility], when a time period has expired
+\item[OpenPEARL tasks], if they need a direct restart at their
+     termination in cases of interrupt overrun.
+\item[interrupt devices] to trigger the internal treatment
+\end{description}
+
+\section{System Console}
+Each plattform needs a system console for emergency error logging.
+The retarget mechanismn of the glibc needs access to stdin and stdout
+to realize printf and scanf. These functions are nice to use during 
+system debugging.
+An uart is the first choice for this purpose. It is desired to multiplex
+the system console with a normal dation. 
+
+The  architecture consists a GenericUart class, which defines the low 
+level interface 
+of a concrete uart (e.q. Lpc17xxUartInternal). This class is
+realized as singleton to make shure that only 1 instance for a 
+concrete uart is instantiated.
+The GenericUart class performs the multiplexing of retargeting,
+user dation and actions for the xon/xoff-protocol.
+
+The GenericUartDation class defines the additional interface of a
+SystemDationNB call, which realizes a serial system dation. 
+
+The interface for the retarget job is realized in the Retarget class.
+This class implements the basic C functions  \verb|_read| and \verb|_write|,
+which delegates to a plattform specific class SystemConsole, which
+is a singleton. 
+The implementation of \verb|_read| and \verb|_write| starts in polling mode
+and is switch over to interrupt mode, when FreeRTOS is started.
+
+The class SystemConsole contains just the singleton and instantiates 
+the system consol uart with plattform specific parameters.
+
+The concrete SystemDationNB class for the uart with a system console
+must use the low level implementation  of the uart. It must implement
+the interfaces from SystemDationNB and GenericUartDation. 
+
+\paragraph{Summary:}\ \\
+GenericUart, GenericUartDation and Retarget are common to all micro
+ controllers.
+
+The plattform specific classes are very small:
+
+\begin{itemize}
+\item SystemDation
+\item the low level uart interface
+\item the complete uart interface
+\end{itemize}
+
+By this architecture the port to other controllers should be very simple.
+
+\section{Time Base}
+
+The presence of a real time clock (RTC) is not guaranteed on a
+microprocessor system.
+This is no big problem for most PEARL applications, since they works 
+in many cases with relative times.
+
+FreeRTOS provides a tick based system time. The resolution is specified
+in the file \texttt{FreeRTOSConfig.h} --- 
+set in OpenPEARL to $1 ms$.
+
+Some applications many require absolute times and more precise timing.
+That's the reason why the FreeRTOS provided timers are not used. 
+There is an implemtation of the \texttt{itimer} system. This 
+implementation allows the specification of a time source.
+This system was introduced  by Jonas Meyer in his thesis.
+
+\subsection{Timer-Treatment}
+The principle of operation of the implementation of the timer facility is
+that there are two lists of timer entries. A timer entry contains 
+the information about an initial delay and a repetition rate of the timer.
+This is similar to the itimer of POSIX.
+The operation is cyclic:
+\begin{enumerate}
+\item the definition of a new timer inserts the correspondig timer entry
+   in the sorted list of active timers
+\item The timer entry which elapses first defines the setup of a hardware timer.
+\item As soon as the hardware timer elapses, the interrupt service  routine
+triggers the timer task to continue.
+\item The timer task checks which timers have elapsed and performs the 
+callback of the defined timer. This callback is implemented in the
+class TaskTimerCommon.
+\item if an elapsed timer should operate repetitive, the timer is rescheduled
+   at the time $currentSchedule + period$. \
+	If the elapsed timer is a oneshot timer, it is added in the free-list.
+\item the next timer entry in the active list defines the new delay for the
+  next hardware timer delay. This delay is limited to one second. If the 
+  desired period is longer than one second, several iterations are required.
+\end{enumerate}
+
+The implementation of the hardware specific part
+(e.g. interrupt service routine) must be implemented in the concrete
+timer facilities. The FreeRTOSClock provides this bevavior on base
+of the 1ms system tick.
+
+Each timer informs the service task about time exprirations and 
+sends its own callback function pointer for further treatment.
+
+\subsection{class FreeRTOSClock}
+The class TaskTimer provides the FreeRTOS tick as
+base for itimers.
+The absolute time is set to 1.1.2016 0:0:0 at system startup.
+
+Other time sources are plattform specific and described there.
+
+\section{Modification in FreeRTOS}
+FreeRTOS was modified in the following points:
+\begin{description}
+\item[static tcb and stack:]  Normally FreeRTOS places task control blocks (tcb)
+   and task stack in the heap storage. This may produce memory fragmentation,
+   when application tasks are deleted and restarted in a random sequence.
+
+   A new configuration item in \texttt{FreeRTOSConfig.h}  changes this
+   behavior. If \texttt{configUSE\_STATIC\_STACK\_AND\_TCB} is set to 1
+   the function \texttt{xTaskCreate} assumes a pointer to a struct with
+   pointers to the previous applications parameters and two new pointers
+   to the tasks control block (with type \texttt{TCB\_t}) and tasks stack
+   (type \texttt{StackEntry\_t *}). The application is expected to be
+   responsible to pass valid pointers.
+\item[getTaskCurrentFreeStack] is a new function, which returns the number
+   of free stack element (of size 32 bit) on the current active tasks stack.
+   This feature is enabled by the option
+    \texttt{INCLUDE\_xTaskGetCurrentFreeStack}
+\end{description}
+
+\section{Stack Checking}
+The gcc tool chain provides the possibility of code instrumentation
+for tracing. The option \texttt{-finstrument-functions} additional
+function call at each function entry and exit of the compilation unit.
+The corresponding functions must be supplied by the application program.
+
+The signature of the functions is:
+\begin{verbatim}
+extern "C" {
+void __cyg_profile_func_enter(void*this_fn, void* call_site)
+     __attribute__((no_instrument_function));
+
+void __cyg_profile_func_exit(void*this_fn, void* call_site)
+     __attribute__((no_instrument_function));
+};
+\end{verbatim}
+
+The configuration option \texttt{CONFIG\_LPC1768\_CHECK\_STACK\_OVERFLOW}
+controls the usage of the compiler option and inclusion of the
+module \texttt{FreeRTOS/addOns/checkStackOverflow.cc}.
+
+
+In case of the remaining stack of less than 250 elements (1000 bytes), or a
+remaining unused size of less than 250 elements will cause the raising
+of the signal StackOverflowSignal. This signal is intended to be non catchable
+by the application program. 
+The compiler arm-non-eabi-g++ v4.9.3 proved to need approximatelly 190 stack elements to perform the stack unrolling, the limit should not be set with caution.
+
+The monitoring of functions of the template classes for Fixed and Bit 
+is switched off for runtime efficiency.
+
+\section{Heap usage}
+FreeRTOS uses for several resources like tcp, stacks, queues, semaphores 
+on the heap.
+For OpenPEARL, the heap is configured as static data array of a fixed size.
+A new heap allocator (heap\_1\_2.c) provides a {\em pool allocation pattern}
+for heap elements to avoid memory fragmentation, if any heap element
+of freed and allocated cyclic.
+
+Usually FreeRTOS tasks locate stack and tcb on the heap. 
+These elements are allocates and released at task start and termination.
+This would produce heap fragmentation, when task stacks have different lengths.
+To avoid the fragmentation, stacks and tcbs are allocated static in the
+application code.
+
+A OpenPEARL task needs aside from the applications data:
+
+\begin{tabular}{lcc}
+    & .bss & FreeRTOS Heap \\
+tcb & 300 byte & 88 byte \\
+stack & 30 - 2400 byte & - \\
+\end{tabular} 
+
+Note: Stack checking requires a unused buffer of 800 bytes!
+
+Semphores and queues are not deleted during the lifetime of an 
+OpenPEARL-application. They are still allocted on the heap of the application.
+Note: All OpenPEARL semaphores uses one (1!) FreeRTOS semaphore together.
+
+The heap of the c-library is made available by the linker script. 
+Maybe some C++-objects are allocated in this heap.
+This should only be used, if these objects are never deleted.
+
+
+\section{Stack Size and Allocation Control}
+{\em missing part; 
+proposal: pseudo devices allow the specification of stack size.
+
+this will be solved together with the cross module linker
+}
+
+\section{Added Features to FreeRTOS and glib-c}
+There are some additional functions in \texttt{FreeRTOS/addOns},
+ which supply the toolchain
+with UNIX-like time functions like gettimeofday.
+\begin{description}
+\item[clock.c]provides gettimeofday and some more
+\item[timer.c] provides the itimers
+\item[testStackOverflow.cc] provides the implementation of the 
+  stack checking profiling function
+\item[service.c] provides the service task
+\end{description}
+
+Implementation of FreeRTOS Hooks:
+\begin{description}
+\item[assert.c] provides the implementation of the function
+  \texttt{assert()}, which is used in FreeRTOS to verify
+  proper operation
+\item[FreeRTOSHooks.c] provides some error hooks for stack and head overflow.
+\end{description}
+
+\section{Task Mapping}
+
+The task mapping is described in the thesis of
+ Florian Mahlecke in detail.
+
+In short:
+\begin{itemize}
+\item GenericTask.h defines C-macros for task declararion and specification
+\item Each PEARL task is derived from the class {\em Task} (\verb|Task.cc|).
+      The tasking methods are implemented in \verb|Task.cc|.
+\item Each PEARL task implements the method \verb|task(TaskCommon*me)| 
+    with the C++ code generated by the compiler.
+\item {
+  \begin{description}
+  \item[class Task] provides the required plattform specific implementation
+     of the tasking methods. The automatic restart of a task in case of
+     \verb|WHEN ... ACTIVATE| overruns is treated by the service task.
+  \item[class TaskTimer] provides the time related stuff for the tasking
+     methods. This class is working on base of the itimer extension 
+     in \texttt{FreeRTOS/addOns}
+  \item[class PrioMapper] provides a 1:1 mapping of PEARL to FreeRTOS
+      priorities. Furthermore is provides the list of other used
+      priorities in the system for background threads like the timer task.
+      For details about the list of background task, please 
+      check the doxgen documenation of the class PrioMapper.
+  \end{description}
+}
+\end{itemize}
+
+\section{Logging}
+The logging is done slightly different to the linux version.
+In order to safe stack in the application tasks, the formatting is passed
+to a special log-task which runs with high priority.
+The logging class checks for each logging request if the FreeRTOS scheduler
+is running. If the scheduler is not running - the formatting is done in the 
+context of the calling thread. If the scheduler is running, the parameters
+are passed to the log-task.
+This mechanism reduces the stack usage of the logging down to 17 words. This
+is important for the case of logging the stack overflow situation.
+
+
+\section{Device Driver}
+\label{sec_microcontroller_devicedriver}
+
+The device drivers should be implemented with zero-copy principle.
+If a background task is suitable for the device operation, the 
+tasks priority must be registered in the class PrioMapper. The usage
+of the the same priority for several devices is ok.
+
+Usually, the device driver is called in the context of the calling thread.
+The operation of the driver job is passed to an interrupt service routine and
+the calling thread is blocked by a FreeRTOS mechanism e.q. binary semaphore.
+At completion of the driver job in the isr the calling thread is continued.
+
+The semaphore handle will be a class attribute.
+\begin{verbatim}
+SemaphoreHandle_t blockSema;
+\end{verbatim}
+
+ In the ctor,
+the semaphore will be created with 
+\begin{verbatim}
+blockSema = xSemaphoreCreateBinary();
+\end{verbatim}
+
+The read/write operation triggers usually the interrupt mechanism and blocks
+the calling thread like:
+\begin{verbatim}
+xSemaphoreTake(blockSema, portMAX_DELAY);
+\end{verbatim}
+
+
+When the interrupt service routine detects that the i/o-operation is completed
+the semaphore becomes released:
+\begin{verbatim}
+xSemaphoreGiveFromISR(recvCommand.blockSema, NULL);
+\end{verbatim}
+
+A device driver is ether derived from \verb|UserdationNB|,
+ \verb|SystemdationB| or \verb|Interrupt|.
+It must implement the virtual methods according their
+expected behavior. For details please check the doxygen documentation
+of these methods.
+
+UserdationNB works internally only with the newline character to 
+perform a skip. The translation into carriage return and linefeed must
+be done in the driver if this is desired.
+
+The usual device driver does not support reentrant operations from
+different tasks. 
+The mechanism of the \verb|UserDation| enshures that only one dation
+operation is active at on time on the same userdation. In cases, where
+a system device may be used in more than one userdation, a buffering
+algorithmn must be implemented. 
+
+The usual kind of operation is:
+\begin{enumerate}
+\item provide an interrupt service routine with a name fitting to the
+   setting in \verb|startup_xxx.S|
+\item If the controller supports interrupt prioritios,
+choose an interrupt priority, which fits to the system design.
+ The log-device should have better priority than all other
+ system device to allow print-statements for debugging purpose.
+\item check the device parameters in the ctor. The ctor is the last chance to
+   allocate any memory on the FreeRTOS-heap.
+\item provide the virtual methods from the base class. Mutual exclusion
+   between the API methods and the interrupt service routine may
+   be achived by disabling the corresponding interrupt in the NVIC.
+\item create test applications for 
+  \begin{enumerate}
+  \item google tests for e.g. tests in the ctor
+  \item sample PEARL application, maybe  written in C++ to verify
+        the device operation
+  \end{enumerate}
+\item add device description is the documentation, as
+  \begin{enumerate}
+  \item section in the plattform specific part
+  \item as entry in the table of devices
+  \end{enumerate}
+\item supply the device description for the IMC as described in the IMC-documentation.
+\end{enumerate}
+
+
+\input{interrupt_priorities.tex}
+
+\section{FAT File System}
+In order to provide FAT file system facilities, the code from Chan
+is used. 
+The licence provides enough freedom to use the code.
+
+The FatFs module is configurable to support different features. 
+The selected features are:
+\begin{itemize}
+\item 2 volumes (0: for SD and 1: for USB-memory stick)
+\item volume locking for concurrent usage
+\item short file names,
+      since Microsoft has a patent on the long file name feature
+\item only one (1) partiion on the volume
+\item codepage ???
+\item .... ??
+\end{itemize}
+
+The structure is shown in fig \ref{fig_chanfs}.
+\begin{figure}
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{tikzpicture} [
+    node distance=2.0cm,
+    block/.style= {rectangle, draw=black,
+                   thick,
+                   text centered,
+                   minimum width={width("Low Level Device Control")+2pt},
+                   }]
+    \node[block](lowLevDevContr)at (0,10)
+            {\shortstack{Low Level Device Control\\
+                         RTC, SD-Card, USB, ...}};
+    \node[block, above=0.2cm of lowLevDevContr](fatfs) {FatFs Module};
+    \node[block, above=0.2cm of fatfs](app) {Application};
+\end{tikzpicture}
+\caption{structure of Chan FatFs}
+\label{fig_chanfs}
+\end{center}
+\end{figure}
+
+The date and time for the FAT system is derived from the system time
+in the FatFs.cpp module.
+
+For device locking, FreeRTOS semaphores are used by Elm Chan.
+
+To select the device driver, the sample version of disk.io 
+in the demonstration code  used a switch-statement.
+This was modified. Now the volume specific
+drivers register themself at diskio.c during their setup (ctor).
+This safes memory footprint, since only the really used volumes reside in
+the object file.
+The specific device drivers are selected in the OpenPEARL system part.
+.
+The following volume names are reserved in OpenPEARL:
+\begin{description}
+\item[0:/] denotes the SD-card
+\item[1:/] denotes the USB-memory stick
+\end{description}
+
+\subsection{Generic SD-Card via SPI Support}
+\label{sec:SDCardSpi}
+The operation of SD-cards is described in the "'SD Specifications -- 
+Simplified Specification V6.0"' and in the online paper of
+Elm Chan.
+
+The operation need the wait for replies of the card. The duration
+varies between some mircoseconds and some milliseconds. If the 
+operation is not finished in some poll cycles, the calling thread 
+is delayed for 2 ticks (2 ms) in order to safe cpu time for other threads.
+
+The platform specific hardware support function for
+\begin{itemize}
+\item detect card \verb|spiIsCardInserted|
+\item drive the CS line \verb|spiSelect|
+\item set transmission speed \verb|spiHighSpeed|
+\item single byte transfer \verb|spiRwByte|
+\item send block \verb|spiSendBlock|
+\item receive block \verb|spiReadBlock|
+\end{itemize}
+are defined as pure virtual. They must be supported by the platform specific 
+sdcard driver.
+
+
+\paragraph{Note:} There is no support for MMC crads, since UI found no card
+to test. The code was tested with cards of 2GB and 8GB size.
+If other cards are detected a warning will be issued.
+
+\section{Fake Types of Packages}
+In order to keep the API of OpenPEARL easy, it is desired not to include
+package specific types from e.g. FreeRTOS or Chan's FatFS package 
+in the global PearlIncludes.h header.
+
+\subsection{Analysis}
+The implementation modules need the concrete package headers.
+The specification modules (header-files) need knownledge about 
+specific types, in order to reserve memory or pointers. 
+Maybe \verb|define| constants are required in a header file.
+
+If an API relevant header file would include an internal package specific
+header file, this package specific header file will be also part of 
+the PearlIncludes. 
+
+A detailed look on the problem shows, that the API header need 
+information about the size and native type of the package specific types.
+
+If we provide a {\em fake} implementaion using only standard types,
+the OpenPEARL API header becomes free of the internal package types.
+
+\subsection{Solution}
+In FreeRTOS/addOns there are some utility-files, which generate the header file 
+\verb|FakeTypes.h| for the needed internal types.
+
+\begin{description}
+\item[mkFakeTypes.c] defines data of the required types in different sections.
+This file ist compiled by the target plattform C-compiler and inspected by
+the {\em size} utility, which dumps the sizes of all sections in an object file.
+\item[fakeTypes.c] is a C-program, which runs on the host system. It reads
+the output of the {\em size} command and generates the file \verb|FakeTypes.h|.
+\item[check\_FakeTypes.c] is a C-source file, which uses the FakeTypes.h and 
+the original includes as well. It verifies that the original and
+the faked types deliver the same sizes. In case of differences, there will be
+some compilation errors. The program \verb|fakeTypes.c| must be adjusted
+in this case.
+\end{description}
+
+The faked types are generated by the target {\em Makefile}.
+An example may be found in the lpc1768-plattform part.
+
+\section{To be done}
+  \begin{itemize}
+  \item provide device drivers for the standard devices (Ethernet)
+  \item device wait queue for tasks in begin/end-sequence?
+  \end{itemize}
+
+

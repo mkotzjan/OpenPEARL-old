@@ -1,0 +1,31 @@
+\chapter{Log}
+The logging facility itself is platform specific since the
+default log interface depends on the target system.. The interface is 
+defined platform independently in {\em Log.h}.
+
+The platform independed formatting is located in \verb|common/Log.cc|
+and tghe platform, specific ctor ist located in the platform specific
+directory as \verb|Log.cc|\footnote{The use of the same file name 
+should be resolved in the future!}. 
+
+The following log levels are defined:
+\begin{description}
+\item[INFO] general information about the program execution
+\item[DEBUG] messages used for debugging the runtime system. Note that
+   many messages may affect the application execution.
+\item[WARN] messages aabout situations, where a backup solution is used.
+E.g. start of the application without root priviledes in Linux will 
+forbid the usage of the priority scheduler. The normal scheduler will be 
+used instead.
+\item[ERROR] are diagnostic information is case of signal raising.
+\end{description}
+
+The log interface defines the methods
+\verb|Log::info()|, \verb|Log::debug()|, Log::warn()| and \verb|Log::error()|.
+Each method takes at least on string argument like printf.
+Plain text is passed to the corresponding output.
+The following format elements are in use: \verb|%d|, \verb|%u|, \verb|%s|,
+\verb|%f| and \verb|%c|. No additional parameters are allowed with these 
+formatting options.
+
+The output device is platform specific.

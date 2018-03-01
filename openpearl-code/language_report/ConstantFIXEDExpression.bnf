@@ -1,0 +1,3 @@
+\htgt{ConstantFIXEDExpression} ::=\\
+\x \hlink{Term} [ \{ \kw{+} $\mid$ \kw{-} \} \hlink{Term} ] $^{...}$
+        

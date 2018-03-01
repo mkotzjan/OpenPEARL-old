@@ -1,0 +1,3 @@
+\htgt{IOStructure} ::=\\
+\x \kw{STRUCT} [ \hlink{IOStructureComponent} [ , \hlink{IOStructureComponent} ] $^{...}$ ]
+

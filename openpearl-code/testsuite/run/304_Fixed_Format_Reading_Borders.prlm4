@@ -1,0 +1,92 @@
+/****************************************
+Testing the GET statement for Field width. 
+Reading only parts of the Numbers that have been 
+Put out before.
+Special Case is when the number starts with the 
+decimal point.
+****************************************/
+
+
+MODULE(Fixed_Format_Reading_Borders);
+SYSTEM;
+changequote(`{',`}')
+include({pipe_header.m4h})
+include({m4_exception.m4h})
+include({m4_testing.m4h})
+
+
+PROBLEM;
+
+DCL pipe_out DATION OUT ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+DCL pipe_in DATION IN ALPHIC DIM(*,80)
+             FORWARD NOCYCL  STREAM 
+             CREATED(pipe);
+
+
+Test1: TASK MAIN;
+     DCL (fo1,fo2,fo3,fi1,fi2,fi3) FIXED(31) INIT(0,0,0,0,0,0);
+     DCL (float_out,float_in) FIXED(53) INIT(0.0,0.0);
+     DCL result_fixed FIXED(63) INIT (0);
+     DCL result_float FLOAT(53) INIT(0.0);
+     DCL check FIXED(15) INIT(0);
+     
+     DCL error_pipe_in FIXED(31) INIT(0);
+     DCL error_pipe_out FIXED(31) INIT(0);
+
+     
+     OPEN pipe_in BY RST(error_pipe_in);
+     OPEN pipe_out BY RST(error_pipe_out);
+
+     fo1 := 1;
+     fo2 := 2;
+     result_fixed := 12;
+     PUT fo1,fo2 TO pipe_out BY F(1);                   ! Put number 1 and 2 to pipe directly behind each other 
+     GET fi1 FROM pipe_in BY F(2);                      ! Read 2 numbers 
+     EXPECT_EQ({fi1},{result_fixed});
+     
+
+     fo1 := 12;
+     fo2 := 1;
+     fo3 := 144;
+     result_fixed := 121144;
+     PUT fo1,fo2,fo3 TO pipe_out BY F(2),F(1),F(3);
+     GET fi1 FROM pipe_in BY F(6);
+     EXPECT_EQ({fi1},{result_fixed});
+
+     fo1 := 12;
+     fo2 := 1;
+     fo3 := 144;
+
+     PUT fo1,fo2,fo3 TO pipe_out BY F(3);               ! "_12__1144"
+     GET fi1,fi2,fi3 FROM pipe_in BY F(2);
+     result_fixed:= 1;
+     EXPECT_EQ({fi1},{result_fixed});
+     result_fixed:= 2;
+     EXPECT_EQ({fi2},{result_fixed});
+     result_fixed:= 1;
+     EXPECT_EQ({fi3},{result_fixed});
+
+     result_fixed := 144;
+     GET fi1  FROM pipe_in BY F(3);
+     EXPECT_EQ({fi1},{result_fixed});
+
+     fo1 := 1;
+     float_out := .123;
+     PUT fo1,float_out TO pipe_out BY F(1),F(4);
+     GET fi1,float_in FROM pipe_in BY F(1),F(4);
+     EXPECT_EQ({float_out},{float_in});
+     EXPECT_EQ({fo1},{fi1});
+     
+
+
+
+     CLOSE pipe_in;
+     CLOSE pipe_out;
+
+include({m4_check_header.m4h})
+END;
+MODEND;
+

@@ -1,0 +1,5 @@
+\htgt{AbsolutePosition} ::=\\
+\x \{ \kw{COL} $\mid$ \kw{LINE} \} \kw{(}\hlink{Expression}\kw{)}\\
+\x $\mid$ \kw{POS} \kw{(} [ [ \hlink{Expression} \kw{,} ] \hlink{Expression} \kw{,} ] \hlink{Expression}\kw{)}\\
+\x $\mid$ \kw{SOP} \kw{(} [ [ \hlink{Name} \kw{,} ] \hlink{Name} \kw{,} ] \hlink{Name}\kw{)}
+

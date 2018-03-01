@@ -1,0 +1,26 @@
+\section{Add a new SIGNAL}
+The signals of PEARL are mapped to C++ exceptions in OpenPEARL.
+For each PEARL signal a special class is required.
+These classes are very similar. The creation of theses classes
+is automated via an OpenOffice-spreadsheet and a pearl-skript.
+
+As long as no new signal group is required, the new signal
+must be added to the spreadsheet \texttt{Signals.ods}.
+For each signal the following elements must be specified, as 
+data in the corresponding column in the spreadsheet:
+\begin{description} 
+\item[GroupIndex] is usually the next free index in this group.
+   The value must be an integer $>= 0$
+\item [ExceptionClass] is the name of the class to be generated.
+   The name must be a valid C++ identifier. The text 'Signal' should
+   be used as postfix.
+\item[ParentClass] is used for signal grouping in the signal handlers
+\item[System] use GENERIC, if the signal appears in all target
+   platform of OpenPEARL, or select the concerend target platform.
+\item[Message] is the message which is printed to the error log.
+   This message shoul not exceed 40 characters.
+\item[Description] is a TeX formatted text for the documentation
+\end{description}
+
+During the build process, the spreadsheet is lranslated into a C++ source
+and  header file as well as LaTeX input for the documentation.

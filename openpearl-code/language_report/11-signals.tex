@@ -1,0 +1,305 @@
+\chapter{Signals}   % 11
+\label{sec_signals}
+
+When executing certain statements, internal events, so-called signals,
+can occur, leading to an interruption of the running task; such signals
+may, e.g., be an overflow in course of an arithmetic operation, a
+division by zero, or reaching the end of a file.
+
+A program abortion can be avoided by enabling a corresponding error
+handling upon the occurrence of a signal.
+
+\section{System Part Entries}
+The signals needed for a program are declared in the system part, where
+freely selectable user names can be assigned to them.
+%%%%%\begin{removed} Additionally, an
+%%%%%error list can be defined to limit the signal scheduling to one or
+%%%%%several particular error numbers.
+%%%%%
+%%%%%UserNameDeclaration$\S $For-SIGNAL ::= \\
+%%%%%\x Identifier$\S $UserName : Identifier$\S $SIGNAL-SystemName\\
+%%%%%\x \x [ ( Identifier$\S $ErrorNumber [ , Identifier$\S $ErrorNumber ] $^{...}$ ) ]
+%%%%%\end{removed}
+
+\begin{grammarframe}
+\input{SystemSignalDeclaration.bnf}
+\end{grammarframe}
+
+The signals and their associated error numbers possible on a certain
+computer are described in the respective user manual, giving their
+system names and meanings.
+
+\section{Declaration and Specification of Signals} 
+
+Before signals are used, they must be specified under their user names
+in the problem part at module level.
+
+Example:
+
+%%%\begin{removed}
+%%%IO\_SIGNAL and ENDF are system names; c\_error\_open is a pre-defined
+%%%constant.
+%%%
+%%%{\bf MODULE};\\
+%%%\x {\bf SYSTEM};\\
+%%%\x \x OPEN\_ERR : IO\_SIGNAL (c\_error\_open);\\
+%%%\x \x EOF : ENDF;\\
+%%%\x \x ...\\
+%%%\x {\bf PROBLEM};\\
+%%%\x \x {\bf SPC} ( OPEN\_ERR, EOF ) {\bf SIGNAL};\\
+%%%\x \x ... \\
+%%%{\bf MODEND};
+%%%\end{removed}
+\code{FixedOverflowSignal} and \code{DationEOFSignal} are system names.
+
+\begin{lstlisting}
+MODULE(moduleName);
+SYSTEM;
+   overflow : FixedOverflowSignal;
+   eof : DationEOFSignal;
+...
+PROBLEM;
+   SPC ( overflow, eof ) SIGNAL;
+ ... 
+MODEND;
+\end{lstlisting}
+
+The general form of the specification of signals reads:
+
+%%%\begin{front}
+%%%SIGNAL-Specification ::=\\
+%%%\x \{ {\bf SPECIFY  $\mid$  SPC} \} Identifier\_or\_IdentifierList 
+%%%{\bf SIGNAL} [ GlobalAttribute ] ;
+%%%\end{front}
+\begin{grammarframe}
+\input{SignalSpecification.bnf}
+\index{SIGNAL@\textbf{SIGNAL}}
+\index{SIGNAL@\textbf{SIGNAL}!Specification}
+\end{grammarframe}
+
+%%%%%\begin{added}
+%%%%%
+%%%%%Proposal fuer UserSignals
+%%%%%
+%%%%%Dies ist Thema auf der AK-Sitzung im November 2016
+
+In larger software systems it may be useful to define own signals, e.g.
+for wrong usage of functions. 
+The declaration of a user defined signal is allowed on module level.
+
+\begin{grammarframe}
+\input{UserSignalDeclaration.bnf}
+\index{SIGNAL@\textbf{SIGNAL}!Declaration}
+\end{grammarframe}
+
+Valid ranges for the error number are listed in the plattform specific manual.
+
+%%%%%\end{added}
+
+\section{Signal Reactions}
+\label{sec_signal_reactions}
+The reaction planned for the occurrence of a signal is scheduled with
+the following statement:
+
+%%%%%\begin{removed}
+%%%%%SchedulingSignalReaction ::=\\
+%%%%%\x {\bf ON} Name$\S $Signal \{ [ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
+%%%%%\x \x SignalReaction $\mid$ {\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};
+%%%%%
+%%%%%SignalReaction ::=\\
+%%%%%\x UnlabeledStatement
+%%%%%\end{removed}
+
+%%%%%\begin{discuss}
+\begin{grammarframe}
+\input{SchedulingSignalReaction.bnf}
+\index{SIGNAL@\textbf{SIGNAL}!Reaction}
+\index{SIGNAL@\textbf{SIGNAL}!\textbf{ON}}
+\index{ON@\textbf{ON}}
+\index{RST@\textbf{RST}!Signal Reaction}
+%%%%\input{SignalStatement.bnf}
+\input{SignalReaction.bnf}
+\input{SignalFinalStatement.bnf}
+\input{InduceStatement.bnf}
+\index{INDUCE@\textbf{INDUCE}}
+\index{SIGNAL@\textbf{SIGNAL}!\textbf{INDUCE}}
+\end{grammarframe}
+
+%%%%%\end{discuss}
+
+Instead of UnlabeledStatement, all statements besides the
+statement SchedulingSignalReaction are permitted, particularly
+%%%\removedtext{blocks or procedure calls}\addedtext{blocks,  which  end with a SignalFinalStatement}.
+blocks,  which  end with a SignalFinalStatement.
+
+The statement SchedulingSignalReaction is not permitted within \code{BEGIN}
+and \code{REPEAT} blocks, or as SignalReaction.
+
+\begin{itemize}
+\item Validity range of scheduling a signal reaction:\\
+The validity range of scheduling a signal reaction reaches from the
+execution of the corresponding \code{ON} statement to the end of the
+scheduling task or procedure, respectively.\\
+If another scheduling for the same signal (e.g., in a procedure called
+by the scheduling task) is run, it hides the preceding scheduling until
+the end of the validity range of the new schedule (in the example until
+the end of the scheduling procedure).
+\item Leaving a procedure (task) after the execution of a signal
+reaction:\\
+If a signal occurs within the validity range of scheduling a signal
+reaction, the procedure (task) in which the signal reaction is scheduled
+is left by 
+%%%\removedtext{an implicit RETURN(TERMINATE)} \addedtext{
+the explicit \code{INDUCE}, \code{RETURN} or \code{TERMINATE}
+%%%}
+ after having executed the 
+corresponding signal reaction, unless the signal reaction is left by a 
+\code{GOTO} statement.
+\item Validitiy of signal schedulings during the execution of a signal
+reaction:\\
+If a signal reaction is scheduled at procedure level, only those \code{ON}
+schedulings are valid during the execution of this signal reaction which
+were already executed before calling this procedure.\\
+If the signal reaction is scheduled at task level, no \code{ON} schedulings are
+valid during the execution of this signal reaction.
+\item Validity of signal schedulings after leaving a signal reaction by
+\code{GOTO}:\\
+If the execution of a signal reaction scheduled at procedure or task
+level is left by \code{GOTO}, the signal schedulings which were already
+executed before triggering the signal, particularly those of the
+triggered signal, are valid again.
+\end{itemize}
+
+To test the reaction scheduled for a signal, the occurrence of a signal
+can be simulated analogously to the occurrence of an interrupt:
+
+%%%\begin{removed}
+%%%InduceStatement ::=\\
+%%%\x {\bf INDUCE} Name$\S $Signal [ {\bf RST} ( Expression$\S $ErrorNumber ) ];
+%%%\end{removed}
+%%%\begin{added}
+\begin{grammarframe}
+\input{InduceStatement.bnf}
+\end{grammarframe}
+
+
+The variant of the \code{INDUCE} statement without a specified signal is 
+only allowed inside a signal reaction. This will trigger the signal handler
+of the superior function or task with the identical signal.
+%%%\end{added}
+
+
+Whereas it is possible to react to asynchronous exception situations
+(i.e., influences effecting from outside) by interrupts, the signal
+treatment serves exclusively for reacting to synchronous error states
+(i.e., cause and treatment of the error state originate from the same
+task).
+
+Example:
+
+The procedure \code{analysis} shall sequentially analyse a logbook created
+in the course of a day; the single data elements of the \code{logBook} are of
+type \code{Event}
+
+\begin{lstlisting}
+...
+PROBLEM;
+   SPC eof SIGNAL,
+       tape  DATION INOUT SYSTEM ALL;
+   TYPE Event ...;
+   DCL logBook DATION IN Event DIM(*) FORWARD CREATED(tape);
+
+analysis: PROC;
+   DCL input Event;
+   ...
+   OPEN logBook;
+   ON eof:
+      BEGIN
+      CLOSE logBook;
+      RETURN;
+   END; ! ON eof
+   ...
+   REPEAT
+      READ input FROM logBook;
+      ...
+   END;
+END; ! analysis
+\end{lstlisting}
+
+For testing, the statement
+
+\kw{INDUCE}\code{ eof;}
+
+could be executed sporadically instead of the read statement.
+
+
+%%%\begin{modified}
+%%%fixiert, dass die Systemreaktion zur Terminierung des ausfuehrenden Task
+%%%fuehrt.
+
+If a signal is induced, whether by an error state or an induce
+statement, and no signal reaction is scheduled for it, the system
+reaction is triggered (i.e., generally an error message of the run time
+system), which terminates the causing task.
+%%%\end{modified}
+
+By stating a variable after RST in the signal scheduling, the programmer
+gets access to the error number (error cause). In this case, the signal
+SignalName can be induced for the error with the number ErrorNumber by
+
+\kw{INDUCE} SignalName \kw{RST} \kw{(} ErrorNumber \kw{)} \kw{;}
+
+%%%%%\begin{modified}
+%%%%%Im letzten Satz des vorherigen Abschnitts muss "'In this case"' gestrichen 
+%%%%%werden, oder?
+
+%%%%%\begin{added}
+In case of inducing a signal with an error number, the predefined number
+is superseeded for only this action with the given value. This does not change
+the identity of a signal, when setting the actual number to the
+system number of another signal.  
+
+
+%%%%%\end{added}
+%%%%%\end{discuss}
+
+Example:
+
+The signal \code{taskSignal} shall be simulated with the 
+superseeded error number ``1010`` and not superseeded error number
+The causing task shall react by writing out the error
+number on the console:
+
+\begin{lstlisting}
+PROBLEM};\\
+ SPC taskSignal SIGNAL;  ! assume signal number as 1234
+ DCL errorNummer FIXED;
+
+regulator: TASK PRIO 20;
+restart:
+   ON TaskSignal RST (errorNumber):
+   BEGIN 
+      PUT errorNumber TO console;
+      GOTO restart;
+   END;  ! of error handler 
+   ...
+   CALL test;
+   ...
+END; ! regulator
+
+start: TASK MAIN;
+   ALL ...  ACTIVATE regulator;
+END; ! start
+
+test: PROC;
+   IF ... 
+   THEN
+      ...
+      INDUCE taskSignal; ! prints 1234
+   ELSE
+      ...
+      INDUCE taskSignal RST (1010); ! prints 1010
+   FIN;
+END; ! test
+\end{lstlisting}
+

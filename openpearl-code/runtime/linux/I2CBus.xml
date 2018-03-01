@@ -1,0 +1,10 @@
+   <connection name="I2CBus">
+      <parameters>
+         <CHAR length="32767">
+            <NotEmpty/>
+         </CHAR>
+      </parameters>
+      <associationProvider>
+         <associationType name="I2CBusProvider"/>
+      </associationProvider>
+   </connection>

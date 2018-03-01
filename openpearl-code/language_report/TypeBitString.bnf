@@ -1,0 +1,3 @@
+\htgt{TypeBitString} ::=\\
+\x {\bf BIT} [ \kw{(} \hlink{LengthOfString} \kw{)} ]
+

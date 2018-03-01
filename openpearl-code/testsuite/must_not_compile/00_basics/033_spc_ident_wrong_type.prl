@@ -1,0 +1,9 @@
+MODULE(m1);
+
+PROBLEM;
+   ! must fail --  xx is of type FLOAT
+   SPC x FIXED IDENT(xx);
+   DCL xx FLOAT;
+
+END;
+MODEND;

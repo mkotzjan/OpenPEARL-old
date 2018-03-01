@@ -1,0 +1,3 @@
+\htgt{TypeDefinition} ::=\\
+\x {\bf TYPE} \hlink{Identifier}$\S $ForType \{ \hlink{SimpleType}
+	 $\mid$ \hlink{TypeStructure} \} ;\\

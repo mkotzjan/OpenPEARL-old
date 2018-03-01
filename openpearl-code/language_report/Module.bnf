@@ -1,0 +1,7 @@
+%%%%%% modified: Identifier is mandatory
+\htgt{Module} ::=\\
+\x \kw{MODULE} ( \hlink{Identifier}$\S $OfTheModule  )  ;\\
+\x \{ \hlink{SystemPart} [ \hlink{ProblemPart} ] \} 
+	$\mid$ \hlink{ProblemPart} \\
+\x \kw{MODEND} ;
+

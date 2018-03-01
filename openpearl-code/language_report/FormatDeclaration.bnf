@@ -1,0 +1,4 @@
+\htgt{FormatDeclaration} ::=\\
+\x \hlink{Identifier} \kw{:} \kw{FORMAT} ( \hlink{FormatOrPosition} \\
+\x  \x [ \kw{,} \hlink{FormatOrPosition} ] $^{...}$ ) \kw{;}
+

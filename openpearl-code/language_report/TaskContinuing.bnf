@@ -1,0 +1,4 @@
+\htgt{TaskContinuing} ::=\\
+\x [ \hlink{SimpleStartCondition} ] \kw{CONTINUE} [ \hlink{Name}$\S $Task ] \\
+\x [ \hlink{PriorityExpression} ]\kw{;}
+

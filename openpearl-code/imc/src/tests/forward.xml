@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module file="forward.prl">
+<system>
+
+<username name="lm75a" line="6">
+   <sysname name="LM75">
+   <parameters>
+   <BIT>'49'B4</BIT>
+   </parameters>
+   </sysname>
+   <association name="i2cbus1">
+   </association>
+</username>
+
+<username name="i2cbus1" line="7">
+   <sysname name="I2CBus">
+      <parameters>
+        <CHAR>'/dev/i2c-1'</CHAR>
+        <FIXED>100000</FIXED>
+      </parameters>
+   </sysname>
+</username>
+
+</system>
+
+<problem>
+   <spc type="dation" name="lm75a" line="21">
+      <attributes> IN, BASIC,SYSTEM </attributes>
+      <data>FIXED(15)</data>
+   </spc>
+</problem>
+</module>

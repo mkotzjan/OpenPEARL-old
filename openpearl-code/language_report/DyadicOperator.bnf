@@ -1,0 +1,12 @@
+\htgt{DyadicOperator} ::=\\
+\x \kw{+} $\mid$ \kw{-} $\mid$ \kw{*} $\mid$ \kw{/} $\mid$ \kw{//} $\mid$
+    \kw{REM} $\mid$ \kw{**} \\
+\x $\mid$ \kw{$<$} $\mid$ \kw{LT} $\mid$ \kw{$>$} $\mid$ \kw{GT} $\mid$
+    \kw{$<$=} $\mid$ \kw{LE} $\mid$ \kw{$>$=} $\mid$ \kw{GE} $\mid$ \kw{==}
+     $\mid$ \kw{EQ} $\mid$ \kw{/=} $\mid$ \kw{NE} \\
+\x $\mid$ \kw{AND} $\mid$ \kw{OR} $\mid$ \kw{EXOR} $\mid$ 
+    \kw{$><$} $\mid$ \kw{CAT} $\mid$ \kw{$<>$} $\mid$ \kw{CSHIFT}
+     $\mid$ \kw{SHIFT} $\mid$ \kw{LWB} $\mid$ \kw{UPB} \\
+\x $\mid$ \kw{IS} $\mid$ \kw{ISNT} $\mid$ \kw{FIT}
+%%% \x $\mid$ Identifier\S UserDefinedDyadicOperator
+

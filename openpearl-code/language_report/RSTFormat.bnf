@@ -1,0 +1,3 @@
+\htgt{RSTFormat} ::=\\
+\x \kw{RST} \kw{(} \hlink{Name}$\S $ErrorVariable-FIXED \kw{)}
+

@@ -1,0 +1,37 @@
+/*#########################################################################
+PROGRAM
+The Control Task activate after 3 sec the Work task and after 4 sec 
+the Disorder task. The Work task prevent the Disorder task und the 
+Disorder task prevent the Work task.
+###########################################################################
+RESULT
+The Work task prevents the Disorder task and set the exit code of 0.
+The Disorder task never works.
+##########################################################################*/
+
+MODULE(taskingPrevent);
+
+PROBLEM;
+
+Control: TASK PRIO 3 MAIN;
+    
+	AFTER 3 SEC ACTIVATE Work;        
+ 
+    AFTER 4 SEC ACTIVATE Disorder;  
+    
+END;
+
+Work: TASK PRIO 4;
+    PREVENT Disorder;
+    __cpp__('pearlrt::Control::setExitCode(0); ');	
+    __cpp__('printf("*** SUCCESS ***\\n"); ');	
+END;
+
+Disorder: TASK PRIO 4;
+    PREVENT Work;
+    __cpp__('printf("*** FAILED ***\\n"); ');	
+    __cpp__('pearlrt::Control::setExitCode(1); ');	
+
+END;
+
+MODEND;

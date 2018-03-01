@@ -1,0 +1,108 @@
+/*#########################################################################
+PROGRAM
+The Main  task activate the Task2 and activate them again and this in all 
+taskstate combination from taskstate active:
+	sa=0, sc=0
+	sa=1, sc=0
+	sa=0, sc=1
+	sa=1, sc=1
+and each time it must come the TaskRunningSignal.
+###########################################################################
+RESULT
+It musst come the Signal TaskRunningSignal four times 
+and therefore the variable check must have the value 4.
+##########################################################################*/
+
+MODULE(activate_activate);
+
+PROBLEM;
+
+Main : TASK PRIO 1 MAIN;
+	__cpp__('pearlrt::Control::setExitCode(1);');
+    DCL check FIXED(3) INIT(0);
+
+	/* Taskstate active [sa=0,sc=0] */
+    ACTIVATE Task2;
+
+    __cpp__(
+    'try {');
+        ACTIVATE Task2 PRIO 1;
+    __cpp__('}'
+    'catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	TERMINATE Task2;
+
+	/* Taskstate active [sa=1,sc=0] */
+	ACTIVATE Task2;
+	AFTER 3 SEC ACTIVATE Task2;
+
+    __cpp__(
+    'try {');
+        ACTIVATE Task2;
+    __cpp__('}'
+    'catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	PREVENT Task2;
+	TERMINATE Task2;
+
+	/* Taskstate active [sa=0,sc=1] */
+	AFTER 3 SEC CONTINUE Task2;
+	ACTIVATE Task2;
+
+	__cpp__(
+    'try {');
+        ACTIVATE Task2;
+    __cpp__('}'
+    'catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+	TERMINATE Task2;
+
+	/* Taskstate active [sa=1,sc=1] */
+	ACTIVATE Task2;
+	AFTER 3 SEC CONTINUE Task2;
+	AFTER 4 SEC ALL 1 SEC ACTIVATE Task2;
+
+	__cpp__(
+    'try {');
+        ACTIVATE Task2;
+    __cpp__('}'
+    'catch (pearlrt::TaskRunningSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	PREVENT Task2;
+	TERMINATE Task2;
+
+	__cpp__(
+    'if (_check.x == 4) {'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf("*** SUCCESS ***\\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf("*** FAILED ***\\n");'
+    '}');
+
+
+END;
+
+Task2 : TASK;
+
+    DCL x FIXED(31) INIT(0);
+
+    !WHILE x < 1000000 THEN
+    !   x := x + 1;
+    !FIN;
+
+    __cpp__(
+    'while (_x.x < 10000000) {');
+        x := x + 1;
+    __cpp__('}');
+
+
+END;
+MODEND;

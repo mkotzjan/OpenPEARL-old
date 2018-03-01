@@ -1,0 +1,6 @@
+\htgt{IndexRange}::=\\
+\x \hlink{ConstantFIXEDExpression} 
+	[ \kw{:} \hlink{ConstantFIXEDExpression} ]\\
+\x $\mid$ \hlink{CharacterStringConstant}$\S $OfLength1 \\
+\x \x	[ \kw{:} \hlink{CharacterStringConstant}$\S $OfLength1 ]
+

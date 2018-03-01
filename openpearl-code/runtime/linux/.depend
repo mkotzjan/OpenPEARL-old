@@ -1,0 +1,654 @@
+TaskTimer.o: TaskTimer.cc ../common/Signals.h ../common/Signals.hh \
+ UnixSignal.h ../common/Interrupt.h ../common/TaskWhenLinks.h TaskTimer.h \
+ ../common/Clock.h ../common/Fixed63.h ../common/BitString.h \
+ ../common/Fixed.h ../common/Signals.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Clock.h ../common/Duration.h ../common/Log.h ../common/Fixed.h \
+ ../common/TaskCommon.h ../common/Interrupt.h ../common/Prio.h Mutex.h \
+ ../common/MutexCommon.h CSema.h ../common/CSemaCommon.h \
+ ../common/UserDation.h ../common/Rst.h ../common/TaskCommon.h \
+ ../common/TaskTimerCommon.h ../common/TaskTimerCommon.h Task.h \
+ ../common/BitString.h PrioMapper.h ../common/Prio.h CSema.h
+Task.o: Task.cc Task.h ../common/BitString.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ PrioMapper.h ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/Clock.h ../common/BitString.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/Clock.h \
+ ../common/Duration.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Log.h ../common/Fixed.h ../common/TaskCommon.h \
+ ../common/Interrupt.h ../common/Prio.h Mutex.h ../common/MutexCommon.h \
+ CSema.h ../common/UserDation.h ../common/Rst.h ../common/TaskCommon.h \
+ ../common/TaskTimerCommon.h TaskTimer.h ../common/TaskTimerCommon.h \
+ ../common/TaskList.h Task.h ../common/TaskMonitor.h \
+ ../common/Semaphore.h ../common/PriorityQueue.h ../common/Bolt.h
+Mutex.o: Mutex.cc Mutex.h ../common/MutexCommon.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/Character.h ../common/RefChar.h
+PrioMapper.o: PrioMapper.cc ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Character.h ../common/RefChar.h \
+ ../common/Fixed.h ../common/Signals.h PrioMapper.h
+CSema.o: CSema.cc CSema.h ../common/CSemaCommon.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/Character.h ../common/RefChar.h
+Pipe.o: Pipe.cc Pipe.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h Mutex.h ../common/MutexCommon.h \
+ ../common/Character.h ../common/RefChar.h ../common/Character.h \
+ ../common/Dation.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/RefChar.h ../common/Signals.h
+Disc.o: Disc.cc Disc.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h Mutex.h ../common/MutexCommon.h \
+ ../common/Character.h ../common/RefChar.h ../common/Character.h \
+ ../common/Dation.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/RefChar.h ../common/Signals.h
+StdIn.o: StdIn.cc StdIn.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h Mutex.h ../common/MutexCommon.h \
+ ../common/Character.h ../common/RefChar.h ../common/Character.h \
+ ../common/Dation.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/RefChar.h ../common/Signals.h
+StdOut.o: StdOut.cc StdOut.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h Mutex.h ../common/MutexCommon.h \
+ ../common/Character.h ../common/RefChar.h ../common/Character.h \
+ ../common/Dation.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/RefChar.h ../common/Signals.h
+StdError.o: StdError.cc StdError.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h Mutex.h ../common/MutexCommon.h \
+ ../common/Character.h ../common/RefChar.h ../common/Character.h \
+ ../common/Dation.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/RefChar.h ../common/Signals.h
+Console.o: Console.cc Task.h ../common/BitString.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ PrioMapper.h ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/Clock.h ../common/BitString.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/Clock.h \
+ ../common/Duration.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Log.h ../common/Fixed.h ../common/TaskCommon.h \
+ ../common/Interrupt.h ../common/Prio.h Mutex.h ../common/MutexCommon.h \
+ CSema.h ../common/UserDation.h ../common/Rst.h ../common/TaskCommon.h \
+ ../common/TaskTimerCommon.h TaskTimer.h ../common/TaskTimerCommon.h \
+ Console.h ../common/SystemDationNB.h Mutex.h ../common/ConsoleCommon.h \
+ ../common/PriorityQueue.h StdIn.h ../common/Character.h \
+ ../common/RefChar.h StdOut.h ../common/Dation.h ../common/Signals.h
+UnixSignal.o: UnixSignal.cc UnixSignal.h ../common/Interrupt.h \
+ ../common/TaskWhenLinks.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Character.h ../common/RefChar.h
+os.o: os.cc Task.h ../common/BitString.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ PrioMapper.h ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/Clock.h ../common/BitString.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/Clock.h \
+ ../common/Duration.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Log.h ../common/Fixed.h ../common/TaskCommon.h \
+ ../common/Interrupt.h ../common/Prio.h Mutex.h ../common/MutexCommon.h \
+ CSema.h ../common/UserDation.h ../common/Rst.h ../common/TaskCommon.h \
+ ../common/TaskTimerCommon.h TaskTimer.h ../common/TaskTimerCommon.h \
+ ../common/TaskList.h Task.h ../common/TaskMonitor.h ../common/Signals.h \
+ ../common/Control.h UnixSignal.h StdIn.h ../common/SystemDationNB.h \
+ Mutex.h ../common/Character.h ../common/RefChar.h ../common/LogFile.h \
+ Disc.h
+TaskMonitor.o: TaskMonitor.cc ../common/TaskMonitor.h Mutex.h \
+ ../common/MutexCommon.h
+Log.o: Log.cc ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Character.h ../common/RefChar.h \
+ Mutex.h ../common/MutexCommon.h ../common/Signals.h StdError.h \
+ ../common/SystemDationNB.h ../common/Character.h ../common/RefChar.h
+Array.o: ../common/Array.cc ../common/Array.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h
+Bolt.o: ../common/Bolt.cc ../common/TaskCommon.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/Clock.h ../common/BitString.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Interrupt.h ../common/TaskWhenLinks.h ../common/Prio.h Mutex.h \
+ ../common/MutexCommon.h CSema.h ../common/CSemaCommon.h \
+ ../common/UserDation.h ../common/Rst.h ../common/TaskTimerCommon.h \
+ ../common/Bolt.h Task.h ../common/BitString.h PrioMapper.h \
+ ../common/Prio.h CSema.h ../common/Clock.h ../common/Duration.h \
+ ../common/Interrupt.h ../common/Log.h ../common/Fixed.h \
+ ../common/TaskCommon.h TaskTimer.h ../common/TaskTimerCommon.h \
+ ../common/PriorityQueue.h
+LogFile.o: ../common/LogFile.cc ../common/LogFile.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/Character.h ../common/RefChar.h
+Log.o: ../common/Log.cc ../common/Clock.h ../common/Fixed63.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/PutClock.h \
+ ../common/Sink.h ../common/RefCharSink.h
+Clock.o: ../common/Clock.cc ../common/Clock.h ../common/Fixed63.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h
+Duration.o: ../common/Duration.cc ../common/Duration.h \
+ ../common/Fixed63.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/BitString.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h ../common/Clock.h
+PutDuration.o: ../common/PutDuration.cc ../common/PutDuration.h \
+ ../common/Duration.h ../common/Fixed63.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/BitString.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/Clock.h ../common/Sink.h
+GetDuration.o: ../common/GetDuration.cc ../common/Duration.h \
+ ../common/Fixed63.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/BitString.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h ../common/Clock.h \
+ ../common/GetDuration.h ../common/Source.h ../common/GetHelper.h
+Signals.o: ../common/Signals.cc ../common/Signals.h ../common/Signals.hh \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Fixed.h \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Character.h ../common/RefChar.h \
+ ../common/Signals.hcc
+ScheduleSignalAction.o: ../common/ScheduleSignalAction.cc \
+ ../common/ScheduleSignalAction.h ../common/Signals.h \
+ ../common/Signals.hh
+Fixed63.o: ../common/Fixed63.cc ../common/Fixed63.h ../common/Signals.h \
+ ../common/Signals.hh
+Fixed.o: ../common/Fixed.cc ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h
+Prio.o: ../common/Prio.cc ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/Prio.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h
+CharSlice.o: ../common/CharSlice.cc ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed.h ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/CharSlice.h ../common/BitString.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h
+Character.o: ../common/Character.cc ../common/Character.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed.h \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h
+RefChar.o: ../common/RefChar.cc ../common/RefChar.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Character.h ../common/Fixed.h \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h
+compare.o: ../common/compare.cc ../common/BitString.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/CharSlice.h
+Interrupt.o: ../common/Interrupt.cc ../common/Interrupt.h \
+ ../common/TaskWhenLinks.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Character.h ../common/RefChar.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Prio.h Mutex.h ../common/MutexCommon.h CSema.h \
+ ../common/CSemaCommon.h ../common/UserDation.h ../common/Rst.h \
+ ../common/TaskTimerCommon.h
+Source.o: ../common/Source.cc ../common/Source.h ../common/Signals.h \
+ ../common/Signals.hh
+RefCharSink.o: ../common/RefCharSink.cc ../common/RefChar.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Character.h \
+ ../common/Fixed.h ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/RefCharSink.h ../common/Sink.h
+RefCharSource.o: ../common/RefCharSource.cc ../common/RefChar.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Character.h \
+ ../common/Fixed.h ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/RefCharSource.h ../common/Source.h
+SystemDationNBSource.o: ../common/SystemDationNBSource.cc \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/SystemDationNBSource.h ../common/Source.h
+SystemDationNBSink.o: ../common/SystemDationNBSink.cc \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/SystemDationNBSink.h ../common/Sink.h
+PutClock.o: ../common/PutClock.cc ../common/Clock.h ../common/Fixed63.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/PutClock.h \
+ ../common/Sink.h
+GetClock.o: ../common/GetClock.cc ../common/Clock.h ../common/Fixed63.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/GetClock.h \
+ ../common/Source.h ../common/GetHelper.h
+PutBitString.o: ../common/PutBitString.cc ../common/Sink.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/PutBitString.h
+GetHelper.o: ../common/GetHelper.cc ../common/GetHelper.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Source.h
+PutHelper.o: ../common/PutHelper.cc ../common/PutHelper.h \
+ ../common/Sink.h ../common/RefChar.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Character.h ../common/Fixed.h \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h
+TaskWhenLinks.o: ../common/TaskWhenLinks.cc ../common/TaskWhenLinks.h
+TaskCommon.o: ../common/TaskCommon.cc Task.h ../common/BitString.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Character.h ../common/RefChar.h PrioMapper.h ../common/Prio.h \
+ CSema.h ../common/CSemaCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Clock.h ../common/Duration.h ../common/Interrupt.h \
+ ../common/TaskWhenLinks.h ../common/Log.h ../common/Fixed.h \
+ ../common/TaskCommon.h ../common/Interrupt.h ../common/Prio.h Mutex.h \
+ ../common/MutexCommon.h CSema.h ../common/UserDation.h ../common/Rst.h \
+ ../common/TaskCommon.h ../common/TaskTimerCommon.h TaskTimer.h \
+ ../common/TaskTimerCommon.h PrioMapper.h ../common/TaskList.h \
+ ../common/TaskMonitor.h ../common/Semaphore.h ../common/PriorityQueue.h
+TaskList.o: ../common/TaskList.cc ../common/TaskList.h Task.h \
+ ../common/BitString.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ PrioMapper.h ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/Clock.h ../common/BitString.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/Clock.h \
+ ../common/Duration.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Log.h ../common/Fixed.h ../common/TaskCommon.h \
+ ../common/Interrupt.h ../common/Prio.h Mutex.h ../common/MutexCommon.h \
+ CSema.h ../common/UserDation.h ../common/Rst.h ../common/TaskCommon.h \
+ ../common/TaskTimerCommon.h TaskTimer.h ../common/TaskTimerCommon.h \
+ ../common/compare.h ../common/CharSlice.h
+TaskMonitor.o: ../common/TaskMonitor.cc ../common/TaskMonitor.h Mutex.h \
+ ../common/MutexCommon.h
+MutexCommon.o: ../common/MutexCommon.cc ../common/MutexCommon.h
+CSemaCommon.o: ../common/CSemaCommon.cc ../common/CSemaCommon.h
+Semaphore.o: ../common/Semaphore.cc ../common/TaskCommon.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h Mutex.h ../common/MutexCommon.h CSema.h \
+ ../common/CSemaCommon.h ../common/UserDation.h ../common/Rst.h \
+ ../common/TaskTimerCommon.h ../common/Semaphore.h Task.h \
+ ../common/BitString.h PrioMapper.h ../common/Prio.h CSema.h \
+ ../common/Clock.h ../common/Duration.h ../common/Interrupt.h \
+ ../common/Log.h ../common/Fixed.h ../common/TaskCommon.h TaskTimer.h \
+ ../common/TaskTimerCommon.h ../common/PriorityQueue.h
+PriorityQueue.o: ../common/PriorityQueue.cc ../common/PriorityQueue.h \
+ ../common/TaskCommon.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/Clock.h ../common/BitString.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Interrupt.h ../common/TaskWhenLinks.h ../common/Prio.h Mutex.h \
+ ../common/MutexCommon.h CSema.h ../common/CSemaCommon.h \
+ ../common/UserDation.h ../common/Rst.h ../common/TaskTimerCommon.h \
+ ../common/compare.h ../common/CharSlice.h
+Rst.o: ../common/Rst.cc ../common/Rst.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed.h ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h
+SystemDation.o: ../common/SystemDation.cc ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h
+SystemDationNB.o: ../common/SystemDationNB.cc ../common/Signals.h \
+ ../common/Signals.hh ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Fixed.h \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/Character.h \
+ ../common/RefChar.h
+DationRW.o: ../common/DationRW.cc ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/UserDation.h Mutex.h \
+ ../common/MutexCommon.h ../common/Rst.h ../common/SystemDation.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/TaskTimerCommon.h ../common/DationRW.h \
+ ../common/UserDationNB.h ../common/DationDim.h ../common/TFUBuffer.h \
+ ../common/Sink.h ../common/Source.h ../common/IOJob.h \
+ ../common/SystemDationNBSink.h ../common/DationDim1.h \
+ ../common/DationDim2.h ../common/DationDim3.h ../common/compare.h \
+ ../common/CharSlice.h
+IOFormats.o: ../common/IOFormats.cc ../common/IOFormats.h \
+ ../common/Sink.h ../common/Source.h ../common/PutFixed.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/compare.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/BitString.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Character.h ../common/RefChar.h \
+ ../common/CharSlice.h ../common/GetFixed.h ../common/GetHelper.h \
+ ../common/Clock.h ../common/Duration.h ../common/GetFloat.h \
+ ../common/PutFloat.h ../common/PutHelper.h ../common/PutCharacter.h \
+ ../common/GetCharacter.h ../common/PutBitString.h \
+ ../common/GetBitString.h ../common/UserDationNB.h ../common/UserDation.h \
+ Mutex.h ../common/MutexCommon.h ../common/Rst.h ../common/TaskCommon.h \
+ ../common/Interrupt.h ../common/TaskWhenLinks.h ../common/Prio.h CSema.h \
+ ../common/CSemaCommon.h ../common/TaskTimerCommon.h \
+ ../common/DationDim.h ../common/TFUBuffer.h ../common/IOJob.h \
+ ../common/SystemDationNBSink.h ../common/PutClock.h ../common/GetClock.h \
+ ../common/PutDuration.h ../common/GetDuration.h
+IOJob.o: ../common/IOJob.cc ../common/IOJob.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h Mutex.h ../common/MutexCommon.h CSema.h \
+ ../common/CSemaCommon.h ../common/UserDation.h ../common/Rst.h \
+ ../common/TaskTimerCommon.h ../common/SystemDationNBSink.h \
+ ../common/Sink.h
+DationPG.o: ../common/DationPG.cc ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/UserDation.h Mutex.h \
+ ../common/MutexCommon.h ../common/Rst.h ../common/SystemDation.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/TaskTimerCommon.h ../common/DationPG.h \
+ ../common/UserDationNB.h ../common/DationDim.h ../common/TFUBuffer.h \
+ ../common/Sink.h ../common/Source.h ../common/IOJob.h \
+ ../common/SystemDationNBSink.h ../common/SystemDationNBSource.h \
+ ../common/IOFormats.h ../common/PutFixed.h ../common/compare.h \
+ ../common/CharSlice.h ../common/GetFixed.h ../common/GetHelper.h \
+ ../common/GetFloat.h ../common/PutFloat.h ../common/PutHelper.h \
+ ../common/PutCharacter.h ../common/GetCharacter.h \
+ ../common/PutBitString.h ../common/GetBitString.h ../common/PutClock.h \
+ ../common/GetClock.h ../common/PutDuration.h ../common/GetDuration.h
+StringDationConvert.o: ../common/StringDationConvert.cc \
+ ../common/StringDationConvert.h ../common/RefCharSink.h ../common/Sink.h \
+ ../common/RefChar.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Character.h ../common/Fixed.h ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/RefCharSource.h ../common/Source.h ../common/Rst.h \
+ ../common/IOFormats.h ../common/PutFixed.h ../common/compare.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/CharSlice.h \
+ ../common/GetFixed.h ../common/GetHelper.h ../common/Clock.h \
+ ../common/Duration.h ../common/GetFloat.h ../common/PutFloat.h \
+ ../common/PutHelper.h ../common/PutCharacter.h ../common/GetCharacter.h \
+ ../common/PutBitString.h ../common/GetBitString.h \
+ ../common/UserDationNB.h ../common/UserDation.h Mutex.h \
+ ../common/MutexCommon.h ../common/TaskCommon.h ../common/Interrupt.h \
+ ../common/TaskWhenLinks.h ../common/Prio.h CSema.h \
+ ../common/CSemaCommon.h ../common/TaskTimerCommon.h \
+ ../common/DationDim.h ../common/TFUBuffer.h ../common/IOJob.h \
+ ../common/SystemDationNBSink.h
+DationTS.o: ../common/DationTS.cc ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/UserDation.h Mutex.h \
+ ../common/MutexCommon.h ../common/Rst.h ../common/SystemDation.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/TaskTimerCommon.h ../common/DationTS.h \
+ ../common/SystemDationB.h ../common/DationDim.h ../common/compare.h \
+ ../common/CharSlice.h
+UserDationNB.o: ../common/UserDationNB.cc ../common/UserDationNB.h \
+ ../common/Dation.h ../common/Device.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/UserDation.h Mutex.h ../common/MutexCommon.h ../common/Rst.h \
+ ../common/SystemDation.h ../common/TaskCommon.h ../common/Clock.h \
+ ../common/BitString.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/Character.h ../common/RefChar.h ../common/Duration.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/Interrupt.h \
+ ../common/TaskWhenLinks.h ../common/Prio.h CSema.h \
+ ../common/CSemaCommon.h ../common/TaskTimerCommon.h \
+ ../common/DationDim.h ../common/TFUBuffer.h ../common/Sink.h \
+ ../common/Source.h ../common/IOJob.h ../common/SystemDationNBSink.h \
+ ../common/DationDim1.h ../common/DationDim2.h ../common/DationDim3.h \
+ ../common/compare.h ../common/CharSlice.h Task.h ../common/BitString.h \
+ PrioMapper.h ../common/Prio.h CSema.h ../common/Clock.h \
+ ../common/Duration.h ../common/Interrupt.h ../common/Log.h \
+ ../common/Fixed.h ../common/TaskCommon.h TaskTimer.h \
+ ../common/TaskTimerCommon.h
+UserDation.o: ../common/UserDation.cc ../common/UserDation.h Mutex.h \
+ ../common/MutexCommon.h ../common/Rst.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed.h ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/SystemDationNB.h ../common/Character.h \
+ ../common/RefChar.h ../common/Duration.h ../common/Float.h \
+ ../common/FloatHelper.h ../common/Interrupt.h ../common/TaskWhenLinks.h \
+ ../common/Prio.h CSema.h ../common/CSemaCommon.h \
+ ../common/TaskTimerCommon.h
+TFUBuffer.o: ../common/TFUBuffer.cc ../common/TFUBuffer.h \
+ ../common/Sink.h ../common/Source.h ../common/SystemDationNB.h \
+ ../common/SystemDation.h ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Log.h ../common/Character.h \
+ ../common/RefChar.h
+DationDim.o: ../common/DationDim.cc ../common/Dation.h ../common/Device.h \
+ ../common/Fixed.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/DationDim.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Character.h ../common/RefChar.h ../common/compare.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/BitString.h \
+ ../common/CharSlice.h
+DationDim1.o: ../common/DationDim1.cc ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/DationDim1.h ../common/DationDim.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Character.h ../common/RefChar.h ../common/compare.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/BitString.h \
+ ../common/CharSlice.h
+DationDim2.o: ../common/DationDim2.cc ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/DationDim2.h ../common/DationDim.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Character.h ../common/RefChar.h ../common/compare.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/BitString.h \
+ ../common/CharSlice.h
+DationDim3.o: ../common/DationDim3.cc ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/DationDim3.h ../common/DationDim.h ../common/Log.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Character.h ../common/RefChar.h ../common/compare.h \
+ ../common/Float.h ../common/FloatHelper.h ../common/BitString.h \
+ ../common/CharSlice.h
+FloatHelper.o: ../common/FloatHelper.cc ../common/FloatHelper.h \
+ ../common/Signals.h ../common/Signals.hh
+SoftInt.o: ../common/SoftInt.cc ../common/SoftInt.h ../common/Interrupt.h \
+ ../common/TaskWhenLinks.h ../common/Signals.h ../common/Signals.hh \
+ ../common/Log.h ../common/SystemDationNB.h ../common/SystemDation.h \
+ ../common/Dation.h ../common/Device.h ../common/Fixed.h \
+ ../common/Fixed63.h ../common/../../configuration/include/autoconf.h \
+ ../common/stackcheck.h ../common/IfThenElseTemplate.h \
+ ../common/NumberOfBytes.h ../common/Character.h ../common/RefChar.h
+Control.o: ../common/Control.cc ../common/Control.h ../common/Fixed.h \
+ ../common/Signals.h ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h
+ConsoleCommon.o: ../common/ConsoleCommon.cc ../common/ConsoleCommon.h \
+ ../common/SystemDationNB.h ../common/SystemDation.h ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/TaskCommon.h ../common/Clock.h ../common/BitString.h \
+ ../common/Log.h ../common/Character.h ../common/RefChar.h \
+ ../common/Duration.h ../common/Float.h ../common/FloatHelper.h \
+ ../common/Interrupt.h ../common/TaskWhenLinks.h ../common/Prio.h Mutex.h \
+ ../common/MutexCommon.h CSema.h ../common/CSemaCommon.h \
+ ../common/UserDation.h ../common/Rst.h ../common/TaskTimerCommon.h \
+ ../common/PriorityQueue.h
+SampleBasicDation.o: ../common/SampleBasicDation.cc ../common/Dation.h \
+ ../common/Device.h ../common/Fixed.h ../common/Signals.h \
+ ../common/Signals.hh ../common/Fixed63.h \
+ ../common/../../configuration/include/autoconf.h ../common/stackcheck.h \
+ ../common/IfThenElseTemplate.h ../common/NumberOfBytes.h \
+ ../common/SampleBasicDation.h ../common/SystemDationB.h \
+ ../common/SystemDation.h ../common/Log.h ../common/SystemDationNB.h \
+ ../common/Character.h ../common/RefChar.h

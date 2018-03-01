@@ -1,0 +1,310 @@
+/*#########################################################
+PROGRAM
+Check the Operators +, -, *, /, ** with FLOAT53 and FLOAT24
+and a combination of both. The epsilon variable is for the
+tolerance. This program check not the accuracy but only the 
+functionality of the operators in Pearl.
+############################################################ 
+RESULT
+When all operators works correct with a tolerance, the variable
+check musst be zero.
+###########################################################*/ 
+
+MODULE(float_operator_two);
+
+PROBLEM;
+    !__cpp__('#include <stdlib.h>');
+
+Main : TASK MAIN;
+    DCL check FIXED(15) INIT(0);
+    DCL expo  FIXED(31) INIT(0);
+
+	DCL (resultFixed1_63, resultFixed2_63) 		FIXED(63) INIT(0,0);
+
+	DCL (a24,b24,c24,d24) 					 	FLOAT(24) INIT(0.0,0.0,0.0,0.0);
+    DCL (result1_24, result2_24, realResult24) 	FLOAT(24) INIT(0.0,0.0,0.0);
+
+    DCL (a53,b53,c53,d53) 					 	FLOAT(53) INIT(5.2,2.0,1.3,2.0);
+    DCL (e53,f53,g53, a253) 					FLOAT(53) INIT(1.24,3.23,4.57,1.1);
+	DCL (h53,i53,j53,k53,l53,m53) 				FLOAT(53) INIT(9.04,-6.56,2.58,18.303764,3.38,32768.0);
+    DCL (result1_53, result2_53, realResult53) 	FLOAT(53) INIT(0.0,0.0,322.68769779);
+
+	DCL epsilon53 FLOAT(53);
+    DCL epsilon24 FLOAT(24);
+
+    epsilon24 := 1.0 * ((10.0)**(-6));
+    epsilon53 := 1.0 * ((10.0)**(-14));
+
+!   __cpp__('printf("check : %d \\n", _check.x);');
+!	__cpp__('printf("1: %E 2: %E \\n", _result1_24.x, _realResult24.x);');
+
+
+/* the inaccuracy in the type conversion from FLOAT24 too FLOAT53 */
+/*    __cpp__(
+    ' float a = 1.24;'
+    ' float b = 3.23;'
+    ' float c = 4.57;'
+	' float realresult = 9.04;'
+	' double a1 = a;'
+    ' double b1 = b;'
+    ' double c1 = c;'
+    ' double realresult1 = realresult;'
+    ' double result1 = 0;'
+    ' double result2 = 0;'
+    'result1 = a1 + b1 + c1;'
+    'result2 = abs(result1 - realresult1);'
+	'printf ("float   a: %f, hex a:  %x \\n", a, *(int*)(&a));'
+	'printf ("double a1: %f, hex a1: %llx \\n", a1, *(long long int*)(&a1));'
+    'printf ("1: %E, 2: %E, 3 %E \\n", result1, realresult1, result2);');
+ */   
+
+/*#####################################
+    a + b + c
+#####################################*/
+
+	/*### FLOAT 24 ###*/
+    a24 := 1.24;
+    b24 := 3.23;
+    c24 := 4.57;
+
+    result1_24 := a24 + b24 + c24;
+    realResult24 := 9.04;
+	result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN; 
+
+	result1_24 := a24 + (b24 + c24);
+    realResult24 := 9.04;
+    result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;    
+
+	/*### FLOAT 53 ###*/
+
+	result1_53 := e53 + f53 + g53;
+	result2_53 := ABS(h53 - result1_53);  
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN; 
+
+	result1_53 := a24 + f53 + g53;
+	result2_53 := ABS(h53 - result1_53);  
+
+    IF  result2_53 > epsilon24 THEN
+        check := check + 1;
+    FIN; 
+
+	result1_53 := e53 + (f53 + g53);
+    result2_53 := ABS(h53 - result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN; 
+
+	!__cpp__('printf("check : %d \\n", _check.x);');
+/*#####################################
+    a - b - c
+#####################################*/
+    
+	/*### FLOAT 24 ###*/
+    result1_24 := a24 - b24 - c24;
+    realResult24 := -6.56;
+    result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	result1_24 := a24 - (b24 - c24);
+    realResult24 := 2.58;
+    result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	/*### FLOAT 53 ###*/
+	result1_53 := e53 - f53 - g53;
+    result2_53 := ABS(i53 - result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := a24 - f53 - g53;
+    result2_53 := ABS(i53 - result1_53);
+
+    IF  result2_53 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := e53 - (f53 - g53);
+    result2_53 := ABS(j53 - result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+	
+	!__cpp__('printf("check : %d \\n", _check.x);');
+/*#####################################
+    a * b * c
+#####################################*/
+
+	/*### FLOAT 24 ###*/
+	a24 := 1.24;
+    b24 := 3.2;
+    c24 := 4.5;
+
+    result1_24 := a24 * b24 * c24;
+    realResult24 := 17.856;
+    result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+
+	/*### FLOAT 53 ###*/
+
+    result1_53 := e53 * f53 * g53;
+    result2_53 := ABS(k53 - result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := ((e53) * (f53 * g53));
+    result2_53 := ABS(k53 - result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := a24 * f53 * g53;
+    result2_53 := ABS(k53 - result1_53);
+
+    IF  result2_53 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+	
+	!__cpp__('printf("check : %d \\n", _check.x);');
+/*#####################################
+    a / b / c
+#####################################*/
+ 
+	/*### FLOAT 24 ###*/   
+    a24 := 5.2;
+    b24 := 2.0;
+    c24 := 1.3;
+
+    result1_24 := a24 / b24 / c24;
+	realResult24 := 2.0;
+    result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+	
+	result1_24 := a24 / (b24 / c24);
+	realResult24 := 3.38;
+	result2_24 := ABS(realResult24 - result1_24);
+
+    IF  result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	/*### FLOAT 53 ###*/   
+
+    result1_53 := a53 / b53 / c53;
+    result2_53 := ABS(d53- result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := a24 / b53 / c53;
+    result2_53 := ABS(d53- result1_53);
+
+    IF  result2_53 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+	
+	result1_53 := a53 / (b53 / c53);
+	result2_53 := ABS(l53 - result1_53);
+
+    IF  result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	!__cpp__('printf("check : %d \\n", _check.x);');
+/*#####################################
+    a ** b
+#####################################*/
+
+	/*### FLOAT 24 ###*/   
+    expo := 15;
+    a24 := 2.0;
+
+    realResult24 := 32768.0;
+	result1_24 := a24 ** expo;
+	result2_24 := ABS(realResult24 - result1_24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	expo := 9;
+    a24 := 1.9;
+
+    realResult24 := a24 *a24 *a24 *a24 *a24 *a24 *a24 *a24 *a24;
+    result1_24 := a24 ** expo;
+	result2_24 := ABS(realResult24 - result1_24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	/*### FLOAT 53 ###*/   
+    expo := 15;
+
+	result1_53 := b53 ** expo;
+	result2_53 := ABS(m53 - result1_53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	expo := 7;
+	realResult53  := a253 * a253 * a253 * a253 * a253 * a253 * a253;
+    result1_53 := a253 ** expo;
+	result2_53 := ABS(realResult53 - result1_53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+	
+    !__cpp__('printf("check : %d \\n", _check.x);');
+
+/*#####################################
+    verify the variable check
+    check = 0  -> SUCCESS
+    check /= 0 -> FAILED
+#####################################*/
+
+    IF check == 0 THEN
+        __cpp__('printf ("*** SUCCESS *** \\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf ("*** FAILED *** \\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+        
+
+END;
+
+MODEND;

@@ -1,0 +1,3 @@
+\htgt{Precision} ::=\\
+\x \hlink{IntegerWithoutPrecision}\S GreaterOrEqualZero\\
+

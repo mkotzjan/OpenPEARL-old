@@ -1,0 +1,14 @@
+MODULE(mixedcppinc);
+
+PROBLEM;
+T1: TASK MAIN;
+   DCL x FIXED;
+!  __cpp__ ( "pearlrt::Fixed<15>  _x;");
+!  __cpp__ ( "pearlrt::Fixed<15>  _y;");
+  __cpp__ ("me->setLocation(5,filename);");
+   x := 1;
+  __cpp__ ("me->setLocation(6,filename);");
+!   y := 0;
+END;
+
+MODEND;

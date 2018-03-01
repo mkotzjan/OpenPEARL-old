@@ -1,0 +1,3 @@
+\htgt{RFormat} ::=\\
+\x \kw{R} \kw{(} \hlink{Identifier}$\S $Format \kw{)}
+

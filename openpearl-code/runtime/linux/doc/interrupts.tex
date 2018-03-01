@@ -1,0 +1,28 @@
+\section{Linux specific Interrupt Sources}
+
+\subsection{UnixSignal}
+Some UNIX signals may be used to trigger the PEARL application from outside.
+
+Synopis: \verb|UnixSignal(nbr)|
+
+The parameter \verb|nbr| denotes the linux signal number.
+The following signals are supported:
+
+\begin{tabular}{|l|c|}
+\hline
+Signal & Number \\
+\hline
+SIGHUP & 1 \\
+SIGINT & 2 \\
+SIGQUIT & 3 \\
+SIGTERM & 15 \\
+SIGUSR1 & 16 \\
+SIGUSR2 & 17 \\
+\hline
+\end{tabular}
+
+Note that there may be only one user defined name for each UNIX signal.
+In case of attempting more than one user defined interrupt for 
+a UNIX signal the InternalDatatypeSignal is induced 
+during system initializing phase.
+

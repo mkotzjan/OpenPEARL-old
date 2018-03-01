@@ -1,0 +1,3 @@
+\htgt{SourceSinkAttribute} ::=\\
+\x  \kw{IN} $\mid$ \kw{OUT} $\mid$ \kw{INOUT}
+

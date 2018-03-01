@@ -1,0 +1,8 @@
+    IF check == 0 THEN
+        __cpp__('printf ("*** SUCCESS *** \\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf ("*** FAILED *** \\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+

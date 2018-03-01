@@ -1,0 +1,6 @@
+\htgt{ProcedureReferenceDeclaration} ::= \\
+\x \{ \kw{DECLARE} $\mid$ \kw{DCL} \} \hlink{OneIdentifierOrList}
+	 [ \hlink{DimensionAttribute} ] \\
+\x [ \kw{INV} ] \kw{REF} \hlink{TypeProcedure} [ \hlink{GlobalAttribute} ] \\
+\x [ \hlink{InitialisationAttribute} ] \kw{;}
+

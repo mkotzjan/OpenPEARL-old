@@ -1,0 +1,46 @@
+# define a list of test sources
+# the relative path must be added by the target specific makefile
+#
+
+CXX_COMMON_TESTS1 := \
+	ArrayTests.cc\
+	BitTests.cc\
+	CharacterTests.cc\
+	Fixed63Tests.cc\
+	FixedTests.cc \
+	FloatTests.cc \
+	SizeTests.cc \
+	DurationTests.cc\
+	ClockTests.cc
+
+CXX_COMMON_TESTS2 := \
+	GetBitStringTests.cc  \
+	GetCharacterTests.cc \
+	GetClockTests.cc \
+	GetDurationTests.cc \
+	GetFixedTests.cc \
+	GetFloatTests.cc \
+	GetUtils.cc \
+	PutBitStringTests.cc\
+	PutCharacterTests.cc\
+	PutClockTests.cc\
+	PutDurationTests.cc\
+	PutFixedTests.cc\
+	PutFloatTests.cc\
+	RefCharSinkTests.cc\
+	RefCharSourceTests.cc \
+	RefCharTests.cc
+
+CXX_COMMON_TESTS := $(CXX_COMMON_TESTS1) $(CXX_COMMON_TESTS2)
+
+CXX_COMMON_GTESTS := $(CXX_COMMON_TESTS)
+	
+CXX_COMMON_TEST_PROGS := SampleBasicDationTests.cc \
+	sematest.cc \
+	bolttest.cc \
+	sematerminate.cc \
+	interruptTest.cc  \
+	log_test.cc \
+	RefTest.cc
+
+

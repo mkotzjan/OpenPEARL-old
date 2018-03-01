@@ -1,0 +1,34 @@
+MODULE(UsbKb);
+SYSTEM;
+
+   kb: Lpc17xxUsbKeyboard;
+   hy32: Hy32(0);
+
+PROBLEM;
+
+   SPC kb DATION IN SYSTEM ALPHIC GLOBAL;
+   SPC hy32 DATION OUT SYSTEM ALPHIC GLOBAL;
+
+   DCL conin DATION IN ALPHIC DIM(*,80) FORWARD CREATED(kb);
+   DCL conout DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(hy32);
+
+ttt1: TASK MAIN;
+   DCL text CHAR(20);
+
+   OPEN conout;
+   PUT 'Usb Keyboard start' TO conout BY A, SKIP;
+
+ !  AFTER 0.5 SEC RESUME;
+   OPEN conin;
+
+   REPEAT
+      GET text FROM conin BY A, SKIP;
+      PUT text TO conout BY A, SKIP;
+   END;
+END;
+
+MODEND;
+
+      
+
+

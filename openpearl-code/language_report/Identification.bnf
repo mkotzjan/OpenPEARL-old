@@ -1,0 +1,4 @@
+\htgt{Identification} ::=\\
+\x \{ \kw{SPC} $\mid$ \kw{SPECIFY}\} \hlink{Identifier} 
+	[ \kw{INV} ] \hlink{Type} \hlink{IdentificationAttribute} ;\\
+

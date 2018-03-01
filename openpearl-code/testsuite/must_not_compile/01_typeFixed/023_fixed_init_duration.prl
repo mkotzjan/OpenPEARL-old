@@ -1,0 +1,8 @@
+MODULE(m);
+
+PROBLEM;
+
+DCL f FIXED(15) INIT(2 MIN);
+
+MODEND;
+

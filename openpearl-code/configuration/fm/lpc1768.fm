@@ -1,0 +1,131 @@
+config LPC1768
+        boolean  "Select the runtime sytem for the Landtiger board"
+	default n
+	help
+	This port targets the LPC1768 Landtiger board. Target specific 
+	i/o-setting is done directly in the source code.
+	
+	This port is in work. Build and execution problems 
+        may occur selecting this option. 
+
+config LPC1768_CHECK_STACK_OVERFLOW
+	depends on LPC1768
+	boolean "check stack overflow in application code"
+	default y
+	help
+	This adds a function call in each funtion entry (and exit)
+        in order to check the current value of the stack pointer.
+	If the stack pointer is near to/or beyond of the stack limit
+        a non catchable exception is raised and the task is terminated.
+	
+	This option relies on the -finstrument-functions option of 
+	the g++ compiler.
+
+#choice
+config LPC1768_tests
+	depends on LPC1768
+	boolean "build low level test applications"
+	default n
+	help
+	This will create the low level test application of the runtime
+        system for the LPC1768 microcontroller. 
+        These tests should be run at least once to make shure that
+	the runtime system interacts properly with your configuration
+        with hardware and toolchain.
+	Usually deselect this.
+
+#choice
+#depends on LPC1768
+#   prompt  "Select System Timer"
+#    default LPC1768_FreeRTOSSystemTimer
+#    help
+#    Exactly one timer solution must be selected for the timed tasking
+#    operations.
+#
+# config LPC1768_FreeRTOSSystemTimer 
+#     bool "SystemTimer1MS"
+#     help 
+#     The system time is based on a 1ms timer. This limits the precision
+#     of delay to this time increment.
+#
+#
+# config LPC1768_FreeRTOSHRTimer 
+#     bool "HR-Timer (experimental)"
+#     help
+#     The system time is based on a high precision timer, whos operation
+#     is updated on each new timer request in the system.
+#     This should leed to delay opertation on a time base of 1us.
+#     Currently this feature does not work properly.
+#
+#endchoice
+
+
+menu "Drivers"
+depends on LPC1768
+
+# this option is set when selecting one usb component
+# this option is not shown in the menu
+config LPC1768_HAS_USB
+     bool
+     default n
+
+config HAS_FAT
+     bool
+     default n
+
+config HAS_SDCARDSPI
+     bool
+     default n
+
+config LPC1768_USB_Keyboard
+     bool "USB keyboard support"
+     default n
+     select LPC1768_HAS_USB
+     help
+     This option provides the usage of an standard usb keyboard
+     device via the usb interface.
+     Only 1 usb device may be attached.
+
+config LPC1768_USB_Disk
+     bool "USB mass storage support"
+     default n
+     select LPC1768_HAS_USB
+     select HAS_FAT
+     help
+     This option provides mass storage access via the usb interface.
+     A common usb flash disc device may be attached.
+     Only 1 usb device may be attached.
+
+config LPC1768_SDCARD
+     bool "SD-card mass storage support"
+     select HAS_FAT
+     select HAS_SDCARDSPI
+     default n
+     help
+     This option provides mass storage access via spi/sd card interface.
+
+config LPC1768_UART
+     bool "UART support"
+     default y
+     help
+     This option enables the system dation and driver for the two uart
+     channels
+
+config LPC1768_HY32A
+     bool "HY32A support display support"
+     default y
+     help
+     This option enables the system dation and driver for the onboard
+     color grafic module
+
+config LPC1768_CAN
+     depends on CANSUPPORT
+     bool "CAN bus support"
+     default n
+     help
+     This option enables the system dation and driver for the onboard
+     CAN interfaces CAN1 and CAN2
+     Experimaltal!!! --> usually deselect this.
+
+endmenu
+

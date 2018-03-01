@@ -1,0 +1,3 @@
+\htgt{TypeFixed} ::=\\
+\x \kw{FIXED} [ \kw{(} \hlink{Precision} \kw{)} ]
+

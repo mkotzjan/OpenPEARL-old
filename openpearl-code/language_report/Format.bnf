@@ -1,0 +1,21 @@
+\htgt{Format} ::=\\
+\x \hlink{FixedFormat} $\mid$ \hlink{FloatFormat} $\mid$\\
+\x \hlink{CharacterStringFormat} $\mid$ \hlink{BitFormat} $\mid$ \\
+\x \hlink{TimeFormat} $\mid$ \hlink{DurationFormat} $\mid$ \\
+\x \hlink{ListFormat} $\mid$ \hlink{RFormat} \\
+ 
+%%%\x \{ {\bf F $\mid$ E 
+%%%	%%%\addedtext{$\mid$ E3 }
+%%%	$\mid$ 	E3}\} ( \hlink{Expression}
+%%%	 [ , \hlink{Expression} [ , \hlink{Expression} ] ] ) \\
+%%%\x $\mid$ \{ {\bf B $\mid$ B1 $\mid$ B2 $\mid$ B3 $\mid$ B4 $\mid$ A} \}
+%%%	 [ ( \hlink{Expression} ) ]\\
+%%%\x $\mid$ \{ {\bf T $\mid$ D} \} ( \hlink{Expression}
+%%%	 [ , \hlink{Expression} ] )\\
+%%%\x $\mid$ {\bf LIST}\\
+%%%\x $\mid$ {\bf R} ( \hlink{Identifier}$\S $Format )\\
+%%%\begin{removed}
+%%%\x $\mid$ {\bf S} ( \hlink{Name}$\S $LengthVariable-FIXED )\\
+%%%\end{removed}
+
+

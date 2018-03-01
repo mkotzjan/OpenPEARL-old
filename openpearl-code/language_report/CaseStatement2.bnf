@@ -1,0 +1,7 @@
+\htgt{CaseStatement2} ::=\\
+\x \kw{CASE} \hlink{CaseIndex}\\
+\x \{ \kw{ALT} ( \hlink{CaseList} ) 
+	 \hlink{Statement} $^{...}$  \} $^{...}$\\
+\x [ \kw{OUT}  \hlink{Statement} $^{...}$  ]\\
+\x \kw{FIN} \kw{;}
+

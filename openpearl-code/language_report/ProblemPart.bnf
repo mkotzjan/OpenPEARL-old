@@ -1,0 +1,5 @@
+\htgt{ProblemPart} ::=\\
+\x \kw{PROBLEM}; \\
+\x [\{ \hlink{Declaration} $\mid$ 
+	\hlink{Specification} $\mid$
+	\hlink{Identification} \} $^{...}$ ]\\

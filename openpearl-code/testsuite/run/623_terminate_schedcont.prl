@@ -1,0 +1,85 @@
+/*#########################################################################
+PROGRAM
+The main Task controls the activity.
+
+Task Task2 suspends itself and does an active delay for 1 second before it
+inceremts a global counter and terminates.
+
+The main task activates Task2, continues the task2 and set an scheduled
+continue while task2 is working. The main tasks waits until task2
+terminated and activates the task2 again. The scheduled continue should
+reach task2 automatically, which will do agian its active delay and 
+inceret the counter. Thus the couter should reach the value 2, if the
+scheduled continue flag is stored over task terimation and activation.
+
+###########################################################################
+RESULT
+The count variable have must the value 2. 
+##########################################################################*/
+
+MODULE(tasking_terminate_schedContinue);
+
+PROBLEM;
+
+	DCL count FIXED (15) INIT (0);
+
+Main : TASK PRIO 2 MAIN;
+
+	ACTIVATE Task2;
+	AFTER 0.5 SEC RESUME;  /* task2 should reach suspend */
+	CONTINUE Task2;
+
+	AFTER 5 SEC CONTINUE Task2;
+        /* task2: sa=0, sc = 1 */
+
+	__cpp__(
+        'if (_count.x != 0) {'
+        '   printf("error(0): count should be 0 (is %d)\\n", _count.x);'
+        '}');
+
+	/* suspended [sa=0,sc=1] */
+        AFTER 2 SEC RESUME; 
+	__cpp__(
+        'if (_count.x != 1) {'
+        '   printf("error(1): count should be 1 (is %d)\\n", _count.x);'
+        '}');
+
+	ACTIVATE Task2;
+
+        /* task2  should continue in after approx 10 sec */
+	__cpp__(
+        'if (_count.x != 1) {'
+        '   printf("error(2): count should be 1 (is %d)\\n", _count.x);'
+        '}');
+
+        /* wait until TASK2 is continued and did its delay */
+        AFTER 5 SEC RESUME;
+
+	__cpp__(
+        'if (_count.x != 2) {'
+        '       printf("error: count should be 2 (is %d)\\n", _count.x);'
+	'	pearlrt::Control::setExitCode(1);'
+	'	printf("*** FAILED *** \\n");'
+        '} else {'
+	'	printf("*** SUCCESS *** \\n");'
+        '}');
+
+END;
+
+Task2 : TASK;
+        DCL end CLOCK;
+__cpp__('printf("Task2 started\\n");');
+	SUSPEND;
+__cpp__('printf("Task2 continued\\n");');
+
+        /* 1 seconds active delay */
+	 __cpp__ (
+	'_end=pearlrt::Clock::now() + (pearlrt::Duration)(1);'
+        'while ( (_end>pearlrt::Clock::now()).getBoolean());'
+	);
+
+	count :=  count + 1;
+__cpp__('printf("Task2 terminated\\n");');
+END;
+
+MODEND;

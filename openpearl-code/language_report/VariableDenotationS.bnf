@@ -1,0 +1,6 @@
+\htgt{VariableDenotationS} ::=\\
+\x 
+%%%\hlink{IdentifierDenotation}
+\hlink{OneIdentifierOrList}
+     [ \kw{INV} ] \hlink{TypeAttribute}\\
+\x \{ \hlink{GlobalAttribute} $\mid$ \hlink{IdentificationAttribute} \}

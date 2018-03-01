@@ -1,0 +1,44 @@
+/*#########################################################################
+PROGRAM
+Task 1 activated Task2 and go sleep for 1 Sec.
+Task2 increment the variable varTask2 and go for two sec sleep.
+Task1 come back and terminate task2. Task2 never execute the second
+increment.
+The task1 check the variable varTask2 and set the exit code.
+##########################################################################
+RESULT
+
+The variable varTask2 must be 1.
+########################################################################*/
+
+MODULE(tasking_Terminate);
+
+
+PROBLEM;
+
+DCL varTask2 FIXED(3) INIT(0);
+
+Task1: TASK PRIO 1 MAIN;
+	
+    ACTIVATE Task2;
+
+    AFTER 1 SEC RESUME;
+
+    TERMINATE Task2;
+	
+    AFTER 1.2 SEC RESUME;
+    __cpp__('if( _varTask2.x == 1) { '
+            '   printf("*** SUCCESS *** \\n"); '
+            '   pearlrt::Control::setExitCode(0); }');
+END;
+
+
+Task2: TASK PRIO 2;
+    varTask2 := varTask2 + 1;
+    AFTER 2 SEC RESUME;   
+    varTask2 := varTask2 + 1;
+    __cpp__('printf ("*** FAILED ***\\n"); '
+            'pearlrt::Control::setExitCode(1); ');
+END;
+
+MODEND;

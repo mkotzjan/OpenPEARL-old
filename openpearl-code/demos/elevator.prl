@@ -1,0 +1,637 @@
+/*
+Demonstration application for elevator model at the HFU
+
+This demo expects the system devices PCan, StdIn and StdOut
+
+*/
+
+MODULE(elevator);
+
+SYSTEM;
+   stdin: StdIn;
+   stdout: StdOut;
+   pcan: PCan('/dev/pcan32', 1000000); ! 1MBaud
+
+PROBLEM;
+    SPC stdin DATION IN SYSTEM ALPHIC GLOBAL;
+    SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;
+    SPC pcan   DATION INOUT SYSTEM BASIC ALL GLOBAL;
+
+    DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(stdout);
+    DCL termin  DATION IN ALPHIC DIM(*,80) FORWARD STREAM CREATED(stdin);
+
+    DCL canBusOut DATION OUT BASIC ALL CREATED(pcan);
+    DCL canBusIn DATION IN BASIC ALL CREATED(pcan);
+
+    DCL (true,false) BIT(1) INIT('1'B1, '0'B1);
+
+    /* function unit */
+    DCL (unitDisplay, unitMotor,unitSwitches,unitDiagnosis, unitLed) FIXED
+          INIT (12,10,9,15,11);
+
+    /* motor commands */
+    DCL (motorOpen, motorClose, motorStop) INV FIXED INIT(2,1,0);
+
+    /* can nodes */
+    DCL (motor,groundFloor,firstFloor,secondFloor,cabin) 
+         INV FIXED INIT(0,1,2,3,4);
+
+
+    /* ------------- Elevator Status ---------------------- */
+    DCL initialized BIT(1) INIT('0'B1);
+    __cpp__('pearlrt::BitString<1> _cabinRequest[5];'
+            'pearlrt::BitString<1> _upRequest[3];'
+            'pearlrt::BitString<1> _downRequest[3];'
+    );
+    DCL done SEMA PRESET(0);
+    DCL wait4Completion BIT(1) INIT('0'B1);
+    DCL statusMutex SEMA PRESET(1);
+    DCL cabinLedStatus BIT(8);
+    DCL (unknown, stopped, opening, opened, closing, closed) INV FIXED
+       INIT (-1,0,1,2,3,4);
+    ! 0=stopped, 1=opening, 2=opened, 3=closing, 4=closed
+    DCL cabinStatus FIXED INIT(-1);   ! open === up, close == down 
+    DCL door1Status FIXED INIT(-1);
+    DCL door2Status FIXED INIT(-1);
+    DCL door3Status FIXED INIT(-1);
+    DCL destinationFloor FIXED INIT(0); ! 0=reached, 1=ground 1=first,2=second
+    DCL currentFloor FIXED INIT(0); ! 0=unknown, 1=ground 2=first,3=second
+    /* ------------- Elevator Status ---------------------- */
+
+    DCL keepCanReceiveRunning BIT(1) INIT('1'B1);
+
+
+showStatus: PROC;
+   PUT                '  door '    TO termout BY X(12), A, SKIP;
+   PUT '  2nd floor:', door3Status TO termout BY A(12),F(3),SKIP; 
+   PUT '  1nd floor:', door2Status TO termout BY A(12),F(3),SKIP; 
+   PUT 'gound floor:', door1Status TO termout BY A(12),F(3),SKIP; 
+   PUT '      cabin:', cabinStatus TO termout BY A(12),F(3),SKIP; 
+   PUT 'current floor:', currentFloor TO termout BY A, F(3), SKIP;
+   PUT 'dest floor:', destinationFloor TO termout BY A, F(3), SKIP;
+END;
+
+
+canSend: PROC(unit FIXED, adr FIXED, rtr BIT(1), fcn FIXED, data FIXED);
+   DCL d BIT(8);
+   DCL id FIXED;
+    __cpp__(
+        ' struct _CanMessage {'
+        '   pearlrt::Fixed<11>    identifier;'
+        '   pearlrt::BitString<1> rtrRequest; '
+        '   pearlrt::Fixed<4>     dataLength; '
+        '   pearlrt::BitString<8> data[8];    '
+        ' } _canMessage; '
+    );
+
+
+   id = ((unit*16)+adr)*8+fcn; 
+   ! d := TOBIT(data).BIT(9:16);
+   __cpp__(' _d = (pearlrt::BitString<8>) (_data.x);');
+   PUT 'send',d,'to id',id ,'rtr=', rtr TO termout
+      BY X(20),A,X,B4(2), X,A,X, F(4),X,A,B1(1), SKIP;
+      __cpp__ (
+        '_canMessage.identifier=_id;'
+        '_canMessage.rtrRequest=_rtr;'
+        '_canMessage.dataLength=1;'
+        '_canMessage.data[0]=_d;'
+      );
+      SEND canMessage TO canBusOut;    
+END;
+
+treatBase: PROC ((d1,d2) BIT(8));
+   DCL stop BIT(1);
+   DCL changed BIT(8);
+   IF initialized THEN
+        __cpp__('_changed = _d1.bitNot().bitAnd(_d2);'); 
+        stop := false;
+        IF cabinStatus EQ opening THEN
+           __cpp__('_stop.x = (_changed.x & 0x02)<<6;');
+           IF stop THEN
+              CALL canSend(unitMotor,motor,false,0,motorStop);
+              cabinStatus := opened;
+              IF wait4Completion THEN
+                 RELEASE  done;
+              FIN;
+              PUT 'cabin stopped up  stop=',stop,'changed=',changed TO termout
+                BY A, B4(2), X, A, B4(2), SKIP;
+           FIN;
+        FIN;
+        IF cabinStatus EQ closing THEN
+          __cpp__('_stop.x = (_changed.x & 0x01)<<7;');
+
+           IF stop THEN
+              CALL canSend(unitMotor,motor,false,0,motorStop);
+              cabinStatus := closed;
+              IF wait4Completion THEN
+                 RELEASE  done;
+              FIN;
+              PUT 'cabin stopped down  stop=',stop,'changed=',changed TO termout
+                 BY A, B4(2), X, A, B4(2), SKIP;
+           FIN;
+        FIN;
+   ELSE
+      ! not initialized       
+           cabinStatus := stopped;
+PUT 'base ', d1 TO termout BY A,B4(2);
+          __cpp__('_stop.x = ((~_d1.x) & 0x01)<<7;');
+           IF stop THEN
+              cabinStatus := closed;
+PUT '  closed' TO termout BY A;
+           FIN;
+          __cpp__('_stop.x = ((~_d1.x) & 0x02)<<6;');
+           IF stop THEN
+              cabinStatus := opened;
+PUT '  opend' TO termout BY A;
+           FIN;
+PUT '.' TO termout BY A, SKIP;
+   FIN;
+PUT 'cabinSttaus=', cabinStatus TO termout BY A,F(3), SKIP;
+END;
+
+
+treatCabin: PROC ((d1,d2) BIT(8));
+   DCL changed BIT(8);
+   DCL bitsel BIT(1);
+   DCL floor FIXED INIT(1);
+   DCL bitNbr FIXED INIT(8);
+   DCL data FIXED;
+
+   __cpp__('_changed = _d1.bitNot().bitAnd(_d2);'); 
+   
+   __cpp__('_bitsel = _changed.getBit(8); ');
+   IF bitsel THEN
+      __cpp__('_cabinRequest[2] = _true;'
+              '_cabinLedStatus.setBit(_bitNbr, _true);'
+      );
+   FIN;
+   bitNbr := bitNbr - 1;
+   floor := floor + 1;
+   __cpp__('_bitsel = _changed.getBit(7); ');
+   IF bitsel THEN
+      __cpp__('_cabinRequest[1] = _true;'
+              '_cabinLedStatus.setBit(_bitNbr, _true);'
+      );
+   FIN;
+   bitNbr := bitNbr - 1;
+   floor := floor + 1;
+   __cpp__('_bitsel = _changed.getBit(6); ');
+   IF bitsel THEN
+      __cpp__('_cabinRequest[0] = _true;'
+              '_cabinLedStatus.setBit(_bitNbr, _true);'
+      );
+   FIN;
+   __cpp__('_data = _cabinLedStatus.toFixed();'); 
+   CALL canSend(unitLed, cabin, false, 0 , data);
+END;
+
+clearCabinRequestLED: PROC;
+     DCL bitNbr FIXED;
+     DCL data FIXED;
+     bitNbr := 5 + currentFloor;
+     __cpp__('_cabinRequest[_currentFloor.x-1] = _true;'
+             '_cabinLedStatus.setBit(_bitNbr, _false);'
+             '_cabinRequest[_currentFloor.x-1] = _false;'
+             '_data = _cabinLedStatus.toFixed();'); 
+     CALL canSend(unitLed, cabin, false, 0 , data);
+     PUT '*** new LED state:' , cabinLedStatus TO termout BY A, B4(2), SKIP;
+END;
+
+treatFloor: PROC (floor FIXED, doorStatus FIXED IDENT, (d1,d2) BIT(8));
+     DCL floorSwitch BIT(1);
+     DCL stop BIT(1);
+     DCL showChar CHAR;
+     DCL (doorIsOpened, doorIsClosed) BIT(1);
+     __cpp__('pearlrt::Character<1> _letter[3] = {"E", "1", "2" };');
+
+IF initialized  THEN
+     __cpp__('_floorSwitch.x = (((~_d1.x)&_d2.x) & 0x01)<<7;');
+     IF floorSwitch THEN
+        currentFloor := floor;
+        __cpp__('_showChar = _letter[_currentFloor.x-1];');
+        PUT 'reached floor ', floor ,' destination: ', destinationFloor,
+            ' display' , showChar
+          TO termout BY A,F(2),A,F(2), A,A, SKIP;
+        CALL allDotMatrix(showChar);
+     FIN;
+     IF cabinStatus NE stopped THEN
+        stop := false;
+        IF destinationFloor EQ currentFloor THEN
+          stop := true;
+        FIN;
+        IF stop THEN
+           CALL canSend(unitMotor, motor, false, 0, motorStop);
+           destinationFloor := 0;
+	   cabinStatus := stopped;
+           CALL clearCabinRequestLED;
+/*
+bitNbr := 5 + currentFloor;
+           __cpp__('_cabinRequest[_currentFloor.x-1] = _true;'
+              '_cabinLedStatus.setBit(_bitNbr, _false);'
+              '_cabinRequest[_currentFloor.x-1] = _false;'
+              '_data = _cabinLedStatus.toFixed();'); 
+           CALL canSend(unitLed, cabin, false, 0 , data);
+PUT 'new LED state:' , cabinLedStatus TO termout BY A, B4(2), SKIP;
+*/
+              IF wait4Completion THEN
+                 RELEASE  done;
+              FIN;
+        FIN;
+     FIN;
+
+     stop := false;
+
+     IF doorStatus EQ opening THEN
+        __cpp__('_stop.x = (((~_d1.x) & _d2.x) & 0x02)<<6;');
+        IF stop THEN
+          doorStatus := opened;
+          CALL canSend(unitMotor,floor,false,0,motorStop);
+          IF wait4Completion THEN
+             RELEASE  done;
+          FIN;
+        FIN;
+     FIN;
+     IF doorStatus EQ closing THEN
+       __cpp__('_stop.x = (((~_d1.x) & _d2.x) & 0x04)<<5;');
+        IF stop THEN
+            doorStatus := closed;
+            CALL canSend(unitMotor,floor,false,0,motorStop);
+            IF wait4Completion THEN
+               RELEASE  done;
+            FIN;
+        FIN;
+     FIN;
+  ELSE
+    ! not initialized yet
+     IF doorStatus EQ unknown THEN
+       __cpp__('_stop.x = ((~_d1.x) & 0x02)<<6;'); ! opened?
+       doorStatus := stopped;
+       IF stop THEN
+          doorStatus := opened;
+       FIN;
+       __cpp__('_stop.x = ((~_d1.x) & 0x04)<<5;'); ! closed?
+       IF stop THEN
+          doorStatus := closed;
+       FIN;
+     FIN;
+   FIN;
+END;
+  
+stopMotor: PROC (id FIXED, (d1,d2) BIT(8));
+    ! d2 signals which bits has flipped
+    DCL stop BIT(1);
+
+    CASE id
+      ALT (1152) ! base unit
+        CALL treatBase(d1,d2);
+        
+      ALT (1160) ! Ground floor
+        CALL treatFloor(1, door1Status, d1,d2);
+
+      ALT (1168) ! First floor
+        CALL treatFloor(2, door2Status, d1,d2);
+
+      ALT (1176) ! second floor
+        CALL treatFloor(3, door3Status, d1,d2);
+
+    FIN;
+   
+END;
+
+allDotMatrix: PROC(char CHAR(1));
+    CALL dotMatrix(1,char);
+    CALL dotMatrix(2,char);
+    CALL dotMatrix(3,char);
+    CALL dotMatrix(4,char);
+END;
+
+dotMatrix: PROC (unit FIXED, char CHAR(1));
+    DCL ch FIXED;
+!    ch := TOFIXED(char);
+    __cpp__('_ch = _char.toFixed();');
+    CALL canSend(unitDisplay, unit, false, 0,ch);
+END;
+
+
+door: PROC (floor FIXED, openCloseStop FIXED);
+   DCL ok FIXED INIT(0);
+   DCL newStatus FIXED;
+PUT '*** door(',floor,', ',openCloseStop,' ) ' TO termout BY A,F(2),A,F(2),A,SKIP;
+   IF openCloseStop EQ motorClose THEN
+      newStatus := closing;
+   FIN;
+   IF openCloseStop EQ motorOpen THEN
+      newStatus := opening;
+   FIN;
+   IF openCloseStop EQ motorStop THEN
+      newStatus := stopped;
+   FIN;
+   IF floor GE 1 THEN
+      IF  floor LE 3 THEN
+      
+         CASE floor
+           ALT /* 1*/
+               door1Status := newStatus;
+           ALT door2Status := newStatus;
+           ALT door3Status := newStatus;
+         FIN;
+         ! ... send can message and wait for end switch
+         CALL canSend(unitMotor,floor,false,0,openCloseStop);
+         ok := 1;
+      FIN;
+   FIN;
+   IF ok EQ 0 THEN
+      PUT '*** illegal floor number' TO termout BY A, SKIP;
+   FIN; 
+END;
+
+getAllSwitches: PROC;
+    /* send RTR frames to all nodes whos status was not received yet
+    */
+    door1Status := unknown;
+    CALL canSend(unitSwitches, groundFloor, true, 0,0);
+    WHILE door1Status EQ unknown REPEAT
+       AFTER 0.01 SEC RESUME;
+    END;
+
+    door2Status :=unknown;
+    CALL canSend(unitSwitches, firstFloor, true, 0,0);
+    WHILE door2Status EQ unknown REPEAT
+       AFTER 0.01 SEC RESUME;
+    END;
+
+    door3Status := unknown;
+    CALL canSend(unitSwitches, secondFloor, true, 0,0);
+    WHILE door3Status EQ unknown REPEAT
+       AFTER 0.01 SEC RESUME;
+    END;
+
+    cabinStatus := unknown;
+    CALL canSend(unitSwitches, motor, true, 0,0);
+    WHILE cabinStatus EQ unknown REPEAT
+       AFTER 0.01 SEC RESUME;
+    END;
+
+    CALL showStatus;
+END;
+
+initState: PROC;
+   DCL data FIXED;
+
+   initialized := false;
+   __cpp__(
+    '_cabinRequest[0] = _false;'
+    '_cabinRequest[1] = _false;'
+    '_cabinRequest[2] = _false;'
+    '_cabinRequest[3] = _false;'
+    '_cabinRequest[4] = _false;'
+   );
+   currentFloor := -1;   ! unknown
+   ! stop all motors
+   CALL allDotMatrix('I');
+   CALL getAllSwitches;
+
+   initialized := true;
+   IF cabinStatus NE opened THEN
+      cabinStatus := opening;
+      CALL canSend(unitMotor,motor,false,0,motorOpen);
+   FIN;
+   WHILE cabinStatus NE opened REPEAT
+       AFTER 0.01SEC RESUME;
+   END;
+PUT ' init cabin: opened (cur,dest)=',currentFloor, destinationFloor TO termout BY A,F(3),X,F(3),SKIP;
+   
+   IF currentFloor NE 1 THEN
+      destinationFloor = 1;
+      cabinStatus := closing;
+      CALL canSend(unitMotor,motor,false,0,motorClose);
+   FIN;
+   WHILE cabinStatus EQ closing REPEAT
+       AFTER 0.01SEC RESUME;
+   END;
+
+   IF door1Status NE closed THEN
+      CALL door(groundFloor,motorClose);
+   FIN;
+   IF door2Status NE closed THEN
+      CALL door(firstFloor,motorClose);
+   FIN;
+   IF door3Status NE closed THEN
+      CALL door(secondFloor,motorClose);
+   FIN; 
+   __cpp__('_data = _cabinLedStatus.toFixed();'); 
+   CALL canSend(unitLed, cabin, false, 0 , data);
+PUT ' init cabin: initiated' TO termout BY A,SKIP;
+END;
+
+goto: PROC(dest FIXED);
+   PUT 'goto(',dest,') called; current=', currentFloor TO termout BY A, F(3), A, F(3), SKIP;
+   destinationFloor := dest;
+   IF currentFloor GT destinationFloor THEN
+      cabinStatus := closing;
+      CALL canSend(unitMotor,motor,false,0,motorClose);
+   FIN;
+   IF currentFloor LT destinationFloor THEN
+      cabinStatus := opening;
+      CALL canSend(unitMotor,motor,false,0,motorOpen);
+   FIN;
+END;
+
+directControl: PROC;
+   DCL cmd CHAR(6);
+   DCL param FIXED;
+   DCL floor FIXED;
+   DCL keepOnRunning BIT(1) INIT('1'B1);
+   DCL ch CHAR;
+   DCL gotoText CHAR(2) INIT('->');
+
+   WHILE keepOnRunning REPEAT
+   PUT '****** direct control mode ****',
+       'supported commands',
+       'INIT  -- initialize device; ',
+       '         close all doors and goto ground floor',
+       'OPEN  -- open door at selected floor',
+       'CLOSE -- close door at selected floor',
+       'UP    -- move cabin up',
+       'DOWN  -- move cabin down',
+       'STOP  -- stop cabin',
+       'GOTO  -- goto floot',
+       'PARK  -- goto park position',
+       'CHAR  -- write char to display',
+       'STATUS-- dump current status',
+       'RUN   -- start normal execution',
+       'EXIT  -- leave direct control'
+   TO termout BY A, SKIP;
+   GET cmd FROM termin BY A, SKIP;
+
+   IF cmd EQ 'INIT  ' THEN
+      CALL initState;
+   FIN;
+
+   IF cmd EQ 'OPEN  ' THEN
+      PUT 'enter floor to open (1..3): ' TO termout BY A;
+      GET floor FROM termin BY F(1), SKIP;
+      CALL door(floor,motorOpen);
+   FIN;
+   IF cmd EQ 'CLOSE ' THEN
+      PUT 'enter floor to close (1..3): ' TO termout BY A;
+      GET floor FROM termin BY F(1), SKIP;
+      CALL door(floor,motorClose);
+   FIN;
+   IF cmd EQ 'UP    ' THEN
+      cabinStatus := opening;
+      CALL canSend(unitMotor,motor,false,0,motorOpen);
+   FIN;
+   IF cmd EQ 'DOWN  ' THEN
+      cabinStatus := closing;
+      CALL canSend(unitMotor,motor,false,0,motorClose);
+   FIN;
+   IF cmd EQ 'STOP  ' THEN
+      CALL canSend(unitMotor,motor,false,0,motorStop);
+   FIN;
+   IF cmd EQ 'PARK  ' THEN
+      CALL canSend(unitDiagnosis,motor,false,5,80); ! 80 = 'P'
+   FIN;
+   IF cmd EQ 'GOTO  ' THEN
+      PUT 'enter destination floor (1..3): ' TO termout BY A;
+      GET destinationFloor FROM termin BY F(1), SKIP;
+PUT ' GOTO: ', currentFloor, gotoText, destinationFloor TO termout
+ BY   A,F(3),A,F(3),SKIP;
+      goto(destinationFloor);
+   FIN;
+   IF cmd EQ 'CHAR  ' THEN
+      PUT 'enter unit (1..4): ' TO termout BY A;
+      GET param FROM termin BY F(1), SKIP;
+      PUT 'enter character to show: ' TO termout BY A;
+      GET ch FROM termin BY A(1), SKIP;
+      CALL dotMatrix(param,ch);
+   FIN;
+   IF cmd EQ 'STATUS' THEN
+       CALL showStatus;
+   FIN;
+   IF cmd EQ 'RUN   ' THEN
+       ACTIVATE normalOperation;;
+   FIN;
+   IF cmd EQ 'EXIT  ' THEN
+       keepOnRunning := false;
+   FIN;
+   END; ! while keepOnRunning
+END;
+
+normalOperation: TASK;
+   DCL (goto1,goto2, goto3) BIT(1);
+   wait4Completion := true;
+    REPEAT
+       __cpp__(
+          '_goto1 = _cabinRequest[0];'
+          '_goto2 = _cabinRequest[1];'
+          '_goto3 = _cabinRequest[2];' );
+      ! PUT 'pending requests: ',goto1, goto2, goto3 TO termout
+      !  BY A, X,B1(1), X, B1(1), X, B1(1), SKIP;
+       IF goto1 THEN
+          IF currentFloor NE 1 THEN
+             goto(1);
+             REQUEST done;
+          FIN;
+          CALL clearCabinRequestLED;
+          CALL door(groundFloor,motorOpen);
+          REQUEST done;
+          AFTER 1 SEC RESUME;
+          CALL door(groundFloor,motorClose);
+          REQUEST done;
+       ELSE IF goto2 THEN
+          IF currentFloor NE 2 THEN
+             goto(2);
+             REQUEST done;
+          FIN;
+          CALL clearCabinRequestLED;
+          CALL door(firstFloor,motorOpen);
+          REQUEST done;
+          AFTER 1 SEC RESUME;
+          CALL door(firstFloor,motorClose);
+          REQUEST done;
+       ELSE IF goto3 THEN
+          IF currentFloor NE 3 THEN
+             goto(3);
+             REQUEST done;
+          FIN;
+          CALL clearCabinRequestLED;
+          CALL door(secondFloor,motorOpen);
+          REQUEST done;
+          AFTER 1 SEC RESUME;
+          CALL door(secondFloor,motorClose);
+          REQUEST done;
+       ELSE
+         AFTER 0.1 SEC RESUME;
+       FIN;
+       FIN;
+       FIN;
+       
+    END;
+
+END;
+
+startTask: TASK MAIN;
+
+   OPEN termout;
+   OPEN termin;
+   PUT 'Elevator demonstration' TO termout BY A, SKIP;
+   OPEN canBusOut;
+
+   ACTIVATE canReceive;
+
+   CALL directControl;
+   keepCanReceiveRunning := false;
+   PUT 'Elevator demonstration terminated' TO termout BY A, SKIP;
+
+END;
+
+canReceive: TASK;
+   DCL id FIXED;
+   DCL rtr BIT(1);
+   DCL len FIXED;
+   DCL (d1,d2) BIT(8);
+    __cpp__(
+        ' struct _CanMessage {'
+        '   pearlrt::Fixed<11>    identifier;'
+        '   pearlrt::BitString<1> rtrRequest; '
+        '   pearlrt::Fixed<4>     dataLength; '
+        '   pearlrt::BitString<8> data[8];    '
+        ' } _canMessage; '
+    );
+
+   OPEN canBusIn;
+   !
+   WHILE keepCanReceiveRunning 
+   REPEAT
+
+      TAKE canMessage FROM canBusIn;    
+      __cpp__ (
+        '_id=_canMessage.identifier;'
+        '_rtr=_canMessage.rtrRequest;'
+        '_len=_canMessage.dataLength;'
+        '_d1 =_canMessage.data[0];'
+        '_d2 =_canMessage.data[1];'
+      );
+
+      CASE  id
+       ALT (1024,1032,1040,1048,1056) ! error message 
+	;
+       ALT (1025,1033,1041,1049,1057) ! hardbeat
+	;
+       ALT (1152,1160,1168,1176) ! switches
+  	PUT id,': switch ',d1,' changed ' , d2 ,' rtr=', rtr TO termout
+         BY F(5),A,       B4(2),  A,      B4(2),X,A,B1(1),SKIP;
+        CALL stopMotor(id,d1,d2);
+       ALT (1184) ! cabin 
+  	PUT id,': switch ',d1,' changed ' , d2 ,' rtr=', rtr TO termout
+         BY F(5),A,       B4(2),  A,      B4(2),X,A,B1(1),SKIP;
+         CALL treatCabin(d1,d2); 
+       OUT
+        PUT 'unknown ID',id,'RTR=',rtr,' len=',len,'data',d1,d2 TO termout 
+          BY A,F(5),X,A,B1(1),A,F(3), A,X, B4(2),X,B4(2), SKIP;
+      FIN;
+   END;
+END;
+MODEND;
+

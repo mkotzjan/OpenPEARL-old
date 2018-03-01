@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module name="mhello"  file="hello.prl">
+<system>
+ <username name="stdout"  line="8">
+ <sysname name="StdOut">
+ </sysname>
+ </username>
+
+
+</system>
+<problem>
+ <spc type="dation" name="stdout" line="11">
+ <attributes>SYSTEM,OUT</attributes>
+ <data>ALPHIC</data>
+ </spc>
+
+</problem>
+</module>

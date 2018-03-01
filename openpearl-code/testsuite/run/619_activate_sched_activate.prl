@@ -1,0 +1,47 @@
+/*#########################################################################
+PROGRAM
+The main task do a scheduled activate statement for the SchedActivateTask
+(look line 18) and then the main task go sleep for 1.5 SEC. After this time
+the main task come back and activate the SchedActivateTask without 
+schedudled condition. This activate statement must overwrite the scheduled
+condition from line 18. (look at the Taskstate-Table)
+###########################################################################
+RESULT
+The SchedActivateTask starts only one time and because of this the variable
+taskRunnkig must have the value one.
+##########################################################################*/
+
+MODULE(taskingPrevent_schedContinue);
+
+PROBLEM;
+
+	DCL taskRunning FIXED (5) INIT (0);
+
+Main : TASK PRIO 1 MAIN;
+
+	AFTER 2 SEC ALL 1 SEC DURING 3.9 SEC ACTIVATE SchedActivateTask;
+
+	AFTER 1.5 SEC RESUME;
+
+	ACTIVATE SchedActivateTask;
+
+	AFTER 3 SEC RESUME;
+
+	__cpp__(
+	'if (_taskRunning.x == 1) {'
+	'	printf ("*** SUCCESS ***  \\n");'
+
+	'}else {'
+	'	pearlrt::Control::setExitCode(1);'
+	'	printf ("*** FAILED ***  \\n");'
+	'}');
+	
+END;
+
+SchedActivateTask : TASK;
+
+	taskRunning := taskRunning + 1;
+
+END;
+
+MODEND;

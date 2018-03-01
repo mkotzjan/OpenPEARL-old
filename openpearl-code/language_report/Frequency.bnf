@@ -1,0 +1,5 @@
+\htgt{Frequency} ::=\\
+\x \kw{ALL} \hlink{Expression}$\S $Duration\\
+\x [ \{ \kw{UNTIL} \hlink{Expression}$\S $Time \} 
+	$\mid$ \{ \kw{DURING} \hlink{Expression}$\S $Duration \} ]
+

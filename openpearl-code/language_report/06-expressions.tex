@@ -1,0 +1,1391 @@
+\chapter{Expressions and Assignments}   % 6
+
+\section{Expressions}   % 6.1
+\label{sec_expressions}
+
+Expressions are used for various language forms, e.g.,
+
+\begin{itemize}
+\item as values for assignment statements:\\
+      e.g., \code{pi := 4.0 * atan(1.0);}
+\item as index when addressing array elements:\\
+      \code{Identifier}\S Array(Expression,Expression)\\
+      e.g., \code{tab(k,2*i)}
+\item as value for the return statement in function procedures
+      (see \ref{sec_proc_dcl}):\\
+      \kw{RETURN}\code{(Expression);}\\
+      e.g., \kw{RETURN}\code{(No);}
+\item as parameter when calling procedures (see \ref{sec_call}):\\
+      \code{ListOfActualParameters ::= (Expression [ , Expression ] $^{...}$ )}\\
+      e.g., \kw{CALL}\code{ p(a, tab (k, 2*i));}
+\item as start condition for tasks (see \ref{sec_task_activate}):\\
+      \kw{AT} \code{Expression}\S Time\\
+      e.g., \kw{AT} 12:00:00 \kw{ACTIVATE}\code{ task1};
+\end{itemize}
+
+These examples show that an expression at least can be
+
+\begin{itemize}
+\item a constant
+\item an identifier
+\item an indexed identifier or
+\item an arithmetical expression (e.g., 2*i).
+\end{itemize}
+
+Identifiers, indexed identifiers and names of structure components are
+generally summarised under the notion ``Name'':
+
+\begin{grammarframe}
+\input{Name.bnf}
+\input{Index.bnf}
+\end{grammarframe}
+
+Examples:
+
+\code{a}, \code{a(3)}, \code{a(i,j,2*k)}, \code{a.b}, \code{a.b.c}, 
+\code{a(3).b.c(i,j)}
+
+The identifiers of the components of a structure can be selected
+independently from the identifiers outside the structure:
+
+\begin{lstlisting}
+DCL person STRUCT
+      [ ..., /* see above */ 
+        town  CHAR(15);
+        ...
+      ]
+ ...
+person.address.town := town;
+\end{lstlisting}
+
+Generally, the names denoted in expressions have to be names of scalar
+variables; however, in the expression lists of the output statements
+(cf. \ref{sec_read_write}, \ref{sec_get_put}, \ref{sec_convert}, 
+\ref{sec_take_send}) even identifiers of arrays may be given.
+
+In general, an expression has the form
+
+\begin{grammarframe}
+\input{Expression.bnf}
+\end{grammarframe}
+
+Monadic operators have only one operand, dyadic operators have two
+operands.
+
+%%%\begin{removed}
+%%%Assignment als Operand,
+%%%eigene Operatoren
+%%%\end{removed}
+\begin{grammarframe}
+\input{MonadicOperator.bnf}
+\index{NOT@\textbf{NOT}}
+\index{ABS@\textbf{ABS}}
+\index{SIGN@\textbf{SIGN}}
+\index{LWB@\textbf{LWB}}
+\index{UPB@\textbf{UPB}}
+\index{SIZEOF@\textbf{SIZEOF}}
+\index{CONT@\textbf{CONT}}
+\index{TOFIXED@\textbf{TOFIXED}}
+\index{TOFLOAT@\textbf{TOFLOAT}}
+\index{TOBIT@\textbf{TOBIT}}
+\index{TOCHAR@\textbf{TOCHAR}}
+\index{ENTIER@\textbf{ENTIER}}
+\index{ROUND@\textbf{ROUND}}
+
+\input{DyadicOperator.bnf}
+\index{REM@\textbf{REM}}
+\index{LT@\textbf{LT}}
+\index{GT@\textbf{GT}}
+\index{LE@\textbf{LE}}
+\index{GE@\textbf{GE}}
+\index{EQ@\textbf{EQ}}
+\index{NE@\textbf{NE}}
+\index{AND@\textbf{AND}}
+\index{OR@\textbf{OR}}
+\index{EXOR@\textbf{EXOR}}
+\index{CAT@\textbf{CAT}}
+\index{SHIFT@\textbf{SHIFT}}
+\index{CSHIFT@\textbf{CSHIFT}}
+\index{LWB@\textbf{LWB}}
+\index{UPB@\textbf{UPB}}
+\index{IS@\textbf{IS}}
+\index{ISNT@\textbf{ISNT}}
+\index{FIT@\textbf{FIT}}
+
+\input{Operand.bnf}
+\index{PRIO@\textbf{PRIO}}
+\index{TASK@\textbf{TASK}!Operand}
+\index{TRY@\textbf{TRY}}
+\end{grammarframe}
+
+
+Examples:
+
+\begin{itemize}
+\item \code{-a + b * c - d/e**2}
+\item \code{(a - b) / (a + b)}
+\item \code{f(tab(k, 2*i)) / (f(i) - 3)}
+\item \code{a $<$ b OR a $<$ c}
+\item \code{processImageNew  AND NOT processImageOld}\\
+      (the result has 1 in {\it that} bit place where \code{processImageOld}
+      has 0 and \code{processImageNew} has 1)
+\item \code{xCoord $><$ yCoord $><$ zCoord}\\
+      (the three bit strings are concatenated to one bit string)
+\end{itemize}
+
+%%%\begin{removed}
+%%%The conditional expression can be useful, e.g., in assignments or
+%%%function procedures (see 8); it has the following form:
+%%%
+%%%ConditionalExpression ::=\\
+%%%\x {\bf IF} Expression\S WithValueOfType-BIT(1)\\
+%%%\x \x {\bf THEN} Expression {\bf ELSE} Expression {\bf FIN}
+%%%
+%%%If the calculation of the expression following IF yields value '1'B
+%%%(true), the expression following THEN is executed; if the value equals '0'B (wrong), the expression after ELSE
+%%%is executed.
+%%%
+%%%Examples:
+%%%
+%%%\begin{enumerate}
+%%%\item The function procedure max shall state and return the greater one
+%%%      of two floating point numbers.
+%%%
+%%%      max: {\bf PROC}((X,Y){\bf FLOAT}) {\bf RETURNS} ({\bf FLOAT});\\
+%%%      \x {\bf RETURN}({\bf IF} X$>$Y {\bf THEN} X {\bf ELSE} Y {\bf FIN});\\
+%%%      \x {\bf END};\\
+%%%      ... \\
+%%%      A := max(B,C)/2.0 ;
+%%%
+%%%\item Equivalent with this assignment is the following one:
+%%%
+%%%      A := ( {\bf IF} B$>$C {\bf THEN} B {\bf ELSE} C {\bf FIN})/2.0;
+%%%\end{enumerate}
+%%%\end{removed}
+
+The importance of dereferentiation was treated in
+ \ref{sec_references}, References. The
+general form reads:
+
+\begin{grammarframe}
+\input{Dereferentiation.bnf}
+\end{grammarframe}
+
+The i-th bit of a bit string can be addressed with the help of the
+standard attribute \code{BIT(i)}
+ which --- separated by a full-stop --- is mentioned
+behind the name of the bit string. Therefore, a bit string \code{b} of length
+\code{lg} is considered as structure \code{b}, which as only component has a
+one-dimensional array \code{BIT} of length \code{lg},
+ whose elements are of type
+\code{BIT(1)}. Analogously, the i-th character of a character string \code{z}
+ can be
+addressed with \code{z.CHAR(i)} or \code{z.CHARACTER(i)}.
+ The bits or characters of a
+bit or character string are numbered from the left to the right,
+ starting with 1.
+
+Example:
+
+\begin{lstlisting}
+... 
+DCL byte  BIT(8),
+    bt    BIT(1), 
+    i     FIXED;  
+... 
+byte:='11101111'B; 
+bt:=byte.BIT(4);      /* Bt obtains value '0'B */
+byte.BIT(2):='0'B;    /* Byte has value '10101111'B */
+i:=8; 
+byte.BIT(i):=bt;      /* Byte has value '10101110'B */
+\end{lstlisting}
+
+Furthermore, segments of bit or character strings containing several
+bits or characters can be addresses analogously; the general form of
+addressing is:
+
+\begin{grammarframe}
+\input{StringSelection.bnf}
+\index{BIT@\textbf{BIT}!String Selection}
+\index{CHAR@\textbf{CHAR}!String Selection}
+\index{CHARACTER@\textbf{CHARACTER}!String Selection}
+\end{grammarframe}
+
+
+The expressions Start and End must have integer values. End must be
+greater than or equal to Start, and both values must be within the
+declared string length.
+%%%\begin{added}
+If Start or End is outside of the boundaries of  the char string
+the \code{CharacterIndexOutOfRangeSignal} is induced.
+If Start or End is outside of the boundaries of  the bit string
+the \code{BitIndexOutOfRangeSignal} is induced.
+%%%\end{added}
+
+The result of such a string segment expression has type \code{BIT(lg)} or
+\code{CHAR(lg)}, resp., where \code{lg := End - Start + 1} is holds. For bit
+strings, the compiler must be able to calculate length \code{lg}, so that
+further type checks are possible when using the string segment
+expression.
+
+The following cases are distinguished by the compiler:
+\begin{enumerate}
+\item Name.\{ \kw{BIT} $\mid$ \kw{CHAR} \}\kw{(}Expression\kw{)}
+\item Name.\{ \kw{BIT} $\mid$ \kw{CHAR} \}\kw{(}constant-FIXED-Expression\kw{:} constant-FIXED-Expression\kw{)}
+\item Name.\{ \kw{BIT} $\mid$ \kw{CHAR} \}\kw{(}Expression1\kw{:} Expression2 \kw{+} FIXED-Constant\kw{)}
+\item Name.\kw{CHAR}\kw{(}Expression\S Start\kw{:} Expression\S End\kw{)}
+\end{enumerate}
+
+In case (1), the length of the string segment equals 1, ``Expression''
+denotes the bit number or the character position, respectively.
+
+In case (2), the compiler calculates the values of the two constant
+expressions and determines the length ``lg := Constant\S End -
+Constant\S Start + 1''.
+
+In case (3), Expression1 and Expression2 must be equal. Thus, the length
+results from the additive constant: ``lg := FIXED-Constant + 1''.
+
+In case (4), the compiler cannot calculate the length of the string
+segment! This is not allowed for bit strings. Case (4) provides a
+variable character string, i.e., the length is not calculable until run
+time. Variable character strings can be used anywhere, besides in
+conjunction with the  \code{CAT} operator.
+
+Example:
+
+Let a transport vehicle in a warehouse be connected to a digital input
+via 16 consecutive positions. Let the meaning of the connectors be as
+follows:
+
+\begin{tabular}{l@{ : }l}
+connector 1--8   & X coordinate\\
+connector 9--12  & Y coordinate\\
+connector 13     & Z coordinate\\
+connector 14--16 & further parameters
+\end{tabular}
+
+When positioning has been completed, the actual position shall be
+retrieved and checked.
+
+\begin{lstlisting}
+MODULE(moduleName);
+SYSTEM;
+  rfz : RpiDigitalIn(1,16);
+...
+PROBLEM;
+  SPC rfz DATION IN SYSTEM BIT(16);
+  DCL uRfz DATION IN BIT(16) CREATED(rfz);
+...
+control: TASK;
+   DCL rfzState BIT(16),
+       xCoord  BIT(8), yCoord BIT(4), zCoord BIT(1);
+...
+   /* positioning */ 
+   TAKE rfzState FROM uRfz;
+   xCoord:=rfzState.BIT(1:8);
+   yCoord:=rfzState.BIT(9:12);
+   zCoord:=rfzState.BIT(13);
+   /* checking of the actual position */ 
+   ...
+END; ! control
+...
+\end{lstlisting}
+
+This program part can be programmed more flexibly by additionally
+recording the initial positions of the partial strings \code{xCoord},
+\code{yCoord}
+and \code{zCoord} in variables \code{initX}, \code{initY}, \code{initZ}.
+
+\begin{lstlisting}
+control: TASK;
+   ... 
+   DCL (initX, initY, initZ) INV FIXED INIT(1, 9, 13);
+   ... 
+   xCoord := rfzState.BIT(initX:initX+7);
+   yCoord := rfzState.BIT(initY:initY+3);
+   zCoord := rfzState.BIT(initZ);
+   ... 
+END; ! control
+\end{lstlisting}
+
+Assignments to string segments are possible, too; furthermore, they may
+occur as operands in expressions.
+
+Parts of an expression may be written in brackets to influence the order
+of the expression calculation (cf. \ref{sec_assignments}), e.g.
+
+\code{a - ( b + c )}
+
+\subsection{Monadic Operators}   % 6.1.1
+\label{sec_monadic_operators}
+
+Table~\ref{tab_monadic_numeric_temp_bit}
+ describes for each listed monadic operator
+\begin{itemize}
+\item which type the operand may have
+\item which type the result (of the operation) has, and
+\item the meaning of the operator.
+\end{itemize}
+In tables~\ref{tab_monadic_numeric_temp_bit} to \ref{tab_monadic_other}, ``a'' stands for any operand, g for the precision, and lg for
+the length of the operand.
+
+\begin{table} % 7.1 
+\begin{center}
+\caption{Monadic operators for numerical, temporal and bit values}
+\label{tab_monadic_numeric_temp_bit}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|} 
+\hline
+{\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operator}\\ \hline
+
+\kw{+}a          & \code{FIXED(g)}          & \code{FIXED(g)}         & identity\\
+                 & \code{FLOAT(g)}          & \code{FLOAT(g)}         & \\
+                 & \code{DURATION}          & \code{DURATION}         & \\ \hline
+
+\kw{-}a          & \code{FIXED(g)}          & \code{FIXED(g)}         & changing the sign of a\\
+                 & \code{FLOAT(g)}          & \code{FLOAT(g)}         & \\
+                 & \code{DURATION}          & \code{DURATION}         & \\ \hline
+
+\kw{NOT} a\index{NOT@\textbf{NOT}|textbf}
+                 & \code{BIT(lg)}           & \code{BIT(lg)}          & inverting all bit positions of a\\ \hline
+
+\kw{ABS} a\index{ABS@\textbf{ABS}|textbf}
+                 & \code{FIXED(g)}          & \code{FIXED(g)}         & absolute value of a\\
+                 & \code{FLOAT(g)}          & \code{FLOAT(g)}         & \\
+                 & \code{DURATION}          & \code{DURATION}         & \\ \hline
+
+\kw{SIGN} a
+\index{SIGN@\textbf{SIGN}|textbf}
+                 & \code{FIXED(g)}          & \code{FIXED(1)}         & determining the sign of a\\ 
+                 & \code{FLOAT(g)}          &                  & 1 for a $>$ 0\\
+                 & \code{DURATION}          &                  & 0 for a = 0\\   
+                 &                   &                  & -1 for a $<$ 0\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Examples (Table~\ref{tab_monadic_numeric_temp_bit}):
+
+\begin{lstlisting}
+DCL (x, y)  FLOAT,  
+     b      BIT(4);
+x := 3;           
+b := '1001'B     
+y := -x;          /* y has value -3 */
+b := NOT b;       /* b has value '0110'B */
+\end{lstlisting}
+
+In general, in an assignment, the type of the variable given to the left
+of the assignment character must match the type of the value of the
+assigned expression (cf. section \ref{sec_assignments}).
+ Particularly, only values of type
+integer may be assigned to variables of integers. Furthermore, the types
+of operands of dyadic operators must be compatible.
+
+Thus, several operators are provided which cause a possibly needed
+conversion of the type of objects.
+
+\begin{table} % 7.2
+\begin{center}
+\caption{Monadic operators for explicit type conversions}
+\label{tab_monadic_type}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operator}\\ \hline
+
+\kw{TOFIXED} a
+\index{TOFIXED@\textbf{TOFIXED}|textbf}
+        & \code{CHARACTER(1)}  & \code{FIXED(7)} & internal representation\\
+        &                      &                 & for operand character\\
+        & \code{BIT(lg)}       & \code{FIXED(g)} & interpreting the bit pattern of the\\
+        &                      &                 & operand as an integer, with g = lg-1\\ \hline
+
+\kw{TOFLOAT} a
+\index{TOFLOAT@\textbf{TOFLOAT}|textbf}
+        & \code{FIXED(g)}      & \code{FLOAT(g)}  & converting the operand into a\\
+        &                      &                  & floating point number\\ \hline
+    
+\kw{TOBIT} a
+\index{TOBIT@\textbf{TOBIT}|textbf}
+        & \code{FIXED(g)}      & \code{BIT(lg)}   & interpreting the operand as bit\\
+        &                      &                  & pattern, with lg = g+1\\ \hline
+
+\kw{TOCHAR} a
+\index{TOCHAR@\textbf{TOCHAR}|textbf}
+        & \code{FIXED}         & \code{CHARACTER(1)} & character for the internal code\\
+        &                      &                  & of the operand\\ \hline
+
+\kw{ENTIER} a
+\index{ENTIER@\textbf{ENTIER}|textbf}
+        & \code{FLOAT(g)}      & \code{FIXED(g)}  & greatest integer less or equal than\\
+        &                      &                  & the operand\\ \hline
+ 
+\kw{ROUND} a
+\index{ROUND@\textbf{ROUND}|textbf}
+        & \code{FLOAT(g)}      & \code{FIXED(g)}  & next integer \\ \hline
+
+\kw{CONT} a
+\index{CONT@\textbf{CONT}|textbf}
+        & \code{REF} type      & type             & explicit de-referentiation\\
+\hline
+\end{tabular}  
+\end{center} 
+\end{table}
+
+Examples (Table \ref{tab_monadic_type}):
+
+\begin{lstlisting}
+DCL a  FIXED(31),
+    x  FLOAT(23),
+    a1 FIXED(31),
+    b  BIT(15),
+    c  BIT(32);
+...
+a1 := ENTIER x//2;    /* corresponds to a := (ENTIER x)//2; */ 
+a1 := ENTIER (x/2.0);  /* with float division */
+a1 := ENTIER 3.4;     /* delivers 3 */ 
+a1 := ENTIER 3.5;     /* delivers 3 */ 
+a1 := ENTIER -3.4;    /* delivers -3 */
+a1 := ENTIER -3.5;    /* delivers -3 */
+a1 := ROUND 3.4;      /* delivers 3 */ 
+a1 := ROUND 3.5;      /* delivers 4 */ 
+a1 := ROUND -3.4;     /* delivers -3 */ 
+a1 := ROUND -3.5;     /* delivers -4 */
+c :=  TOBIT a AND b;
+a :=  ROUND x + TOFIXED b;
+\end{lstlisting}
+\FloatBarrier
+
+\begin{table} % 7.3
+%%%%%%%%%% modified 29-sept-2017
+%%%%%%%%% these operators operate only on FLOAT
+\begin{center}
+\caption{Monadic arithmetical operators}
+\label{tab_monadic_aritmetic}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|}
+\hline 
+{\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operator}\\ \hline
+\kw{SQRT} a
+\index{SQRT@\textbf{SQRT}|textbf}
+           & \code{FLOAT(g)} or & \code{FLOAT(g)}  & square root of operand \\ \cline{1-1} \cline{4-4}
+\kw{SIN} a
+\index{SIN@\textbf{SIN}|textbf}
+            & \code{FIXED(g)}   &                   & sine of operand \\ \cline{1-1} \cline{4-4}
+\kw{COS} a
+\index{COS@\textbf{COS}|textbf}
+            &                    &                   & cosine of operand \\ \cline{1-1} \cline{4-4}
+\kw{EXP} a
+\index{EXP@\textbf{EXP}|textbf}
+            &                    &                   & $e^{a}$, with e=Euler's number\\ \cline{1-1} \cline{4-4}
+\kw{LN} a
+\index{LN@\textbf{LN}|textbf}
+             &                    &                   & natural logarithm of operand\\ \cline{1-1} \cline{4-4}
+\kw{TAN} a
+\index{TAN@\textbf{TAN}|textbf}
+            &                    &                   & tangent of operand \\ \cline{1-1} \cline{4-4}
+\kw{ATAN} a
+\index{ATAN@\textbf{ATAN}|textbf}
+           &                    &                   & arcus tangent of operand\\ \cline{1-1} \cline{4-4}
+\kw{TANH} a
+\index{TANH@\textbf{TANH}|textbf}
+           &                    &                   & tangent hyperbolicus of operand\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table} 
+\begin{center}
+\caption{Other monadic operators}
+\label{tab_monadic_other}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Operand type} & {\bf Result type} & {\bf Meaning of operand}\\ \hline
+
+\kw{LWB} a
+\index{LWB@\textbf{LWB}|textbf}
+       & array              & \code{FIXED(31)}        & lower boundary of the first\\
+       &                    &                         & dimension of the operand array\\ \hline
+
+\kw{UPB} a
+\index{UPB@\textbf{UPB}|textbf}
+       & array              & \code{FIXED(31)}        & upper boundary of the first\\
+       &                    &                         & dimension of the operand array\\
+\cline{2-2} \cline{4-4}
+       & \code{CHARACTER(lg)} & \code{FIXED(15)}      & result := Lg \\ \hline
+ 
+\kw{SIZEOF} a
+\index{SIZEOF@\textbf{SIZEOF}|textbf}
+       & \hlink{Identifier} & \code{FIXED(31)}        & memory size of the identified\\
+       &                    &                         & object at run time in bytes\\
+\cline{2-2} \cline{4-4}
+       & \hlink{SimpleType}  &                        & memory size of an object\\ 
+       & \hlink{TypeStructure}  &                     & of the given type in bytes\\ 
+       & \hlink{Identifier}\S ForType  &              & \\ \hline
+
+\kw{SIZEOF} a \kw{MAX}
+\index{SIZEOF@\textbf{SIZEOF}!MAX}
+\index{MAX@\textbf{MAX}!SIZEOF}
+       & \code{REF CHAR( )} & \code{FIXED(31)}        & maximum length of the referenced\\
+       &                    &                         & character string variable\\ \hline
+
+\kw{SIZEOF} a \kw{LENGTH}
+\index{SIZEOF@\textbf{SIZEOF}!LENGTH}
+\index{LENGTH@\textbf{LENGTH}!SIZEOF}
+       & \code{REF CHAR( )} & \code{FIXED(31)}        & actual length of the referenced\\
+       &                    &                         & character string variable\\ \hline
+
+\kw{TRY} a
+\index{TRY@\textbf{TRY}|textbf}
+       & \code{SEMA}        & \code{BIT(1)}           & try of a REQUEST, '1'B\\
+       &                    &                         & if successful\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\FloatBarrier
+\subsection{Dyadic Operators}   % 6.1.2
+\label{sec_dyadic_operators}
+
+Tables~\ref{tab_dyadic_numeric_temp},
+ \ref{tab_dyadic_compare}, \ref{tab_dyadic_boolean_shift} and 
+\ref{tab_dyadic_string} describe for each listed dyadic operator
+\begin{itemize}
+\item which type the operands may have
+\item which type the result (of the operation) has, and
+\item the meaning of the operator,
+\end{itemize}
+where
+\begin{itemize}
+\item ``op1'' and ``op2'', denote the first and second operand, resp.
+\item g1, g2, ..., and lg1, lg2, ..., denote the precision and
+lengths, resp., of the operands and the results.
+\end{itemize}
+Since the precision of the result of an addition, subtraction,
+multiplication or division equals the maximum of the precisions of both
+operands, it may happen that the overflows arising in these operations
+are cut off. Hence, the dyadic operator \code{FIT} is provided.
+It causes the conversion from the precision of operand ``a'' into the
+precision of operand b. \code{FIT} has rank 1.
+
+\begin{table} % 7.5
+\begin{center}
+\caption{Dyadic operators for numerical and temporal values}
+\label{tab_dyadic_numeric_temp}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
+                 & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
+op1 \kw{+} op2        & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g3)}         & addition of the values of\\
+
+                 & \code{FIXED(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & the operands op1 and op2\\
+                 & \code{FLOAT(g1)}       & \code{FIXED(g2)}       & \code{FLOAT(g3)}         & \\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & g3 = max (g1, g2)\\
+                 & \code{DURATION}        & \code{DURATION}        & \code{DURATION}          & \\
+                 & \code{DURATION}        & \code{CLOCK}           & \code{CLOCK}             & \\
+                 & \code{CLOCK}           & \code{DURATION}        & \code{CLOCK}             & \\ \hline
+
+op1 \kw{-} op2        & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g3)}         & subtraction of the values of\\
+                 & \code{FIXED(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & the operands op1 and op2\\
+                 & \code{FLOAT(g1)}       & \code{FIXED(g2)}       & \code{FLOAT(g3)}         & \\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & g3 = max (g1, g2)\\
+                 & \code{DURATION}        & \code{DURATION}        & \code{DURATION}          & \\
+                 & \code{CLOCK}           & \code{DURATION}        & \code{CLOCK}             & \\
+                 & \code{CLOCK}           & \code{CLOCK}           & \code{DURATION}          & \\ \hline
+
+op1 \kw{*} op2        & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g3)}         & multiplication of the values of\\
+                 & \code{FIXED(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & the operands op1 and op2\\
+                 & \code{FLOAT(g1)}       & \code{FIXED(g2)}       & \code{FLOAT(g3)}         & \\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & g3 = max (g1, g2)\\
+                 & \code{FIXED(g1)}       & \code{DURATION}        & \code{DURATION}          & \\
+                 & \code{DURATION}        & \code{FIXED(g2)}       & \code{DURATION}          & \\
+                 & \code{FLOAT(g1)}       & \code{DURATION}        & \code{DURATION}          & \\
+                 & \code{DURATION}        & \code{FLOAT(g2)}       & \code{DURATION}          & \\ \hline
+
+op1 \kw{/} op2        & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FLOAT(g3)}         & division of the values of\\
+                 & \code{FLOAT(g1)}       & \code{FIXED(g2)}       & \code{FLOAT(g3)}         & the operands op1 and op2,\\
+                 & \code{FIXED(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & if op2 $\neq$ 0\\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g3)}         & \\
+                 & \code{DURATION}        & \code{FIXED(g2)}       & \code{DURATION}          & g3 = max (g1, g2)\\
+                 & \code{DURATION}        & \code{FLOAT(g2)}       & \code{DURATION}          & g4 = e.g. 52\\
+                 & \code{DURATION}        & \code{DURATION}        & \code{FLOAT(g4)}         & (dependent on implementation)\\ \hline
+
+op1 \kw{//} op2       & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g3)}         & integer division of the values of\\
+                 &                 &                 &                   & the operands op1 and op2\\
+                 &                 &                 &                   & \\
+                 &                 &                 &                   & g3 = max (g1, g2)\\ \hline
+
+op1 \kw{REM} op2
+\index{REM@\textbf{REM}|textbf}
+      & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g3)}         & remainder of the integer division\\
+                 &                 &                 &                   & of the values of the operands op1\\
+                 &                 &                 &                   & and op2\\ \hline
+
+op1 \kw{**} op2       & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g1)}         & exponentiation of the values\\
+                 & \code{FLOAT(g1)}       & \code{FIXED(g2)}       & \code{FLOAT(g1)}         & of the operands op1 and op2\\ \hline
+
+op1 \kw{FIT} op2
+\index{FIT@\textbf{FIT}|textbf}
+      & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{FIXED(g2)}         & changing the precision of\\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       & \code{FLOAT(g2)}         & operand op1 into the precision\\
+                 &                 &                 &                   & of operand op2\\  
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\FloatBarrier
+Example:
+
+\begin{lstlisting}
+... 
+DCL (a, b) FIXED(15),
+        c FIXED(31);
+DCL d  BIT(16); 
+a := 32767;           
+b := 4;              
+c := (a FIT c)*b;         /* c obtains value 131068 */ 
+a := a FIT c;             /* assignment not permitted */ 
+a := C FIT a;             /* OK, but may induce FixedOverflowSignal*/ 
+a := (-5) REM (-3);      /* delivers -2 */
+a := (-5) REM (+3);      /* delivers -2 */ 
+a := (+5) REM (-3);      /* delivers +2 */ 
+a := (+5) REM (+3);      /* delivers +2 */ 
+
+/* conversion of FIXED and BIT objects  */ 
+/* without conversion of the internal presentation */ 
+a := TOFIXED d;           /* ok */
+a := (TOFIXED d) FIT a;   /* ok; FIT A is obsolete! */
+d := TOBIT (a FIT 1(16)); /* error assign BIT(17) to BIT(16) not ok */  
+d := TOBIT a;             /* ok */
+\end{lstlisting}
+
+\begin{table} % 7.6
+\begin{center}
+\caption{Dyadic comparison operators}
+\label{tab_dyadic_compare}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
+                 & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
+
+op1 \kw{\boldmath$<$} op2      & \code{FIXED(g1)}       & \code{FIXED(g2)}       &   \code{BIT(1)}             & ``less than''\\
+or               & \code{FIXED(g1)}       & \code{FLOAT(g2)}       &                      & If op1 is less than op2,\\
+op1 \kw{LT} op2
+\index{LT@\textbf{LT}|textbf}
+       & \code{FLOAT(g1)}       & \code{FIXED(g2)}       &                      & the result has value '1'B,\\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       &                      & otherwise '0'B.\\
+                 & \code{CLOCK}           & \code{CLOCK}           &                      & \\
+                 & \code{DURATION}        & \code{DURATION}        &                      & \\ \cline{2-3} \cline{5-5}
+                 & \code{CHAR(lg1)}       & \code{CHAR(lg2)}       &                      & character string comparison\\
+%%%                 &                 &                 &                      & (for string comparison algorithm,\\ \hline
+%%%                 &                 &                 &                      & cf. explanations)\\ \hline
+                 &                 &                 &                      & if lg1 $\neq$ lg2 the shorter  \\ 
+                 &                 &                 &                      & character string is padded with\\
+                 &                 &                 &                      & spaces on the right side to    \\
+                 &                 &                 &                      & match the length. Then the    \\
+                 &                 &                 &                      & internal represenations are \\ 
+                 &                 &                 &                      & compared character by character \\
+                 &                 &                 &                      & from left to right \\ \hline
+op1 \kw{\boldmath$>$} op2      & refer         & refer         & \code{BIT(1)}               & ``greater than'':\\
+or               & op1 $<$ op2     & op1 $<$ op      &                      & If op1 is greater than op2,\\
+op1 \kw{GT} op2
+\index{GT@\textbf{GT}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
+                 &                 &                 &                      & otherwise '0'B.\\ \hline
+
+op1 \kw{\boldmath$<$=} op2     & refer         & refer         & \code{BIT(1)}               & ``less or equal''\\
+or               & op1 $<$ op2     & op1 $<$ op2     &                      & If op1 is less or equal op2,\\
+op1 \kw{LE} op2
+\index{LE@\textbf{LE}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
+                 &                 &                 &                      & otherwise '0'B.\\ \hline
+
+op1 \kw{\boldmath$>$=} op2     & refer         & refer         & \code{BIT(1)}               & ``greater or equal''\\
+or               & op1 $<$ op2     & op1 $<$ op2     &                      & If op1 is greater or equal op2,\\
+op1 \kw{GE} op2
+\index{GE@\textbf{GE}|textbf}
+       &                 &                 &                      & the result has value '1'B,\\
+                 &                 &                 &                      & otherwise '0'B.\\ \hline
+
+op1 \kw{==} op2       & \code{FIXED(g1)}       & \code{FIXED(g2)}       & \code{BIT(1)}               & ``equal''\\
+or               & \code{FIXED(g1)}       & \code{FLOAT(g2)}       &                      & If op1 is equal op2,\\
+op1 \kw{EQ} op2
+\index{EQ@\textbf{EQ}|textbf}
+       & \code{FLOAT(g1)}       & \code{FIXED(g2)}       &                      & the result has value '1'B,\\
+                 & \code{FLOAT(g1)}       & \code{FLOAT(g2)}       &                      & otherwise '0'B.\\
+                 & \code{CLOCK}           & \code{CLOCK}           &                      & If lg2 $\neq$ lg1, the shorter\\
+                 & \code{DURATION}        & \code{DURATION}        &                      & character or bit string, resp.,\\
+			 & \code{CHAR(lg1)}       & \code{CHAR(lg2)}       &                      & is padded with blanks or zeros,\\
+			 & \code{BIT(lg1)}        & \code{BIT(lg2)}        &                      & resp., on the right side to match\\
+			 &                 &                 &                      & the length of the longer string.\\ \hline
+
+	op1 \kw{/=} op2       & refer         & refer         & \code{BIT(1)}               & ``not equal''\\
+	or               & op1 == op2     & op1 == op2     &                      & If op1 is not equal op2,\\
+	op1 \kw{NE} op2
+	\index{NE@\textbf{NE}|textbf}
+	       &                 &                 &                      & the result has value '1'B,\\
+			 &                 &                 &                      & otherwise '0'B.\\
+			 &                 &                 &                      & If lg2 $\neq$ lg1, refer ``equal''\\ \hline
+
+	op1 \kw{IS} op2
+	\index{IS@\textbf{IS}|textbf}
+	       & \code{REF} type        & \code{REF} type        & \code{BIT(1)}               & Comparison for equality of the\\
+			 &                 &                 &                      & objects of references variables.\\
+			 &                 &                 &                      & The result upon equality is '1'B.\\ \hline
+
+	op1 \kw{ISNT} op2
+	\index{ISNT@\textbf{ISNT}|textbf}
+	     & \code{REF} type        & \code{REF} type        & \code{BIT(1)}               & Comparison for equality of the\\
+			 &                 &                 &                      & objects of references variables.\\
+			 &                 &                 &                      & The result upon non-equality\\
+			 &                 &                 &                      & is '1'B.\\
+	\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table} % 7.7
+\begin{center}
+\caption{Dyadic Boolean and shift operators}
+\label{tab_dyadic_boolean_shift}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
+                 & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
+
+op1 \kw{AND} op2
+\index{AND@\textbf{AND}|textbf}
+      & \code{BIT(lg1)}        & \code{BIT(lg2)}        & \code{BIT(lg3)}          & Boolean bitwise conjunction,\\  
+                 &                 &                 &                   & disjunction, or antivalence,\\
+                 &                 &                 &                   & resp., of the operands\\
+                 &                 &                 &                   & lg3 = max (lg1, lg2).\\
+                 &                 &                 &                   & The shorter operand is padded\\
+                 &                 &                 &                   & with zeros on the right side to\\
+                 &                 &                 &                   & match the length of the longer\\
+                 &                 &                 &                   & operand.\\ \cline{1-4}
+op1 \kw{OR} op2
+\index{OR@\textbf{OR}|textbf}
+       & \code{BIT(lg1)}        & \code{BIT(lg2)}        & \code{BIT(lg3)}          & \\ \cline{1-4}
+op1 \kw{EXOR} op2
+\index{EXOR@\textbf{EXOR}|textbf}
+     & \code{BIT(lg1)}        & \code{BIT(lg2)}        & \code{BIT(lg3)}          & \\ \hline
+
+op1 \kw{\boldmath$<>$} op2     & \code{BIT(lg)}         & \code{FIXED(g)}        & \code{BIT(lg)}           & Cyclic shift of operand op1 for the\\
+or               &                 &                 &                   & number of positions determined\\
+op1 \kw{CSHIFT} op2
+\index{CSHIFT@\textbf{CSHIFT}|textbf}
+   &                 &                 &                   & by operand op2.\\
+                 &                 &                 &                   & If operand op2 $>$ 0,\\
+                 &                 &                 &                   & op1 is shifted to the left,\\
+                 &                 &                 &                   & otherwise to the right.\\ \hline
+
+op1 \kw{SHIFT} op2
+\index{SHIFT@\textbf{SHIFT}|textbf}
+    & \code{BIT(lg)}         & \code{FIXED(g)}        & \code{BIT(lg)}           & Shifting of operand op1 for the\\
+                 &                 &                 &                   & number of positions determined\\
+                 &                 &                 &                   & operand op2. If operand op2 $>$ 0,\\
+                 &                 &                 &                   & op1 is shifted to the left,\\
+                 &                 &                 &                   & otherwise to the right. In both\\
+                 &                 &                 &                   & cases, zeros are padded.\\ 
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table} % 7.8
+\begin{center}
+\caption{Dyadic character string operators}
+\label{tab_dyadic_string}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
+                 & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
+
+op1 \kw{\boldmath$><$} op2    & \code{CHAR(lg1)}     & \code{CHAR(lg2)}   & \code{CHAR(lg3)}         & Concatenation of the strings\\ 
+or               & \code{BIT(lg1)}  & \code{BIT(lg2)}& \code{BIT(lg3)}    & op1 and op2. Op2 is linked \\
+                 &                 &                 &                   & to op1 on the right side.\\
+op1 \kw{CAT} op2 
+\index{CAT@\textbf{CAT}|textbf}
+     &                 &                 &                   & lg3 = lg1 + lg2.\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+In order to enable the user to reconstruct the result of a comparison
+operation of two character strings, the comparison algorithm is given
+here (the shorter character string is filled with blanks on the right
+side).
+
+Algorithm to compare two character strings, where it holds ``lg3 =
+max(lg1, lg2)'':
+
+\begin{lstlisting}
+TYPE StringCheck FIXED;
+DCL (less, equal, greater) INV FIXED INIT}(-1, 0, 1);
+stringComparison: PROC((string1, string2) REF INV CHAR(lg3))
+                  RETURNS(StringCheck);
+   FOR i TO lg3  REPEAT
+      IF TOFIXED string1.CHAR(i) < TOFIXED string2.CHAR}(i)
+      THEN 
+         RETURN(less);
+      ELSE IF TOFIXED string1.CHAR(i) > TOFIXED string2.CHAR(i)
+           THEN
+              RETURN(greater);
+           FIN;
+      FIN;
+   END; ! loop
+   RETURN(equal);
+END; ! PROC stringComparison
+\end{lstlisting}
+
+
+Two further dyadic standard operators relating to array bounds are defined in Table~\ref{tab_dyadic_other}.
+
+\begin{table} % 7.9 
+\begin{center}
+\caption{Other dyadic operators}
+\label{tab_dyadic_other}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+{\bf Expression} & {\bf Type}      & {\bf Type}      & {\bf Result type} & {\bf Meaning of operator}\\
+                 & {\bf operand 1} & {\bf operand 2} &                   & \\ \hline
+
+op1 \kw{LWB} op2
+\index{LWB@\textbf{LWB}|textbf}
+      & \code{FIXED(g)}        & array           & \code{FIXED(31)}         & lower boundary of the dimension\\
+                 &                 &                 &                   & (given by op1) of the array\\
+                 &                 &                 &                   & (determined by op2), if existing\\ \hline
+
+op1 \kw{UPB} op2
+\index{UPB@\textbf{UPB}|textbf}
+      & \code{FIXED(g)}        & array           & \code{FIXED(31)}         & upper boundary of the dimension\\
+                 &                 &                 &                   & (given by op1) of the array\\
+                 &                 &                 &                   & (determined by op2), if existing\\ 
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\FloatBarrier
+The first operand of \code{UPB} and  \code{LWB} starts counting at 1 for the first index.
+If the given index is outside of the definition of the array the 
+\code{ArrayIndexOutOfBoundsSignal} 
+is induced in \OpenPEARL.
+
+
+Example (for usage of LWB and UPB):
+
+\begin{lstlisting}
+...
+p: PROC(a(,) FIXED IDENT);
+   ... 
+   FOR i  FROM LWB a TO UPB a
+   REPEAT
+      FOR k  FROM 2 LWB a TO 2 UPB a 
+      REPEAT
+         ...
+      END; ! for k
+      ... 
+   END; ! for i
+...
+END; ! proc p 
+...
+DCL tab1(5,10) FIXED,
+    tab2(-1:2, 3:5) FIXED;
+... 
+CALL p(tab1);
+...
+CALL p(tab2);
+\end{lstlisting}
+
+\subsection{Evaluation of Expressions}   % 6.1.3
+
+In the sequel, lower-case letters a, b, c ... denote constants or scalar
+variables.
+
+According to the rules of arithmetics, the order of calculating an
+expression is dependent on the \mbox{(pre-)}rank of the various operators in
+the expression. The dyadic operator ``*'', e.g., has a higher rank than
+the dyadic operator ``+'': In the expression ``a+b*c'', hence, ``b*c''
+is calculated first, and the product is added to a.
+
+The ranking of dyadic operators is defined in Table~\ref{ranks}. Lower
+numbers correspond to higher ranks.
+
+\begin{table}
+\begin{center}
+\caption{Ranks of the operators defined in PEARL}
+\label{ranks}
+\vspace{5mm}
+\begin{tabular}{|l@{\x}|l@{\x}|l|}
+\hline
+rank & dyadic operators       & evaluation order \\ \hline
+1    & \kw{**}, \kw{FIT}, \kw{LWB}, \kw{UPB}   
+     & from the right to the left\\
+2    & \kw{*}, /, \kw{\boldmath{$><$}}, \kw{//}, \kw{REM}
+     & from the left to the right\\
+3    & \kw{+}, \kw{-}, \kw{\boldmath{$<>$}}, \kw{SHIFT} 
+     & from the left to the right\\
+4    & \kw{$<$}, \kw{\boldmath{$>$}}, \kw{\boldmath{$<=$}},
+       \kw{\boldmath{$>=$}}
+     & from the left to the right\\
+5    & \kw{==}, \kw{/=}, \kw{IS}, \kw{ISNT} 
+     & from the left to the right\\
+6    & \kw{AND} 
+     & from the left to the right\\
+7    & \kw{OR}, \kw{EXOR} 
+     & from the left to the right \\
+\hline
+\end{tabular}
+\index{Operator!Rank}
+\index{FIT@\textbf{FIT}!Rank}
+\index{LWB@\textbf{LWB}!Rank}
+\index{UPB@\textbf{UPB}!Rank}
+\index{CAT@\textbf{CAT}!Rank}
+\index{REM@\textbf{REM}!Rank}
+\index{SHIFT@\textbf{SHIFT}!Rank}
+\index{CSHIFT@\textbf{CSHIFT}!Rank}
+\index{IS@\textbf{IS}!Rank}
+\index{ISNT@\textbf{ISNT}!Rank}
+\index{AND@\textbf{AND}!Rank}
+\index{OR@\textbf{OR}!Rank}
+\index{LT@\textbf{LT}!Rank}
+\index{LE@\textbf{LE}!Rank}
+\index{GE@\textbf{GE}!Rank}
+\index{EQ@\textbf{EQ}!Rank}
+\index{NE@\textbf{NE}!Rank}
+\index{GT@\textbf{XOR}!Rank}
+\end{center}
+\end{table}
+
+All monadic standard operators have rank 1.
+
+The order of calculating an expression is furthermore influenced in the
+common way of putting parentheses around parts of the expression; e.g.,
+in the expression
+
+\code{a*(b-(c-d))}
+
+first \code{c-d} is calculated, this first intermediate result is subtracted
+from \code{b}, and then this second intermediate result is multiplied by 
+\code{a}.
+
+In general, an expression is calculated according to following rules:
+\begin{enumerate}
+\item The partial expression with the highest rank operator is
+calculated first, unless one of the rules 2 or 3 is violated.
+\item If several operators of the same rank occur, the calculation takes
+place
+\begin{itemize}
+\item from the left to the right in case 2$\ge$rank$\ge$7
+\item from the right to the left in case rank=1\\
+      Example: \code{-a**b} corresponds to \code{-(a**b)}
+\end{itemize}
+\item parenthesised partial expressions are completely calculated due to
+the rules above, before they are combined with another partial
+expression.
+\end{enumerate}
+
+%%%\begin{removed}
+%%%\section{Operator Definition (OPERATOR)}   % 6.2
+%%%
+%%%The operator definition allows to define new operators with freely
+%%%selectable identifiers, or to extend the meaning of the previously
+%%%introduced standard operators.
+%%%
+%%%\begin{front}
+%%%OperatorDefinition ::=\\
+%%%\x {\bf OPERATOR} OpName ( [ OpParameter , ] OpParameter )\\
+%%%\x {\bf RETURNS} (ResultType);\\
+%%%\x ProcedureBody\\
+%%%\x {\bf END};
+%%%
+%%%OpName ::=\\
+%%%\x Identifier $\mid + \mid - \mid * \mid ** \mid / \mid // \mid == \mid /= \mid <= \mid >= \mid < \mid > \mid <> \mid ><$
+%%%
+%%%OpParameter ::=\\
+%%%\x Identifier [ VirtDimensionList ] ParameterType [ {\bf IDENTICAL $\mid$ IDENT} ]
+%%%
+%%%ResultType ::=\\
+%%%\x SimpleType $\mid$ StructuredType $\mid$ TypeReference
+%%%\end{front}
+%%%\begin{grammar}
+%%%\input{OperatorDefinition.bnf}
+%%%\input{OpName.bnf}
+%%%\input{OpParameter.bnf}
+%%%\end{grammar}
+%%%
+%%%The meaning is analogous to the one of a function procedure (cf. 8).
+%%%
+%%%
+%%%Example:
+%%%
+%%%The standard operator + shall be extended for complex numbers.
+%%%
+%%%{\bf PROBLEM};
+%%%
+%%%{\bf TYPE} Complex {\bf STRUCT}\\
+%%%\x [ Real {\bf FLOAT}, Imag {\bf FLOAT} ];
+%%%
+%%%{\bf OPERATOR} + (A Complex {\bf IDENT}, B Complex {\bf IDENT}) {\bf RETURNS} (Complex):\\
+%%%\x {\bf DCL} Sum Complex;\\
+%%%\x Sum.Real := A.Real + B.Real;\\
+%%%\x Sum.Imag := A.Imag + B.Imag;\\
+%%%\x {\bf RETURN} (Sum);\\
+%%%\x {\bf END}; ! Operator +
+%%%
+%%%{\bf DCL} (XX, YY, ZZ) Complex,\\
+%%%\x (X, Y, Z) {\bf FLOAT};\\
+%%%...\\
+%%%ZZ := XX + YY;\\
+%%%Z := X + Y;\\
+%%%...
+%%%
+%%%This example shows the possibility to define various operators with the
+%%%same operator name, if the operands are of different types. If an
+%%%expression is evaluated, in which such an operator name occurs, that
+%%%operation is executed where the parameter types are identical with the
+%%%operand types in the expression.
+%%%
+%%%If an operator declaration serves for extending the meaning of a
+%%%standard operator, the re-declared operator has the rank of the standard
+%%%operator. For an operator declared with a new operator name not
+%%%introduced in a standard way, a rank between 1 and 7 can be determined
+%%%with the help of a rank declaration:
+%%%
+%%%\input{PrecedenceDefinition.bnf}
+%%%
+%%%If a precedence shall be defined for a new operator, this must take place
+%%%before the operator definition; if no precedence definition is stated, the
+%%%new operator is given precedence 7.
+%%%
+%%%Example:
+%%%
+%%%...
+%%%{\bf PRECEDENCE} INDEX(1);\\
+%%%{\bf OPERATOR} INDEX...;
+%%%\end{removed}
+%%%
+
+\section{Assignments}   % 6.3
+\label{sec_assignments}
+
+Assignments are implemented for scalar variables and for structures, but
+not for arrays.
+
+\begin{grammarframe}
+\input{Assignment.bnf}
+\index{Assignment}
+\end{grammarframe}
+
+\subsection{Assignments for Scalar Variables}   % 6.3.1
+
+Assignments for scalar variables are defined as follows:
+
+\begin{grammarframe}
+\input{ScalarAssignment.bnf}
+\index{Assignment!Scalar Variable}
+\end{grammarframe}
+
+The statement causes that the value of the expression on the right side
+is assigned to the variable given on the left of the assignment sign
+(``:='' or ``=''), i.e., after the execution of the assignment, this
+name can be used to refer to the value determined by this expression
+and, if needed, calculated before the actual assignment:
+
+\code{result(i) := koeff * SIN((x(i+1) - x(i)) / x(i));}
+
+The type of the variable given to the left of the assignment sign has to
+match the type of the value of the expression, with the following
+exceptions:
+\begin{itemize}
+\item The value of a \code{FIXED} variable or an integer, resp., may be
+assigned to a \code{FLOAT} variable.
+\item The precision of a numeric variable to the left of an assignment
+sign may be greater than the precision of the value of the expression.
+\item A bit or character string, resp., to the left may have a greater
+length than the value to be assigned; if needed, the latter is extended
+by zeros or spaces, resp., on the right.
+\end{itemize}
+
+Operators for needed type conversions are described in \ref{tab_monadic_type}.
+
+Examples:
+
+\begin{lstlisting}
+DCL (i, j)       FIXED(15),
+    k            FIXED(31),
+    (x, y)       FLOAT,
+    bit8         BIT(8),
+    bit12        BIT(12),
+    text4        CHAR(4),
+    text10       CHAR(10),
+    duration(2)  DURATION,
+    time(2)      CLOCK;
+
+i := 2.0;                ! wrong 
+j := 3;   
+x := j+5; y := 0; 
+k := j;  
+j := k;                  ! wrong
+text10 := 'Result';      ! text10 has value 'Result  ' 
+bit8 := 'A9F'B4;         ! wrong, because too long 
+duration(1) := 1 HRS; 
+duration(2) := 30 MIN;
+time(1) := 11:00:00; 
+IF time(1) < 12:00:00 
+THEN
+   time(2) := time(1) + duration(1);
+ELSE
+   time(2) := time(1) + duration(2);
+FIN; 
+
+bit8 := '10001100'B; 
+bit12 := bit8 >< '11'B;  ! Bit12 has value '100011001100'B 
+bit8 := bit8 CSHIFT 3;   ! Bit8 has value '01100100'B 
+bit12 := bit8 SHIFT -6;  ! Bit12 has value '000000000001'B 
+\end{lstlisting}
+
+It is possible to declare variables with an attribute for assignment
+protection (cf.  \ref{sec_inv}). Assignments to such variables result in error
+messages.
+
+\subsection{Assignments for Structures}   % 6.3.2
+
+The values of all components of a structure can be assigned to another
+structure in one single assignment:
+
+\begin{grammarframe}
+\input{StructureAssignment.bnf}
+\index{Assignment!Structure}
+\end{grammarframe}
+
+The values of the components of Structure\_2 are assigned to the
+corresponding components of Structure\_1. Both structures must have the same
+type; i.e., the number of components and their types must match; an
+implicit type adaptation like for scalar variables takes not place.
+
+Example:
+
+\begin{lstlisting}
+TYPE TypeMeasurement STRUCT
+     [ timeStamp CLOCK, 
+       value     FLOAT(52)
+     ];
+
+DCL workpiece STRUCT
+     [ ident   CHAR(8),
+       quality TypeMeasurement,
+       ... 
+     ];
+
+DCL measurement TypeMeasurement;
+...    
+workpiece.quality := measurement;
+\end{lstlisting}
+
+%%%\begin{removed}
+%%%\section{Overloading of Data Structures}   % 6.4
+%%%
+%%%To exclude programming errors to a large extent, the compiler checks the
+%%%use of variables and values in accordance with types.
+%%%
+%%%Upon assignments, the types of the left and right side have to match
+%%%each other (see \ref{sec_assignments}: Assignments), and when calling a procedure, the
+%%%actual parameters have to match the formal parameters in type (see 8.2:
+%%%Call of Procedures).
+%%%
+%%%However, there are often situations where the required type
+%%%compatibility (``strong typing'') proves to be a hindrance. As an
+%%%example, we refer to a data base interface: the data base shall store
+%%%user data of different types with different length. For this, the
+%%%routines only need the address and the length of the structures to be
+%%%stored. For strong typing, a new data base interface (with the desired
+%%%user types) had to be programmed for each application.
+%%%
+%%%PEARL 90 provides two different syntactic forms for the overloading of
+%%%different data types. Both forms allow exclusively the type conversion
+%%%of the objects' addresses when assigning or identifying, resp. A data
+%%%conversion does not take place in any case. For converting basic types,
+%%%there is a sufficient number of standard operations in PEARL (see 6.1:
+%%%Monadic and Dyadic Operators).
+%%%
+%%%\subsection{The ``BY TYPE'' Operator} % 6.4.1
+%%%
+%%%With the ``BY TYPE'' operator, the type of a variable address can be
+%%%converted to any other pointer type.
+%%%
+%%%\begin{front}
+%%%TypeConvertingExpression ::=\\
+%%%\x Name {\bf BY TYPE} Type
+%%%\end{front}
+%%%\begin{grammar}
+%%%not in grammar
+%%%\end{grammar}
+%%%
+%%%The type of the variable ``Name'' is converted into the given Type by
+%%%operator ``BY TYPE''. The result of the type converting expression is
+%%%the address of ``Name'' with type ``Type''. This type conversion is a
+%%%compiler internal action preventing an error message of the compiler. At
+%%%run time, no action is executed; especially the content of ``Name''
+%%%stays unchanged.
+%%%\end{removed}
+%%%\begin{removed}
+%%%Example:
+%%%
+%%%Overloading of data objects upon assignment
+%%%
+%%%{\bf DCL} var \x        TYPE\_A;\\
+%%%{\bf DCL} ptr {\bf REF} TYPE\_B;\\
+%%%...\\
+%%%ptr := var {\bf BY TYPE} TYPE\_B;
+%%%
+%%%The address of variable ``var'' receives type ``TYPE\_B''; thus, the
+%%%assignment to pointer ``ptr'' is correct. It is now possible to access a
+%%%data object of type ``TYPE\_B'', which overloads variable ``var'', via
+%%%pointer ``ptr''.
+%%%
+%%%Example:
+%%%
+%%%Overloading of data objects upon procedure call
+%%%
+%%%{\bf SPC} p1 {\bf ENTRY} ({\bf REF} TYPE\_B) {\bf GLOBAL};\\
+%%%{\bf SPC} p2 {\bf ENTRY} (TYPE\_B {\bf IDENT}) {\bf GLOBAL};\\
+%%%{\bf DCL} var TYPE\_A;\\
+%%%...\\
+%%%{\bf CALL} p1 (var {\bf BY TYPE} TYPE\_B);\\
+%%%{\bf CALL} p2 (var {\bf BY TYPE} TYPE\_B);
+%%%
+%%%The type of the formal parameter ``var'' is converted to type
+%%%``TYPE\_B'' by operator ``BY TYPE''. In both cases, the address of
+%%%variable ``var'' is passed on to an object of type ``TYPE\_B'' to the
+%%%procedures as pointer. Thus, both calls are correct.
+%%%
+%%%By switching off the type control, the compiler cannot indicate errors
+%%%any longer. On no account it is allowed to read or write beyond the end
+%%%of the basic memory space with the help of an overloaded data structure,
+%%%because severe errors can arise upon program execution (a data loss is
+%%%just the smallest problem).
+%%%
+%%%The programmer should not make use of any assumptions about data storage
+%%%within the overloaded memory area, either. Storing data is generally
+%%%dependent on the target machine. Programs converting data with the help
+%%%of overloaded data structures are hardware dependent and only portable
+%%%with great effort. Access to data should always be executed via the same
+%%%data structure, both for writing and for reading later on. Since in
+%%%this case, the data are always processed in accordance with their types,
+%%%such programs are portable, if the space requirements of the overloading
+%%%data structure do not go beyond the supported filler.
+%%%
+%%%\end{removed}
+%%%\begin{removed}
+%%%\subsection{The ``VOID'' Data Type}    % 6.4.2
+%%%\label{sec_type_void}
+%%%
+%%%In contrast to the active type conversion by the ``BY TYPE'' operator,
+%%%the ``VOID'' data type provides a passive possibility to overload
+%%%different data objects. Similar to the constant ``NIL'', which can be
+%%%assigned to pointer variables of any data types, the compiler accepts
+%%%the assignment of any data addresses to a pointer variable of type
+%%%``VOID''.
+%%%
+%%%The ``VOID'' data type is written as structure description without
+%%%components, and may only be used in combination with REF.
+%%%
+%%%\begin{front}
+%%%VOID-DataType ::=\\
+%%%\x {\bf STRUCT} [ ]
+%%%\end{front}
+%%%\begin{grammar}
+%%%\input{Type-VOID.bnf}
+%%%\end{grammar}
+%%%
+%%%A reference variable with this type can admit any variable address, the
+%%%variable, however, cannot be altered directly. First, the address must
+%%%be assigned to a reference variable with the needed type, before the
+%%%data object can be manipulated via the reference variable.
+%%%
+%%%Example:
+%%%
+%%%General memory administration routine
+%%%
+%%%\begin{tabbing}
+%%%{\bf DCL} memory\_block (c\_max\_buffer) \= {\bf FIXED}(31); \= \kill
+%%%
+%%%{\bf DCL} c\_max\_buffer \x    {\bf INV} \> {\bf FIXED}(31)  \> {\bf INIT}(10000);\\
+%%%{\bf DCL} memory\_block (c\_max\_buffer) \> {\bf CHAR}(1);   \> \\
+%%%{\bf DCL} free                           \> {\bf FIXED}(31)  \> {\bf INIT}(0);\\
+%%%{\bf DCL} memory\_protection             \> {\bf SEMA}       \> {\bf PRESET}(1);
+%%%\end{tabbing}
+%%%
+%%%Malloc: {\bf PROC}(size {\bf FIXED}(31)){\bf RETURNS}({\bf REF STRUCT}[ ]){\bf GLOBAL};\\
+%%%\x {\bf DCL} ptr {\bf REF CHAR}(1);
+%%%
+%%%\x {\bf REQUEST} memory\_protection; \x /* synchronize access to global variables */
+%%%
+%%%\x {\bf IF} free + size $>=$ c\_max\_buffer {\bf THEN}\\
+%%%\x \x ptr := {\bf NIL}; \x /* no space left */\\
+%%%\x {\bf ELSE} \\
+%%%\x \x ptr := memory\_block(free + 1);\\
+%%%\x \x free := free + size;\\
+%%%\x {\bf FIN};
+%%%
+%%%\x {\bf RELEASE} memory\_protection;\\
+%%%\x {\bf RETURN}(ptr);\\
+%%%{\bf END}; ! Malloc
+%%%
+%%%t: {\bf TASK};\\
+%%%\x {\bf DCL} ptr\_var\_a {\bf REF} TYPE\_A;\\
+%%%\x {\bf DCL} ptr\_var\_b {\bf REF} TYPE\_B;
+%%%
+%%%\x /* require memory range for different types */\\
+%%%\x ptr\_var\_a := Malloc ({\bf SIZEOF} TYPE\_A);\\
+%%%\x ptr\_var\_b := Malloc ({\bf SIZEOF} TYPE\_B);\\
+%%%{\bf END}; ! t
+%%%
+%%%\end{removed}
+%%%\begin{removed}
+%%%This second form is particularly suitable for polymorphic procedures,
+%%%i.e., procedures called with actual parameters of different types. The
+%%%``VOID'' data type serves on the one hand as indication in the procedure
+%%%specification that the procedure works with different parameter types,
+%%%on the other hand, an explicit type conversion with the ``BY TYPE''
+%%%operator can be omitted in the call position.
+%%%
+%%%Example (Data base interface):
+%%%
+%%%\begin{tabbing}
+%%%{\bf SPC} write\_record \= {\bf ENTRY}(adr {\bf REF INV} \= {\bf STRUCT}[ ], size {\bf FIXED}(31)) {\bf GLOBAL}; \kill
+%%%{\bf SPC} read\_record  \> {\bf ENTRY}(adr {\bf REF}     \> {\bf STRUCT}[ ], size {\bf FIXED}(31)) {\bf GLOBAL}; \\
+%%%{\bf SPC} write\_record \> {\bf ENTRY}(adr {\bf REF INV} \> {\bf STRUCT}[ ], size {\bf FIXED}(31)) {\bf GLOBAL};
+%%%\end{tabbing}
+%%%
+%%%...\\
+%%%{\bf DCL} user\_data TYPE\_A;
+%%%
+%%%/* add record with user data into data base */\\
+%%%{\bf CALL} write\_record (user\_data, {\bf SIZEOF} TYPE\_A);
+%%%
+%%%/* read user record from data base */\\
+%%%{\bf CALL} read\_record (user\_data, {\bf SIZEOF} TYPE\_A);
+%%%
+%%%The data base routines ``read\_record'' and ``write\_record'' are
+%%%called by various user programs. They can store and read records of
+%%%different length.  For this, the data base routines need only the
+%%%addresses and lengths of the records, but not the user specific data
+%%%types.
+%%%\end{removed}
+

@@ -1,0 +1,5 @@
+   <dation name="Console">
+      <parameters> </parameters>
+      <attributes>FORWARD, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALPHIC</data>
+   </dation>

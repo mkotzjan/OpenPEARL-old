@@ -1,0 +1,3 @@
+042_fixed_inv_prov_parameter.prl:6:5: ERROR : illegal assignment to INV element
+   f :=1;   ! illegal, since f is INV
+     ^

@@ -1,0 +1,5 @@
+\htgt{ProcedureReferenceSpecification} ::= \\
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList} 
+	[ \hlink{VirtualDimensionList} ]\\
+\x  [ \kw{INV} ] \kw{REF} \hlink{TypeProcedure} \hlink{GlobalAttribute};
+

@@ -1,0 +1,6 @@
+\htgt{FormatOrPositionConvert} ::= \\
+\x [ \hlink{FormatFactor} ] \{ \hlink{Format} $\mid$
+	 \hlink{PositionConvert} \}\\
+\x $\mid$ \hlink{FormatFactor} \kw{(} \hlink{FormatOrPositionConvert} \\
+\x \x [ \kw{,} \hlink{FormatOrPositionConvert} ] $^{...}$ \kw{)}
+

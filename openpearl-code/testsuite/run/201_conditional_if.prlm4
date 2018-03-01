@@ -1,0 +1,64 @@
+/****************************************
+Testing if the conditional "if" works
+as supposed. The final check variable of 
+every test depends on it. 
+****************************************/
+
+
+
+MODULE(conditonal_if);
+changequote(`{',`}')
+include({m4_testing.m4h})
+
+PROBLEM;
+
+Main : TASK MAIN;
+    DCL (f1,f2)  FIXED(15) INIT(0,0);
+    DCL check FIXED(15) INIT(0);
+
+
+    f1 := 10;
+
+/***************************************
+Compare to 10
+***************************************/
+
+    f2 := 10;
+
+    EXPECT_EQ({f1}, {f2});    
+
+
+    
+/***************************************
+Compare to smaller and bigger numbers
+***************************************/
+    
+    f2 := 11;
+    EXPECT_LT({f1}, {f2});    
+
+    f2 := 9;
+    EXPECT_GT({f1}, {f2});
+
+    f2 := 8;
+    EXPECT_GT({f1}, {f2}); ! just another small number
+
+
+/**************************************
+    verify the variable check
+    check = 0  -> SUCCESS
+    check /= 0 -> FAILED
+***************************************/
+
+
+    IF check == 0 THEN
+        __cpp__('printf ("*** SUCCESS *** \\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf ("*** FAILED *** \\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+
+
+END;
+
+MODEND; 

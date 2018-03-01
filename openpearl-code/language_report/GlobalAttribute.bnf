@@ -1,0 +1,2 @@
+\htgt{GlobalAttribute} ::=\\
+\x \kw{GLOBAL} [ ( \hlink{Identifier}$\S $OfTheModule ) ]\\

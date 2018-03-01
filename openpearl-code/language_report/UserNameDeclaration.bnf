@@ -1,0 +1,5 @@
+\htgt{UserNameDeclaration} ::=\\
+\x \{ \hlink{SystemDationDeclaration} \\
+\x $\mid$ \hlink{SystemSignalDeclaration}  \\
+\x $\mid$ \hlink{SystemInterruptDeclaration} \} 
+

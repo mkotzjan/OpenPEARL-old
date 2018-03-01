@@ -1,0 +1,15 @@
+----------------------------------------------
+Test cases for type FIXED
+done:
+00x: LENGTH
+01x: DCL
+02x: INIT
+03x: illegal constants, constants with precision
+04x: INV
+05x: assignments to FIXED with different types,
+
+tbd:
+07x: expression result type
+procedure and function
+parameter and return types)
+----------------------------------------------

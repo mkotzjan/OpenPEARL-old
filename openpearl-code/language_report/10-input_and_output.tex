@@ -1,0 +1,2102 @@
+% labels and refs added
+% grammar for 'SYSTEM' added
+% signals in put/get formats added; behavior clearified
+
+\chapter{Input and Output}   % 10
+\label{sec_input_output}
+The input and output statements enable the transfer of data from the
+working memory of the computer to an external data station (output) and
+vice versa, the transfer of data from an external data station to the
+working memory (input). Primarily, data stations are standard peripheral
+devices (printer, console, disk, magnetic tape, keyboard, etc.) or
+process peripherals (sensors, actuators, embedded controllers, etc.).
+
+On these {\em system defined} data stations, {\em user defined} data
+stations can be created in the program to store data, e.g., on disks,
+magnetic tapes, printers, etc.
+
+In the I/O statements of the problem part, the data stations are
+addressed under freely selectable, logical user names; the features of
+the data stations are to be specified before mentioning these names.
+
+In conventional programming languages, the association of the logical
+identifiers (user names) for data stations used in the program to the
+devices of a particular computer system is done by additional control
+definitions when setting up a compiler program (job control
+definitions). In PEARL, these associations take place in standardised
+notation by declarations in the system part.
+
+\section{System Part}    % 10.1
+\label{dation_system_part}
+
+The system part serves for describing the used I/O configurations of a
+PEARL program. A system name must be associated with all devices of a
+computer system which can directly be addressed with PEARL I/O
+statements. A list of these devices and their system names can be
+found in the PEARL user manual of the corresponding target system. In
+the system part, freely selectable user names must be assigned to the
+system names of the needed devices. The devices can only be addressed in
+I/O statements of the problem part via these user names. 
+
+\begin{grammarframe}
+\input{SystemPart.bnf}
+\end{grammarframe}
+%%%\begin{added}
+
+Devices may be connected directly to the computer or they are connected 
+via a bus like I2C to the computer. In this case, the bus is represented
+by a separate user name declaration. The identifier of the bus may
+be used in conjuntion with the connection symbol (-\,-\,-) to
+a bus component. If the bus component is only used once in the system part,
+it may be specified directly. In other cases, a user supplied name
+must be introduced and used.
+
+
+Thus, a system part consists of a number of device associations of the
+following form:
+%%%\end{added}
+
+
+\begin{grammarframe}
+\input{UserNameDeclaration.bnf}
+\end{grammarframe}
+
+The declaration of interrupts and signals are defined in
+ chapter \ref{sec_interrupts} and \ref{signals}.
+
+\begin{grammarframe}
+\input{SystemDationDeclaration.bnf}
+
+%\input{SystemSignalDeclaration.bnf}
+%\input{SystemInterruptDeclaration.bnf}
+
+\input{Association.bnf}
+\input{ListOfConstants.bnf}
+\input{ConstantParameter.bnf}
+\end{grammarframe}
+ 
+%%%\begin{added}
+Especially for standalone running microcontrollers the system part
+may configure the behavior of the PEARL environment, like the
+definition of an error output channel. 
+
+\begin{grammarframe}
+\input{ConfigurationElement.bnf}
+\end{grammarframe}
+
+%%%\begin{removed}
+%%%Example:
+%%%\begin{tabbing}
+%%%\x dateout: \= \kill
+%%%{\bf Module} (example); \> \\
+%%%{\bf SYSTEM}; \> \\
+%%%\x tty0:    \> Lpc17xxUart(0, 9600, 8, 1, 'E');\\
+%%%\x  \> Log('WE') -\,-\,- tty0; ! send errors and warnings to uart 0\\
+%%%\x ...
+%%%\end{tabbing}
+%%%\end{removed}
+
+%%%\end{added}
+%%%\begin{added}
+
+For the example of a system part as given below, a typical linux computer
+system is considered, with the following provided system names in \OpenPEARL{}:
+
+\begin{tabular}{ll@{\x}p{6cm}}
+SystemName & Parameter & Device \\ \hline
+StdIn  &  - & standard input \\
+StdOut  &  - & standard output \\
+Disc       & '/home', 10 & files for reading and writing are located in the given folder. The maximum of concurrent open files also specified. \\
+RPiDigitalIn & ... & Digital input: Details are described in 
+		the plattform users guide \\
+RPiDigitalOut & ... & Digital output: Details are described in 
+		the plattform users guide \\
+\end{tabular}
+
+PEARL example for the system part:
+
+\begin{lstlisting}
+MODULE (example); 
+SYSTEM; 
+   ! system dations 
+   termin:   StdIn; 
+   termout:  StdOut;
+   folder:   Disc('/tmp' ,10) ;  
+   counter:  RPiDigitalIn(2,1); 
+   switch:   RPiDigitalOut(3,1); 
+   motor:    RPiDigitalOut(8,4); ! Bit 8-11
+   ic2bus1:  I2CBus('/dev/i2c-0', 100000);
+   temp:     LM75('48'B4) --- i2cbus1;
+
+   ! configuration elements 
+   Log('EW') --- LogFile('pearl_log.txt') --- folder; 
+PROBLEM;
+ ...
+\end{lstlisting}
+
+%%%\end{added}
+
+%%%\begin{added}
+The configuration item for logging denotes that errors and warnings ('EW')
+should be gathered in the file '\code{pearl\_log.txt}' in the disc folder specified
+by the previous defined folder on the disc drive.
+%%%\end{added}
+
+The available devices and the associated system names must be taken from
+the corresponding user manual of the \OpenPEARL{} platform 
+specific implementation.
+
+\section{Specification and Declaration of Data Stations (DATION) in 
+the Problem Part}   % 10.2
+\label{sec_dation_problem_part}
+
+\subsection{System Data Stations}   % 10.2.1
+\index{DATION@\textbf{DATION}!System Data Station}
+
+Before using system defined data stations, they must be specified in the
+problem part, defining their associated user names. 
+%%%\acceptedtext{The class attribute {\bf SYSTEM} must be set in the
+%%%specification statement}.
+
+The general form reads:
+
+\begin{grammarframe}
+\input{DationSpecification.bnf}
+\index{SPC@\textbf{SPC}!System Data Station}
+\input{TypeDationSystem.bnf}
+\end{grammarframe}
+
+The different attributes in a system dation specification describe the
+fundamental features of the physical device to be communicated with. The
+features of a device and the possible attributes are described for all
+devices in the user manual.
+
+For the declarations from the above example, this can take place as:
+
+\begin{lstlisting}
+SPC termin  DATION IN    SYSTEM ALPHIC,
+    termout DATION OUT   SYSTEM ALPHIC,
+    folder  DATION INOUT SYSTEM ALL,   
+    counter DATION IN    SYSTEM BIT(1),
+    switch  DATION OUT   SYSTEM BIT(1),
+    motor   DATION OUT   SYSTEM BIT(4);
+\end{lstlisting}
+%%%\end{accepted}
+
+
+\subsection{User Defined Data Stations}    % 10.2.2
+
+By a dation declaration, a logical, so-called user defined data station
+(or user dation) is created on a physical device (system dation). The
+allocation to a device is determined by the 
+\code{CREATED} \index{CREATED@\textbf{CREATED}} attribute.
+
+All input/output statements described in the following refer to user
+dations --- the direct declaration of system dations leads to run time
+errors.
+
+\begin{grammarframe}
+\input{DationDeclaration.bnf}
+\index{DCL@\textbf{DCL}!User Data Station}
+\end{grammarframe}
+
+Hence, no arrays of data stations may be declared. However, it is
+possible to declare arrays of references to data stations to enable also
+indexed addressing of data stations.
+
+The various attributes enable the detection of contradictions between
+the features of data stations and their way of using in I/O statements
+already at compilation time.
+
+\begin{grammarframe}
+\input{TypeDation.bnf}
+\end{grammarframe}
+
+Each data station is source and/or sink of a data transmission. The
+corresponding feature must be given upon declaration:
+
+\begin{grammarframe}
+\input{SourceSinkAttribute.bnf}
+\end{grammarframe}
+
+\code{IN} \index{IN@\textbf{IN}}
+ means that this data station is a source for data, i.e., it may only
+appear in such data transmission statements which transmit these data
+{\em into} the working memory (e.g., digital inputs, keyboard).
+
+Data stations specified with \code{OUT} \index{OUT@\textbf{OUT}} 
+may only be used as sinks for outputs
+from the working memory (e.g., printer).
+
+A data station with attribute \code{INOUT} \index{INOUT@\textbf{INOUT}}
+ allows for data transmissions in
+both directions (e.g., disk).
+
+The data transmissions take place with the computer internal format of
+the data or by means of conversion between computer internal and
+external format. For this, PEARL provides three different kinds of I/O
+statements:
+\begin{itemize}
+\item The \code{READ}/\code{WRITE} statements for transmission in computer internal
+format (e.g., for disk data, see \ref{sec_read_write}).
+\item The \code{PUT}/\code{GET} statements for transmission with conversion between
+internal format and representation in the character set available on the
+data station (e.g., for printer output, see \ref{sec_get_put}).
+\item The \code{TAKE}/\code{SEND} statements for transmitting process data (see
+\ref{sec_take_send}).
+\end{itemize}
+
+The data transmission to or from a data station can only take place in
+one of the given ways.
+
+The selection is made when declaring the data station by means of the
+class attribute stating to which of the three classes the data belong:
+\begin{itemize}
+\item If the \code{READ}/\code{WRITE} statements are to be used, i.e., if the data
+station records data in computer internal form, the type of data to be
+transmitted is stated as class attribute, e.g., \code{FIXED}, or \code{FLOAT}, %%%(53),
+or \code{BIT (16)}, or \code{ALL} \index{ALL@\textbf{ALL}} (for various types).
+\item If the data are represented alphanumerically on the data stations
+(case \code{PUT}/\code{GET}), the data station gets the class attribute 
+\code{ALPHIC} \index{ALPHIC@\textbf{ALPHIC}}.
+\item Data stations for transmissions with the \code{TAKE}/\code{SEND} statements
+have class attribute \code{BASIC} \index{BASIC@\textbf{BASIC}}.
+\end{itemize}
+
+The general form of the class attribute reads:
+
+\begin{grammarframe}
+\input{ClassAttribute.bnf}
+\input{TypeOfTransmissionData.bnf}
+\input{SimpleType.bnf}
+\input{IOCompoundType.bnf}
+\input{IOStructure.bnf}
+\input{IOStructureComponent.bnf}
+\end{grammarframe}
+
+Hence, the type of the transmission data may also be a multiply
+structured structure or a newly defined type, but no component being of
+type reference.
+
+Example:
+
+\begin{lstlisting}
+...
+TYPE KindStructure STRUCT 
+      [ (index, number) FIXED,
+         weight         FLOAT,
+          ...
+      ];
+DCL  kindFile DATION INOUT KindStructure ...,
+     tab      DATION INOUT FIXED ...;
+\end{lstlisting}
+
+The attribute \code{ALL} includes all other possibilities of type of
+transmission data.
+No type checking occurs in this case.
+
+Example:
+
+On a disk memory drive with system name
+%%%\removedtext{PSP31}\acceptedtext{Disc}
+\code{Disc}
+  and user name \code{Disk}, a file
+File1 for the input of \code{FIXED} quantities and a file \code{File2} for the
+input/output of \code{FLOAT} quantities with computer internal format are to be
+created.
+
+\begin{lstlisting}
+SYSTEM;
+   disk: Disc('/home',10);
+PROBLEM;
+   SPC disk  DATION INOUT SYSTEM ALL ...;
+   DCL file1 DATION IN    FIXED ... CREATED (disk);
+   DCL file2 DATION INOUT FLOAT ... CREATED (disk);
+\end{lstlisting}
+
+The source/sink attribute and the class attribute must be defined for
+each data station, in contrast to the now described attributes for the
+structure and access possibilities of a data stations.
+
+The smallest data set transmitted to or from a data station is called
+data element. Its type is determined by the class attribute. Several
+data elements can be combined into a record (synonymously, line), and
+several records to a segment (syonymously, page), i.e., all elements
+make up a 1-, 2-, or 3-dimensional array. For this, the number of data
+elements in a line, the number of lines in a page, and the number of
+pages must be denoted in the structure attribute:
+
+\begin{grammarframe}
+\input{Typology.bnf}
+\input{TypologyDeclaration.bnf}
+\input{TypologySpecification.bnf}
+\index{DIM@\textbf{DIM}}
+\end{grammarframe}
+
+%%%\begin{added}
+
+The Constant-FIXED-Expressions of each dimension size
+ must have a positive value.
+%%%\end{added}
+
+%%%pi must be substituded in next paragraph
+%%%The pi denotation furthest to the right always denotes the number of
+%%%elements per line, the next (possibly lacking) pi denotation denotes
+%%%the number of lines per page, and the following (possibly lacking) pi
+%%%denotation denotes the number of pages.
+The furthest dimension value to the right always denotes the number of
+elements per line,
+ the next (possibly lacking) value denotes
+the number of lines per page, and the next (possiby lacking)
+value denotes the number of pages.
+%%%\end{discuss}
+
+The denotation \code{*} means that
+the corresponding number is not limited. E.g., a data station \code{printer}
+with 120 characters per line, 60 lines per page, and any number of pages
+can obtain the structure \code{(*, 60, 120)}.
+
+The following combinations are possible:
+\begin{itemize}
+\item 3-dimensional typology\\
+\code{DIM (}number of pages, number of lines, number of elements\code{)}, or\\
+\code{DIM (*}, number of lines, number of elements\code{)}
+\item 2-dimensional typology\\
+\code{DIM (}number of lines, number of elements\code{)}, or\\
+\code{DIM (*}, number of elements\code{)}
+\item 1-dimensional typology\\
+\code{DIM (}number of elements\code{)}, or\\
+\code{DIM (*)}
+\end{itemize}
+
+\begin{modified}
+Furthermore, the typology indicates, how many data elements are
+transmitted {\em at least} upon the execution of {\em one} data
+transmission statement:
+\begin{itemize}
+\item If the attribute \code{TFU} is lacking, single data elements,
+lines or pages can be transmitted.
+\item The \code{TFU} attribute \index{TFU@\textbf{TFU}}
+ means that only lines are transferable.
+If the actual number of data elements in a data transmission statement
+is less than the number of data elements of a line, this line
+%%% or page, respectively,
+ is implicitly padded with spaces (\code{ALPHIC} data
+stations) or zeros (\code{BASIC} data stations).
+
+
+Example:
+
+\kw{DCL}\code{ printer }\kw{DATION OUT ALPHIC DIM}\code{(*, 60, 120) }\kw{TFU}\code{ ... ;}\\
+\code{...} \\
+\kw{PUT}{ \code 'PEARL' }\kw{TO}\code{ printer;}
+
+This \code{PUT} statement has the effect that the five characters P, E, A, R,
+L are written out in one (new) line by \code{printer}.
+\item \code{TFU} may only be used if the number of elements of a record is defined. 
+Obviously, it is not allowed for a typology like \code{DIM(*)}.
+\item It is possible to use  \code{SKIP} additionally to indicate the end of line.
+Multiple \code{SKIP}-statements will produce empty lines on output.
+\item On input, a complete line will be processed.  Any data after the last
+read input  element will be discarded. A single \code{SKIP} statement at the end 
+of the line is ignored in the format list. Multiple \code{SKIP} statements will
+discard input lines.
+\item \code{TFU} enshures the correct record structure. Obviously
+\code{STREAM} is not allowed in combination with \code{TFU}.
+%%%\begin{removed}
+%%%\item TFU MAX corresponds to TFU.
+%%%\end{removed}
+\end{itemize}
+\end{modified}
+
+\begin{added}
+Details about the behavior of \code{TFU}:
+\begin{itemize}
+\item If the system dation requires transfer units, the sice is specified
+   in the system dation definition. The record length of the user dation must not
+   exceed this length. 
+\item If the system dation does not require \code{TFU}, the behavior is simulated
+  by the user dation.
+\item If a user dation is declared with \code{TFU}, the record length is defined by
+  \begin{itemize}
+   \item the position of the end-of-record marker (e.g. NL) for ALPHIC dations
+      with access attribute FORWARD
+   \item the number of data elements in a line and the size of the data elements for
+      all other non basic  dation types. No end-of-record markers are used.
+  \end{itemize}
+\item On output:
+  \begin{itemize}
+  \item  If the record length of the system dation is larger than
+   the record length of the user dation, the remaining elements
+    are padded with zeros or spaces according the dation type.
+  \item The \code{TFU} buffer is transfered to the device:
+  \begin{itemize}
+   \item at the end of the output statement
+   \item if a positioning statement leaves the current record
+  \end{itemize}
+  \end{itemize}
+\item On input:
+  \begin{itemize}
+  \item If the record length of the system dation is larger than
+   the record length of the user dation, the remaining elements must be equal
+   to the padding element.
+   If the input record is shorter, the remaining elements are ignored.
+\item A new TFU record is read from the device,
+   the first data input format element in the input statement
+   after a positioning statement which leaves the current record is treated.
+\end{itemize}
+\end{itemize}
+\end{added}
+
+The possible ways of accessing a data station are determined by the
+access attribute:
+
+\begin{grammarframe}
+\input{AccessAttribute.bnf}
+\end{grammarframe}
+
+\code{DIRECT} \index{DIRECT@\textbf{DIRECT}}
+means that (based on a transmitted data element) any data element
+can directly be accessed, giving the position of the element
+(see \ref{sec_read_write}, \ref{sec_get_put}).
+
+%%% FORBACK eliminated
+The attribute \code{FORWARD} \index{FORWARD@\textbf{FORWARD}}
+%%% and FORBACK
+ mean sequential access; i.e., the
+access may (based on a transmitted element) only take place in the order
+determined by the structure,
+% --- for FORWARD only forward, for FORBACK in both directions ---
+possibly giving the relative position of the wanted
+element to the element just transmitted 
+(see \ref{sec_read_write}, \ref{sec_get_put}).
+
+%\begin{added}
+%OpenPEARL does not support \code{FORBACK} dations.
+%\end{added}
+
+\code{NOCYCL} \index{NOCYCL@\textbf{NOCYCL}}, \code{CYCLIC}\index{CYCLIC@\textbf{CYCLIC}},
+ \code{STREAM}\index{STREAM@\textbf{STREAM}} and 
+\code{NOSTREAM}\index{NOSTREAM@\textbf{NOSTREAM}} are treated in the context of the
+I/O statements in 
+\ref{sec_read_write} and \ref{sec_get_put}.
+
+Example:
+
+On a disk drive with system name 
+%%%\removedtext{PSP31}\addedtext{Disc}
+\code{Disc}
+ and user name \code{disc} a file for a
+table with 300 lines and 5 columns (elements per line) is to be created.
+Let the table elements be floating point numbers; the access takes place
+to elements directly and only reading.
+
+\begin{lstlisting}
+MODULE(modulename);
+
+SYSTEM;
+disc: Disc('/home', 10);
+... 
+ROBLEM;
+  SPC disc DATION INOUT SYSTEM ALL;
+  DCL table DATION IN FLOAT DIM(300, 5) DIRECT GLOBAL CREATED (disc);
+ ...
+\end{lstlisting}
+
+Examples for the declaration of data stations for inputs/outputs in
+character form are described in 
+\ref{sec_read_write} and \ref{sec_get_put}.
+
+%%%\begin{accepted}
+The characteristics of the system dation must fit to the specification:
+\begin{itemize}
+\item \code{ALPHIC} specification is allowed upon system dations of type \code{ALPHIC},
+   \code{ALL} or \code{CHAR}
+\item \code{FORWARD} specification is compatible with \code{DIRECT} attribute
+   of the system dation
+\item \code{DIM} specifications must not exceed the size of the system dation ---
+      more artificial dimensions may be specified
+\end{itemize}
+%%%\end{accepted}
+
+\section{Opening and Closing of Data Stations (OPEN, CLOSE)}   % 10.3
+\label{sec_dation_open_close}
+\index{OPEN@\textbf{OPEN}}
+
+Before a data station may be used for the first time in a data
+transmission statement, it must be opened by the open statement:
+
+\begin{grammarframe}
+\input{OpenStatement.bnf}
+\index{OPEN@\textbf{OPEN}!\textbf{BY}}
+\index{OPEN@\textbf{OPEN}!\textbf{IDF}}
+\index{BY@\textbf{BY}!\textbf{OPEN}}
+\index{IDF@\textbf{IDF}}
+\end{grammarframe}
+
+When executing the open statement, a data station with typology is
+positioned at its beginning.
+The open parameters serve to handle data stations containing
+identifyable files. E.g., a system defined data station \code{Disc} can possess
+a file \code{TAB1}, which is also maintained after terminating the program
+under this name. Later on, the same or another program can create a user
+defined data station \code{table} on \code{disc}, identified with file \code{TAB1} in the
+open statement.
+
+
+\begin{grammarframe}
+\input{OpenParameter.bnf}
+\end{grammarframe}
+
+
+%%%\begin{added}
+The open parameters may not conflict --- e.g. \code{OLD} and \code{NEW} are not allowed
+in the same statement.
+
+%%%\end{added}
+%%%\begin{removed}
+%%%subsets nicht definiert!
+
+%%%The open parameters of the open statement must belong to different
+%%%subsets.
+%%%\end{removed}
+
+Meaning of the parameters:
+\begin{itemize}
+\item \code{IDF} (Name$\S $CharacterVariable $\mid$ CharacterStringConstant)
+\index{IDF@\textbf{IDF}}\\
+The value of the specified character variable or the specified character
+string constant is the name of the file to be identified with the data
+station named Name$\S $Dation.
+\item \code{RST} (Name$\S $ErrorVariable-FIXED)
+\index{RST@\textbf{RST}!\textbf{OPEN}}\\
+If an error occurs during the \code{OPEN} execution, the specified variable is
+assigned an error number unequal to zero; in the error-free case, it is
+set to zero (see \ref{sec_dation_rst}).
+\item \code{OLD}\index{OLD@\textbf{OLD}}\\
+If there is a file with \code{IDF} name, it its allocated on the notated data
+station. Otherwise, or if \code{IDF} is lacking, an error message is given, or
+the \code{RST} variable is set with the error number.
+\item \code{NEW}\index{NEW@\textbf{NEW}}\\
+A file with \code{IDF} name is created and identified with the notated data
+station. If there is already a file with this name, or if \code{IDF} is
+lacking, an error message is given, or the \code{RST} variable is set with the
+error number.
+%%%\begin{added}
+If the dation has a fixed topology like \code{DIM(10,10)} the content is
+filled with spaces or null bytes for \code{ALPHIC} or typed dations, respectively.
+%%%\end{added}
+\item \code{ANY}\index{ANY@\textbf{ANY}}\\
+If there is already a file with \code{IDF} name, it is identified with the
+notated data station. Otherwise, a new file is created for it. If \code{IDF}
+is lacking, a new file is created under a name determined by the system
+and identified with the denoted data station.
+\item \code{CAN}\index{CAN@\textbf{CAN}} (from ``cancel'')\\
+The file is no longer to be made accessible after executing the close
+statement (see below).
+\item \code{PRM}\index{PRM@\textbf{PRM}} (from ``permanent'')\\
+The file is still there after executing the close statement, and again
+accessible with the same name after re-executing an open statement.
+%%%\begin{discuss}
+%%% removed, since multiple OPENs are forbidden now (22.3.2017)
+%%%\item EXCLUSIVE\index{EXCLUSIVE@\textbf{EXCLUSIVE}} \\
+%%%The dation (not file) may be opened only once.
+%%%Subsequent attempts to open the already
+%%%opened  dation produce an error message, or the RST variable is set with the
+%%%error number.
+%%%\end{discuss}
+\end{itemize}
+
+%%%\begin{removed}
+%%%If open parameters are lacking, ANY and PRM are assumed.
+%%%\end{removed}
+
+%%%\begin{added}
+If the open parameter about the previous state of the file (e.g. \code{OLD}, \code{NEW}, \code{ANY})
+is missing \code{ANY} is assumed.
+If the parameter about the state of the file after closing (e.g. \code{CAN}, \code{PRM})
+is missing in \code{OPEN} and \code{CLOSE} statements \code{PRM} is assumed.
+%%%\end{added}
+
+When executing the close statement, a file is closed; i.e., it is
+usable again not before the execution of an open statement.
+
+\index{CLOSE@\textbf{CLOSE}}
+\begin{grammarframe}
+\input{CloseStatement.bnf}
+\index{CLOSE@\textbf{CLOSE}!CloseStatement}
+\index{BY@\textbf{BY}!\textbf{CLOSE}}
+\end{grammarframe}
+
+The settings for closing a data station made in the open statement can
+be overwritten by a close statement:
+
+%%%\begin{front}
+%%%CloseParameter ::=\\
+%%%\x {\bf CAN $\mid$ PRM $\mid$ RST} (Name$\S $ErrorVariable-FIXED)
+%%%\end{front}
+\begin{grammarframe}
+\input{CloseParameter.bnf}
+\index{RST@\textbf{RST}!\textbf{CLOSE}}
+\index{CAN@\textbf{CAN}!\textbf{CLOSE}}
+\index{PRM@\textbf{PRM}!\textbf{CLOSE}}
+\end{grammarframe}
+
+Generally, the following rules hold:
+\begin{itemize}
+%%%\begin{added}
+\item The close parameters may not conflict --- e.g. ether \code{CAN} or \code{PRM} is allowed
+%%%\end{added}
+\item Not every task executing an access to a data station must execute
+an \code{OPEN} or \code{CLOSE} statement.
+%%% removed: OPEN allowed only once
+%%%\item However, at least one open statement must be executed concerning
+%%%the access to a data station.
+%%% removed: OPEN allowed only once
+%%%\item The same number of close statements and open statements must
+%%%be executed to close the data station.
+%%%\begin{added}
+%%%\item The close statement which leads to the closing of the data station
+%%%defines the action concerning CAN and PRM.
+%%%\end{added}
+%%% added}
+\item The dation must be opened before any access to its data.
+
+\item Corresponding \code{OPEN} and \code{CLOSE} statements need not be executed by
+the same task.
+\item Upon lacking parameters, \code{PRM} is assumed, unless earlier
+executed close or open statements have made explicit settings.
+%%%\begin{added}
+%%%\item executing an OPEN statement on an already opened dation ignores the
+%%%IDF attribute. The attributes CAN or PRM must be identical 
+%%%in all concurrent OPEN statements. Otherwise an error message is produced
+%%%or the RST variable is set with the error number.
+
+%%%% removed: OPEN allowed only once 
+%%%\item
+%%%Executing the OPEN statement on an already opened dation need identical 
+%%%open parameters IDF, CAN and PRM. Otherwise an error message is produced
+%%%or the RST variable is set with the error number.
+%%%% added: OPEN allowed only once 
+\item
+Executing the \code{OPEN} statement on an already opened dation
+will cause an error message or the \code{RST} variable is set with the error
+number.
+\item
+Executing the \code{CLOSE} statement on an already closed dation
+will cause an error message or the RST variable is set with the error
+number.
+%%%\end{added}
+\end{itemize}
+
+Example:
+\label{example}
+
+\begin{lstlisting}
+MODULE(modulename);
+SYSTEM;
+   printer: DRUA;
+   disc: Disc('/home' ,10);
+ ... 
+PROBLEM;
+   SPC printer DATION OUT SYSTEM ALPHIC;
+   DCL tabProt DATION OUT ALPHIC DIM($^*$, 50, 30) FORWARD GLOBAL
+       CREATED(printer);
+   SPC disc  DATION INOUT SYSTEM ALL;
+   DCL table  DATION IN FLOAT DIM(300, 5) DIRECT GLOBAL CREATED(disc);
+
+start: TASK MAIN;
+   OPEN tabProt;
+   OPEN table BY IDF('TAB-1'), OLD;
+   ACTIVATE prot;
+   ...
+END; ! start
+
+prot: TASK;
+   ! Data transmission statements with table and tabProt
+   ...
+   CLOSE tabProt;
+   CLOSE table; 
+END; ! prot 
+... 
+MODEND;
+\end{lstlisting}
+
+\section{The Read and Write Statements (READ, WRITE)}   % 10.4
+\label{sec_read_write}
+%\index{READ@\textbf{READ}}
+%\index{WRITE@\textbf{WRITE}}
+
+The read statement serves for the input, the write statement for the
+output of data without converting the computer internal representation
+(binary input/output). Data can be transmitted to or from the connected
+devices (e.g., a file on disk or magnetic tape). The corresponding data
+stations must be declared with the class attribute
+``TypeOfTransmissionData''.
+
+Examples:
+
+\begin{enumerate}
+\item Columns 4 and 5 in the dation \code{table}  (cf. the example on page
+\pageref{example}) are to be replaced by re-calculated values.
+
+\begin{lstlisting}
+...
+DCL (x, y, z) FLOAT;
+...
+FOR line FROM 1 TO 300
+REPEAT
+   ! calculation of x, y, z
+   WRITE x, SIN(y+z) TO table BY POS(line, 4);
+END;
+\end{lstlisting}
+
+\item A task \code{measurement} periodically acquires 14 temperature values
+(Procedure \code{getTemp}), processes them, and writes them sequentially in
+blocks with 14 values in a logbook on the disk.
+
+\begin{lstlisting}
+PROBLEM;
+   SPC getTemp PROC(i FIXED) RETURNS} (FIXED(15)) GLOBAL;
+   SPC disc    DATION INOUT SYSTEM ALL;
+   DCL logbook DATION OUT          FIXED(15) DIM(*, 14)
+               TFU FORWARD CREATED (disc);
+   DCL numTemp INV FIXED(15) INIT (14);
+
+start: TASK MAIN;
+   OPEN logbook;  ! Positioning to beginning
+   ALL 10 SEC ACTIVATE measurement;
+   ... 
+END; ! start
+
+measurement: TASK;
+   DCL temperature (numTemp) FIXED(15); 
+   FOR i TO numTemp
+   REPEAT
+      temperature(i) := getTemp(i);
+   END;
+   ! Processing the measured values
+   WRITE temperature TO logbook; 
+END; ! measurement
+\end{lstlisting}
+\end{enumerate}
+
+The general forms of the read and write statements read:
+
+\begin{grammarframe}
+\input{ReadStatement.bnf}
+\index{READ@\textbf{READ}!ReadStatement}
+\index{FROM@\textbf{FROM}!\textbf{READ}}
+\index{BY@\textbf{BY}!\textbf{READ}}
+\index{RST@\textbf{RST}!\textbf{READ}}
+\input{WriteStatement.bnf}
+\index{WRITE@\textbf{WRITE}!WriteStatement}
+\index{TO@\textbf{TO}!\textbf{WRITE}}
+\index{BY@\textbf{BY}!\textbf{WRITE}}
+\index{RST@\textbf{RST}!\textbf{WRITE}}
+\end{grammarframe}
+
+A slice may be defined as range of the last index of an array.
+\begin{grammarframe}
+\input{Slice.bnf}
+
+\input{Position.bnf}
+\index{BY@\textbf{BY}!Position}
+
+\input{AbsolutePosition.bnf}
+\index{COL@\textbf{COL}}
+\index{LINE@\textbf{LINE}}
+\index{POS@\textbf{POS}}
+\index{SOP@\textbf{SOP}}
+
+\input{RelativePosition.bnf}
+\index{X@\textbf{X}}
+\index{SKIP@\textbf{SKIP}}
+\index{PAGE@\textbf{PAGE}}
+\index{ADV@\textbf{ADV}}
+\index{EOF@\textbf{EOF}}
+
+\end{grammarframe}
+
+
+Upon entry with the read statement, the addressed data elements are
+read one after the other and correspondingly assigned to the variables
+in the variable list. The variables are assigned according to the
+general rules for assignments. If an element of the variable list is an
+array, the addressed data are assigned by rows; if it is a structure, the
+data are assigned to the structure components in the order determined by
+the structure declaration.
+
+For simplicity in writing, the elements (of the last dimension) of an
+array following one another in the variable list can be declared in form
+of a segment. Let list be an array with ten elements \code{list(1), ... ,
+list(10);} then the two following statements are equivalent:
+
+\kw{READ}\code{ list(2), list(3), list(4) ... ;}\\
+\kw{READ}\code{ list (2 : 4), ... ;}
+
+All position expressions are completely evaluated, before values are
+assigned to the data elements.
+
+Example:
+
+Read \code{x} from position 3 and \code{y} from position 5 from the dation file:
+
+\kw{READ}\code{ x }\kw{FROM}\code{ file }\kw{BY POS}\code{(3) ;}\\
+\kw{READ}\code{ y }\kw{FROM}\code{ file }\kw{BY POS}\code{(5) ;}\\
+
+The execution of the statement
+
+\kw{READ}\code{ x,y }\kw{FROM}\code{ file }\kw{BY POS}\code{(3), }\kw{POS}\code{(5) ;}
+
+however, results in that \code{x} being read from position 5 and \code{y} from the
+subsequent position.
+
+The \code{RST} attribute (cf. \ref{sec_dation_rst}) can occur anywhere in the
+ position list.
+However, it does not become effective until it is evaluated. A position
+list is elaborated one after the other, starting from the left. If an
+error occurs, the elaboration of the I/O statement is aborted in this
+position, and the error reaction valid at this moment (error assignment
+to an \code{RST} variable or system reaction) is executed.
+
+These statements analogously hold for the write statement.
+
+The type of the variables in the variable list of the read statement
+must be compatible with the class attribute of the given data station;
+this holds analogously for the results of the expressions in the
+expression list of the write statement.
+
+The variable or expression list of the read or write statement may be
+lacking, if these statements shall only be used for positioning in the
+denoted data stations. In this case, however, a position must be
+given.
+
+The values in the position list refer to the structure of the data
+station and determine the data elements to be transmitted. Thus, the
+values of the expressions must be of type \code{FIXED} and must be compatible
+with the structure.
+
+When using an absolute position, i.e., a position independent from the
+actual data element, the data station must have the access attribute
+\code{DIRECT}. A relative position denotes the distance of the data element to
+be transmitted from the current data element; in this case, the data
+station must have the access attribute \code{FORWARD}
+%%%\removedtext{, FORBACK}
+ or \code{DIRECT}.
+
+In detail, the possible position attributes have the following
+meanings:
+\begin{itemize}
+\item \code{COL}\index{COL@\textbf{COL}} (Expression)\\
+refers to the first dimension (from the right) of the structure and
+determines the i-th element in the current line of the data station, if
+i equals the value of the expression.
+\item \code{LINE} (Expression)\\
+refers to the second dimension of the structure and determines the i-th
+line of the current page of the data station, if i equals the value of
+the expression.
+
+Example:
+
+A 2-dimensional array corresponds to the structure (5,10):
+
+\setlength{\unitlength}{0.00087500in}%
+\begin{picture}(5627,2781)(179,-2206)
+\thicklines
+\put(451,-1861){\framebox(4500,2250){}}
+\thinlines
+%\multiput(1891,-61)(-5.62500,-5.62500){17}{\makebox(6.3500,9.5250){\SetFigFont{7}{8.4}{rm}.}}
+\put(1891,-61){\line(-1,-1){90}}
+\put(1981,-61){\line(-1,-1){180}}
+\put(2071,-61){\line(-1,-1){270}}
+\put(2161,-61){\line(-1,-1){360}}
+\put(2251,-61){\line(-1,-1){450}}
+\put(2251,-151){\line(-1,-1){360}}
+\put(2251,-241){\line(-1,-1){270}}
+\put(2251,-331){\line(-1,-1){180}}
+%\multiput(2251,-421)(-5.62500,-5.62500){17}{\makebox(6.3500,9.5250){\SetFigFont{7}{8.4}{rm}.}}
+\put(2251,-421){\line(-1,-1){90}}
+\put(1801,-61){\line( 1,-1){450}}
+\put(1891,-61){\line( 1,-1){360}}
+\put(1981,-61){\line( 1,-1){270}}
+\put(2071,-61){\line( 1,-1){180}}
+%\multiput(2161,-61)(5.62500,-5.62500){17}{\makebox(6.3500,9.5250){\SetFigFont{7}{8.4}{rm}.}}
+\put(2161,-61){\line( 1,-1){90}}
+\put(1801,-421){\line( 1,-1){90}}
+\put(1801,-151){\line( 1,-1){360}}
+\put(1801,-241){\line( 1,-1){270}}
+\put(1801,-331){\line( 1,-1){180}}
+%\multiput(1801,-421)(5.62500,-5.62500){17}{\makebox(6.3500,9.5250){\SetFigFont{7}{8.4}{rm}.}}
+\put(1801,389){\line( 0,-1){2250}}
+\put(2251,389){\line( 0,-1){2250}}
+\put(451,-61){\line( 1, 0){4500}}
+\put(451,-511){\line( 1, 0){4500}}
+\put(676,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}1}}}
+\put(1126,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}2}}}
+\put(1576,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}3}}}
+\put(2026,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}4}}}
+\put(2476,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}5}}}
+\put(2926,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}6}}}
+\put(3376,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}7}}}
+\put(3826,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}8}}}
+\put(4276,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}9}}}
+\put(4726,479){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}10}}}
+\put(226,-1726){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}5}}}
+\put(2026,-2176){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}COL(4)}}}
+\put(5491,-376){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}LINE(2)}}}
+\put(226,-331){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}2}}}
+\put(226,119){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}1}}}
+\put(226,-781){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}3}}}
+\put(226,-1231){\makebox(0,0)[b]{\smash{\SetFigFont{12}{14.4}{rm}4}}}
+\end{picture}
+
+\item \code{POS} ( [ [ Expression$\S $Page , ] Expression$\S $Row , ] Expression$\S $Column )\\
+gives the position of a data element in the n-dimensional structure
+(n = 1, 2, 3) of a data station. Lacking expressions are replaced by the
+respective current value.
+
+Example:
+
+With the statement
+
+\kw{READ}\code{ x }\kw{FROM}\code{ file1 }\kw{BY POS}\code{(3,2,8);}
+
+the eighth data element of the second row of the third page of \code{file1} is
+read into \code{x}. If this is followed by the statement
+
+\kw{READ}\code{ x }\kw{FROM}\code{ file1 }\kw{BY POS}\code{(4,5);}
+
+the fifth data element of the fourth row of the third page of \code{file1} is
+read into \code{x}.
+\item \code{SOP} ( [ [ Name$\S $Page , ] Name$\S $Row , ] Name$\S $Column )\\
+is the counterpart to \code{POS}. With \code{SOP}, the current positions of a dation
+can be assigned to the given program variables. The number of names in
+\code{SOP} may not exceed the number of dimensions in the addressed dation.
+\end{itemize}
+
+In the following, let i be the value of the respective expression.
+\begin{itemize}
+\item \code{X} [ (Expression) ]\\
+refers to the first dimension of the structure and determines the i-th
+element behind (i positive) or before (i negative), respectively, the
+current element in the current row of the data station; i = 0 denotes
+the current element.
+\item \code{SKIP} [ (Expression) ]\\
+refers to the second dimension of the structure and determines the start
+(the first element) of the i-th row behind (i positive) or before (i
+negative), respectively, the current row of the current page of the data
+station; i = 0 denotes the current row.
+\item \code{PAGE} [ (Expression) ]\\
+refers to the third dimension of the structure and determines the start
+of the i-th page behind (i positive) or before (i negative),
+respectively, the current page of the data station; i = 0 denotes the
+current page.
+\end{itemize}
+
+If the Expression denotation is not present for \code{X}, \code{SKIP}, or \code{PAGE}, respectively,
+value 1 is assumed. The value of a given expression must be positive, if
+the data station has the attribute \code{FORWARD}.
+\begin{itemize}
+\item \code{ADV} ( [ [ Expression$\S $Page , ] Expression$\S $Row , ] Expression$\S $Column )\\
+gives the distance of the data element to be transmitted from the
+current data element. Missing expressions are replaced by the value
+zero. If the data station has the attribute \code{FORWARD}, the value for the
+expression furthest to the left must be positive or zero.
+%%%\begin{discuss}
+\item \code{EOF}\\
+refers to the end of the dation. If used in conjunction with fixed typology
+and \code{CYCLIC} attribute the
+compiler will emit a warning that the effective position will be the
+beginning of the dation.
+%%%\end{discuss}
+\end{itemize}
+
+Examples:
+
+Let the corresponding data station \code{file1} have the structure (10, 10,
+10), let the actual position be (5,3,8).
+
+\begin{tabular}{l@{\x}l@{\x}l}
+position statement   & new position &     \\ \hline
+\code{X}                    & (5,3,9)      &     \\
+\code{X (-5)}               & (5,3,3)      &     \\
+\code{X (4)}                & (5,4,2)      & (1) \\
+\code{SKIP (2)}             & (5,5,1)      &     \\
+\code{SKIP (-1)}            & (5,2,1)      &     \\
+\code{PAGE}                 & (6,1,1)      &     \\
+\code{PAGE (6)}             & (1,1,1)      & (2) \\
+\code{PAGE (-4)}            & (1,1,1)      &     \\
+\code{ADV (2,5,1)}          & (7,8,9)      &     \\
+\code{ADV (1,0)}            & (5,4,8)      &     \\
+\code{ADV (-3,-2,1)}        & (2,1,9)      &     \\
+\code{ADV (1,8,0)}          & (7,1,8)      & (3)
+\end{tabular}
+
+With a relative positioning, dimension boundaries may not be exceeded
+(cf. the marked examples), unless the data station possesses the access
+attribute \code{STREAM} or \code{CYCLIC}, respectively. \code{STREAM} allows to exceed the
+internal dimension boundary (examples (1) and (3)), but not to exceed
+the boundary of the highest dimension (example (2)). For this, a data
+station must possess the attribute \code{CYCLIC}. If error reactions shall
+occur upon exceeding the corresponding boundaries, the attributes
+\code{NOSTREAM} or \code{NOCYCL}, respectively, must be given. By default, \code{STREAM} and
+\code{NOCYCL} are assumed.
+
+Example:
+
+\kw{DCL}\code{ file1 }\kw{DATION INOUT FIXED DIM}\code{(10,10,10) }\kw{FORWARD CYCLIC}\\
+\x \kw{GLOBAL CREATED}\code{(disc);}
+
+Let each time the current position be (5,3,8). Then it holds:
+
+\begin{tabular}{l@{\x}l}
+position statement   & new position \\ \hline
+\code{X (6)}                & (5,4,4)      \\
+\code{SKIP (8)}             & (6,1,1)      \\
+\code{PAGE (7)}             & (2,1,1)      \\
+\code{ADV (9,0,3)}          & (4,4,1)
+\end{tabular}
+
+%%%\begin{accepted}
+The positioning controls work diffently on \code{FORWARD} and \code{DIRECT}
+dations. \code{FORWARD} dations does not allow to adjust the real position for read
+and write directly. 
+Thus the positioning discards input data in the \code{READ} statement and 
+writes as may zero bytes as required to fill the amount of data elements
+in the \code{WRITE} statements.
+%%%\end{accepted}
+
+%%%\begin{accepted}
+For dations with the ClassAttribute \code{ALL}
+%%%only one unlimited dimension DIM(*) is supported in OpenPEARL.
+the positioning operates on byte level.
+%%%Absolute positioning is allowed only to POS(1) for DIRECT dations.
+%%%No relative positioning is allowed.
+%%%\end{accepted}
+
+\section{The Get and Put Statements (GET, PUT)}    % 10.5
+\label{sec_get_put}
+%\index{PUT@\textbf{PUT}}
+%\index{GET@\textbf{GET}}
+
+The get statement serves for the input, the put statement for the
+output of data with conversion between computer internal and external,
+character oriented representations on \code{ALPHIC} data stations. To control
+this conversion, formats can be declared.
+
+Examples:
+
+\begin{enumerate}
+\item The following text is to appear on the monitor of a storekeeper:
+
+\begin{verbatim}
+___article no:__4711
+___stock:_______1281
+\end{verbatim}
+
+Program steps required:
+
+\begin{lstlisting}
+...
+DCL stockMonitor DATION INOUT ALPHIC DIM(*,20,80)
+                 FORWARD GLOBAL CREATED (monitor);
+DCL (artno, stock) FIXED;
+...
+PUT 'article no:', artno, 'stock:', stock TO stockMonitor
+    BY X(3), A(13), F(4), SKIP, X(3), A(13), F(4);
+...
+\end{lstlisting}
+
+\item Output of two values in standard format on a new page of the
+printer.
+
+\begin{lstlisting}
+...
+DCL printer DATION OUT ALPHIC DIM(*,50,120) FORWARD
+  GLOBAL CREATED (thermoPrint);
+DCL a FIXED(15), x FLOAT(23);
+...
+a := 5;
+x := 2.33;
+...
+PUT TO printer BY PAGE;
+PUT a, x TO printer BY LIST;
+\end{lstlisting}
+
+The execution results in the following printer layout:
+
+\begin{verbatim}
+_____5___2.33000E+00
+\end{verbatim}
+\item Let data be stored in an input file on floppy disk in the
+following form:
+
+\begin{tabular}{l@{:}l}
+column  1 -- 10 & article identifier (\code{CHARACTER})\\
+column 12 -- 20 & quantity (\code{FIXED})\\
+column 22 -- 30 & price per unit right-justified (e.g., \_\_\_124.57)
+\end{tabular}
+
+They are to be read into the variables \code{articleId}, \code{quantity}, \code{price}:
+
+\begin{lstlisting}
+...
+DCL inputFile DATION IN ALPHIC DIM(*,80) TFU FORWARD
+              GLOBAL CREATED (floppyDisk),
+    articleId CHAR(10),
+    quantity  FIXED,
+    price     FLOAT;
+...
+GET articleId, quantity, price FROM inputFile BY
+    A(10), X,   F(9), X,  E(9), SKIP;
+\end{lstlisting}
+\end{enumerate}
+
+The general forms of the get and put statements read:
+
+\begin{grammarframe}
+\input{GetStatement.bnf}
+\index{GET@\textbf{GET}!GetStatement}
+\index{FROM@\textbf{FROM}!\textbf{GET}}
+\index{BY@\textbf{BY}!\textbf{GET}}
+\index{RST@\textbf{RST}!\textbf{GET}}
+\input{PutStatement.bnf}
+\index{PUT@\textbf{PUT}!PutStatement}
+\index{TO@\textbf{TO}!\textbf{PUT}}
+\index{BY@\textbf{BY}!\textbf{PUT}}
+\index{RST@\textbf{RST}!\textbf{PUT}}
+\input{FormatOrPosition.bnf}
+\input{FormatFactor.bnf}
+\input{Format.bnf}
+\end{grammarframe}
+
+Upon input with the get statement, the addressed data elements are
+read one after the other and correspondingly assigned to the variables
+in the variable list (analogously to the read statement). The
+assignment to the variables takes place according to the general
+assignment rules.
+
+The input is terminated, when the the variable list is worked off. If
+there still are list elements, but no data elements, an error message is
+displayed.
+
+When executing the put statement, the values of the expressions
+following \code{PUT} in the list are written out in the given order.
+
+In the order of notation, a format in the format position list is
+associated with each variable in the variable list of the get
+statement, describing the external representation of the data on the
+named data station and used for converting into computer internal
+representation. 
+%%%\begin{removed}
+%%%The kind of format is determined by the type of the
+%%%variable.
+%%%\end{removed}
+%%%\begin{added}
+If no formats are specified, the kind of format is determined by the
+type of the variable (see \code{LIST} \ref{sec_dation_list_format}).
+%%%\end{added}
+Besides formats, the list of the format positions can also
+contain position statements (cf. \ref{sec_read_write})
+for positioning in the data
+station. If the variable list is not exhausted, yet, the further
+positionings are executed and the just mentioned association is
+continued with the next following format. If, on the contrary, the
+variable list is already exhausted, the following position attributes
+are elaborated, until a format is encountered or the list is worked off.
+
+If the variable list contains an array or a segment, the following
+formats are associated with the array elements one after the other.
+
+The number of the transmitted data elements is only determined by the
+variable list, not by the format position list. If there are more
+formats than variables, the surplus formats are neglected. If there are
+still variables left, when the format position list is worked off, it is
+re-started with the first element of the format position list. In each
+case, the transmission is terminated, when the variable list is
+exhausted.
+
+The above analogously holds for the \code{PUT} statement with ``variable''
+replaced by ``expression''.
+
+The data station must possess the class attribute \code{ALPHIC}, a structure,
+and an access attribute. The selection of the access attribute possibly
+limits the positioning possibilities (cf. \ref{sec_read_write}).
+
+The format position list consists of format and position statements.
+To simplify notation, repetition factors may be used in the list. For
+instance, the format position list
+
+\code{X(2), F(12,3), X(2), F(12,3), X(2), F(12,3)}
+
+can be written in an easier way:
+
+\code{(3) (X(2), F(12,3))}
+
+The following table shows the permitted associations between formats and
+types of the data elements to be transferred:
+
+\begin{tabular}{ll}
+format                  & data type \\ \hline
+fixed format            & \code{FIXED}, \code{FLOAT} \\
+float format            & \code{FIXED}, \code{FLOAT} \\
+bit format              & \code{BIT}          \\
+character string format & \code{CHARACTER}    \\
+time format             & \code{CLOCK}        \\
+duration format         & \code{DURATION}     \\
+list format             & all given data types
+\end{tabular}
+
+In detail, the formats have the following forms and meanings (the
+position statements were explained in \ref{sec_read_write}).
+
+\begin{modified}
+If no FormatOrPosition elements are specified the default format is \code{LIST}
+ for each data element.
+\end{modified}
+
+%%%\begin{accepted}
+% already stated at read/write
+The positioning controls work differently on \code{FORWARD} and \code{DIRECT}
+dations. \code{FORWARD} dations does not allow to adjust the real position for read
+and write directly. 
+Thus the positioning discards input data in the \code{GET} statement and 
+writes as may space characters as required to fill the amount of data elements
+in the \code{PUT} statements.
+%%%\end{accepted}
+
+
+\subsection{The Fixed Format (F)}   % 10.5.1
+\label{sec_dation_f_format}
+\index{F@\textbf{F}}
+
+\begin{grammarframe}
+\input{FixedFormat.bnf}
+
+\input{FieldWidth.bnf}
+\index{FORMAT@\textbf{FORMAT}!\textbf{F}}
+\index{FieldWidth!F-Format}
+\index{F@\textbf{F}!FieldWidth}
+
+\input{DecimalPositions.bnf}
+\index{DecimalPositions!F-Format}
+\index{F@\textbf{F}!DecimalPositions}
+\end{grammarframe}
+
+The fixed format describes the external representation of decimal fixed
+point numbers. The field width w is the complete number of characters
+available for the decimal number; decimal positions d denote the number
+of digits behind the decimal point. 
+%%%\begin{accepted}
+The behavior is described separatelly for input and output.
+%%%\end{accepted}
+
+%%%\begin{accepted}
+\begin{enumerate}
+\item {\bf Output}
+\begin{enumerate}
+\item The decimal number is stored right-justified in a field of length
+w in the form
+
+[ - ] pi [ . pi ]
+
+where pi means positive integer. If the number does not occupy the
+entire field, the left part is padded with spaces.
+\item If 0 $>$ d or w $\leq$ d, the \code{FixedFormatSignal} is induced
+\item In case w $\leq$ 0, the \code{FixedFormatSignal} is induced
+\item If d = 0 or is not given, only the integer part of the decimal
+number rounded without decimal point is written out.
+\item Except for the zero immediately in front of the decimal point,
+leading zeros are suppressed.
+\item if the output value does not fit into the given field width 
+   (also regarding
+% p and
+ negative sign), the \code{FixedValueSignal} is induced.
+\item Example for output:
+
+\begin{tabular}{lll}
+value  & format   & output \\ \hline
+13.5   & \code{F(7,-1)}   &  \x \x {\em FixedFormatSignal!}  \\
+13.5   & \code{F(0)}   &  \x \x {\em FixedFormatSignal!}  \\
+13.5   & \code{F(7,2)}   & \_\_13.50  \\
+-13.5   & \code{F(7,2)}   & \_-13.50  \\
+275.2  & \code{F(4,1)}   &  \x \x {\em FixedValueSignal!} \\
+22.8   & \code{F(5)}     & \_\_\_23 \\
+212.73 & \code{F(9,2)}   & \_\_\_212.73 \\
+\end{tabular}
+%%%\end{accepted}
+\end{enumerate}
+\item {\bf Input}
+\begin{enumerate}
+\item A field of length w is read, containing a decimal fixed point
+number in the following representation:
+
+[ [ + $\mid$ - ] pi [ . [ pi ] ] ]
+
+\item Spaces preceding or following the number are ignored.
+%%%%\item If the entire field is empty, value 0 is read in.
+\item If the entire field is empty, the \code{FixedValueSignal} is induced.
+\item If no decimal point occurs in the representation, the last d
+digits are interpreted as positions following a decimal point.
+\item If a decimal point occurs in front of the last b digits in the
+representation, then it has priority over the specification by d. In
+this case, the statement of d has no meaning. Nevertheless the value must
+be reasonable in respect to the other rules. 
+\item If w $\leq$ 0 or d $<$ 0 or w $\leq$ d, no assignment takes place;
+    the \code{FixedFormatSignal} is induced
+\item If the data in the input field does not match a valid fixed 
+   number, the \code{FixedValueSignal} is induced
+
+
+%%%\begin{accepted}
+\item Example for input:
+
+\begin{tabular}{llll}
+external       &          & \multicolumn{2}{c}{input as}  \\ 
+value       &          & \code{FIXED} & \code{FLOAT}  \\ \hline
+13.5   & \code{F(7,1)}   &  14 & 13.5   \\
+13.5   & \code{F(5)}     &  14 & 13.5   \\
+275.2  & \code{F(4,1)}   & 275 & 275.2 \\
+\_\_\_212.73 &  \code{F(9,2)}&  213 & 213,73 \\
+\_\_\_\_\_ & \code{F(5)} & 0& 0.0 \\
+\_3A\_\_\_ & \code{F(5)} & \multicolumn{2}{c}{\em FixedValueSignal!} \\
+\end{tabular}
+\end{enumerate}
+\end{enumerate}
+
+%%%\end{accepted}
+
+\subsection{The Float Format (E)}   % 10.5.2
+\label{sec_dation_e_format}
+\index{E@\textbf{E}}
+\index{E3@\textbf{E3}|see{E}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{E}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{E3}}
+
+\begin{grammarframe}
+\input{FloatFormat.bnf}
+\index{FieldWidth!E-Format}
+\index{E@\textbf{E}!FieldWidth}
+\index{DecimalPositions!E-Format}
+\index{E@\textbf{E}!DecimalPositions}
+\input{Significance.bnf}
+\index{Significance!E-Format}
+\index{E@\textbf{E}!Significance}
+\end{grammarframe}
+
+The float format describes the external representation of decimal
+floating point numbers of the form
+
+[ + $\mid$ - ] FloatingPointNumber
+
+where the exponent consists of two 
+%%%\acceptedtext{
+(E) or three (E3) %%%}
+ digits.
+ Field width and decimal
+positions have the same meaning as in the fixed format; significance s
+denotes the number of significant digits; i.e., the length of the
+mantissa.
+
+E(w,d) is of equivalent to E(w,d,d+1), and E(w) to E(w,0).
+
+%%%\begin{accepted}
+\begin{enumerate}
+\item {\bf Output}\\
+\begin{enumerate}
+\item If w $<$ d or w $<=$ 0, the \code{ExpFormatSignal} is induced. 
+
+\item If w is too small to mention a digit of the mantissa,
+    the \code{ExpValueSignal} is induced
+
+\item The floating point number is stored right-justified in a
+ field of length w.
+%%% Otherwise, 1(a) in \ref{sec_dation_f_format} holds.
+
+\item In case w $>$ d $>$ s, the mantissa is chosen so that it holds:
+
+\hspace*{1cm}$10^{s-d-1} \leq \mid$ mantissa $\mid < 10^{s-d}$
+
+\item If d $>$ 0, the number has the form
+
+\hspace*{1cm}[ - ] s-d digits . d digits E \{ + $\mid$ - \} exponent.
+
+The exponent is determined in such a way that the leading digit of the
+mantissa does not equal zero, if the number is different from zero.
+
+\item If d = 0, the number has the form
+
+\hspace*{1cm}[ - ] s digits E \{ + $\mid$ - \} exponent
+
+\item the exponent field used two digits in E-format and 
+      three digit in E3-format
+
+\item If s $<$ d +1 the \code{ExpFormatSignal} is induced.
+\item Example for output:
+
+\begin{tabular}{llll}
+value  & format    & output \\ \hline
+-0.07  & \code{E(9,1)}    & \_-7.0E-02 \\
+2713.5 & \code{E(11,2,4)} & \_\_27.14E+02 & rounding occurs\\
+2721   & \code{E(8)}      & \_\_\_2E+03 \\
+2721   & \code{E3(8)}      & \_\_2E+003
+\end{tabular}
+
+\end{enumerate}
+ 
+\item {\bf Input}\\
+\begin{enumerate}
+\item If w $<=$ 0, or d $<$ 0, or s $<$ 
+%%%\removedtext{0}\addedtext{1}
+d+1 , no assignment happens and  
+         the \code{ExpFormatSignal} is induced
+\item If the field  is empty, the \code{ExpValueSignal} is induced.
+\item If the data in the field does not match a valid number, 
+ no data is assigned and the \code{ExpValueSignal} is induced.
+\item A field of length w is read,
+    containing a decimal floating point number
+    in one of the possible representations (cf. 5.3).
+    Otherwise the \code{ExpValueSignal} is induced.
+%\item The statements 2(b) to 2(f) in \ref{sec_dation_f_format}
+%     hold analogously.
+\end{enumerate}
+\end{enumerate}
+
+%%%\end{accepted}
+
+%\subsection{The Character String Formats (A) and (S)}  % 10.5.3
+\subsection{The Character String Formats (A)}  % 10.5.3
+\label{sec_dation_a_format}
+
+%%%\begin{front}
+%%%CharacterStringFormat ::=\\
+%%%\x {\bf A} [ (Expression$\S $NumberCharacters) ]
+%%%  \removedtext{ $\mid$ {\bf S} (Name$\S $NumberCharactersVariableFixed) }
+%%%\end{front}
+\begin{grammarframe}
+\input{CharacterStringFormat.bnf}
+\index{A@\textbf{A}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{A}}
+\end{grammarframe}
+
+
+The character formats describe the external representation of character
+strings (character quantities) of the form
+
+Character$^{...}$
+
+%\subsubsection{Character String Format (A)}
+
+The value of the expression in character string format means the total
+number w of the character positions available for the representation.
+\begin{enumerate}
+\item {\bf Output}\\
+\begin{enumerate}
+\item If the format has form ``\code{A} (Expression)'', the character string is
+written out left-justified in the above presented form in a field of
+length w.
+\item  If the character string consists of more than w characters, it
+is truncated on the right; if it consists of less than w characters, the
+field is padded with spaces on the right. 
+%%%\begin{removed}
+%%%If w = 0, no characters are
+%%%written out, and the expression in the expression list of the put
+%%%statement is skipped.
+%%%\end{removed}
+%%%\begin{accepted}
+\item If w $<=$ 0, the \code{CharacterFormatSignal} is induced
+%%%\end{accepted}
+\item If the expression is not given in the format, i.e., the format has the
+form ``\code{A}'', the string is written out in a field, whose length equals
+the string length.
+\end{enumerate}
+\item {\bf Input}\\
+\begin{enumerate}
+\item Characters up to the maximum of w or until encountering the next record
+delimiter (e.g., CR) are read in. A record delimiter is not transferred
+into the character string variable.
+\item If w is smaller than length lg of the associated character string
+variable, the right part is padded with spaces; in case w $>$ lg, the
+right part is truncated.
+%%%\begin{removed}
+%%% If w = 0, a string of lg spaces is assigned to
+%%%the variable.
+%%%\end{removed}
+%%%\begin{accepted}
+\item  If w $<=$ 0, no assignment happens and the \code{CharacterFormatSignal} is 
+   induced. 
+%%%\end{accepted}
+\end{enumerate}
+\end{enumerate}
+
+Examples:
+
+The output of the character string 'PEARL' in format
+
+\begin{itemize}
+\item \code{A}    results in \code{PEARL} 
+\item \code{A(5)} results in \code{PEARL} 
+\item \code{A(7)} results in \code{PEARL\_\_}
+\item \code{A(2)} results in \code{PE}
+\end{itemize}
+
+The input of the character string '\code{PEARL\_\_}' to a 
+\code{CHAR(5)} variable text in format
+
+\begin{itemize}
+\item \code{A} is equivalent to \code{text := 'PEARL';}
+\item \code{A(5)} is equivalent to \code{text := 'PEARL';}
+\item \code{A(7)} is equivalent to \code{text := 'PEARL';}
+\item \code{A(2)} is equivalent to \code{text := 'PE\_\_\_';}
+\end{itemize}
+
+%%%\begin{removed}
+%%%\subsubsection{Character String Format (S)}
+%%%
+%%%The variable in character string format must be of type FIXED.
+%%%\begin{enumerate}
+%%%\item {\bf Output}\\
+%%%Identical with A format: the value of the given variable determines the
+%%%width of the output field.
+%%%\item{\bf Input}\\
+%%%Characters up to the maximum lg (length of the associated character
+%%%string variables) or until encountering the next record delimiter are
+%%%read in; otherwise, the same rules like for the A format hold.
+%%%Additionally, the number of characters (without record delimiter) read
+%%%is assigned to the variable of the S format. Which record delimiters are
+%%%defined for which devices is to be found in the respective PEARL user
+%%%manual.
+%%%\end{enumerate}
+%%%
+%%%Example:
+%%%
+%%%Command lines are to be read in from the terminal.
+%%%
+%%%{\bf DCL} buffer {\bf CHAR}(80);\\
+%%%{\bf DCL} length {\bf FIXED};\\
+%%%...\\
+%%%{\bf GET} buffer {\bf FROM} terminal {\bf BY S}(length);\\
+%%%...
+%%%
+%%%After the entry ``abc$<$RETURN$>$'' on the keyboard (the key
+%%%$<$RETURN$>$ creates a record delimiter), the variable ``buffer''
+%%%contains the characters ``abc'' and the variable ``length'' the value 3.
+%%%\end{removed}
+
+
+\subsection{The Bit Format (B)}    % 10.5.4
+\label{sec_dation_b_format}
+
+\begin{grammarframe}
+\input{BitFormat.bnf}
+\index{FORMAT@\textbf{FORMAT}!\textbf{B},B1,B2,B3,B4}
+\index{B@\textbf{B}}
+\index{B1@\textbf{B1}|see {B}}
+\index{B2@\textbf{B2}|see {B}}
+\index{B3@\textbf{B3}|see {B}}
+\index{B4@\textbf{B4}|see {B}}
+\end{grammarframe}
+
+The bit format describes the external representation of bit strings (bit
+quantities), namely (cf. \ref{sec_bit_strings})
+\begin{itemize}
+\item in binary form by the format: \{ \code{B} $\mid$ \code{B1} \} 
+		[ \code{(} Expression \code{)} ] ,
+\item in form of tetrades by the format: \code{B2} [ \code{(} Expression \code{)} ] ,
+\item in form of octades by the format: \code{B3} [ \code{(} Expression \code{)} ] ,
+\item in hexadecimal form by the format: \code{B4} [ \code{(} Expression \code{}) ] .
+\end{itemize}
+
+The value of the expression in bit format means the total number w of
+the character positions available for the representation.
+\begin{enumerate}
+\item {\bf Output}\\
+\begin{enumerate}
+\item If the expression is declared in the format, the bit string is written
+out left-justified in the above represented form in a field of length
+w. 
+\item If the bit string consists of more than w characters, it is truncated
+on the right; if it consists of less than w characters, the field is
+padded with zeros on the right. 
+\item If w is not given, and if the bit format
+thus has the form \code{B} $\mid$ \code{B1} $\mid$ \code{B2} $\mid$
+	 \code{B3} $\mid$ \code{B4}, the string
+is written out in a field, whose length equals the length of the
+string.
+%%%\begin{accepted}
+\item If w $<=$ 0, no data is written and the \code{BitFormatSignal} is induced.
+%%%\end{accepted}
+\end{enumerate}
+\item {\bf Input}\\
+\begin{enumerate}
+\item The expression must be given.
+\item A field of length w is read in, which must contain a bit string of the
+above described form.
+If the data field does not match a valid bit representation, 
+or the field consists completely of spaces,
+the
+\code{BitValueSignal} is induced.
+\item Spaces preceding or following the string are ignored.
+
+%%%\begin{accepted}
+\item If w $<=$ 0, no data is assigned and the \code{BitFormatSignal} is induced.
+
+
+%%%\end{accepted}
+\end{enumerate}
+\end{enumerate}
+
+Example:
+
+The output of the bit string '\code{0101110}' in the format
+
+\begin{itemize}
+\item \code{B(5)} results in \code{01011} 
+\item \code{B2(3)} results in \code{113} 
+\item \code{B3(3)} results in \code{270} 
+\item \code{B4(2)} results in \code{5C}
+\end{itemize}
+
+Let the variable bit string be of type \code{BIT(8)}; the input, there are the
+following possibilities:
+
+\begin{tabular}{lll}
+data element to be entered & format & value of bit string \\ \hline
+11111                      & \code{B(5)}   &         11111000    \\
+201                        & \code{B2(3)}  &         10000100    \\
+235                        & \code{B3(3)}  &         01001110    \\
+AB                         & \code{B4(2)}  &         10101011
+\end{tabular}
+
+\subsection{The Time Format (T)}   % 10.5.5
+\label{sec_dation_t_format}
+
+\begin{grammarframe}
+\input{TimeFormat.bnf}
+\index{T@\textbf{T}}
+\index{FieldWidth!T-Format}
+\index{T@\textbf{T}!FieldWidth}
+\index{FORMAT@\textbf{FORMAT}!\textbf{T}}
+
+\index{DecimalPositions!T-Format}
+\index{T@\textbf{T}!DecimalPositions}
+\end{grammarframe}
+
+%%%\begin{removed}
+
+The time format describes the external representation of time data. The
+field width means the total number w of the character positions
+available for the representation; decimal positions stands for the
+number d of the digits for the fractional parts of seconds of the clock
+time. 
+%%%\addedtext{
+The number of decimal positions defaults to 0.
+%%%}
+\begin{enumerate}
+\item {\bf Output}\\
+\begin{enumerate}
+
+%%%\begin{accepted}
+\item If w $<=$ 0 or d $<$ 0, no data is written an the \code{ClockFormatSignal}
+   is induced.
+
+\item If w is too small for the given clock value, the \code{ClockValueSignal}
+   is induced.
+%%%\end{accepted}
+
+\item The time is written out right-justified in a field of length w in the
+form
+
+[ \code{Digit} ] \code{Digit : Digit Digit : Digit Digit} [ \code{. pi} ]
+
+\item If the first digit is zero, it is replaced by spaces. In case d = 0,
+decimal point and fractional parts of seconds are not written out.
+
+\item If the output value does not occupy the entire field, the left part is
+padded up with spaces.
+\end{enumerate}
+
+\item {\bf Input}\\
+\begin{enumerate}
+\item A field of length w is read in, which must contain a time in a permitted
+representation (see \ref{sec_type_clock}). Preceding and following spaces are ignored.
+
+%%%\begin{accepted}
+\item If w $<=$ 0 or d $<$ 0, no data is read and the \code{ClockFormatSignal}
+   is induced.
+
+\item If the input field does not match a valid clock constant, the 
+   \code{ClockValueSignal} is induced.
+
+%%%\end{accepted}
+
+%%%\begin{discuss}
+%%%The current implementation accepts automatic decimals if no decimal point is given and $d > 0$. This behavior is defined in the F-format. It was removed 
+%%%when the D-format was relaxed.
+%%%
+%%%Should this behavior be removed here and from the F format?
+%%%\end{discuss}
+
+\item The parameter DecimalPosition is not regarded in input
+ --- the decimal point must be given explicitly.
+\end{enumerate}
+\end{enumerate}
+
+Examples:
+
+\begin{tabular}{lll}
+value               & format  & output \\ \hline
+12.30 hours 5.2 sec & \code{T(12,1)} & \_\_12:30:05.2 \\
+8 hours             & \code{T(8)}    & \_8:00:00
+\end{tabular}
+
+\subsection{The Duration Format (D)}   % 10.5.6
+\label{sec_dation_d_format}
+
+\begin{grammarframe}
+\input{DurationFormat.bnf}
+\index{D@\textbf{D}}
+\index{FieldWidth!D-Format}
+\index{D@\textbf{D}!FieldWidth}
+\index{FORMAT@\textbf{FORMAT}!\textbf{D}}
+
+\index{DecimalPositions!D-Format}
+\index{D@\textbf{D}!DecimalPositions}
+\end{grammarframe}
+
+The duration format describes the external representation of durations.
+The value of the field width means the total number w of the character
+positions available for representation, the value of decimal positions
+means the number d of the digits for the fractional parts of seconds of
+the duration.
+
+\begin{enumerate}
+\item {\bf Output}\\
+\begin{enumerate}
+\item  The duration is written out right-justified in a field of length w in
+the form
+
+[ [ [ [ [ \code{Digit} ] \code{Digit} \kw{HRS} ]
+          \code{Digit}] \code{Digit} \kw{MIN} ] 
+	 \code{Digit} ] \code{Digit} [ \kw{.} \code{pi} ] \kw{SEC}
+
+%%%\begin{accepted}
+\item If w $<=$ 0 or d $<$ 0, no data is written an the \code{DurationFormatSignal}
+   is induced.
+
+\item If w is too small for the given clock value, the \code{DurationValueSignal}
+   is induced.
+
+%%%\end{accepted}
+%%%\begin{added}
+\item Leading fields with hours and minutes may be suppressed by 
+choosing a small value of w. 
+
+\item Examples:
+
+\begin{tabular}{lll}
+value               & format  & output \\ \hline
+11 hours 15 minutes & \code{D(20)}   & 11\_HRS\_15\_MIN\_00\_SEC \\
+100 milliseconds    & \code{D(24,3)} & \_0\_HRS\_00\_MIN\_00.100\_SEC \\
+100 milliseconds    & \code{D(9,3)} & 0.100\_SEC \\
+-100 milliseconds    & \code{D(9,3)} & DurationValueSignal \\
+-100 milliseconds    & \code{D(9,2)} & -0.10\_SEC \\
+\end{tabular}
+
+The character \_ means a space.
+%%%\end{added}
+\end{enumerate}
+
+%%%\begin{removed}
+%%%The rules from \ref{sec_dation_t_format} (1) are valid.
+%%%\end{removed}
+\item {\bf Input}\\
+\begin{enumerate}
+\item If w $<=$ 0 or d $<$ 0, no data is read and the \code{DurationFormatSignal}
+   is induced.
+
+%%%\begin{accepted}
+\item A field of length w is read in, which must contain a duration in a
+permitted representation (see \ref{sec_type_duration}).
+ Preceding and following spaces are
+ignored.
+
+\item If the input field does not match a valid duration constant, the 
+   \code{DurationValueSignal} is induced.
+
+%%%\end{accepted}
+%%%\begin{added}
+\item A valid duration constant from chapter \ref{sec_type_duration} is accepted.
+No delimiting spaces are required.
+\item The value of d is not used in input. A decimal point is required in the
+input field for precisions better than \code{1 SEC}.
+
+\item Examples:
+
+\begin{tabular}{lll}
+input               & format  & value \\ \hline
+11 HRS 15 MIN & \code{D(20)}   & 11\_HRS\_15\_MIN\_00\_SEC \\
+0.100 SEC    & \code{D(24,3)} & \_0\_HRS\_00\_MIN\_00.100\_SEC \\
+100 SEC    & \code{D(24,3)} & DurationValueSignal \\
+10MIN1SEC    & \code{D(24,3)} & \_0\_HRS\_10\_MIN\_01\_SEC \\
+-10MIN1SEC    & \code{D(24,3)} & -\_0\_HRS\_10\_MIN\_01\_SEC \\
+\end{tabular}
+
+%%%\end{added}
+The character \_ means a space.
+
+\end{enumerate}
+\end{enumerate}
+
+%%%\begin{removed}
+%%%Examples:
+%%%
+%%%\begin{tabular}{lll}
+%%%value               & format  & output \\ \hline
+%%%11 hours 15 minutes & D(20)   & 11\_HRS\_15\_MIN\_00\_SEC \\
+%%%100 milliseconds    & D(24,3) & \_0\_HRS\_00\_MIN\_00.100\_SEC \\
+%%%100 milliseconds    & D(9,3) & 0.100\_SEC \\
+%%%\end{tabular}
+%%%
+%%%The character \_ means a space.
+%%%\end{removed}
+
+
+\subsection{The List Format (LIST)}    % 10.5.7
+\label{sec_dation_list_format}
+
+\begin{grammarframe}
+\input{ListFormat.bnf}
+\index{L@\textbf{L}}
+\index{LIST@\textbf{LIST}|see {L}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{L}}
+\end{grammarframe}
+
+The list format serves for the input/output of fixed, float, bit, char,
+clock, and dur quantities.
+\begin{enumerate}
+\item {\bf Output}\\
+Subsequent output data are separated by two spaces, each. The data are
+written out in such a way, as if for a quantity of type
+
+\begin{tabular}{lll}
+\code{CHAR}(k)  & format & \code{A}(k)\\
+\code{BIT}(k)   & format & \code{B}(k)\\
+\code{FIXED}(k) & format & \code{F}(n)\\
+\code{FLOAT}(k) & format & \code{E}(m,m-7,m-6)\\
+\code{CLOCK}    & format & \code{T}(8)\\
+\code{DUR}      & format & \code{D}(20)
+\end{tabular}
+
+with n = \code{ENTIER}(k/3.32) + 2, m = \code{ENTIER} (k/3.32) + 3 were
+declared.
+\item {\bf Input}\\
+The input data can have any form permitted for the representation of
+constants. 
+\begin{added}
+The same format replacements as on output are used.
+Only one data element should be read in one input line.
+\end{added} 
+\begin{removed}
+They are separated by a comma or at least two spaces. If no
+constant is between two commas, the corresponding element of the
+variable list remains unchanged.
+\end{removed}
+\end{enumerate}
+
+Examples:
+
+\begin{tabular}{llll}
+data type & value    & implicit format & output \\ \hline
+\code{FIXED}(15) & 127      & \code{F}(6)            & \_\_\_127 \\
+\code{FLOAT}(23) & 3.28E+28 & \code{E}(9,2,3)       & \_3.28E+28\\
+\code{BIT}(8)    & 'EF'B4   & \code{B}(8)            & 11101111
+\end{tabular}
+
+\subsection{The R Format (R)}   % 10.5.8
+\label{sec_dation_r_format}
+
+Sometimes, the same format position lists are used in more than one get
+or put statement. The R format serves to describe these lists only
+once. For this, a list with the so-called format declaration is
+introduced.
+
+\begin{grammarframe}
+\input{FormatDeclaration.bnf}
+\index{FORMAT@\textbf{FORMAT}!Statement}
+\end{grammarframe}
+
+Example:
+
+\code{fTab :} \kw{FORMAT}\code{ ( }\kw{X}\code{(2), }\kw{F}\code{(8,3), (3) ( }
+\kw{X}\code{(2), }\kw{E}\code{(10,3) ) ) ;}
+
+A format declared in such a way can be used in a get or put statement,
+stating its identifier:
+
+\begin{grammarframe}
+\input{RFormat.bnf}
+\index{R@\textbf{R}}
+\index{FORMAT@\textbf{FORMAT}!\textbf{R}}
+\end{grammarframe}
+
+When transmitting data, the \code{R} format is replaced by the format position
+list contained in the indicated format declaration.
+
+Example:
+
+\kw{PUT}\code{ a, x, y, z }\kw{TO}\code{ printer }\kw{BY R}\code{(fTab)} ;
+
+The format position list in the format declaration must not contain any
+\code{R} format referring directly or indirectly (via another format
+declaration) to its own format declaration.
+
+\section{The Convert Statement (CONVERT)}   % 10.6
+\label{sec_convert}
+\index{CONVERT@\textbf{CONVERT}}
+
+The comfortable conversion of number values in character strings and
+vice versa is very important for many applications, e.g., for the
+creation of display masks or for data exchange via communication
+interfaces which cannot transfer binary data. The \code{PUT} and \code{GET}
+statements enable that in connection with data stations. Following
+that, the \code{CONVERT} statement is defined, performing formatted data
+exchange with a character string or character string variable,
+respectively, instead of a data station.
+
+The general forms of the convert statement are:
+
+\begin{grammarframe}
+\input{ConvertStatement.bnf}
+\input{ConvertToStatement.bnf}
+\index{BY@\textbf{BY}!\textbf{CONVERT}}
+\index{TO@\textbf{TO}!\textbf{CONVERT}}
+\input{ConvertFromStatement.bnf}
+\index{FROM@\textbf{FROM}!\textbf{CONVERT}}
+\input{FormatOrPositionConvert.bnf}
+\input{PositionConvert.bnf}
+\index{RST@\textbf{RST}!\textbf{CONVERT}}
+\end{grammarframe}
+
+All permitted formats have the same meaning as for the \code{PUT} and \code{GET}
+statements 
+%%%\addedtext{
+on \code{FORWARD} \code{DATIONS}.
+%%%}.
+%%%\begin{removed}
+%%%The only exception is the S format. In the convert
+%%%statement, the number of characters, which at this point in time was
+%%%read from Expression$\S $CharacterString or written into
+%%%Name$\S $CharacterString, respectively, is assigned to the variable in S
+%%%format.
+%%%\end{removed}
+
+Example:
+
+%%%\begin{added}
+\begin{lstlisting}
+DCL (index, convError) FIXED,
+    value              FLOAT,
+    stringOut          CHAR(40),
+    stringIn           CHAR(20);
+...
+CONVERT 'Index =', index TO stringOut BY A, F(4), A;
+CONVERT index, value FROM stringIn BY RST(convError), F(4), E(10,2);
+\end{lstlisting}
+
+\section{The Take and Send Statements}    % 10.7
+\label{sec_take_send}
+
+The take statement serves for the input, the send statement for the
+output of data. These statements are provided for the transmission of
+process data, and for the data exchange with user specific drivers,
+respectively. The data station must possess the class attribute BASIC.
+
+\begin{grammarframe}
+\input{TakeStatement.bnf}
+\index{TAKE@\textbf{TAKE}}
+\index{BY@\textbf{BY}!\textbf{TAKE}}
+\index{FROM@\textbf{FROM}!\textbf{TAKE}}
+\index{RST@\textbf{RST}!\textbf{TAKE}}
+\input{SendStatement.bnf}
+\index{SEND@\textbf{SEND}}
+\index{BY@\textbf{BY}!\textbf{SEND}}
+\index{TO@\textbf{TO}!\textbf{SEND}}
+\input{RSTFormat.bnf}
+\index{RST@\textbf{RST}!\textbf{SEND}}
+\end{grammarframe}
+
+%%%\begin{accepted}
+The types of the ``variable'' in the take statement or the
+``expression'' in the send statement, respectively, must fit to 
+the type in the dation declaration. If the dation declaration 
+specifies \code{ALL}, no type checking occurs.
+%%%\end{accepted}
+
+%%%\begin{removed}
+%%%The attribute definitions RST, S and CONTROL may be stated in any
+%%%order, but only once, each. The meanings of the CONTROL and S formats
+%%%are implementation dependent and, thus, to be found in the respective
+%%%user manual of a PEARL implementation.
+%%%\end{removed}
+
+Example:
+
+%%%\begin{removed}
+%%%{\bf SYSTEM};\\
+%%%\x motor: DIGEA $^*$1$^*$1,4;
+%%%\end{removed}
+
+\begin{lstlisting}
+PROBLEM;
+  SPC motor DATION OUT SYSTEM BASIC BIT(4);
+  DCL m     DATION OUT        BASIC BIT(4) CREATED ( motor );
+  DCL on    INV BIT(4) INIT('1010'B1);
+
+  SEND on TO m;
+\end{lstlisting}
+
+\section{Error Handling in I/O Statements (RST)}    % 10.8
+\label{sec_dation_rst}
+
+Usually, errors are recognised when the execution of I/O statements lead to the
+termination of the responsible task, and an error message is written
+out. This standard reaction of the PEARL system is suppressed by
+defining
+
+\kw{RST} ( Name$\S $ErrorVariable-FIXED )
+\index{RST@\textbf{RST}}
+
+in the parameter list of the \code{OPEN}/\code{CLOSE} statement, or as format or
+position element in the other data transmission statements,
+respectively.
+
+``Name'' must denote a variable of type \code{FIXED}, in which an error number
+not equal to zero is written in the case of error. Upon error free
+execution of the I/O statement, the variable is set to zero. Possible
+errors and their identification are to be found in the PEARL user manual
+of the respective computer system.
+
+The \code{RST} definition can be located in any position of the format or
+position list of \code{PUT}, \code{GET}, \code{WRITE}, \code{READ} and \code{CONVERT} statements; also
+multiple definitions with different variables are permitted. The \code{RST}
+definition does not change the error reaction before the \code{RST} element is
+evaluated in the format or position list. Upon recognition of an error,
+the I/O statement is immediately aborted, and the error reaction valid
+at this point in time (assignment of an error number to an \code{RST} variable
+or the system reaction) is carried out.
+
+\section{Interface for Additional Drivers}   % 10.9
+\label{sec_driver_interface}
+
+The diversity of --- particularly in the world of PCs 
+and micro controllers --- existing I/O
+controllers and devices does not allow the compiler supplier to account
+for all I/O devices in the system part and create system names for them.
+To be able to address special I/O devices from PEARL in spite of that
+fact, a driver interface can be provided for certain operating systems,
+to which the PEARL programmer himself can connect drivers. This
+interface is described in the respective user manual (in the chapter
+``Open Driver Interfaces'').
+

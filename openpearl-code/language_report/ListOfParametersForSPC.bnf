@@ -1,0 +1,4 @@
+\htgt{ListOfParametersForSPC} ::=\\
+\x \kw{(} \hlink{ParameterSpecification} 
+	[ , \hlink{ParameterSpecification} ]$^{...}$ \kw{)}
+

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module file="demo.prl">
+<system>
+<username name="pcf8574" line="14">
+   <sysname name="Pcf8574">
+   <parameters>
+   <BIT>'20'B4</BIT>
+   <FIXED>7</FIXED>
+   <FIXED>4</FIXED>
+   </parameters>
+   <association name="I2CBus">
+      <parameters>
+        <CHAR>'/dev/i2c-0'</CHAR>
+        <FIXED>100000</FIXED>
+      </parameters>
+   </association>
+   </sysname>
+</username>
+<username name="lm75" line="4">
+   <sysname name="LM75">
+   <parameters>
+   <BIT>'48'B4</BIT>
+   </parameters>
+   <association name="I2CBus">
+      <parameters>
+        <CHAR>'/dev/i2c-0'</CHAR>
+        <FIXED>100000</FIXED>
+      </parameters>
+   </association>
+   </sysname>
+</username>
+
+<username name="lm75a" line="6">
+   <sysname name="LM75">
+   <parameters>
+   <BIT>'49'B4</BIT>
+   </parameters>
+   <association name="i2cbus1">
+   </association>
+   </sysname>
+</username>
+
+<username name="lm75b" line="116">
+   <sysname name="LM75">
+   <parameters>
+   <BIT>'49'B4</BIT>
+   </parameters>
+   <association name="i2cbus1">
+   </association>
+   </sysname>
+</username>
+
+<username name="i2cbus1" line="7">
+   <sysname name="I2CBus">
+      <parameters>
+        <CHAR>'/dev/i2c-1'</CHAR>
+        <FIXED>100000</FIXED>
+      </parameters>
+   </sysname>
+</username>
+
+<username name="sig1" line="9">
+   <sysname name="FixedRangeSignal"/>
+</username>
+
+<username name="int1" line="10">
+  <sysname name="UnixSignal">
+    <parameters>
+      <FIXED>15</FIXED>
+    </parameters>
+  </sysname>
+</username>
+
+<username name="disc" line="12">
+  <sysname name="Disc">
+     <parameters>
+       <CHAR>'/tmp/folder1'</CHAR>
+       <FIXED>10</FIXED>
+     </parameters>
+  </sysname>
+</username>
+
+<username name="stdOut" line="14">
+  <sysname name="StdOut">
+  </sysname>
+</username> 
+
+<configuration line="16">
+  <sysname name="Log">
+    <parameters>
+     <CHAR>'EW'</CHAR>
+    </parameters>
+  <association name="LogFile">
+     <parameters>
+       <CHAR>'prl_log.log'</CHAR>
+     </parameters>
+     <association name="disc">
+     </association>
+  </association>
+  </sysname>
+</configuration>
+</system>
+<problem>
+   <spc type="signal" name="sig1" line="19"/>
+   <spc type="interrupt" name="int1" line="20" />
+   <spc type="dation" name="pcf8574" line="21">
+      <attributes> OUT,SYSTEM </attributes>
+      <data>BIT(4)</data>
+   </spc>
+   <spc type="dation" name="disc" line="21">
+      <attributes> OUT,SYSTEM </attributes>
+      <data>ALL</data>
+   </spc>
+   <spc type="dation" name="stdOut" line="22">
+      <attributes> OUT, SYSTEM </attributes>
+      <data>ALPHIC</data>
+   </spc>
+</problem>
+</module>

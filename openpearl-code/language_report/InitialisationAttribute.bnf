@@ -1,0 +1,4 @@
+\htgt{InitialisationAttribute} ::=\\
+\x \{ \kw{INITIAL} $\mid$ \kw{INIT} \} ( \hlink{InitElement} 
+	[ , \hlink{InitElement} ] $^{...}$ )
+

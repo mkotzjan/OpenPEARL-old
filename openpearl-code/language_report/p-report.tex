@@ -1,0 +1,165 @@
+% remarks about the usage in the OpenPEARL project
+% old stuff is removed by comments %%%
+% added and removed blocks may be found by a seach for begin/end{added/removed}
+% points which are still in discussion are marks with begin/end{discuss}
+
+
+\documentclass{book}
+\usepackage{geometry}  % paper size
+\geometry{a4paper}     % -"-
+
+%%%% read config settings from menuconfig
+\input{../configuration/include/autoconf.tex}
+
+\usepackage[pdftex,colorlinks,linkcolor=blue]{hyperref}
+\usepackage{courier}
+\usepackage{listings}
+\lstset{emph={MODULE,MODEND,SYSTEM,PROBLEM,%
+DCL,DECLARE,SPC,SPECIFY,INV,IDENT,INIT,FIXED,FLOAT,BIT,CLOCK,DURATION,DUR,%
+CHAR,CHARACTER,STRUCT,TYPE,%
+INTERRUPT,DATION, TASK,PRIO,PRIORITY,MAIN,%
+CALL,RETURN,RETURNS,PROC,PROCEDURE,BEGIN,END,%
+GLOBAL,%
+DIRECT,FORWARD,IN,OUT,INOUT,DIM,TFU,CREATED,ALPHIC,ALL,
+CONT,REF,NIL,IS,ISNT,IF,THEN,ELSE,FIN,CASE,ALT,OUT,GOTO,%
+FOR,REPEAT, WHILE,UNTIL,DURING,AT,ALL,AFTER,WHEN,%
+HRS,MIN,SEC,%
+CAT,AND,OR,NOT,EXOR,TOFLOAT,TOFIXED,TOBIT,TOCHAR,ENTIER,ROUND,FIT,%
+REM,SQRT,SIN,COS,EXP,LN,TAN,ATAN,TANH,%
+LWB,UPB,SIZEOF,MAX,LENGTH,TRY,%
+SHIFT,CSHIFT,<>,><,%
+ACTIVATE, TERMINATE, CONTINUE,SUSPEND,PREVENT,
+SEMA,SEMAPHORE,REQUEST,RELEASE,
+ENTER, LEAVE,RESERVE,FREE,BOLT,
+ENABLE,DISABLE,TRIGGER,%
+SIGNAL,INDUCE,
+OPEN,CLOSE,READ,WRITE,PUT,GET,TAKE,SEND,
+FROM,TO,BY,%
+A,F,E,D,T,LIST,X,SKIP;PAGE,POS,SOP,ADV},
+emphstyle={\textbf},
+basicstyle={\ttfamily},
+frame=single,
+}
+\usepackage{multicol}
+\usepackage{placeins}
+%
+% ----- abbreviations for hyperlinks on syntax definitions
+\input{hyperMacros.tex}
+\renewcommand{\htgt}{\htgtOff}  % hypertargets of syntax elements are
+				% only in the appendix
+\newenvironment{grammarframe}%
+{\begin{tcolorbox}[%
+   enhanced,breakable,%
+   outer arc=0pt,arc=0pt,%
+   colback=yellow!10!white,
+   colframe=black
+]
+
+\parskip\baselineskip
+}
+{\end{tcolorbox}}
+
+\usepackage[skins,breakable]{tcolorbox}
+
+%\textwidth16cm
+%\textheight24cm
+%\oddsidemargin1cm
+%\evensidemargin1cm
+% \topmargin1cm
+% DIN-A4: 29,6 cm Hoehe: 29,6-24=5,6 = 2,8 oeb + 2,8 unten
+% => topmargin = 2,54 + 0,26
+%\topmargin 0,26cm 
+\parindent0pt
+\parskip\baselineskip
+
+\newcommand{\x}{\hspace*{1cm}}
+
+\newcommand{\kw}[1]{\textbf{\texttt{#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\def\tekst #1,#2;{\parbox{#1}{\tiny\
+                  \begin{center}#2\end{center}}}
+\begingroup\makeatletter\ifx\SetFigFont\undefined
+% extract first six characters in \fmtname
+\def\x#1#2#3#4#5#6#7\relax{\def\x{#1#2#3#4#5#6}}%
+\expandafter\x\fmtname xxxxxx\relax \def\y{splain}%
+\ifx\x\y   % LaTeX or SliTeX?
+\gdef\SetFigFont#1#2#3{%
+  \ifnum #1<17\tiny\else \ifnum #1<20\small\else
+  \ifnum #1<24\normalsize\else \ifnum #1<29\large\else
+  \ifnum #1<34\Large\else \ifnum #1<41\LARGE\else
+     \huge\fi\fi\fi\fi\fi\fi
+  \csname #3\endcsname}%
+\else
+\gdef\SetFigFont#1#2#3{\begingroup
+  \count@#1\relax \ifnum 25<\count@\count@25\fi
+  \def\x{\endgroup\@setsize\SetFigFont{#2pt}}%
+  \expandafter\x
+    \csname \romannumeral\the\count@ pt\expandafter\endcsname
+    \csname @\romannumeral\the\count@ pt\endcsname
+  \csname #3\endcsname}%
+\fi
+\fi\endgroup
+
+\def\OpenPEARL{{\it OpenPEARL}}
+
+% --- select desired verion of the langage report
+% ----- check first if option was selected 
+% ----- and define it as not selected, if option was not defined
+\ifx\CONFIGxDOCxPREPORTxSHOWxCHANGES\undefined
+\def\CONFIGxDOCxPREPORTxSHOWxCHANGES{0}
+\fi
+\if\CONFIGxDOCxPREPORTxSHOWxCHANGES1
+\input macrosShowChanges.tex
+\else
+\input macrosShowResult.tex
+\fi
+
+\usepackage{makeidx}
+\makeindex
+ 
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+%\sethlcolor{yellow}
+
+\begin{center}
+{\Huge \OpenPEARL} \\
+\vspace{1cm}
+Language Report\\
+\vspace{5cm}
+%2014-Oct-23\\
+\today{}\\
+\vspace{10cm}
+%%%\removedtext{GI FG 4.4.2}
+%%%\begin{accepted}
+GI Fachausschu{\ss} Echtzeitsysteme
+%%%\end{accepted}
+
+\end{center}
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input 01-introduction   	% 1
+\input 02-fundamentals.tex 	% 2
+\input 03-language_forms.tex	% 3
+\input 04-program_structure.tex	% 4
+\input 05-variables_and_constants.tex 	% 5
+\input 06-expressions.tex		% 6
+\input 07-sequential.tex		% 7
+\input 08-procedures.tex		% 8
+\input 09-parallel_activities.tex	% 9
+\input 10-input_and_output.tex		% 10
+\input 11-signals.tex			% 11
+%\input 12-macros.tex			% 12
+\input 90-appendix.tex			% A1
+
+\end{document}
+
+

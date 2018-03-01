@@ -1,0 +1,5 @@
+\htgt{Block} ::= \\
+\x \kw{BEGIN}\\
+\x \x [\{ \hlink{Declaration} $\mid$ \hlink{Identification} \}$^{...}$ ]\\ 
+\x \x [ \hlink{Statement} $^{...}$ ] \\
+\x \kw{END} [ \hlink{Identifier}$\S $Block ] ;\\

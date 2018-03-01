@@ -1,0 +1,9 @@
+
+\htgt{OpenParameter} ::=\\
+\x \kw{RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+\x $\mid$ \kw{IDF} ( \{ \hlink{Name}$\S $CharacterStringVariable
+	 $\mid$ \hlink{CharacterStringConstant} \} )\\
+\x $\mid$ \{ \kw{OLD} $\mid$ \kw{NEW} $\mid$ \kw{ANY} \}\\
+\x $\mid$ \{ \kw{CAN} $\mid$ \kw{PRM} \}
+
+

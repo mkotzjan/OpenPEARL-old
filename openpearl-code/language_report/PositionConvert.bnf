@@ -1,0 +1,8 @@
+
+\htgt{PositionConvert} ::= \\
+\x \kw{RST} \kw{(} \hlink{Name}$\S $ErrorVariable-FIXED \kw{)}\\
+\x $\mid$ \kw{X} [ \kw{(} \hlink{Expression} \kw{)} ]\\
+\x $\mid$ \{ \kw{POS} $\mid$ \kw{ADV} \} \kw{(} \hlink{Expression} \kw{)}\\
+\x $\mid$ \kw{SOP} \kw{(} \hlink{Name}$\S $PositionVariable-FIXED \kw{)}
+
+

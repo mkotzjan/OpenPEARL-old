@@ -1,0 +1,40 @@
+MODULE(LM75);
+
+SYSTEM;
+i2cbus: I2CBus('/dev/i2c-1',100000);
+lm75: LM75('4F'B4) --- i2cbus;
+stdout: StdOut;
+/*__cpp__( 
+   'pearlrt::I2CBus s_i2c("/dev/i2c-1");'
+   'pearlrt::LM75   s_lm75(&s_i2c, 0x4f);'
+   'pearlrt::Device  * d_lm75 = &s_lm75;'
+   'pearlrt::StdOut s_stdout;'
+   'pearlrt::Device *d_stdout = &s_stdout;');
+*/
+PROBLEM;
+
+SPC lm75 DATION IN SYSTEM BASIC FIXED(15) GLOBAL;
+SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;
+
+DCL thermometer DATION IN BASIC FIXED(15) CREATED(lm75);
+DCL terminal DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(stdout);
+
+t1: TASK MAIN;
+  __cpp__(
+   'pearlrt::Character<15> _text1 ("Temperatur");'
+  );
+  DCL t FIXED(15);
+  DCL temp FLOAT;
+  OPEN terminal;
+  OPEN thermometer;
+     PUT text1 TO terminal BY A, SKIP;
+  REPEAT
+     TAKE t FROM thermometer;
+     temp := t / 10.0;
+!     PUT text1,temp TO terminal BY A,F(5,1), SKIP;
+!     AFTER 0.1 SEC RESUME;
+  END;
+END;
+MODEND;
+ 
+   

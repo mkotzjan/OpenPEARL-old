@@ -1,0 +1,102 @@
+/*#############################################################################
+PROGRAM
+
+The program works equal to the program 700_oneSemaphore_samePrio.prl, 
+with the small different that Writer1 after 500 rounds in the loop do 
+a AFTER 3 SEC RESME after he get the REQUEST and at this time the Writer2 and 
+Output Task are blocked on semaphore until the Writer2 come back and do the RELEASE. 
+###############################################################################
+RESULT
+
+The result must be that both Writer task repeated 1000 times and the Output 
+task 2000 times and the writer task write alternately in the buffer, 
+because of this it must be 1999 task changes.
+#############################################################################*/
+
+MODULE(semaphoreOne);
+
+PROBLEM;
+    DCL (in_the_buffer, out_the_buffer,S1) SEMA;
+    DCL (xVar, varLoopTask1, varLoopTask2, varLoopMain) FIXED(31) INIT(0,0,0,0);
+
+    Output: TASK PRIO 1 MAIN;
+
+        DCL xVarTemp FIXED(15) INIT(0);
+        DCL xVarTemp2 FIXED(15) INIT(0);
+        DCL varTaskChange FIXED (31) INIT (-1);
+
+        ACTIVATE Writer_1;
+        ACTIVATE Writer_2;
+       
+        REQUEST S1;
+        REQUEST S1;       
+ 
+        RELEASE in_the_buffer;
+
+        __cpp__(
+        'while (_varLoopMain.x < 2000) { ');
+
+            REQUEST out_the_buffer;
+                xVarTemp := xVar;
+                varLoopMain := varLoopMain + 1;
+            RELEASE in_the_buffer;
+        
+            __cpp__(
+            'if (_xVarTemp.x != _xVarTemp2.x) { ');
+                varTaskChange := varTaskChange + 1;
+                xVarTemp2 := xVarTemp;
+            __cpp__(
+            '}'
+       '}');
+
+        
+        __cpp__(
+        'if (_varLoopTask1.x == 1000 && _varLoopTask2.x == 1000 && _varTaskChange.x == 1999 ) {'
+        '   pearlrt::Control::setExitCode(0); '
+        '   printf("*** SUCCESS ***\\n");'
+        '}else {'  
+        '   pearlrt::Control::setExitCode(1); '
+        '   printf("*** FAILED ***\\n");'
+        '}');
+
+    END;
+
+    Writer_1: TASK PRIO 2;
+        RELEASE S1;
+        __cpp__(
+        'while (_varLoopTask1.x < 1000) { '
+        '   if (_varLoopTask1.x == 500) {');
+                
+                REQUEST in_the_buffer;
+                    AFTER 3 SEC RESUME;
+                    xVar := 11;
+                    varLoopTask1 := varLoopTask1 + 1;
+                RELEASE out_the_buffer;
+       
+        __cpp__(
+        '   }else {');
+            
+                REQUEST in_the_buffer;
+                    xVar := 11;
+                    varLoopTask1 := varLoopTask1 + 1;
+                RELEASE out_the_buffer;
+        __cpp__(
+        '   }'
+        '}');
+    END;
+    
+    Writer_2: TASK PRIO 2;
+        RELEASE S1;   
+ 
+        __cpp__('int b = 0;'
+                'while (_varLoopTask2.x < 1000) { ');
+
+                    REQUEST in_the_buffer;
+                        xVar := 12;
+                        varLoopTask2 := varLoopTask2 + 1;
+                    RELEASE out_the_buffer;
+
+        __cpp__('}');
+
+    END;
+MODEND;       

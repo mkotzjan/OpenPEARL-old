@@ -1,0 +1,58 @@
+MODULE(sematest);
+
+PROBLEM;
+
+! TODO: sema dcl in symboltabelle einhängen
+DCL s0 SEMA;  ! no preset defaults to 0
+DCL s1 SEMA PRESET(1);
+DCL (s2,s3) SEMA PRESET (2,3);
+
+
+!Output: PROC ((Position, Mach_No) FIXED);
+!    DCL BinPos BIT(8);
+!    ! transmission of Position into BinPos
+!    ! output of BinPos to machine Mach No
+!END; ! declaration of Output
+
+
+task1: TASK MAIN;
+   DCL free BIT(1);
+
+
+!    Next Machine: PROCEDURE RETURNS (FIXED);
+!        DCL No FIXED; ! No of the next machine
+!        ! establishing of No with the help of Occ Plan
+!        RETURN (No);
+!    END ! Declaration of Next Machine
+
+   RELEASE s0,s1,s2,s3;
+   REQUEST s0, s1, s2, s3;
+
+   RELEASE s1;
+   REQUEST s1;
+   RELEASE s2;
+   RELEASE s3;
+   REQUEST s2, s3;
+
+!   free := TRY s2,s3;
+   free := TRY s1;
+   IF TRY s1 THEN
+      free := '1'B1;
+   ELSE
+      free := '0'B1;
+   FIN;
+   free := TRY s2;
+   free := TRY s1,s2;
+   free := TRY s1,s2,s3;
+
+
+
+   free := TRY s1;
+   free := TRY s2;
+   free := TRY s1,s2;
+   free := TRY s1,s2,s3;
+
+END;
+
+MODEND;
+   

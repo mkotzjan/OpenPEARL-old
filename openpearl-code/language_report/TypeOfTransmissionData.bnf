@@ -1,0 +1,3 @@
+\htgt{TypeOfTransmissionData} ::=\\
+\x \kw{ALL} $\mid$ \hlink{SimpleType} $\mid$ \hlink{IOCompoundType}
+

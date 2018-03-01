@@ -1,0 +1,51 @@
+\section{Checklist: How to create a new System Device}
+In linux the system devices are represented by a device driver of
+the linux kernel.
+It is possible to access the devices via the normal interface
+with {\em open}, {\em close}, {\em read}, {\em write} and {\em ioctl}.
+The device node name in the folder \verb|/dev| must have access
+priviledges for {\em users}.
+
+These functions should be used in the methods of the C++ class 
+for the device driver.
+
+
+The creation of a new device is very simple:
+\begin{enumerate}
+\item find a suitable device name
+\item pass the parameters needed for construction of the device as
+      parameters
+\item add a target rule for the device in the Makefile
+\item create a C++ class with the name of the device and add this class
+      in the Makefile
+\item derive the C++ class from SystemDationB or SystemDationNB depending
+      on the dation type. SystemDationB is the parent for process dations.
+      SystemDationNB is parent for dations for formatted and unformatted
+      i/o with PUT,GET,READ and WRITE
+\item provide {\em capabilities} in the ctor in that way that the allowed
+      capabilities are listed
+\item if more than on dation may be opened in a concurrent way on the new
+      device, you should provide a pool mechanisme like in Disc.
+      If the new device allows only one opened dation at one time, you 
+      should omit the pool.
+\item provide the dationOpen, dationClose, dationRead, dationWrite 
+      and dationSeek methods. Check the actual given parameters on
+      validity and create Log-entries and throw exceptions in case
+      of bad parameters.
+      Note that dationSeek is not required, if only FORWARD dations
+      may be created.
+\item create a suitable XML description file, which describes the
+      device characteristics.
+\item If the device depends on special libraries or 
+      system setup, insert a configuration item  
+      in the system configuration menu
+      and set the default to {\em not available} ('n').
+\item modify the corresponding Makefile and add the device depending on
+      the configuration item. If additional libraries are needed,
+      add them to \texttt{LDPATH} variable. 
+\item create unit tests for google tests framework in tests/ and add the
+      tests in tests/Makefile
+\item run the tests and check for proper operation of the new device
+\item add the documentation of the new device to this document
+\end{enumerate}
+

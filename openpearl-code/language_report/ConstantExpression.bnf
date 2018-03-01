@@ -1,0 +1,5 @@
+\htgt{ConstantExpression} ::=\\
+\x \{ \kw{+} $\mid$ \kw{-} \}  \hlink{FloatingPointNumber}\\
+\x $\mid$ \{ \kw{+} $\mid$ \kw{-} \} \hlink{DurationConstant}\\
+\x $\mid$ \hlink{ConstantFIXEDExpression}
+

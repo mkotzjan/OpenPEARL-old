@@ -1,0 +1,3 @@
+\htgt{TypeClock}::=\\
+\x \kw{CLOCK}
+

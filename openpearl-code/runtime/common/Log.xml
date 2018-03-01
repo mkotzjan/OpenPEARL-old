@@ -1,0 +1,8 @@
+   <configuration name="Log" instances="1" >
+      <parameters>
+         <CHAR length="4">
+           <NotEmpty/>
+         </CHAR>
+      </parameters>
+      <needAssociation name="AlphicOutProvider"/>
+   </configuration>

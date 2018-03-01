@@ -1,0 +1,87 @@
+\chapter{Interrupt}
+An interrupt is an asynchrous event from the outside world.
+It is \textbf{NOT} the hardware interrupt of the processor.
+
+\section{Specification and Declaration}
+An interrupt is declared in the system part.
+
+Example: Declare the identifier \verb|ctrlc| as the plattform specific
+interrupt source \verb|^C|
+
+\begin{verbatim}
+ctrlc: UnixSignal(2);
+\end{verbatim}
+
+The specification takes place in the problem part:
+
+\begin{verbatim}
+SPC ctrlc INTERRUPT;
+\end{verbatim}
+
+A specific plattform may support several different interrupt sources.
+All concrete interrupt sources must be derived from the parent class
+\verb|pearlrt::Interrupt|.
+
+
+\section{C++ Mapping between System and Problem Part}
+The user defined identifier in the system part denotes a specifice interrupt
+source. The identifier in the problem part denotes a generalized interrupt.
+The compiler should generate a pointer to the generalized interrupt object like
+shown in the example below:
+
+\begin{PEARLCode}
+SYSTEM;
+  ctrlc: UnixSignal(2);
+PROBLEM;
+   SPC ctrlc INTERRUPT;
+\end{PEARLCode}
+
+The user supplied identifier (\verb|ctrlc|) is used as base of derived
+identifiers.
+\begin{description}
+\item[sys\_] prefix denotes the real defined interrupt object 
+\item[\_] prefix (as usual for all user supplied idetifiers) denotes the
+    pointer to the generalized interrupt object.
+\end{description}
+
+\begin{CppCode}
+// SYSTEM;
+static pearlrt::UnixSignal sys_ctrlc(2);
+       pearlrt::Interrupt * _ctrlc = (pearlrt::Interrupt*)&sys_ctrlc;
+// PROBLEM;
+extern pearlrt::Interrupt * _ctrlc;
+\end{CppCode}
+
+\section{Method Mapping}
+The interrupt class provides methods for the PEARL language statements
+working directly on interrupts.
+
+The translation from PEARL to C++ is generic. 
+The interrupt identifier is a pointer to the generalized interrupt object.
+
+\begin{methodMapping}
+\verb|ENABLE|  & \verb|enable()| & \\
+\verb|DISABLE|  & \verb|disable()|&  \\
+\verb|TRIGGER|  & \verb|trigger()| & \\
+\end{methodMapping}
+
+Example:
+
+\begin{PEARLCode}
+! ctrlc is specified as INTERRUPT;
+...
+ENABLE ctrlc;
+DISABLE ctrlc;
+TRIGGER ctrlc;
+\end{PEARLCode}
+
+Should translate into:
+\begin{CppCode}
+_ctrlc->enable();
+_ctrlc->disable();
+_ctrlc->trigger();
+\end{CppCode}
+
+\section{Usage in Task Scheduling}
+See chapter \ref{task}
+

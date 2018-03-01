@@ -1,0 +1,91 @@
+MODULE(fixedinit);
+
+PROBLEM;
+   DCL x1  FIXED(1);
+   DCL x15 FIXED(15);
+   DCL x31 FIXED(31);
+   DCL x63 FIXED(63);
+   DCL (a,b,c,d) INV  FIXED(31)  INIT(1,2,3,4),
+        (e,f    )   FIXED(15)  INIT(5,6);
+   DCL (g) INV  FIXED(31)  INIT(7);
+
+   ! the same as DCL a FIXED(31);
+   !             DCL b FIXED(31);
+   !             DCL c FIXED(31);
+
+   ! DECLARE (v1,v2,v3) INV FIXED(15) GLOBAL INIT (1,2,3),
+   !          (v4,v5)        FIXED(31)        INIT (4,5);
+
+   DCL x FIXED(31) INIT(1);
+   DCL xx FIXED(31) INIT(-1);
+   DCL xxx FIXED(63) INIT(1234567890);
+   DCL xxxx FIXED(31) INIT(-1);
+   DCL xxxxx FIXED(63) INIT(-1234567890);
+
+T1: TASK MAIN;
+   DCL y FIXED;
+   DCL y1  FIXED(1);
+   DCL y15 FIXED(15);
+   DCL y31 FIXED(31);
+   DCL y63 FIXED(63);
+   __cpp__ (
+	"if (sizeof(_x) != sizeof(_x31)) {	"
+	"	printf(\"FIXED should be FIXED(31)\\n\");"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_x1) == 1) printf(\"sizeof(Fixed1): ok\\n\");	"
+	"if (sizeof(_x1) != 1) {"
+	"	printf(\"sizeof(Fixed1): fail got %d (expected %d)\\n\","
+        "              sizeof(_x1),1);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_x15) == 2) printf(\"sizeof(Fixed15): ok\\n\");	"
+	"if (sizeof(_x15) != 2) {	"
+	"	printf(\"sizeof(Fixed15): fail got %d (expected %d)\\n\","
+        "              sizeof(_x15),2);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_x31) == 4) printf(\"sizeof(Fixed31): ok\\n\");	"
+	"if (sizeof(_x31) != 4) {"
+	"	printf(\"sizeof(Fixed31): fail got %d (expected %d)\\n\","
+        "              sizeof(_x31),4);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_x63) == 8) printf(\"sizeof(Fixed64): ok\\n\");	"
+	"if (sizeof(_x63) != 8) {"
+	"	printf(\"sizeof(Fixed63): fail got %d (expected %d)\\n\","
+        "              sizeof(_x63),8);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_y) != sizeof(_y31)) {	"
+	"	printf(\"FIXED should be FIXED(31) : but size(FIXED)=%d\\n\","
+        "          sizeof(_y));"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_y1) == 1) printf(\"sizeof(Fixed1): ok\\n\");	"
+	"if (sizeof(_y1) != 1) {"
+	"	printf(\"sizeof(Fixed1): fail got %d (expected %d)\\n\","
+        "              sizeof(_y1),1);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_y15) == 2) printf(\"sizeof(Fixed15): ok\\n\");	"
+	"if (sizeof(_y15) != 2) {	"
+	"	printf(\"sizeof(Fixed15): fail got %d (expected %d)\\n\","
+        "              sizeof(_y15),2);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_y31) == 4) printf(\"sizeof(Fixed31): ok\\n\");	"
+	"if (sizeof(_y31) != 4) {"
+	"	printf(\"sizeof(Fixed31): fail got %d (expected %d)\\n\","
+        "              sizeof(_y31),4);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	"if (sizeof(_y63) == 8) printf(\"sizeof(Fixed64): ok\\n\");	"
+	"if (sizeof(_y63) != 8) {"
+	"	printf(\"sizeof(Fixed63): fail got %d (expected %d)\\n\","
+        "              sizeof(_y63),8);"
+	" 	pearlrt::Control::setExitCode(1);	"
+	"}						"
+	);
+END;
+MODEND;

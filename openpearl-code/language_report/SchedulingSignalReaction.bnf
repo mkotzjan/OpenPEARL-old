@@ -1,0 +1,4 @@
+\htgt{SchedulingSignalReaction} ::=\\
+\x \kw{ON} \hlink{Name}$\S $Signal [ \kw{RST} \kw{(} \hlink{Name}$\S $ErrorVariable-FIXED \kw{)} ] \kw{:}\\
+\x \x \hlink{SignalReaction} \kw{;}
+

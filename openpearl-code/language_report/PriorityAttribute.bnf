@@ -1,0 +1,4 @@
+\htgt{PriorityAttribute} ::=\\
+\x \{ \kw{PRIORITY} $\mid$ \kw{PRIO} \}
+	 \hlink{ConstantFIXEDExpression}$\S $GreaterZero
+

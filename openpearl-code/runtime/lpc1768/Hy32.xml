@@ -1,0 +1,8 @@
+   <dation name="Hy32">
+      <parameters>
+         <FIXED length="15"><FIXEDRANGE>0,3</FIXEDRANGE></FIXED>
+      </parameters>
+      <attributes>FORWARD, OUT, SYSTEM</attributes>
+      <data>ALPHIC</data>
+   </dation>
+

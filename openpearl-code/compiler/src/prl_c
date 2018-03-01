@@ -1,0 +1,12 @@
+#! /bin/bash
+
+if [ -z ${OPENPEARL_INSTALL_DIR+x} ]; then
+   java -cp /usr/local/bin/smallpearl_compiler.jar:/usr/local/lib/antlr-4.0-complete.jar  org/smallpearl/compiler/Compiler $*
+else
+   java -cp $OPENPEARL_INSTALL_DIR/smallpearl_compiler.jar:/usr/local/lib/antlr-4.0-complete.jar  org/smallpearl/compiler/Compiler $*
+fi
+
+
+
+
+

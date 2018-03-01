@@ -1,0 +1,174 @@
+/*
+ [A "BSD license"]
+ Copyright (c) 2012-2016 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+MODULE(sched_demo);
+SYSTEM;
+termout: StdOut;
+
+
+PROBLEM;
+SPC termout DATION OUT SYSTEM ALPHIC;
+
+
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD /* GLOBAL */ CREATED(termout);
+DCL common_x FIXED;
+
+DCL stop_rr_test BIT(1) INIT('0'B1);
+
+rr_test: PROC;
+   DCL end CLOCK;
+
+   PUT 'start round robin test. This takes 10 seconds' TO console 
+     BY SKIP, A, SKIP;
+   end := NOW + 2 SEC;
+   AT end ACTIVATE RR1;
+   AT end ACTIVATE RR2;
+   AFTER 10 SEC RESUME;
+   stop_rr_test := '1'B1;
+END;
+
+rr_test_function: PROC (id FIXED);
+  DCL (min,max,sum,dur) DURATION;
+  DCL first(10) DURATION;
+  DCL loopcounter FIXED INIT(1);
+  DCL start CLOCK;
+
+   max := 0 SEC;
+   min := 0 SEC;
+   WHILE NOT stop_rr_test REPEAT
+      start := NOW;
+      common_x = id;
+      WHILE common_x EQ id AND NOT stop_rr_test REPEAT
+         ! just wait until the scheduler performs a task switch
+      END;
+      IF NOT stop_rr_test THEN
+          dur := NOW - start;
+          IF (loopcounter EQ 0) THEN
+              min := dur;
+              max := dur;
+              sum := dur;
+          ELSE
+              IF (dur < min) THEN
+                 min := dur;
+              FIN;
+              IF (dur > max) THEN
+                 max := dur;
+              FIN;
+              sum := sum + dur;
+          FIN;
+          loopcounter := loopcounter + 1;
+          IF loopcounter LE 10 THEN
+             first(loopcounter) := dur;
+          FIN;
+      FIN;
+   END;
+
+   IF stop_rr_test AND loopcounter EQ 0 THEN
+       PUT 'RR',id,': round robin seems to be off' TO console BY A,F(1),A,SKIP;
+   ELSE
+       PUT 'RR',id,':+++++++++++++++++++++++',
+                'round robin scheduling works' TO console
+           BY A,F(1),A,SKIP,A,SKIP;
+       IF first(1) > 1 SEC THEN
+          PUT '   !!! first duration > 1 sec' TO console BY A, SKIP;
+          sum := sum - first(1);
+          loopcounter := loopcounter - 1;
+       FIN;
+       PUT 'RR',id,' time slice min:=',min TO console
+          BY A,F(1),A,D(30,6),SKIP;
+       PUT 'RR',id,' time slice max:=',max TO console
+          BY A,F(1),A,D(30,6),SKIP;
+       sum := sum / loopcounter;
+       PUT 'RR',id,' time slice avg:=',sum TO console
+          BY A,F(1),A,D(30,6),SKIP;
+   FIN;
+   
+END;
+
+
+RR1: TASK;
+   CALL rr_test_function(1);
+END;
+
+RR2: TASK;
+   CALL rr_test_function(2);
+END;
+
+startTask: TASK PRIO 2 MAIN;
+     DCL end CLOCK;
+
+     OPEN console BY ANY;
+
+
+     ACTIVATE TASK2 PRIO 10;
+
+     PUT 'Task 1...' TO console  BY A, SKIP;
+
+     end = NOW + 10 SEC;
+
+     WHILE NOW < end REPEAT
+
+         PUT NOW, 'Task 1 works' TO console BY T(15,6),X(3),A,SKIP;
+
+         AFTER 2 SEC RESUME;
+
+     END;
+
+     PUT 'Task1: preventing Task3' TO console BY A,SKIP;
+
+     PREVENT TASK3;
+
+     PUT 'Task1: terminating Task2' TO console BY A,SKIP;
+
+     TERMINATE TASK2;
+
+     CALL rr_test;
+
+
+     PUT 'Task1 finished' TO console BY A,SKIP;
+END;
+
+TASK2: TASK PRIO 4;
+
+   AFTER 5 SEC ALL 3 SEC ACTIVATE TASK3;
+
+   REPEAT
+      PUT NOW,'Task2 works' TO console BY T(15,6),X(15),A,SKIP;
+
+      AFTER 5 SEC RESUME;
+
+   END; ! of REPEAT
+END;
+
+TASK3: TASK PRIO 6;
+   PUT NOW,'3 works' TO console BY T(15,6),X(25),A,SKIP;
+END;
+
+
+MODEND;

@@ -1,0 +1,3 @@
+\htgt{DurationFormat} ::=\\
+\x \kw{D} \kw{(} \hlink{FieldWidth} [ \kw{,} \hlink{DecimalPositions} ] \kw{)}
+

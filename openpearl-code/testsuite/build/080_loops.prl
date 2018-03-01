@@ -1,0 +1,59 @@
+MODULE(loop_statements);
+
+PROBLEM;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+T1: TASK MAIN;
+  DCL local_var FIXED;
+  DCL start FIXED(63) INIT(1);
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  FOR i FROM 1 TO 10 WHILE local_var < 10 REPEAT
+     local_var := local_var + i;
+  END;
+
+  FOR i FROM 10 BY -1 TO 1 REPEAT
+     local_var := local_var + i;
+  END;
+
+  FOR i FROM start TO 10 WHILE local_var < 10 REPEAT
+     local_var := local_var + i FIT local_var;
+  END;
+
+  FOR i REPEAT
+     local_var := local_var + i;
+  END;
+
+  WHILE local_var < 10 REPEAT
+     local_var := local_var + 1;
+  END;
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !! Here are some strange possible constructs:
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  FROM 1 REPEAT
+     local_var := local_var + 1;
+     EXIT loop_010;
+  END loop_010;
+
+  BY 1 REPEAT
+     local_var := local_var + 1;
+     EXIT loop_011;
+  END loop_011;
+
+  TO 10 REPEAT
+     local_var := local_var + 1;
+     EXIT loop_012;
+  END loop_012;
+
+  REPEAT
+     local_var := local_var + 1;
+     EXIT loop_013;
+  END loop_013;
+
+END;
+
+MODEND;

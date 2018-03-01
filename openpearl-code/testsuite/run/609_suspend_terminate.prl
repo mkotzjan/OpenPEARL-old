@@ -1,0 +1,84 @@
+/*#########################################################################
+PROGRAM
+Main task suspend a terminate Task and this in all 
+taskstate combination from taskstate terminated:
+	sa=0, sc=0
+	sa=1, sc=0
+	sa=0, sc=1
+	sa=1, sc=1
+and each time it must come the TaskTerminatedSignal.
+###########################################################################
+RESULT
+It muss come for times the TaskTerminatedSignal Signal and therefore
+the variable check must have the value 4.
+(This behavior is not specified in PEARL90)
+#########################################################################*/
+
+MODULE(suspend_terminate);
+
+PROBLEM;
+
+Main : TASK PRIO 1 MAIN;
+	__cpp__('pearlrt::Control::setExitCode(1);');
+    DCL check FIXED(5) INIT(0);    
+
+	/*taskstate termianted [sa=0,sc=0] */
+    __cpp__(
+    'try {');
+        SUSPEND Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	/*taskstate termianted [sa=1,sc=0] */
+	AFTER 3 SEC ACTIVATE Task2;
+	__cpp__(
+    'try {');
+        SUSPEND Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+	PREVENT Task2;
+
+	/*taskstate termianted [sa=0,sc=1] */
+	AFTER 3 SEC CONTINUE Task2;
+	__cpp__(
+    'try {');
+        SUSPEND Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+	/*taskstate termianted [sa=1,sc=1] */
+	AFTER 3 SEC ALL 0.2 SEC ACTIVATE Task2;
+	AFTER 3 SEC CONTINUE Task2;
+	__cpp__(
+    'try {');
+        SUSPEND Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+	PREVENT Task2;
+
+
+	/* Check the variable check */
+	__cpp__(
+    'if (_check.x == 4) {'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf ("*** SUCCESS ***\\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf ("*** FAILED ***\\n");'
+    '}');
+
+END;
+
+Task2 : TASK PRIO 2;
+
+END;
+
+MODEND;

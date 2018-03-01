@@ -1,0 +1,12 @@
+\htgt{Operand} ::= \\
+\x \hlink{Constant} $\mid$ \hlink{Name} $\mid$ 
+	\hlink{FunctionCall} \\
+%%%$\mid$ \hlink{ConditionalExpression}
+\x $\mid$ \hlink{Dereferentiation} $\mid$ 
+	\hlink{StringSelection} $\mid$  \kw{(} \hlink{Expression} \kw{)} 
+%%%	$\mid$ ( \hlink{Assignment} ) 
+\\
+\x $\mid$ \kw{PRIO} [ \kw{(} \hlink{Name}$\S $Task \kw{)} ] 
+	$\mid$ \kw{TASK} [ \kw{(} \hlink{Name}$\S $Task \kw{)} ] 
+	$\mid$ \kw{TRY} \hlink{Name}$\S $Sema
+

@@ -1,0 +1,18 @@
+%%%\begin{discuss}
+%%%CREATED(Identifier) oder CREATED(NAME) ; Name kann auch Feldelement sein.
+%%%Felder von Systemteilnamen haben wir nicht mehr, also ist
+%%%Identifier die engere Beschreibung. 
+%%%
+%%%Dies wird auf der AK-Sitzung im November 2016 geklaert.
+
+%%% 8.2.2018: OpenPEARL hat keine Arrays und STRUCT im Systemteil. Damit sind
+%%%   hier nur Identifier moeglich 
+
+\htgt{DationDeclaration} ::= \\
+\x \{ \kw{DECLARE} $\mid$ \kw{DCL}\} \hlink{OneIdentifierOrList} 
+   \hlink{TypeDation} [\hlink{GlobalAttribute}]\\
+\x \kw{CREATED} (\hlink{Identifier}$\S $UserNameOfSystemDation) \kw{;}
+
+%%%\end{discuss}
+
+

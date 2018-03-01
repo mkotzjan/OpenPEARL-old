@@ -1,0 +1,4 @@
+\htgt{CharacterStringFormat} ::=\\
+\x \kw{A} [ \kw{(}\hlink{Expression}$\S $NumberCharacters\kw{)} ]
+%%% \removedtext{ $\mid$ {\bf S} (Name$\S $NumberCharactersVariableFixed) 
+

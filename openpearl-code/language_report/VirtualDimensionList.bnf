@@ -1,0 +1,3 @@
+\htgt{VirtualDimensionList} ::=\\
+\x \kw{(} [ , $^{...}$ ] \kw{)}
+

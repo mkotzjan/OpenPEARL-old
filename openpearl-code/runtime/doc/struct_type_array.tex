@@ -1,0 +1,353 @@
+\chapter{Struct, Type and Arrays}
+
+\section{Struct}
+\label{sec:struct}
+
+PEARL structs may be mapped to C++ structs.
+The C++ operators like \verb|=| (assignment), \verb|.| (dot) and 
+\verb|->| (follow) will work.
+
+One problem arises when structs are multiply defined
+in PEARL. All struct with the same internal structures as
+taken to be identical. C and C++ structs as not compatible
+if multiply defined.
+
+The struct statement should be mapped to a named C++ struct and the identifier
+of the struct is derived from the struct components.
+The C++ standard states that a C++ compiler should support at least 1024
+characters for identifiers. The g++ has no limit for the length of identifiers.
+
+Each possible data type for a struct component is mapped to a letter.
+The length has a maximum length of 64 for FIXED, FLOAT and BIT. CHAR
+variables may have a length of up to 32767 characters.
+ C++ provides only 63 different
+ characters for the use in identifiers. So we use 1-5 digits
+for the length.
+
+If the component is an array, the number of dimensions and the
+ limits are
+passed as \verb|_| (underscore) separated list of decimal integers
+to the type.
+
+Mapping of data types to letters:
+
+\begin{tabular}{|l|c|c|}
+\hline
+Datatype & letter & REF \\
+\hline
+FIXED & A &a\\
+FLOAT & B &b\\
+BIT  & C &c\\
+CHARACTER & D &d \\
+CLOCK  & E &e \\
+DURATION & F&f \\
+TASK & & g \\
+PROC  & & h \\
+SEMA & I & i \\
+BOLT & J & j \\
+\hline
+STRUCT & S &s\\
+\hline
+\end{tabular}
+
+\paragraph{Note:} Semaphores and Bolts variables are not allowed in structs,
+but the encoding mapping is also used for the inter module checker.
+
+
+Structs are mapped to the key 'S' followed by an integer
+indicating the length of the struct components.
+E.g. 
+
+Example:
+\begin{PEARLCode}
+... STRUCT [ 
+    x FIXED(15);
+    y FLOAT(53);
+    ]
+...
+\end{PEARLCode}
+
+The component x ist translated into A15 and y into B53.
+The struct consists of these two elements with a length of
+the type string of 3 digits each. Thus the content
+of the struct is described by the string "'A15B53"'.
+This is prefixed with "'S"' and the length of the component
+descriptor leading to S6A15B53.
+
+\begin{CppCode}
+struct S6A15B53 {
+   pearlrt::Fixed<15> _x;
+   pearlrt::Float<53> _y;
+};
+\end{CppCode}
+
+In case of combination of arrays in structs and array of structs we get:
+
+\begin{PEARLCode}
+DCL x STRUCT [
+   a FIXED(7);
+   b(1:3,3:10) FLOAT(24);
+   c(2) STRUCT [
+     c1(19) FIXED(15);
+     c2 BIT(5);
+     ];
+  ];
+\end{PEARLCode}
+
+The name of the struct results into: 
+
+$S37\underbrace{\underbrace{A7}_{FIXED(7)}}_{a}\underbrace{\underbrace{B24}_{Float(24)}\underbrace{\_2\_1\_3\_3\_10}_{(1:3,3:10)}}_{b(1:3,3:10)}\underbrace{\underbrace{S12\underbrace{A15\_1\_1\_19}_{c1(19) FIXED(15)}\underbrace{C5}_{c2 BIT(5)}}_{STRUCT ..}\underbrace{\_1\_1\_2}_{(2)}}_{c(2)}$
+
+
+\begin{CppCode}
+struct S37A7B24_2_1_3_3_10S12A15_1_1_19C5_1_1_2 {
+   pearlrt::Fixed<7> _a;
+   pearlrt::Float<24> data_a[32];
+   struct S13A15_1_1_19C5 {
+     pearlrt::Fixed<15> data_c1[19];
+     pearlrt::BitString<5>  _c2;
+   } data_c[2];
+};
+
+// for array descriptors see corresponding section
+DCLARRAY(ad_2_1_3_3_10,2,LIMITS{{1,3,6},{3,10,1}};
+DCLARRAY(ad_1_1_19,1,LIMITS{{1,19,1}}};
+DCLARRAY(ad_1_1_2,1,LIMITS{{1,2,1}}};
+\end{CppCode}
+
+
+
+\section{TYPE}
+The type statement must we resolved by the compiler. 
+When used in STRUCTs, it is recommended that they are replaced by the
+native elements.
+%should be mapped on \verb|typedef| with a suitable prefix 
+%(here \verb|type_|). For details about struct nameing see next section.
+
+Example:
+\begin{PEARLCode}
+TYPE complex STRUCT [
+     real FLOAT(53);
+     imaginary FLOAT(53);
+];
+\end{PEARLCode}
+
+\begin{CppCode}
+struct _SB53B53 {
+   pearlrt::Float<53> _real;
+   pearlrt::Float<53> _imaginary;
+};
+
+\end{CppCode}
+%
+
+\section{Array}
+
+PEARL supports multidemensional arrays with individual index
+boundaries. Different arrays may be passed to procedures if the
+number of dimensions are identical.
+Arrays may be part of data structures.
+
+\subsection{Array Data}
+The data storage for the array elements may be defined as a plain
+linear data array. The access of array elements is done via the 
+{\em array descriptor}. It is recommended to name the array
+descriptor like the according the user element and make
+a decoration for the data storage. 
+The calculation of the required number of data elements must be
+done in the PEARL$\rightarrow$C++ compiler.
+
+\subsection{Array Descriptor}
+The operations of arrays are done with the {\em array descriptor}
+and the pointer to the first element of the data storage.
+The descriptor is of the type \verb|Array *|.
+
+\begin{classSummary}
+ Class & \verb|Array| \\
+ Specification & Array.h \\
+ Namespace & pearlrt \\
+ Implementation & Array.cc \\
+ \verb|offset(...)|      & returns the linear index 
+       			to the specified array element \\
+ \verb|upb(Fixed<31> idx)| & return upper bound of the
+			 specified index; index starts counting at 1\\
+ \verb|lwb(Fixed<31> idx)| & return lower bound of the
+			 specified index; index starts counting at 1 \\
+\end{classSummary}
+
+The definition of the array descriptor is done via a C-macro.
+The methods \verb|offset|, \verb|upb| and \verb|lwb| 
+will throw \verb|ArrayIndexOutOfBoundsSignal|
+if the index is out of the bounds.
+
+\paragraph{Note:} The DCLARRAY macro may be compressed into a single statement.
+The separate statements are for clearance.
+The elements should become static to avoid conflicts, if more than 
+one module is used. A simple way of inter module reuse is not known up to now.
+
+\begin{verbatim}
+#define DCLARRAY(name,dimensions,limits) \
+   pearlrt::ArrayDescriptor<dimensions> a_##name = { dimensions, limits }; \
+   pearlrt::Array b_##name((pearlrt::ArrayDescriptor<0>*)&a_##name); \
+   pearlrt::Array * name = &(b_##name);
+\end{verbatim}
+
+The parameters are:
+\begin{description}
+\item[name] a compiler generated identifier, which will become
+    the name  of the array descriptor. The descriptors should be 
+    named according the array structure. One descriptor for all
+    arrays with the same structure is sufficient, independent of
+    the contained data type.
+\item [dimensions] is a C integer constant with the number of 
+   array dimensions. This must be larger than 0.
+\item[limits] is a initializer list for the limits data structure.
+   The elements of the limits structure are also C integers
+   \begin{enumerate}
+   \item start index as integer
+   \item end index as integer
+   \item number of elements in next sub array. This value is 1 for the 
+     last index. It is the product of all index ranges of all subarrays.
+     E.g. a(3,4,5) $\rightarrow$ LIMITS(3,\{1,3,4*5*1\},\{1,4,5*1\},\{1,5,1\}\}
+     \\
+     LIMITS is implemented as a macro.
+   \end{enumerate}
+\end{description}
+
+The access to the array elements is done via the method \verb|offset|, 
+with gets a variadic parameter list with all array indices.
+
+Used prefix decoration scheme:
+
+\begin{tabular}{|l|l|}
+\hline
+data & data storage as linear array \\
+\hline
+a & array descriptor object \\
+\hline
+b & array object which stores the pointer of the array descriptor \\
+\hline
+\end{tabular}
+
+\subsection{Example}
+
+\begin{PEARLCode}
+DCL testValue FIXED(31); 
+DCL x(10:20) FIXED(31); 
+DCL y(1,10,10:20) FLOAT(24); 
+TYPE MyStruct STRUCT [
+           dummy FIXED(31);
+           array1 (0:9,9:9) FIXED(31);
+           dummy2 FIXED(31);
+           ];
+DCL s(0:19) MyStruct;
+...
+x(10) := x(15);
+y(10,10) := 0.0;
+testValue := s(2).array1(0,1);
+\end{PEARLCode}
+
+
+\begin{CppCode}
+// DCL x(10:20) FIXED(31); 
+static Fixed<31> data_x[11]; // 11 data elements
+                             // identifier with decoration
+DCLARRAY(ad_1_10_20, 1, LIMITS{{10,20,1}});
+// - - - - - - 
+// DCL y(1,10,10:20) FLOAT(24); 
+ // 10*11 data elements
+ // identifier with decoration
+static pearlrt::Float<24> data_y[110];
+DCLARRAY(ad_2_1_10_10_20, 2, LIMITS{{1,10,11},{10,20,1}});
+
+// - - - - - - 
+   struct S17A31A31_1_1_100A31 {
+      pearlrt::Fixed<31> _dummy1;
+      pearlrt::Fixed<31> _array1[100];
+         // arrayData Fixed(0:9,0:9);
+      pearlrt::Fixed<31> _dummy2;
+   } ;
+   S17A31A31A31_1_1_100A31 _s[20]; 
+
+                        // indices 0..19;
+                        //multiply with 1
+                        // since no subarray present
+   DCLARRAY(ad_1_0_19, 1, LIMITS({{0,19,1}}));
+   DCLARRAY(ad_2_0_9_0_9, 2, LIMITS({{0,9,10},{0,9,1}}));
+
+...
+   *(_x+ad_1_10_20->offset(pearlrt::Fixed<31>(10))) =
+             *(x_data+ad_1_10_20->offset(pearlrt::Fixed<31>(15)));
+   *(_y+ad_2_1_10_10_20->offset(pearlrt::Fixed<31>(10),
+            pearlrt::Fixed<31>(10)) =
+                          pearlrt::Float<24>(0.0);
+...
+   pearlrt::Fixed<31> testValue;
+
+   testValue = 
+        *((*(_s+ad_1_1_2->offset(pearlrt::Fixed<31>(2))) )._array1)+
+             ad_2_0_9_0_9->offset(pearlrt::Fixed<31>(0),pearlrt::Fixed<31>(1)
+        );
+
+\end{CppCode}
+
+\subsection{Usage as Paramater}
+The array descriptor is a pointer, which must be passed as additional parameter
+to procedures. 
+Passing arrays of structs containing some array may lead to the requirement
+to pass more than one array descriptor in addition to the pointer to the 
+reals data object.
+By convention the array descriptors should be passed after the pointer to the
+data storage in the order of declaration of the array descriptors (DCLARRAY).
+
+\begin{PEARLCode}
+DCL x(10:20) FIXED(31); 
+TYPE MyStruct STRUCT [
+           dummy FIXED(31);
+           array1 (0:9,9:9) FIXED(31);
+           dummy2 FIXED(31);
+           ];
+DCL s(0:19) MyStruct;
+...
+CALL anyFunc(x);
+CALL otherAnyFunc(s);
+...
+anyFunc(a() FIXED(31) IDENT) 
+   a(LWB a) := 0;  // clear first element
+END;
+\end{PEARLCode}
+
+\begin{CppCode}
+// DCL x(10:20) FIXED(31); 
+ // 11 data elements
+ // identifier with decoration
+static pearlrt::Fixed<31> _x[11];
+DCLARRAY(ad_1_10_20, 1, LIMITS{{10,20,1}});
+
+// - - - - - - 
+   struct S19A31A31_2_0_9_0_9A31 {
+      pearlrt::Fixed<31> _dummy1;
+                       // arrayData Fixed(0:9,0:9);
+      pearlrt::Fixed<31> _array1[100]; 
+      pearlrt::Fixed<31> _dummy2;
+   };
+
+   struct S19A31A31_2_0_9_0_9A31  _s[20]; 
+   DCLARRAY(ad_1_1_20, 1, LIMITS({{0,19,1}}));
+   DCLARRAY(ad_2_0_9_0_9, 2, LIMITS({{0,9,10},{0,9,1}}));
+
+...
+   anyFunc(_x, ad_1_10_20);
+   otherAnyFunc(_s, as_2_0_9_0_9);
+...
+void anyFunc(pearlrt::Fixed<31> * _a,
+             pearlrt::Array * ad_a) {
+  *(_a+ad_a->offet(ad_a->lwb(1))) =
+          (pearlrt::Fixed<31>)(0)
+}
+\end{CppCode}
+
+If a complete array should be written to a DATION with e.g. WRITE,
+the address of the first array element must be used.
+
+

@@ -1,0 +1,83 @@
+/*#########################################################################
+PROGRAM
+Main task activate Task2 and supend them two times.
+Then the main task activate Task3, Task3 do a REQUEST (Taskstate = blocked(synch))
+and suspend the Task3 two times.
+After that the main Task continue Task2 and Task3.
+###########################################################################
+RESULT
+It muss come the Signal TaskSuspendedSignal
+##########################################################################*/
+
+MODULE(suspend_suspend);
+
+PROBLEM;
+
+	DCL S1 SEMA;
+
+Main : TASK PRIO 1 MAIN;
+    
+    DCL check FIXED(3) INIT(0);
+    ACTIVATE Task2;
+
+	AFTER 0.5 SEC RESUME;
+    SUSPEND Task2;
+
+    __cpp__(
+    'try {');
+        SUSPEND Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskSuspendedSignal &s) {');
+        check := check + 1;
+    __cpp__('}');
+
+    
+	ACTIVATE Task3;
+
+	AFTER 0.5 SEC RESUME;
+    SUSPEND Task3;
+
+	__cpp__(
+    'try {');
+        SUSPEND Task3;
+    __cpp__(
+    '}catch (pearlrt::TaskSuspendedSignal &s) {');
+        check := check + 1;
+    __cpp__(
+    '}'
+    'if (_check.x == 2) {'
+    '   printf ("*** SUCCESS ***\\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'    
+    '   printf ("*** FAILED ***\\n");'
+    '}');
+	
+	CONTINUE Task2;
+	CONTINUE Task3;
+	RELEASE S1;
+
+END;
+
+Task2 : TASK PRIO 3;
+
+    DCL x FIXED(31) INIT(0);
+
+    !WHILE (x < 11000000) THEN
+    !   x := x + 1;
+    !FIN;
+
+    __cpp__(
+    'while (_x.x < 11000000) {');
+        x := x +1;  
+    __cpp__(
+    '}');
+
+END;
+
+Task3 : TASK PRIO 2;
+	REQUEST S1;
+   
+
+END;
+
+MODEND;

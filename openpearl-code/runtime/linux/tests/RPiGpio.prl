@@ -1,0 +1,40 @@
+MODULE(RPiGpio);
+
+SYSTEM;
+bito: RPiDigitalOut(25,4);
+biti: RPiDigitalIn(27,1,'u');
+
+/*
+__cpp__(
+	'pearlrt::RPiDigitalOut s_bito(25,5);'
+	'pearlrt::Device* d_bito = & s_bito;'
+	'pearlrt::RPiDigitalIn s_biti(27,1,"u");'
+	'pearlrt::Device* d_biti = & s_biti;'
+       ); 
+*/
+PROBLEM;
+   SPC biti DATION IN SYSTEM BASIC BIT(1);
+   SPC bito DATION OUT SYSTEM BASIC BIT(4);
+
+   DCL taste DATION IN BASIC BIT(1) CREATED(biti);
+   DCL led DATION OUT BASIC BIT(4) CREATED(bito);
+
+T1: TASK MAIN;
+!   DCL on BIT(1) INIT ('1'B1);
+!   DCL off BIT(1) INIT ('0'B1);
+   __cpp__( 'pearlrt::BitString<1> _on(1);');
+   __cpp__( 'pearlrt::BitString<1> _off(0);');
+   __cpp__( 'pearlrt::BitString<5> _work(1);');
+   OPEN taste;
+   OPEN led;
+   REPEAT
+!      TAKE  work FROM taste;
+      SEND  work TO led;
+      AFTER 1 SEC RESUME;
+     __cpp__ ('_work = _work.bitCshift(1);');
+   END;
+END;
+
+MODEND;
+
+

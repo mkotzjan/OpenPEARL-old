@@ -1,0 +1,3 @@
+002_length_fixed_missing.prl:4:14: ERROR : Syntax error :missing IntegerConstant at ')'
+LENGTH FIXED ();
+              ^

@@ -1,0 +1,7 @@
+%%%\begin{added}
+\htgt{ConstantParameter} ::=\\
+\x \hlink{IntegerWithoutPrecision} \\
+\x $\mid$ \hlink{BitStringConstant} \\
+\x $\mid$ \hlink{CharacterStringConstant}
+%%%\end{added}
+

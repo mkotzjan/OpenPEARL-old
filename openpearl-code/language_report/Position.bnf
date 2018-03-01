@@ -1,0 +1,4 @@
+\htgt{Position} ::=\\
+\x \hlink{AbsolutePosition} $\mid$ \hlink{RelativePosition}\\
+\x  $\mid$ \kw{RST} \kw{(} \hlink{Name}$\S $ErrorVariable-FIXED \kw{)}
+

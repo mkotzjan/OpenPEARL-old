@@ -1,0 +1,5 @@
+\htgt{StructureAssignment} ::=\\
+\x \hlink{Name}\S Structure\_1 \{ \kw{:=} $\mid$ \kw{=} \}
+	 \hlink{Expression}\S Structure\_2;
+
+

@@ -1,0 +1,66 @@
+MODULE(switch);
+PROBLEM;
+
+ticket187: PROC;
+
+   DCL sel FIXED INIT(1);
+   DCL s FIXED INIT (-1);
+   CASE sel
+      ALT (0) 
+         s := sel;
+      ALT (2) ;
+         s := sel;
+      OUT  
+         s := sel;
+    FIN;
+
+    IF s EQ -1 THEN
+         __cpp__("printf(\"failure (OUT) \\n\");"
+                 "pearlrt::Control::setExitCode(1);");
+    FIN;
+
+END;
+
+T1: TASK MAIN;
+
+  DCL f1 FIXED(15) INIT(1);
+  DCL f2 FIXED(15) INIT(2);
+  DCL f3 FIXED(15) INIT(3);
+
+  CALL ticket187;
+
+  CASE f3
+     ALT /* 1 */ 
+         __cpp__("printf(\"failure (f3)\\n\");"
+                 "pearlrt::Control::setExitCode(1);");
+     ALT /* 2 */ 
+         __cpp__("printf(\"failure (f3)\\n\");"
+                 "pearlrt::Control::setExitCode(1);");
+     ALT /* 3 */ 
+         __cpp__("printf(\"success (f3) \\n\");");
+     ALT /* 4 */ 
+         __cpp__("printf(\"failure (f3)\\n\");"
+                 "pearlrt::Control::setExitCode(1);");
+     OUT /* all other cases */
+         __cpp__("printf(\"failure (f3)\\n\");"
+                 "pearlrt::Control::setExitCode(1);");
+  FIN;
+END;
+
+/*
+T2: TASK;
+  DCL f1 FIXED(15) INIT(1);
+
+  CASE f1
+   ALT (3 , 4 )
+   ALT (6:7)
+   ALT (9:11,13:19)
+   OUT
+  FIN;
+
+END;
+*/
+
+MODEND;
+
+

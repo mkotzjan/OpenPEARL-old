@@ -1,0 +1,6 @@
+RTOSCSRC = tasks.c
+RTOSCSRC += list.c 
+RTOSCSRC += queue.c
+RTOSCSRC += portable/GCC/ARM_CM3/port.c
+
+RTOSINCS = include portable/GCC/ARM_CM3  

@@ -1,0 +1,498 @@
+\chapter{Devices and I/O}
+
+PEARL distinguishes between system dations and user dations.
+All examples in the language report shown that the statements TAKE and SEND
+operate directly on system dations like a digital i/o.
+The operations READ, WRITE, GET and PUT work only on user dations.
+User dations are created upon a system dation.
+
+System part and problem part may be compiled separatelly. Therefore 
+no information from the system part may be used to compile the problem part.
+
+To avoid matching problems, the compiler produces an XML-file for each 
+module with the import and export interface of the module.
+The tool IMC (inter module checker) verifies the matching and creates the
+C++ code for the system part.
+
+
+\section{Not Supported Language Elements}
+\begin{description}
+%\item[TFU] should be ignored by the compiler
+%\item[TFU(MAX)] should be ignored by the compiler
+\item[FORBACK] is not supported yet, since tape drives are
+   difficult to find
+\item[R()] remote format must be treated by the compiler
+\end{description}
+
+\section{Declarations in System Part}
+The compiler checks the elements for proper grammar and passaes the
+parsed elements into an XML-file with the same name as the source file.
+
+To provide complete code examples the linux target is used here.
+For details of the used system devices please check chapter \ref{x8632devices}.
+
+\begin{PEARLCode}
+MODULE (m1);
+SYSTEM;
+   output: StdStream(1);
+PROBLEM;
+MODEND;
+\end{PEARLCode}
+
+The IMC will respond with a code like:
+
+\begin{CppCode}
+static pearlrt::StdStream s_output(1);
+       pearlrt::Device * d_output = &s_output;
+\end{CppCode};
+
+All devices are derived from {\em Device}.
+Devices for basic dations are derived from {\em SystemDationB},
+all other devices are derived from {\em SystemDationNB}.
+The upcast of the pointer
+to the generic {\em Device*} type enables the compiler to generated 
+suitable code for the problem part.
+
+The concrete device object is set to {\em static} to avoid namespace polution.
+Only the pointer is needed.
+
+\section{Decoration Scheme for Devices}
+We need different obejcts, which concern the same user object.
+The user objects are prependend with an underscore (\verb|_|).
+
+\begin{description}
+\item[d\_...] denotes the upcasted to {\em Device} 
+\item[s\_...] denotes the (static defined) real system device object
+\item[\_...] without other prefix)denotes the downcasted object in 
+     the C++ code of the problem part
+\item[dim\_...] denotes the dimension object, which is relate to the 
+   user dation
+\end{description}
+
+\section{Bus Device Associations}
+The update of the language definition introduced {\em BusDeviceAssociations},
+which allows to interconnect system part elements.
+
+E.g.
+\begin{PEARLCode}
+MODULE (m1);
+SYSTEM;
+   i2c: I2CBus('/dev/i2c-0',100000);  ! access to i2-c
+                                      ! interface with 
+                                      ! 100kHz bus speed
+   temp: LM75('48'B4) --- i2c;        ! one temperatur
+                                      ! sensor at
+                                      ! the bus i2c
+PROBLEM;
+   SPC temp DATION SYSTEM BASIC FIXED(15);
+MODEND;
+\end{PEARLCode}
+
+\begin{CppCode}
+// system part only
+static pearlrt::I2CBus s_i2c("/dev/i2c-0",100000);
+
+static pearlrt::LM75 s_temp(&s_i2c,0x48);
+       pearlrt::Device * d_temp = &s_temp;
+\end{CppCode}
+
+Depending to the characteristics of the bus there may be only one client,
+or multiple clients. This is specified in the XML-description of the 
+device.
+
+The implementation provides two roles:
+\begin{itemize}
+\item ConnectionProvider, which represents the bus device
+\item ConnectionClient, which represents the component on the bus.
+\end{itemize}
+
+The classes for clients are derived from \texttt{SystemDationB}.
+The classes for providers are be derived from a class which
+defines the interface for the connection. 
+
+E.g.:
+\begin{description} 
+\item[ \texttt{I2CProvider} ] is common to all plattforms
+   and defines the communication interface between provider and client
+\item[ \texttt{I2CBus}] implements the access to the i2c-bus on a 
+   specific plattform
+\item[ \texttt{LM75} ] defines a system dation, which is attached to an i2c-bus.
+    This element is plattform independent.
+\end{description}
+
+\paragraph{Note:} The client has access to the provider by default, since
+the provider is passed as first argument in the ctor of the client.
+If the provider needs access to the client, the ctor of the client
+should register itself at the provider.
+
+
+\paragraph{Note:} The second parameter in I2CBus is used in microcontroller
+   environmants. The linux systems define the transmission speed at
+   another location.
+
+\section{Specifications in Problem Part}
+The system device is specified in the problem part.
+Depending on the class specifier in the {\em SPC}-statement the concete 
+dation type is deduced (see tab. \ref{dationTypes}).
+
+\begin{table}[bpht]
+\begin{tabular}{l|l|l|l}
+  & BASIC & ALPHIC & ALL / type \\
+\hline
+SYSTEM & SystemDationB & SystemDationNB & SystemDationNB \\
+ & DationTS & DationPG & DationRW \\
+\hline
+\end{tabular}
+\caption{Deduced type of the dation object}
+\label{dationTypes}
+\end{table}
+
+
+\begin{PEARLCode}
+SPC output DATION OUT SYSTEM ALPHIC GLOBAL;
+SPC disc DATION OUT SYSTEM ALL GLOBAL;
+SPC console DATION OUT ALPHIC GLOBAL;
+SPC logbook DATION OUT Fixed(15) GLOBAL;
+SPC mot DATION OUT SYSTEM BASIC BIT(4) GLOBAL;
+\end{PEARLCode}
+
+\begin{CppCode}
+extern pearlrt::Device * d_output;
+static pearlrt::SystemDationNB _output* = 
+             static_cast<pearlrt::SystemDationNB*>(d_output);
+
+extern pearlrt::Device * d_disc;
+static pearlrt::SystemDationNB _disc* = 
+             static_cast<pearlrt::SystemDationNB*>(d_disc);
+
+extern pearlrt::DationPG _console;
+
+extern pearlrt::DationRW _logbook;
+
+extern pearlrt::Device * d_mot;
+static pearlrt::SystemDationB * _mot = 
+             static_cast<pearlrt::SystemDationB*>(d_mot);
+\end{CppCode}
+
+\section{Declaration of a User Dation}
+The declaration of user dation may appear inside and outside of procedures and 
+tasks.
+The declaration leads to an instantiation of an object. 
+The class attribute of the user dation decide about the type of the object
+(see tab. \ref{dationTypes}).
+
+The different types of possible dimension specifications are mapped to
+a class hierarchy for {\em DationDim}s. For details see the doxygen part 
+of the runtime documentation.
+
+\begin{PEARLCode}
+DCL console DATION OUT ALPHIC DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
+DCL file DATION OUT FIXED(15) DIM(*,80) FORWARD STREAM NOCYCL CREATED(output);
+DCL file1 DATION OUT ALL DIM(*) FORWARD STREAM NOCYCL CREATED(output);
+DCL motor DATION OUT BASIC BIT(4) CREATED(mot);
+\end{PEARLCode}
+
+\begin{CppCode} 
+// 2-dimensions, first dimension is unbound
+static pearlrt::DationDim2 dim_console(80);
+static pearlrt::DationPG _console(_output, 
+                pearlrt::Dation::OUT      |
+                pearlrt::Dation::FORWARD  | 
+                pearlrt::Dation::STREAM   |
+                pearlrt::Dation::NOCYCL,
+                &dim_console);
+
+static pearlrt::DationDim2 dim_file(80);
+static pearlrt::DationPG _file(_output, 
+                pearlrt::Dation::OUT      |
+                pearlrt::Dation::FORWARD  | 
+                pearlrt::Dation::STREAM   |
+                pearlrt::Dation::NOCYCL,
+                &dim_file, sizeof(pearlrt::Fixed<15>));
+
+static pearlrt::DationDim1 dim_file1();
+static pearlrt::DationPG _file1(_output, 
+                pearlrt::Dation::OUT      |
+                pearlrt::Dation::FORWARD  | 
+                pearlrt::Dation::STREAM   |
+                pearlrt::Dation::NOCYCL,
+                &dim_file, 1);
+
+static pearlrt::DationTS _motor(_mot,
+                pearlrt::Dation::OUT);
+\end{CppCode}
+
+Remarks:
+\begin{itemize}
+\item the dation parameters are \verb|or|ed together
+\item the dimenion object is defined statically.
+\item the {\em CREATED()} parameter is passsed as first parameter
+\item if the dation is defined as {\em GLOBAL} the \verb|static| must
+  be omitted
+\item a user dation with transfer type ALL must be 1-dimensional --- may
+be bounded --- and the size of a data element must be specified as 1
+\item the userdations of type BASIC do not allow Topology- and 
+AccessAttribut-specifications 
+\end{itemize}
+
+\subsection{DIRECT Dation}
+DIRECT dations are implemented on e.g. disc files
+\begin{itemize}
+\item    as artificial array like structure
+\item    the DIM-specifies the structure
+\item    absolute positioning is allowed
+\item    relative positioning is mapped on the absolute positioning
+\item    STREAM allows the positioning across dimension limits
+\item    STREAM allows silent reading and writing across dimension limits
+ \item   CYCLIC realizes a cyclic positioning modulo the complete
+        dimension in both directions
+\item    CYCLIC realizes a cyclic writing in that way that a
+          repositioning to the beginning of the dation is inserted
+          at the end of the dation, if the system device does not support
+          CYCLIC operation with the same dimension
+%\item    unwritten locations in the dations contain undefined values
+\item    CYCLIC on unbounded dations is ridiculous
+\end{itemize}
+
+\subsection{FORWARD Dation}
+FORWARD and CYCLIC is ridiculous if the system dation is not CYCLIC,
+ since FORWARD can not rewind.
+
+FORWARD dations are typically used on devices like stdin, 
+stdout or TCP/IP-sockets.
+
+\begin{description}
+\item[PUT/GET] dations are created on e.g. stdout. 
+   \begin{itemize}
+   \item PUT ... BY X, SKIP and PAGE write space, new line or formfeeds
+         as required by format
+   \item  GET ... BY X, SKIP and PAGE discard input characters until the
+         required number of characters, newlines or formfeeds were detected
+   \item NOSTREAM causes 
+        the specified dimension is used for error detection. 
+         GET/PUT across boundary cause an error condition
+   \item STREAM:
+         number of dimensions control the possibility for X,SKIP and PAGE
+         no boundary enforced
+   \end{itemize}
+
+\item[READ/WRITE] positioning:
+   \begin{itemize}
+     \item WRITE ... BY  X,SKIP and PAGE fills zero-records as required 
+           by the current location
+     \item READ ... BY  X,SKIP and PAGE discards input until 
+           the required location is reached.
+   \end{itemize}
+\item[READ/WRITE + NOSTREAM] dations are implemented on e.g.
+        TCP/IP socket or pipes
+   \begin{itemize}
+    \item The specified dimension is used for error detection
+    \end{itemize}
+\item[ READ/WRITE + STREAM] will  
+        normalize the current location to be within the specified dimensions
+        by calculating any out of bounds position by simulating line
+        and page wraps. Eg:
+\begin{verbatim}
+DIM( 10,80)
+! current location: (5,79)
+WRITE a,b,c TO ...; --> new logical location (5, 81)
+WRITE d TO .. BY SKIP;
+\end{verbatim}
+    \begin{itemize}
+     \item calculate virtual normalized location: (6,1)
+     \item SKIP fills 79 records with 0; new location (7,1)
+     \item d will be written on location (7,1); new location is  (7,2)
+     \end{itemize}
+\end{description}
+
+\section{Concurrency during I/O}
+\label{ioconcurrency}
+
+\subsection{Concurrency on the same user dation}
+It is never stated but clearly appreciated that i/o-statements from
+different tasks should not intermix within their i/o-operations.
+This behavior is achieved by the {\em beginSequence} and 
+{\em endSequence} clause. 
+This clause locks mutex of the dation object to block concurrent
+i/o-statments upon the same dation.
+The task's object reference (me-pointer) is passed with
+the {\em beginSequence} call.
+
+In case of abnormal termination due to signals in the try-block
+the {\em endSequence} in the catch-clause releases the used mutex.
+If a RST-value is specified in the statement the given variable is
+updated, else the exception is rethrown.
+
+Task suspending and termination within the try-block would cause an
+eternal blocking of the dation. 
+This behavior is not desired.
+Thus the suspend and terminate will not be done only at the end of a record
+({\em SKIP}) or after the completion of the i/o-statement.
+This is realized internally in the runtime system.
+
+\begin{PEARLCode}
+DCL (x,y) Fixed(15);
+DCL rst Fixed(31);
+...
+PUT x,y TO console BY F(4), RST(rst), F(5), SKIP;
+\end{PEARLCode}
+
+\begin{CppCode}
+Fixed<31> rst;
+Fixed<15> x
+Fixed<15> y;
+
+{
+   // setup data list and format list
+
+   // the blocking was moved into the user dation
+   // operations put(), get(), ...
+   _console.put(me, dataList, formatList);
+}
+\end{CppCode}
+
+Inside the put,get,read,write, take and send methods a
+try-catch-clause captures all PEARL-signals from the code in the 
+type block. If a RST-value is specified in the format list, the method
+{\em updateRst} will assign the actual signal code to the RST-variable.
+If no RST-vale is specified for this statement, the signal is propagated.
+If the error is produced in the formatting of x, a signal is thrown.
+If the error is produced in the formatting of y, no signal is thrown but rst
+is set.
+
+If the system dation supports multipe io-operations in the same time,
+the locking mechanism of the user dation is switched off, by implementing
+a method \verb|bool allowMultipleIOOperations()| in the system dation.
+In this case, ths system dation is responsible for proper operation.
+
+\subsection{Concurrency on the same system dation}
+It is possible to create several user dations upon the same system dation.
+If the operation on the system dation is not reentrant, the developer must
+enshure by additional mutex variables, that those operations do not operlap.
+
+\section{Open and Close}
+The super class UserDation knows the OPEN and CLOSE operations.
+Both have optional parameters. This is solved by a \verb|or|ed
+parameter.
+
+\begin{PEARLCode}
+DCL f FIXED(31);
+...
+OPEN console;
+...
+OPEN logbook BY RST(f), IDF('file.001') ANY;
+...
+CLOSE console;
+...
+CLOSE logbook BY CAN;
+\end{PEARLCode}
+
+\begin{CppCode}
+Fixed<15> f;
+...
+_console.dationOpen();
+...
+{
+   static Character<8> fileName("file.001");
+   _logbook.dationOpen(Dation::IDF|Dation::ANY| Dation::RST, &fileName ,& f);
+}
+...
+_console.dationClose();
+...
+_logbook.dationClose(Dation::CAN);
+\end{CppCode}
+
+Remarks:
+\begin{itemize}
+\item The presence of a rst-value is signaled by the \verb|or|ed parameter
+   in dationOpen and dationClose
+\item The filename must be passed by reference. The corresponding
+   object must be defined. Eg. as \verb|static| is a new block.
+\item The runtime system checks whether the dation parameters from
+   user dation match the system dation's parameters. 
+   If they do not match a PEARL signal is raised
+\end{itemize}
+
+\section{IO Transfer Operations}
+The IO-operations are treated by methods  of the user dations.
+These methods receive a list of data elements and a list of format
+elements. These lists will be treated according the semantics of the dation
+type. ALPHIC dation are controlled by the data list and will use
+the format list cyclic, if more data than formats are in the list.
+Non basic dations with a specific data type will treat all positioning
+elements first followed by the treatment of the data elements. 
+The locking mechanisme \ref{ioconcurrency} is realized inside of these methods.
+
+For details see the source code documentation of the classes
+\begin{description}
+\item[IODataEntry] the individual data entries
+\item[IODataList] the list of all data entries for one statement
+\item[IOFormatEntry] the individual format entries
+\item[IOFormatList] the list of all format entries for one statement
+\end{description}
+
+All parameters of format elements are expected as type
+\verb|pearlrt::Fixed<31>|.
+
+The effective code will be in this case:
+\begin{CppCode}
+Fixed<31> rst;
+Fixed<15> x
+Fixed<15> y;
+
+{
+  // setup io data and format lists in a new block
+  // define variables for expression results in data list and format list
+  ...
+  IODataEntry dataEntries[] = { {...},{...},...};
+  IODataList dataList = {sizeof( dataEntries)/sizeof(dataEntries[0]),
+                         dataEntries};
+  IOFormatEntry formatEntries[] = { {...},{...},...};
+  IOFormatList formatList = {sizeof( formatEntries)/sizeof(formatEntries[0]),
+                         formatEntries};
+  // evaluate expressions in datalist and format list
+  _console.put(me, dataList, formatList);
+  // leave block with put statement
+}
+\end{CppCode}
+
+\subsection{Structs}
+Struct components must be rolled out for CONVERT, PUT and GET.
+
+\subsection{Array of Structs}
+An array of struct is passed to the io-system as a loop with the 
+rolled out pointers for the first loop iteration.
+The loop parameters are:
+\begin{description}
+\item[dataType.width] contains the number of items in this loop
+\item[dataPtr.offsetIncrement] contains the size of the struct
+\item[param1.numberOfElements] is a pointer to the number of array
+    elements 
+\end{description}
+
+If a struct contains another array of struct as a compontent, this
+structure is nested up to 11 levels.
+
+
+\subsection{Array slices}
+Arrays and array slices of simple types are passed to the i/o system
+as
+\begin{description}
+\item[.dataPtr] pointer to the first data element
+\item[.param1.numberOfElements] pointer to the number of elements.
+     This may be ether a pointer to a constant,
+      or a pointer to temporary variable, if a limits are
+      calculated at run time.
+\end {description}
+
+\subsection{BIT Slices}
+Bit slices are not possible as struct component and as arrays.
+They are passed as 
+\begin{itemize}
+\item pointer and size of the parent bit string
+\item pointer to the starting bit number (\texttt{size\_t*}) 
+\item pointer to the last bit number (\texttt{size\_t*})
+\end{itemize}
+
+For details check the source code documentation of the file \texttt{IOJob.h}
+

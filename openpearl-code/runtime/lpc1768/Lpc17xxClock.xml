@@ -1,0 +1,5 @@
+   <configuration name="Lpc17xxClock">
+      <parameters>
+        <FIXED length="15"><FIXEDRANGE>0,4</FIXEDRANGE></FIXED>
+      </parameters>
+   </configuration>

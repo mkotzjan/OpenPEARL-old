@@ -1,0 +1,17 @@
+%%%\begin{discuss}
+%%%GLOBAL und IDENT sind doch unabhängig!
+
+%%%\htgt{SemaSpecification} ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{OneIdentifierOrList}\\
+%%%\x \x [ \hlink{VirtualDimensionList} ] {\bf SEMA} \\
+%%%\x \x \{ \hlink{GlobalAttribute} $\mid$ \hlink{IdentificationAttribute} \};
+
+\htgt{SemaSpecification} ::=\\
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList}
+ [ \hlink{VirtualDimensionList} ]  \kw{SEMA} \\
+ \x [ \hlink{GlobalAttribute} ] [ \hlink{IdentificationAttribute} ] \kw{;}
+
+%%%\end{discuss}
+
+
+

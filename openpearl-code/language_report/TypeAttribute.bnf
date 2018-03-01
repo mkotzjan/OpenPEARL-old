@@ -1,0 +1,2 @@
+\htgt{TypeAttribute} ::=\\
+\x \hlink{SimpleType} $\mid$ \hlink{TypeReference} $\mid$ \hlink{Identifier}\S ForType

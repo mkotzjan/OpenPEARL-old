@@ -1,0 +1,15 @@
+%%%\begin{removed}
+%%% \htgt{SimpleType} ::=\\
+%%% \x \{ {\bf FIXED $\mid$ FLOAT $\mid$ BIT $\mid$
+%%% 	 CHAR $\mid$ CHARACTER} \}\\
+%%% \x \x [ ( \hlink{Constant-FIXED-Expression}$\S $PrecisionResp.Length ) ]\\
+%%% \x $\mid$ {\bf CLOCK}\\
+%%% \x $\mid$ \{ {\bf DUR $\mid$ DURATION} \}\\
+%%%\end{removed}
+
+\htgt{SimpleType} ::=\\
+\x \hlink{TypeFixed} $\mid$ \hlink{TypeFloat} $\mid$\\
+\x \hlink{TypeBitString} $\mid$ \hlink{TypeCharacterString} $\mid$\\
+\x \hlink{TypeClock} $\mid$ \hlink{TypeDuration}
+
+

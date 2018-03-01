@@ -1,0 +1,5 @@
+\htgt{CloseStatement} ::=\\ 
+\x \kw{CLOSE} \hlink{Name}$\S $Dation 
+	[ \kw{BY} \hlink{CloseParameter} 
+	[ , \hlink{CloseParameter} ] $^{...}$ ] \kw{;}
+

@@ -1,0 +1,4 @@
+\htgt{RefTaskAssignment} ::=\\
+\x \hlink{Name}\S RefTaskVariable \{ \kw{:=} $\mid$ \kw{=} \} \\
+\x \x\{ \hlink{Identifier}\S Task $\mid$ \hlink{Name}\S RefTaskVariable \} \kw{;}
+

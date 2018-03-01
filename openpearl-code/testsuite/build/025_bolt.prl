@@ -1,0 +1,166 @@
+/*
+ [A "BSD license"]
+ Copyright (c) 2017 Rainer Mueller
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/*
+test program for simple bolt operations
+*/
+
+MODULE(bolttest);
+SYSTEM;
+   con: StdOut;
+PROBLEM;
+
+   SPC con DATION OUT SYSTEM ALPHIC;
+   DCL console DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(con);
+
+DCL (s1,s2) BOLT;
+DCL n FIXED(15);
+
+__cpp__("char buffer[100];");
+
+T1: TASK PRIO 10 MAIN;
+   DCL ok BIT(1);
+
+   OPEN console;
+   PUT 'Task T1: ENTER-LEAVE' TO console BY A, SKIP;
+   ENTER s1;
+   LEAVE s1;
+   
+   PUT 'Task T1: RESERVE-FREE' TO console BY A, SKIP;
+   RESERVE s1;
+   FREE s1;
+
+   PUT 'Task T1: just LEAVE' TO console BY A, SKIP;
+   __cpp__("try {");
+   ok = '0'B1;
+     LEAVE s1;
+   __cpp__( "} catch (BoltStateSignal s) {");
+      ok = '1'B1;
+         PUT '*** success got BoltStateSignal' TO console BY A, SKIP;
+      __cpp__("}");
+
+      IF NOT ok THEN
+         PUT '*** fail got NO BoltStateSignal' TO console BY A, SKIP;
+      FIN;
+
+   ! test multiple enter
+   n = 0;
+   __cpp__("*buffer = 0;");
+   ACTIVATE T2;
+   ACTIVATE T3;
+   AFTER 1SEC RESUME;
+   IF n EQ 2 THEN
+      PUT '*** multiple ENTER is ok' TO console BY A, SKIP;
+   ELSE
+      PUT '*** multiple ENTER failed' TO console BY A, SKIP;
+   FIN;
+ 
+   AFTER 3SEC RESUME;
+   IF n EQ 0 THEN
+      PUT '*** multiple LEAVE is ok' TO console BY A, SKIP;
+   ELSE
+      PUT '*** multiple LEAVE failed' TO console BY A, SKIP;
+   FIN;
+   __cpp__("printf(\"sequence: %s\\n\", buffer);");
+
+   ! test multiple reserve
+   n = 0;
+   __cpp__("*buffer = 0;");
+   ACTIVATE R1;
+   ACTIVATE R2;
+   AFTER 1SEC RESUME;
+   IF n EQ 1 THEN
+      PUT '*** multiple RESERVE is ok' TO console BY A, SKIP;
+   ELSE
+      PUT '*** multiple RESERVE failed' TO console BY A, SKIP;
+   FIN;
+   AFTER 3SEC RESUME;
+   IF n EQ 0 THEN
+      PUT '*** multiple FREE is ok' TO console BY A, SKIP;
+   ELSE
+      PUT '*** multiple FREE failed' TO console BY A, SKIP;
+   FIN;
+   __cpp__("printf(\"sequence: %s\\n\", buffer);");
+
+   ! test priority of reserve before enter
+   PUT 'test reserve priority' TO console BY A, SKIP;
+   n = 0;
+   __cpp__("*buffer = 0;");
+   ACTIVATE R1;
+   ACTIVATE T2;
+   ACTIVATE R2;
+   AFTER 5 SEC RESUME;
+   __cpp__("if (strcmp(buffer,\"R1 R2 T2 \") == 0) {");
+      PUT '*** reserve has priority is ok' TO console BY A, SKIP;
+   __cpp__("} else {");
+      PUT '*** reserve has priority failed' TO console BY A, SKIP;
+   __cpp__("}");
+   __cpp__("printf(\"sequence: %s\\n\", buffer);");
+
+END;
+
+T2: TASK PRIO 20;
+  ENTER s1, s2;
+  n := n + 1;
+  __cpp__("strcat(buffer,\"T2 \");");
+  AFTER 2SEC RESUME;
+  LEAVE s1,s2;
+  n := n - 1;
+END;
+
+T3: TASK PRIO 20;
+  ENTER s1, s2;
+  n := n + 1;
+  __cpp__("strcat(buffer,\"T3 \");");
+  AFTER 2SEC RESUME;
+  LEAVE s1,s2;
+  n := n - 1;
+END;
+
+R1: TASK PRIO 20;
+  RESERVE s1, s2;
+  n := n + 1;
+  __cpp__("strcat(buffer,\"R1 \");");
+  AFTER 1SEC RESUME;
+  FREE s1,s2;
+  n := n - 1;
+END;
+
+R2: TASK PRIO 20;
+  RESERVE s1, s2;
+  n := n + 1;
+  __cpp__("strcat(buffer,\"R2 \");");
+  AFTER 1SEC RESUME;
+  FREE s1,s2;
+  n := n - 1;
+END;
+
+
+MODEND;
+

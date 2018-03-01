@@ -1,0 +1,4 @@
+\htgt{InterruptStatement} ::=\\
+\x \{ \kw{ENABLE} $\mid$ \kw{DISABLE} $\mid$ \kw{TRIGGER} \}
+	 \hlink{Name}$\S $Interrupt \kw{;}
+

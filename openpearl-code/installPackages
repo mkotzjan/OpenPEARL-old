@@ -1,0 +1,125 @@
+#!/bin/bash
+if [ `id -u` -ne 0 ]
+then
+   echo "must be root for essential package installation"
+   exit 1
+fi
+
+Developer=0
+if [ "$1" == "dev" ]
+then
+   Developer=1
+fi
+
+SystemKnown=0
+AptPackageList=""
+
+grep "PRETTY_NAME=\"Ubuntu 17.10\"" /etc/os-release >/dev/null
+rc=$?
+if [ $rc -eq 0 ]
+then
+   echo "detected: Ubunto 17.10 "
+   AptPackageList+="gcc g++ make"
+   AptPackageList+="openjdk-8-jdk"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphviz doxygen"
+      AptPackageList+=" texlive texlive-lang-english texlive-generic-extra"
+      AptPackageList+=" texlive-latex-extra"
+   fi
+   SystemKnown=1
+fi
+
+grep "PRETTY_NAME=\"Debian GNU/Linux 8 (jessie)\"" /etc/os-release >/dev/null
+rc=$?
+if [ $rc -eq 0 ]
+then
+   echo "detected: Debian 8 jessie "
+   AptPackageList+="openjdk-7-jdk"
+   AptPackageList+=" gcc g++ git make gawk"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphviz doxygen"
+   fi
+   SystemKnown=1
+fi
+
+grep "PRETTY_NAME=\"Debian GNU/Linux 9 (stretch)\"" /etc/os-release >/dev/null
+rc=$?
+if [ $rc -eq 0 ]
+then
+   echo "detected: Debian 9 stretch "
+   AptPackageList+="openjdk-8-jdk"
+   AptPackageList+=" gcc g++ git make gawk"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphviz doxygen"
+   fi
+   SystemKnown=1
+fi
+
+grep "PRETTY_NAME=\"Raspbian GNU/Linux 8 (jessie)\"" /etc/os-release >/dev/null
+rc=$?
+if [ $rc -eq 0 ]
+then
+   echo "detected: Raspbian 8 jessie "
+   AptPackageList+="openjdk-7-jdk"
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphviz doxygen"
+   fi
+   SystemKnown=1
+fi
+
+grep "PRETTY_NAME=\"Raspbian GNU/Linux 9 (stretch)\"" /etc/os-release >/dev/null
+rc=$?
+if [ $rc -eq 0 ]
+then
+   echo "detected: Raspbian 9 stretch "
+   #AptPackageList+="openjdk-8-jdk" # raspbian comes with a javac
+   AptPackageList+=" flex libncurses5-dev"
+   AptPackageList+=" expat libexpat1-dev"
+   if [ $Developer -eq 1 ]
+   then
+      AptPackageList+=" astyle graphviz doxygen"
+      AptPackageList+=" texlive texlive-lang-english texlive-generic-extra"
+      AptPackageList+=" texlive-latex-extra"
+   fi
+   SystemKnown=1
+fi
+
+if [ "$SystemKnown" -ne "1" ] 
+then
+   echo "host linux version not detected"
+   cat /etc/os-release
+   exit 1
+fi
+
+echo "required apt-packages"
+echo $AptPackageList
+
+if [ "$SystemKnown" -eq "1" ] 
+then
+   # common for all platforms
+   wget http://www.antlr.org/download/antlr-4.5-complete.jar
+   mv antlr-4.5-complete.jar /usr/local/lib/
+   apt-get -y install $AptPackageList
+
+   # set automatic 'y' for cpan/cpanm installation
+   export PERL_MM_USE_DEFAULT=1
+   cpan -T App::cpanminus		# do not test
+   cpanm --notest Spreadsheet::Read
+   cpanm --notest Spreadsheet::ReadSXC
+fi
+
+echo
+echo "please log on as normal user and perform"
+echo "    make defconfig"

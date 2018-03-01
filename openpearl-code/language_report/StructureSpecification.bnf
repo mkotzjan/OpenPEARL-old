@@ -1,0 +1,4 @@
+\htgt{StructureSpecification} ::=\\
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{StructureDenotationS}\\
+\x  [ , \hlink{StructureDenotationS} ] $^{...}$ ;
+

@@ -1,0 +1,246 @@
+\chapter{Rules for the Construction of PEARL Language Forms}   % 3
+
+A PEARL program can be written free of format; particularly, it is not
+necessary to pay attention to the fact that a statement starts in a
+certain column.
+
+All elements of a PEARL program are produced from characters of the
+following character set. Certainly, character string constants and
+comments may contain any character that is allowed by ISO 646 and
+national variants of ISO 646.
+
+%%%% begin added
+\OpenPEARL{} does not check input data for data of type \code{CHAR} and the \code{TOCHAR}
+operator to result in values according ISO 646. 
+%%%% end added
+
+\section{Character Set}   % 3.1
+
+The character set of PEARL is a partial set of the ISO 7 bit character
+set (ISO 646). It contains
+
+\begin{itemize}
+\item the upper-case letters \code{A} to \code{Z}
+\item the lower-case letters \code{a} to \code{z}
+\item the digits \code{0} to \code{9}, and
+\item the special characters
+      \begin{tabbing}
+      \x \=   \kill
+      \code{\_} \> underline\\
+\code{ }  \> space (for better clearness sometimes, underline \_ is used)\\
+      \code{!}  \> exclamation mark (start of the line comment)\\
+      \code{'}  \> apostrophe\\
+      \code{(}  \> open round parenthesis\\
+      \code{)}  \> close round parenthesis\\
+      \code{,}  \> comma\\
+      \code{.}  \> full stop\\
+      \code{;}  \> semicolon\\
+      \code{:}  \> colon\\
+      \code{+}  \> plus sign (e.g. for addition, algebraic sign)\\
+      \code{-}  \> minus sign (e.g. for subtraction, algebraic sign)\\
+      \code{*}  \> asterisk (e.g. for multiplication)\\
+      \code{/}  \> oblique stroke (e.g. for division)\\
+      \code{=}  \> equals sign (e.g. for assignment)\\
+      \code{<}  \> less sign\\
+      \code{>}  \> greater sign\\
+      \code{[}  \> square bracket\\
+      \code{]}  \> square bracket\\
+      \code{\textbackslash} \> backslash (for control signs in character strings)
+      \end{tabbing}
+\end{itemize}
+
+The following character combinations are interpreted as an entity (a
+compound symbol):
+
+\begin{tabbing}
+\x \= exponentiation symbol \kill
+
+\code{:=}    \> assignment symbol\\ \relax
+\code{**}    \> exponentiation symbol\\
+\code{/*}    \> start comment\\ \relax
+\code{*/}    \> end comment\\
+\code{//}    \> symbol for integer division\\
+\code{==}    \> equals symbol\\
+\code{/=}    \> not equals symbol\\
+\code{<=}  \> greater or equal symbol\\
+\code{>=}  \> less or equal symbol\\
+\code{<>}  \> cyclic-shift symbol\\
+\code{><}  \> concatenation symbol\\
+\code{'\textbackslash} \> start of a control character sequence in character string constants\\
+\code{\textbackslash'} \> end of a control character sequence in character string constants
+\end{tabbing}
+
+If not all symbols required for program notation are available on a
+device, the following character sequences can be used alternatively:
+
+\begin{tabbing}
+CSHIFT \= for $<>$ \kill
+
+\code{LT}    \> for \code{$<$}\\
+\code{GT}     \> for \code{$>$}\\
+\code{EQ}     \> for \code{==}\\
+\code{NE}     \> for \code{/=}\\
+\code{LE}     \> for \code{<=}\\
+\code{GE}     \> for \code{>=}\\
+\code{CSHIFT} \> for \code{<>}\\
+\code{CAT}    \> for \code{><}\\
+\code{(/}     \> for \code{[}\\
+\code{/)}     \> for \code{]}\\
+\end{tabbing}
+This feature is kept for backward compatibility.
+%%%% added
+The equality (\code{==}) and not equality (\code{/=}) operators are avoided
+in this document due to possible misinterpretation 
+with the divide operator in C and C++. The substitutes \code{EQ} and \code{NE} are 
+used.
+
+\section{Basic Elements}    % 3.2
+
+A PEARL program is built up from the following basic elements:
+
+\begin{itemize}
+\item identifiers
+\item constants
+\item delimiters (meaning special characters and compound symbols), and
+\item comments
+\end{itemize}
+
+Character sequences for identifiers and constants must be followed by
+delimiters or comments.
+
+\subsection{Identifiers}   % 3.2.1
+
+Identifiers are used for constructing names of objects (e.g. numerical
+variables, procedures). They consist of a sequence of letters
+(upper-case or lower-case), the underline and/or numerals; this sequence
+has to start with a letter. For identifiers, PEARL distinguishes between
+upper-case and lower-case letters, i.e., \code{valve}, \code{VALVE} and 
+\code{Valve} denote different objects.
+
+Examples: \code{counter\_1}, \code{DISPO}, \code{wait}
+
+Some words have a specific meaning at prescribed positions in the PEARL
+program; these words are called keywords. E.g., the words \code{BIT} or 
+\code{GOTO}
+are such keywords. The appendix contains a list of all keywords. They
+must not be used as identifiers and have always to be written with
+upper-case letters.
+
+To avoid conflicts it is recommended that identiers start with a lower
+case letter.
+
+\subsection{Constants}   % 3.2.2
+
+Constants are integer numbers, floating point numbers, bit strings,
+character strings, times and durations. They are described in Chapter 
+\ref{sec_variables}
+together with the corresponding variables.
+
+\subsection{Comments}    % 3.2.3
+
+Comments are used to explain the program and are of no importance for
+running of the program. There are two kinds of comments: One kind may
+cover several lines and is put in brackets by the compound symbols \code{/*}
+and \code{*/}. Within these brackets, any characters may occur except the
+compound symbol \code{*/} for the end of the comment.
+
+The other kind, the line of comment, starts with an exclamation
+mark \code{!} and is terminated by the end of the line.
+
+Comments may be inserted wherever spaces are allowed.
+
+Examples:
+
+\begin{lstlisting}
+/* This comment is not ended
+   by the end of the line */
+! This comment is limited to 1 line
+\end{lstlisting}
+
+\section{Construction of Language Forms}  % 3.3
+
+In the following chapters, the language forms allowed in PEARL are
+described.  In order to make these descriptions exact and as compact as
+possible, some formal possibilities are needed apart from the verbal
+formulation:
+
+Each language form has a name, by which it is defined with the help of
+the (meta) symbol ``::='' :
+
+\code{NameOfTheLanguageForm} ::=\\
+\x \code{DefinitionOfTheLanguageForm}
+
+Example:
+
+\code{UpperCaseLetter} ::=\\
+\x A or B or ... or Z
+
+\code{Digit} ::=\\
+\x 0 or 1 or ... or 9
+
+As this example shows, the definition of a language form may contain
+elements that are given alternatively when constructing the language
+form. To shorten that, in the following the alternatively possible
+elements are divided by the symbol ``$\mid$'':
+
+Example:
+
+\begin{grammarframe}
+\input{Letter.bnf}
+\input{Digit.bnf}
+\end{grammarframe}
+
+If one element shall occur on different occasions, but at least once, it
+is to be provided with three superscribed dots.
+
+Example:
+
+\code{SimpleInteger} ::=\\
+\x \code{Digit} $^{...}$
+
+To express that an element may be missing while constructing the
+language form, it is given in square brackets ``['' ... ``]'' (The 
+same symbols are used in the PEARL language in conjunction with data structures.
+To avoid confusion, the backets in data structures are printed boldly).
+
+Example:
+
+\code{Identifier} ::=\\
+\x \code{Letter} [ \{ \code{Letter} $\mid$ \code{Digit} $\mid$ \_ \} $^{...}$ ]
+
+Here, already two further rules were used: The definition of a language
+form may again contain names of language forms; furthermore the braces
+and square brackets are also used to put together elements to new
+elements. Thus, the last example is equivalent to the following:
+
+Example:
+
+\begin{grammarframe}
+\input{Identifier.bnf}
+\end{grammarframe}
+
+% ::=\\
+%\x Letter [ Letter $\mid$ Digit $\mid$ \_ ] $^{...}$
+
+For the description of lists whose elements are separated by a certain
+symbol, the list element and the delimiter are given in the form
+
+\code{ListElement} [ \code{Delimiter} \code{ListElement} ] $^{...}$
+
+to define the corresponding language form.
+
+Example:
+
+\code{IdentifierList} ::=\\
+\x \code{Identifier} [ , \code{Identifier} ] $^{...}$
+
+For a better understanding or a more exact description of the definition
+of a language form, elements are often provided with an explanatory or
+restricting comment that is separated from the element by the symbol
+\S .
+
+Example:
+
+\code{DeviceList} ::=\\
+\x \code{Identifier}\S  Device [ , \code{Identifier}\S Device ] $^{...}$
+

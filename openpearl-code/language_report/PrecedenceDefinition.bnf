@@ -1,0 +1,3 @@
+PrecedenceDefinition ::= \\
+\x {\bf PRECEDENCE} OpName ( \{ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7 \} ) ;
+

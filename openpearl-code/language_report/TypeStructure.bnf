@@ -1,0 +1,4 @@
+\htgt{TypeStructure} ::=\\
+\x \kw{STRUCT [} \hlink{StructureComponent} 
+	[ , \hlink{StructureComponent} ] $^{...}$ \kw{]} 
+

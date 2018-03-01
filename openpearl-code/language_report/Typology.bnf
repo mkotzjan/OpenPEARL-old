@@ -1,0 +1,13 @@
+%%%\begin{discuss}
+%%%TFU als E/A-Puffergroesse definieren?
+%%%Gehoert dann TFU zu Typology oder als separater Eintrag in die 
+%%%Dation Grammatik? 
+%%%Sollte Typology aufgeteilt werden in eine Fassung fuer DCL und eine Fassung fuer SPC? --- bei SPC kein TFU(Puffergroesse)
+%%%% 8.2.2018 Typology aufgeteilt in Dcl and Spc 
+
+
+\htgt{Typology} ::=\\
+\x \hlink{TypologyDeclaration} $\mid$ \hlink{TypologySpecification} 
+
+%%%\end{discuss}
+

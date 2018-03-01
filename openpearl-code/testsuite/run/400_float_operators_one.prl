@@ -1,0 +1,544 @@
+/* ###############################################################
+PROGRAM
+This program tests all monadic operators which are for the datatyp
+FLOAT (+, -, ABS, SIGN, SQRT, SIN, COS, TAN, ATAN, TANH, LN, EXP). 
+This program combine no operators, it only checks each operator
+for themselves.
+More inforamtion about the operators can be found in the 
+language report on page 6-7 to 6-9.
+##################################################################
+RESULT
+After every Operator the result are checked and when the
+result are not correct, the variable check are increment.
+When all operators works correct, the variable check have
+the value zero.
+#################################################################*/
+
+
+MODULE(float_monadic_operator);
+
+PROBLEM;
+
+Main : TASK MAIN;
+    DCL (check, aFixed) FIXED(15) INIT(0,0);
+	DCL resultFixed24 FIXED(24) INIT(0);
+	DCL resultFixed53 FIXED(53) INIT(0);
+    DCL e FIXED(1) INIT(0);
+
+    DCL (PI24,i24)                              FLOAT(24) INIT(0.0,0.0);
+    DCL (w24, x24, y24, z24)                    FLOAT(24) INIT(0.0,0.0,0.0,0.0);
+    DCL (realResult24, result1_24, result2_24)  FLOAT(24) INIT(0.0,0.0,0.0);
+    DCL tempResult24                            FLOAT(24) INIT(0.0);
+
+    DCL (w53, x53, y53, z53)                    FLOAT(53) INIT(0.0,0.0,0.0,0.0);
+    DCL (PI53,i53)                              FLOAT(53) INIT(0.0,0.0);
+    DCL (j,k,l,m)                               FLOAT(53) INIT(0.0,0.0,0.0,0.0);
+    DCL (realResult53, result1_53, result2_53)  FLOAT(53) INIT(0.0,0.0,0.0);
+    DCL tempResult53                            FLOAT(53) INIT(0.0);
+
+    DCL epsilon53 FLOAT(53);
+    DCL epsilon24 FLOAT(24);
+
+    epsilon24 := 1.0 * ((10.0)**(-6));
+    epsilon53 := 1.0 * ((10.0)**(-14));
+
+	!__cpp__('printf("eps24: %E, eps53: %E \\n", _epsilon24.x, _epsilon53.x);');
+
+    i24 := 1.0;
+    i53 := 1.0;
+    PI24 := (ATAN i24) * 4.0;
+    PI53 := (ATAN i53) * 4.0;
+
+    w24 := 3.1234;   
+    w53 :=  21.3456;
+    x24 := -3.1234;  
+    x53 := -21.3456;
+    y24 := -235.323; 
+    y53 := -1234.56789; 
+    z24 := 235.323;  
+    z53 :=  1234.56789;
+
+/*##################################
+        + Operator
+##################################*/  
+    result1_24 := +w24;
+    IF result1_24 /= w24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := +w53;
+    IF result1_53 /= w53 THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        - Operator
+##################################*/  
+    result1_24 := -w24; 
+    IF result1_24 /= x24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := -w53;
+    IF result1_53 /= x53 THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        ABS Operator
+##################################*/  
+    result1_24  := ABS y24;
+    IF result1_24 /= z24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := ABS y53;
+    IF result1_53 /= z53 THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        SIGN Operator
+##################################*/  
+    y24 := 0.0;
+    y53 := 0.0;
+    
+    /*### FLOAT 24 ###*/
+    e := SIGN w24;
+    IF e /= 1 THEN
+        check := check + 1;
+    FIN;
+
+    e := SIGN y24;
+    IF e /= 0 THEN
+        check := check + 1;
+    FIN;    
+
+    e := SIGN x24;
+    IF e /= -1 THEN
+        check := check + 1;
+    FIN;
+    
+    /*### FLOAT 53 ###*/
+    e := SIGN w53;
+    IF e /= 1 THEN
+        check := check + 1;
+    FIN;
+    e := SIGN y53;
+    IF e /= 0 THEN
+        check := check + 1;
+    FIN;
+    e := SIGN x53;
+    IF e /= -1 THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        SQRT Operator
+##################################*/ 
+
+    x24 := 16.0; 
+    x53 := 16.0;
+    realResult24 := 4.0;
+    realResult53 := 4.0;
+
+    result1_24 := SQRT x24;
+    result2_24 := ABS (result1_24 - realResult24);
+    IF result2_24 >  epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := SQRT x53;
+    result2_53 := ABS (result1_53 - realResult53);
+
+    IF result2_53 >  epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+    x24 := 16384.25;
+    x53 := 16384.25;
+
+    result1_24 := SQRT x24;
+    result2_24 := result1_24 * result1_24;
+    realResult24 = (ABS (result2_24 - x24));
+
+    IF realResult24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := SQRT x53;
+    result2_53 := result1_53 * result1_53;
+    realResult53 = (ABS (x53 - result2_53));
+
+    IF realResult53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        SIN, COS, TAN Operator
+##################################*/ 
+
+    /*### Float 24 ###*/
+
+    result1_24 := SIN (0.0);
+	realResult24 := 0.0;
+	result2_24 := ABS (result1_24 - realResult24);
+        
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_24 := COS (0.0);
+    result2_24 := ABS (result1_24 - 1.0);
+    
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_24 := ( (SIN (PI24))**2 )+( (COS PI24) **2);
+    realResult24 := 1.0;
+    result2_24 := ABS(result1_24 - realResult24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+   
+
+    result1_24 := ( ( SIN (PI24 / 2.0) )**2 )+( (COS (PI24 / 2.0) ) **2 );
+    realResult24 := 1.0;
+    result2_24 := ABS(result1_24 - realResult24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+    
+    result1_24 := ( ( SIN (PI24 / 3.0) )**2 )+( (COS (PI24 / 3.0) ) **2 );
+    realResult24 := 1.0;
+    result2_24 := ABS(result1_24 - realResult24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_24 := ( ( SIN (PI24 / 6.0) )**2 )+( (COS (PI24 / 6.0) ) **2 );
+    realResult24 := 1.0;
+    result2_24 := ABS(result1_24 - realResult24);
+ 
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_24 := TAN PI24;
+    tempResult24 := (SIN(PI24)) / (COS(PI24));
+    result2_24 := ABS(result1_24 - tempResult24);
+
+    IF result2_24 > epsilon24  THEN
+        check := check + 1;
+    FIN;
+
+	result1_24 := TAN (PI24 / 4.0);
+    tempResult24 := (SIN(PI24 / 4.0)) / (COS(PI24 / 4.0));
+    result2_24 := ABS(result1_24 - tempResult24);
+
+    IF result2_24 > epsilon24  THEN
+        check := check + 1;
+    FIN;
+
+	/*### Float 53 ###*/
+
+    result1_53 := SIN (0.0);
+	realResult53 := 0.0;
+	result2_53 := ABS (realResult53 - result1_53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := SIN (PI24);
+	realResult53 := 0.0;
+	result2_53 := ABS (realResult53 - result1_53);
+
+    IF result2_53 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := COS (0.0);
+    realResult53 := 1.0;
+    result2_53 := ABS (result1_53 - realResult53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := COS (PI24 / 3.0);
+    realResult53 := 0.5;
+    result2_53 := ABS (result1_53 - realResult53);
+
+    IF result2_53 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := ( (SIN (PI53))**2 )+( (COS PI53) **2);
+    realResult53 := 1.0;
+    result2_53 := ABS(result1_53 - realResult53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+   
+
+    result1_53 := ( ( SIN (PI53 / 2.0) )**2 )+( (COS (PI53 / 2.0) ) **2 );
+    realResult53 := 1.0;
+    result2_53 := ABS(result1_53 - realResult53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+    
+    result1_53 := ( ( SIN (PI53 / 3.0) )**2 )+( (COS (PI53 / 3.0) ) **2 );
+    realResult53 := 1.0;
+    result2_53 := ABS(result1_53 - realResult53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := ( ( SIN (PI53 / 6.0) )**2 )+( (COS (PI53 / 6.0) ) **2 );
+    realResult53 := 1.0;
+    result2_53 := ABS(result1_53 - realResult53);
+ 
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+    result1_53 := TAN PI53;
+    tempResult53 := (SIN(PI53))/(COS(PI53));
+    result2_53 := ABS(result1_53 - tempResult53);
+
+    IF result2_53 > epsilon53  THEN
+        check := check + 1;
+    FIN;
+
+	result1_53 := TAN (PI53 / 4.0);
+    tempResult53 := (SIN(PI53 / 4.0))/(COS(PI53 / 4.0));
+    result2_53 := ABS(result1_53 - tempResult53);
+
+    IF result2_53 > epsilon53  THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        ATAN & TANH Operator
+##################################*/
+
+	/*### Float 24 ATAN ###*/
+    realResult24 := PI24;
+
+    result1_24 := TAN(ATAN(PI24));
+    result2_24 := ABS(result1_24 - realResult24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	realResult24 := PI24 / 2.0;
+
+    result1_24 := TAN( ATAN (PI24 / 2.0) );
+    result2_24 := ABS(result1_24 - realResult24);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	/*### Float 53 ATAN ###*/
+	realResult53 := PI53;
+
+    result1_53 := TAN( ATAN (PI53));
+    result2_53 := ABS(result1_53 - realResult53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	realResult53 := PI53 / 2;
+
+    result1_53 := TAN( ATAN (PI53 / 2));
+    result2_53 := ABS(result1_53 - realResult53);
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	/*### Float 24 TANH ###*/
+
+	realResult24 := -1 + ( 2 / (1 + (EXP(-(2*PI24)))));
+
+	result1_24 := TANH (PI24);
+	result2_24 := ABS(realResult24 - result1_24);
+
+	IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	realResult24 := -1 + ( 2 / (1 + (EXP(-PI24))));
+
+	result1_24 := TANH (PI24 / 2.0);
+	result2_24 := ABS(realResult24 - result1_24);
+
+	IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	realResult24 := -1 + ( 2 / (1 + (EXP(-(2*PI24)/4.0))));
+
+	result1_24 := TANH (PI24 / 4.0);
+	result2_24 := ABS(realResult24 - result1_24);
+
+	IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+	/*### Float 53 TANH ###*/
+
+	realResult53 := -1 + ( 2 / (1 + (EXP(-(2*PI53)))));
+
+	result1_53 := TANH (PI53);
+	result2_53 := ABS(realResult53 - result1_53);
+
+	IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	realResult53 := -1 + ( 2 / (1 + (EXP(-PI53))));
+
+	result1_53 := TANH (PI53 / 2.0);
+	result2_53 := ABS(realResult53 - result1_53);
+
+	IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	realResult53 := -1 + ( 2 / (1 + (EXP(-(2*PI53)/4.0))));
+
+	result1_53 := TANH (PI53 / 4.0);
+	result2_53 := ABS(realResult53 - result1_53);
+
+	IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+ 
+/*##################################
+        LN & EXP Operator
+##################################*/
+   
+    realResult24 := 2.0;
+	realResult53 := 2.0;
+	
+	result1_24 := LN(EXP (2.0));
+	result1_53 := LN(EXP (realResult53));
+
+	result2_24 := ABS (realResult24 - result1_24);
+	result2_53 := ABS (realResult53 - result1_53);
+
+    IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+	realResult24 := 2.452;
+	result1_24 := LN(EXP (2.452));
+	result2_24 := ABS (realResult24 - result1_24);
+
+	IF result2_24 > epsilon24 THEN
+        check := check + 1;
+    FIN;
+
+
+	realResult53 := 3.45233;
+	result1_53 := LN(EXP (realResult53));
+	result2_53 := ABS (realResult53 - result1_53);	
+
+    IF result2_53 > epsilon53 THEN
+        check := check + 1;
+    FIN;
+
+/*##################################
+        ENTIER & ROUND Operator
+##################################*/
+
+	/*### Float 24 ###*/
+	w24 := 1.5345;
+	resultFixed24 := ENTIER w24;
+
+	IF resultFixed24 /= 1 THEN
+		check := check + 1;
+	FIN;
+
+	x24 := 123.95;		
+	resultFixed24 := ENTIER x24;
+
+	IF resultFixed24 /= 123 THEN
+		check := check + 1;
+	FIN;
+
+	resultFixed24 := ROUND w24;
+
+	IF resultFixed24 /= 2 THEN
+		check := check + 1;
+	FIN;
+
+	resultFixed24 := ROUND x24;
+	
+	IF resultFixed24 /= 124 THEN
+		check := check + 1;
+	FIN;
+
+	/*### Float 53 ###*/
+	w53 := 1.53453456;
+	resultFixed53 := ENTIER w53;
+
+	IF resultFixed53 /= 1 THEN
+		check := check + 1;
+	FIN;
+
+	x53 := 123.95345;		
+	resultFixed53 := ENTIER x53;
+
+	IF resultFixed53 /= 123 THEN
+		check := check + 1;
+	FIN;
+
+	resultFixed53 := ROUND w53;
+
+	IF resultFixed53 /= 2 THEN
+		check := check + 1;
+	FIN;
+
+	resultFixed53 := ROUND x53;
+	
+	IF resultFixed53 /= 124 THEN
+		check := check + 1;
+	FIN;
+
+/*#####################################
+    verify the variable check
+    check = 0  -> SUCCESS
+    check /= 0 -> FAILED
+#####################################*/
+
+    IF (check == 0) THEN
+       __cpp__(
+       'printf("*** SUCCESS *** \\n");'
+       'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__(
+        'printf ("*** FAILED *** \\n");'
+        'pearlrt::Control::setExitCode(1);');
+    FIN;
+
+END;
+
+MODEND;

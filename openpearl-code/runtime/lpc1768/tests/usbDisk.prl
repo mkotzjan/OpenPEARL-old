@@ -1,0 +1,156 @@
+MODULE(usbdisk);
+SYSTEM;
+Lpc17xxUsbDisk;
+Post(0);
+!Lpc17xxClock(4);
+disk : FatFs('1:/',10);
+disk2 : FatFs('1:/noDir/',1);
+con: Lpc17xxUart(0,115200,8,1,'N','0'B1);
+
+PROBLEM;
+
+   SPC con DATION OUT SYSTEM ALPHIC GLOBAL;
+   SPC disk DATION INOUT SYSTEM ALL GLOBAL;
+   SPC disk2 DATION INOUT SYSTEM ALL GLOBAL;
+   DCL console DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(con);
+   DCL tab1 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk);
+   DCL tab2 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk);
+   DCL tab3 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk);
+   DCL tabdisk2 DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(disk2);
+   DCL fileName1 CHAR(9) INIT('FILE1.TXT');
+   DCL fileName2 CHAR(9) INIT('FILE2.TXT');
+   DCL fileName3 CHAR(9) INIT('FILE3.TXT');
+   DCL tab DATION INOUT FIXED(15) DIM(30,30) DIRECT CREATED(disk);
+
+ttt: TASK MAIN;
+   DCL error FIXED(15) INIT(1);
+
+   OPEN console;
+   PUT 'usbDisk started' TO console BY A, SKIP;
+
+   WHILE error NE 0
+   REPEAT
+   !  error = 0;
+     PUT 'try to open file1' TO console BY A, SKIP;
+     OPEN tab1 BY RST(error), IDF(fileName1), ANY;
+   END;
+   OPEN tab2 BY RST(error), IDF(fileName1), ANY;
+   IF error NE 0 THEN
+      PUT 'try to open same file name again: returns', error, 'ok'
+       TO console BY A, F(6), A, SKIP;
+   ELSE
+      PUT 'try to open same file name again: returns', error, 'not detected'
+       TO console BY A, F(6), A, SKIP;
+     CLOSE tab2;
+   FIN;
+   OPEN tab2 BY  IDF(fileName2), ANY;
+   OPEN tab3 BY  IDF(fileName3), ANY;
+   CLOSE tab2;
+   OPEN tab2 BY  RST(error),IDF(fileName3), ANY;
+   IF error NE 0 THEN
+      PUT 'try to open same file name again: returns', error, 'ok'
+       TO console BY A, F(6), A, SKIP;
+   ELSE
+      PUT 'try to open same file name again: returns', error, 'not detected'
+       TO console BY A, F(6), A, SKIP;
+     CLOSE tab2;
+   FIN;
+
+   PUT 'write part 1 to ', fileName1 TO console BY A,A,SKIP;
+   PUT 'Hallo' TO tab1 BY A, SKIP;
+   PUT 'sleep 5 sec' TO console BY A, SKIP;
+   AFTER 5 SEC RESUME;
+   PUT 'write part 2 to ', fileName1 TO console BY A,A,SKIP;
+   PUT 'Welt' TO tab1 BY RST(error),A, SKIP;
+   PUT 'write2: RST-value=', error TO console BY A, F(6), SKIP;
+
+   CLOSE tab1 BY RST(error);
+   PUT 'close: RST-value=', error TO console BY A, F(6), SKIP;
+   CLOSE tab1 BY RST(error);
+   PUT '2nd close: RST-value=', error TO console BY A, F(6), SKIP;
+
+   ! try to use it again
+   OPEN tab1 BY  IDF(fileName1), ANY;
+   PUT 'Hallo Welt' TO tab1 BY A, SKIP;
+   CLOSE tab1;
+
+   ! try to open on disk2 --> should fail
+   PUT 'try to open file of non existing folder' TO console BY A, SKIP;
+   OPEN tabdisk2 BY RST(error), IDF(fileName1), ANY;
+   IF error NE 0 THEN
+     PUT 'failed (error=',error,')'  TO console BY A,F(6),A, SKIP;
+   ELSE
+     PUT 'should not succeed!!!' TO console BY A, SKIP;
+     CLOSE tabdisk2;
+   FIN;
+
+   AFTER 0.2 SEC ACTIVATE t2;
+   CALL checkerfield(fileName2);
+
+   PUT 'end of TASK ttt' TO console BY A, SKIP;
+END;
+
+t2: TASK;
+   FOR j TO 10 REPEAT
+      PUT j ,'ter Durchlauf' TO console BY F(6), A, SKIP;
+      OPEN tab1 BY IDF(fileName1), ANY;
+      FOR i TO 50 REPEAT
+         PUT i,'-te Zeile' TO tab1 BY F(6),A,SKIP;
+      END;
+      CLOSE tab1;
+   END;
+   PUT 'end of TASK t2' TO console BY A, SKIP;
+END;
+
+checkerfield: PROC(fn CHAR(9));
+   DCL (data,data2) FIXED(15);
+   DCL ok BIT(1) INIT('1'B1);
+   ! DCL tab DATION INOUT FIXED(15) DIM(30,30) DIRECT CREATED(disk);
+
+   OPEN  tab BY IDF(fn), ANY;
+
+   ! preset data
+   FOR i TO 30 REPEAT
+      FOR j TO 30 REPEAT
+        ! data := 30*i+j;
+        data := 30;
+        data := data*i+j;
+         WRITE data TO tab BY POS(i,j);
+      END;
+   END;
+   
+   ! transpose matrix
+   FOR i TO 30 REPEAT
+      FOR j TO 30 REPEAT
+         READ data FROM tab BY POS(i,j);
+         READ data2 FROM tab BY POS(j,i);
+         WRITE data TO tab BY POS(j,i);
+         WRITE data2 TO tab BY POS(i,j);
+      END;
+   END;
+    
+   ! verify data
+   FOR i TO 30 REPEAT
+      FOR j TO 30 REPEAT
+         READ data FROM tab BY POS(i,j);
+         data2 := 30;
+         data2 := data2*i+j;
+         IF data NE data2 THEN
+             PUT 'error at (',i,' , ',j,') ' TO console BY
+                 A,F(3),A,F(3),A,SKIP;
+             ok = '0'B1;
+         FIN;
+      END;
+   END;
+   IF ok THEN
+     PUT 'data verification passed' TO console BY A, SKIP;
+   FIN; 
+
+   CLOSE tab;
+
+END;
+
+MODEND;
+
+
+

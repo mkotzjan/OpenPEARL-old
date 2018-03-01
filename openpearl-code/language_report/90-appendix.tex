@@ -1,0 +1,1013 @@
+\appendix
+\chapter{Appendix}
+
+% --------
+% enable hypertargets for syntax elements
+\renewcommand{\htgt}{\htgtOn}
+
+\section{Data Types and their usability}    % A1
+\label{sec_data_types_usability}
+
+The following overview shows for each of the available data types, whether
+objects of this type may
+
+\begin{itemize}
+\item be summarised to arrays,
+\item occur as structure components,
+\item be formal procedure parameters,
+\item be results of a function procedure,
+\item be values of a reference variable,
+\item be transmitted to or from data stations,
+\item be provided with allocation protection,
+\item be global, or
+\item be provided with the initialisation attribute.
+\end{itemize}
+
+%%%\begin{discuss}
+%%%IRPT als Parameter oder REF value zulaessig?
+%%%
+%%%bei SIGNALs geht nur GLOBAL; die restlichen 'x' raus?
+%%%
+%%%REF STRUCT[] entfernt
+%%%
+%%%Dies ist Thema auf der AK-Sitzung im November 2016.
+%%%\end{discuss}
+
+\begin{table}[htb]
+\begin{tabular}{lccccccccc}
+{\bf type}     & \multicolumn{9}{c}{{\bf usage}} \\ 
+               & array & struct. & para- & result & ref.  & dation & \code{INV} & \code{GLOBAL} & \code{INIT} \\ 
+               &       &         & meter & type   & value & class  &     &        &      \\ \hline
+\code{FIXED}          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{FLOAT}          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{BIT}            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{CHAR}           & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{CLOCK}          & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{DUR}            & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{SEMA}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{BOLT}           & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{IRPT}           & --     &  --     & --     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{SIGNAL}         & --     &  --     & --     &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{DATION}         & x     &  --     & x     &  --    &  x    &   --   &  -- &    x   &  --  \\
+array          & --    &  x      & x     &  --    &  x    &   --   &  x  &    x   &  x   \\
+\code{STRUCT}         & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+new type       & x     &  x      & x     &  x     &  x    &   x    &  x  &    x   &  x   \\
+\code{REF}            & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+procedure      & --    &  --     & --    &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{TASK}           & --    &  --     & --    &  --    &  x    &   --   &  -- &    x   &  --  \\
+\code{FORMAT}         & --    &  --     & --    &  --    &  --   &   --   &  -- &    --  &  --  \\
+\code{REF CHAR ( )}   & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
+\code{REF PROC}       & x     &  x      & x     &  --    &  --   &   --   &  x  &    x   &  x   \\
+\code{REF TASK}       & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+%%% REF STRUCT [ ] & x     &  x      & x     &  x     &  --   &   --   &  x  &    x   &  x   \\
+\end{tabular}
+\end{table}
+                                                                                 
+Objects of type \code{SEMA}, \code{BOLT}, \code{IRPT}, \code{SIGNAL}, \code{DATION}
+ or array may only be 
+passed on by means of identification (\code{IDENT}) as procedure parameters.
+
+\newpage
+\section{Predefined Functions}   % A 2
+
+This appendix describes the functions known to the PEARL
+% compiler
+System. They
+can be used in the single modules 
+%%%without
+by
+%%% ^^added
+ specifying them before. 
+%%%If one 
+%%%of the functions is specified in a module, no object may exist with the 
+%%%functions' name at module level.
+%%%\begin{added}
+A user supplied global function with the same signature substitutes
+the predefined function in the whole program.
+%%%\end{added}
+
+\subsection{The Function NOW}    % A 2.1
+\label{sec_function_now}
+
+The function procedure NOW passes back the actual time or system time, resp., 
+as value of type \code{CLOCK}. The specification of the function looks like this:\\
+
+\kw{SPC}\code{ NOW }\kw{PROC RETURNS ( CLOCK ) GLOBAL}\code{ ;} 
+\index{Predefined Functions!\textbf{NOW}}
+\index{NOW@\textbf{NOW}}
+
+
+\subsection{The Function DATE}    % A 2.2
+\label{sec_function_date}
+
+The actual date can be received by invoking the function procedure \code{DATE}.
+The function result is a character string constant of length 10, containing
+the date in the form ``year--month--day''. Here an example for December 5,
+1991: ``1991--12-05''. The function must  be specified like this:\\
+
+\kw{SPC}\code{ DATE }\kw{PROC RETURNS ( CHAR(10) ) GLOBAL}\code{ ;}
+\index{Predefined Functions!\textbf{DATE}}
+\index{DATE@\textbf{DATE}}
+
+%%%\begin{added}
+\section{CPP-Insertions}
+The language translation is done in two steps.
+Step 1 translates \OpenPEARL{} into C++.
+Step 2 translates C++ into the plattform specific machine code.
+
+It is possible to insert C++ statements into the generated C++ 
+code in tasks and procedures. The position of the insertion is
+just between the output of the surrounding
+statements.
+
+The syntax is.
+\begin{grammarframe}
+CPPInsertion ::=\\
+\x \kw{\_\_cpp\_\_} \kw{(} \hlink{CStringConstant}$^{...}$ \kw{)} \kw{;}
+\end{grammarframe}
+The CStringConstants are expected in C notation.
+All quotations from C apply for these constants.
+
+Example:
+\begin{lstlisting}
+__cpp__(	
+    "// a simple C++ comment!"
+    " char c = 'c';   " 
+    " printf(\"this we be sent to stdout\n\");  " 
+);
+\end{lstlisting}
+
+%%%\end{added}
+
+\newpage
+\section{Syntax}    % A 3
+\begin{discuss}
+die Syntaxelemente sind ggf. noch besser zu ordnen.
+Es koennen auch noch ueberzaehlige Elemente vorhanden sein!
+
+ParameterListForSPC kann vermutlich durcgListOfFormalParameters ersetzt 
+werden.
+
+%%%Ist IdentifierDenotation das gleiche wie OneIdentifierOrList?
+%%% ja --> wurde komplett ersetzt
+%%% war so definiert:
+%%%IdentifierDenotation ::=\\
+%%%\x Identifier $\mid$ (Identifier [ , Identifier ] $^{...}$ )
+%%%
+%%% Indicator wurde durch Identifier ersetzt
+
+\end{discuss}
+
+Following meta characters are used in the syntax description:\\ 
+
+\begin{tabular}{ll}
+meta character & meaning \\ \hline
+::=            & introduction of a Name (nonterminal symbol) for a language form\\
+$[\ ]$         & bracketing of optional parts of a language form \\ 
+$\mid$         & separation of alternative parts of a language form\\
+\{ \}          & putting together several elements to a new element\\
+$^{...}$       & one or multiple repetition of the preceding element\\
+               & (or of several elements bracketed by \{ \} or [ ] ) \\
+$\S $          & separates an explaining comment from a language form Name\\
+$/^*$ $^*/$    & comment brackets: 
+                 includes an explaining text, possibly explaining the\\
+               & language form in detail instead of a formal description\\
+\end{tabular}
+
+All other elements occurring in the syntax rules are either Names of language
+forms or terminal symbols. Examples for terminal symbols are the PEARL
+keywords (printed boldly) or the characters semicolon ``;'', opening round
+bracket ``('' and closing round bracket ``)'', 
+% Klammer auf und zu ???
+or the apostrophe `` ' ''; the terminal symbols opening square bracket ``[''
+and closing square bracket ``]'' are printed boldly to distinguish them
+from the meta symbols for optional parts. Attention: the round brackets are
+no meta characters and have thus no grouping effect!\\
+
+The symbol PEARL-Program is the initial symbol of the following syntax
+description.
+\begin{discuss}
+die hier eingerahmenten Grammatikelemente teten vorne nicht auf
+
+sind dies widersprüchlich?
+
+korrekt?
+\end{discuss}
+\subsection{Program}    % A 3.1
+
+\input{Program.bnf}
+
+\input{Module.bnf}
+
+\subsection{System Part}   % A 3.2
+
+\input{SystemPart.bnf}
+
+\input{UserNameDeclaration.bnf}
+\input{SystemDationDeclaration.bnf}
+\input{SystemSignalDeclaration.bnf}
+\input{SystemInterruptDeclaration.bnf}
+
+\input{ConfigurationElement.bnf}
+\input{ListOfConstants.bnf}
+\input{ConstantParameter.bnf}
+\input{Association.bnf}
+
+%%%\begin{removed}
+%%%nngz ::= \\
+%%%\x IntegerWithoutPrecision$\S $NonNegative
+%%%\end{removed}
+
+
+\subsection{Basic Elements}    % A 3.3 
+\input{Digit.bnf} 
+\input{Letter.bnf}
+\input{Identifier.bnf}
+
+\input{Constant.bnf}
+
+\input{Integer.bnf} 
+
+\input{IntegerWithoutPrecision.bnf}
+
+\input{Precision.bnf}
+
+\begin{grammarframe}
+\htgt{FloatingPointNumber} ::=\\
+\x \hlink{FloatingPointNumberWithoutPrecision} [ ( \hlink{Precision} ) ]\\
+
+\htgt{FloatingPointNumberWithoutPrecision} ::=\\
+\x \{ \hlink{Digit} $^{...}$ . [ \hlink{Digit} $^{...}$ ] $\mid$ . \hlink{Digit} $^{...}$ \} [ \hlink{Exponent} ]\\
+\x $\mid$ \hlink{Digit} $^{...}$ \hlink{Exponent}\\
+
+\htgt{Exponent} ::=\\
+\x E [ + $\mid$ - ] \hlink{Digit} $^{...}$\\
+
+\htgt{BitStringConstant} ::=\\
+\x ' \hlink{B1-Digit} $^{...}$ ' \{ {\bf B} $\mid$ {\bf B}1 \} $\mid$ ' \hlink{B2-Digit} $^{...}$ ' {\bf B}2 $\mid$ ' \hlink{B3-Digit} $^{...}$ ' {\bf B}3 $\mid$ ' \hlink{B4-Digit}$^{...}$ ' {\bf B4}\\
+
+\htgt{B1-Digit} ::= 0 $\mid$ 1\\
+
+\htgt{B2-Digit} ::= 0 $\mid$ 1 $\mid$ 2 $\mid$ 3\\
+
+\htgt{B3-Digit} ::= 0 $\mid$ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7\\
+
+\htgt{B4-Digit} ::= 0 $\mid$ 1 $\mid$ 2 $\mid$ 3 $\mid$ 4 $\mid$ 5 $\mid$ 6 $\mid$ 7 $\mid$ 8 $\mid$ 9 $\mid$ A $\mid$ B $\mid$ C $\mid$ D $\mid$ E $\mid$ F\\
+
+\htgt{CharacterStringConstant} ::=\\
+\x ' \{ \hlink{CharacterBesidesApostrophe} $\mid$ '' $\mid$ \hlink{ControlCharacterSequence} \} $^{...}$ '\\
+
+\htgt{CharacterBesidesApostrophe} ::=\\
+\x \hlink{Digit} $\mid$ \hlink{Letter} \\
+\x $\mid$ \_ $\mid$ + $\mid$ - $\mid$ $^*$ $\mid$ / $\mid$ $\backslash$ $\mid$ ( $\mid$ ) $\mid$ {\bf [} $\mid$ {\bf ]} $\mid$ : $\mid$ . $\mid$ ; $\mid$ , $\mid$ = $\mid$ $<$ $\mid$ $>$ $\mid$ !\\
+\x $\mid$ $/^*$ more printable characters of the machine character set $*/$ \\
+
+\htgt{ControlCharacterSequence} ::= \\
+\x '$\backslash$ \{ \hlink{B4-Digit} \hlink{B4-Digit} \} $^{...}$ $\backslash$'\\
+
+\htgt{TimeConstant} ::=\\
+\x \hlink{Digit} $^{...}$ : \hlink{Digit} $^{...}$ : \hlink{Digit} $^{...}$ [ . \hlink{Digit} $^{...}$ ] \\
+
+\htgt{DurationConstant} ::=\\
+\x \hlink{Hours} [ \hlink{Minutes} ] [ \hlink{Seconds} ]\\
+\x $\mid$ \hlink{Minutes} [ \hlink{Seconds} ]\\
+\x $\mid$ \hlink{Seconds}\\
+
+\htgt{Hours} ::=\\
+\x \hlink{IntegerWithoutPrecision} \kw{HRS}
+
+\htgt{Minutes} ::=\\
+\x \hlink{IntegerWithoutPrecision} \kw{MIN}
+
+\htgt{Seconds} ::=\\
+\x \{ \hlink{IntegerWithoutPrecision} 
+	$\mid$ \hlink{FloatingPointNumberWithoutPrecision} \} \kw{SEC}
+\end{grammarframe}
+
+\input{ConstantExpression.bnf}
+
+\input{ConstantFIXEDExpression.bnf} 
+        
+\input{Term.bnf}
+
+\input{Factor.bnf}
+
+\subsection{Problem Part}   % A 3.4
+
+\input{ProblemPart.bnf}
+
+\subsubsection{Declaration}    % A 3.4.1
+
+\begin{grammarframe}
+\htgt{Declaration} ::=\\
+\x \hlink{LengthDefinition} \\
+\x $\mid$ \hlink{TypeDefinition}\\
+\x $\mid$ \hlink{VariableDeclaration}\\
+\x $\mid$ \hlink{FormatDeclaration}\\
+\x $\mid$ \hlink{ProcedureDeclaration}\\
+\x $\mid$ \hlink{TaskDeclaration}\\
+%%%% added
+\x $\mid$ \hlink{UserSignalDeclaration}\\
+\end{grammarframe}
+
+%%%%%\begin{removed}
+%%%%%\x $\mid$ OperatorDefinition\\
+%%%%%\x $\mid$ PredenceDefinition\\
+%%%%%\end{removed}
+
+
+\input{LengthDefinition.bnf} 
+
+\input{TypeDefinition.bnf}
+\input{Type.bnf}
+\input{TypeFixed.bnf}
+\input{TypeFloat.bnf}
+\input{TypeBitString.bnf}
+\input{TypeCharacterString.bnf}
+\input{TypeClock.bnf}
+\input{TypeDuration.bnf}
+
+\input{LengthOfString.bnf}
+
+\input{ScalarVariableDeclaration.bnf}
+%%%\input{VariableDenotation.bnf}
+\input{ScalarDeclareDataSentence.bnf}
+\input{TypeAttribute.bnf}
+
+\begin{discuss}
+sind DeclareSentence und DationAttribute noch notwendig?
+
+Es gibt ScalarVariableDeclaration, Bezug zu VariableDeclaration?
+
+\htgt{VariableDeclaration} ::=\\
+\x \{ {\bf DECLARE $\mid$ DCL} \} \hlink{DeclareSentence} [ , \hlink{DeclareSentence} ] $^{...}$ ;\\
+% wie ist "Satz" hier gemeint ???
+
+\htgt{DeclareSentence} ::=\\
+\x \hlink{OneIdentifierOrList} [ \hlink{DimensionAttribute} ]\\
+\x \{ \hlink{ProblemDataAttribute} $\mid$ \hlink{SemaAttribute} $\mid$ \hlink{BoltAttribute} $\mid$ \hlink{DationAttribute} \}\\ 
+\end{discuss}
+
+
+\begin{discuss}
+Doppelte Regel mit DationDeclaration
+
+\htgt{DationAttribute} ::=\\
+\x \hlink{TypeDation}\\
+\x [ \hlink{GlobalAttribute} ]\\
+\x \kw{CREATED} \kw{(} \hlink{Identifier}$\S $UserNameForSytemDation \kw{)}
+
+\end{discuss}
+
+
+\input{OneIdentifierOrList.bnf}
+
+\input{DimensionAttribute.bnf}
+
+\input{DimensionBoundaries.bnf}
+ 
+\begin{grammarframe}       
+\htgt{ProblemDataAttribute} ::=\\
+\x [ \kw{INV} ] \{ \hlink{SimpleType} $\mid$ \hlink{StructuredType} 
+	$\mid$ \hlink{TypeReference} \}\\
+\x [ \hlink{GlobalAttribute} ] [ \hlink{InitialisationAttribute} ]\\
+\end{grammarframe}       
+
+\input{SimpleType.bnf}
+
+\begin{grammarframe}       
+\htgt{StructuredType} ::=\\
+\x \hlink{TypeStructure} $\mid$ \hlink{Identifier}$\S $ForNewDefinedType\\
+
+% war schon mal da \input{TypeStructure.bnf}
+\end{grammarframe}
+
+\input{StructureComponent.bnf}
+
+\input{TypeAttributeInStructureComponent.bnf}
+
+\input{TypeReference.bnf}
+
+\input{VirtualDimensionList.bnf}
+
+%%%\begin{removed}
+%%%\input{Type-VOID.bnf}
+%%%\end{removed}
+
+\input{ArrayDeclaration.bnf}
+\input{ArrayDenotation.bnf}
+\input{TypeAttributeForArray.bnf}
+% war schon mal da \input{DimensionAttribute.bnf}
+% war schon mal da \input{DimensionBoundaries.bnf}
+
+\input{ArraySpecification.bnf}
+\input{ArrayDenotationS.bnf}
+
+\input{StructureDeclaration.bnf}
+\input{StructureDenotation.bnf}
+\input{TypeStructure.bnf}
+% ist schon mal da  \input{StructureComponent.bnf}
+% ist schon mal da \input{TypeAttributeInStructureComponent.bnf}
+\input{StructureSpecification.bnf}
+\input{StructureDenotationS.bnf}
+
+\begin{grammarframe}
+\htgt{SemaAttribute} ::=\\
+\x \kw{SEMA} [ \hlink{GlobalAttribute} ]\\
+\x [ \kw{PRESET} ( \hlink{ConstantFIXEDExpression}\\
+\x \x [ , \hlink{ConstantFIXEDExpression} ] $^{...}$ ) ]\\
+
+\htgt{BoltAttribute} ::=\\
+\x \kw{BOLT} [ \hlink{GlobalAttribute} ]\\
+\end{grammarframe}
+
+\input{GlobalAttribute.bnf}
+
+\input{InitialisationAttribute.bnf}
+
+\input{InitElement.bnf}
+
+
+\input{DationDeclaration.bnf}
+
+%%%\input{DationAttribute.bnf}
+
+\input{TypeDationSystem.bnf}
+\input{TypeDation.bnf}
+
+\input{SourceSinkAttribute.bnf}
+
+%%%%%\begin{removed}
+%%%%%ClassAttribute ::= \\
+%%%%%\x {\bf ALPHIC $\mid$ BASIC} $\mid$ TypeOfTransmissionData\\
+%%%%%\end{removed}
+
+%%%%%\begin{added}
+\input{ClassAttribute.bnf}
+%%%%%\end{added}
+
+\input{TypeOfTransmissionData.bnf}
+\input{IOCompoundType.bnf}
+\input{IOStructure.bnf}
+\input{IOStructureComponent.bnf}
+
+\input{Typology.bnf}
+\input{TypologyDeclaration.bnf}
+\input{TypologySpecification.bnf}
+
+\input{AccessAttribute.bnf}
+
+\input{FormatDeclaration.bnf}
+
+\input{ProcedureDeclaration.bnf}
+
+\input{ProcedureBody.bnf}
+
+\input{ListOfFormalParameters.bnf}
+        
+\input{FormalParameter.bnf}
+
+\input{ParameterType.bnf}
+
+\input{TypeRealTimeObject.bnf}
+
+\input{ResultAttribute.bnf}
+
+\input{ResultType.bnf}
+
+\input{TaskDeclaration.bnf}
+
+\input{TaskBody.bnf}
+        
+\input{PriorityAttribute.bnf}
+
+%%%%%\begin{removed}
+%%%%%\input{OperatorDefinition.bnf}
+%%%%%
+%%%%%\input{OpName.bnf}
+%%%%%
+%%%%%\input{OpParameter.bnf}
+%%%%%
+%%%%%\input{PrecedenceDefinition.bnf}
+%%%%%
+%%%%%\end{removed}
+
+\subsection{Specification and Identification}    % A 3.4.2
+\begin{discuss}
+Auswirkung auf alte Teile pruefen
+
+\input{ScalarVariableSpecification.bnf}
+\input{VariableDenotationS.bnf}
+\end{discuss}
+
+\begin{grammarframe}
+\htgt{Specification} ::=\\
+\x \{ \kw{SPC} $\mid$ \kw{SPECIFY} \} \hlink{SpecificationDefinition}\\
+\x \x  [ , \hlink{SpecificationDefinition} ] $^{...}$ \kw{;}
+
+\htgt{SpecificationDefinition} ::=\\
+\x \hlink{OneIdentifierOrList}\\
+\x \{ \hlink{SpecificationAttribute} $\mid$ \hlink{ProcedureUsageAttribute} $\mid$ \hlink{TaskUsageAttribute} \}\\
+
+\htgt{SpecificationAttribute} ::=\\
+\x [ \hlink{VirtualDimensionList} ] \\
+\x \{ [ \kw{INV} ] \{ \hlink{SimpleType} $\mid$ 
+	\hlink{StructuredType} $\mid$
+	\hlink{TypeReference} \} \\
+\x \x $\mid$ \kw{SEMA} $\mid$ \kw{BOLT} $\mid$ 
+	\kw{INTERRUPT} $\mid$ \kw{IRPT} $\mid$ \kw{SIGNAL} 
+	$\mid$ \hlink{TypeDation}\\
+\x \}\\
+\x [ \hlink{GlobalAttribute} ]\\
+
+\htgt{ProcedureUsageAttribute} ::=\\
+\x \kw{PROC} [ 
+	\hlink{ParameterListForSPC} ] [ \hlink{ResultAttribute} ] 
+ \hlink{GlobalAttribute}
+\end{grammarframe}
+
+%%%\begin{removed}
+%%%\htgt{ParameterListFor-SPC} ::=\\
+%%%\x ( \hlink{FormalParameterFor-SPC} 
+%%%	[ , \hlink{FormalParameterFor-SPC} ] $^{...}$ )\\
+%%%      
+%%%\htgt{FormalParameterFor-SPC} ::=\\
+%%%\x [ \hlink{Identifier}$\S $OnlyForDocumentation ] 
+%%%	[ \hlink{VirtualDimensionList} ]\\
+%%%\x \hlink{ParameterType} [ {\bf IDENTICAL $\mid$ IDENT} ]\\
+%%%\end{removed}
+\input{ProcedureSpecification.bnf}
+\input{ListOfParametersForSPC.bnf}
+\input{ParameterSpecification.bnf}
+\input{TypeProcedure.bnf}
+
+\begin{grammarframe}
+\htgt{TaskUsageAttribute} ::=\\
+\x \kw{TASK} \hlink{GlobalAttribute}
+\end{grammarframe}
+
+\input{Identification.bnf}
+
+
+\input{IdentificationAttribute.bnf}
+
+\subsection{Expressions}    % A 3.4.3
+
+\input{Expression.bnf}
+
+\input{MonadicOperator.bnf}
+
+\input{DyadicOperator.bnf}
+
+\input{Operand.bnf}
+
+\input{Name.bnf}
+
+\input{Index.bnf}
+
+\input{FunctionCall.bnf}
+
+\input{ListOfActualParameters.bnf}
+
+%%%\begin{discuss}
+%%%aus Sprache gestrichen
+%%%
+%%%\input{ConditionalExpression.bnf}  %%% noch nicht in front genutzt!
+%%%\end{discuss}
+
+\input{Dereferentiation.bnf}
+
+\input{StringSelection.bnf}
+
+\subsection{Statements}    % A 3.4.4
+
+\begin{grammarframe}
+\htgt{Statement} ::=\\
+\x [ \hlink{Identifier}$\S $Label : ] $^{...}$ \hlink{UnlabelledStatement}\\
+
+\htgt{UnlabelledStatement} ::=\\
+\x \hlink{EmptyStatement} $\mid$ \hlink{Assignment} $\mid$ \hlink{Block} $\mid$ \hlink{SequentialControlStatement}\\
+\x $\mid$ \hlink{RealTimeStatement} $\mid$ \hlink{ConvertStatement} $\mid$ \hlink{I/O-Statement}\\
+\end{grammarframe}
+
+\input{EmptyStatement.bnf}
+
+\input{Assignment.bnf}
+\input{ScalarAssignment.bnf}
+\input{StructureAssignment.bnf}
+\input{RefProcAssignment.bnf}
+
+\input{Block.bnf}
+
+\input{SequentialControlStatement.bnf}
+
+\input{IfStatement.bnf}
+
+\input{CaseStatement.bnf}
+
+\input{CaseStatement1.bnf}
+
+\input{CaseStatement2.bnf}
+
+\input{CaseIndex.bnf}
+
+\input{CaseList.bnf}
+
+\input{IndexRange.bnf}
+
+\input{LoopStatement.bnf}
+        
+\input{ExitStatement.bnf}
+
+\input{ProcedureCall.bnf}
+
+\input{ReturnStatement.bnf}
+
+\input{GoToStatement.bnf}
+
+\begin{grammarframe}
+\htgt{RealTimeStatement} ::=\\
+\x \hlink{TaskControlStatement} $\mid$ \hlink{TaskCoordinationStatement}\\
+\x $\mid$ \hlink{InterruptStatement} $\mid$ \hlink{SignalStatement}\\
+
+\htgt{TaskControlStatement} ::=\\
+\x \hlink{TaskStarting} $\mid$ \hlink{TaskTerminating}\\             
+\x $\mid$ \hlink{TaskSuspending} $\mid$ \hlink{TaskContinuing}\\   
+\x $\mid$ \hlink{TaskResuming} $\mid$ \hlink{TaskPreventing}\\
+\end{grammarframe}
+
+\input{TaskStarting.bnf}
+
+\input{SimpleStartCondition.bnf}
+
+\input{PriorityExpression.bnf}
+
+\input{StartCondition.bnf}
+
+\input{Frequency.bnf}
+
+\input{TaskTerminating.bnf}
+
+\input{TaskSuspending.bnf}
+
+\input{TaskContinuing.bnf}
+
+\input{TaskResuming.bnf}
+
+\input{TaskPreventing.bnf}
+
+\input{TaskCoordinationStatement.bnf}
+\input{SemaStatement.bnf}
+\input{BoltStatement.bnf}
+
+\input{InterruptStatement.bnf}
+
+%%%%%\begin{removed}
+%%%%%SchedulingSignalReaction ::=\\
+%%%%%\x {\bf ON} Name$\S $Signal \{ [ 
+%%%%%	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) ] :\\
+%%%%%\x \x SignalReaction $\mid$ 
+%%%%%	{\bf RST} ( Name$\S $ErrorVariable-FIXED ) \};\\
+%%%%%
+%%%%%SignalReaction::= UnlabeledStatement\\
+%%%%%
+%%%%%InduceStatement ::=\\
+%%%%%\x {\bf INDUCE} Name$\S $Signal 
+%%%%%	[ {\bf RST} ( Expression$\S $ErrorNumber-FIXED ) ] ;\\
+%%%%%\end{removed}
+
+%%%%%\begin{added}
+\input{UserSignalDeclaration.bnf}
+\input{SignalStatement.bnf}
+\input{SignalReaction.bnf}
+\input{SignalFinalStatement.bnf}
+\input{InduceStatement.bnf} 
+%%%%%\end{added}
+
+\input{ConvertStatement.bnf}
+
+\input{ConvertToStatement.bnf}
+
+\input{ConvertFromStatement.bnf}
+
+\input{FormatOrPositionConvert.bnf}
+
+\input{PositionConvert.bnf}
+
+\begin{grammarframe}
+\htgt{I/O-Statement} ::=\\
+\x \hlink{OpenStatement} $\mid$ \hlink{CloseStatement}\\
+\x $\mid$ \hlink{PutStatement} $\mid$ \hlink{GetStatement}\\
+\x $\mid$ \hlink{WriteStatement} $\mid$ \hlink{ReadStatement}\\
+\x $\mid$ \hlink{SendStatement} $\mid$ \hlink{TakeStatement}\\
+\end{grammarframe}
+         
+\input{OpenStatement.bnf}
+
+\input{OpenParameter.bnf}
+
+\input{CloseStatement.bnf}
+
+\input{CloseParameter.bnf}
+
+\input{PutStatement.bnf}
+
+\input{GetStatement.bnf}
+
+
+\input{WriteStatement.bnf}
+        
+\input{ReadStatement.bnf}
+        
+%%%%%\begin{removed}
+%%%%%SendStatement ::=\\
+%%%%%\x {\bf SEND} [ \hlink{Expression} ] {\bf TO} \hlink{Name}$\S $Dation\\
+%%%%%\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%
+%%%%%TakeStatement ::=\\
+%%%%%\x {\bf TAKE} [ \hlink{Name} ] {\bf FROM} \hlink{Name}$\S $Dation\\
+%%%%%\x [ {\bf BY} RST-S-CTRL-Format [ , RST-S-CTRL-Format ] $^{...}$ ] ;\\
+%%%%%
+%%%%%RST-S-CTRL-Format ::=\\
+%%%%%\x {\bf RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+%%%%%\x $\mid$ {\bf S} ( \hlink{Name}$\S $Variable-FIXED )\\
+%%%%%\x $\mid$ {\bf CONTROL} ( \hlink{Expression} [ , \hlink{Expression} [ , \hlink{Expression} ] ] )\\
+%%%%%\end{removed}
+
+%%%%%\begin{added}
+\input{SendStatement.bnf} 
+
+\input{TakeStatement.bnf}
+
+\input{RSTFormat.bnf}
+
+%%%%%\end{added}
+
+\input{Slice.bnf}
+
+\input{FormatOrPosition.bnf}
+      
+%%%%%\begin{removed}  
+%%%%%Factor ::=\\
+%%%%%\x ( \hlink{Expression}$\S $IntegerGreaterZero ) $\mid$ \hlink{IntegerWithoutPrecision}$\S $GreaterZero\\
+%%%%%
+%%%%%.. and sustituted Factor by FormatFactor in Convert and Put/GET statements
+%%%%%\end{removed}  
+%%%%%\begin{added}  
+\input{FormatFactor.bnf}
+
+%%%%%\end{added}  
+
+\input{Format.bnf}
+\input{FixedFormat.bnf}
+\input{FloatFormat.bnf}
+\input{CharacterStringFormat.bnf}
+\input{BitFormat.bnf}
+\input{TimeFormat.bnf}
+\input{DurationFormat.bnf}
+\input{ListFormat.bnf}
+\input{RFormat.bnf}
+\input{FieldWidth.bnf}
+\input{DecimalPositions.bnf}
+\input{Significance.bnf}
+
+\input{Position.bnf}
+\input{AbsolutePosition.bnf}
+\input{RelativePosition.bnf}
+
+\twocolumn[\section{List of Keywords with Shortforms}   % A 4
+The denotation behind the keyword refers to the paragraph where it
+is introduced.\\]
+
+{
+{\bf ACTIVATE} \ref{sec_task_activate}\\
+{\bf AFTER} \ref{sec_task_activate}\\
+{\bf ALL} \ref{sec_task_activate}\\
+{\bf ALPHIC} \ref{sec_dation_problem_part}\\
+{\bf ALT} \ref{sec_case}\\
+{\bf AT} \ref{sec_task_activate}\\
+
+{\bf BASIC} \ref{sec_dation_problem_part}\\
+{\bf BEGIN} \ref{sec_block} \\
+{\bf BIT} \ref{sec_bit_strings}\\
+{\bf BOLT} \ref{sec_bolt}\\
+{\bf BY} \ref{sec_repetition}, \ref{sec_dation_open_close}\\
+
+{\bf CALL} \ref{sec_call}\\
+{\bf CASE} \ref{sec_case}\\
+{\bf CHARACTER}, {\bf CHAR} \ref{sec_char_strings}\\
+{\bf CLOCK} \ref{sec_type_clock}\\
+{\bf CLOSE} \ref{sec_dation_open_close}\\
+{\bf CONT} \ref{sec_references}\\
+{\bf CONTINUE} \ref{sec_continue}\\
+{\bf CONTROL} \ref{sec_dation_problem_part}\\
+{\bf CONVERT} \ref{sec_dation_problem_part}\\
+{\bf CREATED} \ref{sec_dation_problem_part}\\
+{\bf CYCLIC} \ref{sec_dation_problem_part}\\
+ 
+{\bf DATION} \ref{sec_dation_problem_part}\\
+{\bf DECLARE}, {\bf DCL} \ref{sec_dcl}\\
+{\bf DIM} \ref{sec_dation_problem_part}\\
+{\bf DIRECT} \ref{sec_dation_problem_part}\\
+{\bf DISABLE} \ref{sec_task_interrupt}\\
+{\bf DURATION}, {\bf DUR} \ref{sec_type_duration}\\
+{\bf DURING} \ref{sec_task_activate}\\
+
+{\bf ELSE} \ref{sec_if}\\
+{\bf ENABLE} \ref{sec_task_interrupt}\\
+{\bf END} \ref{sec_block}, \ref{sec_repetition}, \ref{sec_proc_dcl},
+	 \ref{sec_task_dcl}\\
+{\bf ENTER} \ref{sec_bolt}\\
+%{\bf ENTRY} \ref{sec_proc_dcl}\\
+{\bf EXIT} \ref{sec_exit}\\
+
+{\bf FIN} \ref{sec_if}, \ref{sec_case}\\
+{\bf FIXED} \ref{sec_type_fixed}\\
+{\bf FLOAT} \ref{sec_type_float}\\
+{\bf FOR} \ref{sec_repetition}\\
+{\bf FORBACK} \ref{sec_dation_problem_part}\\
+{\bf FORMAT} \ref{sec_dation_r_format}\\
+{\bf FORWARD} \ref{sec_dation_problem_part}\\
+{\bf FREE} \ref{sec_bolt}\\
+{\bf FROM} \ref{sec_repetition}, \ref{sec_read_write}\\
+ 
+{\bf GET} \ref{sec_get_put}\\
+{\bf GLOBAL} \ref{sec_references_module}\\
+{\bf GOTO} \ref{sec_goto}\\
+ 
+{\bf HRS} \ref{sec_type_duration}\\
+ 
+{\bf IDENTICAL}, {\bf IDENT} \ref{sec_spc}, \ref{sec_proc_dcl}\\
+{\bf IF} \ref{sec_if}\\                           
+{\bf IN} \ref{sec_dation_problem_part}\\
+{\bf INDUCE} \ref{sec_signal_reactions}\\
+{\bf INITIAL}, {\bf INIT} \ref{sec_init}\\
+{\bf INOUT} \ref{sec_dation_problem_part}\\
+{\bf INTERRUPT}, {\bf IRPT} \ref{sec_interrupts}\\
+{\bf INV} \ref{sec_inv}\\
+ 
+{\bf LEAVE} \ref{sec_bolt}\\
+{\bf LENGTH} \ref{sec_length}\\
+ 
+{\bf MAIN} \ref{sec_task_dcl}\\
+{\bf MAX} \ref{sec_dation_problem_part}\\
+{\bf MIN} \ref{sec_type_duration}\\
+{\bf MODEND} \ref{sec_modules}\\
+{\bf MODULE} \ref{sec_modules}\\
+ 
+{\bf NIL} \ref{sec_references}\\
+{\bf NOCYCL} \ref{sec_dation_problem_part}\\
+{\bf NOSTREAM} \ref{sec_dation_problem_part}\\
+
+{\bf ON} \ref{sec_signal_reactions}\\
+{\bf OPEN} \ref{sec_dation_open_close}\\
+%%%%% {\bf OPERATOR} 6.2\\    removed due to no OPERATOR support
+{\bf OUT} \ref{sec_case}, \ref{sec_dation_problem_part}\\
+ 
+%%%%% {\bf PRECEDENCE} 7.2\\  removed, due no no OPERATOR support
+{\bf PRESET} \ref{sec_semaphores}\\
+{\bf PREVENT} \ref{sec_prevent}\\
+{\bf PRIORITY}, {\bf PRIO} \ref{sec_task_dcl}\\
+{\bf PROBLEM} \ref{sec_modules}\\
+{\bf PROCEDURE}, {\bf PROC} \ref{sec_proc_dcl}\\
+{\bf PUT} \ref{sec_get_put}\\
+
+{\bf READ} \ref{sec_read_write}\\
+{\bf REF} \ref{sec_references}\\
+{\bf RELEASE} \ref{sec_semaphores}\\
+{\bf REPEAT} \ref{sec_repetition}\\
+{\bf REQUEST} \ref{sec_semaphores}\\
+{\bf RESERVE} \ref{sec_bolt}\\
+{\bf RESUME} \ref{sec_resume}\\
+{\bf RETURN} \ref{sec_proc_dcl}\\
+{\bf RETURNS} \ref{sec_proc_dcl}\\
+ 
+{\bf SEC} \ref{sec_type_duration}\\
+{\bf SEMA} \ref{sec_semaphores}\\
+{\bf SEND} \ref{sec_take_send}\\
+{\bf SIGNAL} \ref{sec_signals}\\
+{\bf SPECIFY}, {\bf SPC} \ref{sec_spc}\\
+{\bf STREAM} \ref{sec_dation_problem_part}\\
+{\bf STRUCT} \ref{sec_struct}\\
+{\bf SUSPEND} \ref{sec_suspend}\\
+{\bf SYSTEM} \ref{sec_modules}\\
+ 
+{\bf TAKE} \ref{sec_take_send}\\
+{\bf TASK} \ref{sec_task_dcl}\\
+{\bf TERMINATE} \ref{sec_terminate}\\
+{\bf TFU} \ref{sec_dation_problem_part}\\
+{\bf THEN} \ref{sec_if}\\
+{\bf TO} \ref{sec_repetition}, \ref{sec_read_write}\\
+{\bf TRIGGER} \ref{sec_task_interrupt}\\
+{\bf TYPE} \ref{sec_type}\\
+ 
+{\bf UNTIL} \ref{sec_task_activate}\\
+ 
+{\bf WHEN} \ref{sec_task_activate}\\
+{\bf WHILE} \ref{sec_repetition}\\
+{\bf WRITE} \ref{sec_read_write}\\
+}
+\onecolumn
+
+\twocolumn[\section{Other Word Symbols in PEARL}    % A 5
+
+The denotation behind the word symbol refers to the paragraph where it
+is introduced.\\]
+
+{
+{\bf A} \ref{sec_dation_a_format}\\
+{\bf ABS} \ref{sec_monadic_operators}\\
+{\bf ADV} \ref{sec_read_write}\\
+{\bf AND} \ref{sec_dyadic_operators}\\
+{\bf ANY} \ref{sec_dation_open_close}\\
+{\bf ATAN} \ref{sec_monadic_operators}\\
+
+{\bf B} \ref{sec_dation_b_format}\\
+{\bf B1} \ref{sec_dation_b_format}\\
+{\bf B2} \ref{sec_dation_b_format}\\
+{\bf B3} \ref{sec_dation_b_format}\\
+{\bf B4} \ref{sec_dation_b_format}\\
+
+{\bf CAN} \ref{sec_dation_open_close}\\
+{\bf CAT} \ref{sec_dyadic_operators}\\
+{\bf COL} \ref{sec_read_write}\\
+{\bf CONT} \ref{sec_references}\\
+{\bf COS} \ref{sec_monadic_operators}\\
+{\bf CSHIFT} \ref{sec_dyadic_operators}\\
+ 
+{\bf D} \ref{sec_dation_d_format}\\
+{\bf DATE} \ref{sec_function_date}\\
+ 
+{\bf E} \ref{sec_dation_e_format}\\
+{\bf ENTIER} \ref{sec_monadic_operators}\\
+{\bf EQ} \ref{sec_dyadic_operators}\\
+{\bf EXOR} \ref{sec_dyadic_operators}\\
+{\bf EXP} \ref{sec_monadic_operators}\\
+ 
+{\bf F} \ref{sec_dation_f_format}\\
+{\bf FIT} \ref{sec_dyadic_operators}\\
+ 
+{\bf GE} \ref{sec_dyadic_operators}\\
+{\bf GT} \ref{sec_dyadic_operators}\\
+ 
+{\bf IDF} \ref{sec_dation_open_close}\\
+{\bf IS} \ref{sec_references}, \ref{sec_dyadic_operators}\\
+{\bf ISNT} \ref{sec_references}, \ref{sec_dyadic_operators}\\
+
+ 
+{\bf LE} \ref{sec_dyadic_operators}\\
+{\bf LINE} \ref{sec_read_write}\\
+{\bf LIST} \ref{sec_dation_listformat}\\
+{\bf LN} \ref{sec_monadic_operators}\\
+{\bf LT} \ref{sec_dyadic_operators}\\
+{\bf LWB} \ref{sec_monadic_operators}, \ref{sec_dyadic_operators}\\
+ 
+{\bf NE} \ref{sec_dyadic_operators}\\
+{\bf NEW} \ref{sec_dation_open_close}\\
+{\bf NOT} \ref{sec_monadic_operators}\\
+{\bf NOW} \ref{sec_function_now}\\
+ 
+{\bf OLD} \ref{sec_dation_open_close}\\
+{\bf OR} \ref{sec_dyadic_operators}\\
+ 
+{\bf PAGE} \ref{sec_read_write}\\
+{\bf POS} \ref{sec_read_write}\\
+{\bf PRM} \ref{sec_dation_open_close}\\
+ 
+{\bf R} \ref{sec_dation_r_format}\\
+{\bf REM} \ref{sec_dyadic_operators}\\
+{\bf ROUND} \ref{sec_monadic_operators}\\
+{\bf RST} \ref{sec_dation_open_close}, \ref{sec_dation_rst},
+   \ref{sec_signal_reactions} \\
+ 
+%%%%%{\bf S} \ref{sec_dation_a_format}\\
+{\bf SHIFT} \ref{sec_dyadic_operators}\\
+{\bf SIGN} \ref{sec_monadic_operators}\\
+{\bf SIN} \ref{sec_monadic_operators}\\
+{\bf SIZEOF} \ref{sec_monadic_operators}\\
+{\bf SKIP} \ref{sec_read_write} \\
+{\bf SOP}  \ref{sec_read_write}\\
+{\bf SQRT} \ref{sec_monadic_operators}\\
+ 
+{\bf T} \ref{sec_dation_t_format}\\
+{\bf TAN} \ref{sec_monadic_operators}\\
+{\bf TANH} \ref{sec_monadic_operators}\\
+{\bf TOBIT} \ref{sec_monadic_operators}\\
+{\bf TOCHAR} \ref{sec_monadic_operators}\\
+{\bf TOFIXED} \ref{sec_monadic_operators}\\
+{\bf TOFLOAT} \ref{sec_monadic_operators}\\
+{\bf TRY} \ref{sec_semaphores}\\
+ 
+{\bf UPB} \ref{sec_monadic_operators}, \ref{sec_dyadic_operators}\\
+
+{\bf X} \ref{sec_read_write}
+}
+
+%\twocolumn[\section{Index}    % A 5
+%
+%???? The denotation behind the word symbol refers to the paragraph where it
+%is introduced.\\]
+%
+
+
+\printindex

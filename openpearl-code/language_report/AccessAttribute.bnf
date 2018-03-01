@@ -1,0 +1,6 @@
+\htgt{AccessAttribute} ::=\\
+\x \{ \kw{DIRECT} $\mid$ \kw{FORWARD} %%%\removedtext{$\mid$ FORBACK}
+	 \}\\
+\x [ \kw{NOCYCL} $\mid$ \kw{CYCLIC} ]\\
+\x [ \kw{STREAM} $\mid$ \kw{NOSTREAM} ]
+

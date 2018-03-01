@@ -1,0 +1,6 @@
+\htgt{SimpleStartCondition} ::= \\
+\x \kw{AT} \hlink{Expression}$\S $Time \\
+\x $\mid$ \kw{AFTER} \hlink{Expression}$\S $Duration \\
+\x $\mid$ \kw{WHEN} \hlink{Name}$\S $Interrupt
+
+

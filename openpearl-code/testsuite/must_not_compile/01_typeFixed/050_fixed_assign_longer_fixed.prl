@@ -1,0 +1,14 @@
+MODULE(m1);
+
+PROBLEM;
+
+p: PROC;
+   DCL f1 FIXED(15);
+   DCL f2 FIXED(16);
+
+   ! must fail, since f2 has a larger type (FIT needed)
+   f1 := f2;
+
+END;
+
+MODEND;

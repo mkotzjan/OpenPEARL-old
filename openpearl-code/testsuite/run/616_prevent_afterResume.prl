@@ -1,0 +1,51 @@
+/*#########################################################################
+PROGRAM
+The main Task activate the Task2 and  go sleep for 1.5 Sec. 
+In this time the task2 starts and go sleep for 3 Sec and have now the
+taskstate suspended [sa=0, sc=1].
+The main task come back and prevent the task2 and go sleep for 2 sec and come 
+after the 2 sec back and check if Task2 continued to run.
+The task2 don't start after the 3 sec resume statement.
+###########################################################################
+RESULT
+The check variable have must the value 1. 
+The Task2 come never back because the main task suspended them.
+##########################################################################*/
+
+MODULE(test);
+
+PROBLEM;
+
+DCL check FIXED(15) INIT(0);
+
+Main : TASK PRIO 1 MAIN;
+    ACTIVATE Task2;   
+
+    AFTER 1.5 SEC RESUME; 
+
+    PREVENT Task2;
+
+    AFTER 2 SEC RESUME;
+    __cpp__(
+    'if (_check.x == 1) {'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf("*** SUCCESS *** \\n");'
+    '}else { ' 
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf("*** FAILED *** \\n");'
+    '}');
+    CONTINUE Task2;
+
+END;
+
+Task2 : TASK PRIO 2;
+    
+    check := check + 1;
+
+    AFTER 3 SEC RESUME;
+
+    check := check + 1;
+    
+END;
+
+MODEND;

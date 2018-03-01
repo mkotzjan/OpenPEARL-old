@@ -1,0 +1,5 @@
+\htgt{TaskReferenceSpecification} ::= \\
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList} 
+	[ \hlink{VirtualDimensionList} ]\\
+\x  [ \kw{ INV} ] \kw{REF TASK}  \hlink{GlobalAttribute} \kw{;}
+

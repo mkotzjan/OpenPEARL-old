@@ -1,0 +1,4 @@
+\htgt{CloseParameter} ::=\\
+\x \kw{RST} ( \hlink{Name}$\S $ErrorVariable-FIXED )\\
+\x $\mid$ \{ \kw{CAN} $\mid$ \kw {PRM} \}
+

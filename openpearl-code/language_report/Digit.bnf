@@ -1,0 +1,3 @@
+\htgt{Digit} ::=\\
+\x 0 $\mid$ 1 $\mid$ 2 $\mid$ ... $\mid$ 9
+

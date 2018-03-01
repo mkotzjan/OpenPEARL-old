@@ -1,0 +1,119 @@
+\contentsline {chapter}{\numberline {1}Introduction}{9}{chapter.1}
+\contentsline {chapter}{\numberline {2}Fundamental Features of PEARL}{11}{chapter.2}
+\contentsline {section}{\numberline {2.1}Multitasking Characteristics}{11}{section.2.1}
+\contentsline {section}{\numberline {2.2}Possibilities of Input and Output}{12}{section.2.2}
+\contentsline {section}{\numberline {2.3}Program Structure}{13}{section.2.3}
+\contentsline {section}{\numberline {2.4}Data Types}{14}{section.2.4}
+\contentsline {section}{\numberline {2.5}Control Structures}{14}{section.2.5}
+\contentsline {chapter}{\numberline {3}Rules for the Construction of PEARL Language Forms}{17}{chapter.3}
+\contentsline {section}{\numberline {3.1}Character Set}{17}{section.3.1}
+\contentsline {section}{\numberline {3.2}Basic Elements}{19}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Identifiers}{19}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Constants}{19}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Comments}{19}{subsection.3.2.3}
+\contentsline {section}{\numberline {3.3}Construction of Language Forms}{20}{section.3.3}
+\contentsline {chapter}{\numberline {4}Program Structure}{23}{chapter.4}
+\contentsline {section}{\numberline {4.1}Modules}{23}{section.4.1}
+\contentsline {section}{\numberline {4.2}Declarations and Specifications}{25}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Declaration (DCL)}{25}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Specification (SPC) and Identification (SPC IDENT)}{26}{subsection.4.2.2}
+\contentsline {section}{\numberline {4.3}Block Structure, Validity of Objects}{27}{section.4.3}
+\contentsline {section}{\numberline {4.4}References between Modules}{29}{section.4.4}
+\contentsline {section}{\numberline {4.5}Execution of a Program}{30}{section.4.5}
+\contentsline {chapter}{\numberline {5}Variables and Constants}{31}{chapter.5}
+\contentsline {section}{\numberline {5.1}Declaration and Specification of Variables and Constants}{31}{section.5.1}
+\contentsline {section}{\numberline {5.2}Integers (FIXED)}{32}{section.5.2}
+\contentsline {section}{\numberline {5.3}Floating Point Numbers (FLOAT)}{33}{section.5.3}
+\contentsline {section}{\numberline {5.4}Bit Strings (BIT)}{34}{section.5.4}
+\contentsline {section}{\numberline {5.5}Character Strings (CHARACTER)}{36}{section.5.5}
+\contentsline {section}{\numberline {5.6}The Length Definition}{37}{section.5.6}
+\contentsline {section}{\numberline {5.7}Times (CLOCK)}{38}{section.5.7}
+\contentsline {section}{\numberline {5.8}Durations (DURATION)}{38}{section.5.8}
+\contentsline {section}{\numberline {5.9}References (REF)}{39}{section.5.9}
+\contentsline {subsection}{\numberline {5.9.1}Variable Character String Pointers (REF CHAR())}{41}{subsection.5.9.1}
+\contentsline {section}{\numberline {5.10}Arrays}{43}{section.5.10}
+\contentsline {section}{\numberline {5.11}Structures}{45}{section.5.11}
+\contentsline {section}{\numberline {5.12}Type Definition (TYPE)}{49}{section.5.12}
+\contentsline {section}{\numberline {5.13}The Initialisation Attribute (INITIAL)}{51}{section.5.13}
+\contentsline {section}{\numberline {5.14}Assignment Protection (INV)}{52}{section.5.14}
+\contentsline {subsection}{\numberline {5.14.1}Named Constants (INV Constants)}{53}{subsection.5.14.1}
+\contentsline {subsection}{\numberline {5.14.2}Constant Expressions (of Type FIXED)}{54}{subsection.5.14.2}
+\contentsline {chapter}{\numberline {6}Expressions and Assignments}{57}{chapter.6}
+\contentsline {section}{\numberline {6.1}Expressions}{57}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}Monadic Operators}{61}{subsection.6.1.1}
+\contentsline {subsection}{\numberline {6.1.2}Dyadic Operators}{65}{subsection.6.1.2}
+\contentsline {subsection}{\numberline {6.1.3}Evaluation of Expressions}{69}{subsection.6.1.3}
+\contentsline {section}{\numberline {6.2}Assignments}{70}{section.6.2}
+\contentsline {subsection}{\numberline {6.2.1}Assignments for Scalar Variables}{71}{subsection.6.2.1}
+\contentsline {subsection}{\numberline {6.2.2}Assignments for Structures}{72}{subsection.6.2.2}
+\contentsline {chapter}{\numberline {7}Statements for the Control of Sequential Execution}{73}{chapter.7}
+\contentsline {section}{\numberline {7.1}Empty Statement}{73}{section.7.1}
+\contentsline {section}{\numberline {7.2}Conditional Statement (IF)}{74}{section.7.2}
+\contentsline {section}{\numberline {7.3}Statement Selection (CASE)}{74}{section.7.3}
+\contentsline {section}{\numberline {7.4}Repetition (FOR -- REPEAT)}{77}{section.7.4}
+\contentsline {section}{\numberline {7.5}GoTo Statement (GOTO)}{79}{section.7.5}
+\contentsline {section}{\numberline {7.6}Exit Statement (EXIT)}{79}{section.7.6}
+\contentsline {chapter}{\numberline {8}Procedures}{83}{chapter.8}
+\contentsline {section}{\numberline {8.1}Declaration and Specification of Procedures (PROC)}{84}{section.8.1}
+\contentsline {section}{\numberline {8.2}Calls of Procedures (CALL)}{87}{section.8.2}
+\contentsline {section}{\numberline {8.3}References to Procedures (REF PROC)}{89}{section.8.3}
+\contentsline {chapter}{\numberline {9}Parallel Activities}{91}{chapter.9}
+\contentsline {section}{\numberline {9.1}Declaration and Specification of Tasks (TASK)}{92}{section.9.1}
+\contentsline {subsection}{\numberline {9.1.1}References to Tasks (REF TASK)}{93}{subsection.9.1.1}
+\contentsline {subsection}{\numberline {9.1.2}Determining Task Addresses}{94}{subsection.9.1.2}
+\contentsline {subsection}{\numberline {9.1.3}Determining Task Priorities}{95}{subsection.9.1.3}
+\contentsline {section}{\numberline {9.2}Timing}{95}{section.9.2}
+\contentsline {section}{\numberline {9.3}Statements for Controlling Tasks}{96}{section.9.3}
+\contentsline {subsection}{\numberline {9.3.1}Starting a Task (ACTIVATE)}{96}{subsection.9.3.1}
+\contentsline {subsection}{\numberline {9.3.2}Terminating a Task (TERMINATE)}{101}{subsection.9.3.2}
+\contentsline {subsection}{\numberline {9.3.3}Suspending a Task (SUSPEND)}{102}{subsection.9.3.3}
+\contentsline {subsection}{\numberline {9.3.4}Continuing a Task (CONTINUE)}{102}{subsection.9.3.4}
+\contentsline {subsection}{\numberline {9.3.5}Delaying a Task (RESUME)}{103}{subsection.9.3.5}
+\contentsline {subsection}{\numberline {9.3.6}De-scheduling a Task (PREVENT)}{105}{subsection.9.3.6}
+\contentsline {section}{\numberline {9.4}Synchronising Tasks}{106}{section.9.4}
+\contentsline {subsection}{\numberline {9.4.1}Semaphore Variables (SEMA) and Statements (REQUEST, RELEASE, TRY)}{107}{subsection.9.4.1}
+\contentsline {subsection}{\numberline {9.4.2}Bolt Variables (BOLT) and Statements (ENTER, LEAVE, RESERVE, FREE)}{111}{subsection.9.4.2}
+\contentsline {section}{\numberline {9.5}Interrupts and Interrupt Statements}{114}{section.9.5}
+\contentsline {subsection}{\numberline {9.5.1}Declarations of Interrupts and Software Interrupts}{114}{subsection.9.5.1}
+\contentsline {subsection}{\numberline {9.5.2}Interrupt Statements (TRIGGER, ENABLE, DISABLE)}{115}{subsection.9.5.2}
+\contentsline {chapter}{\numberline {10}Input and Output}{117}{chapter.10}
+\contentsline {section}{\numberline {10.1}System Part}{117}{section.10.1}
+\contentsline {section}{\numberline {10.2}Specification and Declaration of Data Stations (DATION) in the Problem Part}{119}{section.10.2}
+\contentsline {subsection}{\numberline {10.2.1}System Data Stations}{119}{subsection.10.2.1}
+\contentsline {subsection}{\numberline {10.2.2}User Defined Data Stations}{120}{subsection.10.2.2}
+\contentsline {section}{\numberline {10.3}Opening and Closing of Data Stations (OPEN, CLOSE)}{126}{section.10.3}
+\contentsline {section}{\numberline {10.4}The Read and Write Statements (READ, WRITE)}{129}{section.10.4}
+\contentsline {section}{\numberline {10.5}The Get and Put Statements (GET, PUT)}{134}{section.10.5}
+\contentsline {subsection}{\numberline {10.5.1}The Fixed Format (F)}{137}{subsection.10.5.1}
+\contentsline {subsection}{\numberline {10.5.2}The Float Format (E)}{138}{subsection.10.5.2}
+\contentsline {subsection}{\numberline {10.5.3}The Character String Formats (A)}{140}{subsection.10.5.3}
+\contentsline {subsection}{\numberline {10.5.4}The Bit Format (B)}{141}{subsection.10.5.4}
+\contentsline {subsection}{\numberline {10.5.5}The Time Format (T)}{142}{subsection.10.5.5}
+\contentsline {subsection}{\numberline {10.5.6}The Duration Format (D)}{143}{subsection.10.5.6}
+\contentsline {subsection}{\numberline {10.5.7}The List Format (LIST)}{144}{subsection.10.5.7}
+\contentsline {subsection}{\numberline {10.5.8}The R Format (R)}{145}{subsection.10.5.8}
+\contentsline {section}{\numberline {10.6}The Convert Statement (CONVERT)}{145}{section.10.6}
+\contentsline {section}{\numberline {10.7}The Take and Send Statements}{146}{section.10.7}
+\contentsline {section}{\numberline {10.8}Error Handling in I/O Statements (RST)}{147}{section.10.8}
+\contentsline {section}{\numberline {10.9}Interface for Additional Drivers}{147}{section.10.9}
+\contentsline {chapter}{\numberline {11}Signals}{149}{chapter.11}
+\contentsline {section}{\numberline {11.1}System Part Entries}{149}{section.11.1}
+\contentsline {section}{\numberline {11.2}Declaration and Specification of Signals}{149}{section.11.2}
+\contentsline {section}{\numberline {11.3}Signal Reactions}{150}{section.11.3}
+\contentsline {chapter}{\numberline {A}Appendix}{155}{appendix.A}
+\contentsline {section}{\numberline {A.1}Data Types and their usability}{155}{section.A.1}
+\contentsline {section}{\numberline {A.2}Predefined Functions}{156}{section.A.2}
+\contentsline {subsection}{\numberline {A.2.1}The Function NOW}{156}{subsection.A.2.1}
+\contentsline {subsection}{\numberline {A.2.2}The Function DATE}{156}{subsection.A.2.2}
+\contentsline {section}{\numberline {A.3}CPP-Insertions}{157}{section.A.3}
+\contentsline {section}{\numberline {A.4}Syntax}{158}{section.A.4}
+\contentsline {subsection}{\numberline {A.4.1}Program}{158}{subsection.A.4.1}
+\contentsline {subsection}{\numberline {A.4.2}System Part}{159}{subsection.A.4.2}
+\contentsline {subsection}{\numberline {A.4.3}Basic Elements}{159}{subsection.A.4.3}
+\contentsline {subsection}{\numberline {A.4.4}Problem Part}{162}{subsection.A.4.4}
+\contentsline {subsubsection}{Declaration}{162}{section*.2}
+\contentsline {subsection}{\numberline {A.4.5}Specification and Identification}{168}{subsection.A.4.5}
+\contentsline {subsection}{\numberline {A.4.6}Expressions}{170}{subsection.A.4.6}
+\contentsline {subsection}{\numberline {A.4.7}Statements}{171}{subsection.A.4.7}
+\contentsline {section}{\numberline {A.5}List of Keywords with Shortforms}{179}{section.A.5}
+\contentsline {section}{\numberline {A.6}Other Word Symbols in PEARL}{181}{section.A.6}

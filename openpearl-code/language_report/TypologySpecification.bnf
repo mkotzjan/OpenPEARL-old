@@ -1,0 +1,4 @@
+\htgt{TypologySpecification} ::=\\
+\x	\kw{DIM} ( [ \kw{,} [ \kw{,} ] ] )
+
+

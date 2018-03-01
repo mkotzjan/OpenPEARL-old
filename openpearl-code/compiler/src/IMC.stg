@@ -1,0 +1,143 @@
+/*
+ [The "BSD license"]
+ Copyright (c) 2015-2016 Marcel Schaible
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ 3. The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+group openpearl;
+
+Module(sourcefile,name,SystemPart,ProblemPart) ::= <<
+\<?xml version="1.0" encoding="UTF-8" ?>
+\<module name="<name>"  file="<sourcefile>">
+<if(SystemPart)><SystemPart><endif>
+<if(ProblemPart)><ProblemPart><endif>
+\</module>
+>>
+
+SystemPart(decls) ::= <<
+\<system>
+ <decls: {decl|<decl>}>
+\</system>
+>>
+
+ProblemPart(decls) ::= <<
+\<problem>
+ <decls: {decl|<decl>}>
+\</problem>
+>>
+
+Username_Declaration(lineno,username,decl) ::= <<
+\<username name="<username>"  line="<lineno>">
+<decl>
+\</username>
+
+
+>>
+
+Username_Declaration_Without_Dataflow_Direction(lineno,sysname,parameters) ::= <<
+\<sysname name="<sysname>">
+    <if(parameters)><parameters><endif>
+\</sysname>
+>>
+
+Username_Declaration_With_Dataflow_Direction(sysname,parameters,association) ::= <<
+\<sysname name="<sysname>">
+    <if(parameters)><parameters><endif>
+    <if(association)><association><endif>
+\</sysname>
+>>
+
+Username_Parameters(params) ::= <<
+  \<parameters>
+    <params: {param| <param> }; separator="\n">
+  \</parameters>
+>>
+
+User_Configuration(lineno,sysname,parameters,association) ::= <<
+\<configuration line="<lineno>">
+    \<sysname name="<sysname>" >
+        <if(parameters)><parameters><endif>
+        <association>
+    \</sysname>
+\</configuration>
+
+>>
+
+Association(name,parameters) ::= <<
+\<association name="<name>">
+<if(parameters)><parameters><endif>
+\</association>
+>>
+
+Parameter(type) ::= <<
+<type>
+>>
+
+Type(name) ::= <<
+<name>
+>>
+
+Type_Char(name) ::= <<
+    \<CHAR><name>\</CHAR>
+>>
+
+Type_Bit(name) ::= <<
+    \<BIT><name>\</BIT>
+>>
+
+Type_Fixed(name) ::= <<
+    \<FIXED><name>\</FIXED>
+>>
+
+
+Specification(lineno,name,type) ::= <<
+\<spc type="<type>" name="<name>" line="<lineno>" />
+
+>>
+
+DationSpecification(lineno,name,attributes,datalist) ::= <<
+\<spc type="dation" name="<name>" line="<lineno>">
+<if(attributes)><attributes><endif>
+<if(datalist)><datalist><endif>
+\</spc>
+
+>>
+
+Attributes(attributes) ::= <<
+\<attributes><attributes: {attribute|<attribute>}; separator=",">\</attributes>
+>>
+
+Attribute(name) ::= <<
+<name>
+>>
+
+DataList(data) ::= <<
+\<data><data: {d|<d>}; separator=",">\</data>
+>>
+
+Data(name) ::= <<
+<name>
+>>

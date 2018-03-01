@@ -1,0 +1,16 @@
+%%%\begin{discuss}
+%%%GLOBAL und IDENT sind doch unabhängig?
+%%%
+%%%\htgt{BoltSpecification} ::=\\
+%%%\x \{ {\bf SPECIFY $\mid$ SPC} \} \hlink{OneIdentifierOrList} 
+%%%[ \hlink{VirtualDimensionList} ]\\
+%%%\x \x {\bf BOLT} \{ \hlink{GlobalAttribute} $\mid$ \hlink{IdentificationAttribute} \} ;
+
+\htgt{BoltSpecification} ::=\\
+\x \{ \kw{SPECIFY} $\mid$ \kw{SPC} \} \hlink{OneIdentifierOrList} 
+[ \hlink{VirtualDimensionList} ]\\
+\x \kw{BOLT} [ \hlink{GlobalAttribute} ] [ \hlink{IdentificationAttribute} ] \kw{;}
+
+%%%\end{discuss}
+
+

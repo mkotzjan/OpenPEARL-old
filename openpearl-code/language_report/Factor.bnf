@@ -1,0 +1,12 @@
+\htgt{Factor} ::= \\
+\x [ + $\mid$ - ] \\
+\x \{ \hlink{Integer}\\
+\x $\mid$ \kw{(} \hlink{ConstantFIXEDExpression} \kw{)}\\
+\x $\mid$ \kw{TOFIXED}\\
+\x \x  \{ 
+	\hlink{CharacterStringConstant}$\S $OfLength1 
+	$\mid$ \hlink{BitStringConstant} \}\\
+\x $\mid$ \hlink{Identifier}$\S $NamedFIXEDConstant\\
+\x \} \\
+\x [ \kw{FIT} \hlink{ConstantFIXEDExpression} ]
+

@@ -1,0 +1,3 @@
+\htgt{ListFormat} ::=\\
+\x \kw{LIST}
+

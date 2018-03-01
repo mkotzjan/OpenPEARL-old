@@ -1,0 +1,5 @@
+\htgt{StructureDenotation} ::=\\
+\x \hlink{OneIdentifierOrList}\S MainStructure [ \hlink{DimensionAttribute} ]\\
+\x [ \kw{INV} ] \hlink{TypeStructure} \\
+\x [ \hlink{GlobalAttribute} ][ \hlink{InitialisationAttribute} ]
+

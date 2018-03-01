@@ -1,0 +1,13 @@
+MODULE(cppAfterTask);
+
+PROBLEM;
+
+t : TASK MAIN;
+  DCL  f  FIXED;
+END;
+
+__cpp__(
+"void f() {}"
+);
+
+MODEND;

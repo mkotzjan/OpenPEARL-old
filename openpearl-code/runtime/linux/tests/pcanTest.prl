@@ -1,0 +1,105 @@
+MODULE(pcanTest);
+
+SYSTEM;
+pcan: PCan('/dev/pcan32', 1000000);
+termout: StdOut;
+termin: StdIn;
+
+PROBLEM;
+   SPC termout DATION OUT   SYSTEM ALPHIC GLOBAL;
+   SPC termin  DATION IN    SYSTEM ALPHIC GLOBAL;
+   SPC pcan    DATION INOUT SYSTEM BASIC ALL GLOBAL;
+
+   DCL stdout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(termout);
+   DCL stdin  DATION IN  ALPHIC DIM(*,80) FORWARD STREAM CREATED(termin);
+
+main: TASK MAIN;
+    DCL hello CHAR(18) INIT('PCan Test started');
+    OPEN stdout;
+    OPEN stdin;
+
+    PUT hello TO stdout BY A, SKIP;
+
+    ACTIVATE canRead;
+    ACTIVATE canWrite;
+
+    !CLOSE stdout;    
+
+END;
+
+canWrite: TASK;
+   DCL promptId CHAR(11) INIT('identifier:');
+   DCL candev DATION OUT BASIC ALL CREATED(pcan);
+    DCL id FIXED(11);
+    DCL rtr BIT(1);
+    DCL len FIXED(4);
+    DCL data BIT(8);
+    DCL rtrText CHAR;
+    __cpp__(
+	' struct _CanMessage {'
+        '   pearlrt::Fixed<11>    identifier;'
+        '   pearlrt::BitString<1> rtrRequest; '
+        '   pearlrt::Fixed<4>     dataLength; '
+        '   pearlrt::BitString<8> data[8];    '
+        ' } _canMessage; '
+    );
+
+   OPEN candev;
+
+   REPEAT
+       PUT 'enter identifier to send:' TO stdout BY A, SKIP;
+       GET id FROM stdin BY F(4), SKIP;
+       PUT 'is RTR? (y/n) ' TO stdout BY A;
+       GET rtrText FROM stdin BY A, SKIP; 
+       PUT 'data size? ' TO stdout BY A, SKIP;
+       GET len FROM stdin BY F(1) , SKIP;
+       FOR i TO len REPEAT
+           PUT 'data byte #',i TO stdout BY A,F(1);
+           GET data FROM stdin BY B4(2), SKIP;
+           __cpp__('_canMessage.data[_i.x] = _data;');
+       END;
+   END;
+END;
+
+canRead: TASK;
+   DCL candev DATION IN BASIC ALL CREATED(pcan);
+    DCL id FIXED(11);
+    DCL rtr BIT(1);
+    DCL len FIXED(4);
+    DCL (d1,d2,d3,d4,d5,d6,d7,d8) BIT(8);
+
+    __cpp__(
+	' struct _CanMessage {'
+        '   pearlrt::Fixed<11>    identifier;'
+        '   pearlrt::BitString<1> rtrRequest; '
+        '   pearlrt::Fixed<4>     dataLength; '
+        '   pearlrt::BitString<8> data[8];    '
+        ' } _canMessage; '
+    );
+   OPEN candev;
+    REPEAT
+    TAKE canMessage FROM candev;
+    __cpp__ (
+    '   _id = _canMessage.identifier;'
+    '   _rtr = _canMessage.rtrRequest;'
+    '   _len = _canMessage.dataLength;'
+    '   _d1 = _canMessage.data[0];'
+    '   _d2 = _canMessage.data[1];'
+    '   _d3 = _canMessage.data[2];'
+    '   _d4 = _canMessage.data[3];'
+    '   _d5 = _canMessage.data[4];'
+    '   _d6 = _canMessage.data[5];'
+    '   _d7 = _canMessage.data[6];'
+    '   _d8 = _canMessage.data[7];'
+    ' printf("id=%d rtr=%d len=%d data=%02x %02x %02x %02x %02x %02x %02x %02x\\n",'
+    '    _id.x, !!_rtr.x, _len.x, _d1.x, _d2.x, _d3.x, _d4.x,'
+    '                             _d5.x, _d6.x, _d7.x, _d8.x);' 
+    );
+
+    PUT id,rtr,len,d1,d2,d3,d4,d5,d6,d7,d8 TO stdout BY F(6),X(3),B4(1),X(3),F(4),
+       B4(2),X(2), B4(2),X(2), B4(2),X(2), B4(2),X(2),
+       B4(2),X(2), B4(2),X(2), B4(2),X(2), B4(2),X(2), SKIP;
+
+    END;
+END;
+MODEND;

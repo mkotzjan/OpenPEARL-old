@@ -1,0 +1,159 @@
+MODULE(bitexpr);
+SYSTEM;
+term: StdOut;
+
+PROBLEM;
+ SPC term DATION OUT SYSTEM ALPHIC;
+ DCL console DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(term);
+ DCL success BIT(1) INIT('1'B);
+
+p1: PROC;
+    DCL f BIT(1) INIT('0'B1);
+    DCL t BIT(1) INIT('1'B1);
+    DCL (d,d1,e) BIT(1);
+    DCL b2 BIT(2) INIT('01'B1);
+
+   PUT 'BIT(1) tests' TO console BY A, SKIP;
+   d := NOT f;
+   d1 := NOT d;
+   IF (d NE '1'B1) OR
+      (d1 NE '0'B1) OR
+      (NOT '0'B1) NE '1'B1 OR
+      (NOT '1'B1) NE '0'B1
+   THEN
+      PUT 'error#1 with NOT' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+
+   e := NOT(t AND f) AND NOT( f AND f) AND NOT(f AND t) AND (t AND t);
+   IF e NE '1'B1 THEN
+      PUT 'error#2 with AND ' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+
+   e := NOT(t OR f) OR ( f OR f) OR NOT(f OR t) OR NOT (t OR t);
+   IF e NE '0'B1 THEN
+      PUT 'error#3 with OR ' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+
+   e := NOT(t EXOR f) OR ( f EXOR f) OR NOT(f EXOR t) OR (t EXOR t);
+   IF e NE '0'B1 THEN
+      PUT 'error#4 with EXOR ' TO console BY A, SKIP;
+      success := '0'B1;
+   FIN;
+   
+   e := t SHIFT 1;
+   IF e NE '0'B1 THEN
+      PUT 'error#5 with SHIFT' TO console BY A, SKIP;
+   FIN;
+
+   e := t CSHIFT 1;
+   IF e NE '1'B1 THEN
+      PUT 'error#6 with CSHIFT' TO console BY A, SKIP;
+   FIN;
+END;
+
+p2: PROC;
+    DCL b BIT(4) INIT('0001'B1);
+    DCL e BIT(4);
+    DCL ss FIXED INIT(-1);
+
+   PUT 'BIT(4) tests' TO console BY A, SKIP;
+
+   IF (NOT '0101'B1) NE  '1010'B1 THEN
+       PUT 'error#7 with NOT' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ('0011'B AND '1110'B) NE  '0010'B THEN
+       PUT 'error#8 with AND' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ('0011'B OR '0110'B) NE  '0111'B THEN
+       PUT 'error#9 with OR' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ('0111'B EXOR '1110'B) NE  '1001'B THEN
+       PUT 'error#10 with EXOR' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ( ('0111'B SHIFT  1) NE '1110'B ) OR
+      ( ('0111'B SHIFT -1) NE '0011'B ) OR
+      ( ('0111'B SHIFT  4) NE '0000'B ) OR
+      ( ('0111'B SHIFT -3) NE '0000'B )
+   THEN
+       PUT 'error#11 with SHIFT' TO console BY A, SKIP;
+       success = '0'B1;
+   FIN;
+
+   IF ( ('0111'B CSHIFT 1) NE  '1110'B ) OR
+      ( ('0111'B CSHIFT 2) NE '1101'B ) OR
+      ( ('0111'B CSHIFT -1) NE '1011'B ) OR
+      ( ('0111'B CSHIFT 10) NE '1101'B ) OR
+      ( ('0111'B CSHIFT -3) NE '1110'B )
+   THEN
+       PUT 'error#12 with CSHIFT' TO console BY A, SKIP;
+       e := '0111'B CSHIFT 1;
+       PUT e TO console BY B1(4), SKIP;
+       e := '0111'B CSHIFT 2;
+       PUT e TO console BY B1(4), SKIP;
+       e := '0111'B CSHIFT -1;
+       PUT e TO console BY B1(4), SKIP;
+       e:= '0111'B CSHIFT 10;
+       PUT e TO console BY B1(4), SKIP;
+       e:= '0111'B CSHIFT -3;
+       PUT e TO console BY B1(4), SKIP;
+
+       success = '0'B1;
+   FIN;
+
+   IF ( ('01'B1 CAT '10'B1) NE '0110'B1) THEN
+       PUT 'error#13 with CAT' TO console BY A, SKIP;
+       PUT '01'B1 CAT '10'B1 TO console BY B1(4), SKIP;
+       success = '0'B1;
+   FIN;
+        
+END;
+
+p3: PROC;
+   DCL (b15,c15) BIT(15);
+   DCL f14 FIXED(14);
+
+   b15 := '011'B CAT 'FFF'B4;
+   f14 = TOFIXED b15;
+   IF f14 NE 2047 THEN
+      PUT 'error#13 with TOFIXED; result=',f14 TO console BY A,F(6), SKIP;
+      success = '0'B1;
+   FIN; 
+
+   c15 := TOBIT f14;
+   IF (b15 NE c15) THEN
+      PUT 'error#14 with TOBIT ' ,b15,' NE ', c15 TO console
+        BY A,B1(15),A,B1(15), SKIP;
+      success = '0'B1;
+   FIN;
+
+END;
+
+T1: TASK MAIN;
+
+    OPEN console;
+    CALL p1;
+    CALL p2;
+    IF success THEN
+        PUT '*** success' TO console BY A, SKIP;
+    ELSE
+        PUT '*** fail' TO console BY A, SKIP;
+        __cpp__("pearlrt::Control::setExitCode(1);");
+    FIN;
+
+    CLOSE console;
+
+END;
+
+MODEND;
+

@@ -1,0 +1,4 @@
+\htgt{TakeStatement} ::=\\
+\x  \kw{TAKE} [ \hlink{Name}$\S $Variable ] \kw{FROM} \hlink{Name}$\S $Dation\\
+\x [ \kw{BY} \hlink{RSTFormat} ] \kw{;}
+

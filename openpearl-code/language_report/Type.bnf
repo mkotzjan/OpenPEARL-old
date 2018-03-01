@@ -1,0 +1,9 @@
+\begin{discuss}
+\htgt{Type} ::= \\
+hier fehlt wohl was?
+sollte das eine Sammlung der moeglichen Typen (FIXED,...STRUCT,... TASK, ...)
+ sein?
+Ist es identisch zu TypeAttribute?
+\end{discuss}
+ 
+

@@ -1,0 +1,86 @@
+/****************************************
+Testing the fixed type with dyadic 
+operators
+****************************************/
+
+
+
+MODULE(Fixed_Dyadic_Operators);
+changequote(`{',`}')
+include({m4_testing.m4h})
+
+
+SYSTEM;
+PROBLEM;
+T1: TASK MAIN;
+    DCL (f1,f2,f3) FIXED(15) INIT(0,0,0);
+    DCL check FIXED(15) INIT(0);
+    DCL zero FIXED(15) INIT(0);
+
+    f1:= 1;
+    f2:= f1 + 1;
+    f3:= f2 - 2;
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 1;
+    f2:= f1 - 1;
+    f3:= f2;
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 3;
+    f2:= f1 * 3;
+    f3:= f2 - 9;
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 10; 
+    f2:= f1 / 5;
+    f3:= f2 - 2;
+    EXPECT_EQ({f3}, {zero});
+    
+    f1:= 7;
+    f2:= f1 // 2;
+    f3:= f2 - 3;
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 7;
+    f2:= f1 REM 2;
+    f3:= f2 - 1;
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 2;
+    f2:= 2**2;
+    f3:= f2 - 4;
+    EXPECT_EQ({f3}, {zero});
+
+    f1:= 15;
+    f2:= 14 FIT f1;
+    f3:= f2 - 14;
+    EXPECT_EQ({f3}, {zero});
+
+/**************************************
+    verify the variable check
+    check = 0  -> SUCCESS
+    check /= 0 -> FAILED
+***************************************/
+
+
+    IF check == 0 THEN
+        __cpp__('printf ("*** SUCCESS *** \\n");'
+                'pearlrt::Control::setExitCode(0);');
+    ELSE
+        __cpp__('printf ("*** FAILED *** \\n");'
+                'pearlrt::Control::setExitCode(1);');
+    FIN;
+
+   
+
+     
+  
+   
+
+    
+
+
+END;
+MODEND;
+

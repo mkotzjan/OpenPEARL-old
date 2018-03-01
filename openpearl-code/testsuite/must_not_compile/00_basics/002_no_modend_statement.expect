@@ -1,0 +1,1 @@
+002_no_modend_statement.prl:3:0: ERROR : Syntax error :mismatched input '<EOF>' expecting 'MODEND'

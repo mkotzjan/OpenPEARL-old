@@ -1,0 +1,4 @@
+\htgt{ResultType} ::=\\
+\x \hlink{SimpleType} $\mid$ \hlink{StructuredType}
+	 $\mid$ \hlink{TypeReference} $\mid$ \hlink{Identifier}\S ForType
+

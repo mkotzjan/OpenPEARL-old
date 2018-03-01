@@ -1,0 +1,6 @@
+MODULE(m1);
+
+PROBLEM;
+   SPC f1 FIXED INIT(1) GLOBAL(b);
+
+MODEND;

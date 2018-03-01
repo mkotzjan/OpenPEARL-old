@@ -1,0 +1,6 @@
+MODULE(m1);
+
+PROBLEM;
+   DCL f1,f2 FIXED;
+
+MODEND;

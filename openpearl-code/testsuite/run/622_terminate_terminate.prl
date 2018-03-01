@@ -1,0 +1,82 @@
+/*#########################################################################
+PROGRAM
+The main task terminated a terminate task, because of this it must come
+the Signal TaskTerminatedSignal.
+This program check all combination of the terminated taskstate and by all 
+terminate command must come the signal
+###########################################################################
+RESULT
+The Variable check must have the value 4. Because it must come 
+for times the TaskTerminatedSignal.
+##########################################################################*/
+
+MODULE(terminate_termiante);
+
+PROBLEM;
+
+Main : TASK PRIO 2 MAIN;
+	DCL check FIXED(5) INIT(0);
+
+	__cpp__(
+    'try {');
+        TERMINATE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__('}');
+
+	ACTIVATE Task2;
+	AFTER 3 SEC ALL 3 SEC DURING 7 SEC ACTIVATE Task2;
+	AFTER 5 SEC CONTINUE Task2;
+	TERMINATE Task2;
+
+	__cpp__(
+    'try {');
+        TERMINATE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__('}');
+
+    PREVENT Task2;
+
+	AFTER 3 SEC ACTIVATE Task2;
+
+	__cpp__(
+    'try {');
+        TERMINATE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__('}');
+
+	PREVENT Task2;
+
+	AFTER 5 SEC CONTINUE Task2;
+
+	__cpp__(
+    'try {');
+        TERMINATE Task2;
+    __cpp__(
+    '}catch (pearlrt::TaskTerminatedSignal &s) {' );
+        check := check + 1;
+    __cpp__('}');
+
+
+	__cpp__(
+    'if (_check.x == 4){'
+    '   pearlrt::Control::setExitCode(0);'
+    '   printf ("*** SUCCESS ***\\n");'
+    '}else {'
+    '   pearlrt::Control::setExitCode(1);'
+    '   printf ("*** FAILED ***\\n");'
+    '}');
+
+END;
+
+Task2 : TASK;
+
+	
+END;
+
+MODEND;

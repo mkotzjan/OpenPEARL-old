@@ -1,0 +1,4 @@
+\htgt{DimensionBoundaries} ::=\\
+\x [ \hlink{ConstantFIXEDExpression}$\S $ForLowerBoundary : ]\\
+\x \hlink{ConstantFIXEDExpression}$\S $ForUpperBoundary
+
