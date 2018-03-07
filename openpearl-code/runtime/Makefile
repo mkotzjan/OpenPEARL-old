@@ -46,6 +46,11 @@ ifeq ($(CONFIG_LPC1768),y)
   targets += lpc1768
 endif
 
+ifeq ($(CONFIG_ESP32),y) 
+  phony += esp32
+  targets += esp32
+endif
+
 $(warning targets = $(targets))
 
 # helper commands include composer, deleted white spaces
@@ -67,12 +72,18 @@ endif
 ifeq ($(CONFIG_LPC1768),y) 
 	@(cd lpc1768; make prepare;)
 endif
+ifeq ($(CONFIG_ESP32),y) 
+	@(cd esp32; make prepare;)
+endif
 
 linux:
 	(cd linux; make -B;)
 
 lpc1768:
 	(cd lpc1768; make -B;)
+
+esp32:
+	(cd esp32; make -B;)
 
 help:
 	@echo "-----------------"
@@ -108,6 +119,13 @@ ifeq ($(CONFIG_LPC1768),y)
 	@cat lpc1768/pearl.h >>$(INSTALL_PEARLINCLUDES)
 	@echo "#endif" >> $(INSTALL_PEARLINCLUDES)
 endif
+ifeq ($(CONFIG_ESP32),y) 
+	@(cd esp32; make -B install;)
+	@echo "#define ESP32	3" >> $(INSTALL_PEARLINCLUDES)
+	@echo "#if TARGET == ESP32" >> $(INSTALL_PEARLINCLUDES)
+	@cat esp32/pearl.h >>$(INSTALL_PEARLINCLUDES)
+	@echo "#endif" >> $(INSTALL_PEARLINCLUDES)
+endif
 
 
 .PHONY: cc_bin.inc
@@ -126,6 +144,12 @@ ifeq ($(CONFIG_LPC1768),y)
 	@echo 'rc=$$?' >>cc_bin.inc
 	@echo 'fi' >>cc_bin.inc
 endif
+ifeq ($(CONFIG_ESP32),y) 
+	@echo 'if [ "$$PLATTFORM" = "esp32" ] ; then' >>cc_bin.inc
+	@echo '#include  "runtime/esp32/cc_bin.inc" ' >>cc_bin.inc
+	@echo 'rc=$$?' >>cc_bin.inc
+	@echo 'fi' >>cc_bin.inc
+endif
 
 .PHONY: run_bin.inc
 run_bin.inc:
@@ -140,6 +164,12 @@ endif
 ifeq ($(CONFIG_LPC1768),y) 
 	@echo 'if [ "$$PLATTFORM" = "lpc1768" ] ; then' >>run_bin.inc
 	@echo '#include  "runtime/lpc1768/run_bin.inc" ' >>run_bin.inc
+	@echo 'rc=$$?' >>run_bin.inc
+	@echo 'fi' >>run_bin.inc
+endif
+ifeq ($(CONFIG_ESP32),y) 
+	@echo 'if [ "$$PLATTFORM" = "esp32" ] ; then' >>run_bin.inc
+	@echo '#include  "runtime/esp32/run_bin.inc" ' >>run_bin.inc
 	@echo 'rc=$$?' >>run_bin.inc
 	@echo 'fi' >>run_bin.inc
 endif
