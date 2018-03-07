@@ -2,5 +2,6 @@ menu "Runtime System"
 source fm/commonDrivers.fm
 source fm/linux.fm
 source fm/lpc1768.fm
+source fm/esp32.fm
 endmenu
 

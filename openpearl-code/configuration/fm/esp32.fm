@@ -1,0 +1,10 @@
+config ESP32
+        boolean  "Select the runtime sytem for the ESP32"
+	default n
+	help
+	This port targets the ESP32. Target specific 
+	i/o-setting is done directly in the source code.
+	
+	This port is in work. Build and execution problems 
+        may occur selecting this option. 
+
