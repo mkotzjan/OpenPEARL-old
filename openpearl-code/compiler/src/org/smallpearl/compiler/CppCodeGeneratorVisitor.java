@@ -123,6 +123,8 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
         prologue.add("taskSpecifierList", taskspec);
         prologue.add("ConstantPoolList", generateConstantPool());
 
+        prologue.add( "useSystemElements", true);
+
         return prologue;
     }
 

@@ -31,9 +31,16 @@ group smallpearl;
 
 /****************************************************************************/
 
-Prologue(src,headerfiles,namespaces,taskSpecifierList,ConstantPoolList) ::= <<
+Prologue(src,headerfiles,namespaces,useSystemElements,taskSpecifierList,ConstantPoolList) ::= <<
 #include \<PearlIncludes.h>
-#include \<cmath>
+
+<if(useSystemElements)>
+namespace pearlrt {
+    extern int createSystemElements();
+}
+
+static int dummy = pearlrt::createSystemElements();
+<endif>
 
 const char* filename = (char*) "<src>";
 
