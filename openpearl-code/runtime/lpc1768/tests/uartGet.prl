@@ -1,14 +1,13 @@
 MODULE(uartget);
 
 SYSTEM;
-!__cpp__('pearlrt::Lpc17xxUart com2(2,9600,7,1,\'E\', 0x010080);'
-!        'pearlrt::Device * d_terminal = &com2;');
-!__cpp__('pearlrt::Lpc17xxUart com2(2,115200,8,1,\'N\', 0x010080);'
-!        'pearlrt::Device * d_terminal = &com2;');
-!__cpp__('pearlrt::Lpc17xxUart com2(0,115200,8,1,\'N\', 0);'
-!        'pearlrt::Device * d_terminal = &com2;');
    terminal: Lpc17xxUart(0,115200,8,1,'N','0'B1);
-!__cpp__('pearlrt::Post ppp(0);');
+
+__cpp__(
+"// enshure that the static (parametrized) objects are instanciated first"
+"namespace pearlrt {extern int createSystemElements();}"
+"static int dummy = pearlrt::createSystemElements();"
+);
 
 PROBLEM;
 SPC terminal DATION INOUT SYSTEM ALPHIC;
@@ -17,9 +16,8 @@ DCL console DATION INOUT ALPHIC DIM(*,80) FORWARD CREATED(terminal);
 
 t1: TASK MAIN;
   DCL (f1, f2) FIXED(31);
-
-  __cpp__('pearlrt::Character<25> _t1("enter F(3), f(3), skip");'
-          'pearlrt::Character<20> _result("Result:");');
+  DCL t1 CHAR(25) INIT('enter F(3), F(3), SKIP');
+  DCL result CHAR(20) INIT ('Result:');
 
   OPEN console;
   REPEAT
