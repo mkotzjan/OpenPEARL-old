@@ -204,19 +204,19 @@ END;
 
 
 TASK1: TASK PRIO 10 MAIN;
-__cpp__("printf(\"TASK1 start\\n\");");
+!__cpp__("printf(\"TASK1 start\\n\");");
 !  DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD CREATED(lcd);
   OPEN termout;
-__cpp__("printf(\"Open Done \\n\");"
-        "pearlrt::Log::error(\"hallo\");"
-);
+!__cpp__("printf(\"Open Done \\n\");"
+!        "pearlrt::Log::error(\"hallo\");"
+!);
 
 
   PUT text1 TO termout BY A, SKIP;
   CALL clearTests;
-__cpp__("printf(\"clear Done \\n\");");
+!__cpp__("printf(\"clear Done \\n\");");
   CALL textColors;
-__cpp__("printf(\"text colors Done \\n\");");
+!__cpp__("printf(\"text colors Done \\n\");");
   CALL gotoTests;
   CALL fontTests;
 
@@ -225,6 +225,3 @@ __cpp__("printf(\"text colors Done \\n\");");
 END;
 
 MODEND;
-
-
-
