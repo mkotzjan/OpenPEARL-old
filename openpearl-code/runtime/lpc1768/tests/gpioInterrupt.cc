@@ -46,7 +46,7 @@ DCLTASK(tint0, pearlrt::Prio(110), pearlrt::BitString<1>(0)) {
 
 DCLTASK(blink, pearlrt::Prio(10), pearlrt::BitString<1>(1)) {
    pearlrt::BitString<1> b; 
-   led7.dationOpen(NULL,0);
+   led7.dationOpen(NULL,pearlrt::Dation::OUT);
    while(1) {
       led7.dationWrite(&b, sizeof(b));
       b = b.bitNot();
