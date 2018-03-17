@@ -90,7 +90,7 @@ namespace pearlrt {
       return (*this);
    }
 
-   const Duration Duration::operator+(const Duration& rhs) const {
+   Duration Duration::operator+(const Duration& rhs) const {
       return Duration(*this) += rhs;
    }
 
@@ -107,11 +107,11 @@ namespace pearlrt {
    }
 
 
-   const Duration Duration::operator-(const Duration& rhs) const {
+   Duration Duration::operator-(const Duration& rhs) const {
       return Duration(*this) -= rhs;
    }
 
-   const Duration Duration::operator-() const {
+   Duration Duration::operator-() const {
       return Duration(Duration(0) - (*this));
    }
 
@@ -127,7 +127,7 @@ namespace pearlrt {
       return result;
    }
 
-   const Float<24> Duration::operator/(const Duration& rhs) const {
+   Float<24> Duration::operator/(const Duration& rhs) const {
       return Duration(*this) /= rhs;
    }
 
