@@ -1,51 +1,78 @@
+/*
+send pulses to P1.0
+
+in fast mode the bit is set and reset in a simple loop
+this provides a period of approx. 195us
+
+the interactive mode allows to input of the desired period.
+the default at start is 1ms.
+at 800us the output is still stable.
+at 750us the cpu limit is reached and no more interaction is possible
+shorter values leed to unpredictable results
+
+measured at 17 March 2018
+
+*/
 MODULE(pulseOnDigOut);
 
 SYSTEM;
-  terminal: Lpc17xxUart(0,115200,7,1,'E','0'B1);
-  Lpc17xxClock(3); 
-  bit: Lpc17xxDigitalOut(1,0,1);
+   terminal: Lpc17xxUart(0,115200,8,1,'N','0'B1);
+   Lpc17xxClock(3); 
+   bit: Lpc17xxDigitalOut(1,0,1);  ! Portbit 1.0
 
 PROBLEM;
-SPC terminal DATION INOUT SYSTEM ALPHIC;
-SPC bit DATION OUT SYSTEM BASIC BIT(1);
+   SPC terminal DATION INOUT SYSTEM ALPHIC;
+   SPC bit DATION OUT SYSTEM BASIC BIT(1);
 
-DCL console DATION INOUT ALPHIC DIM(*,80) FORWARD CREATED(terminal);
-DCL outBit DATION OUT BIT(1) CREATED(bit);
+   DCL console DATION INOUT ALPHIC DIM(*,80) FORWARD CREATED(terminal);
+   DCL outBit DATION OUT BASIC BIT(1) CREATED(bit);
 
-DCL delay FIXED(31) INIT(1000);
-!__cpp__ (     "pearlrt::Duration _delayms(100.0e-3);");
-DCL delayms DURATION INIT(0.1 SEC);
+   DCL delay FIXED(31) INIT(1000);
+   DCL delayms DURATION INIT(0.1 SEC);
 
 t1: TASK MAIN;
+   DCL version FIXED INIT(0);
 
-  DCL t1 CHAR(40) INIT('enter delay in us F(6) skip');
-  DCL t2 CHAR(40) INIT('pulse generator on P1.0');
-  DCL reply CHAR(20) INIT('new delay:');
+   OPEN console;
+   PUT 'pulse generator on P1.0' TO console BY A, SKIP;
 
-  OPEN console;
-!  ACTIVATE puls;
-  ACTIVATE fastestPulses;
+   WHILE version NE 1 AND version NE 2 
+   REPEAT
+      PUT 'select version','1: enter period via uart0','2: fastest access'
+      TO console BY A,SKIP,A,SKIP,A,SKIP;
+      GET version FROM console BY F(6),SKIP;
+   END;
 
-  REPEAT
-    PREVENT triggerPulses;
-!  __cpp__(
-!  ' _triggerPulses.activate(me, pearlrt::Task::ALL, pearlrt::Prio(),'
-!  '                        pearlrt::Clock(), pearlrt::Duration(), _delayms);' );
-     ALL delayms ACTIVATE triggerPulses;
+   IF version EQ 1 THEN
+      PUT 'toggle output bit at specified rate' TO console BY A, SKIP;
+      ACTIVATE interactive;
+   FIN;
+   IF version EQ 2 THEN
+      PUT 'toggle output bit as fast as possible' TO console BY A, SKIP;
+      ACTIVATE fastestPulses;
+   FIN;
+END;
 
-     PUT  t1 TO console BY A,SKIP;
-     GET delay FROM console BY F(6), SKIP;
-     PUT reply, delay TO console BY A,F(6), SKIP;
-     delayms = delayms / 1000000.0;
-!     __cpp__(
-!      "   _delayms = pearlrt::Duration(_delay.x*1.0e-6);"
-!    );
-  END;
-  CLOSE console;
+interactive: TASK;
+
+   ACTIVATE puls;
+
+   REPEAT
+!     PREVENT triggerPulses;
+
+      ALL delayms ACTIVATE triggerPulses;
+
+      PUT 'enter new delay in us F(6) format' TO console BY A,SKIP;
+      GET delay FROM console BY F(6), SKIP;
+      !delayms = 1SEC * delay / 1.0E-6;
+      delayms = 1SEC * delay / 1000000.0;
+      PUT 'new delay: ', delayms TO console BY X(2),A,D(13,6), SKIP;
+   END;
+   CLOSE console;
 END;
 
 triggerPulses: TASK PRIO 9;
-  CONTINUE puls;
+   CONTINUE puls;
 END;
  
 puls: TASK PRIO 10;
@@ -56,7 +83,6 @@ puls: TASK PRIO 10;
        SUSPEND;
        SEND bitValue TO outBit ;
        bitValue = NOT bitValue;
-!__cpp__( '   bitvalue = bitvalue.bitNot();' );
     END;
 END;
 
@@ -64,20 +90,10 @@ fastestPulses: TASK PRIO 10;
    DCL bitValue BIT(1) INIT('1'B1);
 
    OPEN outBit;
-!__cpp__(
-!      'pearlrt::BitString<1> bitvalue(1);'
-!      ' ' 
-!      'bit.dationOpen(NULL,0);');
-      REPEAT
-       SEND bitValue TO outBit ;
-       bitValue = NOT bitValue;
-!
-!__cpp__(
-!      '   bit.dationWrite(&bitvalue, sizeof(bitvalue));'
-!      '   bitvalue = bitvalue.bitNot();'
-!      ' //  _puls.resume(pearlrt::Task::AFTER, pearlrt::Clock(), _delayms);' );
-!      ! AFTER delayms RESUME; 
-      END;
+   REPEAT
+      SEND bitValue TO outBit ;
+      bitValue = NOT bitValue;
+   END;
 END;
 
 MODEND;
