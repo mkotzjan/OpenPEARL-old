@@ -279,6 +279,7 @@ public class TargetPlatformXml {
 				String evaluated = systemEntry.evaluateExpression(items[0]);
 				int low = Integer.parseInt(evaluated);
 				evaluated = systemEntry.evaluateExpression(items[1]);
+//System.out.println("evaluated high as string: "+evaluated+"  item[1]="+items[1]);
 				int high = Integer.parseInt(evaluated);
 				int val = Integer.parseInt(p.getValue());
 				if (val >= low && val <= high) {
