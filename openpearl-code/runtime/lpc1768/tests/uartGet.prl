@@ -3,11 +3,6 @@ MODULE(uartget);
 SYSTEM;
    terminal: Lpc17xxUart(0,115200,8,1,'N','0'B1);
 
-__cpp__(
-"// enshure that the static (parametrized) objects are instanciated first"
-"namespace pearlrt {extern int createSystemElements();}"
-"static int dummy = pearlrt::createSystemElements();"
-);
 
 PROBLEM;
 SPC terminal DATION INOUT SYSTEM ALPHIC;
@@ -16,14 +11,12 @@ DCL console DATION INOUT ALPHIC DIM(*,80) FORWARD CREATED(terminal);
 
 t1: TASK MAIN;
   DCL (f1, f2) FIXED(31);
-  DCL t1 CHAR(25) INIT('enter F(3), F(3), SKIP');
-  DCL result CHAR(20) INIT ('Result:');
 
   OPEN console;
   REPEAT
-     PUT  t1 TO console BY A,SKIP;
+     PUT  'enter as f(3), f(3), skip format' TO console BY A,SKIP;
      GET f1,f2 FROM console BY F(3), F(3), SKIP;
-     PUT result, f1, f2 TO console BY A,F(3), F(3), SKIP;
+     PUT 'result:', f1, f2 TO console BY A,F(3), X, F(3), SKIP;
   END;
   CLOSE console;
 END;
