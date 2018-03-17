@@ -24,6 +24,7 @@ while [ "$1" != "" ] ; do
         -i) INTERFACE=$2;  shift 2;;
         -c) COMPILEONLY=1;        shift;;
         -r) RUN=1;                shift;;
+        -nosys) NOSYSTEMPART=1;   shift;;
         -h) HELP=1;        shift;;
 	 *) if [ "$INPUT" != "" ] ; then
                echo "illegal parameter " $1; 
@@ -50,6 +51,7 @@ then
    echo "        known plattforms: $plattforms"
    echo "    -r run application on MCU" 
    echo "    -i <interface> download interface for MCU (default /dev/ttyUSB0)" 
+   echo "    -nosys do not invke the imc - no system part is used"
    echo "    -h this page" 
    echo "   Example: "
    echo "     prl x.prl -c   : compile only until C++ source"
@@ -115,12 +117,15 @@ else  if [ "$COMPILEONLY" = "1" ] ; then
    fi
 fi
 if [ "$COMPILEONLY" != "1" ] ; then
-  #include "imc/imc.inc"
-  rc=$?
-  if [ $rc -ne 0 ]
-  then
-   echo "terminate due to errors in stage 1b (imc)"
-   exit $rc
+  if [ "$NOSYSTEMPART" != "1" ] ; then
+    SYSTEM="system.cc"
+    #include "imc/imc.inc"
+    rc=$?
+    if [ $rc -ne 0 ]
+    then
+      echo "terminate due to errors in stage 1b (imc)"
+      exit $rc
+    fi
   fi
   #   echo "C++->BIN"
 #include "runtime/cc_bin.inc"
