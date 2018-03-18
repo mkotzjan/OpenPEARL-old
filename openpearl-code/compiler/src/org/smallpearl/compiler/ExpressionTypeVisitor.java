@@ -1518,7 +1518,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
                     }
                 }
 
-                System.out.println( "ExpressionTypeVisitor:visitLiteral:Fixed: ctx="+ctx.toStringTree()+" precision="+precision);
+//                System.out.println( "ExpressionTypeVisitor:visitLiteral:Fixed: ctx="+ctx.toStringTree()+" precision="+precision);
                 ExpressionResult expressionResult = new ExpressionResult(new TypeFixed(precision), true);
                 m_properties.put(ctx, expressionResult);
             } catch (NumberFormatException ex) {

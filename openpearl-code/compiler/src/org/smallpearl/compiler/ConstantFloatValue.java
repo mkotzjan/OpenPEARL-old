@@ -70,7 +70,7 @@ public class ConstantFloatValue extends ConstantValue {
             name += "_P";
         }
 
-        name += "_" + value.toString().replace('.','_') + "_" + m_precision.toString();
+        name += "_" + value.toString().replace('.','_').replace('-','_').replace('+','_') + "_" + m_precision.toString();
 
         return name;
     }
