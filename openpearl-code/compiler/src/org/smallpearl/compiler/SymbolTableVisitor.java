@@ -1366,4 +1366,20 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
 
         return constant;
     }
+
+    @Override
+    public Void visitDationSpecification(SmallPearlParser.DationSpecificationContext ctx) {
+        LinkedList<ModuleEntry> listOfModules = this.symbolTable.getModules();
+
+        if ( listOfModules.size() > 1 ) {
+            throw new NotYetImplementedException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+        ModuleEntry moduleEntry = listOfModules.get(0);
+        SymbolTable symbolTable = moduleEntry.scope;
+
+        symbolTable.setUsesSystemElements();
+        return null;
+    }
+
 }

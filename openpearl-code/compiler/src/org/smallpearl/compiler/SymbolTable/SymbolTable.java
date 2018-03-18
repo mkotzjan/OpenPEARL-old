@@ -52,6 +52,7 @@ public class SymbolTable {
     public SymbolTable() {
         m_entries = new HashMap();
         m_level = 0;
+        m_usesSystemElements = false;
     }
 
     /**
@@ -374,7 +375,11 @@ public class SymbolTable {
         return -1;
     }
 
+    public void setUsesSystemElements() { m_usesSystemElements = true;}
+    public boolean usesSystemElements() { return m_usesSystemElements;}
+
     public SymbolTable parent;
     protected HashMap m_entries;
     public int m_level;
+    private boolean m_usesSystemElements;
 }
