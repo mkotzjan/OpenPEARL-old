@@ -639,6 +639,11 @@ public class ConstantPoolVisitor extends SmallPearlBaseVisitor<Void> implements 
             if ( ctx.stringSelection().charSelection() != null ) {
                 id = ctx.stringSelection().charSelection().ID().getText();
             }
+            else  if (ctx.stringSelection().bitSelection() != null) {
+                id = ctx.stringSelection().bitSelection().ID().getText();
+            } else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+            }
         } else {
             id = ctx.ID().getText();
         }

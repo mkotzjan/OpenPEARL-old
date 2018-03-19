@@ -1,6 +1,5 @@
 package org.smallpearl.compiler;
 
-import com.sun.corba.se.impl.orbutil.closure.Constant;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.smallpearl.compiler.SmallPearlParser.Unlabeled_statementContext;

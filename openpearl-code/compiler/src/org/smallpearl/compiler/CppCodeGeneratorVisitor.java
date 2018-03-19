@@ -2139,6 +2139,35 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                             st.add("lhs",setCharSlice);
                             stmt = st;
                         }
+                        else  if (ctx.stringSelection().bitSelection() != null) {
+                            ST st = m_group.getInstanceOf("assignmentStatementBitSlice");
+
+                            st.add("id", getUserVariable(id));
+
+                            SmallPearlParser.BitSelectionContext c = (SmallPearlParser.BitSelectionContext) ctx.stringSelection().bitSelection();
+                            for (int i = 0; i < c.bitSelectionSlice().size(); i++) {
+                                ST slice= m_group.getInstanceOf("BitSlice");
+
+                                slice.add("lwb", getExpression(c.bitSelectionSlice(i).expression(0)));
+
+                                if ( c.bitSelectionSlice(i).expression().size() == 2 ) {
+                                    slice.add("upb", getExpression(c.bitSelectionSlice(i).expression(1)));
+                                } else {
+                                    slice.add("upb", getExpression(c.bitSelectionSlice(i).expression(0)));
+                                }
+
+                                st.add("lhs", slice);
+                            }
+
+                            ST setBitSlice = m_group.getInstanceOf("SetBitSlice");
+
+                            setBitSlice.add("expr", getExpression(ctx.expression()));
+                            st.add("lhs",setBitSlice);
+                            stmt = st;
+                        }
+                        else {
+                            throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+                        }
                     } else {
                         ST st = m_group.getInstanceOf("assignment_statement");
                         st.add("lhs", getUserVariable(id));
@@ -5404,9 +5433,9 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        st.add("offset", ((ConstantFixedValue)lwb).getValue());
-        st.add("id", ctx.ID().getText());
-        st.add("size",((ConstantFixedValue)upb).getValue() - ((ConstantFixedValue)lwb).getValue() + 1);
+//        st.add("offset", ((ConstantFixedValue)lwb).getValue());
+//        st.add("id", ctx.ID().getText());
+//        st.add("size",((ConstantFixedValue)upb).getValue() - ((ConstantFixedValue)lwb).getValue() + 1);
 
         return st;
     }
