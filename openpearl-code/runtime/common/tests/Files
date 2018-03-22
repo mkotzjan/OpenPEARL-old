@@ -5,6 +5,7 @@
 CXX_COMMON_TESTS1 := \
 	ArrayTests.cc\
 	BitTests.cc\
+	BitSliceTests.cc\
 	CharacterTests.cc\
 	Fixed63Tests.cc\
 	FixedTests.cc \

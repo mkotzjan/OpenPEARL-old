@@ -153,17 +153,17 @@ namespace pearlrt {
    };
 
 #include "IfThenElseTemplate.h"
-   /** 
+   /**
    \addtogroup datatypes
    @{
    */
    /**
-   \brief Implemenation of BitString 
+   \brief Implemenation of BitString
 
    BitString contains a fixed number of bits.
    Depending on the length of the bit string, different data conatiners are
    used.
- 
+
    - 1-8 bit are stored in one byte (type Bits<1>),
    - 9-16 bits are stored in 16 bit integer (type Bits<2>),
    - 17-32 bits are stored in a 32 bit integer (type Bits<4>),
@@ -253,7 +253,7 @@ namespace pearlrt {
       /**
        construct with given preset value of a FIXED-type.
 
-       In OpenPEARL, the operations TOFIXED and TOBIT operate as 
+       In OpenPEARL, the operations TOFIXED and TOBIT operate as
        direct copy of the internal operation. Thus TOBIT converts
        a FIXED(S) into an BIT(S+1) type and TOFIXED vice versa.
 
@@ -263,7 +263,7 @@ namespace pearlrt {
 
        \param y the preset value, given as a Fixed<S-1> type
       */
-      BitString(Fixed<S-1> y) NOSTACKCHECK {
+      BitString(Fixed < S - 1 > y) NOSTACKCHECK {
          x = y.x;
          x <<= shiftSize;
          x &= mask;
@@ -321,6 +321,7 @@ namespace pearlrt {
          // the desired number of rotations os larger than
          // the length of the bit string
          effectiveShift = l.modulo(S);
+
          if (effectiveShift.x > 0) {
             retval.x <<= effectiveShift.x;
             retval.x |= (x >> (S - effectiveShift.x));
@@ -359,7 +360,7 @@ namespace pearlrt {
       */
       template<int P> BitString < S + P >
       bitCat(BitString<P> y) {
-         BitString < S + P > z,z1;
+         BitString < S + P > z, z1;
 
          // adjust the first operant to target size
          z.x = x << ((sizeof(z) - sizeof(x)) * 8);
@@ -403,34 +404,41 @@ namespace pearlrt {
         set slice of the bitstring
 
         \param start starting index; the leftmost bit is adressed by 1
+        \param end the end index; the leftmost bit is adressed by 1
         \param slice the new value of the slice
         \tparam P the length of the slice
         \throws BitIndexOutOfRangeSignal if the start is too low, or slice
                 would be too long for the bitstring (e.g. start-1+P <= S)
       */
       template <int P> void
-      setSlice(const Fixed<15>start, const BitString<P> slice) {
-         if (start.x - 1 + P >= S || start.x < 1) {
+      setSlice(const Fixed<15>start, const Fixed<15> end,
+               const BitString<P> slice) {
+         if (start.x - 1 + P >= S || start.x < 1 ||
+               end.x - start.x + 1 < P) {
             throw theBitIndexOutOfRangeSignal;
          }
 
          DataType s, m;
          static const int lengthAdjust = (sizeof(s) - sizeof(slice)) * 8;
+
+         // create bitstring for slice at the location of
+         // the current bit string
          s = slice.x;
          s <<= lengthAdjust;        // adjust in case of S>P
          s >>= start.x - 1;
-         // mask x depending of start and P -->
+
+         // mask x depending of start and end -->
          //    first start.x-1 bits are 1; (counting starts at 1!!!)
-         //    P zeros following;
-         //    1's till the end
-         // eg. start=2; P=3; S=9
+         //    bits 'start:end' are 0
+         //    1's until the end
+         // eg. start=2; end=4; -> lhsSize=3; S=9
          // xxxx'xxxx'x
          // 0111'0000'0000'0000
          m = mask;
          m <<= start.x - 1;
          m >>= start.x - 1;
-         m >>= (sizeof(m) * 8 - P - start.x + 1 + lengthAdjust);
-         m <<= (sizeof(m) * 8 - P - start.x + 1 + lengthAdjust);
+         m >>= (sizeof(m) * 8 - end.x);
+         m <<= (sizeof(m) * 8 - end.x);
          x &= ~m;
          x |= s;
          return;
@@ -440,12 +448,11 @@ namespace pearlrt {
         get single bit from the bitstring
 
         \param start starting index; the leftmost bit is adressed by 1
-      \returns the adressed bit as Bit<1>
-             \throws BitIndexOutOfRangeSignal if the start is too low, or slice
-                     would be too long for the bitstring (e.g. start-1+P <= S)
-          */
-      BitString<1>
-      getBit(const Fixed<15>start) const {
+        \returns the adressed bit as Bit<1>
+        \throws BitIndexOutOfRangeSignal if the start is too low, or slice
+                   would be too long for the bitstring (e.g. start-1+P <= S)
+      */
+      BitString<1> getBit(const Fixed<15>start) const {
          if (start.x > S || start.x < 1) {
             throw theBitIndexOutOfRangeSignal;
          }
@@ -460,7 +467,7 @@ namespace pearlrt {
         set single bit from the bitstring
 
         \param start starting index; the leftmost bit is adressed by 1
-      \param newValue the new value for the adressed bit
+        \param newValue the new value for the adressed bit
         \throws BitIndexOutOfRangeSignal if the start is too low, or slice
                 would be too long for the bitstring (e.g. start-1+P <= S)
       */
@@ -492,8 +499,8 @@ namespace pearlrt {
 
       \returns the bits as (signed) Fixed<S> value
       */
-      Fixed<S-1> toFixed() const {
-         Fixed<S-1> returnValue;
+      Fixed < S - 1 > toFixed() const {
+         Fixed < S - 1 > returnValue;
          returnValue.x = ((SignedDataType)x) >> shiftSize;
          return returnValue;
       }
@@ -665,7 +672,7 @@ namespace pearlrt {
       realizes a bitwise AND of two bit string.
       The shorter bit string will be extended at the right side to the
       length of the longer bit string.
-     
+
       \tparam P length of the right hand side BitString
       \param y the right hand side BitString
       \returns the result with the longer type
@@ -683,7 +690,7 @@ namespace pearlrt {
       The shorter bit string will be extended at the right side to the
       length of the longer bit string.
       The result type is given by the longer bit string.
-     
+
       \tparam P length of the right hand side BitString
       \param y the right hand side BitString
       \returns the result with the longer type
@@ -701,7 +708,7 @@ namespace pearlrt {
       The shorter bit string will be extended at the right side to the
       length of the longer bit string.
       The result type is given by the longer bit string.
-     
+
       \tparam P length of the right hand side BitString
       \param y the right hand side BitString
       \returns the result with the longer type
@@ -746,7 +753,7 @@ namespace pearlrt {
       template<int P>
       BitString<1> operator!= (const BitString<P> y) const {
          return (IF < (S < P), THENAND<P>, ELSEAND<P> >::
-                    SELECT_CLASS::bitCompare(*this, y)).bitNot();
+                 SELECT_CLASS::bitCompare(*this, y)).bitNot();
       }
 
    };
@@ -754,4 +761,3 @@ namespace pearlrt {
 }
 # undef NOSTACKCHECK
 #endif
-

@@ -44,7 +44,7 @@ The class is also useful for all slice operations.
 
 #include "Signals.h"
 #include "Fixed.h"
-#include "BitString.h"
+//#include "BitString.h"
 #include "Character.h"
 
 namespace pearlrt {
