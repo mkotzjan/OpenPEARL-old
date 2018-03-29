@@ -254,7 +254,6 @@ namespace pearlrt {
             //printf("Character: illegal length (%d)", length);
             throw theCharacterTooLongSignal;
          }
-
          characterSafeCopy(data, string.data, T);
          characterFillSpaces(data + T, length - T);
 

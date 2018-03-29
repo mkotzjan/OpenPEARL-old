@@ -426,6 +426,7 @@ public class SystemEntry {
 			String nickValue = getNickNameValue(nickName);
 			expanded = expr.substring(0, nickNameStart) + nickValue
 					+ expr.substring(nickNameEnd);
+//System.out.println("evaluateExpression: expanded="+expanded);
 			nickNameStart = expanded.indexOf('$');
 		}
 
@@ -442,6 +443,8 @@ public class SystemEntry {
 
 			// evaluate the expression
 			String nakedExpression = expanded.substring(exprStart + 1, exprEnd);
+//System.out.println("nakedExpression="+nakedExpression);
+
 			ScriptEngineManager mgr = new ScriptEngineManager();
 			ScriptEngine engine = mgr.getEngineByName("JavaScript");
 			Object result;
@@ -454,14 +457,19 @@ public class SystemEntry {
 						+ nakedExpression + ")");
 				return null;
 			}
+//System.out.println("result="+result);
 
 			// insert expression result in the expanded string
                         String value;
                         if (result.getClass() == Integer.class) {
                            value=result.toString();
+                        } else if (result.getClass() == Double.class) {
+                           Integer ihelp=((Double)result).intValue();  // the type must be int
+                           value=ihelp.toString();
                         } else {
-			   Error.info("can not handle result type "+
-			              result.getClass().getName());
+			   Error.error("can not handle result type "+
+			              result.getClass().getName()+"\n"+
+                          "SystemEntry::evaluateExpression");
                            value = "";
                         } 
                             
@@ -470,6 +478,7 @@ public class SystemEntry {
 			// System.out.println("nakedExpression --> "+value);
 			expanded = expanded.substring(0, exprStart) + value
 					+ expanded.substring(exprEnd + 1);
+//System.out.println("new expended="+expanded);
 
 			// test for further expressions in the expanded string
 			exprStart = expanded.indexOf('[');

@@ -69,6 +69,7 @@ Only this file mus be included.
 #include "ScheduleSignalAction.h"
 #include "Prio.h"
 #include "BitString.h"
+#include "BitSlice.h"
 #include "PutBitString.h"
 #include "GetBitString.h"
 #include "RefCharSink.h"

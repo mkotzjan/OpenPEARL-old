@@ -31,9 +31,16 @@ group smallpearl;
 
 /****************************************************************************/
 
-Prologue(src,headerfiles,namespaces,taskSpecifierList,ConstantPoolList) ::= <<
+Prologue(src,headerfiles,namespaces,useSystemElements,taskSpecifierList,ConstantPoolList) ::= <<
 #include \<PearlIncludes.h>
-#include \<cmath>
+
+<if(useSystemElements)>
+namespace pearlrt {
+    extern int createSystemElements();
+}
+
+static int dummy = pearlrt::createSystemElements();
+<endif>
 
 const char* filename = (char*) "<src>";
 
@@ -373,6 +380,10 @@ assignment_statement(lhs,rhs) ::= <<
 
 assignmentStatementCharSlice(id,lhs) ::= <<
     pearlrt::CharSlice(<id>)<lhs>;
+>>
+
+assignmentStatementBitSlice(id,lhs) ::= <<
+    pearlrt::BitSlice(<id>)<lhs>;
 >>
 
 if_statement(rhs, then_block, else_block) ::= <<
@@ -1805,9 +1816,20 @@ SetCharSlice(expr) ::= <<
 
 /* --------------------------- BIT SLICE -------------------------------------------*/
 
+/*
 BitSlice(id,offset,size) ::= <%
 <user_variable(id)>.getSlice(<offset>,(pearlrt::BitString\<<size>>*) 0)
 %>
+*/
+
+BitSlice(lwb,upb,offset) ::= <<
+    .getSlice(<lwb>,<upb>)<\n>
+>>
+
+
+SetBitSlice(expr) ::= <<
+    .setSlice(<expr>)<\n>
+>>
 
 /* --------------------------- INTERRUPTS -------------------------------------------*/
 

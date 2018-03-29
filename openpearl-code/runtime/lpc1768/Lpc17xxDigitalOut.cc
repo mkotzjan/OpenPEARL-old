@@ -105,8 +105,8 @@ namespace pearlrt {
          throw theDationParamSignal;
       }
 
-      if (openParam != 0) {
-         Log::error("No open parameters allowed for Lpc17xxDigitalOut device");
+      if (openParam != OUT) {
+         Log::error("No open parameters except OUT allowed for Lpc17xxDigitalOut device");
          throw theDationParamSignal;
       }
 

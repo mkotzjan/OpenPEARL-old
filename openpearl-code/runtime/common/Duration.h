@@ -144,7 +144,7 @@ namespace pearlrt {
 
       \throws DurationRangeSignal
       */
-      const Duration operator+(const Duration& rhs) const;
+      Duration operator+(const Duration& rhs) const;
 
       /**
       reduce by a duration
@@ -165,7 +165,7 @@ namespace pearlrt {
 
       \throws DurationRangeSignal
       */
-      const Duration operator-(const Duration& rhs) const;
+      Duration operator-(const Duration& rhs) const;
 
 
       /**
@@ -175,7 +175,7 @@ namespace pearlrt {
 
       \throws DurationRangeSignal
       */
-      const Duration operator-() const;
+      Duration operator-() const;
 
       /**
       multiply with Fixed
@@ -198,7 +198,7 @@ namespace pearlrt {
 
       \throws DurationRangeSignal
       */
-      template<int S>const Duration  operator*(const Fixed<S>& rhs) const {
+      template<int S>Duration  operator*(const Fixed<S>& rhs) const {
          return Duration(*this) *= rhs;
       }
 
@@ -260,7 +260,7 @@ namespace pearlrt {
 
       \throws DurationRangeSignal
       */
-      template<int S>const Duration  operator*(const Float<S>& rhs) const {
+      template<int S>Duration  operator*(const Float<S>& rhs) const {
          return Duration(*this) *= rhs;
       }
 
@@ -323,7 +323,7 @@ namespace pearlrt {
 
        \throws DurationDivideByZeroSignal
        */
-      const Float<24> operator/(const Duration& rhs) const;
+      Float<24> operator/(const Duration& rhs) const;
 
       /**
        compare operation
@@ -423,7 +423,7 @@ namespace pearlrt {
 
    \throws DurationRangeSignal
    */
-   template<int S>const Duration  operator*(const Fixed<S>& lhs,
+   template<int S>Duration  operator*(const Fixed<S>& lhs,
          const Duration &rhs) {
       Duration result(rhs);
       result *= lhs;
@@ -440,7 +440,7 @@ namespace pearlrt {
 
    \throws DurationRangeSignal
    */
-   template<int S>const Duration  operator*(const Float<S>& lhs,
+   template<int S>Duration  operator*(const Float<S>& lhs,
          const Duration &rhs) {
       Duration result(rhs);
       result *= lhs;

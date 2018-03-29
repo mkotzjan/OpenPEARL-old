@@ -1518,7 +1518,7 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
                     }
                 }
 
-                System.out.println( "ExpressionTypeVisitor:visitLiteral:Fixed: ctx="+ctx.toStringTree()+" precision="+precision);
+//                System.out.println( "ExpressionTypeVisitor:visitLiteral:Fixed: ctx="+ctx.toStringTree()+" precision="+precision);
                 ExpressionResult expressionResult = new ExpressionResult(new TypeFixed(precision), true);
                 m_properties.put(ctx, expressionResult);
             } catch (NumberFormatException ex) {
@@ -1685,10 +1685,14 @@ public  class ExpressionTypeVisitor extends SmallPearlBaseVisitor<Void> implemen
         if (m_verbose > 0) {
             System.out.println("ExpressionTypeVisitor: visitAssignment_statement");
         }
-
         if ( ctx.stringSelection() != null ) {
-            if ( ctx.stringSelection().charSelection() != null ) {
+            if (ctx.stringSelection().charSelection() != null) {
                 id = ctx.stringSelection().charSelection().ID().getText();
+            }
+            else  if (ctx.stringSelection().bitSelection() != null) {
+                id = ctx.stringSelection().bitSelection().ID().getText();
+            } else {
+                throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
             }
         } else {
             id = ctx.ID().getText();

@@ -13,8 +13,8 @@ DCLTASK(TASK1, pearlrt::Prio(110), pearlrt::BitString<1>(1)) {
    pearlrt::Fixed<15> eins(1);
 
    pearlrt::Log::info("FreeRTOS Task-1 is running");
-   leds.dationOpen(NULL,0);
-   joy.dationOpen(NULL,0);
+   leds.dationOpen(NULL,pearlrt::Dation::OUT);
+   joy.dationOpen(NULL,pearlrt::Dation::IN);
 
    while(1) {
       pearlrt::Log::info("send %x to leds", bits.x);

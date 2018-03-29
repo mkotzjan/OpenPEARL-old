@@ -155,7 +155,7 @@ public class ModuleXml {
 					continue; // lets check the next element
 				}
 				
-				// treate association for username and configuration element
+				// treat association for username and configuration element
 				// un is the current SystemEntry
 				
 				targetNode = treatSysName(n);
@@ -207,7 +207,7 @@ public class ModuleXml {
 
 				String systemName = currentChild.getAttributes()
 						.getNamedItem("name").getTextContent();
-				// System.out.println("systemname found " + systemName);
+//System.out.println("systemname found " + systemName);
 				un.setSystemName(systemName);
 				targetNode = targetXml.hasSystemName(systemName);
 				if (targetNode != null) {
