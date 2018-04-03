@@ -23,6 +23,7 @@ then
    AptPackageList+="openjdk-8-jdk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
+   AptPackageList+=" wget bison gperf python python-serial"
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
@@ -41,6 +42,7 @@ then
    AptPackageList+=" gcc g++ git make gawk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
+   AptPackageList+=" wget bison gperf python python-serial"
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
@@ -57,6 +59,7 @@ then
    AptPackageList+=" gcc g++ git make gawk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
+   AptPackageList+=" wget bison gperf python python-serial"
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
@@ -72,6 +75,7 @@ then
    AptPackageList+="openjdk-7-jdk"
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
+   AptPackageList+=" wget bison gperf python python-serial"
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
@@ -87,6 +91,7 @@ then
    #AptPackageList+="openjdk-8-jdk" # raspbian comes with a javac
    AptPackageList+=" flex libncurses5-dev"
    AptPackageList+=" expat libexpat1-dev"
+   AptPackageList+=" wget bison gperf python python-serial"
    if [ $Developer -eq 1 ]
    then
       AptPackageList+=" astyle graphviz doxygen"
