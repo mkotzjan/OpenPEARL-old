@@ -59,6 +59,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         m_debug = false;
         m_verbose = verbose;
 
+
+        m_debug = true;
         if (m_verbose > 0) {
             System.out.println("Building new symbol table");
         }
@@ -118,6 +120,8 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
                     visitProcedureDeclaration((SmallPearlParser.ProcedureDeclarationContext) c);
                 } else if (c instanceof SmallPearlParser.LengthDefinitionContext) {
                     visitLengthDefinition((SmallPearlParser.LengthDefinitionContext) c);
+                } else if (c instanceof SmallPearlParser.StructVariableDeclarationContext) {
+                    visitStructVariableDeclaration((SmallPearlParser.StructVariableDeclarationContext) c);
                 }
             }
         }
@@ -1379,6 +1383,49 @@ public class SymbolTableVisitor extends SmallPearlBaseVisitor<Void> implements S
         SymbolTable symbolTable = moduleEntry.scope;
 
         symbolTable.setUsesSystemElements();
+        return null;
+    }
+
+    @Override
+    public Void visitStructVariableDeclaration(SmallPearlParser.StructVariableDeclarationContext ctx ) {
+        if (m_debug) {
+            System.out.println("SymbolTableVisitor: visitStructVariableDeclaration");
+        }
+
+        visitChildren(ctx);
+        return null;
+    }
+
+    @Override
+    public Void visitTypeStructure(SmallPearlParser.TypeStructureContext ctx ) {
+        if (m_debug) {
+            System.out.println("SymbolTableVisitor: visitTypeStructure");
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visitStructureDenotation(SmallPearlParser.StructureDenotationContext ctx) {
+        if (m_debug) {
+            System.out.println("SymbolTableVisitor: visitStructureDenotation");
+        }
+
+        SymbolTableEntry entry = this.m_currentSymbolTable.lookup(ctx.ID().toString());
+
+        if (entry != null) {
+            throw new DoubleDeclarationException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
+        }
+
+
+        StructureEntry structEntry = new StructureEntry(ctx.ID().getText(), ctx, this.m_currentSymbolTable);
+        this.m_currentSymbolTable = this.m_currentSymbolTable.newLevel(structEntry);
+        this.m_symboltablePerContext.put(ctx, this.m_currentSymbolTable);
+
+        visitChildren(ctx);
+
+        this.m_currentSymbolTable = this.m_currentSymbolTable.ascend();
+
         return null;
     }
 

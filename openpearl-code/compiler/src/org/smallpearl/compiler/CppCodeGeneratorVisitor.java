@@ -2146,7 +2146,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
                             SmallPearlParser.BitSelectionContext c = (SmallPearlParser.BitSelectionContext) ctx.stringSelection().bitSelection();
                             for (int i = 0; i < c.bitSelectionSlice().size(); i++) {
-                                ST slice= m_group.getInstanceOf("BitSlice");
+                                ST slice = m_group.getInstanceOf("GetBitSlice");
 
                                 slice.add("lwb", getExpression(c.bitSelectionSlice(i).expression(0)));
 
@@ -2156,13 +2156,16 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
                                     slice.add("upb", getExpression(c.bitSelectionSlice(i).expression(0)));
                                 }
 
-                                st.add("lhs", slice);
+                                st.add("slices", slice);
                             }
 
                             ST setBitSlice = m_group.getInstanceOf("SetBitSlice");
 
                             setBitSlice.add("expr", getExpression(ctx.expression()));
-                            st.add("lhs",setBitSlice);
+                            setBitSlice.add("size", 42);
+
+                            st.add("rhs", setBitSlice);
+
                             stmt = st;
                         }
                         else {
@@ -5395,7 +5398,7 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
 
     @Override
     public ST visitCase1BitSlice(SmallPearlParser.Case1BitSliceContext ctx) {
-        ST st = m_group.getInstanceOf("BitSlice");
+        ST st = m_group.getInstanceOf("BitSliceRHS");
 
         if (m_verbose > 0) {
             System.out.println("CppCodeGeneratorVisitor: visitCase1BitSlice");
@@ -5407,16 +5410,17 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-        st.add("offset", ((ConstantFixedValue)offset).getValue());
         st.add("id", ctx.ID().getText());
-        st.add("size",1);
+        st.add("lwb", offset.toString());
+        st.add("upb", offset.toString());
+        st.add("size", 1);
 
         return st;
     }
 
     @Override
     public ST visitCase2BitSlice(SmallPearlParser.Case2BitSliceContext ctx) {
-        ST st = m_group.getInstanceOf("BitSlice");
+        ST st = m_group.getInstanceOf("BitSliceRHS");
 
         if (m_verbose > 0) {
             System.out.println("CppCodeGeneratorVisitor: visitCase2BitSlice");
@@ -5433,9 +5437,12 @@ public class CppCodeGeneratorVisitor extends SmallPearlBaseVisitor<ST> implement
             throw new InternalCompilerErrorException(ctx.getText(), ctx.start.getLine(), ctx.start.getCharPositionInLine());
         }
 
-//        st.add("offset", ((ConstantFixedValue)lwb).getValue());
-//        st.add("id", ctx.ID().getText());
-//        st.add("size",((ConstantFixedValue)upb).getValue() - ((ConstantFixedValue)lwb).getValue() + 1);
+        long size = ((ConstantFixedValue) upb).getValue() - ((ConstantFixedValue) lwb).getValue() + 1;
+
+        st.add("id", ctx.ID().getText());
+        st.add("lwb", lwb.toString());
+        st.add("upb", upb.toString());
+        st.add("size", size);
 
         return st;
     }

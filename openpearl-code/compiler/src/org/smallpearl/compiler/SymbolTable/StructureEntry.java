@@ -45,7 +45,7 @@ public class StructureEntry extends SymbolTableEntry {
     /**
      * Construct this with the given data field values.
      */
-    public StructureEntry(String name, SmallPearlParser.Block_statementContext ctx, SymbolTable scope) {
+    public StructureEntry(String name, SmallPearlParser.StructureDenotationContext ctx, SymbolTable scope) {
         super(name);
 //        this.m_ctx = ctx;
         this.scope = scope;
