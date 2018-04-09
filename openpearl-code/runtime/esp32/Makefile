@@ -36,23 +36,23 @@ targets := libOpenPEARLesp32.a esp32.xml
 #INCS += ../cortexM/CMSIS/Include
 
 # -------------------- add FreeRTOS support to project
-#include ../FreeRTOS/FreeRTOS/Files
-#CSRC += $(addprefix ../FreeRTOS/FreeRTOS/,$(RTOSCSRC))
-#INCS += $(addprefix ../FreeRTOS/FreeRTOS/,$(RTOSINCS))
+include esp-idf/components/freertos/Files
+CSRC += $(addprefix esp-idf/components/freertos/,$(RTOSCSRC))
+INCS += $(addprefix esp-idf/components/freertos/,$(RTOSINCS))
 
 # -------------------- add FreeRTOS addOn files to project
-#include ../FreeRTOS/addOns/Files
-#CSRC += $(addprefix ../FreeRTOS/addOns/,$(ADDONCSRC))
-#CHECK_FILES += $(addprefix ../FreeRTOS/addOns/,$(ADDONCSRC))
-#INCS += $(addprefix ../FreeRTOS/addOns/,$(ADDONINCS))
+include esp-idf/components/freertos/addOns/Files
+CSRC += $(addprefix esp-idf/components/freertos/addOns/,$(ADDONCSRC))
+CHECK_FILES += $(addprefix esp-idf/components/freertos/addOns/,$(ADDONCSRC))
+INCS += $(addprefix esp-idf/components/freertos/addOns/,$(ADDONINCS))
 
 # ------------------- add FreeRTOS specific PEARL classes to project
-#include ../FreeRTOS/PEARL/Files
-#CXXSRCS += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_SRC))
-#CHECK_FILES += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_SRC))
-#CHECK_FILES += $(addprefix ../FreeRTOS/PEARL/,$(addsuffix .h,$(basename $(PEARL_FREERTOS_SRC))))
-#INCS += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_INC))
-#XMLFILES += $(addprefix ../FreeRTOS/PEARL/,$(PEARL_FREERTOS_XML))
+include esp-idf/components/freertos/PEARL/Files
+CXXSRCS += $(addprefix esp-idf/components/freertos/PEARL/,$(PEARL_FREERTOS_SRC))
+CHECK_FILES += $(addprefix esp-idf/components/freertos/PEARL/,$(PEARL_FREERTOS_SRC))
+CHECK_FILES += $(addprefix esp-idf/components/freertos/PEARL/,$(addsuffix .h,$(basename $(PEARL_FREERTOS_SRC))))
+INCS += $(addprefix esp-idf/components/freertos/PEARL/,$(PEARL_FREERTOS_INC))
+XMLFILES += $(addprefix esp-idf/components/freertos/PEARL/,$(PEARL_FREERTOS_XML))
 
 # -------------------- add cortex-M clock to project
 #CXXSRCS += ../FreeRTOS/addOns/CortexMClock.cc
@@ -64,6 +64,15 @@ CXXSRCS += $(addprefix ../common/,$(CXX_COMMON))
 CHECK_FILES += $(addprefix ../common/,$(CXX_COMMON))
 INCS += ../common
 XMLFILES  += $(addprefix ../common/,$(XML_COMMON))
+
+# -------------------- add esp specific files to project
+INCS += esp-idf/components/esp32/include
+INCS += esp-idf/components/soc/include
+INCS += esp-idf/components/soc/esp32/include
+INCS += esp-idf/components/heap/include
+INCS += esp-idf/components/driver/include
+INCS += esp-idf/components/freertos/include
+INCS += esp-idf/components/newlib/platform_include
 
 #---------------------------------
 # required parts of LPCopen V2.xx 
@@ -95,8 +104,8 @@ XMLFILES  += $(addprefix ../common/,$(XML_COMMON))
 #endif
 
 # ------------------------ finalize variables 
-#INCS:=$(addprefix -I ,$(INCS))
-#PURECXXFLAGS := $(CXXFLAGS)
+INCS:=$(addprefix -I ,$(INCS))
+PURECXXFLAGS := $(CXXFLAGS)
 #ifeq ($(CONFIG_LPC1768_CHECK_STACK_OVERFLOW),y)
 #PURECXXFLAGS += -finstrument-functions 
 #endif
@@ -125,7 +134,7 @@ CHECK_FILES := $(sort $(CHECK_FILES))
 #$(warning BOARDSUPPORT_OBJ=$(BOARDSUPPORT_OBJ))
 #$(warning XMLFILES=$(XMLFILES))
 
-all: depend $(targets)
+all: mkFakeTypes depend $(targets)
 
 tests/testStackOverflow.s: tests/testStackOverflow.cc
 	$(CXX) $^ -S $(CXXFLAGS)  $(PURECXXFLAGS)
@@ -224,6 +233,17 @@ run_bin:
 phony +=  checkformat
 checkformat:
 	@$(foreach f,$(CHECK_FILES),../codestyle/check.sh $(f);)
+
+phony += mkFakeTypes
+mkFakeTypes: 
+	@echo "[create] $@"
+	@$(CC) $(INCS) -c esp-idf/components/freertos/addOns/mkFakeTypes.c
+	@mv mkFakeTypes.o esp-idf/components/freertos/addOns/
+	@(cd esp-idf/components/freertos/addOns; size -A mkFakeTypes.o >sizes.txt;\
+	 gcc fakeTypes.c -o fakeTypes; ./fakeTypes)
+	@$(CXX) $(INCS) -c esp-idf/components/freertos/addOns/check_FakeTypes.c
+	@(cd esp-idf/components/freertos/addOns; \
+	rm -f sizes.txt mkFakeTypes.o check_FakeTypes.o fakeTypes)
 
 -include .depend
 

@@ -1,0 +1,12 @@
+PEARL_FREERTOS_SRC += \
+#	CSema.cc \
+	Mutex.cc \
+#	PrioMapper.cc \
+#	Task.cc \
+#	TaskMonitor.cc  \
+#	TaskTimer.cc \
+#	GenericUart.cc
+
+#	Log.cc \
+
+PEARL_FREERTOS_INC = .
