@@ -17,7 +17,7 @@ COMPILE.cc = @echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -
 #COMPILE.cc = echo [compile] $<; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(LINK.cc)
 #LINK = @echo [link] $@; $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
-LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=2 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
+LINK = @echo [link] $@; $(CXX) $(PURECFLAGS) -DTARGET=3 $(CXXFLAGS) $(CPPFLAGS) $(LFLAGS) $(LDFLAGS) $^ -o $@
 
 IC_DIR = ../includeComposer
 IC = $(IC_DIR)/ic
@@ -66,6 +66,9 @@ INCS += ../common
 XMLFILES  += $(addprefix ../common/,$(XML_COMMON))
 
 # -------------------- add esp specific files to project
+CXXSRCS += esp-idf/components/esp32/cpu_start.c
+CHECK_FILES += esp-idf/components/esp32/cpu_start.c
+
 INCS += esp-idf/components/esp32/include
 INCS += esp-idf/components/soc/include
 INCS += esp-idf/components/soc/esp32/include
@@ -73,6 +76,16 @@ INCS += esp-idf/components/heap/include
 INCS += esp-idf/components/driver/include
 INCS += esp-idf/components/freertos/include
 INCS += esp-idf/components/newlib/platform_include
+INCS += esp-idf/components/tcpip_adapter/include
+INCS += esp-idf/components/lwip/include/lwip
+INCS += esp-idf/components/lwip/include/lwip/port
+INCS += esp-idf/components/spi_flash/include
+INCS += esp-idf/components/nvs_flash/include
+INCS += esp-idf/components/log/include
+INCS += esp-idf/components/vfs/include
+INCS += esp-idf/components/app_trace/include
+INCS += esp-idf/components/bootloader_support/include
+INCS += esp-idf/components/esp32/include/xtensa
 
 #---------------------------------
 # required parts of LPCopen V2.xx 
@@ -113,7 +126,7 @@ PURECXXFLAGS := $(CXXFLAGS)
 PURECFLAGS := $(CFLAGS)
 CFLAGS += $(INCS)
 CXXFLAGS += $(INCS)
-CXXFLAGS += -DTARGET=2
+CXXFLAGS += -DTARGET=3
 
 # ----------------- all input sources for dependencies
 SRCS = $(BOARDSUPPORT)  $(CXXSRCS) $(CSRC) $(LPCOpen_CSRC)
@@ -207,7 +220,7 @@ install: all cc_bin run_bin
 phony += cc_bin
 cc_bin:
 	@echo "[create] $@"
-	@echo '$(CXX) -DTARGET=3 $(PURECXXFLAGS) $(LFLAGS) -I $(CONFIG_INSTALL_Target)/include $$SYSTEM $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLesp32.a' > cc_bin.inc 
+	@echo '$(CXX) -DTARGET=3 $(PURECXXFLAGS) $(LFLAGS) -I $(CONFIG_INSTALL_Target)/include $$SYSTEM $$fn.cc -o $$fn $(CONFIG_INSTALL_Target)/lib/libOpenPEARLesp32.a -lstdc++' >> cc_bin.inc 
 
 ######## TODO
 phony += run_bin
@@ -260,3 +273,5 @@ info:
 	@echo "PHONY " $(phony)
 
 .PHONY: $(phony)
+
+print-%  : ; @echo $* = $($*)
