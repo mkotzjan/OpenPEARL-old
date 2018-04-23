@@ -66,9 +66,6 @@ INCS += ../common
 XMLFILES  += $(addprefix ../common/,$(XML_COMMON))
 
 # -------------------- add esp specific files to project
-CXXSRCS += esp-idf/components/esp32/cpu_start.c
-CHECK_FILES += esp-idf/components/esp32/cpu_start.c
-
 INCS += esp-idf/components/esp32/include
 INCS += esp-idf/components/soc/include
 INCS += esp-idf/components/soc/esp32/include
@@ -129,14 +126,14 @@ CXXFLAGS += $(INCS)
 CXXFLAGS += -DTARGET=3
 
 # ----------------- all input sources for dependencies
-SRCS = $(BOARDSUPPORT)  $(CXXSRCS) $(CSRC) $(LPCOpen_CSRC)
+SRCS = $(BOARDSUPPORT)  $(CXXSRCS) $(CSRC)
 
 # ------------------- all files not to be added into lib
-BOARDSUPPORT_OBJ := \
-		 $(addsuffix .o,$(basename $(BOARDSUPPORT))) \
-		 $(addsuffix .o,$(basename $(LPCOpen_CSRC)))
+#BOARDSUPPORT_OBJ := \
+#		 $(addsuffix .o,$(basename $(BOARDSUPPORT))) \
+#		 $(addsuffix .o,$(basename $(LPCOpen_CSRC)))
 
-INCLUDES := $(addsuffix .h,$(basename $(CXXSRCS)))
+#INCLUDES := $(addsuffix .h,$(basename $(CXXSRCS)))
 #PLIB_OBJS +=  $(addsuffix .o,$(basename $(LPCOpen_CSRC)))
 PLIB_OBJS := $(addsuffix .o,$(basename $(CXXSRCS)))
 PLIB_OBJS += $(addsuffix .o,$(basename $(CSRC)))
@@ -152,7 +149,7 @@ all: mkFakeTypes depend $(targets)
 tests/testStackOverflow.s: tests/testStackOverflow.cc
 	$(CXX) $^ -S $(CXXFLAGS)  $(PURECXXFLAGS)
 
-libOpenPEARLesp32.a:  $(PLIB_OBJS)
+libOpenPEARLesp32.a: $(PLIB_OBJS)
 	@echo "[create] $@"
 	@rm   -f libOpenPEARLesp32.a
 	@$(AR) r libOpenPEARLesp32.a $(PLIB_OBJS)
