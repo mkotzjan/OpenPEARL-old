@@ -84,6 +84,10 @@ INCS += esp-idf/components/app_trace/include
 INCS += esp-idf/components/bootloader_support/include
 INCS += esp-idf/components/esp32/include/xtensa
 
+define esp32build
+make -C esp-idf-template
+endef
+
 #---------------------------------
 # required parts of LPCopen V2.xx 
 # directory, includes directories for LPCopen V2.xx
@@ -149,10 +153,22 @@ all: mkFakeTypes depend $(targets)
 tests/testStackOverflow.s: tests/testStackOverflow.cc
 	$(CXX) $^ -S $(CXXFLAGS)  $(PURECXXFLAGS)
 
-libOpenPEARLesp32.a: $(PLIB_OBJS)
+esp-idf-build:
+	@echo "[create] $@"
+	$(call esp32build)
+
+libOpenPEARLesp32.a: esp-idf-build $(PLIB_OBJS)
 	@echo "[create] $@"
 	@rm   -f libOpenPEARLesp32.a
+	@rm   -f libOpenPEARLesp32complete.a
+	@rm   -f libOpenPEARLesp32complete.mri
 	@$(AR) r libOpenPEARLesp32.a $(PLIB_OBJS)
+	@echo "create libOpenPEARLesp32complete.a" > libOpenPEARLesp32complete.mri
+	@echo "addlib libOpenPEARLesp32.a" >> libOpenPEARLesp32complete.mri
+	@find esp-idf-template/build/ -maxdepth 2 -regex ".*\.a" | grep -v main | grep -v freertos | sed -e 's/^/addlib /' >> libOpenPEARLesp32complete.mri
+	@echo "save\nend" >> libOpenPEARLesp32complete.mri
+	@$(AR) -M <libOpenPEARLesp32complete.mri
+	@mv   -f libOpenPEARLesp32complete.a libOpenPEARLesp32.a
 
 esp32.xml: $(XMLFILES)
 	@echo "[create] $@"
@@ -171,6 +187,7 @@ depend: ../common/Signals.hh ../common/Signals.hcc $(SRCS)
 
 phony += clean
 clean:
+	$(call esp32build) clean
 	@rm -f $(BOARDSUPPORT_OBJ)
 	@rm -f $(targets)
 	@rm -f $(GTEST_OBJS)
