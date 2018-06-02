@@ -10,6 +10,9 @@
 # where this file is located.
 #
 
+# Set IDF_PATH to override eventual environment variables
+IDF_PATH:=$(subst /make,,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
 .PHONY: build-components menuconfig defconfig all build clean all_binaries check-submodules size size-components size-files list-components
 
 MAKECMDGOALS ?= all
@@ -413,7 +416,7 @@ $(BUILD_DIR_BASE):
 #
 # Is recursively expanded by the GenerateComponentTargets macro
 define ComponentMake
-+$(MAKE) -C $(BUILD_DIR_BASE)/$(2) -f $(IDF_PATH)/make/component_wrapper.mk COMPONENT_MAKEFILE=$(1)/component.mk COMPONENT_NAME=$(2)
++$(MAKE) -C $(BUILD_DIR_BASE)/$(2) -f $(IDF_PATH)/make/component_wrapper.mk COMPONENT_MAKEFILE=$(1)/component.mk COMPONENT_NAME=$(2) IDF_PATH=$(IDF_PATH)
 endef
 
 # Generate top-level component-specific targets for each component
