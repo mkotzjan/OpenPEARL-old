@@ -76,7 +76,7 @@ namespace pearlrt {
       schedContinueData.taskTimer = &continueTimer;
 
       // FreeRTOS part
-      stackDepth = 800;
+      stackDepth = STACK_SIZE;
       xth = pdFALSE;
       TaskList::Instance().add(this);
    }
@@ -92,7 +92,7 @@ namespace pearlrt {
 
    void Task::directActivate(const Fixed<15>& prio) {
       bool freeRtosRunning;
-      StructParameters_t taskParams;
+      //StructParameters_t taskParams;
       int cp;  // current prio of calling task
 
       int freeRtosPrio = PrioMapper::getInstance()->fromPearl(prio.x);
@@ -116,16 +116,25 @@ namespace pearlrt {
          cp = switchToThreadPrioMax();
       }
 
-      taskParams.pvParameter = (void*) this;
-      taskParams.tcb = &tcb;
-      taskParams.stack = stack;
+      //taskParams.pvParameter = (void*) this;
+      //taskParams.tcb = &tcb;
+      //taskParams.stack = stack;
 
-      taskCreation = xTaskCreate(&tskfunc,
-                                 (const char*) this->name,
-                                 this->stackDepth, &taskParams,
-                                 freeRtosPrio, &xth);
+      //taskCreation = xTaskCreate(&tskfunc,
+      //                           (const char*) this->name,
+      //                           this->stackDepth, &taskParams,
+      //                           freeRtosPrio, &xth);
+      //taskCreation = xTaskCreate(&test, (const char*) this->name, this->stackDepth, NULL, freeRtosPrio, &xth);
+      xth = xTaskCreateStatic(
+			&tskfunc,
+			(const char*) this->name,
+			this->stackDepth,
+			(void*) this,
+			freeRtosPrio,
+			stack,
+			((StaticTask_t*) &tcb));
 
-      if (taskCreation) {
+      if (xth) {
          Log::debug("%s: started", name);
          taskState = RUNNING;
       } else {
@@ -140,7 +149,6 @@ namespace pearlrt {
       }
    }
 
-
    void Task::resume2() {
       suspendMySelf();
    }
@@ -151,8 +159,8 @@ namespace pearlrt {
 
    void Task::tskfunc(void* param) {
       Task* me = ((Task*)param);
-
       me->entry();
+
       Log::debug("%s: starts", me->getName());
 
       try {

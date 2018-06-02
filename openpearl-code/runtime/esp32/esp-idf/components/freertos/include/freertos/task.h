@@ -1856,7 +1856,7 @@ void vTaskGetRunTimeStats( char *pcWriteBuffer ) PRIVILEGED_FUNCTION; /*lint !e9
  *
  *	- eNoAction:
  *	  The task receives a notification without its notification value being
- *	  updated.  ulValue is not used and xTaskNotify() always returns pdPASS in
+ *	  updated.  ulValue is not used and xTaskNotify() always returns pdPASS in
  *	  this case.
  *
  * @return Dependent on the value of eAction.  See the description of the
@@ -2413,10 +2413,20 @@ UBaseType_t uxTaskGetSnapshotAll( TaskSnapshot_t * const pxTaskSnapshotArray, co
 
 /** @endcond */
 
+/**
+ * calculate the number of free stack elements for the current task
+ *
+ * \returns the number of free stack elements of the current task
+ */
+#if INCLUDE_xTaskGetCurrentFreeStack == 1
+        UBaseType_t uxTaskGetCurrentFreeStack( void );
+#endif
+
 #ifdef __cplusplus
 }
 #endif
 #endif /* INC_TASK_H */
+
 
 
 

@@ -1,7 +1,6 @@
 /*
  [The "BSD license"]
  Copyright (c) 2012-2013 Rainer Mueller
- Copyright (c) 2018 Michael Kotzjan
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -39,11 +38,10 @@ Only this file mus be included.
 */
 
 #include "TaskCommon.h"
+#include "TaskTimer.h"
+#include "TaskTimer.h"
 #include "Task.h"
 #include "GenericTask.h"
-#include "TaskTimer.h"
-#include "TaskTimerCommon.h"
-#include "TaskMonitor.h"
 #include "Clock.h"
 #include "PutClock.h"
 #include "GetClock.h"
@@ -66,6 +64,7 @@ Only this file mus be included.
 #include "RefChar.h"
 #include "ScheduleSignalAction.h"
 #include "Prio.h"
+#include "Task.h"
 #include "BitString.h"
 #include "PutBitString.h"
 #include "GetBitString.h"
@@ -75,10 +74,10 @@ Only this file mus be included.
 #include "SystemDationNB.h"
 #include "SystemDationB.h"
 #include "UserDation.h"
+#include "UserDationNB.h"
 #include "DationPG.h"
 #include "DationRW.h"
-#include "DationTS.h"
-#include "UserDationNB.h"
+#include "UserDation.h"
 #include "DationDim.h"
 #include "DationDim1.h"
 #include "DationDim2.h"
@@ -88,13 +87,11 @@ Only this file mus be included.
 #include "SystemDationNBSink.h"
 #include "SystemDationNBSource.h"
 
-#include "Control.h"
-
-#include "StdOut.h"
 #include "SoftInt.h"
 
 #include "Float.h"
 #include "compare.h"
 
 #include "SampleBasicDation.h"
+#include "Control.h"
 

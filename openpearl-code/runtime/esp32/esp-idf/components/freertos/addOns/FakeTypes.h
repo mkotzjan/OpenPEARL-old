@@ -18,7 +18,7 @@ typedef void* FakeSemaphoreHandle_t;
 #define FakexSemaphoreHandle FakeSemaphoreHandle_t
 
 typedef void* FakeTaskHandle_t;
-typedef struct {uint32_t assertAlign; char data[352];} FakeTCB_t;
+typedef struct {uint32_t assertAlign; char data[368];} FakeTCB_t;
 #ifdef _cplusplus
 }
 #endif

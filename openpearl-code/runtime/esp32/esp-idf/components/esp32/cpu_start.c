@@ -83,8 +83,9 @@ static bool app_cpu_started = false;
 #endif //!CONFIG_FREERTOS_UNICORE
 
 static void do_global_ctors(void);
-static void main_task(void* args);
-extern void app_main(void);
+//static void main_task(void* args);
+//extern __attribute__((weak)) int app_main(void);
+extern void startOpenPEARL(void);
 extern esp_err_t esp_pthread_init(void);
 
 extern int _bss_start;
@@ -369,10 +370,28 @@ void start_cpu0_default(void)
     esp_core_dump_init();
 #endif
 
-    portBASE_TYPE res = xTaskCreatePinnedToCore(&main_task, "main",
-                                                ESP_TASK_MAIN_STACK, NULL,
-                                                ESP_TASK_MAIN_PRIO, NULL, 0);
-    assert(res == pdTRUE);
+    //portBASE_TYPE res = xTaskCreatePinnedToCore(&main_task, "main",
+    //                                            ESP_TASK_MAIN_STACK, NULL,
+    //                                            ESP_TASK_MAIN_PRIO, NULL, 0);
+    //assert(res == pdTRUE);
+
+    //app_main();
+
+    // Now that the application is about to start, disable boot watchdogs
+    REG_CLR_BIT(TIMG_WDTCONFIG0_REG(0), TIMG_WDT_FLASHBOOT_MOD_EN_S);
+    REG_CLR_BIT(RTC_CNTL_WDTCONFIG0_REG, RTC_CNTL_WDT_FLASHBOOT_MOD_EN);
+#if !CONFIG_FREERTOS_UNICORE
+    // Wait for FreeRTOS initialization to finish on APP CPU, before replacing its startup stack
+    while (port_xSchedulerRunning[1] == 0) {
+        ;
+    }
+#endif
+    //Enable allocation in region where the startup stacks were located.
+    heap_caps_enable_nonos_stack_heaps();
+
+    // call OpenPEARL startup routine
+    startOpenPEARL();
+
     ESP_LOGI(TAG, "Starting scheduler on PRO CPU.");
     vTaskStartScheduler();
     abort(); /* Only get to here if not enough free heap to start scheduler */

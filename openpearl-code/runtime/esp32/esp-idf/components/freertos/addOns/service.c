@@ -43,19 +43,19 @@
 #include "allTaskPriorities.h"
 #include "service.h"
 
-#define SERVICE_STACK_SIZE 400
+#define SERVICE_STACK_SIZE 4096
 #define STACKLIMIT 100	// limit of minimum free stack for the service task
 
 static TaskHandle_t xServiceTaskHandle;
 static void serviceTask(void *);
 
-static TCB_t serviceTcb;
+static StaticTask_t serviceTcb;
 static StackType_t serviceStack[SERVICE_STACK_SIZE];
 
 static QueueHandle_t serviceQueue;
 
 void init_service() {
-   StructParameters_t createParameters;
+   //StructParameters_t createParameters;
 
    /* the interrupt service routine sends messages to this
    queue on each expiration of the timer. The length is
@@ -64,13 +64,21 @@ void init_service() {
    */
    serviceQueue = xQueueCreate(30, sizeof(ServiceJob));
 
-   createParameters.pvParameter = NULL;
-   createParameters.stack = serviceStack;
-   createParameters.tcb = &serviceTcb;
+   //createParameters.pvParameter = NULL;
+   //createParameters.stack = serviceStack;
+   //createParameters.tcb = &serviceTcb;
 
-   xTaskCreate(serviceTask,
-               "serviceTask", SERVICE_STACK_SIZE, &createParameters,
-               PRIO_TASK_SERVICE, &xServiceTaskHandle);
+   //xTaskCreate(serviceTask,
+   //            "serviceTask", SERVICE_STACK_SIZE, &createParameters,
+   //            255, &xServiceTaskHandle);
+   xServiceTaskHandle = xTaskCreateStatic(
+			serviceTask,
+			"serviceTask",
+			SERVICE_STACK_SIZE,
+			NULL,
+			PRIO_TASK_SERVICE,
+			serviceStack,
+			&serviceTcb);
 
 }
 
@@ -81,7 +89,7 @@ void add_service_from_ISR(ServiceJob * s) {
       }
 
       //The yield is _very_ important for performance
-      portYIELD_FROM_ISR(xServiceTaskHandle);
+      portYIELD_FROM_ISR();
    }
 }
 

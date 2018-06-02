@@ -84,7 +84,7 @@
                  has a MAIN attribute set
  */
 #define DCLTASK(x, prio, ismain) 			\
- C_##x x __attribute__ ((section ("PEARL_APPLICATION"))) \
+ C_##x x \
 	 ((char*)#x,prio, ismain);	\
  void C_##x::task(pearlrt::Task * me)
 

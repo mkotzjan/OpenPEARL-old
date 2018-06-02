@@ -5047,7 +5047,25 @@ TickType_t uxReturn;
 
 #endif
 
+#if INCLUDE_xTaskGetCurrentFreeStack == 1
+	UBaseType_t uxTaskGetCurrentFreeStack( void )
+        {
+            UBaseType_t x; // place one value on the stack
+		#if( portSTACK_GROWTH < 0 )
+		{
+			x = &x - (UBaseType_t*)pxCurrentTCB[0]->pxStack;
+		}
+		#else /* portSTACK_GROWTH */
+		{
+			x = (UBaseType_t*)pxCurrentTCB[0]->pxEndOfStack - &x;
+		}
+		#endif
+		return x;
+	}
+#endif
+
 #ifdef FREERTOS_MODULE_TEST
 	#include "tasks_test_access_functions.h"
 #endif
+
 

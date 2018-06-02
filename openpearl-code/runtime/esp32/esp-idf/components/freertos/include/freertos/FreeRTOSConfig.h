@@ -168,12 +168,7 @@ int xt_clock_freq(void) __attribute__((deprecated));
 /* Default clock rate for simulator */
 //#define configCPU_CLOCK_HZ				80000000
 
-/* This has impact on speed of search for highest priority */
-#ifdef SMALL_TEST
-#define configMAX_PRIORITIES			( 7 )
-#else
-#define configMAX_PRIORITIES			( 25 )
-#endif
+#define configMAX_PRIORITIES			( 260 )
 
 #ifndef CONFIG_ESP32_APPTRACE_ENABLE
 #define configMINIMAL_STACK_SIZE		768
@@ -199,7 +194,10 @@ int xt_clock_freq(void) __attribute__((deprecated));
 //We define the heap to span all of the non-statically-allocated shared RAM. ToDo: Make sure there
 //is some space left for the app and main cpu when running outside of a thread.
 #define configAPPLICATION_ALLOCATED_HEAP 1
-#define configTOTAL_HEAP_SIZE			(&_heap_end - &_heap_start)//( ( size_t ) (64 * 1024) )
+#define configTOTAL_HEAP_SIZE			( ( size_t ) (64 * 1024) )//(&_heap_end - &_heap_start)
+
+#define configUSE_STATIC_STACK_AND_TCB 1 // <<< added
+#define INCLUDE_xTaskGetCurrentFreeStack	1	/* added */
 
 #define configMAX_TASK_NAME_LEN			( CONFIG_FREERTOS_MAX_TASK_NAME_LEN )
 

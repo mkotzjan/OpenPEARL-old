@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2015-2017 Rainer Mueller
  Copyright (c) 2018 Michael Kotzjan
  All rights reserved.
 
@@ -28,73 +28,64 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef ESP32_CLOCK_INCLUDED
+#define ESP32_CLOCK_INCLUDED
+
+
 /**
 \file
 
-\brief list of header file
-
-The compiler does not needed to know all header files of the run time system.
-Only this file mus be included.
-
+\brief select the clock source by defining a system device
 */
 
-#include "TaskCommon.h"
-#include "Task.h"
-#include "GenericTask.h"
-#include "TaskTimer.h"
-#include "TaskTimerCommon.h"
-#include "TaskMonitor.h"
-#include "Clock.h"
-#include "PutClock.h"
-#include "GetClock.h"
 
-#include "Duration.h"
-#include "PutDuration.h"
-#include "GetDuration.h"
+namespace pearlrt {
 
-#include "Interrupt.h"
+   /**
+   \brief Clock Source for the ESP32
 
-#include "Fixed.h"
-#include "PutFixed.h"
-#include "GetFixed.h"
+   With this class it is possible to define the clock source
+   for an application. The parameter selects one of the possible
+   clock sources.
 
-#include "Fixed63.h"
-#include "Character.h"
-#include "PutCharacter.h"
-#include "GetCharacter.h"
+   The default clock Esp32Clock(0) is set automatically in
+   system startup procedure, if no other setting was selected.
 
-#include "RefChar.h"
-#include "ScheduleSignalAction.h"
-#include "Prio.h"
-#include "BitString.h"
-#include "PutBitString.h"
-#include "GetBitString.h"
-#include "RefCharSink.h"
-#include "Signals.h"
-#include "Device.h"
-#include "SystemDationNB.h"
-#include "SystemDationB.h"
-#include "UserDation.h"
-#include "DationPG.h"
-#include "DationRW.h"
-#include "DationTS.h"
-#include "UserDationNB.h"
-#include "DationDim.h"
-#include "DationDim1.h"
-#include "DationDim2.h"
-#include "DationDim3.h"
-#include "Semaphore.h"
+   Usage:
+   \verbatim
+   SYSTEM;
+      Esp32Clock(1); ! 0=Systick, 1=RTC initial time + Systick
+   PROBLEM;
+      ! no access to this device in the problem part
+   \endverbatim
 
-#include "SystemDationNBSink.h"
-#include "SystemDationNBSource.h"
+   */
+   class Esp32Clock {
 
-#include "Control.h"
+   private:
+      static bool clockSelected;
 
-#include "StdOut.h"
-#include "SoftInt.h"
+   public:
 
-#include "Float.h"
-#include "compare.h"
+      /**
+      Constructor to setup the clock
 
-#include "SampleBasicDation.h"
+      \param typeOfClock selector of the desired clock system
+                  <ul>
+        <li>0=Systick only (no absolute time),
+                  <li>1=RTC used as initial time; update by systick
+                  <li> ... others follow
+                  </ul>
 
+      */
+      Esp32Clock(const int typeOfClock);
+
+      /**
+      check if a clock was selected
+
+      \return true, if a clock source was selected
+      */
+      static bool isClockSelected();
+   };
+}
+#endif

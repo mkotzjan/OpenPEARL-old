@@ -1,6 +1,7 @@
 /*
  [A "BSD license"]
  Copyright (c) 2016 Rainer Mueller
+ Copyright (c) 2018 Michael Kotzjan
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -27,21 +28,21 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "chip.h"
-#include "cmsis.h"
+//#include "chip.h"
+//#include "cmsis.h"
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
 #include "Retarget.h"
+#include "GenericUart.h"
 #include <stdio.h>
-#include "lpc17_interruptState.h"
+//#include "lpc17_interruptState.h"
 
 #include "SystemConsole.h"
 
 
 extern "C" {
-   static pearlrt::GenericUart * console = 0;
    static bool useInterruptFlag = false;
 
    struct StdInOutJob {
@@ -50,6 +51,7 @@ extern "C" {
    };
    static struct StdInOutJob *stdOutJob = NULL;
    static struct StdInOutJob *stdInJob = NULL;
+   pearlrt::GenericUart * console;
 
    int __attribute__((used)) _write(int fd, char * ptr, int len) {
       if (! console) {

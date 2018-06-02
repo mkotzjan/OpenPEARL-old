@@ -29,7 +29,7 @@
 #include <time.h>
 #include <inttypes.h>
 #include <stdio.h>
-#include "chip.h"
+//#include "chip.h"
 #include "time_addons.h"
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"

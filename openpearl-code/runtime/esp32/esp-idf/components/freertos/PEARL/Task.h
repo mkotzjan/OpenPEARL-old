@@ -51,6 +51,8 @@
 #include "Signals.h"
 #include "FakeTypes.h"
 
+#define STACK_SIZE 2048
+
 
 namespace pearlrt {
    /**
@@ -78,7 +80,7 @@ namespace pearlrt {
       FakeTCB_t tcb;
 
       /* the FreeRTOS stack */
-      FakeStackType_t stack[800];
+      FakeStackType_t stack[STACK_SIZE];
 
    public:
       /**

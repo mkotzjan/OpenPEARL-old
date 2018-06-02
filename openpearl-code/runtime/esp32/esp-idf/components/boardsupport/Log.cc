@@ -1,6 +1,6 @@
 /*
- [The "BSD license"]
- Copyright (c) 2012-2013 Rainer Mueller
+ [A "BSD license"]
+ Copyright (c) 2016 Rainer Mueller
  Copyright (c) 2018 Michael Kotzjan
  All rights reserved.
 
@@ -28,73 +28,57 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/**
-\file
-
-\brief list of header file
-
-The compiler does not needed to know all header files of the run time system.
-Only this file mus be included.
-
-*/
-
-#include "TaskCommon.h"
-#include "Task.h"
-#include "GenericTask.h"
-#include "TaskTimer.h"
-#include "TaskTimerCommon.h"
-#include "TaskMonitor.h"
-#include "Clock.h"
-#include "PutClock.h"
-#include "GetClock.h"
-
-#include "Duration.h"
-#include "PutDuration.h"
-#include "GetDuration.h"
-
-#include "Interrupt.h"
-
-#include "Fixed.h"
-#include "PutFixed.h"
-#include "GetFixed.h"
-
-#include "Fixed63.h"
-#include "Character.h"
-#include "PutCharacter.h"
-#include "GetCharacter.h"
-
-#include "RefChar.h"
-#include "ScheduleSignalAction.h"
-#include "Prio.h"
-#include "BitString.h"
-#include "PutBitString.h"
-#include "GetBitString.h"
-#include "RefCharSink.h"
+#include "Log.h"
+#include "Mutex.h"
 #include "Signals.h"
-#include "Device.h"
-#include "SystemDationNB.h"
-#include "SystemDationB.h"
-#include "UserDation.h"
-#include "DationPG.h"
-#include "DationRW.h"
-#include "DationTS.h"
-#include "UserDationNB.h"
-#include "DationDim.h"
-#include "DationDim1.h"
-#include "DationDim2.h"
-#include "DationDim3.h"
-#include "Semaphore.h"
+//#include "lpc17_interruptState.h"
 
-#include "SystemDationNBSink.h"
-#include "SystemDationNBSource.h"
+namespace pearlrt {
+   static Mutex mutex;
 
-#include "Control.h"
+   Log::Log() {
+      ctorIsActive = true;
+      provider = NULL;          // no provider --> use printf
+      ctorIsActive = false;
+   }
 
-#include "StdOut.h"
-#include "SoftInt.h"
+   void Log::doit(const Character<7>& type,
+                  const char * format,
+                  va_list args) {
+      Character<128> line;
+      RefCharacter rc(line);
+      bool usePrintf = false;
 
-#include "Float.h"
-#include "compare.h"
+      try {
+         doFormat(type, rc, format, args);
 
-#include "SampleBasicDation.h"
+         if (!provider) {
+            usePrintf = true;
+         }
+         /*
+         if (lpc17_isInterrupt()) {
+            usePrintf = true;
+         }
+         */
+         if (!usePrintf) {
+            mutex.lock();
+            provider->dationWrite(rc.getCstring(), rc.getCurrent());
+            mutex.unlock();
+         } else {
+            printf(rc.getCstring());
+         }
+      } catch (CharacterTooLongSignal s) {
+         if (provider) {
+            mutex.lock();
+            provider->dationWrite(line.get(), (size_t)(line.upb().x));
+            provider->dationWrite((void*)ERRORMESSAGE, strlen(ERRORMESSAGE));
+            mutex.unlock();
+         } else {
+            printf(line.get());
+         }
+      }
 
+   }
+
+
+}

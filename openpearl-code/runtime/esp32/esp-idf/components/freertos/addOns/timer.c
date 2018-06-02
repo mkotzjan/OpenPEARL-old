@@ -299,7 +299,7 @@ static void insert_timer_into_active_list(timer_t t) {
 }
 
 static inline void DMB(void) {
-   asm volatile("dmb" ::: "memory");
+   asm volatile("extw" ::: "memory");
 }
 
 
