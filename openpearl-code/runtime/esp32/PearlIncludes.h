@@ -98,3 +98,4 @@ Only this file mus be included.
 
 #include "SampleBasicDation.h"
 
+#include "Array.h"
