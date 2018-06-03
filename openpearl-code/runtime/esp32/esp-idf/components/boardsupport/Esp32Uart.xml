@@ -1,0 +1,18 @@
+   <dation name="Esp32Uart">
+      <parameters>
+         <FIXED length="15"><VALUES>0,2</VALUES></FIXED>
+         <FIXED length="31">
+            <VALUES>300, 600, 1200, 2400, 4800, 9600,
+                    19200, 38400, 57600, 115200</VALUES>
+         </FIXED>
+         <FIXED length="15"><VALUES>5,6,7,8</VALUES></FIXED>
+         <FIXED length="15"><VALUES>1,2</VALUES></FIXED>
+         <CHAR length="1"><VALUES>'O','E','N'</VALUES></CHAR>
+         <BIT length="1"><VALUES>'0'B1, '1'B1</VALUES></BIT>
+      </parameters>
+      <attributes>FORWARD, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALL</data>
+      <associationProvider>
+         <associationType provider="AlphicOutProvider"/>
+      </associationProvider>
+   </dation>

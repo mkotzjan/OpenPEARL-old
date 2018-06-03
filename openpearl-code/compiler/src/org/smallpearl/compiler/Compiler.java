@@ -40,7 +40,7 @@ import java.io.StringWriter;
 import java.util.concurrent.TimeUnit;
 
 public class Compiler {
-    static String version = "v0.8.9.20";
+    static String version = "v0.8.9.21";
     static String grammarName;
     static String startRuleName;
     static List<String> inputFiles = new ArrayList<String>();

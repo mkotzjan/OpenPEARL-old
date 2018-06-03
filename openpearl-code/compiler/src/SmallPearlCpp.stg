@@ -378,14 +378,6 @@ assignment_statement(lhs,rhs) ::= <<
     <lhs> = <rhs>;
 >>
 
-assignmentStatementCharSlice(id,lhs) ::= <<
-    pearlrt::CharSlice(<id>)<lhs>;
->>
-
-assignmentStatementBitSlice(id,lhs) ::= <<
-    pearlrt::BitSlice(<id>)<lhs>;
->>
-
 if_statement(rhs, then_block, else_block) ::= <<
 if (<rhs>) {
     <then_block>
@@ -1816,20 +1808,29 @@ SetCharSlice(expr) ::= <<
 
 /* --------------------------- BIT SLICE -------------------------------------------*/
 
-/*
-BitSlice(id,offset,size) ::= <%
-<user_variable(id)>.getSlice(<offset>,(pearlrt::BitString\<<size>>*) 0)
-%>
-*/
 
-BitSlice(lwb,upb,offset) ::= <<
+assignmentStatementCharSlice(id,lhs) ::= <<
+    pearlrt::CharSlice(<id>)<lhs>;
+>>
+
+assignmentStatementBitSlice(id,slices,rhs) ::= <<
+    pearlrt::BitSlice(<id>)<\n><slices><rhs>;
+>>
+
+BitSliceRHS(id,lwb,upb,size) ::= <%
+    pearlrt::BitSlice(<user_variable(id)>)<\n>
+      .getSlice(<lwb>,<upb>)<\n>
+      .mkBitString((pearlrt::BitString\<<size>>*) 0)
+%>
+
+GetBitSlice(lwb,upb) ::= <<
     .getSlice(<lwb>,<upb>)<\n>
 >>
 
+SetBitSlice(expr,size) ::= <%
+    .setSlice(<expr>)
+%>
 
-SetBitSlice(expr) ::= <<
-    .setSlice(<expr>)<\n>
->>
 
 /* --------------------------- INTERRUPTS -------------------------------------------*/
 
