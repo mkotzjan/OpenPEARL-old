@@ -483,7 +483,7 @@ static void main_task(void* args)
     }
 #endif
 
-    app_main();
+    //app_main();
     vTaskDelete(NULL);
 }
 
