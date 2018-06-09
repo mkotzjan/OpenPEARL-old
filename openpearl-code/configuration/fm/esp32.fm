@@ -6,5 +6,18 @@ config ESP32
 	i/o-setting is done directly in the source code.
 	
 	This port is in work. Build and execution problems 
-        may occur selecting this option. 
+        may occur selecting this option.
+
+config ESP32_CHECK_STACK_OVERFLOW
+	depends on ESP32
+	boolean "check stack overflow in application code"
+	default y
+	help
+	This adds a function call in each funtion entry (and exit)
+        in order to check the current value of the stack pointer.
+	If the stack pointer is near to/or beyond of the stack limit
+        a non catchable exception is raised and the task is terminated.
+	
+	This option relies on the -finstrument-functions option of 
+	the g++ compiler.
 
