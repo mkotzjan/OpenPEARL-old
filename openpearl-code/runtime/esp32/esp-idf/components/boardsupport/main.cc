@@ -91,7 +91,7 @@ __attribute__((weak)) int app_main(void) {
 
    printf("OpenPEARL started \n");
 
-   Log::getInstance()->setLevel(0x0f);
+   Log::getInstance()->setLevel(0x0c);
 
    // start background service task
    init_service();
@@ -179,7 +179,7 @@ void startOpenPEARL() {
       Esp32Clock dummy(0);  // the object may be discarded immediately
    }
 
-   Log::getInstance()->setLevel(0x0f);
+   Log::getInstance()->setLevel(0x0c);
 
    // start background service task
    init_service();
