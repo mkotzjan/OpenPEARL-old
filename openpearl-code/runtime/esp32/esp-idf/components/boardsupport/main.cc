@@ -182,7 +182,7 @@ void startOpenPEARL() {
    Log::getInstance()->setLevel(0x0f);
 
    // start background service task
-   //init_service();
+   init_service();
 
    /*
     * This task starts all PEARL90 main tasks, afterwards the
