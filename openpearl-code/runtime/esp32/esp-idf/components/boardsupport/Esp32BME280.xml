@@ -1,0 +1,4 @@
+   <dation name="Esp32BME280">
+      <attributes> IN, SYSTEM, BASIC</attributes>
+      <data>ALL</data>
+   </dation>

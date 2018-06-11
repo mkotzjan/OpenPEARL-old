@@ -99,3 +99,5 @@ Only this file mus be included.
 #include "SampleBasicDation.h"
 
 #include "Array.h"
+
+#include "Esp32BME280.h"
