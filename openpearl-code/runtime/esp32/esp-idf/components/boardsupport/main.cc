@@ -175,7 +175,7 @@ void startOpenPEARL() {
 
    // test for clock initialization
    if (!Esp32Clock::isClockSelected()) {
-      printf("set default clock source");
+      printf("set default clock source\n");
       Esp32Clock dummy(0);  // the object may be discarded immediately
    }
 
