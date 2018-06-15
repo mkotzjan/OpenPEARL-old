@@ -100,7 +100,7 @@ Only this file mus be included.
 
 #include "Array.h"
 
-//#include "Esp32Wifi.h"
+#include "Esp32Wifi.h"
 
 //#include "Esp32BME280.h"
 //#include "I2CBus.h"

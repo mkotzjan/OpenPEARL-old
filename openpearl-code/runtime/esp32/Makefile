@@ -132,6 +132,7 @@ INCS += esp-idf/components/xtensa-debug-module/include
 # -------------------- add boardsupport component xml files
 #XMLFILES += esp-idf/components/boardsupport/Esp32Uart.xml
 XMLFILES += esp-idf/components/boardsupport/StdOut.xml
+XMLFILES += esp-idf/components/boardsupport/Esp32Wifi.xml
 
 define esp32build
 make -C esp-idf-template

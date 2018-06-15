@@ -1,0 +1,16 @@
+<!--
+   <configuration name="Esp32Wifi">
+      <parameters>
+        <CHAR length="32"><NotEmpty/></CHAR>
+        <CHAR length="64"><NotEmpty/></CHAR>
+      </parameters>
+   </configuration>
+-->
+   <dation name="Esp32Wifi">
+      <parameters>
+        <CHAR length="32"><NotEmpty/></CHAR>
+        <CHAR length="64"><NotEmpty/></CHAR>
+      </parameters>
+      <attributes>IN, SYSTEM, BASIC</attributes>
+      <data>ALL</data>
+   </dation>
