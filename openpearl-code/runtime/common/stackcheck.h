@@ -4,7 +4,7 @@
 */
 #ifndef NOSTACKCHECK
 
-#if (TARGET==2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1)
+#if ((TARGET==2 && CONFIG_LPC1768_CHECK_STACK_OVERFLOW==1) || (TARGET==3 && CONFIG_ESP32_CHECK_STACK_OVERFLOW==1))
 /**
 
 Stack checking is useful but it costs lot of execution time for
