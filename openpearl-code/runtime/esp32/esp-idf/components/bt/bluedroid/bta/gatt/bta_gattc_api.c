@@ -135,14 +135,13 @@ void BTA_GATTC_AppDeregister(tBTA_GATTC_IF client_if)
 **
 ** Parameters       client_if: server interface.
 **                  remote_bda: remote device BD address.
-**                  remote_addr_type: remote device BD address type.
 **                  is_direct: direct connection or background auto connection
 **                  transport: Transport to be used for GATT connection (BREDR/LE)
 **
 ** Returns          void
 **
 *******************************************************************************/
-void BTA_GATTC_Open(tBTA_GATTC_IF client_if, BD_ADDR remote_bda, tBTA_ADDR_TYPE remote_addr_type,
+void BTA_GATTC_Open(tBTA_GATTC_IF client_if, BD_ADDR remote_bda,
                     BOOLEAN is_direct, tBTA_GATT_TRANSPORT transport)
 {
     tBTA_GATTC_API_OPEN  *p_buf;
@@ -153,7 +152,6 @@ void BTA_GATTC_Open(tBTA_GATTC_IF client_if, BD_ADDR remote_bda, tBTA_ADDR_TYPE 
         p_buf->client_if = client_if;
         p_buf->is_direct = is_direct;
         p_buf->transport = transport;
-        p_buf->remote_addr_type = remote_addr_type;
         memcpy(p_buf->remote_bda, remote_bda, BD_ADDR_LEN);
 
 
@@ -547,7 +545,7 @@ void BTA_GATTC_ReadMultiple(UINT16 conn_id, tBTA_GATTC_MULTI *p_read_multi,
         p_buf->hdr.layer_specific = conn_id;
         p_buf->auth_req = auth_req;
         p_buf->num_attr = p_read_multi->num_attr;
-        p_buf->cmpl_evt = BTA_GATTC_READ_MULTIPLE_EVT;
+        p_buf->cmpl_evt = BTA_GATTC_READ_MUTIPLE_EVT;
         if (p_buf->num_attr > 0) {
             memcpy(p_buf->handles, p_read_multi->handles, sizeof(UINT16) * p_read_multi->num_attr);
 	    }
@@ -831,7 +829,7 @@ tBTA_GATT_STATUS BTA_GATTC_RegisterForNotifications (tBTA_GATTC_IF client_if,
             if ( p_clreg->notif_reg[i].in_use &&
                     !memcmp(p_clreg->notif_reg[i].remote_bda, bda, BD_ADDR_LEN) &&
                   p_clreg->notif_reg[i].handle == handle) {
-                APPL_TRACE_DEBUG("notification already registered");
+                APPL_TRACE_WARNING("notification already registered");
                 status = BTA_GATT_OK;
                 break;
             }

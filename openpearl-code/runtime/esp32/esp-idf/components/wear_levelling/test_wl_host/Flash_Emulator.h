@@ -25,7 +25,7 @@ class Flash_Emulator : public Flash_Access
 {
 
 public:
-    Flash_Emulator(size_t size, size_t sector_sise, size_t min_size);
+    Flash_Emulator(size_t size, size_t sector_sise);
 
     virtual size_t chip_size();
 
@@ -43,7 +43,6 @@ public:
 public:
     size_t size;
     size_t sector_sise;
-    size_t min_size;
     uint8_t *buff;
 
     uint32_t *access_count;

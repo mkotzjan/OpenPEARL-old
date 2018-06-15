@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 # Common bash
 
-if [[ ! -z ${DEBUG_SHELL} ]]
+if [[ ! -z ${DEBUG} ]]
 then
   set -x # Activate the expand mode if DEBUG is anything but empty.
 fi

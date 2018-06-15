@@ -81,8 +81,7 @@ void app_main(void)
     // formatted in case when mounting fails.
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
-        .max_files = 5,
-        .allocation_unit_size = 16 * 1024
+        .max_files = 5
     };
 
     // Use settings defined above to initialize SD card and mount FAT filesystem.
@@ -97,8 +96,8 @@ void app_main(void)
             ESP_LOGE(TAG, "Failed to mount filesystem. "
                 "If you want the card to be formatted, set format_if_mount_failed = true.");
         } else {
-            ESP_LOGE(TAG, "Failed to initialize the card (%s). "
-                "Make sure SD card lines have pull-up resistors in place.", esp_err_to_name(ret));
+            ESP_LOGE(TAG, "Failed to initialize the card (%d). "
+                "Make sure SD card lines have pull-up resistors in place.", ret);
         }
         return;
     }

@@ -40,8 +40,6 @@
 #include "esp_a2dp_api.h"
 #include "oi_codec_sbc.h"
 #include "oi_status.h"
-#include "future.h"
-#include <assert.h>
 
 #if (BTC_AV_SINK_INCLUDED == TRUE)
 
@@ -121,7 +119,6 @@ static void btc_a2dp_sink_data_ready(UNUSED_ATTR void *context);
 
 static tBTC_A2DP_SINK_CB btc_aa_snk_cb;
 static int btc_a2dp_sink_state = BTC_A2DP_SINK_STATE_OFF;
-static future_t *btc_a2dp_sink_future = NULL;
 static xTaskHandle  btc_aa_snk_task_hdl = NULL;
 static QueueHandle_t btc_aa_snk_data_queue = NULL;
 static QueueHandle_t btc_aa_snk_ctrl_queue = NULL;
@@ -235,13 +232,13 @@ bool btc_a2dp_sink_startup(void)
 
     APPL_TRACE_EVENT("## A2DP SINK START MEDIA THREAD ##");
 
-    btc_aa_snk_queue_set = xQueueCreateSet(BTC_A2DP_SINK_TASK_QUEUE_SET_LEN);
+    btc_aa_snk_queue_set = xQueueCreateSet(BTC_MEDIA_TASK_QUEUE_SET_LEN);
     configASSERT(btc_aa_snk_queue_set);
-    btc_aa_snk_data_queue = xQueueCreate(BTC_A2DP_SINK_DATA_QUEUE_LEN, sizeof(int32_t));
+    btc_aa_snk_data_queue = xQueueCreate(BTC_MEDIA_DATA_QUEUE_LEN, sizeof(int32_t));
     configASSERT(btc_aa_snk_data_queue);
     xQueueAddToSet(btc_aa_snk_data_queue, btc_aa_snk_queue_set);
 
-    btc_aa_snk_ctrl_queue = xQueueCreate(BTC_A2DP_SINK_CTRL_QUEUE_LEN, sizeof(void *));
+    btc_aa_snk_ctrl_queue = xQueueCreate(BTC_MEDIA_CTRL_QUEUE_LEN, sizeof(void *));
     configASSERT(btc_aa_snk_ctrl_queue);
     xQueueAddToSet(btc_aa_snk_ctrl_queue, btc_aa_snk_queue_set);
 
@@ -249,7 +246,7 @@ bool btc_a2dp_sink_startup(void)
         goto error_exit;
     }
 
-    xTaskCreatePinnedToCore(btc_a2dp_sink_task_handler, BTC_A2DP_SINK_TASK_NAME, BTC_A2DP_SINK_TASK_STACK_SIZE, NULL, BTC_A2DP_SINK_TASK_PRIO, &btc_aa_snk_task_hdl, BTC_A2DP_SINK_TASK_PINNED_TO_CORE);
+    xTaskCreatePinnedToCore(btc_a2dp_sink_task_handler, BTC_MEDIA_TASK_NAME, BTC_MEDIA_TASK_STACK_SIZE, NULL, BTC_MEDIA_TASK_PRIO, &btc_aa_snk_task_hdl, BTC_MEDIA_TASK_PINNED_TO_CORE);
     if (btc_aa_snk_task_hdl == NULL) {
         goto error_exit;
     }
@@ -276,10 +273,7 @@ error_exit:;
         vQueueDelete(btc_aa_snk_ctrl_queue);
         btc_aa_snk_ctrl_queue = NULL;
     }
-    if (btc_aa_snk_queue_set) {
-        vQueueDelete(btc_aa_snk_queue_set);
-        btc_aa_snk_queue_set = NULL;
-    }
+
     return false;
 }
 
@@ -288,12 +282,7 @@ void btc_a2dp_sink_shutdown(void)
     APPL_TRACE_EVENT("## A2DP SINK STOP MEDIA THREAD ##\n");
 
     // Exit thread
-    btc_a2dp_sink_state = BTC_A2DP_SINK_STATE_SHUTTING_DOWN;
-    btc_a2dp_sink_future = future_new();
-    assert(btc_a2dp_sink_future);
     btc_a2dp_sink_ctrl_post(BTC_MEDIA_TASK_SINK_CLEAN_UP, NULL);
-    future_await(btc_a2dp_sink_future);
-    btc_a2dp_sink_future = NULL;
 
     vTaskDelete(btc_aa_snk_task_hdl);
     btc_aa_snk_task_hdl = NULL;
@@ -303,9 +292,6 @@ void btc_a2dp_sink_shutdown(void)
 
     vQueueDelete(btc_aa_snk_ctrl_queue);
     btc_aa_snk_ctrl_queue = NULL;
-
-    vQueueDelete(btc_aa_snk_queue_set);
-    btc_aa_snk_queue_set = NULL;
 }
 
 /*****************************************************************************
@@ -418,9 +404,6 @@ static void btc_a2dp_sink_data_ready(UNUSED_ATTR void *context)
         }
 
         while ((p_msg = (tBT_SBC_HDR *)fixed_queue_try_peek_first(btc_aa_snk_cb.RxSbcQ)) != NULL ) {
-            if (btc_a2dp_sink_state != BTC_A2DP_SINK_STATE_ON){
-                return;
-            }
             btc_a2dp_sink_handle_inc_media(p_msg);
             p_msg = (tBT_SBC_HDR *)fixed_queue_try_dequeue(btc_aa_snk_cb.RxSbcQ);
             if ( p_msg == NULL ) {
@@ -704,10 +687,6 @@ UINT8 btc_a2dp_sink_enque_buf(BT_HDR *p_pkt)
 {
     tBT_SBC_HDR *p_msg;
 
-    if (btc_a2dp_sink_state != BTC_A2DP_SINK_STATE_ON){
-        return 0;
-    }
-
     if (btc_aa_snk_cb.rx_flush == TRUE) { /* Flush enabled, do not enque*/
         return fixed_queue_length(btc_aa_snk_cb.RxSbcQ);
     }
@@ -769,6 +748,9 @@ static void btc_a2dp_sink_thread_init(UNUSED_ATTR void *context)
 
 static void btc_a2dp_sink_thread_cleanup(UNUSED_ATTR void *context)
 {
+    /* make sure no channels are restarted while shutting down */
+    btc_a2dp_sink_state = BTC_A2DP_SINK_STATE_SHUTTING_DOWN;
+
     btc_a2dp_control_set_datachnl_stat(FALSE);
     /* Clear task flag */
     btc_a2dp_sink_state = BTC_A2DP_SINK_STATE_OFF;
@@ -776,8 +758,6 @@ static void btc_a2dp_sink_thread_cleanup(UNUSED_ATTR void *context)
     btc_a2dp_control_cleanup();
 
     fixed_queue_free(btc_aa_snk_cb.RxSbcQ, osi_free_func);
-
-    future_ready(btc_a2dp_sink_future, NULL);
 }
 
 #endif /* BTC_AV_SINK_INCLUDED */

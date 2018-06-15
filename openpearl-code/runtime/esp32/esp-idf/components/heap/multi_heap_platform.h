@@ -63,16 +63,6 @@ inline static void multi_heap_assert(bool condition, const char *format, int lin
     multi_heap_assert((CONDITION), "CORRUPT HEAP: multi_heap.c:%d detected at 0x%08x\n", \
                       __LINE__, (intptr_t)(ADDRESS))
 
-#ifdef CONFIG_HEAP_TASK_TRACKING
-#define MULTI_HEAP_BLOCK_OWNER TaskHandle_t task;
-#define MULTI_HEAP_SET_BLOCK_OWNER(HEAD) (HEAD)->task = xTaskGetCurrentTaskHandle()
-#define MULTI_HEAP_GET_BLOCK_OWNER(HEAD) ((HEAD)->task)
-#else
-#define MULTI_HEAP_BLOCK_OWNER
-#define MULTI_HEAP_SET_BLOCK_OWNER(HEAD)
-#define MULTI_HEAP_GET_BLOCK_OWNER(HEAD) (NULL)
-#endif
-
 #else // ESP_PLATFORM
 
 #include <assert.h>
@@ -83,9 +73,4 @@ inline static void multi_heap_assert(bool condition, const char *format, int lin
 #define MULTI_HEAP_UNLOCK(PLOCK)
 
 #define MULTI_HEAP_ASSERT(CONDITION, ADDRESS) assert((CONDITION) && "Heap corrupt")
-
-#define MULTI_HEAP_BLOCK_OWNER
-#define MULTI_HEAP_SET_BLOCK_OWNER(HEAD)
-#define MULTI_HEAP_GET_BLOCK_OWNER(HEAD) (NULL)
-
 #endif

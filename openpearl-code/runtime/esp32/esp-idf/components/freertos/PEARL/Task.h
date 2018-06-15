@@ -51,7 +51,7 @@
 #include "Signals.h"
 #include "FakeTypes.h"
 
-#define STACK_SIZE 2048
+#define STACK_SIZE 4096
 
 
 namespace pearlrt {

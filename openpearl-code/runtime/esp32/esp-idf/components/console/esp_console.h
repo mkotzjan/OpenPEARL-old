@@ -13,11 +13,6 @@
 // limitations under the License.
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stddef.h>
 #include "esp_err.h"
 
@@ -186,7 +181,3 @@ const char *esp_console_get_hint(const char *buf, int *color, int *bold);
  *      - ESP_ERR_INVALID_STATE, if esp_console_init wasn't called
  */
 esp_err_t esp_console_register_help_command();
-
-#ifdef __cplusplus
-}
-#endif

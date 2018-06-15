@@ -20,8 +20,7 @@ TEST_CASE_PATTERN = {
     "version": "v1 (2016-12-06)",
     "test environment": "UT_T1_1",
     "reset": "",
-    "expected result": "1. set succeed",
-    "cmd set": "test_unit_test_case",
+    "expected result": "1. set succeed"
 }
 
 CONFIG_FILE_PATTERN = {
@@ -79,10 +78,10 @@ class Parser(object):
                 name_addr = table.get_unsigned_int(section, test_addr, 4)
                 desc_addr = table.get_unsigned_int(section, test_addr + 4, 4)
                 file_name_addr = table.get_unsigned_int(section, test_addr + 12, 4)
-                function_count = table.get_unsigned_int(section, test_addr+20, 4)
                 name = table.get_string("any", name_addr)
                 desc = table.get_string("any", desc_addr)
                 file_name = table.get_string("any", file_name_addr)
+
                 tc = self.parse_one_test_case(name, desc, file_name, app_name)
 
                 # check if duplicated case names
@@ -101,13 +100,7 @@ class Parser(object):
                         self.test_env_tags[tc["test environment"]].append(tc["ID"])
                     else:
                         self.test_env_tags.update({tc["test environment"]: [tc["ID"]]})
-
-                    if function_count > 1:
-                        tc.update({"cmd set": "multiple_devices_case",
-                                   "child case num": function_count})
-                        del tc['reset']
-
-                    # only add  cases need to be executed
+                    # only add cases need to be executed
                     test_cases.append(tc)
 
         os.remove("section_table.tmp")
@@ -185,6 +178,7 @@ class Parser(object):
         test_case.update({"Test App": self.APP_NAME_PREFIX + app_name,
                           "module": self.module_map[prop["module"]]['module'],
                           "CI ready": "No" if prop["ignore"] == "Yes" else "Yes",
+                          "cmd set": ["IDFUnitTest/UnitTest", [name]],
                           "ID": tc_id,
                           "test point 2": prop["module"],
                           "steps": name,
@@ -268,3 +262,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

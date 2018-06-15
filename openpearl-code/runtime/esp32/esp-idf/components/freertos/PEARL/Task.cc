@@ -93,7 +93,7 @@ namespace pearlrt {
    void Task::directActivate(const Fixed<15>& prio) {
       bool freeRtosRunning;
       //StructParameters_t taskParams;
-      int cp;  // current prio of calling task
+      int cp = 0;  // current prio of calling task
 
       int freeRtosPrio = PrioMapper::getInstance()->fromPearl(prio.x);
 

@@ -84,7 +84,7 @@ static bool app_cpu_started = false;
 
 static void do_global_ctors(void);
 //static void main_task(void* args);
-//extern __attribute__((weak)) int app_main(void);
+//extern void app_main(void);
 extern void startOpenPEARL(void);
 extern esp_err_t esp_pthread_init(void);
 
@@ -102,9 +102,6 @@ static const char* TAG = "cpu_start";
 struct object { long placeholder[ 10 ]; };
 void __register_frame_info (const void *begin, struct object *ob);
 extern char __eh_frame[];
-
-//If CONFIG_SPIRAM_IGNORE_NOTFOUND is set and external RAM is not found or errors out on testing, this is set to false.
-static bool s_spiram_okay=true;
 
 /*
  * We arrive here after the bootloader finished loading the program from flash. The hardware is mostly uninitialized,
@@ -151,13 +148,8 @@ void IRAM_ATTR call_start_cpu0()
 #if CONFIG_SPIRAM_BOOT_INIT
     esp_spiram_init_cache();
     if (esp_spiram_init() != ESP_OK) {
-#if CONFIG_SPIRAM_IGNORE_NOTFOUND
-        ESP_EARLY_LOGI(TAG, "Failed to init external RAM; continuing without it.");
-        s_spiram_okay = false;
-#else
         ESP_EARLY_LOGE(TAG, "Failed to init external RAM!");
         abort();
-#endif
     }
 #endif
 
@@ -191,12 +183,10 @@ void IRAM_ATTR call_start_cpu0()
 
 
 #if CONFIG_SPIRAM_MEMTEST
-    if (s_spiram_okay) {
-        bool ext_ram_ok=esp_spiram_test();
-        if (!ext_ram_ok) {
-            ESP_EARLY_LOGE(TAG, "External RAM failed memory test!");
-            abort();
-        }
+    bool ext_ram_ok=esp_spiram_test();
+    if (!ext_ram_ok) {
+        ESP_EARLY_LOGE(TAG, "External RAM failed memory test!");
+        abort();
     }
 #endif
 
@@ -263,25 +253,23 @@ void start_cpu0_default(void)
     esp_err_t err;
     esp_setup_syscall_table();
 
-    if (s_spiram_okay) {
 #if CONFIG_SPIRAM_BOOT_INIT && (CONFIG_SPIRAM_USE_CAPS_ALLOC || CONFIG_SPIRAM_USE_MALLOC)
-        esp_err_t r=esp_spiram_add_to_heapalloc();
-        if (r != ESP_OK) {
-            ESP_EARLY_LOGE(TAG, "External RAM could not be added to heap!");
-            abort();
-        }
+    esp_err_t r=esp_spiram_add_to_heapalloc();
+    if (r != ESP_OK) {
+        ESP_EARLY_LOGE(TAG, "External RAM could not be added to heap!");
+        abort();
+    }
 #if CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL
-        r=esp_spiram_reserve_dma_pool(CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL);
-        if (r != ESP_OK) {
-            ESP_EARLY_LOGE(TAG, "Could not reserve internal/DMA pool!");
-            abort();
-        }
+    r=esp_spiram_reserve_dma_pool(CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL);
+    if (r != ESP_OK) {
+        ESP_EARLY_LOGE(TAG, "Could not reserve internal/DMA pool!");
+        abort();
+    }
 #endif
 #if CONFIG_SPIRAM_USE_MALLOC
-        heap_caps_malloc_extmem_enable(CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL);
+    heap_caps_malloc_extmem_enable(CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL);
 #endif
 #endif
-    }
 
 //Enable trace memory and immediately start trace.
 #if CONFIG_ESP32_TRAX
@@ -374,9 +362,7 @@ void start_cpu0_default(void)
     //                                            ESP_TASK_MAIN_STACK, NULL,
     //                                            ESP_TASK_MAIN_PRIO, NULL, 0);
     //assert(res == pdTRUE);
-
-    //app_main();
-
+    
     // Now that the application is about to start, disable boot watchdogs
     REG_CLR_BIT(TIMG_WDTCONFIG0_REG(0), TIMG_WDT_FLASHBOOT_MOD_EN_S);
     REG_CLR_BIT(RTC_CNTL_WDTCONFIG0_REG, RTC_CNTL_WDT_FLASHBOOT_MOD_EN);
@@ -391,7 +377,7 @@ void start_cpu0_default(void)
 
     // call OpenPEARL startup routine
     startOpenPEARL();
-
+    
     ESP_LOGI(TAG, "Starting scheduler on PRO CPU.");
     vTaskStartScheduler();
     abort(); /* Only get to here if not enough free heap to start scheduler */
@@ -483,7 +469,7 @@ static void main_task(void* args)
     }
 #endif
 
-    app_main();
+    //app_main();
     vTaskDelete(NULL);
 }
 

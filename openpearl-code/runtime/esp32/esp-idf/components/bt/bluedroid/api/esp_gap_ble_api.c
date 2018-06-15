@@ -240,8 +240,7 @@ esp_err_t esp_ble_gap_set_prefer_conn_params(esp_bd_addr_t bd_addr,
     if (ESP_BLE_IS_VALID_PARAM(min_conn_int, ESP_BLE_CONN_INT_MIN, ESP_BLE_CONN_INT_MAX) &&
         ESP_BLE_IS_VALID_PARAM(max_conn_int, ESP_BLE_CONN_INT_MIN, ESP_BLE_CONN_INT_MAX) &&
         ESP_BLE_IS_VALID_PARAM(supervision_tout, ESP_BLE_CONN_SUP_TOUT_MIN, ESP_BLE_CONN_SUP_TOUT_MAX) &&
-        (slave_latency <= ESP_BLE_CONN_LATENCY_MAX || slave_latency == ESP_BLE_CONN_PARAM_UNDEF) &&
-        ((supervision_tout * 10) >= ((1 + slave_latency) * ((max_conn_int * 5) >> 1))) && min_conn_int <= max_conn_int) {
+        (slave_latency <= ESP_BLE_CONN_LATENCY_MAX || slave_latency == ESP_BLE_CONN_PARAM_UNDEF)) {
 
         msg.sig = BTC_SIG_API_CALL;
         msg.pid = BTC_PID_GAP_BLE;
@@ -266,18 +265,6 @@ esp_err_t esp_ble_gap_set_device_name(const char *name)
     ESP_BLUEDROID_STATUS_CHECK(ESP_BLUEDROID_STATUS_ENABLED);
 
     return esp_bt_dev_set_device_name(name);
-}
-
-esp_err_t esp_ble_gap_get_local_used_addr(esp_bd_addr_t local_used_addr, uint8_t * addr_type)
-{
-    if(esp_bluedroid_get_status() != (ESP_BLUEDROID_STATUS_ENABLED)) {
-        LOG_ERROR("%s, bluedroid status error", __func__);
-        return ESP_FAIL;
-    } 
-    if(!BTM_BleGetCurrentAddress(local_used_addr, addr_type)) {
-        return ESP_FAIL;
-    }
-    return ESP_OK;
 }
 
 uint8_t *esp_ble_resolve_adv_data( uint8_t *adv_data, uint8_t type, uint8_t *length)

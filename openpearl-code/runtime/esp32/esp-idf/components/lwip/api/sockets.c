@@ -491,7 +491,7 @@ lwip_socket_thread_cleanup(void)
  * @param s externally used socket index
  * @return struct lwip_sock for the socket or NULL if not found
  */
-static struct lwip_sock * ESP_IRAM_ATTR
+static struct lwip_sock *
 get_socket(int s)
 {
   struct lwip_sock *sock;
@@ -962,7 +962,7 @@ lwip_listen(int s, int backlog)
   return 0;
 }
 
-int ESP_IRAM_ATTR
+int
 lwip_recvfrom(int s, void *mem, size_t len, int flags,
               struct sockaddr *from, socklen_t *fromlen)
 {
@@ -1340,7 +1340,7 @@ lwip_sendmsg(int s, const struct msghdr *msg, int flags)
 #endif /* LWIP_UDP || LWIP_RAW */
 }
 
-int ESP_IRAM_ATTR
+int
 lwip_sendto(int s, const void *data, size_t size, int flags,
        const struct sockaddr *to, socklen_t tolen)
 {
@@ -1817,7 +1817,7 @@ return_copy_fdsets:
  * Callback registered in the netconn layer for each socket-netconn.
  * Processes recvevent (data available) and wakes up tasks waiting for select.
  */
-static void ESP_IRAM_ATTR
+static void
 event_callback(struct netconn *conn, enum netconn_evt evt, u16_t len)
 {
   int s;
@@ -3159,7 +3159,7 @@ static void lwip_socket_drop_registered_memberships(int s)
 
 #if ESP_THREAD_SAFE
 
-int ESP_IRAM_ATTR
+int
 lwip_sendto_r(int s, const void *data, size_t size, int flags,
        const struct sockaddr *to, socklen_t tolen)
 {
@@ -3176,7 +3176,7 @@ lwip_send_r(int s, const void *data, size_t size, int flags)
   LWIP_API_UNLOCK();
 }
 
-int ESP_IRAM_ATTR
+int
 lwip_recvfrom_r(int s, void *mem, size_t len, int flags,
               struct sockaddr *from, socklen_t *fromlen)
 {

@@ -57,7 +57,6 @@ extern int btdm_controller_deinit(void);
 extern int btdm_controller_enable(esp_bt_mode_t mode);
 extern int btdm_controller_disable(esp_bt_mode_t mode);
 extern uint8_t btdm_controller_get_mode(void);
-extern const char *btdm_controller_get_compile_version(void);
 extern void btdm_rf_bb_init(void);
 
 /* VHCI function interface */
@@ -98,7 +97,7 @@ typedef struct {
     intptr_t end;
 } btdm_dram_available_region_t;
 
-/* the mode column will be modified by release function to indicate the available region */
+/* the mode column will be modifid by release function to indicate the available region */
 static btdm_dram_available_region_t btdm_dram_available_region[] = {
     //following is .data 
     {ESP_BT_MODE_BTDM,          0x3ffae6e0, 0x3ffaff10},
@@ -403,7 +402,7 @@ esp_err_t esp_bt_controller_mem_release(esp_bt_mode_t mode)
         return ESP_ERR_INVALID_STATE;
     }
 
-    //already released
+    //already relesed
     if (!(mode & btdm_dram_available_region[0].mode)) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -478,8 +477,6 @@ esp_err_t esp_bt_controller_init(esp_bt_controller_config_t *cfg)
     }
 #endif
 
-    ESP_LOGI(BTDM_LOG_TAG, "BT controller compile version [%s]\n", btdm_controller_get_compile_version());
-
     btdm_osi_funcs_register(&osi_funcs);
 
     btdm_controller_mem_init();
@@ -540,13 +537,7 @@ esp_err_t esp_bt_controller_enable(esp_bt_mode_t mode)
     esp_pm_lock_acquire(s_pm_lock);
 #endif
 
-    esp_phy_load_cal_and_init(PHY_BT_MODULE);
-    esp_modem_sleep_register(MODEM_BLE_MODULE);
-
-    /* TODO: Classic BT should be registered once it supports 
-     * modem sleep */
-
-    esp_modem_sleep_exit(MODEM_BLE_MODULE);
+    esp_phy_load_cal_and_init();
 
     if (btdm_bb_init_flag == false) {
         btdm_bb_init_flag = true;
@@ -555,8 +546,6 @@ esp_err_t esp_bt_controller_enable(esp_bt_mode_t mode)
 
     ret = btdm_controller_enable(mode);
     if (ret) {
-        esp_modem_sleep_deregister(MODEM_BLE_MODULE);
-        esp_phy_rf_deinit(PHY_BT_MODULE);
         return ESP_ERR_INVALID_STATE;
     }
 
@@ -579,10 +568,7 @@ esp_err_t esp_bt_controller_disable(void)
     }
 
     if (ret == ESP_BT_MODE_IDLE) {
-        /* TODO: Need to de-register classic BT once it supports
-         * modem sleep */
-        esp_modem_sleep_deregister(MODEM_BLE_MODULE);
-        esp_phy_rf_deinit(PHY_BT_MODULE);
+        esp_phy_rf_deinit();
         btdm_controller_status = ESP_BT_CONTROLLER_STATUS_INITED;
     }
 

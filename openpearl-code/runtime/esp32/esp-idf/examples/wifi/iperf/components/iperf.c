@@ -110,8 +110,7 @@ esp_err_t iperf_start_report(void)
 {
     int ret;
 
-    ret = xTaskCreatePinnedToCore(iperf_report_task, IPERF_REPORT_TASK_NAME, IPERF_REPORT_TASK_STACK, NULL, IPERF_REPORT_TASK_PRIORITY, NULL, portNUM_PROCESSORS-1);
-
+    ret = xTaskCreate(iperf_report_task, IPERF_REPORT_TASK_NAME, IPERF_REPORT_TASK_STACK, NULL, IPERF_REPORT_TASK_PRIORITY, NULL);
     if (ret != pdPASS)  {
         ESP_LOGE(TAG, "create task %s failed", IPERF_REPORT_TASK_NAME);
         return ESP_FAIL;
@@ -192,7 +191,7 @@ esp_err_t iperf_run_tcp_server(void)
     return ESP_OK;
 }
 
-esp_err_t IRAM_ATTR iperf_run_udp_server(void)
+esp_err_t iperf_run_udp_server(void)
 {
     socklen_t addr_len = sizeof(struct sockaddr_in);
     struct sockaddr_in addr;
@@ -322,8 +321,7 @@ esp_err_t iperf_run_udp_client(void)
 
 esp_err_t iperf_run_tcp_client(void)
 {
-    struct sockaddr_in local_addr;
-    struct sockaddr_in remote_addr;
+    struct sockaddr_in addr;
     int actual_send = 0;
     int want_send = 0;
     uint8_t *buffer;
@@ -338,21 +336,19 @@ esp_err_t iperf_run_tcp_client(void)
 
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    memset(&local_addr, 0, sizeof(local_addr));
-    local_addr.sin_family = AF_INET;
-    local_addr.sin_port = 0;
-    local_addr.sin_addr.s_addr = s_iperf_ctrl.cfg.sip;
-    if (bind(sockfd, (struct sockaddr*)&local_addr, sizeof(local_addr)) != 0) {
+    addr.sin_family = AF_INET;
+    addr.sin_port = 0;
+    addr.sin_addr.s_addr = s_iperf_ctrl.cfg.sip;
+    if (bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
         iperf_show_socket_error_reason("tcp client bind", sockfd);
         return ESP_FAIL;
     }
 
 
-    memset(&remote_addr, 0, sizeof(remote_addr));
-    remote_addr.sin_family = AF_INET;
-    remote_addr.sin_port = htons(s_iperf_ctrl.cfg.dport);
-    remote_addr.sin_addr.s_addr = s_iperf_ctrl.cfg.dip;
-    if (connect(sockfd, (struct sockaddr *)&remote_addr, sizeof(remote_addr)) < 0) {
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(s_iperf_ctrl.cfg.dport);
+    addr.sin_addr.s_addr = s_iperf_ctrl.cfg.dip;
+    if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         iperf_show_socket_error_reason("tcp client connect", sockfd);
         return ESP_FAIL;
     }
@@ -363,8 +359,7 @@ esp_err_t iperf_run_tcp_client(void)
     while (!s_iperf_ctrl.finish) {
         actual_send = send(sockfd, buffer, want_send, 0);
         if (actual_send <= 0) {
-            iperf_show_socket_error_reason("tcp client send", sockfd);
-            break;
+            vTaskDelay(1);
         } else {
             s_iperf_ctrl.total_len += actual_send;
         }
@@ -432,9 +427,8 @@ esp_err_t iperf_start(iperf_cfg_t *cfg)
         ESP_LOGE(TAG, "create buffer: out of memory");
         return ESP_FAIL;
     }
-    memset(s_iperf_ctrl.buffer, 0, s_iperf_ctrl.buffer_len);
 
-    ret = xTaskCreatePinnedToCore(iperf_task_traffic, IPERF_TRAFFIC_TASK_NAME, IPERF_TRAFFIC_TASK_STACK, NULL, IPERF_TRAFFIC_TASK_PRIORITY, NULL, portNUM_PROCESSORS-1);
+    ret = xTaskCreate(iperf_task_traffic, IPERF_TRAFFIC_TASK_NAME, IPERF_TRAFFIC_TASK_STACK, NULL, IPERF_TRAFFIC_TASK_PRIORITY, NULL);
     if (ret != pdPASS)  {
         ESP_LOGE(TAG, "create task %s failed", IPERF_TRAFFIC_TASK_NAME);
         free(s_iperf_ctrl.buffer);

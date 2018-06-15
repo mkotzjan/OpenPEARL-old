@@ -461,7 +461,6 @@ static void spp_task_init(void)
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
-    esp_err_t err;
     ESP_LOGE(GATTS_TABLE_TAG, "GAP_EVT, event %d\n", event);
 
     switch (event) {
@@ -470,8 +469,8 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         break;
     case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
         //advertising start complete event to indicate advertising start successfully or failed
-        if((err = param->adv_start_cmpl.status) != ESP_BT_STATUS_SUCCESS) {
-            ESP_LOGE(GATTS_TABLE_TAG, "Advertising start failed: %s\n", esp_err_to_name(err));
+        if(param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+            ESP_LOGE(GATTS_TABLE_TAG, "Advertising start failed\n");
         }
         break;
     default:
@@ -484,7 +483,7 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
     esp_ble_gatts_cb_param_t *p_data = (esp_ble_gatts_cb_param_t *) param;
     uint8_t res = 0xff;
 
-    ESP_LOGI(GATTS_TABLE_TAG, "event = %x\n",event);
+    ESP_LOGE(GATTS_TABLE_TAG, "event = %x\n",event);
     switch (event) {
     	case ESP_GATTS_REG_EVT:
     	    ESP_LOGI(GATTS_TABLE_TAG, "%s %d\n", __func__, __LINE__);
@@ -634,7 +633,7 @@ static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_
             return;
         }
     }
-
+	
     do {
         int idx;
         for (idx = 0; idx < SPP_PROFILE_NUM; idx++) {
@@ -665,25 +664,25 @@ void app_main()
 
     ret = esp_bt_controller_init(&bt_cfg);
     if (ret) {
-        ESP_LOGE(GATTS_TABLE_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTS_TABLE_TAG, "%s enable controller failed\n", __func__);
         return;
     }
 
     ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
     if (ret) {
-        ESP_LOGE(GATTS_TABLE_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTS_TABLE_TAG, "%s enable controller failed\n", __func__);
         return;
     }
 
     ESP_LOGI(GATTS_TABLE_TAG, "%s init bluetooth\n", __func__);
     ret = esp_bluedroid_init();
     if (ret) {
-        ESP_LOGE(GATTS_TABLE_TAG, "%s init bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTS_TABLE_TAG, "%s init bluetooth failed\n", __func__);
         return;
     }
     ret = esp_bluedroid_enable();
     if (ret) {
-        ESP_LOGE(GATTS_TABLE_TAG, "%s enable bluetooth failed: %s\n", __func__, esp_err_to_name(ret));
+        ESP_LOGE(GATTS_TABLE_TAG, "%s enable bluetooth failed\n", __func__);
         return;
     }
 

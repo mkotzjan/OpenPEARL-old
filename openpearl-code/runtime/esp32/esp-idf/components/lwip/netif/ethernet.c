@@ -63,7 +63,7 @@ const struct eth_addr ethzero = {{0,0,0,0,0,0}};
  * @param p the received packet, p->payload pointing to the ethernet header
  * @param netif the network interface on which the packet was received
  */
-err_t ESP_IRAM_ATTR
+err_t
 ethernet_input(struct pbuf *p, struct netif *netif)
 {
   struct eth_hdr* ethhdr;

@@ -219,7 +219,5 @@ uint32_t xPortGetTickRateHz(void);
 }
 #endif
 
-void uxPortCompareSetExtram(volatile uint32_t *addr, uint32_t compare, uint32_t *set);
-
 #endif /* PORTABLE_H */
 

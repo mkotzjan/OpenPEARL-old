@@ -39,8 +39,7 @@ struct sh2lib_handle {
     SSL_CTX         *ssl_ctx;      /*!< Pointer to the SSL context */
     SSL             *ssl;          /*!< Pointer to the SSL handle */
     nghttp2_session *http2_sess;   /*!< Pointer to the HTTP2 session handle */
-    int              sockfd;       /*!< Socket file descriptor */
-    char            *hostname;     /*!< The hostname we are connected to */
+    int             sockfd;        /*!< Socket file descriptor */
 };
 
 /** Flag indicating receive stream is reset */

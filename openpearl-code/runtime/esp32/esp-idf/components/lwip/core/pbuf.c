@@ -513,7 +513,7 @@ pbuf_realloc(struct pbuf *p, u16_t new_len)
  * @return non-zero on failure, zero on success.
  *
  */
-static u8_t ESP_IRAM_ATTR
+static u8_t
 pbuf_header_impl(struct pbuf *p, s16_t header_size_increment, u8_t force)
 {
   u16_t type;
@@ -609,7 +609,7 @@ pbuf_header_impl(struct pbuf *p, s16_t header_size_increment, u8_t force)
  * @return non-zero on failure, zero on success.
  *
  */
-u8_t ESP_IRAM_ATTR
+u8_t
 pbuf_header(struct pbuf *p, s16_t header_size_increment)
 {
    return pbuf_header_impl(p, header_size_increment, 0);

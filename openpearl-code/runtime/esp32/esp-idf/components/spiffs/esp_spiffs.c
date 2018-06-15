@@ -222,14 +222,6 @@ static esp_err_t esp_spiffs_init(const esp_vfs_spiffs_conf_t* conf)
         return ESP_ERR_INVALID_STATE;
     }
 
-    uint32_t flash_page_size = g_rom_flashchip.page_size;
-    uint32_t log_page_size = CONFIG_SPIFFS_PAGE_SIZE;
-    if (log_page_size % flash_page_size != 0) {
-        ESP_LOGE(TAG, "SPIFFS_PAGE_SIZE is not multiple of flash chip page size (%d)",
-                flash_page_size);
-        return ESP_ERR_INVALID_ARG;
-    }
-
     esp_partition_subtype_t subtype = conf->partition_label ?
             ESP_PARTITION_SUBTYPE_ANY : ESP_PARTITION_SUBTYPE_DATA_SPIFFS;
     const esp_partition_t* partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, 
@@ -255,7 +247,7 @@ static esp_err_t esp_spiffs_init(const esp_vfs_spiffs_conf_t* conf)
     efs->cfg.hal_read_f        = spiffs_api_read;
     efs->cfg.hal_write_f       = spiffs_api_write;
     efs->cfg.log_block_size    = g_rom_flashchip.sector_size;
-    efs->cfg.log_page_size     = log_page_size;
+    efs->cfg.log_page_size     = g_rom_flashchip.page_size;
     efs->cfg.phys_addr         = 0;
     efs->cfg.phys_erase_block  = g_rom_flashchip.sector_size;
     efs->cfg.phys_size         = partition->size;
@@ -357,12 +349,8 @@ esp_err_t esp_spiffs_info(const char* partition_label, size_t *total_bytes, size
 
 esp_err_t esp_spiffs_format(const char* partition_label)
 {
-    bool partition_was_mounted = false;
+    bool mount_on_success = false;
     int index;
-    /* If the partition is not mounted, need to create SPIFFS structures
-     * and mount the partition, unmount, format, delete SPIFFS structures.
-     * See SPIFFS wiki for the reason why.
-     */
     esp_err_t err = esp_spiffs_by_label(partition_label, &index);
     if (err != ESP_OK) {
         esp_vfs_spiffs_conf_t conf = {
@@ -375,28 +363,23 @@ esp_err_t esp_spiffs_format(const char* partition_label)
             return err;
         }
         err = esp_spiffs_by_label(partition_label, &index);
-        assert(err == ESP_OK && "failed to get index of the partition just mounted");
+        if (err != ESP_OK) {
+            return err;
+        }
+        esp_spiffs_free(&_efs[index]);
+        return ESP_OK;
     } else if (SPIFFS_mounted(_efs[index]->fs)) {
-        partition_was_mounted = true;
+        SPIFFS_unmount(_efs[index]->fs);
+        mount_on_success = true;
     }
-
-    SPIFFS_unmount(_efs[index]->fs);
-
     s32_t res = SPIFFS_format(_efs[index]->fs);
     if (res != SPIFFS_OK) {
         ESP_LOGE(TAG, "format failed, %i", SPIFFS_errno(_efs[index]->fs));
         SPIFFS_clearerr(_efs[index]->fs);
-        /* If the partition was previously mounted, but format failed, don't
-         * try to mount the partition back (it will probably fail). On the
-         * other hand, if it was not mounted, need to clean up.
-         */
-        if (!partition_was_mounted) {
-            esp_spiffs_free(&_efs[index]);
-        }
         return ESP_FAIL;
     }
 
-    if (partition_was_mounted) {
+    if (mount_on_success) {
         res = SPIFFS_mount(_efs[index]->fs, &_efs[index]->cfg, _efs[index]->work,
                             _efs[index]->fds, _efs[index]->fds_sz, _efs[index]->cache,
                             _efs[index]->cache_sz, spiffs_api_check);
@@ -405,8 +388,6 @@ esp_err_t esp_spiffs_format(const char* partition_label)
             SPIFFS_clearerr(_efs[index]->fs);
             return ESP_FAIL;
         }
-    } else {
-        esp_spiffs_free(&_efs[index]);
     }
     return ESP_OK;
 }

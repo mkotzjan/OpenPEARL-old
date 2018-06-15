@@ -307,13 +307,13 @@ bool btc_a2dp_source_startup(void)
 
     APPL_TRACE_EVENT("## A2DP SOURCE START MEDIA THREAD ##");
 
-    btc_aa_src_queue_set = xQueueCreateSet(BTC_A2DP_SOURCE_TASK_QUEUE_SET_LEN);
+    btc_aa_src_queue_set = xQueueCreateSet(BTC_MEDIA_TASK_QUEUE_SET_LEN);
     configASSERT(btc_aa_src_queue_set);
-    btc_aa_src_data_queue = xQueueCreate(BTC_A2DP_SOURCE_DATA_QUEUE_LEN, sizeof(void *));
+    btc_aa_src_data_queue = xQueueCreate(BTC_MEDIA_DATA_QUEUE_LEN, sizeof(void *));
     configASSERT(btc_aa_src_data_queue);
     xQueueAddToSet(btc_aa_src_data_queue, btc_aa_src_queue_set);
 
-    btc_aa_src_ctrl_queue = xQueueCreate(BTC_A2DP_SOURCE_CTRL_QUEUE_LEN, sizeof(void *));
+    btc_aa_src_ctrl_queue = xQueueCreate(BTC_MEDIA_CTRL_QUEUE_LEN, sizeof(void *));
     configASSERT(btc_aa_src_ctrl_queue);
     xQueueAddToSet(btc_aa_src_ctrl_queue, btc_aa_src_queue_set);
 
@@ -321,7 +321,7 @@ bool btc_a2dp_source_startup(void)
         goto error_exit;
     }
 
-    xTaskCreatePinnedToCore(btc_a2dp_source_task_handler, BTC_A2DP_SOURCE_TASK_NAME, BTC_A2DP_SOURCE_TASK_STACK_SIZE, NULL, BTC_A2DP_SOURCE_TASK_PRIO, &btc_aa_src_task_hdl, BTC_A2DP_SOURCE_TASK_PINNED_TO_CORE);
+    xTaskCreatePinnedToCore(btc_a2dp_source_task_handler, BTC_MEDIA_TASK_NAME, BTC_MEDIA_TASK_STACK_SIZE, NULL, BTC_MEDIA_TASK_PRIO, &btc_aa_src_task_hdl, BTC_MEDIA_TASK_PINNED_TO_CORE);
     if (btc_aa_src_task_hdl == NULL) {
         goto error_exit;
     }
@@ -348,10 +348,7 @@ error_exit:;
         vQueueDelete(btc_aa_src_ctrl_queue);
         btc_aa_src_ctrl_queue = NULL;
     }
-    if (btc_aa_src_queue_set) {
-        vQueueDelete(btc_aa_src_queue_set);
-        btc_aa_src_queue_set = NULL;
-    }
+
     return false;
 }
 
@@ -370,9 +367,6 @@ void btc_a2dp_source_shutdown(void)
 
     vQueueDelete(btc_aa_src_ctrl_queue);
     btc_aa_src_ctrl_queue = NULL;
-
-    vQueueDelete(btc_aa_src_queue_set);
-    btc_aa_src_queue_set = NULL;
 }
 
 /*****************************************************************************
@@ -1493,7 +1487,7 @@ static void btc_a2dp_source_feeding_state_reset(void)
              btc_aa_src_cb.media_feeding.cfg.pcm.num_channel *
              BTC_MEDIA_TIME_TICK_MS) / 1000;
 
-        APPL_TRACE_EVENT("pcm bytes per tick %d",
+        APPL_TRACE_WARNING("pcm bytes per tick %d",
                            (int)btc_aa_src_cb.media_feeding_state.pcm.bytes_per_tick);
     }
 }

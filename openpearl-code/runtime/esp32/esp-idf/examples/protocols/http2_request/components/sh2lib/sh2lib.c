@@ -58,7 +58,6 @@ static int do_ssl_connect(struct sh2lib_handle *hd, int sockfd, const char *host
     hd->ssl_ctx = ssl_ctx;
     hd->ssl = ssl;
     hd->sockfd = sockfd;
-    hd->hostname = strdup(hostname);
 
     int flags = fcntl(hd->sockfd, F_GETFL, 0);
     fcntl(hd->sockfd, F_SETFL, flags | O_NONBLOCK);
@@ -332,10 +331,6 @@ void sh2lib_free(struct sh2lib_handle *hd)
         close(hd->sockfd);
         hd->ssl_ctx = 0;
     }
-    if (hd->hostname) {
-        free(hd->hostname);
-        hd->hostname = NULL;
-    }
 }
 
 int sh2lib_execute(struct sh2lib_handle *hd)
@@ -366,10 +361,10 @@ int sh2lib_do_get_with_nv(struct sh2lib_handle *hd, const nghttp2_nv *nva, size_
 
 int sh2lib_do_get(struct sh2lib_handle *hd, const char *path, sh2lib_frame_data_recv_cb_t recv_cb)
 {
+#define HTTP2_PATH_NV ":path"
     const nghttp2_nv nva[] = { SH2LIB_MAKE_NV(":method", "GET"),
                                SH2LIB_MAKE_NV(":scheme", "https"),
-                               SH2LIB_MAKE_NV(":authority", hd->hostname),
-                               SH2LIB_MAKE_NV(":path", path),
+    {(uint8_t *)HTTP2_PATH_NV, (uint8_t *)path, strlen(HTTP2_PATH_NV), strlen(path), NGHTTP2_NV_FLAG_NONE},
                              };
     return sh2lib_do_get_with_nv(hd, nva, sizeof(nva) / sizeof(nva[0]), recv_cb);
 }
@@ -405,7 +400,6 @@ int sh2lib_do_post(struct sh2lib_handle *hd, const char *path,
 {
     const nghttp2_nv nva[] = { SH2LIB_MAKE_NV(":method", "POST"),
                                SH2LIB_MAKE_NV(":scheme", "https"),
-                               SH2LIB_MAKE_NV(":authority", hd->hostname),
                                SH2LIB_MAKE_NV(":path", path),
                              };
     return sh2lib_do_putpost_with_nv(hd, nva, sizeof(nva) / sizeof(nva[0]), send_cb, recv_cb);
@@ -417,7 +411,6 @@ int sh2lib_do_put(struct sh2lib_handle *hd, const char *path,
 {
     const nghttp2_nv nva[] = { SH2LIB_MAKE_NV(":method", "PUT"),
                                SH2LIB_MAKE_NV(":scheme", "https"),
-                               SH2LIB_MAKE_NV(":authority", hd->hostname),
                                SH2LIB_MAKE_NV(":path", path),
                              };
     return sh2lib_do_putpost_with_nv(hd, nva, sizeof(nva) / sizeof(nva[0]), send_cb, recv_cb);

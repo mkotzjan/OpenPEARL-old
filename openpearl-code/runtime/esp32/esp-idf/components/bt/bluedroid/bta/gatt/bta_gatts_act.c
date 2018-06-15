@@ -420,7 +420,7 @@ void bta_gatts_add_char(tBTA_GATTS_SRVC_CB *p_srvc_cb, tBTA_GATTS_DATA *p_msg)
                                       p_msg->api_add_char.perm,
                                       p_msg->api_add_char.property, p_attr_val, p_control);
     cb_data.add_result.server_if = p_rcb->gatt_if;
-    cb_data.add_result.service_id = p_msg->api_add_char.hdr.layer_specific;
+    cb_data.add_result.service_id = p_msg->api_add_incl_srvc.hdr.layer_specific;
     cb_data.add_result.attr_id = attr_id;
 // btla-specific ++
     memcpy(&cb_data.add_result.char_uuid, &p_msg->api_add_char.char_uuid, sizeof(tBT_UUID));
@@ -470,7 +470,7 @@ void bta_gatts_add_char_descr(tBTA_GATTS_SRVC_CB *p_srvc_cb, tBTA_GATTS_DATA *p_
                                       p_control);
 
     cb_data.add_result.server_if = p_rcb->gatt_if;
-    cb_data.add_result.service_id = p_msg->api_add_char_descr.hdr.layer_specific;
+    cb_data.add_result.service_id = p_msg->api_add_incl_srvc.hdr.layer_specific;
     cb_data.add_result.attr_id = attr_id;
 // btla-specific ++
     memcpy(&cb_data.add_result.char_uuid, &p_msg->api_add_char_descr.descr_uuid, sizeof(tBT_UUID));
@@ -729,7 +729,7 @@ void bta_gatts_open (tBTA_GATTS_CB *p_cb, tBTA_GATTS_DATA *p_msg)
 
     if ((p_rcb = bta_gatts_find_app_rcb_by_app_if(p_msg->api_open.server_if)) != NULL) {
         /* should always get the connection ID */
-        if (GATT_Connect(p_rcb->gatt_if, p_msg->api_open.remote_bda, BLE_ADDR_UNKNOWN_TYPE,
+        if (GATT_Connect(p_rcb->gatt_if, p_msg->api_open.remote_bda,
                          p_msg->api_open.is_direct, p_msg->api_open.transport)) {
             status = BTA_GATT_OK;
 

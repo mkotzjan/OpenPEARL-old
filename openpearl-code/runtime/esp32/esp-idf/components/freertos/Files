@@ -1,5 +1,0 @@
-RTOSCSRC = tasks.c
-RTOSCSRC += list.c 
-RTOSCSRC += queue.c
-
-RTOSINCS = include include/freertos/.

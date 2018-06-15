@@ -34,7 +34,6 @@
 #include "sys/lock.h"
 #include "driver/rtc_cntl.h"
 #include "driver/gpio.h"
-#include "adc1_i2s_private.h"
 
 #ifndef NDEBUG
 // Enable built-in checks in queue.h in debug builds
@@ -100,9 +99,6 @@ static _lock_t adc2_wifi_lock = NULL;
 //prevent ADC2 being used by tasks (regardless of WIFI)
 portMUX_TYPE adc2_spinlock = portMUX_INITIALIZER_UNLOCKED;
 
-//prevent ADC1 being used by I2S dma and other tasks at the same time.
-static _lock_t adc1_i2s_lock = NULL;
-
 typedef struct {
     TimerHandle_t timer;
     uint32_t filtered_val[TOUCH_PAD_MAX];
@@ -111,6 +107,12 @@ typedef struct {
     bool enable;
 } touch_pad_filter_t;
 static touch_pad_filter_t *s_touch_pad_filter = NULL;
+
+typedef enum {
+    ADC_FORCE_FSM = 0x0,
+    ADC_FORCE_DISABLE = 0x2,
+    ADC_FORCE_ENABLE = 0x3,
+} adc_force_mode_t;
 
 //Reg,Mux,Fun,IE,Up,Down,Rtc_number
 const rtc_gpio_desc_t rtc_gpio_desc[GPIO_PIN_COUNT] = {
@@ -381,19 +383,6 @@ esp_err_t rtc_gpio_hold_dis(gpio_num_t gpio_num)
     return ESP_OK;
 }
 
-esp_err_t rtc_gpio_isolate(gpio_num_t gpio_num)
-{
-    if (rtc_gpio_desc[gpio_num].reg == 0) {
-        return ESP_ERR_INVALID_ARG;
-    }
-
-    rtc_gpio_pullup_dis(gpio_num);
-    rtc_gpio_pulldown_dis(gpio_num);
-    rtc_gpio_set_direction(gpio_num, RTC_GPIO_MODE_DISABLED);
-    rtc_gpio_hold_en(gpio_num);
-
-    return ESP_OK;
-}
 
 void rtc_gpio_force_hold_dis_all()
 {
@@ -1036,28 +1025,10 @@ static esp_err_t adc_set_atten(adc_unit_t adc_unit, adc_channel_t channel, adc_a
     return ESP_OK;
 }
 
-void adc_power_always_on()
-{
-    portENTER_CRITICAL(&rtc_spinlock);
-    SENS.sar_meas_wait2.force_xpd_sar = SENS_FORCE_XPD_SAR_PU;
-    portEXIT_CRITICAL(&rtc_spinlock);
-}
-
 void adc_power_on()
 {
     portENTER_CRITICAL(&rtc_spinlock);
-    //The power FSM controlled mode saves more power, while the ADC noise may get increased.
-#ifndef CONFIG_ADC_FORCE_XPD_FSM
-    //Set the power always on to increase precision.
-    SENS.sar_meas_wait2.force_xpd_sar = SENS_FORCE_XPD_SAR_PU;
-#else    
-    //Use the FSM to turn off the power while not used to save power.
-    if (SENS.sar_meas_wait2.force_xpd_sar & SENS_FORCE_XPD_SAR_SW_M) {
-        SENS.sar_meas_wait2.force_xpd_sar = SENS_FORCE_XPD_SAR_PU;
-    } else {
-        SENS.sar_meas_wait2.force_xpd_sar = SENS_FORCE_XPD_SAR_FSM;
-    }
-#endif
+    SENS.sar_meas_wait2.force_xpd_sar = ADC_FORCE_FSM;
     portEXIT_CRITICAL(&rtc_spinlock);
 }
 
@@ -1066,7 +1037,7 @@ void adc_power_off()
     portENTER_CRITICAL(&rtc_spinlock);
     //Bit1  0:Fsm  1: SW mode
     //Bit0  0:SW mode power down  1: SW mode power on
-    SENS.sar_meas_wait2.force_xpd_sar = SENS_FORCE_XPD_SAR_PD;
+    SENS.sar_meas_wait2.force_xpd_sar = ADC_FORCE_DISABLE;
     portEXIT_CRITICAL(&rtc_spinlock);
 }
 
@@ -1190,7 +1161,7 @@ esp_err_t adc_i2s_mode_init(adc_unit_t adc_unit, adc_channel_t channel)
 
     uint8_t table_len = 1;
     //POWER ON SAR
-    adc_power_always_on();
+    adc_power_on();
     adc_gpio_init(adc_unit, channel);
     adc_set_i2s_data_len(adc_unit, table_len);
     adc_set_i2s_data_pattern(adc_unit, 0, channel, ADC_WIDTH_BIT_12, ADC_ATTEN_DB_11);
@@ -1275,55 +1246,12 @@ esp_err_t adc1_config_width(adc_bits_width_t width_bit)
     return ESP_OK;
 }
 
-esp_err_t adc1_i2s_mode_acquire()
-{
-    //lazy initialization
-    //for i2s, block until acquire the lock
-    _lock_acquire( &adc1_i2s_lock );
-    ESP_LOGD( RTC_MODULE_TAG, "i2s mode takes adc1 lock." );
-    portENTER_CRITICAL(&rtc_spinlock);
-    SENS.sar_meas_wait2.force_xpd_sar = SENS_FORCE_XPD_SAR_PU;
-    //switch SARADC into DIG channel
-    SENS.sar_read_ctrl.sar1_dig_force = 1;
-    portEXIT_CRITICAL(&rtc_spinlock);
-    return ESP_OK;
-}
-
-esp_err_t adc1_adc_mode_acquire()
-{
-    //lazy initialization
-    //for adc1, block until acquire the lock
-    _lock_acquire( &adc1_i2s_lock );
-    ESP_LOGD( RTC_MODULE_TAG, "adc mode takes adc1 lock." );
-    portENTER_CRITICAL(&rtc_spinlock);
-    // for now the WiFi would use ADC2 and set xpd_sar force on.
-    // so we can not reset xpd_sar to fsm mode directly.
-    // We should handle this after the synchronization mechanism is established.
-
-    //switch SARADC into RTC channel
-    SENS.sar_read_ctrl.sar1_dig_force = 0;
-    portEXIT_CRITICAL(&rtc_spinlock);
-    return ESP_OK;
-}
-
-esp_err_t adc1_lock_release()
-{
-    RTC_MODULE_CHECK((uint32_t*)adc1_i2s_lock != NULL, "adc1 lock release called before acquire", ESP_ERR_INVALID_STATE );
-    // for now the WiFi would use ADC2 and set xpd_sar force on.
-    // so we can not reset xpd_sar to fsm mode directly.
-    // We should handle this after the synchronization mechanism is established.
-
-    _lock_release( &adc1_i2s_lock );
-    ESP_LOGD( RTC_MODULE_TAG, "returns adc1 lock." );
-    return ESP_OK;
-}
-
 int adc1_get_raw(adc1_channel_t channel)
 {
     uint16_t adc_value;
     RTC_MODULE_CHECK(channel < ADC1_CHANNEL_MAX, "ADC Channel Err", ESP_ERR_INVALID_ARG);
-    adc1_adc_mode_acquire();
-    adc_power_on();
+
+    adc_power_on(); 
 
     portENTER_CRITICAL(&rtc_spinlock);
     //Adc Controler is Rtc module,not ulp coprocessor
@@ -1346,7 +1274,6 @@ int adc1_get_raw(adc1_channel_t channel)
     while (SENS.sar_meas_start1.meas1_done_sar == 0);
     adc_value = SENS.sar_meas_start1.meas1_data_sar;
     portEXIT_CRITICAL(&rtc_spinlock);
-    adc1_lock_release();
     return adc_value;
 }
 
@@ -1473,8 +1400,6 @@ static inline void adc2_config_width(adc_bits_width_t width_bit)
     portENTER_CRITICAL(&rtc_spinlock);
     //sar_start_force shared with ADC1
     SENS.sar_start_force.sar2_bit_width = width_bit;
-    //cct set to the same value with PHY
-    SENS.sar_start_force.sar2_pwdet_cct = 4;
     portEXIT_CRITICAL(&rtc_spinlock);
 
     //Invert the adc value,the Output value is invert
@@ -1542,8 +1467,6 @@ esp_err_t adc2_vref_to_gpio(gpio_num_t gpio)
     rtc_gpio_input_disable(gpio);
     rtc_gpio_pullup_dis(gpio);
     rtc_gpio_pulldown_dis(gpio);
-    //force fsm
-    adc_power_always_on();               //Select power source of ADC
 
     RTCCNTL.bias_conf.dbg_atten = 0;     //Check DBG effect outside sleep mode
     //set dtest (MUX_SEL : 0 -> RTC; 1-> vdd_sar2)
@@ -1552,6 +1475,8 @@ esp_err_t adc2_vref_to_gpio(gpio_num_t gpio)
     RTCCNTL.test_mux.ent_rtc = 1;
     //set sar2_en_test
     SENS.sar_start_force.sar2_en_test = 1;
+    //force fsm
+    SENS.sar_meas_wait2.force_xpd_sar = ADC_FORCE_ENABLE;    //Select power source of ADC
     //set sar2 en force
     SENS.sar_meas_start2.sar2_en_pad_force = 1;      //Pad bitmap controlled by SW
     //set en_pad for channels 7,8,9 (bits 0x380)

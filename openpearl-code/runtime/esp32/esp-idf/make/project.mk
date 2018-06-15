@@ -48,9 +48,6 @@ help:
 	@echo "See also 'make bootloader', 'make bootloader-flash', 'make bootloader-clean', "
 	@echo "'make partition_table', etc, etc."
 
-# Non-interactive targets. Mostly, those for which you do not need to build a binary
-NON_INTERACTIVE_TARGET += defconfig clean% %clean help list-components print_flash_cmd
-
 # dependency checks
 ifndef MAKE_RESTARTS
 ifeq ("$(filter 4.% 3.81 3.82,$(MAKE_VERSION))","")
@@ -392,7 +389,7 @@ endif
 COMPONENT_LINKER_DEPS ?=
 $(APP_ELF): $(foreach libcomp,$(COMPONENT_LIBRARIES),$(BUILD_DIR_BASE)/$(libcomp)/lib$(libcomp).a) $(COMPONENT_LINKER_DEPS) $(COMPONENT_PROJECT_VARS)
 	$(summary) LD $(patsubst $(PWD)/%,%,$@)
-	$(CC) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)
+	$(CXX) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)
 
 app: $(APP_BIN)
 ifeq ("$(CONFIG_SECURE_BOOT_ENABLED)$(CONFIG_SECURE_BOOT_BUILD_SIGNED_BINARIES)","y") # secure boot enabled, but remote sign app image

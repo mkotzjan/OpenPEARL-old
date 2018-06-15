@@ -43,8 +43,8 @@
 #include "allTaskPriorities.h"
 #include "service.h"
 
-#define SERVICE_STACK_SIZE 4096
-#define STACKLIMIT 100	// limit of minimum free stack for the service task
+#define SERVICE_STACK_SIZE 10000
+#define STACKLIMIT 1000	// limit of minimum free stack for the service task
 
 static TaskHandle_t xServiceTaskHandle;
 static void serviceTask(void *);

@@ -265,7 +265,6 @@ void port_release_port (tPORT *p_port)
             memcpy (p_port->bd_addr, BT_BD_ANY, BD_ADDR_LEN);
         } else {
             RFCOMM_TRACE_DEBUG ("port_release_port:Clean-up handle:%d", p_port->inx);
-            rfc_port_timer_free (p_port);
             memset (p_port, 0, sizeof (tPORT));
         }
     }

@@ -236,7 +236,7 @@ endef
 # This pattern is generated for each COMPONENT_SRCDIR to compile the files in it.
 define GenerateCompileTargets
 # $(1) - directory containing source files, relative to $(COMPONENT_PATH) - one of $(COMPONENT_SRCDIRS)
-#
+
 $(1)/%.o: $$(COMPONENT_PATH)/$(1)/%.c $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_SRCDIRS)
 	$$(summary) CC $$(patsubst $$(PWD)/%,%,$$(CURDIR))/$$@
 	$$(CC) $$(CFLAGS) $$(CPPFLAGS) $$(addprefix -I ,$$(COMPONENT_INCLUDES)) $$(addprefix -I ,$$(COMPONENT_EXTRA_INCLUDES)) -I $(1) -c $$< -o $$@

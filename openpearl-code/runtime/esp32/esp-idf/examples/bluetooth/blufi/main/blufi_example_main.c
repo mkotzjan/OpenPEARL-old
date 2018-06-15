@@ -6,14 +6,6 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-
-/****************************************************************************
-* This is a demo for bluetooth config wifi connection to ap. You can config ESP32 to connect a softap
-* or config ESP32 as a softap to be connected by other device. APP can be downloaded from github 
-* android source code: https://github.com/EspressifApp/EspBlufi
-* iOS source code: https://github.com/EspressifApp/EspBlufiForiOS
-****************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -231,10 +223,6 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
         break;
     case ESP_BLUFI_EVENT_REQ_CONNECT_TO_AP:
         BLUFI_INFO("BLUFI requset wifi connect to AP\n");
-        /* there is no wifi callback when the device has already connected to this wifi
-        so disconnect wifi before connection.
-        */
-        esp_wifi_disconnect();
         esp_wifi_connect();
         break;
     case ESP_BLUFI_EVENT_REQ_DISCONNECT_FROM_AP:
@@ -292,16 +280,14 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
         break;
 	case ESP_BLUFI_EVENT_RECV_SOFTAP_SSID:
         strncpy((char *)ap_config.ap.ssid, (char *)param->softap_ssid.ssid, param->softap_ssid.ssid_len);
-        ap_config.ap.ssid[param->softap_ssid.ssid_len] = '\0';
         ap_config.ap.ssid_len = param->softap_ssid.ssid_len;
         esp_wifi_set_config(WIFI_IF_AP, &ap_config);
         BLUFI_INFO("Recv SOFTAP SSID %s, ssid len %d\n", ap_config.ap.ssid, ap_config.ap.ssid_len);
         break;
 	case ESP_BLUFI_EVENT_RECV_SOFTAP_PASSWD:
         strncpy((char *)ap_config.ap.password, (char *)param->softap_passwd.passwd, param->softap_passwd.passwd_len);
-        ap_config.ap.password[param->softap_passwd.passwd_len] = '\0';
         esp_wifi_set_config(WIFI_IF_AP, &ap_config);
-        BLUFI_INFO("Recv SOFTAP PASSWORD %s len = %d\n", ap_config.ap.password, param->softap_passwd.passwd_len);
+        BLUFI_INFO("Recv SOFTAP PASSWORD %s\n", ap_config.ap.password);
         break;
 	case ESP_BLUFI_EVENT_RECV_SOFTAP_MAX_CONN_NUM:
         if (param->softap_max_conn_num.max_conn_num > 4) {
@@ -337,10 +323,6 @@ static void example_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_para
         ESP_ERROR_CHECK(esp_wifi_scan_start(&scanConf, true));
         break;
     }
-    case ESP_BLUFI_EVENT_RECV_CUSTOM_DATA:
-        BLUFI_INFO("Recv Custom Data %d\n", param->custom_data.data_len);
-        esp_log_buffer_hex("Custom Data", param->custom_data.data, param->custom_data.data_len);
-        break;
 	case ESP_BLUFI_EVENT_RECV_USERNAME:
         /* Not handle currently */
         break;
@@ -394,24 +376,24 @@ void app_main()
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ret = esp_bt_controller_init(&bt_cfg);
     if (ret) {
-        BLUFI_ERROR("%s initialize bt controller failed: %s\n", __func__, esp_err_to_name(ret));
+        BLUFI_ERROR("%s initialize bt controller failed\n", __func__);
     }
 
     ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
     if (ret) {
-        BLUFI_ERROR("%s enable bt controller failed: %s\n", __func__, esp_err_to_name(ret));
+        BLUFI_ERROR("%s enable bt controller failed\n", __func__);
         return;
     }
 
     ret = esp_bluedroid_init();
     if (ret) {
-        BLUFI_ERROR("%s init bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
+        BLUFI_ERROR("%s init bluedroid failed\n", __func__);
         return;
     }
 
     ret = esp_bluedroid_enable();
     if (ret) {
-        BLUFI_ERROR("%s init bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
+        BLUFI_ERROR("%s init bluedroid failed\n", __func__);
         return;
     }
 

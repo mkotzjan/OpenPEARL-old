@@ -67,7 +67,7 @@ static sys_sem_t api_sync_sem = NULL;
 static bool tcpip_inited = false;
 static sys_sem_t api_lock_sem = NULL;
 extern sys_thread_t g_lwip_task;
-static const char* TAG = "tcpip_adapter";
+#define TAG "tcpip_adapter"
 
 static void tcpip_adapter_api_cb(void* api_msg)
 {
@@ -79,7 +79,7 @@ static void tcpip_adapter_api_cb(void* api_msg)
     }
 
     msg->ret = msg->api_fn(msg);
-    ESP_LOGV(TAG, "call api in lwip: ret=0x%x, give sem", msg->ret);
+    ESP_LOGD(TAG, "call api in lwip: ret=0x%x, give sem", msg->ret);
     sys_sem_signal(&api_sync_sem);
 
     return;
@@ -408,25 +408,19 @@ esp_err_t tcpip_adapter_set_ip_info(tcpip_adapter_if_t tcpip_if, tcpip_adapter_i
 
     if (p_netif != NULL && netif_is_up(p_netif)) {
         netif_set_addr(p_netif, &ip_info->ip, &ip_info->netmask, &ip_info->gw);
-        if (tcpip_if == TCPIP_ADAPTER_IF_STA || tcpip_if == TCPIP_ADAPTER_IF_ETH) {
-            if (!(ip4_addr_isany_val(ip_info->ip) || ip4_addr_isany_val(ip_info->netmask) || ip4_addr_isany_val(ip_info->gw))) {
-                system_event_t evt;
-                if (tcpip_if == TCPIP_ADAPTER_IF_STA) {
-                    evt.event_id = SYSTEM_EVENT_STA_GOT_IP;
-                } else if (tcpip_if == TCPIP_ADAPTER_IF_ETH) {
-                    evt.event_id = SYSTEM_EVENT_ETH_GOT_IP;
-                }
-                evt.event_info.got_ip.ip_changed = false;
+        if (!(ip4_addr_isany_val(ip_info->ip) || ip4_addr_isany_val(ip_info->netmask) || ip4_addr_isany_val(ip_info->gw))) {
+            system_event_t evt;
+            evt.event_id = SYSTEM_EVENT_STA_GOT_IP;
+            evt.event_info.got_ip.ip_changed = false;
 
-                if (memcmp(ip_info, &esp_ip_old[tcpip_if], sizeof(tcpip_adapter_ip_info_t))) {
-                    evt.event_info.got_ip.ip_changed = true;
-                }
-
-                memcpy(&evt.event_info.got_ip.ip_info, ip_info, sizeof(tcpip_adapter_ip_info_t));
-                memcpy(&esp_ip_old[tcpip_if], ip_info, sizeof(tcpip_adapter_ip_info_t));
-                esp_event_send(&evt);
-                ESP_LOGD(TAG, "if%d tcpip adapter set static ip: ip changed=%d", tcpip_if, evt.event_info.got_ip.ip_changed);
+            if (memcmp(ip_info, &esp_ip_old[tcpip_if], sizeof(tcpip_adapter_ip_info_t))) {
+                evt.event_info.got_ip.ip_changed = true;
             }
+
+            memcpy(&evt.event_info.got_ip.ip_info, ip_info, sizeof(tcpip_adapter_ip_info_t));
+            memcpy(&esp_ip_old[tcpip_if], ip_info, sizeof(tcpip_adapter_ip_info_t));
+            esp_event_send(&evt);
+            ESP_LOGD(TAG, "if%d tcpip adapter set static ip: ip changed=%d", tcpip_if, evt.event_info.got_ip.ip_changed);
         }
     }
 
