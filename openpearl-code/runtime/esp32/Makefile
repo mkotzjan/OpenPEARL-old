@@ -1,6 +1,6 @@
 # Save current directory
-#MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-#CURRENT_DIR := $(dir $(MAKEFILE_PATH))
+MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_DIR := $(dir $(MAKEFILE_PATH))
 
 # read system configuration setting from menuconfig
 include ../../configuration/.config
@@ -133,6 +133,7 @@ INCS += esp-idf/components/xtensa-debug-module/include
 #XMLFILES += esp-idf/components/boardsupport/Esp32Uart.xml
 XMLFILES += esp-idf/components/boardsupport/StdOut.xml
 XMLFILES += esp-idf/components/boardsupport/Esp32Wifi.xml
+XMLFILES += esp-idf/components/boardsupport/TcpIpServer.xml
 
 define esp32build
 make -C esp-idf-template
@@ -293,15 +294,15 @@ install: all cc_bin run_bin
 phony += cc_bin
 cc_bin:
 	@echo "[create] $@"
-	@echo '$(CXX) -g -DTARGET=3 -nostdlib -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,-static -Wl,--start-group -mlongcalls -frtti -u call_user_start_cpu0 -Os -I $(CONFIG_INSTALL_Target)/include $$SYSTEM $$fn.cc -L/usr/local/lib/OpenPEARLesp32 -lapp_trace -lapp_update -laws_iot -lboardsupport -lbootloader_support -lbt -lcoap -lconsole -lcxx -u __cxa_guard_dummy -ldriver -lesp32 /home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/esp32/libhal.a -L/home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/esp32/lib -lcore -lrtc -lnet80211 -lpp -lwpa -lsmartconfig -lcoexist -lwps -lwpa2 -lespnow -lphy -L/home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/esp32/ld -L/home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf-template/build/esp32 -T esp32_out.ld -u ld_include_panic_highint_hdl -T esp32.common.ld -T esp32.rom.ld -T esp32.peripherals.ld -T esp32.rom.spiram_incompatible_fns.ld -lesp_adc_cal -lethernet -lexpat -lfatfs -lfreertos -Wl,--undefined=uxTopUsedPriority -lheap -lidf_test -ljsmn -ljson -llibsodium -llog -llwip -lmbedtls -lmdns -lmicro-ecc /home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/newlib/lib/libc.a /home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/newlib/lib/libm.a -lnewlib -lnghttp -lnvs_flash -lopenpearl_common -lopenssl -lpthread -lsdmmc -lsoc -lspi_flash -lspiffs -ltcpip_adapter -lulp -lvfs -lwear_levelling -lwpa_supplicant -lxtensa-debug-module -lgcc -lstdc++ -lgcov -Wl,--end-group -Wl,-EL -o $$fn -Wl,-Map=esp32.map' >> cc_bin.inc
-	@echo 'python /home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 elf2image --flash_mode "dio" --flash_freq "40m" --flash_size "2MB"  -o $$fn.bin $$fn' >> cc_bin.inc
+	@echo '$(CXX) -g -DTARGET=3 -nostdlib -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,-static -Wl,--start-group -mlongcalls -frtti -u call_user_start_cpu0 -Os -I $(CONFIG_INSTALL_Target)/include $$SYSTEM $$fn.cc -L/usr/local/lib/OpenPEARLesp32 -lapp_trace -lapp_update -laws_iot -lboardsupport -lbootloader_support -lbt -lcoap -lconsole -lcxx -u __cxa_guard_dummy -ldriver -lesp32 $(CURRENT_DIR)/esp-idf/components/esp32/libhal.a -L$(CURRENT_DIR)/esp-idf/components/esp32/lib -lcore -lrtc -lnet80211 -lpp -lwpa -lsmartconfig -lcoexist -lwps -lwpa2 -lespnow -lphy -L$(CURRENT_DIR)/esp-idf/components/esp32/ld -L$(CURRENT_DIR)/esp-idf-template/build/esp32 -T esp32_out.ld -u ld_include_panic_highint_hdl -T esp32.common.ld -T esp32.rom.ld -T esp32.peripherals.ld -T esp32.rom.spiram_incompatible_fns.ld -lesp_adc_cal -lethernet -lexpat -lfatfs -lfreertos -Wl,--undefined=uxTopUsedPriority -lheap -lidf_test -ljsmn -ljson -llibsodium -llog -llwip -lmbedtls -lmdns -lmicro-ecc $(CURRENT_DIR)/esp-idf/components/newlib/lib/libc.a $(CURRENT_DIR)/esp-idf/components/newlib/lib/libm.a -lnewlib -lnghttp -lnvs_flash -lopenpearl_common -lopenssl -lpthread -lsdmmc -lsoc -lspi_flash -lspiffs -ltcpip_adapter -lulp -lvfs -lwear_levelling -lwpa_supplicant -lxtensa-debug-module -lgcc -lstdc++ -lgcov -Wl,--end-group -Wl,-EL -o $$fn -Wl,-Map=esp32.map' >> cc_bin.inc
+	@echo 'python $(CURRENT_DIR)/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 elf2image --flash_mode "dio" --flash_freq "40m" --flash_size "2MB"  -o $$fn.bin $$fn' >> cc_bin.inc
 
 ######## TODO
 phony += run_bin
 run_bin:
 	@echo "[create] $@"
 	@echo "# auto generated " > run_bin.inc
-	@echo 'python /home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port /dev/ttyUSB1 --baud 115200 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 $(CONFIG_INSTALL_Target)/lib/OpenPEARLesp32/bootloader.bin 0x10000 $$fn.bin 0x8000 /home/michael/code/hfu/thesis/OpenPEARL/openpearl-code/runtime/esp32/esp-idf-template/build/partitions_singleapp.bin' >>run_bin.inc
+	@echo 'python $(CURRENT_DIR)/esp-idf/components/esptool_py/esptool/esptool.py --chip esp32 --port /dev/ttyUSB1 --baud 115200 --before default_reset --after hard_reset write_flash -u --flash_mode dio --flash_freq 40m --flash_size detect 0x1000 $(CONFIG_INSTALL_Target)/lib/OpenPEARLesp32/bootloader.bin 0x10000 $$fn.bin 0x8000 $(CURRENT_DIR)/esp-idf-template/build/partitions_singleapp.bin' >>run_bin.inc
 	@echo 'python -m serial.tools.miniterm --rts 0 --dtr 0 --raw /dev/ttyUSB1 115200' >>run_bin.inc
 
 # -------------------------------------------------
