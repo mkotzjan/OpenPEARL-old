@@ -1,0 +1,7 @@
+   <dation name="TcpIpServer">
+      <parameters>
+        <FIXED length="31"> <FIXEDRANGE>1,65535</FIXEDRANGE> </FIXED>
+      </parameters>
+      <attributes>FORWARD, IN, OUT, INOUT, SYSTEM</attributes>
+      <data>ALL</data>
+   </dation>
