@@ -12,7 +12,7 @@ COMPONENT_OBJS := ringbuf.o xtensa_intr.o queue.o croutine.o \
 		addOns/FreeRTOSClock.o \
 		addOns/FreeRTOSHooks.o \
 		addOns/timer.o \
-		addOns/service.o addOns/heap_1_2.o \
+		addOns/service.o \
 		PEARL/CSema.o PEARL/Mutex.o \
 		PEARL/PrioMapper.o PEARL/Task.o \
 		PEARL/TaskMonitor.o PEARL/TaskTimer.o

@@ -104,8 +104,6 @@ namespace pearlrt {
       connected = false;
       ssid = s;
       password = p;
-      wifi_event_group = xEventGroupCreate();
-      printf("WIFI CTOR\n");
    }
 
    SystemDationB* Esp32Wifi::dationOpen(const char* idf,
@@ -132,6 +130,8 @@ namespace pearlrt {
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
+    wifi_event_group = xEventGroupCreate();
 
     tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL) );
