@@ -1,4 +1,4 @@
-# Save current directory
+
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(dir $(MAKEFILE_PATH))
 
@@ -132,6 +132,7 @@ INCS += esp-idf/components/xtensa-debug-module/include
 # -------------------- add boardsupport component xml files
 #XMLFILES += esp-idf/components/boardsupport/Esp32Uart.xml
 XMLFILES += esp-idf/components/boardsupport/StdOut.xml
+XMLFILES += esp-idf/components/boardsupport/Esp32BME280.xml
 XMLFILES += esp-idf/components/boardsupport/Esp32Wifi.xml
 XMLFILES += esp-idf/components/boardsupport/TcpIpServer.xml
 
