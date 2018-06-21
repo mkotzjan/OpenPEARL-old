@@ -41,12 +41,20 @@
 #include "Dation.h"
 #include "Log.h"
 #include "Signals.h"
+#include "lwip/sockets.h"
 #include <stdio.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #define PORT 30000
+
+// These structs outside of the class are preventing the usage
+// of multiple TCP/IP Server at the same time. This has been
+// done due to issues with the Include Composer. A better
+// solution would be the usage of faketypes in the header file.
+struct sockaddr_in server, client;
+bool initsocket;
 
 namespace pearlrt {
    //char* TcpIpServer::devicePath = NULL;
@@ -57,8 +65,24 @@ namespace pearlrt {
       /* ctor is called before multitasking starts --> no mutex required */
       mutex.name("TcpIpServer");
       this->port = port;
-      translateNewLineFlag = false;	
-	
+      translateNewLineFlag = false;
+	initsocket = true;	
+
+   }
+
+   int TcpIpServer::capabilities() {
+      return IN | OUT | INOUT | FORWARD |  ANY | CAN | PRM;
+   }
+
+  
+
+   TcpIpServer* TcpIpServer::dationOpen(const char * idfValue, int openParams) {
+      unsigned int len;
+      mutex.lock();
+
+	if(initsocket){
+	initsocket = false;
+
 	//sockt erstellen, bind, listen, accep
 	
 	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -81,20 +105,7 @@ namespace pearlrt {
 	if(listen(sock, 5) == -1)
 		Log::error("TcpIpServer: Listen error");
 
-	
-	
-
-   }
-
-   int TcpIpServer::capabilities() {
-      return IN | OUT | INOUT | FORWARD |  ANY | CAN | PRM;
-   }
-
-  
-
-   TcpIpServer* TcpIpServer::dationOpen(const char * idfValue, int openParams) {
-      unsigned int len;
-      mutex.lock();
+	} // intisocket
 
       // check parameters
       if (openParams & IDF) {

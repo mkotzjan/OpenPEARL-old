@@ -44,7 +44,6 @@
 #include "Mutex.h"
 #include "Character.h"
 #include "RefChar.h"
-#include "lwip/sockets.h"
 
 
 namespace pearlrt {
@@ -78,11 +77,9 @@ namespace pearlrt {
       mutex for parent data
       */
       Mutex mutex;
-	
-	struct sockaddr_in server, client;
-	int sock, fd;
-	int port;
-        bool translateNewLineFlag;
+      int sock, fd;
+      int port;
+      bool translateNewLineFlag;
    public:
 
       
