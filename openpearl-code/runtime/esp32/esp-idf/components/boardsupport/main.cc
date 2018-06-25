@@ -86,89 +86,8 @@ and start FreeRTOS-scheduler
 
 \returns nothing - will never return!
 */
-__attribute__((weak)) int app_main(void) {
-   char line[40];
-
-   printf("OpenPEARL started \n");
-
-   Log::getInstance()->setLevel(0x0c);
-
-   // start background service task
-   init_service();
-
-   /*
-    * This task starts all PEARL90 main tasks, afterwards the
-    * task suspends itself until another task resume it
-    */
-   Log::info("Defined Tasks");
-
-   // format with sprintf, since Log does not allow format parameters
-   sprintf(line, "%-10.10s %4s %s", "Name", "Prio", "isMain");
-   Log::info(line);
-   TaskList::Instance().sort(); // sort taskList
-
-   for (int i = 0; i < TaskList::Instance().size(); i++) {
-      Task *t = TaskList::Instance().getTaskByIndex(i);
-
-      // format with sprintf, since Log does not allow format parameters
-      sprintf(line, "%-10.10s  %3d  %2d", t->getName(),
-              (t->getPrio()).x,
-              t->getIsMain());
-      Log::info(line);
-      t->init();
-   }
-
-
-   if (TaskList::Instance().size() == 0) {
-      printf("no task defined --> exit.\n");
-      //exit(1);
-   }
-
-   /*****************init end*******************/
-   //activate all threads which declared with "main"
-   Log::info("start all main-threads");
-
-   for (int i = 0; i < TaskList::Instance().size();  i++) {
-      Task *t = TaskList::Instance().getTaskByIndex(i);
-
-      if (t->getIsMain()) {
-         t->activate(t);
-      }
-   }
-
-   // all heap elements should be allocated now !
-   // dump unused size to log
-   Log::info("Free Heap size: %d byte", xPortGetFreeHeapSize());
-
-   Log::info("system startup complete");
-   exit(0);
-}
-
-/**
-vConfigurateTimerForRunTimeStats
-
-is a FreeRTOS hook function, which may be useful for system
-diagnosis
-\note add useful code to vConfigureTimerForRunTimeStats
-
-*/
-void vConfigureTimerForRunTimeStats(void) {
-}
-
-/**
-vApplicationIdleHook
-
-is called by FreeRTOS, if no other task is runnable and the correponding
-flag is set in FreeRTOSconfig.h
-
-\note add useful code to vApplicationIdleHook
-*/
-void vApplicationIdleHook(void) {
-   Log::info("idle..");
-}
-
 extern "C" {
-void startOpenPEARL() {
+int main() {
    char line[40];
 
    printf("OpenPEARL started \n");
@@ -229,7 +148,30 @@ void startOpenPEARL() {
    Log::info("Free Heap size: %d byte", xPortGetFreeHeapSize());
 
    Log::info("system startup complete");
-   //exit(0);
+   return 1;
 }
+}
+
+/**
+vConfigurateTimerForRunTimeStats
+
+is a FreeRTOS hook function, which may be useful for system
+diagnosis
+\note add useful code to vConfigureTimerForRunTimeStats
+
+*/
+void vConfigureTimerForRunTimeStats(void) {
+}
+
+/**
+vApplicationIdleHook
+
+is called by FreeRTOS, if no other task is runnable and the correponding
+flag is set in FreeRTOSconfig.h
+
+\note add useful code to vApplicationIdleHook
+*/
+void vApplicationIdleHook(void) {
+   Log::info("idle..");
 }
 
