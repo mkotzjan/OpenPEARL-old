@@ -69,7 +69,7 @@ namespace pearlrt {
       \param start is the starting bit number (31..0)
       \param width is the number of bits (1..32)
       */
-      Esp32BME280();
+      Esp32BME280(int sda, int scl);
 
 
       /**

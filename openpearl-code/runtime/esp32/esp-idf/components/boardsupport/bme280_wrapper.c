@@ -34,9 +34,6 @@
 #include "esp_err.h"
 #include "bme280.h"
 
-#define SDA_PIN GPIO_NUM_15
-#define SCL_PIN GPIO_NUM_2
-
 #define	I2C_BUFFER_LEN 8
 #define BME280_DATA_INDEX	1
 #define BME280_ADDRESS_INDEX	2
@@ -97,12 +94,12 @@ s32 uncomp_hum;
 // result
 s32 result;
 
-void init_i2c() {
+void init_i2c(int sda, int scl) {
   // init i2c master
   i2c_config_t i2c_config = {
     .mode = I2C_MODE_MASTER,
-    .sda_io_num = SDA_PIN,
-    .scl_io_num = SCL_PIN,
+    .sda_io_num = sda,
+    .scl_io_num = scl,
     .sda_pullup_en = GPIO_PULLUP_ENABLE,
     .scl_pullup_en = GPIO_PULLUP_ENABLE,
     .master.clk_speed = 1000000

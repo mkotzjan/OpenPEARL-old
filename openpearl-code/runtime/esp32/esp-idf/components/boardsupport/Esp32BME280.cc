@@ -44,9 +44,9 @@ extern "C" {
 
 namespace pearlrt {
 
-   Esp32BME280::Esp32BME280() {
+   Esp32BME280::Esp32BME280(int sda, int scl) {
       dationStatus = CLOSED;
-      init_i2c();
+      init_i2c(sda, scl);
    }
 
    SystemDationB* Esp32BME280::dationOpen(const char* idf,

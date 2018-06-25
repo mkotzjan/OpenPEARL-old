@@ -31,7 +31,7 @@
 #define BME280_WRAPPER_H
 
 // Initialize i2c
-void init_i2c();
+void init_i2c(int sda, int scl);
 // initialize bme280
 int init_bme280();
 // end connection
