@@ -1,0 +1,101 @@
+MODULE(TestSocket);
+
+SYSTEM;
+	wifi: Esp32Wifi('SSID', 'PASSWORD');
+  	httpSocket: TcpIpServer(80);
+        stdout: StdOut;
+	bme280: Esp32BME280(15,2);
+       
+
+PROBLEM;
+	SPC httpSocket DATION INOUT SYSTEM ALL;
+	DCL usHttpSocket DATION INOUT ALPHIC DIM(*,200) FORWARD STREAM CREATED(httpSocket);  
+	DCL request CHAR(70);
+	SPC stdout DATION OUT SYSTEM ALPHIC;
+	DCL so DATION OUT ALPHIC DIM(*,200) FORWARD STREAM CREATED(stdout);
+	SPC wifi DATION IN SYSTEM BASIC ALL;
+	DCL internet DATION IN BASIC ALL CREATED(wifi);
+	SPC bme280 DATION IN SYSTEM BASIC ALL;
+	DCL sensor DATION IN BASIC ALL CREATED(bme280);
+
+	DCL (value1, value2, value3) FIXED(31);
+	
+
+httpTask:TASK MAIN;
+	DCL x CHAR(70);
+
+	OPEN so;
+	OPEN internet;
+	OPEN sensor;
+        PUT 'TcpIpServer started' TO so BY A, SKIP;
+
+        REPEAT
+           PUT 'wait for request' TO so BY A, SKIP;
+           OPEN usHttpSocket;	
+   	   GET request FROM usHttpSocket BY A, SKIP;
+           PUT '>', request,'<' TO so BY A,A,A, SKIP;
+
+           PUT 'HTTP/1.1 200 ok' TO usHttpSocket BY A, SKIP;
+           PUT 'Connection: close' TO usHttpSocket BY A, SKIP;
+	   !PUT 'Content-Lenght: 100' TO usHttpSocket BY A, SKIP;
+           PUT 'Context-Type: text/html' TO usHttpSocket BY A, SKIP,SKIP;
+	   
+	   IF request == 'GET / HTTP/1.1' THEN
+	   	CALL index;
+	   ELSE
+		CALL error;
+	   FIN;
+
+           CLOSE usHttpSocket;
+           PUT 'request completed: socket closed' TO so BY A, SKIP;
+
+	END;
+END;
+
+index: PROC;
+	! lese 3x FIXED und kopiere diese in value1, value2 und value3
+	__cpp__("{ pearlrt::Fixed<31> values[3];"
+		"  _sensor.dationRead(&values, sizeof(values));"
+		"_value1.x = values[0].x;"
+		"_value2.x = values[1].x;"
+		"_value3.x = values[2].x; }");
+	PUT '<HTML><HEAD><meta http-equiv=refresh content=2><style>' TO usHttpSocket BY A, SKIP;
+	CALL style;
+	PUT '</style><TITLE>OpenPEARL Projekt</TITLE></HEAD>'TO usHttpSocket BY A, SKIP;
+        
+	PUT '<BODY><div id = value_div><div class = head_div><h1>OpenPEARL auf ESP32 mit BME280</h1></div>' TO usHttpSocket BY A,SKIP;
+	PUT '<div id = value_list_div><ul id = value_list>' TO usHttpSocket BY A, SKIP;
+	PUT '<li>Temperatur: ', value1, ' C</li>'TO usHttpSocket BY A, F(6), A,SKIP;	
+	PUT '<li>Luftdruck: ', value2, ' HPa</li>'TO usHttpSocket BY A, F(6), A,SKIP;	
+	PUT '<li>Luftfeuchtigkeit: ', value3, ' %</li>'TO usHttpSocket BY A, F(6), A,SKIP;	
+	PUT '</ul></div>' TO usHttpSocket BY A, SKIP;
+	PUT '</BODY></HTML>' TO usHttpSocket BY A, SKIP;	
+END;
+
+error: PROC;
+	PUT '<HTML><HEAD><style>' TO usHttpSocket BY A, SKIP;
+	CALL style;
+	PUT '</style><TITLE>OpenPEARL Projekt</TITLE></HEAD>'TO usHttpSocket BY A, SKIP;
+
+	PUT '<BODY><div id = value_div><div class = head_div><h1>Error 404</h1></div><div id = value_list_div style = text-align:center; ><ul id = value_list><li>Site not found</li></ul></div></div><div id = navigation ><div class = head_div ></div></BODY></HTML>' TO usHttpSocket BY A, SKIP;
+END;
+
+
+style: PROC;
+	PUT 'html{margin: 0; font-family: sans-serif;}' TO usHttpSocket BY A, SKIP;
+	PUT 'body{margin: 0; background-color: #eaecbd;}' TO usHttpSocket BY A, SKIP;
+	PUT 'h1{margin: 0;}' TO usHttpSocket BY A, SKIP;
+	PUT '#navigation{position: absolute; overflow: auto; left: 0; top: 0; width: 13%; height: 100%;}' TO usHttpSocket BY A, SKIP;
+	PUT '.head_div{position: relative ; left: 0; top: 0; width: 100%; height: 3.78em; line-height: 3.7em; margin: 0; background-color: #008040; color: white; text-align: center;}' TO usHttpSocket BY A, SKIP;
+	PUT 'value_div{position: absolute; right: 0; bottom: 0; width: 87%; height: 100%;}' TO usHttpSocket BY A, SKIP;
+	PUT '.nav_div{font-size: 1.5em; margin-left: 1em; border-right: solid gray;}' TO usHttpSocket BY A, SKIP;
+	PUT 'a{text-decoration: none; color: gray;}' TO usHttpSocket BY A, SKIP;
+	PUT 'a:hover{text-decoration: underline;}' TO usHttpSocket BY A, SKIP;
+	PUT '#value_list_div{overflow: auto; width: 60%; height: 80%; margin-left: 15%;}' TO usHttpSocket BY A, SKIP;
+	PUT '#value_list{text-decoration: none; list-style-type: none;}' TO usHttpSocket BY A,SKIP;
+END;
+	
+
+
+MODEND;
+

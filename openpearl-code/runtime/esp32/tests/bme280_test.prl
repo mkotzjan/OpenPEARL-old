@@ -1,0 +1,40 @@
+/*
+Demonstration application 'bme280_test'
+*/
+
+MODULE(mbme280);
+
+SYSTEM;
+   stdout: StdOut;
+   bme280: Esp32BME280(15, 2);
+
+PROBLEM;
+   SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;
+   SPC bme280 DATION IN SYSTEM BASIC ALL;
+   DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(stdout);
+   DCL sensor DATION IN BASIC ALL CREATED(bme280);
+   DCL (value1, value2, value3) FIXED(31);
+
+! the task bme280 is started automatically due to the attribute 'MAIN'
+bm280: TASK MAIN;
+
+   OPEN termout;
+   OPEN sensor;
+      WHILE 1 < 2
+      REPEAT
+      ! lese 3x FIXED und kopiere diese in value1, value2 und value3
+      __cpp__("{ pearlrt::Fixed<31> values[3];"
+             "  _sensor.dationRead(&values, sizeof(values));"
+             "_value1.x = values[0].x;"
+             "_value2.x = values[1].x;"
+             "_value3.x = values[2].x; }");
+      PUT 'Temperatur: ', value1, ', Druck: ', value2, ', Luftfeuchtigkeit: ', value3 TO termout BY A, F(6), A, F(6), A, F(6), SKIP;
+      AFTER 1 SEC RESUME;
+      END;
+   CLOSE termout;
+   CLOSE sensor;
+
+END;
+
+MODEND;
+

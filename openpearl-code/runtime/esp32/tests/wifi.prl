@@ -1,0 +1,27 @@
+/*
+Demonstration application 'Hello World'
+*/
+
+MODULE(mwifi_test);
+
+SYSTEM;
+   wifi: Esp32Wifi('SSID', 'PASSWORD');
+   stdout: StdOut;
+
+PROBLEM;
+    SPC stdout DATION OUT SYSTEM ALPHIC GLOBAL;
+    SPC wifi DATION IN SYSTEM BASIC ALL;
+    DCL termout DATION OUT ALPHIC DIM(*,80) FORWARD STREAM CREATED(stdout);
+    DCL internet DATION IN BASIC ALL CREATED(wifi);
+
+! the task wifi_test is started automatically due to the attribute 'MAIN'
+wifi_test: TASK MAIN;
+   OPEN internet;
+   OPEN termout;
+   PUT 'IP Address received' TO termout BY A, SKIP;
+   CLOSE internet;
+   CLOSE termout;
+END;
+
+MODEND;
+
